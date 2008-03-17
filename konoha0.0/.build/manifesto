@@ -1,0 +1,6 @@
+# Konoha manifesto file
+
+konoha_arch: *monolithic loadable_modules
+konoha_os: linux windows macosx tk
+using+: *math readline socket prec
+
