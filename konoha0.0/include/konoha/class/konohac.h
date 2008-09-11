@@ -25,11 +25,10 @@
  *  
  ****************************************************************************/
 
-#ifndef KONOHAC_T_H_
-#define KONOHAC_T_H_
+#ifndef CLASS_KONOHAC_H_
+#define CLASS_KONOHAC_H_
 
 #include<konoha/konoha_t.h>
-
 #include"konoha.h"
 
 /* ************************************************************************ */
@@ -38,163 +37,174 @@
 extern "C" {
 #endif
 
-#define KNH_STT_LVALUE  0
-#define KNH_STT_RVALUE  1
-
 /* ------------------------------------------------------------------------ */
 
 typedef knh_ushort_t   knh_token_t;
 typedef knh_ushort_t   knh_stmt_t;
+#define knh_perror_t   int
 
 /* ------------------------------------------------------------------------ */
+/* @class Token Object knh_Token_struct */
+/* @flag Token.TailWildCard TKF SP(%s)->flag 'is:set:*:*' */
+/* @flag Token.TopDot TKF SP(%s)->flag 'is:set:*:*' */
+/* @flag Token.Getter TKF SP(%s)->flag 'is:set:*:*' */
+/* @flag Token.Setter TKF SP(%s)->flag 'is:set:*:*' */
+/* @flag Token.Generated TKF SP(%s)->flag 'is:set:*:*' */
 
-#define MC_FATAL     0
-#define MC_LANG      1
-#define MC_ERROR     2
-#define MC_TYPE      3
-#define MC_WARNING   4
-#define MC_IGNORED   5
-#define MC_ERRATA    6
-#define MC_NOTICE    7
-#define MC_INFO      8
+/* @flag Token.ExceptionType TKF SP(%s)->flag 'is:set:*:*' */
+/* @flag Token.NotNullType TKF SP(%s)->flag 'is:set:*:*' */
+/* @flag Token.IteratorType TKF SP(%s)->flag 'is:set:*:*' */
+/* @flag Token.ArrayType TKF SP(%s)->flag 'is:set:*:*' */
 
-#define MC_EPRINT(ctx, tk, lv, fmt, ...) { \
-		DEBUG("<ERR=%d>", lv); \
-		OutputStream *w_ = konohac_perror(ctx, tk, lv); \
-		knh_printf(ctx, w_, fmt, ##__VA_ARGS__); \
-		knh_println(ctx, w_, STEXT("")); \
-		knh_flush(ctx, w_); \
-	} \
-
-#define MC_EPRINT2(ctx, tk, lv, fmt, ...) \
-	if(!knh_Token_isPerrored(tk)) { \
-		DEBUG(fmt, ##__VA_ARGS__); \
-		konohac_perror(ctx, tk, lv); \
-		konohac_eprintf(ctx, tk, lv, fmt, ##__VA_ARGS__); \
-		knh_Token_setPerrored(tk, 1); \
-	} else { \
-		DEBUG(fmt, ##__VA_ARGS__); \
-	} \
-
-/* ------------------------------------------------------------------------ */
-
-#define KNH_GOTO(L) \
-	DEBUG("goto .."); \
-	goto L; \
-
-/* ------------------------------------------------------------------------ */
-/* @class Token Object knh_Token */
-/* @flag Token.TailC TKF (%s)->flag 'is:set:*:*' */
-/* @flag Token.TopDot TKF (%s)->flag 'is:set:*:*' */
-/* @flag Token.ExceptionType TKF (%s)->flag 'is:set:*:*' */
-/* @flag Token.NotNullType TKF (%s)->flag 'is:set:*:*' */
-/* @flag Token.IteratorType TKF (%s)->flag 'is:set:*:*' */
-/* @flag Token.ArrayType TKF (%s)->flag 'is:set:*:*' */
-/* @flag Token.NextParenthesis TKF (%s)->flag 'is:set:*:*' */
-/* @flag Token.NextBrace TKF (%s)->flag 'is:set:*:*' */
-/* @flag Token.NextBrancet TKF (%s)->flag 'is:set:*:*' */
-/* @flag Token.ToGet TKF (%s)->flag 'is:set:*:*' */
-/* @flag Token.ToSet TKF (%s)->flag 'is:set:*:*' */
-/* @flag Token.Generated TKF (%s)->flag 'is:set:*:*' */
-/* @flag Token.Perrored TKF (%s)->flag 'is:set:*:*' */
+/* @flag Token.Typed  TKF SP(%s)->flag 'is:set:*:*' */
 
 typedef struct knh_Token {
-	knh_token_t tt;
-	knh_flag_t flag;
-	knh_filen_t filen;
-	knh_line_t line;
-	Object* data;
-} knh_Token;
+//	knh_fileid_t fileid;
+//	knh_line_t   line;
+//	knh_flag_t   flag;
+//	knh_token_t  tt;
+	knh_type_t   type;
+	union {
+		knh_token_t   tt_next;
+		knh_short_t   index;
+		knh_methodn_t mn;
+		knh_token_t   tt_op;
+		knh_fieldn_t  fn;
+		knh_class_t   cid;
+	};
+	union {
+		Object* data;
+		struct knh_Array_t*  list;
+		struct knh_String_t* str;
+		struct knh_Token_t* token;
+		struct knh_Method_t* mtd;
+	};
+} knh_Token_struct;
 
+typedef struct knh_tokens_t {
+	struct knh_Token_t** ts;
+	int c;
+	int e;
+} knh_tokens_t;
+
+#define TT_RAW   TT_CONST
 
 /* ------------------------------------------------------------------------ */
-/* @class Stmt Object knh_Stmt */
-/* @flag Stmt.Adposition STMTF (%s)->flag 'is:set:*:*' */
-/* @flag Stmt.PrintLine STMTF (%s)->flag 'is:set:*:*' */
-/* @flag Stmt.OpNext STMTF (%s)->flag 'is:set:*:*' */
-/* @flag Stmt.OpPrev STMTF (%s)->flag 'is:set:*:*' */
-/* @flag Stmt.Visible STMTF (%s)->flag 'is:set:*:*' */
+
+/* ------------------------------------------------------------------------ */
+/* @class Stmt Object knh_Stmt_struct */
+/* @flag Stmt.Adposition STMTF SP(%s)->flag 'is:set:*:*' */
+/* @flag Stmt.NonNewLine STMTF SP(%s)->flag 'is:set:*:*' */
+/* @flag Stmt.Visible STMTF SP(%s)->flag 'is:set:*:*' */
+/* @flag Stmt.Typed STMTF SP(%s)->flag 'is:set:*:*' */
 
 /* ------------------------------------------------------------------------ */
 
-#define Term         Object
-#define IS_Term(o)   (IS_Token(o)||IS_Stmt(o))
+#define KNH_STT_RVALUE  0
+#define KNH_RVALUE      0
+#define KNH_STT_LVALUE  1
+#define KNH_LVALUE      1
 
 typedef struct knh_Stmt {
-	knh_flag_t flag;
-	knh_stmt_t stt;
+//	knh_fileid_t fileid;
+//	knh_line_t   line;
+//	knh_flag_t   flag;
+//	knh_stmt_t   stt;
+	knh_type_t   type;
+	knh_line_t   line_end;
 	knh_ushort_t size;
 	knh_ushort_t capacity;
-	Term** terms;
-	struct knh_Stmt* meta;
-	struct knh_Stmt* next;
-} knh_Stmt;
-
-struct knh_Stmt;
-typedef void    (*f_stmtvisit)(Ctx*, struct knh_Stmt*, Object*, int, int);
-//typedef void    (*f_termvisit)(Ctx*, Term *, Object*, int, int);
+	union {
+		Object** terms;
+		struct knh_Token_t** tokens;
+		struct knh_Stmt_t** stmts;
+	};
+	union {
+		struct knh_DictMap_t* metaDictMap;
+		struct knh_String_t*  errMsg;
+	};
+	struct knh_Stmt_t* next;
+} knh_Stmt_struct;
 
 /* ------------------------------------------------------------------------ */
-/* @class Cmpl Object knh_Cmpl */
-/* @flag Cmpl.SyntaxError CPF (%s)->flag 'is:set:*:*' */
-/* @flag Cmpl.TypeError CPF (%s)->flag 'is:set:*:*' */
-/* @flag Cmpl.Cancelled CPF (%s)->flag 'is:set:*:*' */
 
-typedef struct knh_Cmpl {
-	knh_flag_t flag;
-	knh_nsn_t nsn;
-	knh_Prototype* nsproto;
-	knh_filen_t filen;
-	knh_class_t this_cid;
-	knh_Method* method;
+#define Term         Any
+#define IS_Term(o)   (IS_Token((Object*)o)||IS_Stmt((Object*)o))
+
+/* ------------------------------------------------------------------------ */
+/* @class Compiler Object knh_Compiler_struct */
+/* @flag Compiler.SyntaxError CPF DP(%s)->flag 'is:set:*:*' */
+/* @flag Compiler.Stopped CPF DP(%s)->flag 'is:set:*:*' */
+/* @flag Compiler.Cancelled CPF DP(%s)->flag 'is:set:*:*' */
+
+typedef struct knh_Compiler {
+	knh_fileid_t           fileid; 
+	knh_flag_t             flag;
+	knh_class_t            this_cid;
+	knh_ushort_t           step; /* unused */
+	struct knh_NameSpace_t *ns;
+	struct knh_Method_t    *method;
 	knh_ushort_t vars_size;
 	knh_ushort_t vars_offset;
 	knh_cfield_t* vars;
 	int nastep;
 	int llstep;
-	knh_Bytes* elf;
-	knh_Bytes* dwarf;
+	struct knh_Bytes_t* elf;
+	struct knh_Bytes_t* dwarf;
 	int line;
-	knh_DictIdx* labelIdDictIdx;
-	knh_DictSet* labelAddrDictSet;
-	knh_Array* lstacks;
-} knh_Cmpl;
+	struct knh_DictIdx_t* labelIdDictIdx;
+	struct knh_DictSet_t* labelAddrDictSet;
+	knh_Array_t*          lstacks;
+} knh_Compiler_struct;
 
 /* ------------------------------------------------------------------------ */
-/* @class VirtualMachineCode Object knh_VirtualMachineCode */
+
+struct knh_Compiler_t;
+typedef void   (*f_visitdecl)(Ctx*, struct knh_Stmt_t*, struct knh_Compiler_t *, struct knh_NameSpace_t *, int);
+typedef void   (*f_visitname)(Ctx*, struct knh_Stmt_t*, struct knh_Compiler_t *, struct knh_NameSpace_t *, int);
+typedef void   (*f_visitcmpl)(Ctx*, struct knh_Stmt_t*, struct knh_Compiler_t *, struct knh_NameSpace_t *, knh_type_t, int);
+
+/* ------------------------------------------------------------------------ */
+/* @class KLRCode Object knh_KLRCode_struct */
 
 typedef struct {
 	knh_ushort_t offset;
 	knh_ushort_t line;
 } knh_dwarf_t;
 
-typedef struct knh_VirtualMachineCode {
-	knh_vmc_t* code;
+typedef struct knh_KLRCode {
+	knhvmc_t* code;
 	size_t size;
-	knh_filen_t filen;
-	knh_nsn_t nsn;
+	knh_fileid_t fileid;
+	knh_nsid_t nsid;
 	knh_dwarf_t* dwarf;
 	size_t dsize;
-} knh_VirtualMachineCode;
+} knh_KLRCode_struct;
 
+/* ======================================================================== */
 
-/* ------------------------------------------------------------------------ */
+#ifdef OLD
+#define KNH_PERROR_BUFSIZ   1024
 
-#define KNH_ASMV_ONSTACK 0
-#define KNH_ASMV_EBP  0
-#define KNH_ASMV_SFP  1
-#define KNH_ASMV_OFP  2
-#define KNH_ASMV_OBJ  3
-#define KNH_ASMV_OIDX 4
-#define KNH_ASMV_ERR  5
+#define KNH_PERROR(ctx, fid, line, pe, fmt, ...) \
+	if(fmt != NULL){ \
+		char buf_[KNH_PERROR_BUFSIZ]; \
+		knh_snprintf(buf_, sizeof(buf_), ": " fmt, ## __VA_ARGS__); \
+		knh_perror(ctx, fid, line, pe, buf_); \
+	}else { \
+		knh_perror(ctx, fid, line, pe, NULL); \
+	} \
 
-typedef struct {
-	knh_uchar_t  potype;
-	knh_uchar_t  index;
-	knh_type_t   type; 
-	Object     *value;
-} knh_asmv_t;
+#define KNH_TOKEN_PERROR(ctx, tk, pe, fmt, ...) \
+	if(fmt != NULL){ \
+		char buf_[KNH_PERROR_BUFSIZ]; \
+		knh_snprintf(buf_, sizeof(buf_), ": " fmt, ## __VA_ARGS__); \
+		knh_Token_perror(ctx, tk, pe, buf_); \
+	}else { \
+		knh_Token_perror(ctx, tk, pe, NULL); \
+	} \
 
+#endif
 
 /* ************************************************************************ */
 
@@ -202,6 +212,4 @@ typedef struct {
 }
 #endif
 
-#include"../gen/konohac_.h"
-
-#endif /*KONOHAC_T_H_*/
+#endif /*CLASS_KONOHAC_T_H_*/

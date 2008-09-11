@@ -39,31 +39,31 @@
 extern "C" {
 #endif
 
-/* ------------------------------------------------------------------------ */
-/* class WebServer Object knh_WebServer */
-
-typedef void (*f_webapp)(Ctx *ctx, InputStream *in, OutputStream *out);
-
-typedef struct knh_WebServer {
-	knh_int_t port;
-	knh_DictSet  *webappDictSet;
-} knh_WebServer;
-
-
-/* ------------------------------------------------------------------------ */
-/* @class Counter Object knh_Counter */
-
-typedef struct knh_Counter {
-	knh_int_t count;
-} knh_Counter;
-
-
-/* ------------------------------------------------------------------------ */
-/* @class Amazon Object knh_Amazon */
-
-typedef struct knh_Amazon {
-	int dummy;
-} knh_Amazon;
+///* ------------------------------------------------------------------------ */
+///* class WebServer Object knh_WebServer */
+//
+//typedef void (*f_webapp)(Ctx *ctx, InputStream *in, OutputStream *out);
+//
+//typedef struct knh_WebServer {
+//	knh_int_t port;
+//	knh_DictSet_struct  *webappDictSet;
+//} knh_WebServer;
+//
+//
+///* ------------------------------------------------------------------------ */
+///* @ class Counter Object knh_Counter */
+//
+//typedef struct knh_Counter {
+//	knh_int_t count;
+//} knh_Counter;
+//
+//
+///* ------------------------------------------------------------------------ */
+///* @ class Amazon Object knh_Amazon */
+//
+//typedef struct knh_Amazon {
+//	int dummy;
+//} knh_Amazon;
 
 
 /* ************************************************************************ */
@@ -71,7 +71,5 @@ typedef struct knh_Amazon {
 #ifdef __cplusplus 
 }
 #endif
-
-#include"../gen/naruto_.h"
 
 #endif /*NARUTO_H_*/

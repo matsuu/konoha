@@ -2,114 +2,111 @@
 #define KONOHA_DEBUG_H_
 
 /* ======================================================================== */
+/* [FASTMODE] */
 
-//#define KONOHA_DEBUGMODE 1
-//#define KONOHA_DEMOMODE  1
-#define KONOHA_SAFEMODE  1
+#ifdef KNH_FASTMODE
+#define KNH_ASSERT(c)        
+#define DEBUG_ASSERT(c)
+#define SAFE_(s)   
 
-/* ======================================================================== */
-/* KONOHA_TERM */
+#else/*KNH_FASTMODE*/
+#define KNH_ASSERT(c)    assert(c)
+#define DEBUG_ASSERT(c)  assert(c)
+#define SAFE_(s)         s
 
-//#ifdef KONOHA_TERM_COLOR
-//#define TERM_INIT          "\x1b[0m"
-//#define TERM_COLOR_DEBUG   "\x1b[0;37m"
-//#define TERM_COLOR_SAFE    "\x1b[0;33m"
-//#define TERM_COLOR_DEMO    "\x1b[0;32m" 
-//#else
-#define TERM_INIT          ""
-#define TERM_COLOR_NOTICE  ""
-#define TERM_COLOR_DEBUG   ""
-#define TERM_COLOR_SAFE    ""
-#define TERM_COLOR_DEMO    ""
-//#endif/*KONOHA_TERM_COLOR*/
+#endif/*KNH_FASTMODE*/
 
 /* ======================================================================== */
-/* KONOHA_DEBUGMODE */
+/* [DBGMODE2] */
 
-#define KNH_NOTICE(fmt, ...) \
-	if(knh_verbose()) { \
-		fprintf(stderr, "konoha[%s]: ", __func__); \
-		fprintf(stderr, fmt, ## __VA_ARGS__); \
-		fprintf(stderr, "\n"); \
-	} \
-	
-/* ======================================================================== */
-/* KONOHA_DEBUGMODE */
+#ifdef KNH_DBGMODE2
+#define KNH_DBGMODE     1
 
-#ifdef KONOHA_DEBUGMODE
+#define DBG2_(stmt)  stmt
 
-#ifndef KONOHA_SAFEMODE
-	#define KONOHA_SAFEMODE
-#endif
-
-#define DEBUG(fmt, ...) \
+#define DBG2_P(fmt, ...) \
 	fflush(stdout); \
-	fprintf(stderr, TERM_COLOR_DEBUG "\nDEBUG[%s:%d/%s]: ", KNH_SAFEFILE(__FILE__), __LINE__, __func__); \
+	fprintf(stderr, "\nDBG2[%s:%d/%s]: ", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
 	fprintf(stderr, fmt, ## __VA_ARGS__); \
-	fprintf(stderr, "\n" TERM_INIT); \
+	fprintf(stderr, "\n"); \
 
-#define TODO() \
-	fprintf(stdout, \
-		TERM_COLOR_DEBUG "TODO[%s:%d/%s]:\n" TERM_INIT, \
-		__FILE__, __LINE__, __func__); \
+#define DBG2_DUMP(ctx, o, opt, msg) \
+	fprintf(stdout, "DBG2[%s]: %s\n", __FUNCTION__, msg); \
+	knh_format(ctx, KNH_STDOUT, METHODN__dump, UP(o), UP(opt)); \
+	fprintf(stdout, "\n"); \
 
-#define DEBUG_RESIZE(o, p, os, ns) \
-	DEBUG("RESIZE %s(%p) %d => %d", STRUCTN(knh_Object_topsid(o)), o, (int)os, (int)ns); \
-	DEBUG("RESIZE old region %p-%p", p , (p + os)); \
+#define TODO2(msg) \
+	fprintf(stdout, "TODO2[%s:%d/%s]: %s\n", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__, msg); \
 
-#else /*KONOHA_DEBUGMODE*/
+#define DBG2_RESIZE(o, p, os, ns) \
+	DBG2_P("RESIZE %s(%p) %d => %d\n\tOLD_BLOCK(%p-%p)", STRUCTN((o->h.bcid)), o, (int)os, (int)ns, p, (p + os)); \
 
-#define DEBUG(fmt, ...)
-#define DUMP(ctx, o)
-#define TODO()
-
-#define DEBUG_RESIZE(o, p, os, ns) 
-
-
-#endif/*KONOHA_DEBUGMODE*/
-	
-
-/* ======================================================================== */
-/* KONOHA_SAFEMODE */
-
-#ifdef KONOHA_SAFEMODE
-
-#define DEBUG_ASSERT(o)     assert(o)
-#define KNH_ASSERT(o)       assert(o)
-#define KNH_FAST_ASSERT(o)  assert(o)
-
-#define SAFE_ASSERT(c, fmt, ...) \
+#define DBG2_ASSERT(c, fmt, ...) \
 	if(!(c)) { \
 		fflush(stdout); \
-		fprintf(stderr, TERM_COLOR_DEBUG "\nSAFE!![%s:%d/%s]:\n\t", KNH_SAFEFILE(__FILE__), __LINE__, __func__); \
+		fprintf(stderr, "\nDBG2!![%s:%d/%s]:\n\t", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
 		fprintf(stderr, fmt, ## __VA_ARGS__); \
-		fprintf(stderr, "\n" TERM_INIT); \
-		assert(c); \
+		fprintf(stderr, "\n"); \
+		KNH_ASSERT(c); \
 	} \
 
-#else /*KONOHA_SAFEMODE*/
+#define KNH_MALLOC(ctx, size) DBG2_malloc(ctx, size)
+#define KNH_FREE(p, size)   DBG2_free(p, size)
 
-#define DEBUG_ASSERT(o)
-#define KNH_ASSERT(o)
-#define KNH_FAST_ASSERT(o)
-#define SAFE_ASSERT(o, fmt, ...) 
+#else/*KNH_DBGMODE2*/
 
-#endif/*KONOHA_SAFEMODE*/
+#define DBG2_(stmt)
+#define DBG2_P(fmt, ...)
+#define DBG2_DUMP(ctx, o, opt, msg)
+#define TODO2(msg)
+#define DBG2_RESIZE(o, p, os, ns)
+#define DBG2_ASSERT(c, fmt, ...)   KNH_ASSERT(c)
+
+#define KNH_MALLOC(ctx, size) knh_malloc(ctx, size)
+#define KNH_FREE(p, size)   knh_free(p, size)
+
+#endif/*KNH_DBGMODE2*/
 
 /* ======================================================================== */
-/* KONOHA_DEMOMODE */
+/* KONOHA_DEBUGMODE */
 
-#ifdef KONOHA_DEMOMODE
+#ifdef KNH_DBGMODE
 
-#define DEMO_DUMP(ctx, o, opt, msg) \
-	fprintf(stdout, TERM_COLOR_DEMO "DEMO[%s]: %s\n", __func__, msg); \
+#define DBG_(stmt)  stmt
+
+#define DBG_P(fmt, ...) \
+	fflush(stdout); \
+	fprintf(stderr, "\nDBG[%s:%d/%s]: ", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
+	fprintf(stderr, fmt, ## __VA_ARGS__); \
+	fprintf(stderr, "\n"); \
+
+#define DBG_DUMP(ctx, o, opt, msg) \
+	fprintf(stdout, "DBG[%s]: %s\n", __FUNCTION__, msg); \
 	knh_format(ctx, KNH_STDOUT, METHODN__dump, o, opt); \
-	fprintf(stdout, "\n" TERM_INIT); \
+	fprintf(stdout, "\n"); \
 
-#else /*KONOHA_SAFEMODE*/
+#define TODO() \
+	fprintf(stderr, "TODO[%s:%d/%s]:\n", KNH_SAFEFILE(__FILE__) , __LINE__, __FUNCTION__); \
 
-#define DEMO_DUMP(ctx,o, opt, msg)
+#define DBG_ASSERT(c, fmt, ...) \
+	if(!(c)) { \
+		fflush(stdout); \
+		fprintf(stderr, "\nDBG!![%s:%d/%s]:\n\t", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
+		fprintf(stderr, fmt, ## __VA_ARGS__); \
+		fprintf(stderr, "\n"); \
+		KNH_ASSERT(c); \
+	} \
 
-#endif/*KONOHA_SAFEMODE*/
+#else/*KNH_DBGMODE2*/
+
+#define DBG_(stmt)
+#define DBG_P(fmt, ...)
+#define DBG_DUMP(ctx, o, opt, msg)
+#define TODO()
+#define DBG_ASSERT(c, fmt, ...)   KNH_ASSERT(c)
+
+#endif/*KNH_DBGMODE2*/
+
+/* ======================================================================== */
 
 #endif /*KONOHA_DEBUG_H_*/

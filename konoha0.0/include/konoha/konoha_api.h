@@ -32,15 +32,24 @@
 extern "C" {
 #endif
 
+/* ------------------------------------------------------------------------ */
+
 #define KONOHA_MAGIC        314159
 #define KONOHA_CTX_MAGIC    112358
 
 typedef struct konoha_t {
 	knh_uint_t  magic;
-	Object *mectx;
+	struct knh_Runtime_t *runtime;
 } konoha_t ;
 
+typedef struct konoha_ctx_t {
+	knh_uint_t  magic;
+	struct knh_Context_t *ctx;
+} konoha_ctx_t ;
+
+
 #define IS_KONOHA(m) (m.magic == KONOHA_MAGIC || m.magic == KONOHA_CTX_MAGIC)
+
 
 /* ------------------------------------------------------------------------ */
 

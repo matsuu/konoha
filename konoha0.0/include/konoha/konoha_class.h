@@ -67,6 +67,7 @@ extern "C" {
 #define CLASS_String__method CLASS_String
 #endif
 
+#define CLASS_String__    CLASS_Iterator
 
 #ifdef __cplusplus 
 }
