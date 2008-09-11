@@ -39,7 +39,7 @@ extern "C" {
 /* ======================================================================== */
 /* [macros] */
 
-#define _IS_SPEC(o)                (CLASS_IntUnit <= knh_Object_cid(o)  && knh_Object_cid(o) <= CLASS_Vocabulary)
+#define _IS_SPEC(o)   (CLASS_IntUnit <= knh_Object_cid(o)  && knh_Object_cid(o) <= CLASS_Vocabulary)
 
 /* ======================================================================== */
 /* [tclass] */

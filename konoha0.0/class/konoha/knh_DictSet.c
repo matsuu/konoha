@@ -36,7 +36,7 @@ extern "C" {
 /** We share these functions with DictMap */
 
 void knh_DictMap_sort(DictMap *b);
-knh_index_t knh_DictMap_indexb(DictMap *b, knh_bytes_t kv);
+knh_index_t knh_DictMap_index__b(DictMap *b, knh_bytes_t kv);
 
 /* ======================================================================== */
 /* [config] */
@@ -45,16 +45,18 @@ knh_index_t knh_DictMap_indexb(DictMap *b, knh_bytes_t kv);
 /* [structs] */
 
 void
-knh_DictSet_struct_init(Ctx *ctx, Struct *s1, int init, Object *cs)
+knh_DictSet_struct_init(Ctx *ctx, knh_DictSet_struct *b, int init, Object *cs)
 {
-	DictSet *b =  (DictSet*)s1;
 	b->capacity = (size_t)knh_int_max(init, KNH_DICTMAP_INITSIZE);
 	b->size = 0;
-	b->list = (knh_dictsete_t*)knh_malloc(ctx, sizeof(knh_dictsete_t) * b->capacity);
-	size_t i;
-	for(i = 0; i < b->capacity; i++) {
-		KNH_INITv(b->list[i].key, KNH_NULL);
-		b->list[i].value = 0;
+	b->list = (knh_dictsete_t*)KNH_MALLOC(ctx, sizeof(knh_dictsete_t) * b->capacity);
+	//DBG2_P("list=%p, capacity=%d, size=%d", b->list, b->capacity, sizeof(knh_dictsete_t) * b->capacity);
+	{
+		size_t i;
+		for(i = 0; i < b->capacity; i++) {
+			KNH_INITv(b->list[i].key, KNH_NULL);
+			b->list[i].value = 0;
+		}
 	}
 	b->sorted = 0;
 }
@@ -62,16 +64,13 @@ knh_DictSet_struct_init(Ctx *ctx, Struct *s1, int init, Object *cs)
 /* ------------------------------------------------------------------------ */
 
 void
-knh_DictSet_struct_copy(Ctx *ctx, Struct *s1, Struct *s2)
+knh_DictSet_struct_copy(Ctx *ctx, knh_DictSet_struct *b, knh_DictSet_struct *b2)
 {
-	DictSet *b =  (DictSet*)s1;
-	DictSet *b2 = (DictSet*)s2;
-	
 	size_t i;
 	b2->capacity = b->capacity;
 	b2->size = b->size;
 	b2->sorted = b->sorted;
-	b2->list = (knh_dictsete_t*)knh_malloc(ctx, sizeof(knh_dictsete_t) * b2->capacity);
+	b2->list = (knh_dictsete_t*)KNH_MALLOC(ctx, sizeof(knh_dictsete_t) * b2->capacity);
 	for(i = 0; i < b2->capacity; i++) {
 		KNH_INITv(b2->list[i].key, b->list[i].key);
 		b2->list[i].value = b->list[i].value;
@@ -80,26 +79,15 @@ knh_DictSet_struct_copy(Ctx *ctx, Struct *s1, Struct *s2)
 
 /* ------------------------------------------------------------------------ */
 
-knh_int_t
-knh_DictSet_struct_compare(Ctx *ctx, Struct *s1, Struct *s2) 
-{
-	DictSet *b =  (DictSet*)s1;
-	DictSet *b2 = (DictSet*)s2;
-	return b - b2;
-}
-
-/* ------------------------------------------------------------------------ */
-
 void
-knh_DictSet_struct_traverse(Ctx *ctx, Struct *s, f_gc gc)
+knh_DictSet_struct_traverse(Ctx *ctx, knh_DictSet_struct *b, f_traverse gc)
 {
-	DictSet *b = (DictSet*)s;
 	size_t i;
 	for(i = 0; i < b->capacity; i++) {
-		gc(ctx, b->list[i].key);
+		gc(ctx, UP(b->list[i].key));
 	}
 	if(IS_SWEEP(gc)) {
-		knh_free(b->list, sizeof(knh_dictsete_t) * b->capacity);
+		KNH_FREE(b->list, sizeof(knh_dictsete_t) * b->capacity);
 	}
 }
 	
@@ -109,10 +97,10 @@ knh_DictSet_struct_traverse(Ctx *ctx, Struct *s, f_gc gc)
 
 DictSet *new_DictSet(Ctx *ctx, knh_int_t capacity)
 {
-	DictSet *b = 
-		(DictSet*)knh_Object_malloc0(ctx, KNH_FLAG_DictSet, CLASS_DictSet, sizeof(DictSet));
-	knh_DictSet_struct_init(ctx, (Struct*)b, capacity, NULL);
-	return b;
+	DictSet *o = 
+		(DictSet*)new_Object_malloc(ctx, FLAG_DictSet, CLASS_DictSet, sizeof(knh_DictSet_struct));
+	knh_DictSet_struct_init(ctx, DP(o), capacity, NULL);
+	return o;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -122,13 +110,11 @@ DictSet *new_DictSet(Ctx *ctx, knh_int_t capacity)
 INLINE
 DictSet* knh_DictSet_new(Ctx *ctx, DictSet *b, knh_int_t initialCapacity)
 {
-	if(initialCapacity > b->capacity) {
+	if(initialCapacity > DP(b)->capacity) {
 		knh_DictSet_resize(ctx, b, (size_t)initialCapacity);
 	}
 	return b;
 }
-
-
 
 /* ======================================================================== */
 /* [wrapper] */
@@ -144,7 +130,7 @@ void knh_DictSet_sort(DictSet *b)
 INLINE
 knh_index_t knh_DictSet_index__b(DictSet *b, knh_bytes_t kv)
 {
-	return knh_DictMap_indexb((DictMap*)b, kv);
+	return knh_DictMap_index__b((DictMap*)b, kv);
 }
 
 /* ======================================================================== */
@@ -153,8 +139,8 @@ knh_index_t knh_DictSet_index__b(DictSet *b, knh_bytes_t kv)
 INLINE 
 String* knh_DictSet_key(DictSet *b, size_t n)
 {
-	DEBUG_ASSERT(n < b->size);
-	return b->list[n].key;
+	KNH_ASSERT(n < DP(b)->size);
+	return DP(b)->list[n].key;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -162,8 +148,21 @@ String* knh_DictSet_key(DictSet *b, size_t n)
 INLINE 
 knh_uint_t knh_DictSet_value(DictSet *b, size_t n)
 {
-	DEBUG_ASSERT(n < b->size);
-	return b->list[n].value;
+	KNH_ASSERT(n < DP(b)->size);
+	return DP(b)->list[n].value;
+}
+
+/* ------------------------------------------------------------------------ */
+
+String *new_String__DictSet(Ctx *ctx, DictSet *o, knh_bytes_t key)
+{
+	knh_int_t loc = knh_DictSet_index__b(o, key);
+	if(loc == -1) {
+		return new_String(ctx, key, NULL);
+	}
+	else {
+		return DP(o)->list[loc].key;
+	}
 }
 
 /* ------------------------------------------------------------------------ */
@@ -172,28 +171,27 @@ INLINE
 knh_uint_t knh_DictSet_get__b(DictSet *b, knh_bytes_t kv)
 {
 	knh_int_t loc = knh_DictSet_index__b(b, kv);
-	return (loc == -1) ? 0 : b->list[loc].value;
+	return (loc == -1) ? 0 : DP(b)->list[loc].value;
 }
 
 /* ------------------------------------------------------------------------ */
-
 /* @method Int! DictSet.get(String! key) */
 
 INLINE
 knh_int_t knh_DictSet_get(DictSet *b, String *key)
 {
 	knh_int_t loc = knh_DictSet_index__b(b, knh_String_tobytes(key));
-	return (loc == -1) ? 0 : b->list[loc].value;
+	return (loc == -1) ? 0 : DP(b)->list[loc].value;
 }
 
 /* ------------------------------------------------------------------------ */
-
-/* @method Bool DictSet.opIn(Any value) */
+/* @method Boolean DictSet.opIn(Any value) */
 
 INLINE
 knh_bool_t knh_DictSet_opIn(Ctx *ctx, DictSet *b, Any *value)
 {
-	return (STRUCT_IS_String(value) && knh_DictSet_index__b(b, knh_String_tobytes(value)) != -1);
+	String *s = (String*)value;
+	return (IS_bString(s) && knh_DictSet_index__b(b, knh_String_tobytes(s)) != -1);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -201,43 +199,41 @@ knh_bool_t knh_DictSet_opIn(Ctx *ctx, DictSet *b, Any *value)
 void
 knh_DictSet_resize(Ctx *ctx, DictSet *b, size_t newsize)
 {
-	DEBUG_RESIZE(b, b->list, b->capacity, newsize);
-	
-	knh_dictsete_t *newlist = (knh_dictsete_t*)knh_malloc(ctx, newsize * sizeof(knh_dictsete_t));
+	DBG2_RESIZE(b, DP(b)->list, DP(b)->capacity, newsize);
+
+	knh_dictsete_t *newlist = (knh_dictsete_t*)KNH_MALLOC(ctx, newsize * sizeof(knh_dictsete_t));
 	size_t i;
-	if(newsize < b->capacity) {
-		knh_memcpy(&newlist[0], &b->list[0], (sizeof(knh_dictsete_t) * newsize));
-		for(i = newsize; i < b->capacity; i++) {
-			KNH_FINALv(ctx, b->list[i].key);
-			b->list[i].value = 0;
+	if(newsize < DP(b)->capacity) {
+		knh_memcpy(&newlist[0], &DP(b)->list[0], (sizeof(knh_dictsete_t) * newsize));
+		for(i = newsize; i < DP(b)->capacity; i++) {
+			KNH_FINALv(ctx, DP(b)->list[i].key);
+			DP(b)->list[i].value = 0;
 		}
 	}else {
-		knh_memcpy(&newlist[0], &b->list[0], (sizeof(knh_dictsete_t) * b->capacity));
-		for(i = b->capacity; i < newsize; i++) {
+		knh_memcpy(&newlist[0], &DP(b)->list[0], (sizeof(knh_dictsete_t) * DP(b)->capacity));
+		for(i = DP(b)->capacity; i < newsize; i++) {
 			KNH_INITv(newlist[i].key, KNH_NULL);
 			newlist[i].value = 0;
 		}
 	}
-	knh_free(b->list, sizeof(knh_dictsete_t) * b->capacity);
-	b->list = newlist;
-	b->capacity = newsize;
+	KNH_FREE(DP(b)->list, sizeof(knh_dictsete_t) * DP(b)->capacity);
+	DP(b)->list = newlist;
+	DP(b)->capacity = newsize;
 }
 
 /* ------------------------------------------------------------------------ */
-
 
 void knh_DictSet_append(Ctx *ctx, DictSet *b, String *key, knh_uint_t value)
 {
-   if(b->size == b->capacity) {
-      knh_DictSet_resize(ctx, b, b->capacity * 2);
+   if(DP(b)->size == DP(b)->capacity) {
+      knh_DictSet_resize(ctx, b, DP(b)->capacity * 2);
    }
-   KNH_SETv(ctx, b->list[b->size].key, key);
-   b->list[b->size].value = value;
-   b->size++;
+   KNH_SETv(ctx, DP(b)->list[DP(b)->size].key, key);
+   DP(b)->list[DP(b)->size].value = value;
+   DP(b)->size++;
 }
 
 /* ------------------------------------------------------------------------ */
-
 /* @method void DictSet.set(String! key, Int! value) */
 
 #define _knh_DictSet_put(ctx,b,k,v) knh_DictSet_set(ctx,b,k,v)
@@ -247,108 +243,51 @@ void knh_DictSet_set(Ctx *ctx, DictSet *b, String *key, knh_uint_t value)
 {
 	knh_int_t loc = knh_DictSet_index__b(b, knh_String_tobytes(key));
 	if(loc != -1) {
-		KNH_SETv(ctx, b->list[loc].key, key);  /* To avoid losing key */
-		if(value == 0 && b->list[loc].value > 0) {
-			b->size--;
-		}else if(value > 0 && b->list[loc].value == 0) {
-			b->size++;
+		KNH_SETv(ctx, DP(b)->list[loc].key, key);  /* To avoid losing key */
+		if(value == 0 && DP(b)->list[loc].value > 0) {
+			DP(b)->size--;
+		}else if(value > 0 && DP(b)->list[loc].value == 0) {
+			DP(b)->size++;
 		}
-		b->list[loc].value = value;
+		DP(b)->list[loc].value = value;
 		return ;
 	}
 	knh_DictSet_append(ctx, b, key, value);
 }
 
 /* ------------------------------------------------------------------------ */
-
 /* @method void DictSet.add(String! key) */
-
 
 void knh_DictSet_add(Ctx *ctx, DictSet *b, String *key)
 {
 	knh_int_t loc = knh_DictSet_index__b(b, knh_String_tobytes(key));
 	if(loc != -1) {
-		KNH_SETv(ctx, b->list[loc].key, key);  /* To avoid losing key */
-		b->list[loc].value++;
+		KNH_SETv(ctx, DP(b)->list[loc].key, key);  /* To avoid losing key */
+		DP(b)->list[loc].value++;
 		return ;
 	}
 	knh_DictSet_append(ctx, b, key, 1);
 }
 
 /* ------------------------------------------------------------------------ */
-
 /* @method void DictSet.clear() */
-
 
 void knh_DictSet_clear(Ctx *ctx, DictSet *b) 
 {
 	size_t i;
-	for(i = 0; i < b->capacity; i++) {
-		KNH_SETv(ctx, b->list[i].key, KNH_NULL);
-		b->list[i].value = 0;
+	for(i = 0; i < DP(b)->capacity; i++) {
+		KNH_SETv(ctx, DP(b)->list[i].key, KNH_NULL);
+		DP(b)->list[i].value = 0;
 	}
-	b->size = 0;
-	b->sorted = 0;
+	DP(b)->size = 0;
+	DP(b)->sorted = 0;
 }
 
 
 /* ======================================================================== */
 /* [mappings] */
 
-
-/* ======================================================================== */
-/* [iterators] */
-
-Object*
-knh_DictSet_key_next(Ctx *ctx, Iterator *it)
-{
-	DictSet *b = (DictSet*)knh_Iterator_source(it);
-	size_t pos;  
-	for(pos = knh_Iterator_pos(it); pos < b->size; pos++) {
-		if(b->list[pos].value != 0) {
-			knh_Iterator_setpos(it,pos+1);
-			return b->list[pos].key;
-		}
-	}
-	knh_Iterator_setpos(it,pos);
-	return KNH_NULL;
-}
-
 /* ------------------------------------------------------------------------ */
-
-/* @map DictSet Iterator! */
-
-
-Object* knh_DictSet_Iterator(Ctx *ctx, Object *self, MapMap *map)
-{
-	return new_Iterator(ctx, CLASS_String, self, knh_DictSet_key_next);	
-}
-
-/* ======================================================================== */
-/* [movabletext] */
-
-/* @method void DictSet.%dump(OutputStream w, Any m) */
-
-void knh_DictSet__dump(Ctx *ctx, DictSet *b, OutputStream *w, Any *m)
-{
-	knh_DictSet_sort(b);
-	knh_putc(ctx, w, '{');
-	size_t c;
-	for(c = 0; c < b->size; c++) {
-		if(c > 0) {
-			knh_write_delim(ctx,w);
-		}
-		if(!knh_array_isdump(c)) {
-			knh_write_dots(ctx, w);
-			break;
-		}
-		knh_format(ctx, w, METHODN__s, b->list[c].key, KNH_NULL);
-		knh_putc(ctx, w, ':');	knh_putc(ctx, w, ' ');
-		knh_write__i(ctx, w, b->list[c].value);
-	}
-	knh_putc(ctx, w, '}');
-}
-
 
 #ifdef __cplusplus
 }

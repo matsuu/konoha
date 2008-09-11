@@ -38,13 +38,10 @@ extern "C" {
 /* ======================================================================== */
 /* [structs] */
 
-void knh_AffineConv_struct_init(Ctx *ctx, Struct *s, int init, Object *cs)
+void knh_AffineConv_struct_init(Ctx *ctx, knh_AffineConv_struct *b, int init, Object *cs)
 {
-	AffineConv *b = (AffineConv*)s;
 	b->scale = 1.0;
 	b->shift = 0.0;
-	b->iscale = 1;
-	b->ishift = 0;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -64,95 +61,128 @@ void knh_AffineConv_struct_init(Ctx *ctx, Struct *s, int init, Object *cs)
 
 AffineConv *new_AffineConv(Ctx *ctx, knh_float_t fa, knh_float_t fb)
 {
-	AffineConv *b = knh_Object_malloc(ctx, CLASS_AffineConv);
-	b->scale = fa;
-	b->shift = fb;
-	b->iscale = (knh_int_t)fa;
-	b->ishift = (knh_int_t)fb;
-	return b;
+	knh_AffineConv_t *o = 
+		(AffineConv*)new_Object_malloc(ctx, FLAG_AffineConv, CLASS_AffineConv, sizeof(knh_AffineConv_struct));
+	//knh_AffineConv_struct_init(ctx, DP(o), 0, NULL);
+	DP(o)->scale = fa;
+	DP(o)->shift = fb;
+	return o;
 }
 
 /* ======================================================================== */
 /* [conv] */
 
-Object *knh_AffineConv_fmap__ftof(Ctx *ctx, Object *self, MapMap *map)
+static
+Int *knh_AffineConv_fmap__i2i(Ctx *ctx, Int *o, Mapper *mpr)
 {
-	AffineConv *b = (AffineConv*)map->config;
-	knh_float_t y = knh_Number_tofloat((Number*)self) * b->scale + b->shift;
-	return new_Number__f(ctx, map->tcid, y);
+	AffineConv *u = (AffineConv*)DP(mpr)->mapdata;
+	knh_float_t y = (o->value * DP(u)->scale) + DP(u)->shift;
+	return new_IntX(ctx, DP(mpr)->tcid, (knh_int_t)y);
 }
 
 /* ------------------------------------------------------------------------ */
 
-Object *knh_AffineConv_fmap__itof(Ctx *ctx, Object *self, MapMap *map)
+static
+Int64 *knh_AffineConv_fmap__i2l(Ctx *ctx, Int *o, Mapper *mpr)
 {
-	AffineConv *b = (AffineConv*)map->config;
-	knh_float_t y = knh_Number_tofloat((Number*)self) * b->scale + b->shift;
-	return new_Number__f(ctx, map->tcid, y);
+	AffineConv *u = (AffineConv*)DP(mpr)->mapdata;
+	knh_float_t y = (o->value * DP(u)->scale) + DP(u)->shift;
+	return new_Int64X(ctx, DP(mpr)->tcid, (knh_int64_t)y);
 }
 
 /* ------------------------------------------------------------------------ */
 
-Object *knh_AffineConv_fmap__ftoi(Ctx *ctx, Object *self, MapMap *map)
+static
+Float *knh_AffineConv_fmap__i2f(Ctx *ctx, Int *o, Mapper *mpr)
 {
-	AffineConv *b = (AffineConv*)map->config;
-	knh_int_t y = knh_Number_toint((Number*)self) * b->iscale + b->ishift;
-	return new_Number__i(ctx, map->tcid, y);
+	AffineConv *u = (AffineConv*)DP(mpr)->mapdata;
+	knh_float_t y = (o->value * DP(u)->scale) + DP(u)->shift;
+	return new_FloatX(ctx, DP(mpr)->tcid, (knh_float_t)y);
 }
 
 /* ------------------------------------------------------------------------ */
 
-Object *knh_AffineConv_fmap__itoi(Ctx *ctx, Object *self, MapMap *map)
+static
+Int *knh_AffineConv_fmap__l2i(Ctx *ctx, Int64 *o, Mapper *mpr)
 {
-	AffineConv *b = (AffineConv*)map->config;
-	knh_int_t y = knh_Number_toint((Number*)self) * b->iscale + b->ishift;
-	return new_Number__i(ctx, map->tcid, y);
+	AffineConv *u = (AffineConv*)DP(mpr)->mapdata;
+	knh_float_t y = (o->value * DP(u)->scale) + DP(u)->shift;
+	return new_IntX(ctx, DP(mpr)->tcid, (knh_int_t)y);
 }
 
 /* ------------------------------------------------------------------------ */
 
-/* @dispatch knh_Object_fmap AffineConv */
-
-f_mapmap knh_AffineConv_fmap(Ctx *ctx, AffineConv *b, knh_class_t scpid, knh_class_t tpcid)
+static
+Int64 *knh_AffineConv_fmap__l2l(Ctx *ctx, Int64 *o, Mapper *mpr)
 {
-	DEBUG_ASSERT(IS_AffineConv(b));
-	knh_class_t scid = knh_tclass_bcid(scpid);
-	knh_class_t tcid = knh_tclass_bcid(tpcid);
+	AffineConv *u = (AffineConv*)DP(mpr)->mapdata;
+	knh_float_t y = (o->value * DP(u)->scale) + DP(u)->shift;
+	return new_Int64X(ctx, DP(mpr)->tcid, (knh_int64_t)y);
+}
 
-	DEBUG_ASSERT(IS_CLASS_Number(scid));
-	DEBUG_ASSERT(IS_CLASS_Number(tcid));
-	
-	switch(scid) {
-		case CLASS_Int:
-			if(tcid == CLASS_Int) {
-				return knh_AffineConv_fmap__itoi;
-			}
-			else if(tcid == CLASS_Float) {
-				return knh_AffineConv_fmap__itof;
-			}
-		case CLASS_Float:
-			if(tcid == CLASS_Int) {
-				return knh_AffineConv_fmap__ftoi;
-			}
-			else if(tcid == CLASS_Float) {
-				return knh_AffineConv_fmap__ftof;
-			}
+/* ------------------------------------------------------------------------ */
+
+static
+Float *knh_AffineConv_fmap__l2f(Ctx *ctx, Int64 *o, Mapper *mpr)
+{
+	AffineConv *u = (AffineConv*)DP(mpr)->mapdata;
+	knh_float_t y = (o->value * DP(u)->scale) + DP(u)->shift;
+	return new_FloatX(ctx, DP(mpr)->tcid, (knh_float_t)y);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+Int *knh_AffineConv_fmap__f2i(Ctx *ctx, Float *o, Mapper *mpr)
+{
+	AffineConv *u = (AffineConv*)DP(mpr)->mapdata;
+	knh_float_t y = (o->value * DP(u)->scale) + DP(u)->shift;
+	return new_IntX(ctx, DP(mpr)->tcid, (knh_int_t)y);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+Int64 *knh_AffineConv_fmap__f2l(Ctx *ctx, Float *o, Mapper *mpr)
+{
+	AffineConv *u = (AffineConv*)DP(mpr)->mapdata;
+	knh_float_t y = (o->value * DP(u)->scale) + DP(u)->shift;
+	return new_Int64X(ctx, DP(mpr)->tcid, (knh_int64_t)y);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+Float *knh_AffineConv_fmap__f2f(Ctx *ctx, Float *o, Mapper *mpr)
+{
+	AffineConv *u = (AffineConv*)DP(mpr)->mapdata;
+	knh_float_t y = (o->value * DP(u)->scale) + DP(u)->shift;
+	return new_FloatX(ctx, DP(mpr)->tcid, (knh_float_t)y);
+}
+
+/* ------------------------------------------------------------------------ */
+
+f_mapper knh_tmapper_faffine(knh_class_t scid, knh_class_t tcid)
+{
+	if(scid == CLASS_Int) {
+		if(tcid == CLASS_Int)    return (f_mapper)knh_AffineConv_fmap__i2i;
+		if(tcid == CLASS_Int64)  return (f_mapper)knh_AffineConv_fmap__i2l;
+		KNH_ASSERT(tcid == CLASS_Float);
+		return (f_mapper)knh_AffineConv_fmap__i2f;
 	}
-	DEBUG("unknown fconv %s => %s", CLASSN(scid), CLASSN(tcid));
-	return NULL;
-}
-
-/* ------------------------------------------------------------------------ */
-
-/* @dispatch new_MapMap_inv AffineConv */
-
-MapMap *new_MapMap_inv__AffineConv(Ctx *ctx, MapMap *map)
-{
-	DEBUG_ASSERT(IS_AffineConv(map->config));
-	AffineConv *b = (AffineConv*)map->config;
-	AffineConv *fconv = new_AffineConv(ctx, 1.0 / b->scale, - (b->shift / b->scale));
-	f_mapmap fmap = knh_AffineConv_fmap(ctx, fconv, map->tcid, map->scid);
-	return new_MapMap(ctx, map->flag, map->tcid, map->scid, fmap, fconv);
+	if(scid == CLASS_Int64) {
+		if(tcid == CLASS_Int)    return (f_mapper)knh_AffineConv_fmap__l2i;
+		if(tcid == CLASS_Int64)  return (f_mapper)knh_AffineConv_fmap__l2l;
+		KNH_ASSERT(tcid == CLASS_Float);
+		return (f_mapper)knh_AffineConv_fmap__l2f;
+	}
+	KNH_ASSERT(scid == CLASS_Float);
+	{
+		if(tcid == CLASS_Int)    return (f_mapper)knh_AffineConv_fmap__f2i;
+		if(tcid == CLASS_Int64)  return (f_mapper)knh_AffineConv_fmap__f2l;
+		KNH_ASSERT(tcid == CLASS_Float);
+		return (f_mapper)knh_AffineConv_fmap__f2f;
+	}
 }
 
 /* ------------------------------------------------------------------------ */
@@ -160,18 +190,28 @@ MapMap *new_MapMap_inv__AffineConv(Ctx *ctx, MapMap *map)
 
 #define _KNH_FLAG_MMF_AFFINE (KNH_FLAG_MMF_SIGNIFICANT|KNH_FLAG_MMF_SYNONYM|KNH_FLAG_MMF_TOTAL|KNH_FLAG_MMF_STATIC)
 
+static void
+KNH_TAFFINE_(Ctx *ctx, knh_class_t scid, knh_class_t tcid, knh_float_t scale, knh_float_t shift)
+{
+	Mapper *mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, scid, tcid, 
+			knh_tmapper_faffine(knh_tClass[scid].bcid, knh_tClass[tcid].bcid), 
+			(Object*)new_AffineConv(ctx, scale, shift));
+	knh_ClassMap_add(ctx, knh_tClass[scid].cmap, mpr);
+}
+
+/* ------------------------------------------------------------------------ */
+
 void
 KNH_TAFFINE(Ctx *ctx, knh_class_t scid, knh_class_t tcid, knh_float_t scale, knh_float_t shift)
 {
-	ClassRel *crel = knh_tclass_crel(scid);
-	MapMap *map = new_MapMap(ctx, KNH_FLAG_MMF_AFFINE, scid, tcid, knh_AffineConv_fmap__ftof, new_AffineConv(ctx, scale, shift));
-	knh_ClassRel_add(ctx, crel, map);
-
-	crel = knh_tclass_crel(tcid);
-	knh_float_t iscale = 1.0 / scale;
-	knh_float_t ishift = -(shift / scale);
-	map = new_MapMap(ctx, KNH_FLAG_MMF_AFFINE, tcid, scid, knh_AffineConv_fmap__ftof, new_AffineConv(ctx, iscale, ishift));
-	knh_ClassRel_add(ctx, crel, map);
+	DEBUG_ASSERT_cid(scid);
+	DEBUG_ASSERT_cid(tcid);
+	{
+		KNH_TAFFINE_(ctx, scid, tcid, scale, shift);
+		if(scale != 0.0) {
+			KNH_TAFFINE_(ctx, tcid, scid, 1.0 / scale, -(shift/scale));
+		}
+	}
 }
 
 /* ------------------------------------------------------------------------ */

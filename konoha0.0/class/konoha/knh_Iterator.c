@@ -38,26 +38,25 @@ extern "C" {
 /* ======================================================================== */
 /* [macros] */
 
-#define _knh_Iterator_cid(it)          (((Iterator*)it)->cid)
-#define _knh_Iterator_source(it)       (((Iterator*)it)->source)
-#define _knh_Iterator_setsource(ctx, it, s)    KNH_SETv(ctx, (((Iterator*)it)->pos), s)
-#define _knh_Iterator_pos(it)          (((Iterator*)it)->pos)
-#define _knh_Iterator_setpos(it, size)  ((Iterator*)it)->pos = (size)
-#define _knh_Iterator_ref(it)          (((Iterator*)it)->ref)
-#define _knh_Iterator_setref(it, rr)       ((Iterator*)it)->ref = (rr)
+#define _knh_Iterator_cid(it)           DP(it)->cid
+#define _knh_Iterator_source(it)        DP(it)->source
+#define _knh_Iterator_pos(it)           DP(it)->pos
+#define _knh_Iterator_setpos(it, p)     DP(it)->pos = p
+#define _knh_Iterator_ref(it)           DP(it)->ref
+
+/* ------------------------------------------------------------------------ */
+/* [private] */
+
+static Object *knh_Object_single_next(Ctx *ctx, Iterator *it);
 
 /* ======================================================================== */
 /* [structs] */
 
 void
-knh_Iterator_struct_init(Ctx *ctx, Struct *s1, int init, Object *cs)
+knh_Iterator_struct_init(Ctx *ctx, knh_Iterator_struct *b, int init, Object *cs)
 {
-	Iterator *b  = (Iterator*)s1;
-	b->cid    =  0;
-	b->flag   =  0;
 	b->fnext  =  knh_Object_single_next;
-	b->feach  =  knh_Iterator_each;
-	KNH_INITv(b->source, KNH_NULL);
+	KNH_INITv(b->source, KNH_VOID);
 	b->pos    =  0;
 	b->ref    =  NULL; 
 	b->count = 0;
@@ -68,14 +67,9 @@ knh_Iterator_struct_init(Ctx *ctx, Struct *s1, int init, Object *cs)
 /* ------------------------------------------------------------------------ */
 
 void
-knh_Iterator_struct_copy(Ctx *ctx, Struct *s1, Struct *s2)
+knh_Iterator_struct_copy(Ctx *ctx, knh_Iterator_struct *b, knh_Iterator_struct *b2)
 {
-	Iterator *b  = (Iterator*)s1;
-	Iterator *b2 = (Iterator*)s2;
-	b2->cid      = b->cid;
-	b2->flag     = b->flag;
 	b2->fnext    = b->fnext;
-	b2->feach    = b->feach;
 	b2->pos      = b->pos;
 	b2->ref      = b->ref;
 	KNH_INITv(b2->source, b->source);
@@ -86,236 +80,61 @@ knh_Iterator_struct_copy(Ctx *ctx, Struct *s1, Struct *s2)
 
 /* ------------------------------------------------------------------------ */
 
-#define _knh_Iterator_struct_compare NULL
-
-/* ------------------------------------------------------------------------ */
-
 void
-knh_Iterator_struct_traverse(Ctx *ctx, Struct *s, f_gc gc)
+knh_Iterator_struct_traverse(Ctx *ctx, knh_Iterator_struct *b, f_traverse gc)
 {
-	Iterator *b = (Iterator*)s;
 	gc(ctx, b->source);
 }
 
 /* ======================================================================== */
 /* [constructors] */
 
-Object *
-knh_Object_single_next(Ctx *ctx, Iterator *it)
+static
+Object *knh_Object_single_next(Ctx *ctx, Iterator *it)
 {
 	if(knh_Iterator_pos(it) == 0) {
 		knh_Iterator_setpos(it, 1);
 		return knh_Iterator_source(it);
 	}
-	return KNH_NULL;		
+	return KNH_VOID;		
 }
 
 /* ------------------------------------------------------------------------ */
 
-
-Iterator* new_Iterator(Ctx *ctx, knh_class_t cid, Object *source, f_next f)
+Iterator* new_Iterator(Ctx *ctx, knh_class_t p1, Any *source, f_next fnext)
 {
-	Iterator *b = (Iterator*)knh_Object_malloc(ctx, CLASS_Iterator);
-	knh_Iterator_struct_init(ctx, (Struct *)b, 0, NULL);
-	b->cid    =  cid;
-	b->fnext  =  f == NULL ? knh_Object_single_next : f;
-	KNH_SETv(ctx, b->source, source);
-	return b;
-}
-
-/* ------------------------------------------------------------------------ */
-
-Object *knh_Iterator_fvalue(Ctx *ctx, knh_class_t cid)
-{
-	return new_Iterator(ctx, cid, KNH_NULL, knh_Object_single_next);
-}
-
-/* ------------------------------------------------------------------------ */
-
-Object* knh_MapMap_fmap__Iterator(Ctx *ctx, Object *self, MapMap *map)
-{
-	return new_Iterator(ctx, knh_Object_cid(self), self, knh_Object_single_next);
-}
-
-/* ======================================================================== */
-/* [object] */
-
-knh_class_t knh_Object_pcid(Object *b)
-{
-	if(IS_Iterator(b)) {
-		Iterator *it = (Iterator*)b;
-		if(it->cid == CLASS_any) {
-			return CLASS_Iterator;
-		}
-		return CLASS_TOPLURAL(it->cid);
+	knh_class_t cid = knh_class_Iterator(ctx, p1);
+	Iterator *o = (Iterator*)new_ObjectX_malloc(ctx, FLAG_Iterator, CLASS_Iterator, cid, sizeof(knh_Iterator_struct));
+	knh_Iterator_struct_init(ctx, DP(o), 0, NULL);
+	if(fnext != NULL) {
+		DP(o)->fnext = fnext;
 	}
-	else {
-		return knh_Object_cid(b);
-	}
-}
-
-/* ======================================================================== */
-/* [foreach] */
-
-INLINE
-Object *knh_Iterator_foreach(Ctx *ctx, Iterator *b, knh_class_t cid)
-{
-	return b->feach(ctx, b, cid);
-}
-
-/* ======================================================================== */
-/* [next] */
-
-Object *knh_Iterator_each(Ctx *ctx, Iterator *b, knh_class_t cid)
-{
-	Object *v = b->fnext(ctx, b);
-	while(IS_NOTNULL(v)) {
-		if(knh_Object_opInstanceof(ctx, v, cid)) {
-			return v;
-		}
-		v = b->fnext(ctx, b);
-	}
-	return v; /* KNH_NULL */
-}
-
-/* ------------------------------------------------------------------------ */
-
-INLINE
-Object *knh_Iterator_each__slice(Ctx *ctx, Iterator *b, knh_class_t cid)
-{
-	Object *v = b->fnext(ctx, b);
-	while(IS_NOTNULL(v)) {
-		if(knh_Object_opInstanceof(ctx, v, cid)) {
-			if(b->count > b->end) {
-				return KNH_NULL;
-			}
-			b->count++;
-			if(b->count < b->start) {
-				continue;
-			}
-			return v;
-		}
-		v = b->fnext(ctx,b);
-	}
-	return v; /* KNH_NULL */
-}
-
-/* ------------------------------------------------------------------------ */
-
-
-Object *knh_Iterator_each__map(Ctx *ctx, Iterator *b, knh_class_t tcid)
-{
-//	TODO();
-//	Object *v, *v2;
-//	while((v = b->fnext(ctx, b)) != KNH_NULL) {
-//		v2 = knh_Object_mapto(ctx, v, tcid);
-//		if(v != v2) knh_Object_safefree(ctx, v);
-//		if(v2 != KNH_NULL) return v2;
-//		knh_Object_safefree(ctx, v2);
-//	}
-	return KNH_NULL;
+	KNH_SETv(ctx, DP(o)->source, source);
+	o->fnext_1 = DP(o)->fnext;
+	return o;
 }
 
 /* ======================================================================== */
 /* [slice] */
 
-//
-//void knh_Iterator_setslice(Iterator *b, size_t start, size_t end)
-//{
-//	b->flag = IF_SLICE | b->flag;
-//	b->count = 0;
-//	b->start = start;
-//	b->end   = end;
-//	b->feach = knh_Iterator_each__slice;
-//}
-
-/* ======================================================================== */
-/* [mappings] */
-
-/* @map Iterator Array! */
-
-Object* knh_Iterator_Array(Ctx *ctx, Object *self, MapMap *map)
+Object *knh_Iterator_slice(Ctx *ctx, Iterator *o)
 {
-	Iterator *b = (Iterator*)self;
-	Array *a = new_Array(ctx, 0);
-	if(b->cid == CLASS_any) {
-		Object *v = b->fnext(ctx, b);
-		while(IS_NOTNULL(v)) {
-			knh_Array_append(ctx, a, v);
-			v = b->fnext(ctx, b);
-		}
-	}else {
-		Object *v = knh_Iterator_foreach(ctx, b, b->cid);
-		while(IS_NOTNULL(v)) {
-			knh_Array_append(ctx, a, v);
-			v = knh_Iterator_foreach(ctx, b, b->cid);
-		}
-	}
-	return a;
-}
-
-/* ======================================================================== */
-/* [movabletext] */
-
-///* @method void Iterator.%s(OutputStream w, Any m) */
-//
-//void knh_Iterator__s(Ctx *ctx, Iterator *b, OutputStream *w, Any *m)
-//{
-//	knh_methodn_t mn = METHODN__s;
-//	Any *m2 = m;
-//	if(IS_NOTNULL(m)) {
-//		knh_bytes_t n = knh_String_tobytes(m);
-//		if(n.buf[0] == '%') {
-//			knh_index_t loc = knh_bytes_index(n, '.');
-//			if(loc > 0) {
-//				mn = knh_tmethodn_forname(ctx, knh_bytes_first(n, loc), METHODN__empty);
-//				m2 = new_String__fast(ctx, CLASS_String, knh_bytes_last(n, loc+1));
-//			}
-//			else {
-//				mn = knh_tmethodn_forname(ctx, n, METHODN__empty);
-//			}
-//		}
-//	}
-//	KNH_LOPEN(ctx, 0);
-//	KNH_LPUSH(ctx, m2);
-//	knh_putc(ctx, w, '[');
-//	size_t c = 0;
-//	Object *v = knh_Iterator_foreach(ctx, b, b->cid);
-//	while(IS_NOTNULL(v)) {
-//		if(c > 0) {
-//			knh_write_delim(ctx,w);
-//		}
-//		knh_format(ctx, w, mn, v, m2);
-//		v = knh_Iterator_foreach(ctx, b, b->cid);
-//		c++;
-//	}
-//	knh_putc(ctx, w, ']');
-//	KNH_LCLOSE(ctx);
-//}
-
-/* ------------------------------------------------------------------------ */
-
-/* @method void Iterator.%dump(OutputStream w, Any m) */
-
-void knh_Iterator__dump(Ctx *ctx, Iterator *b, OutputStream *w, Any *m)
-{
-	knh_putc(ctx, w, '[');
-	size_t c = 0;
-	Object *v = b->fnext(ctx, b);
+	Object *v = o->fnext_1(ctx, o);
+	size_t s = DP(o)->start;
+	size_t c = DP(o)->count;
+	size_t e = DP(o)->end;
 	while(IS_NOTNULL(v)) {
-		if(c > 0) {
-			knh_write_delim(ctx,w);
+		if(c > e) {
+			return KNH_NULL;
 		}
-		//knh_printf(ctx, w, "(#%d)", c);
-		knh_format(ctx, w, METHODN__dump, v, KNH_NULL);
-		if(!knh_array_isdump(c)) {
-			break;
-		}
-		v = b->fnext(ctx, b);
 		c++;
+		if(c < s) {
+			continue;
+		}
+		break;
 	}
-	knh_write_dots(ctx, w);
-	knh_putc(ctx, w, ']');
+	DP(o)->count = c;
+	return v;
 }
 
 /* ------------------------------------------------------------------------ */

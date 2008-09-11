@@ -1,20 +1,20 @@
 /****************************************************************************
- * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER  
- * 
+ * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
+ *
  * Copyright (c) 2005-2008, Kimio Kuramitsu <kimio at ynu.ac.jp>
- *           (c) 2008-      Konoha Software Foundation  
+ *           (c) 2008-      Konoha Software Foundation
  * All rights reserved.
- * 
- * You may choose one of the following two licenses when you use konoha. 
+ *
+ * You may choose one of the following two licenses when you use konoha.
  * See www.konohaware.org/license.html for further information.
- * 
+ *
  * (1) GNU General Public License 2.0      (with    KONOHA_UNDER_GPL2)
  * (2) Konoha Software Foundation License 1.0
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
  * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *  
+ *
  ****************************************************************************/
 
 /* ************************************************************************ */
@@ -31,79 +31,43 @@
 
 /* ************************************************************************ */
 
-#ifdef __cplusplus 
+#ifdef __cplusplus
 extern "C" {
 #endif
 
 /* ------------------------------------------------------------------------ */
 /* [macros] */
 
-#define _FIELDN_NONAME    ((knh_fieldn_t)-1)
-#define _FIELDN_NEWID     ((knh_fieldn_t)-2)
-#define _FIELDN_return    FIELDN_
-#define _METHODN_NONAME   ((knh_methodn_t)-1)
-#define _METHODN_NEWID    ((knh_methodn_t)-2)
 
-#define _KNH_FLAG_FN_SUPER   KNH_FLAG_T0
-#define _KNH_FLAG_FN_U1      KNH_FLAG_T1
-#define _KNH_FLAG_FN_U2      KNH_FLAG_T2
-#define _FIELDN_IS_SUPER(fnq)       ((fnq & KNH_FLAG_FN_SUPER) == KNH_FLAG_FN_SUPER)
-#define _FIELDN_IS_U1(fnq)          ((fnq & KNH_FLAG_FN_U1) == KNH_FLAG_FN_U1)
-#define _FIELDN_IS_U2(fnq)          ((fnq & KNH_FLAG_FN_U2) == KNH_FLAG_FN_U2)
-#define _FIELDN_IS_PROTECTED(fnq)   (FIELDN_IS_U1(fnq)||FIELDN_IS_U2(fnq))
-#define _FIELDN_UNMASK(fnq)         (fnq & (~(KNH_FLAG_FN_SUPER|KNH_FLAG_FN_U1|KNH_FLAG_FN_U2)))
+#define _knh_Method_mn(mtd)    DP(mtd)->mn
+#define _knh_Method_mf(mtd)    DP(mtd)->mf
 
-//#define _METHODN_NONAME   KONOHA_TCLASS_SIZE
-//#define _METHODN_NEWID    0
+static METHOD knh_Method_fAbstractMethod(Ctx *ctx, knh_sfp_t *sfp);
+void knh_KLRCode__dump_(Ctx *ctx, KLRCode* o, OutputStream *w, Any *m);
 
-// 0000 0000 0000 0000
-// 0100 0000 0000 0000  
-// 0010 0000 0000 0000
-// 0110 0000 0000 0000
-
-#define _KNH_FLAG_MN_SUPER        KNH_FLAG_T0
-#define _KNH_FLAG_MN_GETTER       KNH_FLAG_T1
-#define _KNH_FLAG_MN_SETTER       KNH_FLAG_T2
-#define _KNH_FLAG_MN_MOVTEXT      (KNH_FLAG_T1|KNH_FLAG_T2)
-#define _KNH_FLAG_MN_FIELDN       (~(KNH_FLAG_T0|KNH_FLAG_T1|KNH_FLAG_T2))
-
-#define _METHODN_IS_GETTER(mn)   ((mn & KNH_FLAG_MN_MOVTEXT) == KNH_FLAG_MN_GETTER)
-#define _METHODN_TO_GETTER(mn)   (mn | KNH_FLAG_MN_GETTER)
-#define _METHODN_IS_SETTER(mn)   ((mn & KNH_FLAG_MN_MOVTEXT) == KNH_FLAG_MN_SETTER)
-#define _METHODN_TO_SETTER(mn)   (mn | KNH_FLAG_MN_SETTER)
-#define _METHODN_IS_MOVTEXT(mn)  ((mn & KNH_FLAG_MN_MOVTEXT) == KNH_FLAG_MN_MOVTEXT)
-#define _METHODN_TO_MOVTEXT(mn)  (mn | KNH_FLAG_MN_MOVTEXT)
-
-#define _METHODN_TOFIELDN(mn)     (mn & KNH_FLAG_MN_FIELDN)
-
-#define _knh_Method_mn(mtd)    (mtd)->mn
-#define _knh_Method_mf(mtd)    (mtd)->mf
 
 /* ======================================================================== */
 /* [structs] */
 
-void knh_Method_struct_init(Ctx *ctx, Struct *s1, int init, Object *cs)
+void knh_Method_struct_init(Ctx *ctx, knh_Method_struct *b, int init, Object *cs)
 {
-	Method *b =  (Method*)s1;
 	b->flag   = 0;
 	b->delta  = 0;
 	b->cid    = CLASS_Object;
 	b->mn     = METHODN_NONAME;
-	KNH_INITv(b->mf, KNH_NULL);
 	b->func  = knh_Method_fAbstractMethod;
+	KNH_INITv(b->mf, MF_Any_Any_);
 	b->code  = NULL;
 }
 
 /* ------------------------------------------------------------------------ */
 
-void knh_Method_struct_copy(Ctx *ctx, Struct *s1, Struct *s2)
+void knh_Method_struct_copy(Ctx *ctx, knh_Method_struct *b, knh_Method_struct *b2)
 {
-	Method *b =  (Method*)s1;
-	Method *b2 = (Method*)s2;
 	b2->flag  = b->flag;
 	b2->delta  = b->delta;
 	b2->cid    = b->cid;
-	b2->mn     = b->mn;	
+	b2->mn     = b->mn;
 	KNH_INITv(b2->mf, b->mf);
 	b2->func   = b->func;
 	if(knh_Method_isObjectCode(b)) {
@@ -116,151 +80,141 @@ void knh_Method_struct_copy(Ctx *ctx, Struct *s1, Struct *s2)
 
 /* ------------------------------------------------------------------------ */
 
-knh_int_t
-knh_Method_struct_compare(Ctx *ctx, Struct *s1, Struct *s2) 
+void
+knh_Method_struct_traverse(Ctx *ctx, knh_Method_struct *b, f_traverse gc)
 {
-	Method *b =  (Method*)s1;
-	Method *b2 = (Method*)s2;
-	knh_int_t res = knh_strcmp(METHODN(b->mn), METHODN(b2->mn));
-	if(res == 0) {
-		return knh_type_compare(ctx, b->cid, b2->cid);
-	}
-	return res;
-}
-
-/* ------------------------------------------------------------------------ */
-
-void 
-knh_Method_code_traverse(Ctx *ctx, Method *b, f_gc gc)
-{
-	if(knh_Method_isObjectCode(b)) {
-		gc(ctx, (Object*)b->code);	
+	gc(ctx, UP(b->mf));
+	if((b->flag & KNH_FLAG_MF_OBJECTCODE) == KNH_FLAG_MF_OBJECTCODE) {
+		gc(ctx, (Object*)b->code);
 		if(IS_SWEEP(gc)) {
 			b->code = NULL;
 		}
 	}
 }
 
-/* ------------------------------------------------------------------------ */
+/* ======================================================================== */
+/* [AbstractMethod] */
 
-void 
-knh_Method_struct_traverse(Ctx *ctx, Struct *s, f_gc gc)
+static
+METHOD knh_Method_fAbstractMethod(Ctx *ctx, knh_sfp_t *sfp)
 {
-	Method *b = (Method*)s;
-	gc(ctx, b->mf);
-	knh_Method_code_traverse(ctx, b, gc);
+	if(IS_NULL(sfp[0].o)) {
+		METHOD_RETURN(ctx, sfp, KNH_NULL);
+	}
+	{
+		Method *mtd = sfp[-1].mtd;
+		knh_wbuf_t cb = knh_Context_wbuf(ctx);
+		knh_printf(ctx, cb.w, "AbstractMethod!!: %C.%M", knh_Object_cid(sfp[0].o), DP(mtd)->mn);
+		{
+			String *s = new_String__wbuf(ctx, cb);
+			KNH_THROW(ctx, s);
+		}
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Boolean Method.isAbstract() */
+
+INLINE
+knh_bool_t knh_Method_isAbstract(Method *o)
+{
+	return (DP(o)->func == knh_Method_fAbstractMethod);
 }
 
 /* ======================================================================== */
 /* [constructors] */
 
-
 Method* new_Method(Ctx *ctx, knh_flag_t flag, knh_class_t cid, knh_methodn_t mn, f_method func)
 {
-	Method* b = 
-		(Method*)knh_Object_malloc0(ctx, KNH_FLAG_Method, CLASS_Method, sizeof(Method));
-	knh_Method_struct_init(ctx, (Struct*)b, 0, NULL);
-	b->flag  = flag;
-	b->cid    = cid;
-	b->mn     = mn;
-	if(METHODN_IS_MOVTEXT(b->mn)) {
-		KNH_SETv(ctx, b->mf, new_MethodField__mt(ctx));
+	Method* o =
+		(Method*)new_Object_malloc(ctx, FLAG_Method, CLASS_Method, sizeof(knh_Method_struct));
+	knh_Method_struct_init(ctx, DP(o), 0, NULL);
+	DP(o)->flag  = flag;
+	DP(o)->cid    = cid;
+	DP(o)->mn     = mn;
+	if(METHODN_IS_MOVTEXT(DP(o)->mn)) {
+		KNH_SETv(ctx, DP(o)->mf, MF_void_OutputStream_Any);
 	}
-	b->func  = (func == NULL) ? knh_Method_fAbstractMethod : func;
-	b->code  = NULL;
-	return b;
-}
-
-/* ======================================================================== */
-/* [AbstractMethod] */
-
-void knh_Method_fAbstractMethod(Ctx *ctx, Object **sf)
-{
-	if(IS_NULL(sf[0])) {
-		KNH_SETr(ctx, sf, KNH_NULL);
-		return;
-	}
-	KNH_THROWf(ctx, "AbstractMethod!!: %s.%s", 
-		CLASSN(knh_Object_cid(sf[0])), METHODN(((Method*)sf[-1])->mn));
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method Bool Method.isAbstract() */
-
-INLINE
-knh_bool_t knh_Method_isAbstract(Method *b)
-{
-	return (b->func == knh_Method_fAbstractMethod);
+	DP(o)->func  = (func == NULL) ? knh_Method_fAbstractMethod : func;
+	DP(o)->code  = NULL;
+	o->fcall_1 = DP(o)->func;
+	o->code_2  = NULL;
+	return o;
 }
 
 /* ------------------------------------------------------------------------ */
 
-void knh_Method_toAbstract(Ctx *ctx, Method *b)
+knh_hcode_t knh_Method_hashCode(Method *o)
 {
-	if(knh_Method_isObjectCode(b)) {
-		KNH_FINALv(ctx, b->code);
-		knh_Method_setObjectCode(b, 0);
-	}
-	b->func = knh_Method_fAbstractMethod;
+	knh_hcode_u u;
+	u.value2.u1 = DP(o)->cid;
+	u.value2.u1 = DP(o)->mn;
+	return u.hcode;
+}
+
+/* ------------------------------------------------------------------------ */
+
+int knh_Method_compareTo(Method *o, Method *o2)
+{
+	char buf[CLASSNAME_BUFSIZ], buf2[CLASSNAME_BUFSIZ];
+	return knh_strcmp(
+		knh_format_cmethodn(buf, sizeof(buf), DP(o)->cid, DP(o)->mn),
+		knh_format_cmethodn(buf2, sizeof(buf2), DP(o)->cid, DP(o2)->mn));
 }
 
 /* ------------------------------------------------------------------------ */
 /* [abstract] */
 
-void knh_ClassStruct_toAbstractAll(Ctx *ctx, ClassStruct *b) 
+void knh_Method_toAbstract(Ctx *ctx, Method *o)
 {
-	DEBUG_ASSERT(IS_Array(b->methods));
-	knh_int_t i;
-	for(i = 0; i < knh_Array_size(b->methods); i++) {
-		Method *mtd = knh_Array_n(b->methods, i);
-		knh_Method_toAbstract(ctx, mtd);
+	if(knh_Method_isObjectCode(o)) {
+		KNH_FINALv(ctx, DP(o)->code);
+		knh_Method_setObjectCode(o, 0);
+	}
+	DP(o)->func = knh_Method_fAbstractMethod;
+	o->fcall_1 = knh_Method_fAbstractMethod;
+	o->code_2  = NULL;
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_ClassStruct_toAbstractAll(Ctx *ctx, ClassStruct *o)
+{
+	Array *a = DP(o)->methods;
+	if(IS_bArray(a)) {
+		size_t i;
+		for(i = 0; i < knh_Array_size(a); i++) {
+			Method *mtd = (Method*)knh_Array_n(a, i);
+			knh_Method_toAbstract(ctx, mtd);
+		}
 	}
 }
 
 /* ======================================================================== */
 /* [NoSuchMethod] */
 
-Object *
-knh_Method_returnValue(Ctx *ctx, Method *b)
+METHOD knh_Method_fNoSuchMethod(Ctx *ctx, knh_sfp_t *sfp)
 {
-	knh_type_t rtype = TYPE_TONOTNULL(knh_Method_rtype(b));
-	if(knh_tclass_hasDefaultValue(rtype)) {
-		return knh_tclass_safevalue(ctx, rtype);
-	}
-	return KNH_NULL;
-}
-
-/* ------------------------------------------------------------------------ */
-
-void
-knh_Method_fNoSuchMethod(Ctx *ctx, Object **sf)
-{
-	Method *mtd = (Method*)sf[-1];
-	if(IS_NULL(sf[0])) {
-		KNH_SETr(ctx, sf, knh_Method_returnValue(ctx, mtd));
-	}
-	else {
-		knh_buffer_t cb = knh_Context_buffer(ctx);
-		knh_printf(ctx, cb.w, "NoSuchMethod!!: %C.%M", knh_Object_cid(sf[0]), (mtd)->mn);
-		String *s = new_String__buffer(ctx, CLASS_String, cb);
-		KNH_THROW(ctx, s);
-	}
+	Method *mtd = sfp[-1].mtd;
+	char bufcm[CLASSNAME_BUFSIZ];
+	knh_format_cmethodn(bufcm, sizeof(bufcm), knh_Object_cid(sfp[0].o), DP(mtd)->mn);
+	String *s = new_String(ctx, B(bufcm), NULL);
+	KNH_THROW(ctx, s);
 }
 
 /* ------------------------------------------------------------------------ */
 
 INLINE
-knh_bool_t knh_Method_isNoSuchMethod(Method *b)
+knh_bool_t knh_Method_isNoSuchMethod(Method *o)
 {
-	return (b->func == knh_Method_fNoSuchMethod);
+	return (DP(o)->func == knh_Method_fNoSuchMethod);
 }
 
 /* ------------------------------------------------------------------------ */
 
-Method* new_Method__NoSuchMethod(Ctx *ctx, knh_class_t cid, knh_methodn_t mn) 
+Method* new_Method__NoSuchMethod(Ctx *ctx, knh_class_t cid, knh_methodn_t mn)
 {
 	Method *mtd = new_Method(ctx, 0, cid, mn, knh_Method_fNoSuchMethod);
-	KNH_SETv(ctx, mtd->mf, new_MethodField__NoSuchMethod(ctx));
 	return mtd;
 }
 
@@ -282,13 +236,13 @@ knh_bool_t knh_methodn_isNew(knh_methodn_t mn)
 
 /* ------------------------------------------------------------------------ */
 
-knh_bool_t knh_Method_isNew(Method *b)
+knh_bool_t knh_Method_isNew(Method *o)
 {
-	knh_class_t rtype = TYPE_TONOTNULL(knh_Method_rtype(b));
-	if(rtype != b->cid) {
+	knh_class_t rtype = TYPE_UNMASK_NN(knh_Method_rtype(o));
+	if(rtype != DP(o)->cid) {
 		return 0;
 	}
-	return knh_methodn_isNew(b->mn);
+	return knh_methodn_isNew(DP(o)->mn);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -311,43 +265,42 @@ knh_bool_t knh_methodn_isOp(knh_methodn_t mn)
 /* @method String! Method.getName() */
 
 INLINE
-String* knh_Method_getName(Ctx *ctx, Method *b)
+String* knh_Method_getName(Ctx *ctx, Method *o)
 {
 	char buf[CLASSNAME_BUFSIZ];
-	knh_format_methodn(buf, sizeof(buf), b->mn);
-	return new_String__fast(ctx, CLASS_String, B(buf));
+	knh_format_methodn(buf, sizeof(buf), DP(o)->mn);
+	return new_String(ctx, B(buf), NULL);
 }
 
 /* ------------------------------------------------------------------------ */
 
 /* @method String! Method.getURN() */
 
-String* knh_Method_getURN(Ctx *ctx, Method *b)
+String* knh_Method_getURN(Ctx *ctx, Method *o)
 {
 	char buf[CLASSNAME_BUFSIZ];
 	char buf2[CLASSNAME_BUFSIZ];
-	knh_format_methodn(buf2, sizeof(buf2), b->mn);
-	knh_snprintf(buf, sizeof(buf), "%s.%s", CLASSN(b->cid), buf2);
-	return new_String__fast(ctx, CLASS_String__urn, B(buf));
+	knh_format_methodn(buf2, sizeof(buf2), DP(o)->mn);
+	knh_snprintf(buf, sizeof(buf), "%s.%s", CLASSN(DP(o)->cid), buf2);
+	return new_String(ctx, B(buf), NULL);
 }
 
 ///* ------------------------------------------------------------------------ */
 //
-//knh_bool_t knh_Method_update_flag(Ctx *ctx, Method *b, knh_flag_t flag)
+//knh_bool_t knh_Method_update_flag(Ctx *ctx, Method *o, knh_flag_t flag)
 //{
-//	return (b->flag == flag);
+//	return (DP(o)->flag == flag);
 //}
 //
 ///* ------------------------------------------------------------------------ */
 //
-//
-//knh_bool_t knh_Method_update_func(Ctx *ctx, Method *b, f_method func)
+//knh_bool_t knh_Method_update_func(Ctx *ctx, Method *o, f_method func)
 //{
 //	if(func == NULL) {
 //		func = knh_Method_fAbstractMethod;
 //	}
-//	b->func   = func;
-//	b->delta  = 0;
+//	DP(o)->func   = func;
+//	DP(o)->delta  = 0;
 //	knh_Method_code_traverse(ctx, b, knh_sweep);
 //	return 1;
 //}
@@ -357,48 +310,63 @@ String* knh_Method_getURN(Ctx *ctx, Method *b)
 
 /* @method void Method.%s(OutputStream w, Any m) */
 
-void knh_Method__s(Ctx *ctx, Method *b, OutputStream *w, Any *m)
+void knh_Method__s(Ctx *ctx, Method *o, OutputStream *w, Any *m)
 {
-	knh_write__s(ctx, w, CLASSN(b->cid));
+	knh_write__s(ctx, w, CTXCLASSN(DP(o)->cid));
 	knh_putc(ctx, w, '.');
-	knh_write__mn(ctx, w, b->mn);
+	knh_write__mn(ctx, w, DP(o)->mn);
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method void Method.%dump(OutputStream w, Any m) */
+/* @method void Method.%k(OutputStream w, Any m) */
 
-void knh_Method__dump(Ctx *ctx, Method *b, OutputStream *w, Any *m)
+void knh_Method__k(Ctx *ctx, Method *o, OutputStream *w, Any *m)
 {
-	if(knh_Method_isAbstract(b)) {
+	if(knh_Method_isAbstract(o)) {
 		knh_write(ctx, w, STEXT("@abstract"));
 		knh_putc(ctx, w, ' ');
 	}
 
-	if(knh_Method_rtype(b) == TYPE_void) {
-		knh_write(ctx, w, STEXT("void"));
+	if(knh_Method_rtype(o) == TYPE_void) {
+		knh_write(ctx, w, knh_String_tobytes(TS_void));
 	}else{
-		knh_write__type(ctx, w, knh_Method_rtype(b));
+//		knh_write__type(ctx, w, knh_pmztype_totype(ctx, knh_Method_rtype(o), DP(o)->cid));
+		knh_write__type(ctx, w, knh_Method_rtype(o));
 	}
 	knh_putc(ctx, w, ' ');
-	knh_Method__s(ctx, b, w, KNH_NULL);
+	knh_Method__s(ctx, o, w, KNH_NULL);
 	knh_putc(ctx, w, '(');
 	knh_int_t i;
-	for(i = 0; i < knh_Method_psize(b); i++) {
+	for(i = 0; i < knh_Method_psize(o); i++) {
 		if(i > 0) {
 			knh_write_delim(ctx, w);
 		}
-		knh_mfield_t mf = knh_Method_pfields(b, i);
+		knh_mfield_t mf = knh_Method_pfields(o, i);
+		//knh_write__type(ctx, w, knh_pmztype_totype(ctx, mf.type, DP(o)->cid));
 		knh_write__type(ctx, w, mf.type);
 		knh_putc(ctx, w, ' ');
 		knh_write(ctx, w, B(FIELDN(mf.fn)));
 	}
-	if(knh_Method_isVarArgs(b)) {
+	if(knh_Method_isVarArgs(o)) {
 		knh_write_delim(ctx, w);
 		knh_write_dots(ctx, w);
 	}
 	knh_putc(ctx, w, ')');
 }
 
+/* ------------------------------------------------------------------------ */
+/* @method void Method.%dump(OutputStream w, Any m) */
+
+void knh_Method__dump(Ctx *ctx, Method *o, OutputStream *w, Any *m)
+{
+	knh_Method__k(ctx, o, w, m);
+	knh_println(ctx, w, STEXT(""));
+	if(knh_Method_isObjectCode(o)) {
+		if(IS_KLRCode((Object*)DP(o)->code)) {
+			knh_KLRCode__dump_(ctx, (KLRCode*)DP(o)->code, w, UP(o));
+		}
+	}
+}
 
 /* ------------------------------------------------------------------------ */
 

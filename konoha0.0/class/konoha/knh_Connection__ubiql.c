@@ -47,24 +47,24 @@ knh_Connection_open__ubiql(Ctx *ctx, knh_bytes_t url, char *uname, char *upwd)
 
 /* ------------------------------------------------------------------------ */
 
-knh_bool_t knh_ResultSet_next__ubiql(Ctx *ctx, knh_rsptr_t *rsptr, ResultSet *b)
+knh_bool_t knh_ResultSet_next__ubiql(Ctx *ctx, knh_rshdlr_t *rsptr, ResultSet *b)
 {
 	return 0; /* if nothing */
 }
 
 /* ------------------------------------------------------------------------ */
 
-void knh_ResultSet_free__ubiql(knh_rsptr_t *rsptr)
+void knh_ResultSet_free__ubiql(knh_rshdlr_t *rsptr)
 {
 
 }
 
 /* ------------------------------------------------------------------------ */
 
-knh_ResultSet* 
+ResultSet* 
 knh_Connection_query__ubiql(Ctx *ctx, knh_connptr_t *conn, char *sql)
 {
-	return KNH_NULL;
+	return (ResultSet*)KNH_NULL;
 }
 
 /* ------------------------------------------------------------------------ */

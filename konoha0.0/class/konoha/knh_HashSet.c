@@ -35,60 +35,125 @@
 extern "C" {
 #endif
 
-#define THIS(b)  DEBUG_THIS(b, STRUCT_HashSet)
+#ifndef OLDHASH
 
-/* ======================================================================== */
-/* [hashsete] */
-
-INLINE
-knh_hashsete_t *knh_HashSete_new(Ctx *ctx, knh_hcode_t key, Object *keyobj, knh_uint_t value) 
-{
-	knh_hashsete_t *cur = (knh_hashsete_t*)knh_malloc(ctx, sizeof(knh_hashsete_t));
-	cur->h.key = key;
-	if(keyobj == NULL) keyobj = KNH_NULL;
-	KNH_INITv(cur->h.keyobj, keyobj);
-	cur->value = value;
-	cur->next = NULL;
-	return cur;
-}
-
-/* ------------------------------------------------------------------------ */
-
-INLINE
-void knh_HashSete_traverse(Ctx *ctx, knh_hashsete_t *cur, f_gc gc)
-{
-	gc(ctx, cur->h.keyobj);
-	if(IS_SWEEP(gc)) {
-		knh_free(cur, sizeof(knh_hashsete_t));
-	}
-}
 
 /* ======================================================================== */
 /* [structs] */
 
 void
-knh_HashSet_struct_init(Ctx *ctx, Struct *s1, int init, Object *cs)
+knh_HashSet_struct_init(Ctx *ctx, knh_HashSet_struct *b, int init, Object *cs)
 {
-	HashSet *b =  (HashSet*)s1;
-	if(init == 0) init = KNH_HASHMAP_INITSIZE; 
-	b->capacity = KNH_MAX(13, init);
-	b->factor   = KNH_HASHMAP_INITFACTOR;
-	b->size = 0;
-	b->array = (knh_hashsete_t**)knh_malloc(ctx, sizeof(knh_hashsete_t*) * b->capacity);
-	knh_bzero(b->array, sizeof(knh_hashsete_t*) * b->capacity);
+	b->DBG_name = "HashSet";
+	if(init > 0) {
+		int i;
+		b->table_size = init * 3 / 4 + 10;	
+		b->table = (knh_hashsetentry_t*)KNH_MALLOC(ctx, sizeof(knh_hashsetentry_t) * b->table_size);
+		b->ex_tables = NULL;
+		b->ex_size = 0;
+		b->ex_capacity = 0;
+		for(i = 0; i < b->table_size; i++) {
+			b->table[i].hcode = 0;
+			b->table[i].key = NULL;
+			b->table[i].value = 0;
+			b->table[i].next = (i == b->table_size - 1) ? NULL : &(b->table[i+1]);
+		}
+		b->unused = &(b->table[0]);
+	
+		b->capacity = init;
+		b->array = (knh_hashsetentry_t**)KNH_MALLOC(ctx, sizeof(knh_hashsetentry_t*) * init);
+		knh_bzero(b->array, sizeof(knh_hashsetentry_t*) * init);
+	}
+	else {
+		b->table_size = 0;	
+		b->table = NULL;
+		b->ex_tables = NULL;
+		b->ex_size = 0;
+		b->ex_capacity = 0;
+		b->unused = NULL;
+	
+		b->capacity = 0;
+		b->array = NULL;
+	}
+	b->fcompareTo = knh_Object_compareTo;
 }
 
 /* ------------------------------------------------------------------------ */
 
-void
-knh_HashSet_struct_copy(Ctx *ctx, Struct *s1, Struct *s2)
+static
+knh_hashsetentry_t *new_hashsetentry(Ctx *ctx, HashSet *o)
 {
-	//HashSet *b =  (HashSet*)s1;
-	//HashSet *b2 = (HashSet*)s2;
-	TODO();	
-	//b2->flag  =     b->flag;
-	//KNH_INITv(b2->name, b->name);
+	knh_hashsetentry_t *e = DP(o)->unused;
+	if(e != NULL) {
+		DP(o)->unused = e->next;
+		return e;
+	}
+	else if(DP(o)->table_size == 0) {
+		knh_HashSet_struct_init(ctx, DP(o), KNH_HASHMAP_INITSIZE, NULL);
+		e = DP(o)->unused;
+		DP(o)->unused = e->next;
+		return e;
+	}
+	else {
+		knh_HashSet_struct *b = DP(o);
+		knh_hashsetentry_t *newtable = (knh_hashsetentry_t*)KNH_MALLOC(ctx, sizeof(knh_hashsetentry_t) * b->table_size);
+		int i;
+		for(i = 0; i < b->table_size; i++) {
+			newtable[i].hcode = 0;
+			newtable[i].key = NULL;
+			newtable[i].value = 0;
+			newtable[i].next = (i == b->table_size - 1) ? NULL : &(newtable[i+1]);
+		}
+		e = &(newtable[0]);
+		b->unused = &(newtable[1]);
+		
+		if(b->ex_size  == b->ex_capacity) {
+			if(b->ex_capacity == 0) {
+				b->ex_capacity = 8;
+				b->ex_tables = (knh_hashsetentry_t**)KNH_MALLOC(ctx, sizeof(knh_hashsetentry_t*) * b->ex_capacity);
+			}
+			else {
+				b->ex_capacity *= 2;
+				knh_hashsetentry_t **newtbll = (knh_hashsetentry_t**)KNH_MALLOC(ctx, sizeof(knh_hashsetentry_t*) * b->ex_capacity);
+				knh_memcpy(newtbll, b->ex_tables, sizeof(knh_hashsetentry_t*) * b->ex_size);
+				KNH_FREE(b->ex_tables, sizeof(knh_hashsetentry_t*) * b->ex_size);
+				b->ex_tables = newtbll;
+			}
+		}
+		b->ex_tables[b->ex_size] = newtable;
+		b->ex_size++;
+		
+		if(b->ex_size * (b->table_size+1) > b->capacity) {
+			size_t nc = b->capacity * 2 + 1;
+			knh_hashsetentry_t **newarray = (knh_hashsetentry_t**)KNH_MALLOC(ctx, sizeof(knh_hashsetentry_t*) * nc);
+			knh_bzero(newarray, sizeof(knh_hashsetentry_t*) * nc);
+			
+			int i, j;
+			knh_hashsetentry_t *t = b->table;
+			for(i = 0; i < b->table_size; i++) {
+				knh_uint_t h = t[i].hcode % nc;
+				t[i].next = newarray[h];
+				newarray[h] = &(t[i]);
+			}
+			for(j = 0; j < b->ex_size - 1; j++) {
+				t = b->ex_tables[j];
+				for(i = 0; i < b->table_size; i++) {
+					knh_uint_t h = t[i].hcode % nc;
+					t[i].next = newarray[h];
+					newarray[h] = &(t[i]);
+				}
+			}
+			KNH_FREE(b->array, sizeof(knh_hashsetentry_t*) * b->capacity);
+			b->array = newarray;
+			b->capacity = nc;
+		}
+		return e;
+	}
 }
+
+/* ------------------------------------------------------------------------ */
+
+#define _knh_HashSet_struct_copy NULL
 
 /* ------------------------------------------------------------------------ */
 
@@ -97,78 +162,69 @@ knh_HashSet_struct_copy(Ctx *ctx, Struct *s1, Struct *s2)
 /* ------------------------------------------------------------------------ */
 
 void
-knh_HashSet_struct_traverse(Ctx *ctx, Struct *s, f_gc gc)
+knh_HashSet_struct_traverse(Ctx *ctx, knh_HashSet_struct *b, f_traverse ftr)
 {
-	HashSet *b = (HashSet*)s;
-
-	knh_hashsete_t *cur, *next;
 	size_t i;
-	for(i = 0; i < b->capacity; i++) {
-		cur = b->array[i];
-		while(cur != NULL) {
-			next = cur->next;
-			knh_HashSete_traverse(ctx, cur, gc);
-			cur = next;
+	for(i = 0; i < b->table_size; i++) {
+		if(b->table[i].key != NULL) {
+			ftr(ctx, b->table[i].key);
 		}
 	}
-	if(IS_SWEEP(gc)) {
-		knh_free(b->array, sizeof(knh_hashsete_t*) * b->capacity);
+	if(b->ex_size > 0) {
+		int j;
+		for(j = 0; j < b->ex_size; j++) {
+			knh_hashsetentry_t *t = b->ex_tables[j];
+			for(i = 0; i < b->table_size; i++) {
+				if(t[i].key != NULL) {
+					ftr(ctx, t[i].key);
+				}
+			}
+		}
+	}
+	if(IS_SWEEP(ftr)) {
+		if(b->table != NULL) {
+			KNH_FREE(b->table, sizeof(knh_hashsetentry_t) * b->table_size);
+			b->table = NULL;
+		}
+		if(b->array != NULL) {
+			KNH_FREE(b->array, sizeof(knh_hashsetentry_t*) * b->capacity);
+			b->array = NULL;
+		}
+		if(b->ex_tables != NULL) {
+			for(i = 0; i < b->ex_size; i++) {
+				KNH_FREE(b->ex_tables[i], sizeof(knh_hashsetentry_t) * b->table_size);
+			}
+			KNH_FREE(b->ex_tables, sizeof(knh_hashmapentry_t*) * b->ex_capacity);
+			b->ex_tables = NULL;
+		}
 	}
 }
 
 /* ======================================================================== */
 /* [constructors] */
 
-HashSet* new_HashSet(Ctx *ctx, size_t capacity)
+HashSet* new_HashSet(Ctx *ctx, char *name, size_t capacity)
 {
-	HashSet* b = 
-		(HashSet*)knh_Object_malloc0(ctx, KNH_FLAG_HashSet, CLASS_HashSet, sizeof(HashSet));
-	knh_HashSet_struct_init(ctx, (Struct*)b, capacity, NULL);
-	return b;
-}
-
-/* ------------------------------------------------------------------------ */
-
-/* @method HashSet! HashSet.new(Int initialCapacity=0) */
-
-HashSet *knh_HashSet_new(Ctx *ctx, HashSet *b, size_t initialCapacity)
-{
-	if(initialCapacity > b->capacity) {
-		knh_HashSet_resize(ctx, b, (size_t)initialCapacity);
+	HashSet* o = 
+		(HashSet*)new_Object_malloc(ctx, FLAG_HashSet, CLASS_HashSet, sizeof(knh_HashSet_struct));
+	if(capacity == 0) capacity = KNH_HASHMAP_INITSIZE;
+	knh_HashSet_struct_init(ctx, DP(o), capacity, NULL);
+	if(name != NULL) {
+		DP(o)->DBG_name = name;
 	}
-	return b;
-}
-
-/* ======================================================================== */
-/* [wrappers] */
-
-void knh_HashSet_rehash(Ctx *ctx, HashSet *b)
-{
-	knh_HashMap_rehash(ctx, (HashMap*)b);
-}
-
-/* ------------------------------------------------------------------------ */
-
-void knh_HashSet_resize(Ctx *ctx, HashSet *b, size_t nc)
-{
-	knh_HashMap_resize(ctx, (HashMap*)b, nc);
+	return o;
 }
 
 /* ======================================================================== */
 /* [methods] */
 
-/* @method Int! HashSet.get(Any key); */
-
-knh_uint_t knh_HashSet_get(Ctx *ctx, HashSet *b, knh_hcode_t key, Object *keyobj)
+knh_uint_t knh_HashSet_get__hcode(Ctx *ctx, HashSet *o, knh_hcode_t hcode)
 {
-	knh_uint_t h = key % b->capacity;
-	knh_hashsete_t *cur = b->array[h];
-	
+	knh_uint_t h = hcode % DP(o)->capacity;
+	knh_hashsetentry_t *cur = DP(o)->array[h];
 	while(cur != NULL) {
-		if(cur->h.key == key) {
-			if(keyobj == NULL || knh_Object_equals(ctx, keyobj, cur->h.keyobj)) {
-				return cur->value;
-			}
+		if(cur->hcode == hcode) {
+			return cur->value;
 		}
 		cur = cur->next;
 	}
@@ -177,164 +233,317 @@ knh_uint_t knh_HashSet_get(Ctx *ctx, HashSet *b, knh_hcode_t key, Object *keyobj
 
 /* ------------------------------------------------------------------------ */
 
-/* @method Bool HashSet.opIn(Any key) */
-
-INLINE
-knh_bool_t knh_HashSet_opIn(Ctx *ctx, HashSet *b, knh_hcode_t key, Object *keyobj)
+void knh_HashSet_set__hcode(Ctx *ctx, HashSet *o, knh_hcode_t hcode, knh_uint_t value)
 {
-	return (knh_HashSet_get(ctx, b, key, keyobj) != 0);
-}
-
-/* ------------------------------------------------------------------------ */
-
-knh_uint_t knh_HashSet_get__b(Ctx *ctx, HashSet *b, knh_bytes_t kv)
-{
-
-	knh_hcode_t key = knh_bytes_hcode(kv);
-	knh_uint_t h =  key % b->capacity;
-	knh_hashsete_t *cur = b->array[h];
-
+	knh_uint_t h = hcode % DP(o)->capacity;
+	knh_hashsetentry_t *cur = DP(o)->array[h];
 	while(cur != NULL) {
-		if(cur->h.key == key && cur->h.keyobj != NULL) {
-			if(STRUCT_IS_String(cur->h.keyobj) && knh_String_equals(cur->h.keyobj, kv)) {
-				return cur->value;
-			}
+		if(cur->hcode == hcode) {
+			cur->value = value;
+			return ;
 		}
 		cur = cur->next;
 	}
-	return 0;
+	cur = new_hashsetentry(ctx, o);
+	cur->hcode = hcode;
+	KNH_INITv(cur->key, KNH_NULL);
+	cur->value = value;
+	cur->next = DP(o)->array[h];
+	DP(o)->array[h] = cur;
+	DP(o)->size++;
 }
 
 /* ------------------------------------------------------------------------ */
 
-/* @method void HashSet.set(Any key, Int! value); */
-
-#define _knh_HashSet_put(ctx,b,h,k,v) knh_HashSet_set(ctx,b,h,k,v)
-
-
-void knh_HashSet_set(Ctx *ctx, HashSet *b, knh_hcode_t key, Any *keyobj, knh_uint_t value)
+void knh_HashSet_add__hcode(Ctx *ctx, HashSet *o, knh_hcode_t hcode)
 {
-	if(((float)b->size / b->capacity) > b->factor) {
-		knh_HashSet_rehash(ctx, b);
-	}
-
-	knh_uint_t h = key % b->capacity;
-	knh_hashsete_t *cur = b->array[h];
-
+	knh_uint_t h = hcode % DP(o)->capacity;
+	knh_hashsetentry_t *cur = DP(o)->array[h];
 	while(cur != NULL) {
-		if(cur->h.key == key) {
-			if(keyobj == NULL) {
-				KNH_ASSERT(IS_NULL(cur->h.keyobj));
-				cur->value = value;
-				return;
-			}else if(knh_Object_equals(ctx, keyobj, cur->h.keyobj)) {
-				KNH_SETv(ctx, cur->h.keyobj, keyobj);
-				cur->value = value;
-				return;
-			}
-		}
-		cur = cur->next;
-	}
-	cur = knh_HashSete_new(ctx, key, keyobj, value);
-	cur->next = b->array[h];
-	b->array[h] = cur;
-	b->size++;
-}
-
-/* ------------------------------------------------------------------------ */
-
-/* @method void HashSet.add(Any key) */
-
-void knh_HashSet_add(Ctx *ctx, HashSet *b, knh_hcode_t key, Any *keyobj)
-{
-	if(((float)b->size / b->capacity) > b->factor) {
-		knh_HashSet_rehash(ctx, b);
-	}
-
-	knh_uint_t h = key % b->capacity;
-	knh_hashsete_t *cur = b->array[h];
-
-	while(cur != NULL) {
-		if(cur->h.key == key) {
-			if(keyobj == NULL) {
-				KNH_ASSERT(cur->h.keyobj == NULL);
-			}else if(knh_Object_equals(ctx, keyobj, cur->h.keyobj)) {
-				KNH_SETv(ctx, cur->h.keyobj, keyobj);
-			}
+		if(cur->hcode == hcode) {
 			cur->value++;
-			return;
+			return ;
 		}
 		cur = cur->next;
 	}
-	cur = knh_HashSete_new(ctx, key, keyobj, 1);
-	cur->next = b->array[h];
-	b->array[h] = cur;
-	b->size++;
+	cur = new_hashsetentry(ctx, o);
+	cur->hcode = hcode;
+	KNH_INITv(cur->key, KNH_NULL);
+	cur->value = 1;
+	cur->next = DP(o)->array[h];
+	DP(o)->array[h] = cur;
+	DP(o)->size++;
 }
 
 /* ------------------------------------------------------------------------ */
 
-/* @method void HashSet.remove(Any key) */
-
-void knh_HashSet_remove(Ctx *ctx, HashSet *b, knh_hcode_t key, Any *keyobj)
+void knh_HashSet_remove__hcode(Ctx *ctx, HashSet *o, knh_hcode_t hcode)
 {
-	knh_uint_t h = key % b->capacity;
-	knh_hashsete_t **prev, *cur;
-	
-	prev = &b->array[h];
-	cur = *prev;
+	knh_uint_t h = hcode % DP(o)->capacity;
+	knh_hashsetentry_t *cur = DP(o)->array[h];
+	knh_hashsetentry_t **prev_next = &(DP(o)->array[h]);
 	while(cur != NULL) {
-		if(cur->h.key == key) {
-			if(keyobj == NULL || knh_Object_equals(ctx, keyobj, cur->h.keyobj)) {
-				*prev = cur->next;
-				knh_HashSete_traverse(ctx, cur, knh_sweep);
-				b->size--;
-				return ;
-			}
+		if(cur->hcode == hcode) {
+			prev_next[0] = cur->next;
+			cur->next = DP(o)->unused;
+			DP(o)->unused = cur;
+			cur->hcode = 0;
+			cur->key = NULL;
+			cur->value = 0;
+			DP(o)->size--;
+			return ;
 		}
-		prev = &cur->next;
-		cur = *prev;
+		prev_next = &(cur->next);
+		cur = cur->next;
 	}
 }
 
-/* ======================================================================== */
-/* [mappings] */
+/* ------------------------------------------------------------------------ */
 
-/* @map HashSet Iterator! */
-
-
-Object* knh_HashSet_Iterator(Ctx *ctx, Object *self, MapMap *map)
+void knh_HashSet_clear(Ctx *ctx, HashSet *o)
 {
-	return new_Iterator(ctx, CLASS_Any, self, knh_HashSet_key_next);
+	int init = DP(o)->capacity;
+	knh_HashSet_struct_traverse(ctx, DP(o), knh_Object_RCsweep);
+	knh_HashSet_struct_init(ctx, DP(o), init, NULL);
 }
 
-/* ======================================================================== */
-/* [movabletext] */
+#else
 
-/* @method void HashSet.%dump(OutputStream w, Any m) */
-
-void knh_HashSet__dump(Ctx *ctx, HashSet *b, OutputStream *w, Any *m)
-{
+///* ======================================================================== */
+///* [hashsete] */
+//
+//INLINE
+//knh_hashsete_t *knh_HashSete_new(Ctx *ctx, knh_hcode_t key, Object *keyobj, knh_uint_t value) 
+//{
+//	knh_hashsete_t *cur = (knh_hashsete_t*)KNH_MALLOC(ctx, sizeof(knh_hashsete_t));
+//	cur->h.key = key;
+//	if(keyobj == NULL) keyobj = KNH_NULL;
+//	KNH_INITv(cur->h.keyobj, keyobj);
+//	cur->value = value;
+//	cur->next = NULL;
+//	return cur;
+//}
+//
+///* ------------------------------------------------------------------------ */
+//
+//INLINE
+//void knh_HashSete_traverse(Ctx *ctx, knh_hashsete_t *cur, f_traverse gc)
+//{
+//	gc(ctx, cur->h.keyobj);
+//	if(IS_SWEEP(gc)) {
+//		KNH_FREE(cur, sizeof(knh_hashsete_t));
+//	}
+//}
+//
+///* ======================================================================== */
+///* [structs] */
+//
+//void
+//knh_HashSet_struct_init(Ctx *ctx, knh_HashSet_struct *b, int init, Object *cs)
+//{
+//	if(init == 0) init = KNH_HASHMAP_INITSIZE; 
+//	b->capacity = KNH_MAX(13, init);
+//	b->factor   = KNH_HASHMAP_INITFACTOR;
+//	b->size = 0;
+//	b->array = (knh_hashsete_t**)KNH_MALLOC(ctx, sizeof(knh_hashsete_t*) * b->capacity);
+//	knh_bzero(b->array, sizeof(knh_hashsete_t*) * b->capacity);
+//}
+//
+///* ------------------------------------------------------------------------ */
+//
+//void
+//knh_HashSet_struct_copy(Ctx *ctx, knh_HashSet_struct *b, knh_HashSet_struct *b2)
+//{
+//	TODO();	
+//}
+//
+///* ------------------------------------------------------------------------ */
+//
+//#define _knh_HashSet_struct_compare NULL
+//
+///* ------------------------------------------------------------------------ */
+//
+//void
+//knh_HashSet_struct_traverse(Ctx *ctx, knh_HashSet_struct *b, f_traverse gc)
+//{
 //	knh_hashsete_t *cur, *next;
-//	size_t c = 0, i;
-//	knh_fputc(ctx, w, '[');
+//	size_t i;
 //	for(i = 0; i < b->capacity; i++) {
 //		cur = b->array[i];
 //		while(cur != NULL) {
 //			next = cur->next;
-//			if(c > 0) knh_print_delim(ctx,w);
-//			if(!knh_ucheck_todump(lv, c)) {
-//				knh_print_dots(ctx, w);
-//				break;
-//			}
-//			knh_Object__dump(ctx, cur->h.keyobj, w, lv+1);
-//			if(cur->value != 1) knh_printf(ctx, w, "<%d>", cur->value);
-//			c++;
+//			knh_HashSete_traverse(ctx, cur, gc);
 //			cur = next;
 //		}
 //	}
-//	knh_fputc(ctx, w, ']');
-}
+//	if(IS_SWEEP(gc)) {
+//		KNH_FREE(b->array, sizeof(knh_hashsete_t*) * b->capacity);
+//	}
+//}
+//
+///* ======================================================================== */
+///* [wrappers] */
+//
+//HashSet* new_HashSet(Ctx *ctx, size_t capacity)
+//{
+//	HashSet* o = 
+//		(HashSet*)new_Object__RAW(ctx, FLAG_HashSet, CLASS_HashSet, sizeof(knh_HashSet_struct));
+//	knh_HashSet_struct_init(ctx, DP(o), capacity, NULL);
+//	return o;
+//}
+//
+///* ------------------------------------------------------------------------ */
+//
+//
+//
+///* ======================================================================== */
+///* [wrappers] */
+//
+//void knh_HashSet_rehash(Ctx *ctx, HashSet *b)
+//{
+//	knh_HashMap_rehash(ctx, (HashMap*)b);
+//}
+//
+///* ------------------------------------------------------------------------ */
+//
+//void knh_HashSet_resize(Ctx *ctx, HashSet *b, size_t nc)
+//{
+//	knh_HashMap_resize(ctx, (HashMap*)b, nc);
+//}
+//
+///* ======================================================================== */
+///* [methods] */
+//
+///* @method Int! HashSet.get(Any1 key); */
+//
+//knh_uint_t knh_HashSet_get(Ctx *ctx, HashSet *b, knh_hcode_t key, Object *keyobj)
+//{
+//	knh_uint_t h = key % DP(b)->capacity;
+//	knh_hashsete_t *cur = DP(b)->array[h];
+//	
+//	while(cur != NULL) {
+//		if(cur->h.key == key) {
+//			if(keyobj == NULL || knh_Object_equals(keyobj, cur->h.keyobj)) {
+//				return cur->value;
+//			}
+//		}
+//		cur = cur->next;
+//	}
+//	return 0;
+//}
+//
+//
+///* ------------------------------------------------------------------------ */
+//
+//knh_uint_t knh_HashSet_get__b(Ctx *ctx, HashSet *b, knh_bytes_t kv)
+//{
+//
+//	knh_hcode_t key = knh_bytes_hcode(kv);
+//	knh_uint_t h =  key % DP(b)->capacity;
+//	knh_hashsete_t *cur = DP(b)->array[h];
+//
+//	while(cur != NULL) {
+//		if(cur->h.key == key && cur->h.keyobj != NULL) {
+//			if(IS_bString(cur->h.keyobj) && knh_String_equals((String*)cur->h.keyobj, kv)) {
+//				return cur->value;
+//			}
+//		}
+//		cur = cur->next;
+//	}
+//	return 0;
+//}
+//
+///* ------------------------------------------------------------------------ */
+///* @method void HashSet.set(Any1 key, Int! value); */
+//
+//#define _knh_HashSet_put(ctx,b,h,k,v) knh_HashSet_set(ctx,b,h,k,v)
+//
+//void knh_HashSet_set(Ctx *ctx, HashSet *b, knh_hcode_t key, Any *keyobj, knh_uint_t value)
+//{
+//	if(((float)DP(b)->size / DP(b)->capacity) > DP(b)->factor) {
+//		knh_HashSet_rehash(ctx, b);
+//	}
+//
+//	knh_uint_t h = key % DP(b)->capacity;
+//	knh_hashsete_t *cur = DP(b)->array[h];
+//
+//	while(cur != NULL) {
+//		if(cur->h.key == key) {
+//			if(keyobj == NULL) {
+//				KNH_ASSERT(IS_NULL(cur->h.keyobj));
+//				cur->value = value;
+//				return;
+//			}else if(knh_Object_equals(keyobj, cur->h.keyobj)) {
+//				KNH_SETv(ctx, cur->h.keyobj, keyobj);
+//				cur->value = value;
+//				return;
+//			}
+//		}
+//		cur = cur->next;
+//	}
+//	cur = knh_HashSete_new(ctx, key, keyobj, value);
+//	cur->next = DP(b)->array[h];
+//	DP(b)->array[h] = cur;
+//	DP(b)->size++;
+//}
+//
+///* ------------------------------------------------------------------------ */
+///* @method void HashSet.add(Any1 key) */
+//
+//void knh_HashSet_add(Ctx *ctx, HashSet *b, knh_hcode_t key, Any *keyobj)
+//{
+//	if(((float)DP(b)->size / DP(b)->capacity) > DP(b)->factor) {
+//		knh_HashSet_rehash(ctx, b);
+//	}
+//
+//	knh_uint_t h = key % DP(b)->capacity;
+//	knh_hashsete_t *cur = DP(b)->array[h];
+//
+//	while(cur != NULL) {
+//		if(cur->h.key == key) {
+//			if(keyobj == NULL) {
+//				KNH_ASSERT(cur->h.keyobj == NULL);
+//			}else if(knh_Object_equals(keyobj, cur->h.keyobj)) {
+//				KNH_SETv(ctx, cur->h.keyobj, keyobj);
+//			}
+//			cur->value++;
+//			return;
+//		}
+//		cur = cur->next;
+//	}
+//	cur = knh_HashSete_new(ctx, key, keyobj, 1);
+//	cur->next = DP(b)->array[h];
+//	DP(b)->array[h] = cur;
+//	DP(b)->size++;
+//}
+//
+///* ------------------------------------------------------------------------ */
+///* @method void HashSet.remove(Any1 key) */
+//
+//void knh_HashSet_remove(Ctx *ctx, HashSet *b, knh_hcode_t key, Any *keyobj)
+//{
+//	knh_uint_t h = key % DP(b)->capacity;
+//	knh_hashsete_t **prev, *cur;
+//	
+//	prev = &DP(b)->array[h];
+//	cur = *prev;
+//	while(cur != NULL) {
+//		if(cur->h.key == key) {
+//			if(keyobj == NULL || knh_Object_equals(keyobj, cur->h.keyobj)) {
+//				*prev = cur->next;
+//				knh_HashSete_traverse(ctx, cur, knh_Object_RCsweep);
+//				DP(b)->size--;
+//				return ;
+//			}
+//		}
+//		prev = &cur->next;
+//		cur = *prev;
+//	}
+//}
+
+#endif
+
+/* ------------------------------------------------------------------------ */
 
 
 #ifdef __cplusplus

@@ -38,7 +38,7 @@ extern "C" {
 /* ======================================================================== */
 /* [macros] */
 
-#define _KNH_SETJUMP(hdlr)   setjmp(((ExceptionHandler*)hdlr)->jmpbuf)
+#define _KNH_SETJUMP(hdlr)   setjmp(DP((ExceptionHandler*)hdlr)->jmpbuf)
 
 /* ======================================================================== */
 /* [structs] */
@@ -46,9 +46,8 @@ extern "C" {
 /* ------------------------------------------------------------------------ */
 
 void
-knh_ExceptionHandler_struct_init(Ctx *ctx, Struct *s, int init, Object *cs)
+knh_ExceptionHandler_struct_init(Ctx *ctx, knh_ExceptionHandler_struct *b, int init, Object *cs)
 {
-	ExceptionHandler *b = (ExceptionHandler*)s;
 	KNH_INITv(b->caught, KNH_NULL);
 }
 
@@ -63,10 +62,9 @@ knh_ExceptionHandler_struct_init(Ctx *ctx, Struct *s, int init, Object *cs)
 /* ------------------------------------------------------------------------ */
 
 void
-knh_ExceptionHandler_struct_traverse(Ctx *ctx, Struct *s, f_gc gc)
+knh_ExceptionHandler_struct_traverse(Ctx *ctx, knh_ExceptionHandler_struct *b, f_traverse gc)
 {
-	ExceptionHandler *b = (ExceptionHandler*)s;
-	gc(ctx, b->caught);
+	gc(ctx, UP(b->caught));
 }
 
 /* ======================================================================== */
@@ -75,17 +73,17 @@ knh_ExceptionHandler_struct_traverse(Ctx *ctx, Struct *s, f_gc gc)
 
 ExceptionHandler* new_ExceptionHandler(Ctx *ctx)
 {
-	ExceptionHandler* b = 
-		(ExceptionHandler*)knh_Object_malloc0(ctx, KNH_FLAG_ExceptionHandler, CLASS_ExceptionHandler, sizeof(ExceptionHandler));
-	knh_ExceptionHandler_struct_init(ctx, (Struct *)b, 0, NULL);
-	return b;
+	ExceptionHandler* o = 
+		(ExceptionHandler*)new_Object_malloc(ctx, FLAG_ExceptionHandler, CLASS_ExceptionHandler, sizeof(knh_ExceptionHandler_struct));
+	knh_ExceptionHandler_struct_init(ctx, DP(o), 0, NULL);
+	return o;
 }
 
 /* ------------------------------------------------------------------------ */
 
-Object *knh_ExceptionHandler_fvalue(Ctx *ctx, knh_class_t cid)
+Object *knh_ExceptionHandler_fdefault(Ctx *ctx, knh_class_t cid)
 {
-	return new_ExceptionHandler(ctx);
+	return (Object*)new_ExceptionHandler(ctx);
 }
 
 /* ======================================================================== */
@@ -93,20 +91,20 @@ Object *knh_ExceptionHandler_fvalue(Ctx *ctx, knh_class_t cid)
 
 void knh_ExceptionHandler_longjmp(Ctx *ctx, ExceptionHandler *b, Exception *e)
 {
-	DEBUG_ASSERT(IS_Exception(e));
+	KNH_ASSERT(IS_Exception(e));
 	if(!knh_ExceptionHandler_isCatching(b)) {
 		return ;
 	}
-	KNH_SETv(ctx, b->caught, e); // setCaughtException(ctx, b, e)
-	longjmp(b->jmpbuf, e->eid);
+	KNH_SETv(ctx, DP(b)->caught, e); // setCaughtException(ctx, b, e)
+	longjmp(DP(b)->jmpbuf, DP(e)->eid);
 }
 
 /* ------------------------------------------------------------------------ */
 
 Exception* knh_ExceptionHandler_getCaughtException(ExceptionHandler *b)
 {
-	KNH_ASSERT(IS_Exception(b->caught));
-	return b->caught;
+	KNH_ASSERT(IS_Exception(DP(b)->caught));
+	return DP(b)->caught;
 }
 
 /* ======================================================================== */

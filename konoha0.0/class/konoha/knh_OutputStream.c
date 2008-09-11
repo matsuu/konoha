@@ -1,20 +1,20 @@
 /****************************************************************************
- * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER  
- * 
+ * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
+ *
  * Copyright (c) 2005-2008, Kimio Kuramitsu <kimio at ynu.ac.jp>
- *           (c) 2008-      Konoha Software Foundation  
+ *           (c) 2008-      Konoha Software Foundation
  * All rights reserved.
- * 
- * You may choose one of the following two licenses when you use konoha. 
+ *
+ * You may choose one of the following two licenses when you use konoha.
  * See www.konohaware.org/license.html for further information.
- * 
+ *
  * (1) GNU General Public License 2.0      (with    KONOHA_UNDER_GPL2)
  * (2) Konoha Software Foundation License 1.0
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
  * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *  
+ *
  ****************************************************************************/
 
 /* ************************************************************************ */
@@ -31,22 +31,40 @@
 
 /* ************************************************************************ */
 
-#ifdef __cplusplus 
+#ifdef __cplusplus
 extern "C" {
 #endif
 
 /* ======================================================================== */
 /* [drivers] */
 
-static knh_outptr_drivers_t DRIVERS__nop = {
-	knh_OutputStream_open__nop,
-	knh_OutputStream_putc__nop,
-	knh_OutputStream_write__nop,
-	knh_OutputStream_flush__nop,
-	knh_OutputStream_close__nop
+static knh_outptr_t* knh_OutputStream_open__NOP(Ctx *ctx, knh_bytes_t n, char *mode);
+static void knh_OutputStream_putc__NOP(Ctx *ctx, knh_outptr_t *ptr, int ch);
+static size_t knh_OutputStream_write__NOP(Ctx *ctx, knh_outptr_t *ptr, char *buf, size_t bufsiz);
+static void knh_OutputStream_flush__NOP(Ctx *ctx, knh_outptr_t *ptr);
+static void knh_OutputStream_close__NOP(Ctx *ctx, knh_outptr_t *ptr);
+
+static knh_outptr_t* knh_OutputStream_open__FILE(Ctx *ctx, knh_bytes_t file, char *mode);
+static void knh_OutputStream_putc__FILE(Ctx *ctx, knh_outptr_t *ptr, int ch);
+static size_t knh_OutputStream_write__FILE(Ctx *ctx, knh_outptr_t *ptr, char *buf, size_t bufsiz);
+static void knh_OutputStream_flush__FILE(Ctx *ctx, knh_outptr_t *ptr);
+static void knh_OutputStream_close__FILE(Ctx *ctx, knh_outptr_t *ptr);
+
+static void knh_OutputStream_putc__Bytes(Ctx *ctx, knh_outptr_t *ptr, int ch);
+static size_t knh_OutputStream_write__Bytes(Ctx *ctx, knh_outptr_t *ptr, char *buf, size_t bufsiz);
+static void knh_OutputStream_close__Bytes(Ctx *ctx, knh_outptr_t *ptr);
+
+static knh_outptr_drvapi_t OUT__NOP = {
+	KNH_DRVAPI_TYPE__OUTPUTSTREAM, "nop",
+	knh_OutputStream_open__NOP,
+	knh_OutputStream_putc__NOP,
+	knh_OutputStream_write__NOP,
+	knh_OutputStream_flush__NOP,
+	knh_OutputStream_close__NOP
 };
 
-static knh_outptr_drivers_t DRIVERS__FILE = {
+static knh_outptr_drvapi_t OUT__FILE = {
+	KNH_DRVAPI_TYPE__OUTPUTSTREAM, "file",
 	knh_OutputStream_open__FILE,
 	knh_OutputStream_putc__FILE,
 	knh_OutputStream_write__FILE,
@@ -54,38 +72,70 @@ static knh_outptr_drivers_t DRIVERS__FILE = {
 	knh_OutputStream_close__FILE
 };
 
-static knh_outptr_drivers_t DRIVERS__stdout = {
-	knh_OutputStream_open__nop,
+static knh_outptr_drvapi_t OUT__stdout = {
+	KNH_DRVAPI_TYPE__OUTPUTSTREAM, "stdout",
+	knh_OutputStream_open__NOP,
 	knh_OutputStream_putc__FILE,
 	knh_OutputStream_write__FILE,
 	knh_OutputStream_flush__FILE,
-	knh_OutputStream_close__nop
+	knh_OutputStream_close__NOP
 };
 
-static knh_outptr_drivers_t DRIVERS__Bytes = {
-	knh_OutputStream_open__nop,
+static knh_outptr_drvapi_t OUT__Bytes = {
+	KNH_DRVAPI_TYPE__OUTPUTSTREAM, "Bytes",
+	knh_OutputStream_open__NOP,
 	knh_OutputStream_putc__Bytes,
 	knh_OutputStream_write__Bytes,
-	knh_OutputStream_flush__nop,
-	knh_OutputStream_close__nop
+	knh_OutputStream_flush__NOP,
+	knh_OutputStream_close__Bytes
 };
+
+/* ------------------------------------------------------------------------ */
+
+static
+knh_outptr_drvapi_t *knh_System_getOutputStreamDriver(Ctx *ctx, knh_bytes_t name)
+{
+	knh_outptr_drvapi_t *p = (knh_outptr_drvapi_t *)knh_System_getDRVAPI(ctx, KNH_DRVAPI_TYPE__OUTPUTSTREAM, name);
+	if(p == NULL) {
+		KNH_WARNING(ctx, "OutputStream: unsupported scheme '%s'", name);
+		p = &OUT__NOP;
+	}
+	return p;
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(void) konoha_addOutputStreamDriver(Ctx *ctx, char *alias, knh_outptr_drvapi_t *d)
+{
+	KNH_TDRVAPI(ctx, alias, (knh_drvapi_t*)d);
+}
+
+/* ------------------------------------------------------------------------ */
+
+void KNHINIT init_OutputStream(Ctx *ctx)
+{
+	konoha_addOutputStreamDriver(ctx, NULL, &OUT__NOP);
+	konoha_addOutputStreamDriver(ctx, NULL, &OUT__FILE);
+	konoha_addOutputStreamDriver(ctx, NULL, &OUT__stdout);
+	konoha_addOutputStreamDriver(ctx, NULL, &OUT__Bytes);
+}
 
 /* ======================================================================== */
 /* [structs] */
 
 void
-knh_OutputStream_struct_init(Ctx *ctx, Struct *s, int init, Object *cs)
+knh_OutputStream_struct_init(Ctx *ctx, knh_OutputStream_struct *b, int init, Object *cs)
 {
-	OutputStream *b = (OutputStream*)s;
 	b->outptr = NULL;
 	KNH_INITv(b->ba, KNH_NULL);
-	b->drv = DRIVERS__nop;
+	b->apis = OUT__NOP;
 	KNH_INITv(b->bconv, KNH_NULL);
-	KNH_INITv(b->urn, knh_String_EMPTY());
+	KNH_INITv(b->enc, TS_ENCODING);
+	KNH_INITv(b->urn, TS_DEVNULL);
 	b->size = 0;
 	b->line = 0;
-	KNH_INITv(b->NEWLINE, knh_String_NL());
-	KNH_INITv(b->TAB, knh_String_TAB());
+	KNH_INITv(b->NEWLINE, TS_LF);
+	KNH_INITv(b->TAB, TS_TAB);
 	b->indent = 0;
 }
 
@@ -100,197 +150,198 @@ knh_OutputStream_struct_init(Ctx *ctx, Struct *s, int init, Object *cs)
 /* ------------------------------------------------------------------------ */
 
 void
-knh_OutputStream_struct_traverse(Ctx *ctx, Struct *s, f_gc gc)
+knh_OutputStream_struct_traverse(Ctx *ctx, knh_OutputStream_struct *b, f_traverse gc)
 {
-	OutputStream *b = (OutputStream*)s;
-
 	if(IS_SWEEP(gc) && b->outptr != NULL) {
-		b->drv.fclose(ctx, b->outptr);
+		b->apis.fclose(ctx, b->outptr);
 		b->outptr = NULL;
 	}
-	gc(ctx, b->ba);
-	gc(ctx, b->bconv);
-	gc(ctx, b->urn);
-	gc(ctx, b->NEWLINE);
-	gc(ctx, b->TAB);
+	gc(ctx, UP(b->ba));
+	gc(ctx, UP(b->enc));
+	gc(ctx, UP(b->bconv));
+	gc(ctx, UP(b->urn));
+	gc(ctx, UP(b->NEWLINE));
+	gc(ctx, UP(b->TAB));
 }
 
 /* ======================================================================== */
 /* [methods] */
 
-OutputStream *
-new_OutputStream(Ctx *ctx, String *urn, knh_outptr_t *outptr, knh_outptr_drivers_t drv)
+Object *knh_OutputStream_open(Ctx *ctx, OutputStream *o, String *urn, String *mode)
 {
-	OutputStream* b = (OutputStream*)knh_Object_malloc(ctx, CLASS_OutputStream);
-	knh_OutputStream_struct_init(ctx, (Struct*)b, 0, NULL);
-	b->outptr = outptr;
-	if(b->outptr == NULL) {
-		b->drv = DRIVERS__nop;	
+	knh_bytes_t fname = knh_String_tobytes(urn);
+	knh_index_t loc = knh_bytes_index(fname, ':');
+	if(loc == -1 || (loc == 1 && isalpha(fname.buf[0]))) {  /* 'C:/' */
+		DP(o)->apis = *(knh_System_getOutputStreamDriver(ctx, STEXT("file")));
 	}
 	else {
-		b->drv = drv;
+		DP(o)->apis = *(knh_System_getOutputStreamDriver(ctx, knh_bytes_first(fname, loc)));
 	}
-	if(urn == NULL || IS_NULL(urn)) {
-		KNH_SETv(ctx, b->urn, knh_String_EMPTY());
+	if(IS_NULL(mode)) {
+		DP(o)->outptr = DP(o)->apis.fopen(ctx, fname, "w");
 	}
 	else {
-		KNH_SETv(ctx, b->urn, urn);
-	}		
-	return b;
+		DP(o)->outptr = DP(o)->apis.fopen(ctx, fname, knh_String_tochar(mode));
+	}
+	if(DP(o)->outptr == NULL) {
+		char buff[FILENAME_BUFSIZ];
+		knh_snprintf(buff, sizeof(buff), "IO!!: cannot open %s", (char*)fname.buf);
+		DP(o)->apis = OUT__NOP;
+		return (Object*)new_Nue__s(ctx, buff);
+	}
+	knh_OutputStream_setBOL(o,1);
+	knh_OutputStream_setAutoFlush(o,1);
+	return (Object*)o;
 }
 
 /* ======================================================================== */
 /* [methods] */
 
-void knh_OutputStream_putc(Ctx *ctx, OutputStream *b, int ch)
+void knh_OutputStream_putc(Ctx *ctx, OutputStream *o, int ch)
 {
-	b->drv.fputc(ctx, b->outptr, ch);
-	b->size++;
+	DP(o)->apis.fputc(ctx, DP(o)->outptr, ch);
+	DP(o)->size++;
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method void OutputStream.write(Bytes buf) */
 
-void knh_OutputStream_write(Ctx *ctx, OutputStream *b, knh_bytes_t buf)
+void knh_OutputStream_write(Ctx *ctx, OutputStream *o, knh_bytes_t buf)
 {
-	b->drv.fwrite(ctx, b->outptr, (char*)buf.buf, buf.len);
-	b->size += buf.len;
+	DP(o)->apis.fwrite(ctx, DP(o)->outptr, (char*)buf.buf, buf.len);
+	DP(o)->size += buf.len;
 }
 
 /* ------------------------------------------------------------------------ */
 /* @method void OutputStream.flush() */
 
-INLINE
-void knh_OutputStream_flush(Ctx *ctx, OutputStream *b)
+void knh_OutputStream_flush(Ctx *ctx, OutputStream *o)
 {
-	b->drv.fflush(ctx, b->outptr);
+	DP(o)->apis.fflush(ctx, DP(o)->outptr);
 }
 
 /* ------------------------------------------------------------------------ */
 /* @method void OutputStream.close() */
 
-void knh_OutputStream_close(Ctx *ctx, OutputStream *b)
+void knh_OutputStream_close(Ctx *ctx, OutputStream *o)
 {
-	b->drv.fclose(ctx, b->outptr);
-	b->outptr = NULL;
-	b->drv = DRIVERS__nop;
+	DP(o)->apis.fclose(ctx, DP(o)->outptr);
+	DP(o)->outptr = NULL;
+	DP(o)->apis = OUT__NOP;
 }
 
 /* ------------------------------------------------------------------------ */
+
+void knh_OutputStream_indent_inc(Ctx *ctx, OutputStream *o)
+{
+	DP(o)->indent++;
+}
+
 /* ------------------------------------------------------------------------ */
 
-void knh_OutputStream_print_(Ctx *ctx, OutputStream *b, knh_bytes_t str, knh_bool_t isnl)
+void knh_OutputStream_indent_dec(Ctx *ctx, OutputStream *o)
+{
+	DP(o)->indent--;
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_OutputStream_write_indent(Ctx *ctx, OutputStream *o)
+{
+	int i;
+	for(i = 0; i < DP(o)->indent; i++) {
+		knh_OutputStream_write(ctx, o, knh_String_tobytes(DP(o)->TAB));
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_OutputStream_print_(Ctx *ctx, OutputStream *o, knh_bytes_t str, knh_bool_t isnl)
 {
 	if(str.len > 0) {
-		if(IS_NULL(b->bconv)) {
-			b->drv.fwrite(ctx, b->outptr, (char*)str.buf, str.len);
-			b->size += str.len;
+		if(knh_OutputStream_isBOL(o)) {
+			knh_write_BOL(ctx, o);
+		}
+		if(IS_NULL(DP(o)->bconv)) {
+			DP(o)->apis.fwrite(ctx, DP(o)->outptr, (char*)str.buf, str.len);
+			DP(o)->size += str.len;
 		}
 		else {
-			TODO();
+			Bytes *ba = knh_Context_openBConvBuf(ctx);
+			DP(o)->size += knh_BytesConv_conv(ctx, DP(o)->bconv, str, ba);
+			//DBG2_(DP(o)->apis.fwrite(ctx, DP(o)->outptr, (char*)str.buf, str.len);)
+			DP(o)->apis.fwrite(ctx, DP(o)->outptr, knh_Bytes_tochar(ba), ba->size);
+			knh_Context_closeBConvBuf(ctx, ba);
 		}
 	}
 	if(isnl) {
-		knh_bytes_t buf = knh_String_tobytes(b->NEWLINE);
-		b->drv.fwrite(ctx, b->outptr, (char*)buf.buf, buf.len);
-		b->size += buf.len;
-		b->drv.fflush(ctx, b->outptr);
+		knh_write_EOL(ctx, o);
 	}
 }
 
-/* ------------------------------------------------------------------------ */
 
-void knh_OutputStream_indent_inc(Ctx *ctx, OutputStream *b)
-{
-	b->indent++;
-}
-
-/* ------------------------------------------------------------------------ */
-
-void knh_OutputStream_indent_dec(Ctx *ctx, OutputStream *b)
-{
-	b->indent--;
-}
-
-/* ------------------------------------------------------------------------ */
-
-void knh_OutputStream_write_indent(Ctx *ctx, OutputStream *b)
-{
-	int i;
-	for(i = 0; i < b->indent; i++) {
-		knh_OutputStream_write(ctx, b, knh_String_tobytes(b->TAB));
-	}
-}
-
+/* ======================================================================== */
 /* ======================================================================== */
 /* [nop] */
 
-knh_outptr_t* knh_OutputStream_open__nop(Ctx *ctx, knh_bytes_t n)
+static
+knh_outptr_t* knh_OutputStream_open__NOP(Ctx *ctx, knh_bytes_t n, char *mode)
 {
 	return NULL;
 }
 
 /* ------------------------------------------------------------------------ */
 
-void knh_OutputStream_putc__nop(Ctx *ctx, knh_outptr_t *ptr, int ch)
+static
+void knh_OutputStream_putc__NOP(Ctx *ctx, knh_outptr_t *ptr, int ch)
 {
 
 }
 
 /* ------------------------------------------------------------------------ */
 
-size_t 
-knh_OutputStream_write__nop(Ctx *ctx, knh_outptr_t *ptr, char *buf, size_t bufsiz)
+static
+size_t knh_OutputStream_write__NOP(Ctx *ctx, knh_outptr_t *ptr, char *buf, size_t bufsiz)
 {
 	return bufsiz;
 }
 
 /* ------------------------------------------------------------------------ */
 
-void 
-knh_OutputStream_flush__nop(Ctx *ctx, knh_outptr_t *ptr)
+static
+void knh_OutputStream_flush__NOP(Ctx *ctx, knh_outptr_t *ptr)
 {
-	
+
 }
 
 /* ------------------------------------------------------------------------ */
 
-void 
-knh_OutputStream_close__nop(Ctx *ctx, knh_outptr_t *ptr)
+static
+void knh_OutputStream_close__NOP(Ctx *ctx, knh_outptr_t *ptr)
 {
-	
-}
 
-/* ------------------------------------------------------------------------ */
-
-OutputStream *new_OutputStream__NULL(Ctx *ctx)
-{
-	OutputStream* b = (OutputStream*)knh_Object_malloc(ctx, CLASS_OutputStream);
-	knh_OutputStream_struct_init(ctx, (Struct*)b, 0, NULL);
-	b->outptr = (knh_outptr_t*)NULL;
-	KNH_SETv(ctx, b->urn, new_String__fast(ctx, CLASS_String, STEXT("/dev/null")));
-	return b;
 }
 
 /* ======================================================================== */
 /* [FILE] */
 
-knh_outptr_t* knh_OutputStream_open__FILE(Ctx *ctx, knh_bytes_t file)
+static
+knh_outptr_t* knh_OutputStream_open__FILE(Ctx *ctx, knh_bytes_t file, char *mode)
 {
-	char buf[KONOHA_FILEN_SIZE];
-	knh_file_ospath(ctx, file, buf, sizeof(buf));
-	
-	FILE *fp = fopen(buf, "w");
-	if(fp == NULL) {
-		KNH_THROWf(ctx, "IO!!: cannot open: %s¥n", buf);
-		fprintf(stderr, "konoha: Cannot open: %s\n", buf);
-		return NULL;
+	char buf[FILENAME_BUFSIZ];
+	knh_format_ospath(buf, sizeof(buf), file);
+	{
+		FILE *fp = knh_fopen(buf, mode);
+		if(fp == NULL) {
+			KNH_THROWf(ctx, "IO!!: cannot open: %s, mode='%s'\n", (char*)file.buf, mode);
+			return NULL;
+		}
+		return (knh_outptr_t*)fp;
 	}
-	return (knh_outptr_t*)fp;
 }
 
 /* ------------------------------------------------------------------------ */
 
+static
 void knh_OutputStream_putc__FILE(Ctx *ctx, knh_outptr_t *ptr, int ch)
 {
 	fputc(ch, (FILE*)ptr);
@@ -298,137 +349,94 @@ void knh_OutputStream_putc__FILE(Ctx *ctx, knh_outptr_t *ptr, int ch)
 
 /* ------------------------------------------------------------------------ */
 
-size_t 
-knh_OutputStream_write__FILE(Ctx *ctx, knh_outptr_t *ptr, char *buf, size_t bufsiz)
+static
+size_t knh_OutputStream_write__FILE(Ctx *ctx, knh_outptr_t *ptr, char *buf, size_t bufsiz)
 {
 	return fwrite(buf, 1, bufsiz, (FILE*)ptr);
 }
 
 /* ------------------------------------------------------------------------ */
 
-void 
-knh_OutputStream_flush__FILE(Ctx *ctx, knh_outptr_t *ptr)
+static
+void knh_OutputStream_flush__FILE(Ctx *ctx, knh_outptr_t *ptr)
 {
 	fflush((FILE*)ptr);
 }
 
 /* ------------------------------------------------------------------------ */
 
-void 
-knh_OutputStream_close__FILE(Ctx *ctx, knh_outptr_t *ptr)
+static
+void knh_OutputStream_close__FILE(Ctx *ctx, knh_outptr_t *ptr)
 {
-	fclose((FILE*)ptr);
+	knh_fclose((FILE*)ptr);
 }
 
 /* ------------------------------------------------------------------------ */
 
 OutputStream *new_OutputStream__FILE(Ctx *ctx, FILE *fp)
 {
-	OutputStream* b = (OutputStream*)knh_Object_malloc(ctx, CLASS_OutputStream);
-	knh_OutputStream_struct_init(ctx, (Struct*)b, 0, NULL);
-	b->outptr = (knh_outptr_t*)fp;
+	OutputStream* o = (OutputStream*)new_Object_malloc(ctx, FLAG_OutputStream, CLASS_OutputStream, sizeof(knh_OutputStream_struct));
+	knh_OutputStream_struct_init(ctx, DP(o), 0, NULL);
+	knh_OutputStream_setBOL(o, 1);
+	knh_OutputStream_setAutoFlush(o, 1);
+	DP(o)->outptr = (knh_outptr_t*)fp;
 	if(fp == stdout) {
-		KNH_SETv(ctx, b->urn, new_String__fast(ctx, CLASS_String, STEXT("/dev/stdout")));
-		b->drv = DRIVERS__stdout;
+		KNH_SETv(ctx, DP(o)->urn, TS_DEVSTDOUT);
+		DP(o)->apis = OUT__stdout;
 	}
 	else if(fp == stderr) {
-		KNH_SETv(ctx, b->urn, new_String__fast(ctx, CLASS_String, STEXT("/dev/stderr")));
-		b->drv = DRIVERS__stdout;
+		KNH_SETv(ctx, DP(o)->urn, TS_DEVSTDERR);
+		DP(o)->apis = OUT__stdout;
 	}
 	else {
-		KNH_SETv(ctx, b->urn, new_String__fast(ctx, CLASS_String, STEXT("/dev/unknown")));
-		b->drv = DRIVERS__FILE;
+		DP(o)->apis = OUT__FILE;
 	}
-	return b;
+	return o;
 }
 
 /* ======================================================================== */
 /* [Bytes] */
 
+static
 void knh_OutputStream_putc__Bytes(Ctx *ctx, knh_outptr_t *ptr, int ch)
 {
-	OutputStream *b = (OutputStream*)ptr;
-	knh_Bytes_putc(ctx, b->ba, ch);
+	OutputStream *o = (OutputStream*)ptr;
+	knh_Bytes_putc(ctx, DP(o)->ba, ch);
 }
 
 /* ------------------------------------------------------------------------ */
 
-size_t 
-knh_OutputStream_write__Bytes(Ctx *ctx, knh_outptr_t *ptr, char *buf, size_t bufsiz)
+static
+size_t knh_OutputStream_write__Bytes(Ctx *ctx, knh_outptr_t *ptr, char *buf, size_t bufsiz)
 {
-	OutputStream *b = (OutputStream*)ptr;
-	knh_Bytes_write(ctx, b->ba, B2(buf, bufsiz));
+	OutputStream *o = (OutputStream*)ptr;
+	knh_Bytes_write(ctx, DP(o)->ba, B2(buf, bufsiz));
 	return bufsiz;
 }
 
 /* ------------------------------------------------------------------------ */
 
-void 
-knh_OutputStream_close__Bytes(Ctx *ctx, knh_outptr_t *ptr)
+static
+void knh_OutputStream_close__Bytes(Ctx *ctx, knh_outptr_t *ptr)
 {
-	OutputStream *b = (OutputStream*)ptr;
-	KNH_SETv(ctx, b->ba, KNH_NULL);
+	OutputStream *o = (OutputStream*)ptr;
+	KNH_SETv(ctx, DP(o)->ba, KNH_NULL);
 }
 
 /* ------------------------------------------------------------------------ */
 
 OutputStream *new_OutputStream__Bytes(Ctx *ctx, Bytes *ba)
 {
-	OutputStream* b = (OutputStream*)knh_Object_malloc(ctx, CLASS_OutputStream);
-	knh_OutputStream_struct_init(ctx, (Struct*)b, 0, NULL);
-	b->outptr = (knh_outptr_t*)b;
+	OutputStream* o = (OutputStream*)new_Object_malloc(ctx, FLAG_OutputStream, CLASS_OutputStream, sizeof(knh_OutputStream_struct));
+	knh_OutputStream_struct_init(ctx, DP(o), 0, NULL);
+	knh_OutputStream_setBOL(o, 1);
+	//knh_OutputStream_setAutoFlush(o, 1);
 	if(!IS_NULL(ba)) {
-		KNH_SETv(ctx, b->ba, ba);
-		b->drv = DRIVERS__Bytes;
+		KNH_SETv(ctx, DP(o)->ba, ba);
+		DP(o)->apis = OUT__Bytes;
 	}
-	return b;
-}
-
-
-/* ======================================================================== */
-/* [TFUNC] */
-
-void
-KNH_TFUNC_OUTPUTSTREAM_OPEN(Ctx *ctx, char *n, f_outptr_open f)
-{
-	if(f == NULL) f = knh_OutputStream_open__nop;
-	KNH_TFUNC(ctx, n, (void*)f);
-}
-
-/* ------------------------------------------------------------------------ */
-
-void
-KNH_TFUNC_OUTPUTSTREAM_PUTC(Ctx *ctx, char *n, f_outptr_putc f)
-{
-	if(f == NULL) f = knh_OutputStream_putc__nop;
-	KNH_TFUNC(ctx, n, (void*)f);
-}
-
-/* ------------------------------------------------------------------------ */
-
-void
-KNH_TFUNC_OUTPUTSTREAM_WRITE(Ctx *ctx, char *n, f_outptr_write f)
-{
-	if(f == NULL) f = knh_OutputStream_write__nop;
-	KNH_TFUNC(ctx, n, (void*)f);
-}
-
-/* ------------------------------------------------------------------------ */
-
-void
-KNH_TFUNC_OUTPUTSTREAM_FLUSH(Ctx *ctx, char *n, f_outptr_flush f)
-{
-	if(f == NULL) f = knh_OutputStream_flush__nop;
-	KNH_TFUNC(ctx, n, (void*)f);
-}
-
-/* ------------------------------------------------------------------------ */
-
-void
-KNH_TFUNC_OUTPUTSTREAM_CLOSE(Ctx *ctx, char *n, f_outptr_close f)
-{
-	if(f == NULL) f = knh_OutputStream_close__nop;
-	KNH_TFUNC(ctx, n, (void*)f);
+	DP(o)->outptr = (knh_outptr_t*)o;
+	return o;
 }
 
 /* ------------------------------------------------------------------------ */

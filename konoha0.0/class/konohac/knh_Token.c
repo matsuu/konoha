@@ -1,20 +1,20 @@
 /****************************************************************************
- * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER  
- * 
+ * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
+ *
  * Copyright (c) 2005-2008, Kimio Kuramitsu <kimio at ynu.ac.jp>
- *           (c) 2008-      Konoha Software Foundation  
+ *           (c) 2008-      Konoha Software Foundation
  * All rights reserved.
- * 
- * You may choose one of the following two licenses when you use konoha. 
+ *
+ * You may choose one of the following two licenses when you use konoha.
  * See www.konohaware.org/license.html for further information.
- * 
+ *
  * (1) GNU General Public License 2.0      (with    KONOHA_UNDER_GPL2)
  * (2) Konoha Software Foundation License 1.0
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
  * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *  
+ *
  ****************************************************************************/
 
 /* ************************************************************************ */
@@ -31,7 +31,7 @@
 
 /* ************************************************************************ */
 
-#ifdef __cplusplus 
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -39,13 +39,10 @@ extern "C" {
 /* [struct] */
 
 void
-knh_Token_struct_init(Ctx *ctx, Struct *s, int init, Object *cs)
+knh_Token_struct_init(Ctx *ctx, knh_Token_struct *b, int init, Object *cs)
 {
-	Token *b = (Token*)s;
-	b->flag = 0;
-	b->tt = 0;
-	b->filen = 0;
-	b->line =  1;
+	b->tt_next = TT_EOT;
+	b->type    =  CLASS_Any;
 	KNH_INITv(b->data, KNH_NULL);
 }
 
@@ -60,231 +57,289 @@ knh_Token_struct_init(Ctx *ctx, Struct *s, int init, Object *cs)
 /* ------------------------------------------------------------------------ */
 
 void
-knh_Token_struct_traverse(Ctx *ctx, Struct *s, f_gc gc)
+knh_Token_struct_traverse(Ctx *ctx, knh_Token_struct *b, f_traverse gc)
 {
-	Token *b = (Token*)s;
 	gc(ctx, b->data);
 }
 
 /* ======================================================================== */
 /* [constructors] */
 
-Token* new_Token(Ctx *ctx, knh_flag_t flag, knh_filen_t filen, knh_line_t line, knh_bytes_t t, knh_token_t tt)
+Token* new_Token(Ctx *ctx, knh_flag_t flag, knh_fileid_t fileid, knh_line_t line, knh_token_t tt)
 {
-	Token* b = (Token*)knh_Object_malloc(ctx, CLASS_Token);
-	knh_Token_struct_init(ctx, (Struct*)b, 0, NULL);
-	b->flag = flag;
-	b->tt = tt;
-	b->filen =  filen;
-	b->line =  line;
-	if(TT_NUM <= tt) {
-		if(tt == TT_PROPN) t = knh_bytes_last(t, 1);
-		if(tt == TT_LABEL) t.len--;
-		if(tt == TT_STR || tt == TT_QSTR || tt == TT_FMTSTR) {
-			t = knh_bytes_last(t, 1);
-			t.len--;
-		}
-		KNH_SETv(ctx, b->data, new_String__fast(ctx, CLASS_String, t));
-	}
-	return b;
+	knh_Token_t *o =
+		(Token*)new_Object_malloc(ctx, FLAG_Token, CLASS_Token, sizeof(knh_Token_struct));
+	knh_Token_struct_init(ctx, DP(o), 0, NULL);
+	SP(o)->flag =   flag;
+	SP(o)->fileid = fileid;
+	SP(o)->line =   line;
+	SP(o)->tt   =   tt;
+	return o;
 }
 
 /* ------------------------------------------------------------------------ */
 
-INLINE
 Token *new_Token__text(Ctx *ctx, Token *ftk, knh_bytes_t text)
 {
-	return new_Token__parse(ctx, KNH_FLAG_TKF_GENERATED, ftk->filen, ftk->line, text);
+	Token *o = new_Token__parse(ctx, KNH_FLAG_TKF_GENERATED, SP(ftk)->fileid, SP(ftk)->line, text, (BytesConv*)KNH_NULL);
+	DP(o)->tt_next = DP(ftk)->tt_next;
+	return o;
 }
 
 /* ------------------------------------------------------------------------ */
 
-INLINE
-Token *new_Token__ASIS(Ctx *ctx, Token *ftk)
+void knh_Token_setFL(Token *o, Any *fln)
 {
-	Token* b = (Token*)knh_Object_malloc(ctx, CLASS_Token);
-	knh_Token_struct_init(ctx, (Struct*)b, 0, NULL);
-	b->flag = KNH_FLAG_TKF_GENERATED;
-	b->tt = TT_ASIS;
-	b->filen =  ftk->filen;
-	b->line =  ftk->line;
-	return b;
+	if(IS_Token(fln)) {
+		Token *tk = (Token*)fln;
+		SP(o)->fileid =  SP(tk)->fileid;
+		SP(o)->line =  SP(tk)->line;
+	}
+	else if(IS_Compiler((Object*)fln)) {
+		Compiler *cpr = (Compiler*)fln;
+		SP(o)->fileid =  DP(cpr)->fileid;
+		SP(o)->line =  DP(cpr)->line;
+	}
+	else {
+		Stmt *stmt = (Stmt*)fln;
+		KNH_ASSERT(IS_Stmt(stmt));
+		SP(o)->fileid =  SP(stmt)->fileid;
+		SP(o)->line =  SP(stmt)->line;
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+Token *new_TokenASIS(Ctx *ctx, Any *fln)
+{
+	knh_Token_t *o = (Token*)new_Object_malloc(ctx, FLAG_Token, CLASS_Token, sizeof(knh_Token_struct));
+	knh_Token_struct_init(ctx, DP(o), 0, NULL);
+	SP(o)->flag = KNH_FLAG_TKF_GENERATED;
+	SP(o)->tt = TT_ASIS;
+	knh_Token_setFL(o, fln);
+	return o;
+}
+
+/* ------------------------------------------------------------------------ */
+
+Token *new_TokenCID(Ctx *ctx, Any *fln, knh_class_t cid)
+{
+	knh_Token_t *o = (Token*)new_Object_malloc(ctx, FLAG_Token, CLASS_Token, sizeof(knh_Token_struct));
+	knh_Token_struct_init(ctx, DP(o), 0, NULL);
+	SP(o)->flag = KNH_FLAG_TKF_GENERATED;
+	SP(o)->tt = TT_CID;
+	knh_Token_setFL(o, fln);
+	DP(o)->cid = cid;
+	return o;
+}
+
+/* ------------------------------------------------------------------------ */
+
+Token *new_TokenMN(Ctx *ctx, Any *fln, knh_methodn_t mn)
+{
+	knh_Token_t *o = (Token*)new_Object_malloc(ctx, FLAG_Token, CLASS_Token, sizeof(knh_Token_struct));
+	knh_Token_struct_init(ctx, DP(o), 0, NULL);
+	SP(o)->flag = KNH_FLAG_TKF_GENERATED;
+	SP(o)->tt = TT_MN;
+	knh_Token_setFL(o, fln);
+	DP(o)->mn = mn;
+	return o;
+}
+
+/* ------------------------------------------------------------------------ */
+
+Token *new_TokenFN(Ctx *ctx, Any *fln, knh_fieldn_t fn)
+{
+	knh_Token_t *o = (Token*)new_Object_malloc(ctx, FLAG_Token, CLASS_Token, sizeof(knh_Token_struct));
+	knh_Token_struct_init(ctx, DP(o), 0, NULL);
+	SP(o)->flag = KNH_FLAG_TKF_GENERATED;
+	SP(o)->tt = TT_FN;
+	knh_Token_setFL(o, fln);
+	DP(o)->fn = fn;
+	return o;
+}
+
+///* ------------------------------------------------------------------------ */
+//
+//Token *new_Token__T(Ctx *ctx, Token *ftk, knh_token_t tt, char *token)
+//{
+//	knh_Token_t *o =
+//		(Token*)new_Object__RAW(ctx, FLAG_Token, CLASS_Token, sizeof(knh_Token_struct));
+//	knh_Token_struct_init(ctx, DP(o), 0, NULL);
+//	DP(o)->flag = KNH_FLAG_TKF_GENERATED;
+//	SP(o)->tt = tt;
+//	DP(o)->fileid =  DP(ftk)->fileid;
+//	DP(o)->line =  DP(ftk)->line;
+//	DP(o)->tt_next = DP(ftk)->tt_next;
+//	KNH_SETv(ctx, DP(o)->data, new_String__T(ctx, token));
+//	return o;
+//}
+//
+/* ------------------------------------------------------------------------ */
+
+Token *new_Token__S(Ctx *ctx, Any *fln, knh_token_t tt, String *t)
+{
+	knh_Token_t *o =
+		(Token*)new_Object_malloc(ctx, FLAG_Token, CLASS_Token, sizeof(knh_Token_struct));
+	knh_Token_struct_init(ctx, DP(o), 0, NULL);
+	SP(o)->flag = KNH_FLAG_TKF_GENERATED;
+	SP(o)->tt = tt;
+	knh_Token_setFL(o, fln);
+	KNH_SETv(ctx, DP(o)->data, t);
+	return o;
 }
 
 /* ======================================================================== */
 /* [Array] */
 
+#define knh_token_isNested(tt)  (tt == TT_BRACE || tt == TT_PARENTHESIS || tt == TT_BRANCET)
 
-Token** knh_Token_ts(Token *b)
+/* ------------------------------------------------------------------------ */
+
+void knh_Token_tc(Token *o, knh_tokens_t *tc)
 {
-	DEBUG_ASSERT(knh_token_isNested(b->tt));
-	if(IS_Array(b->data)) {
-		return (Token**)knh_Array_list((Array*)b->data);
-	}else{
-		return &(b->data);
+	KNH_ASSERT(knh_token_isNested(SP(o)->tt));
+	tc->c = 0;
+	if(IS_Array(DP(o)->data)) {
+		tc->ts = (Token**)knh_Array_list((Array*)DP(o)->data);
+		tc->e = knh_Array_size(((Array*)DP(o)->data));
+	}
+	else if(IS_NULL(DP(o)->data)) {
+		tc->ts = NULL;
+		tc->e = 0;
+	}
+	else{
+		KNH_ASSERT(IS_Token(DP(o)->data));
+		tc->ts = &(DP(o)->token);
+		tc->e = 1;
 	}
 }
 
 /* ------------------------------------------------------------------------ */
 
-
-size_t knh_Token_tokens_size(Token *b)
+void knh_Token_tokens_add(Ctx *ctx, Token *o, Token *tk)
 {
-	DEBUG_ASSERT(knh_token_isNested(b->tt));
-	if(IS_NULL(b->data)) return 0;
-	if(IS_Token(b->data)) return 1;
-	return knh_Array_size((Array*)b->data);
-}
-
-/* ------------------------------------------------------------------------ */
-
-
-Token* knh_Tokens(Token *b, size_t n)
-{
-	DEBUG_ASSERT(knh_token_isNested(b->tt));
-	DEBUG_ASSERT(IS_NOTNULL(b->data));
-	if(IS_Token(b->data)) {
-		DEBUG_ASSERT(n == 0);
-		return (Token*)b->data;
-	}
-	DEBUG_ASSERT(n < knh_Array_size((Array*)b->data));
-	return knh_Array_n((Array*)b->data, n);
-}
-
-/* ------------------------------------------------------------------------ */
-
-
-void knh_Token_tokens_add(Ctx *ctx, Token *b, Token *tk)
-{
-	DEBUG_ASSERT(knh_token_isNested(b->tt));
-	DEBUG_ASSERT(IS_Token(tk));
-	if(IS_NULL(b->data)) {
-		KNH_SETv(ctx, b->data, tk);
+	KNH_ASSERT(knh_token_isNested(SP(o)->tt));
+	KNH_ASSERT(IS_Token(tk));
+	if(IS_NULL(DP(o)->data)) {
+		KNH_SETv(ctx, DP(o)->data, tk);
 		return ;
 	}
-	if(IS_Token(b->data)) {
-		Array *a = new_Array(ctx, 2);
-		knh_Array_append(ctx, a, b->data);
-		KNH_SETv(ctx, b->data, a);
+	if(IS_Token(DP(o)->data)) {
+		Array *a = new_Array(ctx, CLASS_Any, 2);
+		knh_Array_add(ctx, a, DP(o)->data);
+		KNH_SETv(ctx, DP(o)->data, a);
 	}
-//	DEBUG("typeof(b->data)=%s", CLASSNo(b->data));
-	DEBUG_ASSERT(IS_Array(b->data));
-	knh_Array_add(ctx, (Array*)b->data, tk);
+	KNH_ASSERT(IS_Array(DP(o)->data));
+	knh_Array_add(ctx, (Array*)DP(o)->data, UP(tk));
 }
 
 /* ------------------------------------------------------------------------ */
 
-
-void knh_Token_tokens_empty(Ctx *ctx, Token *b)
+void knh_Token_tokens_empty(Ctx *ctx, Token *o)
 {
-	DEBUG_ASSERT(knh_token_isNested(b->tt));
-	KNH_SETv(ctx, b->data, KNH_NULL);
-}
-
-
-/* ======================================================================== */
-/* [RAW] */
-
-Token* new_Token__RAW(Ctx *ctx, knh_flag_t flag, Token *tk, Object *data)
-{
-	Token* b = (Token*)knh_Object_malloc(ctx, CLASS_Token);
-	b->flag = flag | KNH_FLAG_TKF_GENERATED;
-	b->tt = TT_RAW;
-	b->filen =  tk->filen;
-	b->line =  tk->line;
-	KNH_INITv(b->data, data);
-	return b;
-}
-
-/* ------------------------------------------------------------------------ */
-
-
-void knh_Token_setRAW(Ctx *ctx, Token *b, Object *data)
-{
-	b->tt = TT_RAW;
-	KNH_SETv(ctx, b->data, data);
-}
-
-/* ------------------------------------------------------------------------ */
-
-
-void knh_Token_toRAW(Token *b)
-{
-	b->tt = TT_RAW;
-}
-
-/* ------------------------------------------------------------------------ */
-
-Token *new_Token__using_Null(Ctx *ctx, Token *tk)
-{
-	MC_EPRINT(ctx, tk, 3, "using null");
-	return new_Token__RAW(ctx, KNH_FLAG_TKF_GENERATED, tk, KNH_NULL);
+	KNH_ASSERT(knh_token_isNested(SP(o)->tt));
+	KNH_SETv(ctx, DP(o)->data, KNH_NULL);
 }
 
 
 /* ======================================================================== */
 /* [movabletext] */
 
-
-char *knh_Token_tochar(Token *b)
+char *knh_Token_tochar(Token *o)
 {
-	DEBUG_ASSERT(IS_Token(b));
-	if(b->tt < TT_NUM) {
-		return knh_token_tochar(b->tt);
+	KNH_ASSERT(IS_Token(o));
+	if(SP(o)->tt == TT_ASIS) { return "_"; }
+	if(SP(o)->tt < TT_NUM) {
+		return knh_token_tochar(SP(o)->tt);
 	}
-	if(IS_String(b->data)) {
-		return knh_String_tochar(b->data);
+	if(IS_String(DP(o)->str)) {
+		return knh_String_tochar(DP(o)->str);
 	}
-	if(b->tt == TT_RAW) {
-		return "TT_RAW";
+	if(IS_NULL(DP(o)->data)) {
+		return "null";
+	}
+	if(SP(o)->tt == TT_CID) {
+		return CLASSN(DP(o)->cid);
+	}
+	if(SP(o)->tt == TT_FN) {
+		return FIELDN(DP(o)->fn);
+	}
+#ifdef KNH_DBGMODE
+	if(SP(o)->tt == TT_CONST) {
+		return "TT_CONST";
 	}
 	return "Token: unknown";
+#else
+	return "";
+#endif
 }
 
 /* ------------------------------------------------------------------------ */
 
-INLINE knh_bytes_t knh_Token_tobytes(Token *b)
+knh_bytes_t knh_Token_tobytes(Token *o)
 {
-	knh_bytes_t t;
-	t.buf = (knh_uchar_t*)knh_Token_tochar(b);
-	t.len = knh_strlen(t.buf);
-	return t;
+	return new_bytes(knh_Token_tochar(o));
 }
 
 /* ------------------------------------------------------------------------ */
 /* @method void Token.%s(OutputStream w, Any m) */
 
-void knh_Token__s(Ctx *ctx, Token *b, OutputStream *w, Any *m)
+void knh_Token__s(Ctx *ctx, Token *o, OutputStream *w, Any *m)
 {
-	DEBUG_ASSERT(IS_Token(b));
-	if(b->tt < TT_NUM) {
-		knh_write__s(ctx, w, knh_token_tochar(b->tt));
-	}else if(IS_String(b->data)) {
-		knh_write__s(ctx, w, knh_String_tochar(b->data));
-	}else if(IS_NULL(b->data)) {
+	KNH_ASSERT(IS_Token(o));
+	if(SP(o)->tt < TT_NUM || SP(o)->tt == TT_ASIS) {
+		knh_write__s(ctx, w, knh_token_tochar(SP(o)->tt));
+	}else if(SP(o)->tt == TT_CID) {
+		knh_write__s(ctx, w, CLASSN(DP(o)->cid));
+	}else if(SP(o)->tt == TT_FN) {
+		knh_write__s(ctx, w, FIELDN(DP(o)->fn));
+	}else if(SP(o)->tt == TT_MN) {
+		char bufm[CLASSNAME_BUFSIZ];
+		knh_format_methodn(bufm, sizeof(bufm), DP(o)->mn);
+		knh_write__s(ctx, w, bufm);
+	}else if(IS_String(DP(o)->str)) {
+		if(SP(o)->tt == TT_STR) {
+			knh_putc(ctx, w, '"');
+			knh_write__s(ctx, w, knh_String_tochar(DP(o)->str));
+			knh_putc(ctx, w, '"');
+		}
+		else if(SP(o)->tt == TT_TSTR) {
+			knh_putc(ctx, w, '\'');
+			knh_write__s(ctx, w, knh_String_tochar(DP(o)->str));
+			knh_putc(ctx, w, '\'');
+		}
+		else {
+			knh_write__s(ctx, w, knh_String_tochar(DP(o)->str));
+		}
+	}else if(IS_NULL(DP(o)->data)) {
 		knh_write__s(ctx, w, "null");
-	}else if(b->tt == TT_RAW) {
-		knh_format(ctx, w, METHODN__s, b->data, KNH_NULL);
+	}else {
+		knh_format(ctx, w, METHODN__k, DP(o)->data, KNH_NULL);
 	}
-}	
+}
 
 /* ------------------------------------------------------------------------ */
 /* @method void Token.%dump(OutputStream w, Any m) */
 
-void knh_Token__dump(Ctx *ctx, Token *b, OutputStream *w, Any *m)
+void knh_Token__dump(Ctx *ctx, Token *o, OutputStream *w, Any *m)
 {
-	DEBUG_ASSERT(IS_Token(b));
+	KNH_ASSERT(IS_Token(o));
 	knh_OutputStream_write_indent(ctx, w);
-	knh_printf(ctx, w, "%s[%d]", knh_token_tochar(b->tt), (int)b->line);
-	//knh_write_flag(ctx, w, b->flag);
+	knh_printf(ctx, w, "%s[%d]", knh_token_tochar(SP(o)->tt), (int)SP(o)->line);
 	knh_putc(ctx, w, ' ');
-	knh_Token__s(ctx, b, w, m);
+	knh_Token__s(ctx, o, w, m);
+	knh_printf(ctx, w, " (>>%s) ", knh_token_tochar(DP(o)->tt_next));
+	if(SP(o)->flag != 0)
+		knh_write__flag(ctx, w, SP(o)->flag);
 	knh_println(ctx, w, STEXT(""));
-	if(knh_token_isNested(b->tt)) {
+	if(knh_token_isNested(SP(o)->tt)) {
+		int i;
+		knh_tokens_t tc;
+		knh_Token_tc(o, &tc);
 		knh_OutputStream_indent_inc(ctx, w);
-		knh_int_t i = 0; 
-		for(i = 0; i < knh_Token_tokens_size(b); i++) {
-			knh_Token__dump(ctx, knh_Tokens(b, i), w, m);
+		for(i = 0; i < tc.e; i++) {
+			knh_Token__dump(ctx, tc.ts[i], w, m);
 		}
 		knh_OutputStream_indent_dec(ctx, w);
 	}

@@ -50,7 +50,13 @@ extern "C" {
 #endif
 
 #ifndef KNH_FLOATUNIT_BUFSIZ
-#define KNH_FLOATUNIT_BUFSIZ 80
+#define BUFSIZ_FLOAT 80
+#endif
+
+/* Array */
+
+#ifndef KNH_ARRAY_INITSIZE
+#define KNH_ARRAY_INITSIZE 4
 #endif
 
 /* HashMap */

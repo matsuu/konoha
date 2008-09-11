@@ -38,76 +38,110 @@ extern "C" {
 /* ======================================================================== */
 /* [macros] */
 
-#define _knh_Object_cid(o)           (knh_class_t)(knh_Object_head(o)->cid)
-#define _knh_Object_topsid(o)        knh_tclass_topsid(knh_Object_cid(o))
-#define _knh_Object_offset(o)        knh_tclass_offset(knh_Object_cid(o))
-
+#define _knh_Object_cid(o)           (o)->h.cid
+#define _knh_Object_bcid(o)          (o)->h.bcid
 
 /* ======================================================================== */
-/* [copy] */
+/* [init] */
 
-Object *
-new_Object__cid(Ctx *ctx, knh_flag_t flag, knh_class_t cid)
+Object *new_Object__init(Ctx *ctx, knh_flag_t flag, knh_class_t cid)
 {
-	Object **s = (Object**)knh_Object_malloc(ctx, cid);
-	L_TAIL:;
-	ClassStruct *cs = knh_tclass_cstruct(cid);
-	size_t offset = knh_tclass_offset(cid);
+	DEBUG_ASSERT_cid(cid);
+		
+	switch(knh_tClass[cid].bcid) {
 	
-	f_struct_init finit = knh_tstruct_finit(cs->sid);
-	finit(ctx, (Struct*)(&(s[offset])), 0, cs);
+	case CLASS_Nue :       
+		KNH_ASSERT(ctx == NULL); /* stop */
+		return (Object*)KNH_NULL;
+	case CLASS_Boolean :   
+		KNH_ASSERT(ctx == NULL); /* stop */
+		return (Object*)KNH_FALSE;
+	case CLASS_Class :     
+		KNH_ASSERT(ctx == NULL); /* stop */
+		return (Object*)knh_tClass[CLASS_Object].class_cid;
 
-	if(offset == 0) return (Object*)s;
-	cid = knh_tclass_supcid(cid);
-	goto L_TAIL;
+	case CLASS_Int :       case CLASS_IntX :
+	case CLASS_Float :     case CLASS_FloatX :
+	case CLASS_Int64:      case CLASS_Int64X :
+	case CLASS_String :    case CLASS_StringX :
+		KNH_ASSERT(ctx == NULL); /* stop */
+		return knh_tClass[cid].fdefault(ctx, cid);
+
+	case CLASS_Context:
+		{
+			KNH_ASSERT(ctx == NULL); /* stop */
+			return (Object*)ctx;
+		}
+		
+	case CLASS_Bytes :
+		{
+			KNH_ASSERT((knh_tClass[cid].size == 0));
+			knh_Bytes_t *b = (knh_Bytes_t*)new_Object(ctx, flag, cid);
+			b->buf = (knh_uchar_t*)NULL;
+			b->size = 0;
+			return (Object*)b;
+		}
+
+	case CLASS_Range:
+	case CLASS_Tuple2:
+		{
+			KNH_ASSERT((knh_tClass[cid].size == 0));
+			knh_Tuple2_t *t = (knh_Tuple2_t*)new_Object(ctx, flag, cid);
+			KNH_INITv(t->first, KNH_NULL);
+			KNH_INITv(t->second, KNH_NULL);
+			return (Object*)t;
+		}
+		
+	case CLASS_Array :
+		{
+			KNH_ASSERT((knh_tClass[cid].size == 0));
+			knh_Array_t *a = (knh_Array_t*)new_Object(ctx, flag, cid);
+			a->list = NULL;
+			a->size = 0;
+			return (Object*)a;
+		}
+	
+
+	case CLASS_Object:
+	default :
+		{
+			return new_Object(ctx, flag, cid);
+		}
+	}
 }
 
 /* ======================================================================== */
 /* [copy] */
-
 
 Object *knh_Object_copy(Ctx *ctx, Object *b)
 {
 	if(knh_Object_isImmutable(b)) {
 		return b;
 	}
-	DEBUG("!IMMUTABLE %s", CLASSN(knh_Object_cid(b)));
+	DBG2_P("!IMMUTABLE %s", CLASSN(knh_Object_cid(b)));
 	return b;
-}
-
-/* ======================================================================== */
-/* [class] */
-
-/* @method Class! Object.getClass() */
-
-INLINE
-knh_class_t knh_Object_getClass(Object *b)
-{
-	return knh_Object_pcid(b);
 }
 
 /* ======================================================================== */
 /* [commons] */
 
-
-knh_hcode_t knh_Object_hcode(Ctx *ctx, Object *self)
+knh_hcode_t knh_Object_hashCode(Object *o)
 {
-	switch(knh_Object_topsid(self)) {
-		case STRUCT_String :  return knh_String_hcode(self);
-		case STRUCT_Int :     return (knh_hcode_t)knh_Int_value((Int*)self);
-		case STRUCT_Float:    return (knh_hcode_t)(knh_Float_value((Float*)self));
+	if(o->h.cid == CLASS_Object) {
+		return (knh_hcode_t)o / sizeof(Object*);
 	}
-	TODO();
-	return (knh_hcode_t)self / sizeof(Object*);
+	else {
+		return knh_tStruct[o->h.bcid].fhashCode(o);
+	}
 }
 
 /* ------------------------------------------------------------------------ */
 
-knh_bytes_t knh_Object_tobytes(Ctx *ctx, Object *v)
+knh_bytes_t knh_Object_tobytes(Ctx *ctx, Object *o)
 {
-	switch(knh_Object_topsid(v)) {
-		case STRUCT_String : return knh_String_tobytes(v);
-		case STRUCT_Bytes : return knh_Bytes_tobytes(v);
+	switch(o->h.bcid) {
+		case STRUCT_String : return knh_String_tobytes((String*)o);
+		case STRUCT_Bytes : return knh_Bytes_tobytes((Bytes*)o);
 	}
 	TODO();
 	return STEXT("");
@@ -116,252 +150,20 @@ knh_bytes_t knh_Object_tobytes(Ctx *ctx, Object *v)
 /* ======================================================================== */
 /* [structs] */
 
-/* @method Int! Object.compare(Any other) */
-
-INLINE
-knh_int_t knh_Object_compare(Ctx *ctx, Object *o1, Object *o2)
-{
-	if(o1 == o2) return 0;
-	knh_class_t cid  = knh_Object_cid(o1);
-	knh_class_t cid2 = knh_Object_cid(o2);
-
-	if(cid == cid2) {
-		if(cid == CLASS_Int) {
-			return ((Int*)o1)->value - ((Int*)o2)->value;
-		}
-		f_struct_compare fcmp = knh_tstruct_fcompare(knh_Object_topsid(o1));
-		DEBUG_ASSERT(fcmp != NULL);
-		return fcmp(ctx, (Struct*)o1, (Struct*)o2);
-	}
-	DEBUG("%s - %s", CLASSN(cid), CLASSN(cid2));	
-	return (knh_int_t)o1 - (knh_int_t)o2;
-}
-
-/* ------------------------------------------------------------------------ */
-
-INLINE
-knh_bool_t knh_Object_equals(Ctx *ctx, Object *o1, Object *o2)
-{
-	return (knh_Object_compare(ctx, o1, o2) == 0); 
-}
-
-
-/* ======================================================================== */
-/* [operators] */
-
-/* @method[STATIC] Bool Object.opEq(Any value) */
-
-void knh__Object_opEq(Ctx *ctx, Object **sfp)
-{
-	if(knh_Object_compare(ctx, sfp[0], sfp[1]) == 0) {
-		VM_RET(ctx, KNH_TRUE);
-	}
-	else {
-		VM_RET(ctx, KNH_FALSE);
-	}
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method[STATIC] Bool Object.opNeq(Any value) */
-
-void knh__Object_opNeq(Ctx *ctx, Object **sfp)
-{
-	if(knh_Object_compare(ctx, sfp[0], sfp[1]) == 0) {
-		VM_RET(ctx, KNH_FALSE);
-	}
-	else {
-		VM_RET(ctx, KNH_TRUE);
-	}
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method[STATIC] Bool Object.opLt(Any value) */
-
-void knh__Object_opLt(Ctx *ctx, Object **sfp)
-{
-	if(knh_Object_compare(ctx, sfp[0], sfp[1]) < 0) {
-		VM_RET(ctx, KNH_TRUE);
-	}
-	else {
-		VM_RET(ctx, KNH_FALSE);
-	}
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method[STATIC] Bool Object.opLte(Any value) */
-
-void knh__Object_opLte(Ctx *ctx, Object **sfp)
-{
-	if(knh_Object_compare(ctx, sfp[0], sfp[1]) <= 0) {
-		VM_RET(ctx, KNH_TRUE);
-	}
-	else {
-		VM_RET(ctx, KNH_FALSE);
-	}
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method[STATIC] Bool Object.opGt(Any value) */
-
-void knh__Object_opGt(Ctx *ctx, Object **sfp)
-{
-	if(knh_Object_compare(ctx, sfp[0], sfp[1]) > 0) {
-		VM_RET(ctx, KNH_TRUE);
-	}
-	else {
-		VM_RET(ctx, KNH_FALSE);
-	}
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method[STATIC] Bool Object.opGte(Any value) */
-
-void knh__Object_opGte(Ctx *ctx, Object **sfp)
-{
-	if(knh_Object_compare(ctx, sfp[0], sfp[1]) >= 0) {
-		VM_RET(ctx, KNH_TRUE);
-	}
-	else {
-		VM_RET(ctx, KNH_FALSE);
-	}
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method[STATIC] Bool Object.opNot() */
-
-void knh__Object_opNot(Ctx *ctx, Object **sfp)
-{
-	if(!(IS_TRUE(sfp[0]))) {
-		VM_RET(ctx, KNH_TRUE);
-	}
-	else {
-		VM_RET(ctx, KNH_FALSE);
-	}
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method[STATIC] Bool Object.opSeq(Any value) */
-
-void knh__Object_opSeq(Ctx *ctx, Object **sfp)
-{
-	TODO();
-	VM_RET(ctx, KNH_FALSE);
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method[STATIC] Bool Object.opIsMapTo(Any value) */
-
-void knh__Object_opIsMapTo(Ctx *ctx, Object **sfp)
-{
-	TODO();
-	VM_RET(ctx, KNH_FALSE);
-}
-
 /* ======================================================================== */
 /* [mapping] */
-
-/* @map Object Iterator! */
-
-Object* knh_Object_Iterator(Ctx *ctx, Object *self, MapMap *map)
-{
-	return new_Iterator(ctx, knh_Object_cid(self), self, NULL);
-}
 
 /* ------------------------------------------------------------------------ */
 /* @map Object String! */
 
-Object* knh_Object_String(Ctx *ctx, Object *self, MapMap *map)
+String* knh_Object_String(Ctx *ctx, Object *o, Mapper *map)
 {
-	return knh_Object_movableText(ctx, self, METHODN__s, KNH_NULL);
-}
-
-///* ------------------------------------------------------------------------ */
-///* @method void Object.save(Int lv=0) */
-//
-//void knh_Object_save(Ctx *ctx, Object *b, knh_int_t lv)
-//{
-//	TODO();
-//}
-
-/* ======================================================================== */
-/* [movabletext] */
-
-/* @method void Object.%s(OutputStream w, Any m) */
-
-INLINE
-void knh_Object__s(Ctx *ctx, Object *b, OutputStream *w, Any *m)
-{
-	if(IS_NULL(b)) {
-		knh_write(ctx, w, STEXT("null"));
-	}
-	else {
-		knh_write__s(ctx,w, CLASSN(knh_Object_cid(b)));
-		knh_write(ctx,w, STEXT(":"));
-		knh_write__p(ctx,w, (void*)b);
-	}
+	return knh_Object_movableText(ctx, o, METHODN__s, KNH_NULL);
 }
 
 /* ------------------------------------------------------------------------ */
-
-/* @method void Object.%dump(OutputStream w=new, Any m) */
-
-INLINE
-void knh_Object__dump(Ctx *ctx, Object *b, OutputStream *w, Any *m)
-{
-	knh_class_t cid = knh_Object_cid(b);
-	if(cid < KONOHA_TSTRUCT_SIZE) {
-		knh_format(ctx, w, METHODN__s, b, KNH_NULL);
-		return ;
-	}
-	knh_int_t i, c = 0;
-	knh_putc(ctx, w, '[');
-	for(i = 0; i < knh_tclass_bsize(cid); i++) {
-		knh_cfield_t *cf = knh_Class_fieldAt(cid, i);
-		if(cf->fn == FIELDN_NONAME || KNH_FLAG_IS(cf->flag, KNH_FLAG_CFF_HIDDEN)) continue;
-		if(c > 0) {
-			knh_write_delim(ctx, w);
-		}
-		knh_printf(ctx, w, "%s=", /* cf->type, */ FIELDN(cf->fn));
-		Object *v = KNH_FIELDn(b, i);
-		if(STRUCT_IS_String(v)) {
-			knh_format(ctx, w, METHODN__dump, v, KNH_NULL);
-		}
-		else {
-			knh_format(ctx, w, METHODN__s, v, KNH_NULL);
-		}
-		c++;
-	}
-	knh_putc(ctx, w, ']');
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method void Object.%empty(OutputStream w=new, Any m) */
-
-INLINE
-void knh_Object__empty(Ctx *ctx, Object *b, OutputStream *w, Any *m)
-{
-	
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method void Object.%refc(OutputStream w=new, Any m) */
-
-INLINE
-void knh_Object__refc(Ctx *ctx, Object *b, OutputStream *w, Any *m)
-{
-	knh_write__u(ctx, w, knh_Object_head(b)->refc);
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method void Object.%addr(OutputStream w=new, Any m) */
-
-INLINE
-void knh_Object__addr(Ctx *ctx, Object *b, OutputStream *w, Any *m)
-{
-	knh_write__p(ctx, w, (void*)b);
-}
-
 
 #ifdef __cplusplus
 }
 #endif
+

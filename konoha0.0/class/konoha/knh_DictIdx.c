@@ -1,20 +1,20 @@
 /****************************************************************************
- * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER  
- * 
+ * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
+ *
  * Copyright (c) 2005-2008, Kimio Kuramitsu <kimio at ynu.ac.jp>
- *           (c) 2008-      Konoha Software Foundation  
+ *           (c) 2008-      Konoha Software Foundation
  * All rights reserved.
- * 
- * You may choose one of the following two licenses when you use konoha. 
+ *
+ * You may choose one of the following two licenses when you use konoha.
  * See www.konohaware.org/license.html for further information.
- * 
+ *
  * (1) GNU General Public License 2.0      (with    KONOHA_UNDER_GPL2)
  * (2) Konoha Software Foundation License 1.0
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
  * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *  
+ *
  ****************************************************************************/
 
 /* ************************************************************************ */
@@ -31,7 +31,7 @@
 
 /* ************************************************************************ */
 
-#ifdef __cplusplus 
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -40,40 +40,41 @@ extern "C" {
 /* [structs] */
 
 void
-knh_DictIdx_struct_init(Ctx *ctx, Struct *s, int init, Object *cs)
+knh_DictIdx_struct_init(Ctx *ctx, knh_DictIdx_struct *b, int init, Object *cs)
 {
-	DictIdx *b = (DictIdx*)s;
 	if(init == 0) init = KNH_DICTMAP_INITSIZE;
 	b->offset = 0;
-	KNH_INITv(b->terms, new_Array(ctx, init));
+	if(ctx == NULL) {
+		KNH_INITv(b->terms, new_Array0(ctx, init));
+	}
+	else {
+		KNH_INITv(b->terms, new_Array(ctx, CLASS_String, init));
+	}
 	KNH_INITv(b->termsDictSet, new_DictSet(ctx, init));
 }
 
 /* ------------------------------------------------------------------------ */
 
 #define _knh_DictIdx_struct_copy   NULL
-#define _knh_DictIdx_struct_compare  NULL
 
 /* ------------------------------------------------------------------------ */
 
 void
-knh_DictIdx_struct_traverse(Ctx *ctx, Struct *s, f_gc gc)
+knh_DictIdx_struct_traverse(Ctx *ctx, knh_DictIdx_struct *b, f_traverse gc)
 {
-	DictIdx *b = (DictIdx*)s;
-	gc(ctx, b->terms);
-	gc(ctx, b->termsDictSet);
+	gc(ctx, UP(b->terms));
+	gc(ctx, UP(b->termsDictSet));
 }
 
 /* ======================================================================== */
 /* [constructors] */
 
-
 DictIdx* new_DictIdx(Ctx *ctx, size_t initialCapacity, knh_int_t offset)
 {
-	DictIdx* b = (DictIdx*)knh_Object_malloc0(ctx, KNH_FLAG_DictIdx, CLASS_DictIdx, sizeof(DictIdx));
-	knh_DictIdx_struct_init(ctx, (Struct *)b, initialCapacity, NULL);
-	b->offset = offset;
-	return b;
+	knh_DictIdx_t* o = (DictIdx*)new_Object_malloc(ctx, FLAG_DictIdx, CLASS_DictIdx, sizeof(knh_DictIdx_struct));
+	knh_DictIdx_struct_init(ctx, DP(o), initialCapacity, NULL);
+	DP(o)->offset = offset;
+	return o;
 }
 
 ///* ------------------------------------------------------------------------ */
@@ -83,7 +84,7 @@ DictIdx* new_DictIdx(Ctx *ctx, size_t initialCapacity, knh_int_t offset)
 //DictIdx* knh_DictIdx_new(Ctx *ctx, DictIdx *b, size_t initialCapacity, knh_uint_t offset)
 //{
 //	knh_DictIdx_struct_init(ctx, (Struct *)b, initialCapacity, NULL);
-//	b->offset = offset;
+//	DP(o)->offset = offset;
 //	return b;
 //}
 
@@ -95,12 +96,12 @@ DictIdx* new_DictIdx(Ctx *ctx, size_t initialCapacity, knh_int_t offset)
 //  terms[0], "a"     "a" : idx=1   (idx-1)+offset
 //  terms[1], "b"     "b" : idx=2   (idx-1)+offset
 
-#define termid_toarrayn(termid)      (termid - b->offset)
-#define termid_todictid(termid)      (termid - b->offset + 1)
+#define termid_toarrayn(termid)      (termid - DP(o)->offset)
+#define termid_todictid(termid)      (termid - DP(o)->offset + 1)
 #define dictid_toarrayn(dictid)      (dictid - 1)
-#define dictid_totermid(dictid)      (dictid - 1 + b->offset)
+#define dictid_totermid(dictid)      (dictid - 1 + DP(o)->offset)
 #define arrayn_todictid(arrayn)      (arrayn + 1)
-#define arrayn_totermid(arrayn)      (arrayn + b->offset)
+#define arrayn_totermid(arrayn)      (arrayn + DP(o)->offset)
 
 /* ------------------------------------------------------------------------ */
 
@@ -108,9 +109,9 @@ DictIdx* new_DictIdx(Ctx *ctx, size_t initialCapacity, knh_int_t offset)
 /* @method Int! DictIdx.index(String! term) */
 
 INLINE
-knh_index_t knh_DictIdx_index(Ctx *ctx, DictIdx *b, knh_bytes_t v)
+knh_index_t knh_DictIdx_index(Ctx *ctx, DictIdx *o, knh_bytes_t v)
 {
-	knh_index_t dictid = (knh_index_t)knh_DictSet_get__b(b->termsDictSet, v);
+	knh_index_t dictid = (knh_index_t)knh_DictSet_get__b(DP(o)->termsDictSet, v);
 	if(dictid == 0) return -1;
 	return dictid_totermid(dictid);
 }
@@ -120,38 +121,35 @@ knh_index_t knh_DictIdx_index(Ctx *ctx, DictIdx *b, knh_bytes_t v)
 /* @method Int! DictIdx.add::fast(String! term) */
 
 INLINE
-knh_index_t knh_DictIdx_add__fast(Ctx *ctx, DictIdx *b, String *term)
+knh_index_t knh_DictIdx_add__fast(Ctx *ctx, DictIdx *o, String *term)
 {
-	knh_index_t dictid = (knh_index_t)knh_Array_size(b->terms) + 1;
-	knh_Array_add(ctx, b->terms, term);
-	knh_DictSet_put(ctx, b->termsDictSet, term, dictid);
+	knh_index_t dictid = (knh_index_t)knh_Array_size(DP(o)->terms) + 1;
+	knh_Array_add(ctx, DP(o)->terms, UP(term));
+	knh_DictSet_put(ctx, DP(o)->termsDictSet, term, dictid);
 	return dictid_totermid(dictid);
 }
 
 /* ------------------------------------------------------------------------ */
-
 /* @method Int! DictIdx.add(String! term) */
 
-
-knh_index_t knh_DictIdx_add(Ctx *ctx, DictIdx *b, String *term)
+knh_index_t knh_DictIdx_add(Ctx *ctx, DictIdx *o, String *term)
 {
-	knh_index_t dictid = 
-		(knh_index_t)knh_DictSet_get__b(b->termsDictSet, knh_String_tobytes(term));
+	knh_index_t dictid =
+		(knh_index_t)knh_DictSet_get__b(DP(o)->termsDictSet, knh_String_tobytes(term));
 	if(dictid != 0) {
-		knh_DictSet_put(ctx, b->termsDictSet, term, dictid); /* TO AVOID GC HERE */
+		knh_DictSet_put(ctx, DP(o)->termsDictSet, term, dictid); /* TO AVOID GC HERE */
 		return dictid_totermid(dictid);
 	}
-	return knh_DictIdx_add__fast(ctx, b, term);
+	return knh_DictIdx_add__fast(ctx, o, term);
 }
 
 /* ------------------------------------------------------------------------ */
 
-
-knh_index_t knh_DictIdx_add__b(Ctx *ctx, DictIdx *b, knh_bytes_t term)
+knh_index_t knh_DictIdx_add__b(Ctx *ctx, DictIdx *o, knh_bytes_t term)
 {
-	knh_index_t dictid = (knh_index_t)knh_DictSet_get__b(b->termsDictSet, term);
+	knh_index_t dictid = (knh_index_t)knh_DictSet_get__b(DP(o)->termsDictSet, term);
 	if(dictid != 0) return dictid_totermid(dictid);
-	return knh_DictIdx_add__fast(ctx, b, new_String__fast(ctx, CLASS_String, term));
+	return knh_DictIdx_add__fast(ctx, o, new_String(ctx, term, NULL));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -159,11 +157,11 @@ knh_index_t knh_DictIdx_add__b(Ctx *ctx, DictIdx *b, knh_bytes_t term)
 /* @method String DictIdx.get::fast(Int! index) */
 
 INLINE
-String* knh_DictIdx_get__fast(DictIdx *b, knh_int_t termid)
+String* knh_DictIdx_get__fast(DictIdx *o, knh_int_t termid)
 {
 	size_t n = termid_toarrayn(termid);
-	KNH_FAST_ASSERT(0 <= n && n < knh_Array_size(b->terms));
-	return knh_Array_n(b->terms, n);
+	KNH_ASSERT(0 <= n && n < knh_Array_size(DP(o)->terms));
+	return (String*)knh_Array_n(DP(o)->terms, n);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -171,13 +169,13 @@ String* knh_DictIdx_get__fast(DictIdx *b, knh_int_t termid)
 /* @method String DictIdx.get(Int! index) */
 
 INLINE
-String* knh_DictIdx_get(DictIdx *b, knh_int_t termid)
+String* knh_DictIdx_get(DictIdx *o, knh_int_t termid)
 {
 	size_t n = termid_toarrayn(termid);
-	if(0 <= n && n < knh_Array_size(b->terms)) {
-		return knh_Array_n(b->terms, n);
+	if(0 <= n && n < knh_Array_size(DP(o)->terms)) {
+		return (String*)knh_Array_n(DP(o)->terms, n);
 	}
-	return KNH_NULL;
+	return (String*)KNH_NULL;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -185,34 +183,34 @@ String* knh_DictIdx_get(DictIdx *b, knh_int_t termid)
 /* @method void DictIdx.clear() */
 
 
-void knh_DictIdx_clear(Ctx *ctx, DictIdx *b)
+void knh_DictIdx_clear(Ctx *ctx, DictIdx *o)
 {
-	knh_Array_clear(ctx, b->terms);
-	knh_DictSet_clear(ctx, b->termsDictSet);
+	knh_Array_clear(ctx, DP(o)->terms);
+	knh_DictSet_clear(ctx, DP(o)->termsDictSet);
 }
 
-/* ======================================================================== */
-/* [mappings] */
-
-/* @Map DictIdx Iterator! */
-
-
-Object* knh_DictIdx_Iterator(Ctx *ctx, Object *self, MapMap *map)
-{
-	return knh_Array_Iterator(ctx, ((DictIdx*)self)->terms, KNH_NULL);
-}
+///* ======================================================================== */
+///* [mappings] */
+//
+///* @Map DictIdx Iterator! */
+//
+//Object* knh_DictIdx_Iterator(Ctx *ctx, Object *self, Mapper *map)
+//{
+//	return knh_Array_Iterator(ctx, ((DictIdx*)self)->terms, KNH_NULL);
+//}
 
 /* ======================================================================== */
 /* [movabletext] */
 
-/* @method void DictIdx.%dump(OutputStream w, Any m) */
+/* @method void DictIdx.%k(OutputStream w, Any m) */
 
-
-void knh_DictIdx__dump(Ctx *ctx, DictIdx *b, OutputStream *w, Any *m)
+void knh_DictIdx__k(Ctx *ctx, DictIdx *o, OutputStream *w, Any *m)
 {
-	knh_Array__dump(ctx, b->terms, w, m);
+	knh_Array__k(ctx, DP(o)->terms, w, m);
 }
 
+/* ======================================================================== */
+/* [movabletext] */
 
 #ifdef __cplusplus
 }

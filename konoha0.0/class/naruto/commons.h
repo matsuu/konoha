@@ -34,8 +34,6 @@
 extern "C" {
 #endif
 
-#define ResultSet knh_ResultSet
-#define Connection knh_Connection
 
 
 

@@ -1,20 +1,20 @@
 /****************************************************************************
- * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER  
- * 
+ * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
+ *
  * Copyright (c) 2005-2008, Kimio Kuramitsu <kimio at ynu.ac.jp>
- *           (c) 2008-      Konoha Software Foundation  
+ *           (c) 2008-      Konoha Software Foundation
  * All rights reserved.
- * 
- * You may choose one of the following two licenses when you use konoha. 
+ *
+ * You may choose one of the following two licenses when you use konoha.
  * See www.konohaware.org/license.html for further information.
- * 
+ *
  * (1) GNU General Public License 2.0      (with    KONOHA_UNDER_GPL2)
  * (2) Konoha Software Foundation License 1.0
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
  * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
@@ -22,109 +22,198 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *  
+ *
  ****************************************************************************/
 
 /* ************************************************************************ */
 
 #include"commons.h"
 
-#ifdef  KONOHA_LIBPCRE
-	#include<pcre.h>
-#endif/*KONOHA_LIBPCRE*/
+#ifdef KNH_USING_REGEX
+#include<regex.h>
+#endif
 
 /* ************************************************************************ */
 
-#ifdef __cplusplus 
+#ifdef __cplusplus
 extern "C" {
 #endif
 
 /* ======================================================================== */
-/* [prec] */
+/* [drivers] */
 
+static Object* new_Regex_parser(Ctx *ctx, knh_class_t cid, knh_bytes_t p);
 
+static knh_parser_drvapi_t PARSER__Regex = {
+	KNH_DRVAPI_TYPE__PARSER, "Regex",
+	new_Regex_parser
+};
 
 /* ======================================================================== */
-/* [structs] */
+/* [drivers] */
 
-void
-knh_Regex_struct_init(Ctx *ctx, Struct *s, int init, Object *cs)
+#ifdef KNH_USING_REGEX
+
+static
+knh_regex_t* knh_regex_malloc(Ctx *ctx)
 {
-	Regex *b = (Regex*)s;
-	KNH_INITv(b->pstr, KNH_NULL);
-	b->re = NULL;
+	return (regex_t*)KNH_MALLOC(ctx, sizeof(regex_t));
 }
 
 /* ------------------------------------------------------------------------ */
 
-#define _knh_Regex_struct_copy  NULL
-#define _knh_Regex_struct_compare NULL
+static
+int knh_regex_regcomp(Ctx *ctx, knh_regex_t *reg, char *pattern, int flags)
+{
+	return regcomp(reg, pattern, 0);
+}
 
 /* ------------------------------------------------------------------------ */
 
-void
-knh_Regex_struct_traverse(Ctx *ctx, Struct *s, f_gc gc)
+static
+int knh_regex_regexec(Ctx *ctx, knh_regex_t *reg, char *str, size_t nmatch, knh_regmatch_t p[], int flags)
 {
-	Regex *b = (Regex*)s;
-	gc(ctx, b->pstr);
-	if(IS_SWEEP(gc)) {
-		
+	regmatch_t pmatch[KNH_REGEX_NMATCH_MAX];
+	int res = regexec(reg, str, nmatch, pmatch, 0);
+	size_t i;
+	for(i = 0; i < KNH_REGEX_NMATCH_MAX; i++) {
+		p[i].rm_so = pmatch[i].rm_so;
+		p[i].rm_eo = pmatch[i].rm_eo;
+		p[i].rm_name = NULL;
 	}
+	return res;
 }
 
-/* ======================================================================== */
-/* [constructors] */
+/* ------------------------------------------------------------------------ */
 
-Regex *new_Regex(Ctx *ctx, String *pstr)
+static
+void knh_regex_regfree(knh_regex_t *reg)
 {
-	Regex *b = (Regex*)knh_Object_malloc0(ctx, KNH_FLAG_Regex, CLASS_Regex, sizeof(Regex));
-	knh_Regex_struct_init(ctx, (Struct*)b, 0, NULL);
-	KNH_SETv(ctx, b->pstr, pstr);
-	return b;
+	regfree(reg);
+	KNH_FREE(reg, sizeof(reg));
 }
 
+static knh_regex_drvapi_t RE__regex = {
+	KNH_DRVAPI_TYPE__REGEX, "regex",
+	knh_regex_malloc,
+	knh_regex_regcomp,
+	knh_regex_regexec,
+	knh_regex_regfree
+};
+
+#endif
+
 /* ======================================================================== */
-/* [match] */
+/* [NOP] */
 
-
-INLINE
-knh_bool_t knh_Regex_match__b(Ctx *ctx, Regex *b, knh_bytes_t s)
+static
+knh_regex_t* knh_regex_malloc__NOP(Ctx *ctx)
 {
-	if(b->re == NULL) {
-		TODO(); //KNH_UNSUPPORTEDs(ctx, b, "match");
+	return NULL;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+int knh_regex_regcomp__NOP(Ctx *ctx, knh_regex_t *reg, char *pattern, int flags)
+{
+	return 0;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+int knh_regex_regexec__NOP(Ctx *ctx, knh_regex_t *reg, char *str, size_t nmatch, knh_regmatch_t p[], int flags)
+{
+	size_t i;
+	for(i = 0; i < KNH_REGEX_NMATCH_MAX; i++) {
+		p[i].rm_so = -1;
+		p[i].rm_eo = -1;
+		p[i].rm_name = NULL;
 	}
 	return 0;
 }
 
 /* ------------------------------------------------------------------------ */
 
-/* @method Bool Regex.match(String s) */
-
-INLINE
-knh_bool_t knh_Regex_match(Ctx *ctx, Regex *b, String *s)
+static
+void knh_regex_regfree__NOP(knh_regex_t *reg)
 {
-	if(IS_NULL(s)) return 0;
-	return knh_Regex_match__b(ctx, b, knh_String_tobytes(s));
+	KNH_ASSERT(reg == NULL);
+}
+
+static knh_regex_drvapi_t RE__NOP = {
+	KNH_DRVAPI_TYPE__REGEX, "NOP",
+	knh_regex_malloc__NOP,
+	knh_regex_regcomp__NOP,
+	knh_regex_regexec__NOP,
+	knh_regex_regfree__NOP
+};
+
+/* ======================================================================== */
+
+static
+knh_regex_drvapi_t *knh_System_getRegexDriver(Ctx *ctx, knh_bytes_t name)
+{
+	knh_regex_drvapi_t *p = (knh_regex_drvapi_t *)knh_System_getDRVAPI(ctx, KNH_DRVAPI_TYPE__REGEX, name);
+	if(p == NULL) {
+		KNH_WARNING(ctx, "Regex: unsupported scheme '%s'", name);
+		p = &RE__NOP;
+	}
+	return p;
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(void) konoha_addRegexDriver(Ctx *ctx, char *alias, knh_regex_drvapi_t *d)
+{
+	if(alias != NULL) {
+		konoha_addParserDriver(ctx, alias, &PARSER__Regex);
+	}
+	else {
+		konoha_addParserDriver(ctx, d->name, &PARSER__Regex);
+	}
+	KNH_TDRVAPI(ctx, alias, (knh_drvapi_t*)d);
+}
+
+/* ------------------------------------------------------------------------ */
+
+void KNHINIT init_Regex(Ctx *ctx)
+{
+	konoha_addRegexDriver(ctx, NULL, &RE__NOP);
+#ifdef KNH_USING_REGEX
+	konoha_addRegexDriver(ctx, NULL, &RE__regex);
+	konoha_addRegexDriver(ctx, "re", &RE__regex);
+#endif
 }
 
 /* ======================================================================== */
-/* [transform] */
-/* Tuple t = Tuple(hogehoge, 're:(**):(**):(**)') */
+/* [constructors] */
 
-Object *knh_Regex_transform(Ctx *ctx, Regex *b, knh_class_t tcid, String *s)
+Regex *new_Regex(Ctx *ctx, String *pattern)
 {
-	if(IS_NULL(s)) return KNH_NULL;
-	TODO();
-	return KNH_NULL;
+	knh_Regex_t *o = (knh_Regex_t*)new_PObject0(ctx, FLAG_Regex, CLASS_Regex, CLASS_Regex);
+	knh_bytes_t p = knh_String_tobytes(pattern);
+	knh_index_t loc = knh_bytes_index(p, ':');
+	KNH_INITv(o->pattern, pattern);
+	if(loc == -1) {
+		o->df = knh_System_getRegexDriver(ctx, STEXT("re"));
+		o->reg = o->df->regmalloc(ctx);
+	}
+	else {
+		o->df = knh_System_getRegexDriver(ctx, knh_bytes_first(p, loc));
+		o->reg = o->df->regmalloc(ctx);
+		o->df->regcomp(ctx, o->reg, (char*)(knh_bytes_last(p, loc+1).buf), 0);
+	}
+	return o;
 }
 
-/* ======================================================================== */
-/* [mapmap] */
+/* ------------------------------------------------------------------------ */
 
-Object *knh_mapserv__Regex(Ctx *ctx, Object *mapserv, Object *s, knh_class_t tcid)
+static
+Object* new_Regex_parser(Ctx *ctx, knh_class_t cid, knh_bytes_t p)
 {
-	TODO();
-	return KNH_NULL;
+	return (Object*)new_Regex(ctx, new_String(ctx, p, NULL));
 }
 
 
@@ -134,39 +223,15 @@ Object *knh_mapserv__Regex(Ctx *ctx, Object *mapserv, Object *s, knh_class_t tci
 /* @method void Regex.%s(OutputStream w, Any m) */
 
 INLINE
-void knh_Regex__s(Ctx *ctx, Regex *b, OutputStream *w, Any *m)
+void knh_Regex__s(Ctx *ctx, Regex *o, OutputStream *w, Any *m)
 {
-	knh_write__s(ctx, w, "'re:");
-	knh_write(ctx, w, knh_String_tobytes(b->pstr));
+	knh_putc(ctx, w, '\'');
+	knh_write(ctx, w, knh_String_tobytes(o->pattern));
 	knh_putc(ctx, w, '\'');
 }
 
 /* ------------------------------------------------------------------------ */
 
-/* @method void Regex.%dump(OutputStream w, Any m) */
-
-void knh_Regex__dump(Ctx *ctx, Regex *b, OutputStream *w, Any *m)
-{
-//	int_byte_t quote = '\'';
-//	if(knh_Object_cid(b) == CLASS_Regex) quote = '"';
-//	knh_putc(ctx, w, quote);
-//	char *p = knh_Regex_tochar(b);
-//	knh_int_t i;
-//	for(i = 0; i < b->strlen; i++) {
-//		switch(p[i]) {
-//			case '\t' :
-//				knh_putc(ctx, w, '\\'); knh_putc(ctx, w, 't'); break ;
-//			case '\n' :
-//				knh_putc(ctx, w, '\\'); knh_putc(ctx, w, 'n'); break ;
-//			case '\r' :
-//				knh_putc(ctx, w, '\\'); knh_putc(ctx, w, 'r'); break ;
-//			case '\\' : case '\"' : case '\'' :
-//				knh_putc(ctx, w, '\\'); knh_putc(ctx, w, p[i]); break ;
-//			default :
-//				knh_putc(ctx, w, p[i]);
-//		}
-//	}
-//	knh_putc(ctx, w, quote);
+#ifdef __cplusplus
 }
-
-/* ------------------------------------------------------------------------ */
+#endif
