@@ -1,0 +1,161 @@
+
+/* from knh_Int.c */
+
+/* ------------------------------------------------------------------------ */
+
+/* @method[VARARGS|STATIC] Int! Int.opAdd(Int! v) */
+
+INLINE
+knh_int_t knh_Int_opAdd(Int *b, knh_vargc_t ac, Int **v)
+{
+	knh_int_t i, n = knh_Int_value(b);
+	for(i = 0; i < ac; i++) {
+		//DEBUG("i=%d, cid=%s", i, CLASSN(v[i]));
+		n += knh_Int_value(v[i]);
+	}
+	return n;
+}
+
+/* ------------------------------------------------------------------------ */
+
+/* @method[VARARGS|STATIC] Int! Int.opSub(Int! n) */
+
+INLINE
+knh_int_t knh_Int_opSub(Int *b, knh_vargc_t ac, Int **v)
+{
+	knh_int_t i, n = knh_Int_value(b);
+	for(i = 0; i < ac; i++) {
+		n -= knh_Int_value(v[i]);
+	}
+	return n;
+}
+
+/* ------------------------------------------------------------------------ */
+
+/* @method[VARARGS|STATIC] Int! Int.opMul(Int! n) */
+
+INLINE
+knh_int_t knh_Int_opMul(Int *b, knh_vargc_t ac, Int **v)
+{
+	knh_int_t i, n = knh_Int_value(b);
+	for(i = 0; i < ac; i++) {
+		n *= knh_Int_value(v[i]);
+	}
+	return n;
+}
+
+/* ------------------------------------------------------------------------ */
+
+/* @method[VARARGS|STATIC] Int! Int.opDiv(Int! n) */
+
+INLINE
+knh_int_t knh_Int_opDiv(Int *b, knh_vargc_t ac, Int **v)
+{
+	knh_int_t i, n = knh_Int_value(b);
+	for(i = 0; i < ac; i++) {
+		n /= knh_Int_value(v[i]);
+	}
+	return n;
+}
+
+/* @method[VARARGS|STATIC] Float! Float.opAdd(Float! v) */
+
+INLINE
+knh_float_t knh_Float_opAdd(Float *b, knh_vargc_t ac, Float **v)
+{
+	int i;
+	knh_float_t n = knh_Float_value(b);
+	for(i = 0; i < ac; i++) {
+		n += knh_Float_value(v[i]);
+	}
+	return n;
+}
+
+/* ------------------------------------------------------------------------ */
+
+/* @method[VARARGS|STATIC] Float! Float.opSub(Float! n) */
+
+INLINE
+knh_float_t knh_Float_opSub(Float *b, knh_vargc_t ac, Float **v)
+{
+	int i;
+	knh_float_t n = knh_Float_value(b);
+	for(i = 0; i < ac; i++) {
+		n -= knh_Float_value(v[i]);
+	}
+	return n;
+}
+
+/* ------------------------------------------------------------------------ */
+
+/* @method[VARARGS|STATIC] Float! Float.opMul(Float! n) */
+
+INLINE
+knh_float_t knh_Float_opMul(Float *b, knh_vargc_t ac, Float **v)
+{
+	int i;
+	knh_float_t n = knh_Float_value(b);
+	for(i = 0; i < ac; i++) {
+		n *= knh_Float_value(v[i]);
+	}
+	return n;
+}
+
+/* ------------------------------------------------------------------------ */
+
+/* @method[VARARGS|STATIC] Float! Float.opDiv(Float! n) */
+
+INLINE
+knh_float_t knh_Float_opDiv(Float *b, knh_vargc_t ac, Float **v)
+{
+	int i;
+	knh_float_t n = knh_Float_value(b);
+	for(i = 0; i < ac; i++) {
+		n /= knh_Float_value(v[i]);
+	}
+	return n;
+}
+
+/* ======================================================================== */
+/* [iterators] */
+
+//Object*
+//knh_String_var_next(Ctx *ctx, Iterator *it)
+//{
+//	//String *b = (String*)knh_Iterator_source(it);
+//	//size_t pos = knh_Iterator_pos(it);
+//	return Null;
+//}
+//
+///* @Map String Iterator */
+//
+//
+//Object* 
+//knh_String_toIterator(Ctx *ctx, Object *self, Mapping *map)
+//{
+//	return knh_Iterator_new__old(ctx, DEBUG_CAST(SELF, self), knh_String_var_next);	
+//}
+//
+///* ------------------------------------------------------------------------ */
+//
+//Object* knh_String_byte_next(Ctx *ctx, Iterator *it)
+//{
+//	String *b = (String*)knh_Iterator_source(it);
+//	size_t pos = knh_Iterator_pos(it);
+//	if(pos < b->strlen) {
+//		knh_Iterator_setpos(it, pos+1);
+//		knh_uchar_t *p = (knh_uchar_t*)knh_String_value(b);
+//		return new_Int__checked(ctx, CLASS_Int__byte, (knh_int_t)(p[pos]));
+//	}
+//	return Null;
+//}
+//
+///* ------------------------------------------------------------------------ */
+//
+///* @map Bytes Int:byte.. */
+//
+//
+//Object* knh_String_INTbyte__(Ctx *ctx, Object *self, MapMap *map)
+//{
+//	return new_Iterator(ctx, CLASS_Int__byte, self, knh_String_byte_next);
+//}
