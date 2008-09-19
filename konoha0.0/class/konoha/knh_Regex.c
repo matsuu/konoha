@@ -1,0 +1,237 @@
+/****************************************************************************
+ * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
+ *
+ * Copyright (c) 2005-2008, Kimio Kuramitsu <kimio at ynu.ac.jp>
+ *           (c) 2008-      Konoha Software Foundation
+ * All rights reserved.
+ *
+ * You may choose one of the following two licenses when you use konoha.
+ * See www.konohaware.org/license.html for further information.
+ *
+ * (1) GNU General Public License 2.0      (with    KONOHA_UNDER_GPL2)
+ * (2) Konoha Software Foundation License 1.0
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+ * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ****************************************************************************/
+
+/* ************************************************************************ */
+
+#include"commons.h"
+
+#ifdef KNH_USING_REGEX
+#include<regex.h>
+#endif
+
+/* ************************************************************************ */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* ======================================================================== */
+/* [drivers] */
+
+static Object* new_Regex_parser(Ctx *ctx, knh_class_t cid, knh_bytes_t p);
+
+static knh_parser_drvapi_t PARSER__Regex = {
+	KNH_DRVAPI_TYPE__PARSER, "Regex",
+	new_Regex_parser
+};
+
+/* ======================================================================== */
+/* [drivers] */
+
+#ifdef KNH_USING_REGEX
+
+static
+knh_regex_t* knh_regex_malloc(Ctx *ctx)
+{
+	return (regex_t*)KNH_MALLOC(ctx, sizeof(regex_t));
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+int knh_regex_regcomp(Ctx *ctx, knh_regex_t *reg, char *pattern, int flags)
+{
+	return regcomp(reg, pattern, 0);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+int knh_regex_regexec(Ctx *ctx, knh_regex_t *reg, char *str, size_t nmatch, knh_regmatch_t p[], int flags)
+{
+	regmatch_t pmatch[KNH_REGEX_NMATCH_MAX];
+	int res = regexec(reg, str, nmatch, pmatch, 0);
+	size_t i;
+	for(i = 0; i < KNH_REGEX_NMATCH_MAX; i++) {
+		p[i].rm_so = pmatch[i].rm_so;
+		p[i].rm_eo = pmatch[i].rm_eo;
+		p[i].rm_name = NULL;
+	}
+	return res;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_regex_regfree(knh_regex_t *reg)
+{
+	regfree(reg);
+	KNH_FREE(reg, sizeof(reg));
+}
+
+static knh_regex_drvapi_t RE__regex = {
+	KNH_DRVAPI_TYPE__REGEX, "regex",
+	knh_regex_malloc,
+	knh_regex_regcomp,
+	knh_regex_regexec,
+	knh_regex_regfree
+};
+
+#endif
+
+/* ======================================================================== */
+/* [NOP] */
+
+static
+knh_regex_t* knh_regex_malloc__NOP(Ctx *ctx)
+{
+	return NULL;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+int knh_regex_regcomp__NOP(Ctx *ctx, knh_regex_t *reg, char *pattern, int flags)
+{
+	return 0;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+int knh_regex_regexec__NOP(Ctx *ctx, knh_regex_t *reg, char *str, size_t nmatch, knh_regmatch_t p[], int flags)
+{
+	size_t i;
+	for(i = 0; i < KNH_REGEX_NMATCH_MAX; i++) {
+		p[i].rm_so = -1;
+		p[i].rm_eo = -1;
+		p[i].rm_name = NULL;
+	}
+	return 0;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_regex_regfree__NOP(knh_regex_t *reg)
+{
+	KNH_ASSERT(reg == NULL);
+}
+
+static knh_regex_drvapi_t RE__NOP = {
+	KNH_DRVAPI_TYPE__REGEX, "NOP",
+	knh_regex_malloc__NOP,
+	knh_regex_regcomp__NOP,
+	knh_regex_regexec__NOP,
+	knh_regex_regfree__NOP
+};
+
+/* ======================================================================== */
+
+static
+knh_regex_drvapi_t *knh_System_getRegexDriver(Ctx *ctx, knh_bytes_t name)
+{
+	knh_regex_drvapi_t *p = (knh_regex_drvapi_t *)knh_System_getDRVAPI(ctx, KNH_DRVAPI_TYPE__REGEX, name);
+	if(p == NULL) {
+		KNH_WARNING(ctx, "Regex: unsupported scheme '%s'", name);
+		p = &RE__NOP;
+	}
+	return p;
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(void) konoha_addRegexDriver(Ctx *ctx, char *alias, knh_regex_drvapi_t *d)
+{
+	if(alias != NULL) {
+		konoha_addParserDriver(ctx, alias, &PARSER__Regex);
+	}
+	else {
+		konoha_addParserDriver(ctx, d->name, &PARSER__Regex);
+	}
+	KNH_TDRVAPI(ctx, alias, (knh_drvapi_t*)d);
+}
+
+/* ------------------------------------------------------------------------ */
+
+void KNHINIT init_Regex(Ctx *ctx)
+{
+	konoha_addRegexDriver(ctx, NULL, &RE__NOP);
+#ifdef KNH_USING_REGEX
+	konoha_addRegexDriver(ctx, NULL, &RE__regex);
+	konoha_addRegexDriver(ctx, "re", &RE__regex);
+#endif
+}
+
+/* ======================================================================== */
+/* [constructors] */
+
+Regex *new_Regex(Ctx *ctx, String *pattern)
+{
+	knh_Regex_t *o = (knh_Regex_t*)new_PObject0(ctx, FLAG_Regex, CLASS_Regex, CLASS_Regex);
+	knh_bytes_t p = knh_String_tobytes(pattern);
+	knh_index_t loc = knh_bytes_index(p, ':');
+	KNH_INITv(o->pattern, pattern);
+	if(loc == -1) {
+		o->df = knh_System_getRegexDriver(ctx, STEXT("re"));
+		o->reg = o->df->regmalloc(ctx);
+	}
+	else {
+		o->df = knh_System_getRegexDriver(ctx, knh_bytes_first(p, loc));
+		o->reg = o->df->regmalloc(ctx);
+		o->df->regcomp(ctx, o->reg, (char*)(knh_bytes_last(p, loc+1).buf), 0);
+	}
+	return o;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+Object* new_Regex_parser(Ctx *ctx, knh_class_t cid, knh_bytes_t p)
+{
+	return (Object*)new_Regex(ctx, new_String(ctx, p, NULL));
+}
+
+
+/* ======================================================================== */
+/* [movabletext] */
+
+/* @method void Regex.%s(OutputStream w, Any m) */
+
+INLINE
+void knh_Regex__s(Ctx *ctx, Regex *o, OutputStream *w, Any *m)
+{
+	knh_putc(ctx, w, '\'');
+	knh_write(ctx, w, knh_String_tobytes(o->pattern));
+	knh_putc(ctx, w, '\'');
+}
+
+/* ------------------------------------------------------------------------ */
+
+#ifdef __cplusplus
+}
+#endif
