@@ -1,9 +1,0 @@
-2008-09-15  Kimio Kuramitsu <kimio AT ynu.ac.jp>
-	* Built-in function 'defined' is added.
-	* String formatter is added.
-	* New formatter %man for Class
-	* METHOD Macros refactored.
-
-2008-09-08  Kimio Kuramitsu <kimio AT ynu.ac.jp>
-	* Version 0.1 released.
-	* This day could be Konoha Day!!
