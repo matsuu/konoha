@@ -1,0 +1,6 @@
+2009-04-07 Masahiro Ide <imasahiro@users.sourceforge.jp>
+    * Makefile  make Makefile.
+    * onig.c    make prototype.
+    * onig.k    make prototype.
+    * onig_test.k   make sample file.
+
