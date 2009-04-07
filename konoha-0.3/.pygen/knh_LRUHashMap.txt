@@ -1,0 +1,255 @@
+/****************************************************************************
+ * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
+ *
+ * Copyright (c) 2005-2008, Kimio Kuramitsu <kimio at ynu.ac.jp>
+ *           (c) 2008-      Konoha Software Foundation
+ * All rights reserved.
+ *
+ * You may choose one of the following two licenses when you use konoha.
+ * See www.konohaware.org/license.html for further information.
+ *
+ * (1) GNU General Public License 2.0      (with    KONOHA_UNDER_GPL2)
+ * (2) Konoha Software Foundation License 1.0
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+ * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ****************************************************************************/
+
+///* ------------------------------------------------------------------------ */
+///* @ class LRUHashMap Object knh_LRUHashMap_struct */
+//
+//typedef struct knh_lruentry_t {
+//	knh_hcode_t hcode;
+//	Object *key;
+//	Object *value;
+//	struct knh_lruentry_t  *value_next;
+//	struct knh_lruentry_t  *prev;
+//	struct knh_lruentry_t  *next;
+//} knh_lruentry_t ;
+//
+//typedef struct knh_LRUHashMap {
+//	size_t table_size;
+//	knh_lruentry_t*  table;
+//	knh_lruentry_t*  unused;
+//	knh_lruentry_t** array;
+//	knh_lruentry_t *first;
+//	knh_lruentry_t *last;
+//	char *dbg_name;
+//	size_t hitc;
+//	size_t missc;
+//} knh_LRUHashMap_struct;
+
+///* ------------------------------------------------------------------------ */
+///* class Map Object knh_Map */
+//
+//struct knh_Map;
+//typedef Object* (*f_map_get)(Ctx *, Object *b, Object *k);
+//typedef Object* (*f_map_set)(Ctx *, Object *b, Object *k, Object *v);
+//
+//typedef struct knh_Map {
+//	Object *map;
+//} knh_Map ;
+
+/* ======================================================================== */
+/* LRUHashMap */
+
+#define knh_LRUHashMap_init_ NULL
+#define knh_LRUHashMap_copy NULL
+#define knh_LRUHashMap_traverse_ NULL
+#define knh_LRUHashMap_compareTo NULL
+#define knh_LRUHashMap_hashCode NULL
+#define knh_LRUHashMap_newClass NULL
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_LRUHashMap_init(Ctx *ctx, LRUHashMap *hm, int init)
+{
+	knh_LRUHashMap_struct *b = DP(hm);
+	int i;
+	KNH_ASSERT(init > 0);
+	b->table_size = init;
+	b->table = (knh_lruentry_t*)KNH_MALLOC(ctx, sizeof(knh_lruentry_t) * init);
+	for(i = 0; i < init; i++) {
+		b->table[i].hcode = 0;
+		KNH_INITv(b->table[i].key, KNH_NULL);
+		KNH_INITv(b->table[i].value, KNH_NULL);
+		b->table[i].value_next = (i == init -1) ? NULL : &(b->table[i+1]);
+		b->table[i].next = NULL;
+		b->table[i].prev = NULL;
+	}
+	b->unused = &(b->table[0]);
+	b->array = (knh_lruentry_t**)KNH_MALLOC(ctx, sizeof(knh_lruentry_t*) * init);
+	knh_bzero(b->array, sizeof(knh_lruentry_t*) * init);
+	b->first = NULL;
+	b->last = NULL;
+	b->dbg_name = "LRUHashMap";
+	b->hitc = 0;
+	b->missc = 0;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_LRUHashMap_traverse(Ctx *ctx, LRUHashMap *hm, knh_ftraverse ftr)
+{
+	knh_LRUHashMap_struct *b = DP(hm);
+	size_t i;
+	for(i = 0; i < b->table_size; i++) {
+		ftr(ctx, b->table[i].key);
+		ftr(ctx, b->table[i].value);
+	}
+	if(IS_SWEEP(ftr)) {
+		KNH_FREE(ctx, b->table, sizeof(knh_lruentry_t) * b->table_size);
+		KNH_FREE(ctx, b->array, sizeof(knh_lruentry_t*) * b->table_size);
+		b->table = NULL;
+		b->array = NULL;
+		DBG_P("%s[%d] hit=%d miss=%d ratio=%f",
+			b->dbg_name, (int)b->table_size,
+			(int)b->hitc, (int)b->missc, 100.0 * b->hitc / (b->hitc + b->missc + 1));
+	}
+}
+
+/* ************************************************************************ */
+
+#include"commons.h"
+
+/* ************************************************************************ */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* ======================================================================== */
+/* [constructors] */
+
+LRUHashMap* new_LRUHashMap(Ctx *ctx, char *name, size_t capacity)
+{
+	LRUHashMap* o = (LRUHashMap*)new_Object_bcid(ctx, CLASS_LRUHashMap, capacity);
+	if(name != NULL) {
+		DP(o)->dbg_name = name;
+	}
+	return o;
+}
+
+/* ======================================================================== */
+/* [methods] */
+
+static INLINE
+Object *knh_LRUHashMap_usedValue(LRUHashMap *o, knh_lruentry_t *e)
+{
+	if(e->prev != NULL) { (e->prev)->next = e->next; }
+	if(e->next != NULL) { (e->next)->prev = e->prev; }
+
+	if(DP(o)->first == NULL) {
+		DP(o)->first = e;
+		DP(o)->last  = e;
+		e->prev = NULL;
+		e->next = NULL;
+	}
+	else {
+		knh_lruentry_t *f = DP(o)->first;
+		f->prev = e;
+		e->prev = NULL;
+		e->next = f;
+		DP(o)->first = e;
+	}
+	return e->value;
+}
+
+/* ------------------------------------------------------------------------ */
+
+Object *knh_LRUHashMap_get__hcode(Ctx *ctx, LRUHashMap *o, knh_hcode_t hcode)
+{
+	knh_uint_t h = hcode % DP(o)->table_size;
+	knh_lruentry_t *cur = DP(o)->array[h];
+	while(cur != NULL) {
+		if(cur->hcode == hcode) {
+			DP(o)->hitc = DP(o)->hitc + 1;
+			return knh_LRUHashMap_usedValue(o, cur);
+		}
+		cur = cur->value_next;
+	}
+	DP(o)->missc = DP(o)->missc + 1;
+	return KNH_NULL;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static INLINE
+knh_lruentry_t *knh_LRUHashMap_unusedOrlastEntry(LRUHashMap *o)
+{
+	knh_lruentry_t *e;
+	if(DP(o)->unused != NULL) {
+		e = DP(o)->unused;
+		DP(o)->unused = e->value_next;
+		KNH_ASSERT(e->prev == NULL);
+		KNH_ASSERT(e->next == NULL);
+		return e;
+	}
+	KNH_ASSERT(DP(o)->last != NULL);
+	e = DP(o)->last;
+	DP(o)->last = e->prev;
+	e->prev = NULL;
+	e->next = NULL;
+	return e;
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_LRUHashMap_set__hcode(Ctx *ctx, LRUHashMap *o, knh_hcode_t hcode, Any *value)
+{
+	knh_uint_t h = hcode % DP(o)->table_size;
+	knh_lruentry_t *cur = DP(o)->array[h];
+	while(cur != NULL) {
+		if(cur->hcode == hcode) {
+			KNH_SETv(ctx, cur->value, value);
+			knh_LRUHashMap_usedValue(o, cur);
+		}
+		cur = cur->value_next;
+	}
+
+	cur = knh_LRUHashMap_unusedOrlastEntry(o);
+	KNH_SETv(ctx, cur->value, value);
+	cur->value_next = DP(o)->array[h];
+	DP(o)->array[h] = cur;
+	knh_LRUHashMap_usedValue(o, cur);
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_LRUHashMap_clear(Ctx *ctx, LRUHashMap *o)
+{
+	size_t i;
+	knh_LRUHashMap_struct *b = DP(o);
+	for(i = 0; i < b->table_size; i++) {
+		b->table[i].hcode = 0;
+		KNH_SETv(ctx, b->table[i].key, KNH_NULL);
+		KNH_SETv(ctx, b->table[i].value, KNH_NULL);
+		b->table[i].value_next = (i == b->table_size - 1) ? NULL : &(b->table[i+1]);
+		b->table[i].next = NULL;
+		b->table[i].prev = NULL;
+	}
+	b->unused = &(b->table[0]);
+	knh_bzero(b->array, sizeof(knh_lruentry_t*) * b->table_size);
+	b->first = NULL;
+	b->last = NULL;
+	b->hitc  = 0;
+	b->missc = 0;
+}
+
+/* ------------------------------------------------------------------------ */
+
+#ifdef __cplusplus
+}
+#endif

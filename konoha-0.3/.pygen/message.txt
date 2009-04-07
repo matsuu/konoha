@@ -1,0 +1,252 @@
+#message
+#0
+#1:ERR
+#2:WARNING
+#3:INFO
+NAME:0
+	en:"Konoha"
+	ja:"このは"
+LANG:0
+	en:"English"
+	ja:"日本語"
+CLASS:0
+	en:"CLASSNAME"
+	ja:"クラス"
+CONST:0
+	en:"CONST"
+	ja:"定数"
+OPERATOR:0
+	en:"OPERATOR"
+	ja:"演算子"
+METHOD:0
+	en:"METHOD"
+	ja:"メソッド"
+FORMATTER:0
+	en:"FORMATTER"
+	ja:"フォーマッタ"
+MAPPING:0
+	en:"MAPPING"
+	ja:"マッピング"
+ERRATA:0
+	en:"ERRATA"
+	ja:"訂正"
+ERROR:0
+	en:"error"
+	ja:"エラー"
+WARNING:0
+	en:"warning"
+	ja:"警告"
+INFO:0
+	en:"info"
+	ja:"お知らせ"
+#Stmt.c
+FMTERR:0
+	en:"Source!!: Running error source at %s:%d"
+	ja:"Source!!: ファイル'%s'の%d行目のエラーを強制的に実行しました"
+#tokenizer.c
+UTOKEN:1
+	en:"Syntax Error: undefined token"
+	ja:"未定義の字句を用いました"
+WCHAR:2
+	en:"You have used an illegal character. Ignoring the reminder."
+	ja:"利用不可能な文字を用いたため、これ以降の文字は無視されました"
+WLENGTH:2
+	en:"You will reduce the length of the name"
+	ja:"トークンが長過ぎるため、一部、省略しました"
+IGBLOCK:1
+	en:"Due to syntax error, this block was ignored"
+	ja:"パース不可能なシンタックスエラーのため、このブロックは無視されました"
+EMISMATCH:1
+	en:"You have used a mismatched block/parenthesis"
+	ja:"括弧の対応をあわせてください"
+WASCII:2
+	en:"Don't use non-ASCII characters"
+	ja:"ASCII文字（半角）をお使いください"
+WEOF:2
+	en:"You will close this file at a new line"
+	ja:"行の途中でファイルが終端しています"
+#parser.c
+NOTHERE:1
+	en:"You are not able to use HERE"
+	ja:"ここでは使えません"
+UUSING:1
+	en:"You have used an unsupported using option"
+	ja:"サポート外のusingオプションが利用されました"
+ESYNTAX:1
+	en:"Syntax Error"
+	ja:"文法的な間違いがあります"
+EFUTURE:1
+	en:"Syntax Error. This will be supported in the near future."
+	ja:"将来、サポートの予定です。今のところ、使用はご控えください"
+WSEMICOLON:2
+	en:"Add ';' at the end of the statement"
+	ja:"文末にはセミコロン(;)を追加してください"
+TPATH:1
+	en:"Give a illegal path"
+	ja:"正しくパスをあたえてください"
+TTYPEN:1
+	en:"Give a type"
+	ja:"正しい型名を与えてください"
+TCLASSN:1
+	en:"Give the right Class name"
+	ja:"正しいクラス名を与えてください"
+TNAME:1
+	en:"Give a illegal name"
+	ja:"正しく名前をあたえてください"
+TVARN:1
+	en:"You have used an illegal variable"
+	ja:"変数名として利用できない名前を用いました"
+WEMPTY:2
+	en:"Is it really empty?"
+	ja:"空っぽです"
+CPREOP:2
+	en:"Unsupported this operator"
+	ja:"前置演算子は後置演算子として扱われます"
+ENEXTPREV:1
+	en:"This expression dose not support ++/-- operators"
+	ja:"--演算,++演算が評価できない式です"
+UOP:1
+	en:"You have used an unsupported operator"
+	ja:"定義されていない演算子を用いました"
+UOP1:1
+	en:"This operator is unary"
+	ja:"この演算子は、単項演算子です"
+UOP2:1
+	en:"This operator is binary"
+	ja:"この演算子は、２項演算子です"
+#typing.c
+UCONSTN:1
+	en:"You have used an undefined CONST"
+	ja:"未定義の定数を使用しました"
+UVARN:1
+	en:"You have used an undefined variable"
+	ja:"未宣言の変数を使用しました"
+USYSTEMVARN:1
+	en:"You have used an undefined system variable"
+	ja:"未定義のシステム変数を使用しました"
+UCLASSN:1
+	en:"You have used an undefined Class name"
+	ja:"未定義のクラス名を使用しました"
+UTAG:1
+	en:"You have used an undefined class tag"
+	ja:"未定義のクラスタグを使用しました"
+UTYPEN:1
+	en:"You have used an undefined type"
+	ja:"未定義の型を使用しました"
+UMETHODN:1
+	en:"You have used an undefined method"
+	ja:"定義されていないメソッドを使用しました"
+UNEW:1
+	en:"You have used an undefined constructor"
+	ja:"定義されていないコンストラクタを用いました"
+UMAP:1
+	en:"You have used an undefined mapping"
+	ja:"マッピングは定義されていません"
+UPATH:1
+	en:"Cannot open the specifed path"
+	ja:"指定されたパスが開けません"
+UPACKAGE:1
+	en:"Cannot import package"
+	ja:"パッケージのインポートを失敗しました"
+DIFFDECL:2
+	en:"The type has been defined diffrently"
+	ja:"既に別の型で宣言されています"
+TOOMANYVARS:1
+	en:"Sorry. You used much more variables than we expected"
+	ja:"変数を多く宣言しすぎました"
+WTRUEFALSE:2
+	ja:"Use true/false for the Boolean constant value"
+	ja:"Booleanの定数には、trueかfalseを用いましょう"
+WNUMOVERFLOW:2
+	en:"The given number was overflowed"
+	ja:"数値の最大値もしくは最小値の範囲外です"
+FMTARGS:0
+	en:"#%d"
+	ja:"第%d引数"
+ASSIGNMENT:0
+	en:"assignment"
+	ja:"代入"
+ETYPEFMT:1
+	en:"Incompatible type occurs at %s"
+	ja:"%sにおいて型が一致しません"
+ENULLFMT:1
+	en:"Null exception will always throw at %s"
+	ja:"%sにおいてnullは利用できません"
+IGFIELDVALUE:1
+	en:"Only const value is allowed for initializing the field variable"
+	ja:"フィールド変数の初期値は定数のみ認められます"
+IGQNAME:2
+	en:"The qualifier for variable was ignored"
+	ja:"変数の修飾子は無視されました"
+NNCONST:1
+	en:"Give the const value at the right hand"
+	ja:"左辺に定数を与えてください"
+DUPCONST:1
+	en:"Cannot redefine the given CONST name"
+	ja:"同じ定数名で再定義することはできません"
+ELVALUE:1
+	en:"Invalid L-VALUE"
+	ja:"代入可能な変数名を与えてください"
+EBUILTINFUNC:1
+	en:"Invalid use of built-in function"
+	ja:"組み込み関数の用法が正しくありません"
+ETOOFEWPARAMS:1
+	en:"This method needs more parameter(s)"
+	ja:"与えられた引数の数が少な過ぎます"
+WTOOMANYPARAMS:2
+	en:"Some parameter(s) was overtaken"
+	ja:"与えられた引数の数が多過ぎます"
+EOPCMP:1
+	en:"Gosh!! Comparison of different types"
+	ja:"型が異なるため比較することはできません"
+NORETURNVALUE:1
+	en:"This will return a default value"
+	ja:"return文がないため、デフォルト値を返します"
+IGRETURN:1
+	en:"Returning value was ignored"
+	ja:"return文の戻り値は無視されました"
+DIFFCLASSN:2
+	en:"The Class names are not identical"
+	ja:"class 文のクラス名とメソッドのクラス名が異なります"
+DIFFNEWTYPE:1
+	en:"The Class names are not identical"
+	ja:"コンストラクタ(new メソッド）のクラスが異なります"
+DIFFRTYPE:1
+	en:"Different returning type was given"
+	ja:"既存のメソッドと戻り値の型が一致しません"
+DIFFPSIZE:1
+	en:"The size of parameters was different"
+	ja:"既存のメソッドと引数の数が一致しません"
+DIFFPTYPE:1
+	en:"Different parameter type was given"
+	ja:"既存のメソッドと引数の型が一致しません"
+DIFFPNAME:2
+	en:"Different parameter name was given"
+	ja:"既存のメソッドと引数名が異なります"
+AOVERRIDE:2
+	en:"Add @Override, if you will redefine/redeclare"
+	ja:"再定義しなおすときは@Overrideが必要です"
+EOVERRIDE:1
+	en:"@Override is not allowed"
+	ja:"オーバーライドは許可されていません"
+EEXTENDS:1
+	en:"Extending @Final class is not allowed"
+	ja:"finalクラスを拡張することはできません"
+EIMPLEMENTS:1
+	en:"@Interface is required"
+	ja:"インターフェースとして実装するためには、@Interfaceが必要です"
+#
+#never used
+#
+EABORT:1
+	en:"Syntax Error. Otherwise, you'll find some compiler bugs."
+	ja:"文法的な間違いがあります（もしくは、コンパイラのバグかも知れません）"
+ULABEL:1
+	en:"You have used an undefined label"
+	ja:"未定義のラベルを用いました"
+ETRY:1
+	en:"Don't use nested try clause"
+	ja:"try 節はネストして使うことはできません"
+TOABSTRACT:2
+	en:"This method is abstract, because of cancelling compliation"
+	ja:"コンパイルが中断されたため、抽象メソッドとして定義されました"

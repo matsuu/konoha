@@ -1,0 +1,425 @@
+#message
+#0
+#1:ERR
+#2:WARNING
+#3:INFO
+NAME:0
+	en:"Konoha"
+	ja:"このは"
+LANG:0
+	en:"English"
+	ja:"日本語"
+CLASS:0
+	en:"CLASSNAME"
+	ja:"クラス"
+CONST:0
+	en:"CONST"
+	ja:"定数"
+OPERATOR:0
+	en:"OPERATOR"
+	ja:"演算子"
+METHOD:0
+	en:"METHOD"
+	ja:"メソッド"
+FORMATTER:0
+	en:"FORMATTER"
+	ja:"フォーマッタ"
+MAPPING:0
+	en:"MAPPING"
+	ja:"マッピング"
+ERRATA:0
+	en:"ERRATA"
+	ja:"訂正"
+ERROR:0
+	en:"error"
+	ja:"エラー"
+WARNING:0
+	en:"warning"
+	ja:"警告"
+INFO:0
+	en:"info"
+	ja:"お知らせ"
+#Stmt.c
+FMTERR:0
+	en:"Source!!: Running error source at %s:%d"
+	ja:"Source!!: ファイル'%s'の%d行目のエラーを強制的に実行しました"
+#tokenizer.c
+UTOKEN:1
+	en:"Syntax Error: undefined token"
+	ja:"未定義の字句を用いました"
+WCHAR:2
+	en:"You have used an illegal character. Ignoring the reminder."
+	ja:"利用不可能な文字を用いたため、これ以降の文字は無視されました"
+WLENGTH:2
+	en:"You will reduce the length of the name"
+	ja:"トークンが長過ぎるため、一部、省略しました"
+IGBLOCK:1
+	en:"Due to syntax error, this block was ignored"
+	ja:"パース不可能なシンタックスエラーのため、このブロックは無視されました"
+EMISMATCH:1
+	en:"You have used a mismatched block/parenthesis"
+	ja:"括弧の対応をあわせてください"
+WASCII:2
+	en:"Don't use non-ASCII characters"
+	ja:"ASCII文字（半角）をお使いください"
+WEOF:2
+	en:"You will close this file at a new line"
+	ja:"行の途中でファイルが終端しています"
+#parser.c
+NOTHERE:1
+	en:"You are not able to use HERE"
+	ja:"ここでは使えません"
+UUSING:1
+	en:"You have used an unsupported using option"
+	ja:"サポート外のusingオプションが利用されました"
+ESYNTAX:1
+	en:"Syntax Error"
+	ja:"文法的な間違いがあります"
+EFUTURE:1
+	en:"Syntax Error. This will be supported in the near future."
+	ja:"将来、サポートの予定です。今のところ、使用はご控えください"
+WSEMICOLON:2
+	en:"Add ';' at the end of the statement"
+	ja:"文末にはセミコロン(;)を追加してください"
+TPATH:1
+	en:"Give a illegal path"
+	ja:"正しくパスをあたえてください"
+TTYPEN:1
+	en:"Give a type"
+	ja:"正しい型名を与えてください"
+TCLASSN:1
+	en:"Give the right Class name"
+	ja:"正しいクラス名を与えてください"
+TNAME:1
+	en:"Give a illegal name"
+	ja:"正しく名前をあたえてください"
+TVARN:1
+	en:"You have used an illegal variable"
+	ja:"変数名として利用できない名前を用いました"
+WEMPTY:2
+	en:"Is it really empty?"
+	ja:"空っぽです"
+CPREOP:2
+	en:"Unsupported this operator"
+	ja:"前置演算子は後置演算子として扱われます"
+ENEXTPREV:1
+	en:"This expression dose not support ++/-- operators"
+	ja:"--演算,++演算が評価できない式です"
+UOP:1
+	en:"You have used an unsupported operator"
+	ja:"定義されていない演算子を用いました"
+UOP1:1
+	en:"This operator is unary"
+	ja:"この演算子は、単項演算子です"
+UOP2:1
+	en:"This operator is binary"
+	ja:"この演算子は、２項演算子です"
+#typing.c
+UCONSTN:1
+	en:"You have used an undefined CONST"
+	ja:"未定義の定数を使用しました"
+UVARN:1
+	en:"You have used an undefined variable"
+	ja:"未宣言の変数を使用しました"
+USYSTEMVARN:1
+	en:"You have used an undefined system variable"
+	ja:"未定義のシステム変数を使用しました"
+UCLASSN:1
+	en:"You have used an undefined Class name"
+	ja:"未定義のクラス名を使用しました"
+UTAG:1
+	en:"You have used an undefined class tag"
+	ja:"未定義のクラスタグを使用しました"
+UTYPEN:1
+	en:"You have used an undefined type"
+	ja:"未定義の型を使用しました"
+UMETHODN:1
+	en:"You have used an undefined method"
+	ja:"定義されていないメソッドを使用しました"
+UNEW:1
+	en:"You have used an undefined constructor"
+	ja:"定義されていないコンストラクタを用いました"
+UMAP:1
+	en:"You have used an undefined mapping"
+	ja:"マッピングは定義されていません"
+DIFFDECL:2
+	en:"The type has been defined diffrently"
+	ja:"既に別の型で宣言されています"
+TOOMANYVARS:1
+	en:"Sorry. You used much more variables than we expected"
+	ja:"変数を多く宣言しすぎました"
+WTRUEFALSE:2
+	ja:"Use true/false for the Boolean constant value"
+	ja:"Booleanの定数には、trueかfalseを用いましょう"
+WNUMOVERFLOW:2
+	en:"The given number was overflowed"
+	ja:"数値の最大値もしくは最小値の範囲外です"
+FMTARGS:0
+	en:"#%d"
+	ja:"第%d引数"
+ASSIGNMENT:0
+	en:"assignment"
+	ja:"代入"
+ETYPEFMT:1
+	en:"Incompatible type occurs at %s"
+	ja:"%sにおいて型が一致しません"
+ENULLFMT:1
+	en:"Null exception will always throw at %s"
+	ja:"%sにおいてnullは利用できません"
+IGFIELDVALUE:1
+	en:"Only const value is allowed for initializing the field variable"
+	ja:"フィールド変数の初期値は定数のみ認められます"
+IGQNAME:2
+	en:"The qualifier for variable was ignored"
+	ja:"変数の修飾子は無視されました"
+NNCONST:1
+	en:"Give the const value at the right hand"
+	ja:"左辺に定数を与えてください"
+DUPCONST:1
+	en:"Cannot redefine the given CONST name"
+	ja:"同じ定数名で再定義することはできません"
+ELVALUE:1
+	en:"Invalid L-VALUE"
+	ja:"代入可能な変数名を与えてください"
+EBUILTINFUNC:1
+	en:"Invalid use of built-in function"
+	ja:"組み込み関数の用法が正しくありません"
+ETOOFEWPARAMS:1
+	en:"This method needs more parameter(s)"
+	ja:"与えられた引数の数が少な過ぎます"
+WTOOMANYPARAMS:2
+	en:"Some parameter(s) was overtaken"
+	ja:"与えられた引数の数が多過ぎます"
+EOPCMP:1
+	en:"Gosh!! Comparison of different types"
+	ja:"型が異なるため比較することはできません"
+NORETURNVALUE:1
+	en:"This will return a default value"
+	ja:"return文がないため、デフォルト値を返します"
+IGRETURN:1
+	en:"Returning value was ignored"
+	ja:"return文の戻り値は無視されました"
+DIFFCLASSN:2
+	en:"The Class names are not identical"
+	ja:"class 文のクラス名とメソッドのクラス名が異なります"
+DIFFNEWTYPE:1
+	en:"The Class names are not identical"
+	ja:"コンストラクタ(new メソッド）のクラスが異なります"
+DIFFRTYPE:1
+	en:"Different returning type was given"
+	ja:"既存のメソッドと戻り値の型が一致しません"
+DIFFPSIZE:1
+	en:"The size of parameters was different"
+	ja:"既存のメソッドと引数の数が一致しません"
+DIFFPTYPE:1
+	en:"Different parameter type was given"
+	ja:"既存のメソッドと引数の型が一致しません"
+DIFFPNAME:2
+	en:"Different parameter name was given"
+	ja:"既存のメソッドと引数名が異なります"
+AOVERRIDE:2
+	en:"Add @Override, if you will redefine/redeclare"
+	ja:"再定義しなおすときは@Overrideが必要です"
+EOVERRIDE:1
+	en:"@Override is not allowed"
+	ja:"オーバーライドは許可されていません"
+#
+#never used
+#
+ETIME:0
+	en:"Elapsed Time"
+	ja:"実行時間"
+TYPEINF:0
+	en:"type inferencing"
+	ja:"型推論"
+EABORT:1
+	en:"Syntax Error. Otherwise, you'll find some compiler bugs."
+	ja:"文法的な間違いがあります（もしくは、コンパイラのバグかも知れません）"
+IGSTMT:2
+	en:"This statement might be meaningless"
+	ja:"無効果なステートメントなため無視されました"
+WCLASSN:2
+	en:"Give the right Class name"
+	ja:"正しいクラス名に修正してください"
+WCONSTN:2
+	en:"Give the right CONST name"
+	ja:"正しい定数名に修正してください"
+WCMETHODN:2
+	en:"Give the right Class.method name"
+	ja:"正しいクラスメソッド名に修正してください"
+WNAME:2
+	en:"Give the right name"
+	ja:"正しい名前に修正してください"
+WIGNORED:2
+	en:"The following tokens was ignored"
+	ja:"次の字句は無視されました"
+TEXPTN:1
+	en:"Give the right Exception!! name"
+	ja:"正しい例外名を与えてください"
+TNSNAME:1
+	en:"Give the right namespace(package) name"
+	ja:"正しい名前空間名を与えてください"
+TFURN:1
+	en:"Give the right file path for konoha script (*.k)"
+	ja:"スクリプトファイル(*.k)のパスを与えてください"
+TCURN:1
+	en:"Give a Class name or URN"
+	ja:"クラス名かURNを与えてください"
+TNSCLASSN:1
+	en:"Give the right package.Class"
+	ja:"正しいパッケージ名付きのクラス名を与えてください"
+TMETHODN:1
+	en:"Give the right method name"
+	ja:"正しいメソッド名を与えてください"
+TCLASSTN:1
+	en:"Give the right Class:tag name"
+	ja:"正しいクラス名（タグ付き）を与えてください"
+TSTR:1
+	en:"Give the right \"string\""
+	ja:"正しい文字列を与えてください"
+TARGS:1
+	en:"Give parameter(s) correctly"
+	ja:"正しくパラメータをあたえてください"
+TCMETHODN:1
+	en:"Give the right Class.method name"
+	ja:"正しいクラス名付きメソッド名を与えてください"
+TMT:1
+	en:"Give the right formatter name"
+	ja:"正しいフォーマッタ名を与えてください"
+TANY:1
+	en:"Give the right token"
+	ja:"正しいトークンを与えてください"
+TPEXPR:1
+	en:"Start a statement correctly"
+	ja:"正しく条件式を与えてください"
+TCATCHPARAM:1
+	en:"catch needs a parameter"
+	ja:"catch文のパラメータを与えてください"
+WTYPEINF:2
+	en:"Impossible to infer the type"
+	ja:"型推論ができませんでした．Any型を使います"
+NOTHERECONST:1
+	en:"Defining CONST is allowed within the script or the class-field scope"
+	ja:"定数が定義できるのはスクリプトかクラス内のみです"
+NOTHERECLASSCONST:1
+	en:"Defining Class.CONST is not allowed here"
+	ja:"この位置ではクラス名を付きで定数は定義できません"
+#EEMPTYEXPR:1
+#	en:"Give the right expression"
+#	ja:"正しい式をあたえてください"
+#ETRINARY:1
+#	en:"Syntax Error"
+#	ja:"三項演算子のtrueとfalseの式はコロン(:)で区切ってください"
+EPSTMT3:1
+	ja:"Syntax Error"
+	ja:"正しくfor(stmt;expr;stmt) 文を書いてください"
+EPEACH:1
+	ja:"Syntax Error"
+	ja:"foreach(.. from .. where..) 文を書いてください"
+WLET:2
+	en:"Don't use the assignment within a condition"
+	ja:"条件式では代入を使わないでください"
+USCRIPT:1
+	en:"Cannot open the script file"
+	ja:"スクリプトファイルが開けません"
+UURN:1
+	en:"Cannot download from the given URN"
+	ja:"URNの参照先がダウンロードできません"
+UPACKAGE:1
+	en:"You're attempting to use an uninstalled package"
+	ja:"未インストールのパッケージを利用しようとしました"
+UFUNCN:1
+	en:"You have used an undefined function"
+	ja:"定義されていない関数メソッドを使用しました"
+ULABEL:1
+	en:"You have used an undefined label"
+	ja:"未定義のラベルを用いました"
+#EVOIDPARAM:1
+#	en:"Don't use void method(function) as a parameter"
+#	ja:"メソッド引数にはvoid型のメソッド（関数）を用いることはできません"
+ENULLPARAM:1
+	en:"Null!! always occurs at the given argument"
+	ja:"次のメソッド引数で必ずNull例外が発生します"
+WNULLPARAM:2
+	en:"Null!! might occur at the given argument"
+	ja:"次のメソッド引数においてNull例外が発生する可能性があります"
+ETYPEPARAM:1
+	en:"Incompatible type occurs at the given argument"
+	ja:"次のメソッド引数の型が一致しません"
+#EVOIDRETURN:1
+#	en:"Don't use void method(function) at return"
+#	ja:"return文の戻り値としてvoid型のメソッド（関数）を使うことはできません"
+ENULLRETURN:1
+	en:"Null!! always occurs when returning"
+	ja:"このメソッドではnullをreturnすることはできません"
+WNULLRETURN:2
+	en:"Null!! might occurs when returning"
+	ja:"return時にNull例外が発生する可能性があります"
+#EVOIDLET:2
+#	ja:"void型のメソッド（関数）を代入することはできません"
+#EVOID:2
+#	ja:"void型のメソッド（関数）を用いることはできません"
+ENULLLET:1
+	en:"Don't assign null"
+	ja:"Nullを代入することはできません"
+ENULL:1
+	en:"Don't use null"
+	ja:"Nullは与えられません"
+WNULLLET:2
+	en:"Null!! might occur when assigning the variable"
+	ja:"代入時にNull例外が発生する可能性があります"
+WNULL:2
+	en:"Null!! might occur"
+	ja:"Null例外が発生する可能性があります"
+ETYPELET:1
+	en:"Imcompatible types occurs at the assignment"
+	ja:"代入の右辺と左辺式の型が一致しません"
+ETYPE:1
+	en:"Imcompatible types occurs"
+	ja:"型が一致しません"
+ETYPEBOOL:1
+	en:"Needs Boolean type"
+	ja:"Boolean型を与える必要があります"
+WDUPFUNCNAME:2
+	en:"Naming conflict occurs between functions"
+	ja:"スタティック関数名とメソッド名が重複しています"
+USCLASSFUNC:2
+	en:"Naming conflict occurs between functions"
+	ja:"与えられたクラスはクラス関数をサポートしていません"
+#USNNTYPE:2
+#	en:""
+#	ja:"与えられたクラスではNonNull属性は使えません"
+IGNNTYPE:3
+	en:"NonNull attribute is ignored"
+	ja:"NonNull属性は無視されました"
+EEXTENDS:1
+	en:"Extending @Final class is not allowed"
+	ja:"finalクラスを拡張することはできません"
+EIMPLEMENTS:1
+	en:"@Interface is required"
+	ja:"インターフェースとして実装するためには、@Interfaceが必要です"
+ENESTEDTRY:1
+	en:"Don't use nested try clause"
+	ja:"try 節はネストして使うことはできません"
+DIFFENAME:1
+	en:"Don't use different Exception name in the catch clause"
+	ja:"同じ変数名で例外をcatch してくださいネ"
+EOUTERLOOP:2
+	en:"Ignored because of the outer loop"
+	ja:"ループの内側でないため無視されます"
+IGFIELDNAME:1
+	en:"Don't declare a new field variable HERE"
+	ja:"ここではフィールド変数を新たに宣言することはできません"
+NORETURN:1
+	en:"You don't declare a new field variable HERE"
+	ja:"return文がありません"
+AHISTORIC:2
+	en:"Add @Historic, if you want to use this old-style statement"
+	ja:"このステートメントを使用するためには@Historicが必要です"
+TOABSTRACT:2
+	en:"This method is abstract, because of cancelling compliation"
+	ja:"コンパイルが中断されたため、抽象メソッドとして定義されました"
+#WMAPFOREACH:2
+#	en:"@TODO"
+#	ja:"foreach 文においてMapキャストが必要となります"
+#

@@ -1,0 +1,25 @@
+
+local 文
+
+式をローカル変数化（スタックレジスタへのロード）を行う
+
+local |a|, |a|-1;
+for(i = 0; i < |a|; i++) {
+  for(j = i + 1; j < |a| - 1; j++) {
+    if(a[i] > a[j]) a.swap(i, j);
+  }
+}
+
+戻り値の型推論
+
+function f(int a, int b) {
+  return a + b;
+}
+
+function newfunc() {
+  int x;
+  return {int a => x + a}
+}
+
+
+ 

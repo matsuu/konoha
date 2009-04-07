@@ -1,0 +1,15 @@
+Konoha 0.3.0.1 GPL2 (#488, Jan 13 2009, 03:53:45)
+[GCC 4.0.1 (Apple Inc. build 5490)] on macosx (32, UTF-8, English)
+Options: iconv math sqlite3 regex
+
+>>> quit>>
+DBG2[konohac_parse]: tokens
+{[0] { (>>EOT) 
+	NAME[1] quit (>>>>) 00000000 00000001
+	>>[1] >> (>>;) 
+	;[1] ; (>>EOT) 00000000 00000001
+
+DBG2[konohac_eval]: stmt
+op	(>> quit)
+
+>>> ^D
