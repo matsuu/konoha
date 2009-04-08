@@ -264,6 +264,7 @@ int konoha_installPackage(knh_bytes_t pkgname)
 	if (system("make") == -1) return -1;
 	if (system("make konoha_install") == -1) return -1;
 #endif
+	printf("konohaget success!\n");
 	return 0;
 
 }
