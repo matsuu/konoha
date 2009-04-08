@@ -619,7 +619,7 @@ NameSpace *knh_System_loadPackage(Ctx *ctx, knh_bytes_t pkgname)
 			knh_DictMap_set(ctx, DP(ctx->sys)->NameSpaceTableDictMap, nsname, UP(ns));
 			KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
 			NameSpace *curns = knh_Context_switchNameSpace(ctx, ns);
-			knh_NameSpace_load(ctx, ns, B(fpath), 1 /* isEval */);
+			knh_NameSpace_loadScript(ctx, ns, B(fpath), 1 /* isEval */);
 			knh_Context_switchNameSpace(ctx, curns);
 		}
 		return ns;

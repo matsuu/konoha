@@ -327,7 +327,7 @@ knh_bool_t knh_Object_equals(Ctx *ctx, Object *o1, Object *o2);
 knh_bytes_t knh_Object_tobytes(Ctx *ctx, Object *o);
 /* ../src/class/knh_OutputStream.c */
 Object *knh_OutputStream_open(Ctx *ctx, OutputStream *o, String *urn, String *mode);
-void knh_OutputStream_putc(Ctx *ctx, OutputStream *o, int ch);
+void knh_OutputStream_putc(Ctx *ctx, OutputStream *o, knh_int_t ch);
 void knh_OutputStream_write(Ctx *ctx, OutputStream *o, knh_bytes_t buf);
 void knh_OutputStream_flush(Ctx *ctx, OutputStream *o);
 void knh_OutputStream_clear(Ctx *ctx, OutputStream *o);
@@ -449,7 +449,7 @@ int knh_Stmt_complie(Ctx *ctx, Stmt *stmt, String *nsname, int isEval);
 Stmt *knh_bytes_parseStmt(Ctx *ctx, knh_bytes_t kscript);
 void konohac_eval(Ctx *ctx, String *nsname, InputStream *in);
 void knh_Asm_openlib(Ctx *ctx, Asm *abr, knh_bytes_t fpath);
-int knh_NameSpace_load(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isEval);
+int knh_NameSpace_loadScript(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isEval);
 void konoha_compile(Ctx *ctx, String *nsname, knh_bytes_t fpath);
 /* ../src/compiler/parser.c */
 Stmt *new_StmtINSTMT(Ctx *ctx, Token *tk);

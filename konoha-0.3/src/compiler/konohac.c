@@ -234,6 +234,29 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 /* [declc] */
 
 static
+char *knh_lookup_includeScript(Ctx *ctx, knh_bytes_t path, char *buf, size_t bufsiz)
+{
+	knh_index_t loc = knh_bytes_rindex(path, '/');
+	if(loc == -1) loc = knh_bytes_rindex(path, '\\');
+	char *filename = (char*)path.buf + loc + 1;
+
+#ifdef KNH_PREFIX
+	knh_snprintf(buf, bufsiz, "%s/lib/konoha/%s.k", KNH_PREFIX, filename);
+#else
+	knh_snprintf(buf, bufsiz, "%s/include/%s.k", knh_String_tochar(DP(ctx->sys)->homeDir), filename);
+#endif
+	if(knh_isfile(ctx, B(buf))) return buf;
+	char *p = knh_getenv("HOME");
+	if(p != NULL) {
+		knh_snprintf(buf, bufsiz, "%s/.konoha/%s.k", p, filename);
+		if(knh_isfile(ctx, B(buf))) return buf;
+	}
+	return NULL;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
 int knh_StmtIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 {
 	String *fname = (String*)DP(StmtIMPORT_file(stmt))->data;
@@ -248,8 +271,11 @@ int knh_StmtIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		bufp[0]=0;
 	}
 	knh_format_catpath(buff, sizeof(buff), B(bufp), knh_String_tobytes(fname));
-
-	knh_NameSpace_load(ctx, ns, B(buff), 1 /* isEval */);
+	if(!knh_isfile(ctx, B(buff))) {
+		DBG2_P("searching include.. ");
+		knh_lookup_includeScript(ctx, knh_String_tobytes(fname), buff, sizeof(buff));
+	}
+	knh_NameSpace_loadScript(ctx, ns, B(buff), 1 /* isEval */);
 	return 1;
 }
 
@@ -751,7 +777,7 @@ int knh_NameSpace_isLoaded(Ctx *ctx, NameSpace *o, knh_fileid_t fileid)
 
 /* ------------------------------------------------------------------------ */
 
-int knh_NameSpace_load(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isEval)
+int knh_NameSpace_loadScript(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isEval)
 {
 	knh_fileid_t fileid = konoha_getFileId(ctx, fpath);
 	if(knh_NameSpace_isLoaded(ctx, ns, fileid)) {
@@ -783,7 +809,7 @@ void konoha_compile(Ctx *ctx, String *nsname, knh_bytes_t fpath)
 	KNH_TRY(ctx, L_CATCH, lsfp, 0);
 	{
 		NameSpace *ns = knh_Context_setNameSpace(ctx, nsname);
-		knh_NameSpace_load(ctx, ns, fpath, 0);
+		knh_NameSpace_loadScript(ctx, ns, fpath, 0);
 	}
 	KNH_LOCALBACK(ctx, lsfp);
 	return;

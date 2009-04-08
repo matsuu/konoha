@@ -111,6 +111,20 @@ static METHOD knh__OutputStream_new(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN(ctx, sfp, knh_OutputStream_open(ctx, o, sfp[1].s, sfp[2].s));
 }
 
+/* ------------------------------------------------------------------------ */
+/* @method void OutputStream.putc(Int! ch) */
+
+static METHOD knh__OutputStream_putc(Ctx *ctx, knh_sfp_t *sfp)
+{
+	Bytes *ba = DP(sfp[0].w)->ba;
+	KNH_ASSERT(IS_Bytes(ba));
+	knh_Bytes_putc(ctx, ba, sfp[1].ivalue);
+	if(!knh_OutputStream_isStoringBuffer(sfp[0].w) && ba->size > DP(sfp[0].w)->driver.bufsiz) {
+		DP(sfp[0].w)->driver.fwrite(ctx, DP(sfp[0].w)->fd, (char*)(ba)->buf, (ba)->size);
+		knh_Bytes_clear(ba, 0);
+	}
+	DP(sfp[0].w)->size++;
+}
 
 /* ------------------------------------------------------------------------ */
 /* @method void OutputStream.write(Bytes! buf, Int offset, Int len) */

@@ -77,9 +77,8 @@ Object *knh_OutputStream_open(Ctx *ctx, OutputStream *o, String *urn, String *mo
 /* [methods] */
 
 /* ------------------------------------------------------------------------ */
-/* @method void OutputStream.putc(Int! ch) */
 
-void knh_OutputStream_putc(Ctx *ctx, OutputStream *o, int ch)
+void knh_OutputStream_putc(Ctx *ctx, OutputStream *o, knh_int_t ch)
 {
 	Bytes *ba = DP(o)->ba;
 	KNH_ASSERT(IS_Bytes(ba));

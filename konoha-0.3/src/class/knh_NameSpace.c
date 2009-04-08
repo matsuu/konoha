@@ -185,8 +185,8 @@ void knh_NameSpace_import(Ctx *ctx, NameSpace *o, knh_bytes_t p)
 	if(p.buf[p.len-1] == '.') {
 		p.len--;
 	}
-	for(i = 0; i < ctx->share->ClassTableSize; i++) {
-		if(ctx->share->ClassTable[i].cspec == NULL) continue;
+	for(i = 0; i < KNH_TCLASS_SIZE; i++) {
+		if(ctx->share->ClassTable[i].sname == NULL) continue;
 		KNH_ASSERT(IS_bString(ctx->share->ClassTable[i].lname));
 		if(knh_class_isPrivate(i)) continue;
 		knh_bytes_t cname = knh_String_tobytes(ctx->share->ClassTable[i].lname);
