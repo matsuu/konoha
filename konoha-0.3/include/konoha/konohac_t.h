@@ -170,6 +170,23 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 #define JIT_XMOVDEF(ctx, a, x, cid)  KLR_MOV(ctx, JITSFX(a, x), KNH_DEF(ctx, cid))
 #define JIT_XMOVSYS(ctx, a, x, cid)  KLR_MOV(ctx, JITSFX(a, x), KNH_SYS(ctx, cid))
 
+#ifdef KNH_USING_UNBOXFIELD
+#define SFXi(x)   (*((knh_int_t*)KNH_FIELDn(sfp[x.i].o, x.n)))
+#define KLR_MOVxi(ctx, a, b)    sfp[a].ivalue = SFXi(b)
+#define KLR_XMOVsi(ctx, a, b)   SFXi(a) = sfp[b].ivalue
+#define KLR_XMOVxi(ctx, a, b)   SFXi(a) = SFXi(b)
+
+#define SFXf(x)   (*((knh_float_t*)KNH_FIELDn(sfp[x.i].o, x.n)))
+#define KLR_MOVxf(ctx, a, b)    sfp[a].fvalue = SFXf(b)
+#define KLR_XMOVsf(ctx, a, b)   SFXf(a) = sfp[b].fvalue
+#define KLR_XMOVxf(ctx, a, b)   SFXf(a) = SFXf(b)
+
+#define SFXb(x)   (*((knh_bool_t*)KNH_FIELDn(sfp[x.i].o, x.n)))
+#define KLR_MOVxb(ctx, a, b)    sfp[a].ivalue = SFXb(b)
+#define KLR_XMOVsb(ctx, a, b)   SFXb(a) = sfp[b].ivalue
+#define KLR_XMOVxb(ctx, a, b)   SFXb(a) = SFXb(b)
+#endif/*KNH_USING_UNBOXFIELD*/
+
 /* ------------------------------------------------------------------------ */
 
 #define KLR_INITCODE(ctx, n) { \

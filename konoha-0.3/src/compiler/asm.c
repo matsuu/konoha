@@ -412,6 +412,7 @@ static
 void KNH_ASM_BOX(Ctx *ctx, Asm *abr, knh_type_t atype, int a)
 {
 	if(knh_rtti_issync(abr, a)) return;
+	DBG2_P("@@@ atype=%s%s", TYPEQN(atype));
 	knh_class_t cid = CLASS_type(atype);
 	KNH_ASSERT_cid(cid);
 	knh_class_t bcid = ctx->share->ClassTable[cid].bcid;
@@ -435,7 +436,6 @@ void KNH_ASM_NNBOX(Ctx *ctx, Asm *abr, knh_type_t atype, int a)
 	knh_class_t cid = CLASS_type(atype);
 	KNH_ASSERT_cid(cid);
 	knh_class_t bcid = ctx->share->ClassTable[cid].bcid;
-	//DBG2_P("atype=%s%s", TYPEQN(atype));
 	if(bcid == CLASS_Boolean || bcid == CLASS_Int || bcid == CLASS_Float) {
 		if(IS_NNTYPE(atype)) {
 			KNH_ASM_NNBOX_(ctx, abr, a, cid);
@@ -445,16 +445,6 @@ void KNH_ASM_NNBOX(Ctx *ctx, Asm *abr, knh_type_t atype, int a)
 		}
 	}
 }
-
-/* ------------------------------------------------------------------------ */
-
-//static
-//void KNH_ASM_UNBOX(Ctx *ctx, Asm *abr, knh_type_t atype, int a)
-//{
-//	if(knh_rtti_issync(abr, a)) return;
-//	KNH_ASM_UNBOX_(ctx, abr, a);
-//	knh_rtti_sync(abr, a);
-//}
 
 /* ------------------------------------------------------------------------ */
 
@@ -726,20 +716,6 @@ void KNH_ASM_RET(Ctx *ctx, Asm *abr)
 	KNH_ASM_RET_(ctx, abr);
 }
 
-
-/* ------------------------------------------------------------------------ */
-
-//static
-//knh_methodn_t knh_asm_getmn(Ctx *ctx, Asm *o, Token *tk)
-//{
-//	if(SP(tk)->tt == TT_MN) {
-//		return (knh_methodn_t)DP(tk)->index;
-//	}
-//	if(IS_Method(DP(tk)->data)) {
-//		return DP(DP(tk)->mtd)->mn;
-//	}
-//	return METHODN_NONAME;
-//}
 
 /* ------------------------------------------------------------------------ */
 

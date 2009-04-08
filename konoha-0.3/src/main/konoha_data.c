@@ -156,6 +156,23 @@ void knh_ClassStruct_initField(Ctx *ctx, ClassStruct *cs, knh_class_t self_cid, 
 	size_t i;
 	knh_cfield_t *cf = cs->fields;
 	for(i = 0; i < cs->fsize; i++) {
+#ifdef KNH_USING_UNBOXFIELD
+		if(cf[i].type == NNTYPE_Int) {
+			knh_int_t *data = (knh_int_t*)v[i];
+			data[0] = 0; continue;
+		}
+		if(cf[i].type == NNTYPE_Float) {
+			knh_float_t *data = (knh_float_t*)v[i];
+			data[0] = 0.0; continue;
+		}
+		if(cf[i].type == NNTYPE_Boolean) {
+			knh_bool_t *data = (knh_bool_t*)v[i];
+			data[0] = 0; continue;
+		}
+		if(cf[i].type == CLASS_unknown) {
+			continue;
+		}
+#endif/*KNH_USING_UNBOXFIELD*/
 		if(IS_NULL(cf[i].value) && IS_NNTYPE(cf[i].type)) {
 			knh_class_t cid = knh_pmztype_toclass(ctx, cf[i].type, self_cid);
 			KNH_INITv(v[i], new_Object_init(ctx, 0, cid, 0));
@@ -173,7 +190,6 @@ void knh_ObjectField_init(Ctx *ctx, knh_ObjectField_t *of, int init)
 {
 	knh_class_t cid = of->h.cid;
 	if(ctx->share->ClassTable[cid].size > 0) {
-		//Object **v = (Object**)KNH_MALLOC(ctx, ctx->share->ClassTable[cid].size);
 		Object **v = (Object**)of->fields;
 		size_t offset;
 		while((offset = ctx->share->ClassTable[cid].offset) != 0) {
@@ -196,15 +212,28 @@ void knh_ObjectField_init(Ctx *ctx, knh_ObjectField_t *of, int init)
 static
 void knh_ObjectField_traverse(Ctx *ctx, knh_ObjectField_t *of, knh_ftraverse ftr)
 {
+#ifdef KNH_USING_UNBOXFIELD
+	knh_class_t cid = knh_Object_cid(of);
+	while(cid != CLASS_Object) {
+		knh_ClassStruct_t *cs = ctx->share->ClassTable[cid].cstruct;
+		size_t i, offset = ctx->share->ClassTable[cid].offset;
+		for(i = 0; i < cs->fsize; i++) {
+			if(cs->fields[i].type == NNTYPE_Int || cs->fields[i].type == NNTYPE_Float || cs->fields[i].type == NNTYPE_Boolean) {
+				continue;
+			}
+			if(cs->fields[i].type == CLASS_unknown) {
+				continue;
+			}
+			ftr(ctx, of->fields[i + offset]);
+		}
+		cid = ctx->share->ClassTable[cid].supcid;
+	}
+#else/*KNH_USING_UNBOXFIELD*/
 	size_t i;
 	for(i = 0; i < of->bsize; i++) {
 		ftr(ctx, of->fields[i]);
 	}
-//	if(IS_SWEEP(ftr)) {
-//		KNH_FREE(ctx, of->fields, of->bsize * sizeof(Object*));
-//		of->fields = NULL;
-//		of->bsize = 0;
-//	}
+#endif/*KNH_USING_UNBOXFIELD*/
 }
 
 /* ======================================================================== */

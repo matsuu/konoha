@@ -556,7 +556,7 @@ knh_drvapi_t *konoha_getDriverAPI(Ctx *ctx, int type, knh_bytes_t name)
 /* [namespace] */
 
 static
-char *knh_format_pscript(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t pkgname)
+char *knh_lookup_packageScript(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t pkgname)
 {
 	char pbuf[40];
 	knh_format_bytes(pbuf, sizeof(pbuf), pkgname);
@@ -596,15 +596,15 @@ int konohaget(Ctx *ctx, knh_bytes_t pkgname);
 NameSpace *knh_System_loadPackage(Ctx *ctx, knh_bytes_t pkgname)
 {
 	char buff[FILENAME_BUFSIZ];
-	char *fpath = knh_format_pscript(ctx, buff, sizeof(buff), pkgname);
+	char *fpath = knh_lookup_packageScript(ctx, buff, sizeof(buff), pkgname);
 #ifdef KNH_USING_KONOHAGET
 	if(fpath == NULL && knh_Context_isInteractive(ctx)) {
 		fprintf(stdout,
-				"package %s isn't found on your computer.\n"
-				"would you like to fetch from web?\n", (char*)pkgname.buf);
+				"Package '%s' isn't found on your computer.\n"
+				"Would you like to fetch from web?\n", (char*)pkgname.buf);
 		if(!knh_readline_askYesNo("Please enter [y/N]: ", 0)) return 0;
 		if(konohaget(ctx, pkgname)) {
-			fpath = knh_format_pscript(ctx, buff, sizeof(buff), pkgname);
+			fpath = knh_lookup_packageScript(ctx, buff, sizeof(buff), pkgname);
 		}
 	}
 #endif

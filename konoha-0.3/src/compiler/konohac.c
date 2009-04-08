@@ -137,14 +137,6 @@ void knh_class_addInterface(Ctx *ctx, knh_class_t cid, knh_class_t icid)
 	}
 }
 
-///* ------------------------------------------------------------------------ */
-//
-//static
-//Object *knh_ClassTable_fdefault__OBJECT(Ctx *ctx, knh_class_t cid)
-//{
-//	return new_Object_init(ctx, ctx->share->ClassTable[cid].oflag, cid, 0);
-//}
-
 /* ------------------------------------------------------------------------ */
 
 static
@@ -227,6 +219,7 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	if(SP(StmtCLASS_instmt(stmt))->stt == STT_DONE) {
 		knh_Stmt_done(ctx, stmt);
 	}
+	KNH_NOTICE(ctx, "added new class: %s", CLASSN(cid));
 	return 1;
 }
 
@@ -241,14 +234,14 @@ char *knh_lookup_includeScript(Ctx *ctx, knh_bytes_t path, char *buf, size_t buf
 	char *filename = (char*)path.buf + loc + 1;
 
 #ifdef KNH_PREFIX
-	knh_snprintf(buf, bufsiz, "%s/lib/konoha/%s.k", KNH_PREFIX, filename);
+	knh_snprintf(buf, bufsiz, "%s/lib/konoha/%s", KNH_PREFIX, filename);
 #else
-	knh_snprintf(buf, bufsiz, "%s/include/%s.k", knh_String_tochar(DP(ctx->sys)->homeDir), filename);
+	knh_snprintf(buf, bufsiz, "%s/include/%s", knh_String_tochar(DP(ctx->sys)->homeDir), filename);
 #endif
 	if(knh_isfile(ctx, B(buf))) return buf;
 	char *p = knh_getenv("HOME");
 	if(p != NULL) {
-		knh_snprintf(buf, bufsiz, "%s/.konoha/%s.k", p, filename);
+		knh_snprintf(buf, bufsiz, "%s/.konoha/%s", p, filename);
 		if(knh_isfile(ctx, B(buf))) return buf;
 	}
 	return NULL;
@@ -272,9 +265,9 @@ int knh_StmtIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	}
 	knh_format_catpath(buff, sizeof(buff), B(bufp), knh_String_tobytes(fname));
 	if(!knh_isfile(ctx, B(buff))) {
-		DBG2_P("searching include.. ");
 		knh_lookup_includeScript(ctx, knh_String_tobytes(fname), buff, sizeof(buff));
 	}
+	KNH_NOTICE(ctx, "including script: %s", buff);
 	knh_NameSpace_loadScript(ctx, ns, B(buff), 1 /* isEval */);
 	return 1;
 }
@@ -732,20 +725,21 @@ void knh_Asm_openlib(Ctx *ctx, Asm *abr, knh_bytes_t fpath)
 	}
 
 	knh_bytes_t f = knh_cwb_tobytes(cwb);
-	DBG2_P("opening lib .. '%s'", f.buf);
 	DP(abr)->dlhdr =knh_dlopen(ctx, (char*)f.buf, KNH_RTLD_LAZY);
 	if(DP(abr)->dlhdr != NULL) {
+		KNH_NOTICE(ctx, "opened dynamic library: %s", f.buf);
 		knh_finit finit = (knh_finit)knh_dlsym(ctx, DP(abr)->dlhdr, "init");
 		if(finit != NULL) {
 			finit(ctx);
 		}
 	}
 	else {
-		DBG2_P("cannot openlib .. '%s'", f.buf);
+		if(knh_isfile(ctx, f)) {
+			KNH_WARNING(ctx, "cannot open dynamic library: %s", f.buf);
+		}
 	}
 	knh_cwb_clear(cwb);
 }
-
 
 /* ======================================================================== */
 /* [loaded] */

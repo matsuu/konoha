@@ -4,7 +4,7 @@ class Vec {
   float y;
   float z;
   Vec(double x, double y, double z) {
-    _x = x; _y = y; _z = z;
+    _x = x; y = _y; _z = _x;
   }
 }
 

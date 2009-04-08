@@ -161,6 +161,9 @@ KNHAPI(int) konoha_parseopt(konoha_t konoha, int argc, char **argv)
 		if(t[1] == 'c' && t[2] == 0) {
 			knh_Context_setCompiling(konoha.ctx, 1);
 		}
+		if(t[1] == 'v') {
+			knh_Context_setVerbose(konoha.ctx, 1);
+		}
 		if(t[1] == 'd' && t[2] == '2' && t[3] == 0) {
 			debugMode = 1;
 			konoha_checksize();

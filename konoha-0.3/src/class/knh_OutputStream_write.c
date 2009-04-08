@@ -259,14 +259,6 @@ void knh_write_fline(Ctx *ctx, OutputStream *w, char *file, int line)
 	}
 }
 
-///* ------------------------------------------------------------------------ */
-//
-//void knh_write__expt(Ctx *ctx, OutputStream *w, knh_expt_t cid)
-//{
-//	TODO();
-//	//knh_write(ctx, w, B(CLASSN(cid)));
-//}
-
 /* ======================================================================== */
 /* [String] */
 
@@ -394,140 +386,133 @@ void konoha_setverbose(int v)
 
 KNHAPI(void) konoha_says(Ctx *ctx, int type, char *fmt, ...)
 {
-	TODO();
-//	int ch;
-//	char *c = fmt;
-//	va_list args;
-//	if(ctx == NULL) {
-//		FILE *fp = stderr;
-//		if(type == KONOHA_NOTICE && verbose != 0) {
-//			return;
-//		}
-//		fprintf(fp, "[KONOHA] ");
-//		va_start(args , fmt);
-//		while((ch = *c) != '\0') {
-//			c++;
-//			if(ch == '\\') {
-//				ch = *c++;
-//				switch(ch) {
-//				case '\0' : return ;
-//				case 'n': fprintf(fp, KONOHA_OS_LINEFEED); break;
-//				case 't': fputc('\t', fp); break;
-//				default:
-//					fputc('\\', fp);
-//					fputc(ch, fp);
-//				}
-//			}
-//			else if(ch == '%') {
-//				ch = *c++;
-//				switch(ch) {
-//				case '\0' : return ;
-//				case 'd':
-//					fprintf(fp, KNH_INT_FMT, (knh_int_t)va_arg(args, knh_int_t));
-//					break;
-//
-//				case 'u':
-//					fprintf(fp, KNH_UINT_FMT, (knh_uint_t)va_arg(args, knh_uint_t));
-//					break;
-//
-//				case 'f':
-//					fprintf(fp, "%f", (double)va_arg(args, double));
-//					break;
-//
-//				case 's':
-//					fprintf(fp, "%s", (char*)va_arg(args, char*));
-//					break;
-//
-//				case 'O':
-//					fprintf(fp, "OBJ(cid=%d)", (int)knh_Object_cid((Object*)va_arg(args, Object*)));
-//					break;
-//
-//				case 'p':
-//					fprintf(fp, "%p", (void*)va_arg(args, void*));
-//						break;
-//
-//				default:
-//					fputc('%', fp);
-//					fputc(ch, fp);
-//				}
-//			}
-//			else if(ch == 0) {
-//				return;
-//			}
-//			else {
-//				fputc(ch, fp);
-//			}
-//		} /* while */
-//		fprintf(fp, KONOHA_OS_LINEFEED);
-//	}
-//	else {
-//#ifndef KNH_DBGMODE
-//		if(type == KONOHA_NOTICE && !knh_Context_isVerbose(ctx)) {
-//			return;
-//		}
-//#endif
-//		OutputStream *w = KNH_STDOUT;
-//		knh_Context__s(ctx, (Context*)ctx, w, (String*)KNH_NULL);
-//		knh_putc(ctx, w, ' ');
-//		va_start(args , fmt);
-//		while((ch = *c) != '\0') {
-//			c++;
-//			if(ch == '\\') {
-//				ch = *c++;
-//				switch(ch) {
-//				case '\0' : return ;
-//				case 'n':
-//					knh_write_EOL(ctx, w); break;
-//				case 't':
-//					knh_write_TAB(ctx, w); break;
-//				default:
-//					knh_putc(ctx, w, '\\');
-//					knh_putc(ctx, w, ch);
-//				}
-//			}
-//			else if(ch == '%') {
-//				ch = *c++;
-//				switch(ch) {
-//					case '\0' : return ;
-//					case 'd':
-//						knh_write__i(ctx, w, (knh_int_t)va_arg(args, knh_int_t));
-//						break;
-//
-//					case 'u':
-//						knh_write__u(ctx, w, (knh_uint_t)va_arg(args, knh_uint_t));
-//						break;
-//
-//					case 'f':
-//						knh_write__f(ctx, w, (knh_float_t)va_arg(args, double));
-//						break;
-//
-//					case 's':
-//						knh_write__s(ctx, w, (char*)va_arg(args, char*));
-//						break;
-//
-//					case 'p':
-//						knh_write__p(ctx, w, (void*)va_arg(args, void*));
-//						break;
-//
-//					case 'O':
-//						knh_write__O(ctx, w, (Object*)va_arg(args, Object*));
-//						break;
-//
-//					default:
-//						knh_putc(ctx, w, '%');
-//						knh_putc(ctx, w, ch);
-//				}
-//			}
-//			else if(ch == 0) {
-//				return;
-//			}
-//			else {
-//				knh_putc(ctx, w, ch);
-//			}
-//		} /* while */
-//		knh_write_EOL(ctx, w);
-//	}
-//	va_end(args);
+	int ch;
+	char *c = fmt;
+	va_list args;
+	if(type == KONOHA_NOTICE && !knh_Context_isVerbose(ctx)) {
+		return;
+	}
+	if(ctx->err == NULL) {
+		FILE *fp = stderr;
+		fprintf(fp, "[KONOHA] ");
+		va_start(args , fmt);
+		while((ch = *c) != '\0') {
+			c++;
+			if(ch == '\\') {
+				ch = *c++;
+				switch(ch) {
+				case '\0' : return ;
+				case 'n': fprintf(fp, KONOHA_OS_LINEFEED); break;
+				case 't': fputc('\t', fp); break;
+				default:
+					fputc('\\', fp);
+					fputc(ch, fp);
+				}
+			}
+			else if(ch == '%') {
+				ch = *c++;
+				switch(ch) {
+				case '\0' : return ;
+				case 'd':
+					fprintf(fp, KNH_INT_FMT, (knh_int_t)va_arg(args, knh_int_t));
+					break;
+
+				case 'u':
+					fprintf(fp, KNH_UINT_FMT, (knh_uint_t)va_arg(args, knh_uint_t));
+					break;
+
+				case 'f':
+					fprintf(fp, "%f", (double)va_arg(args, double));
+					break;
+
+				case 's':
+					fprintf(fp, "%s", (char*)va_arg(args, char*));
+					break;
+
+				case 'O':
+					fprintf(fp, "OBJ(cid=%d)", (int)knh_Object_cid((Object*)va_arg(args, Object*)));
+					break;
+
+				case 'p':
+					fprintf(fp, "%p", (void*)va_arg(args, void*));
+						break;
+
+				default:
+					fputc('%', fp);
+					fputc(ch, fp);
+				}
+			}
+			else if(ch == 0) {
+				return;
+			}
+			else {
+				fputc(ch, fp);
+			}
+		} /* while */
+		fprintf(fp, KONOHA_OS_LINEFEED);
+	}
+	else {
+		OutputStream *w = KNH_STDERR;
+		knh_write(ctx, w, STEXT("[konoha] "));
+		va_start(args , fmt);
+		while((ch = *c) != '\0') {
+			c++;
+			if(ch == '\\') {
+				ch = *c++;
+				switch(ch) {
+				case '\0' : return ;
+				case 'n':
+					knh_write_EOL(ctx, w); break;
+				case 't':
+					knh_write_TAB(ctx, w); break;
+				default:
+					knh_putc(ctx, w, '\\');
+					knh_putc(ctx, w, ch);
+				}
+			}
+			else if(ch == '%') {
+				ch = *c++;
+				switch(ch) {
+					case '\0' : return ;
+					case 'd':
+						knh_write__i(ctx, w, (knh_int_t)va_arg(args, knh_int_t));
+						break;
+
+					case 'u':
+						knh_write__u(ctx, w, (knh_uint_t)va_arg(args, knh_uint_t));
+						break;
+
+					case 'f':
+						knh_write__f(ctx, w, (knh_float_t)va_arg(args, double));
+						break;
+
+					case 's':
+						knh_write__s(ctx, w, (char*)va_arg(args, char*));
+						break;
+
+					case 'p':
+						knh_write__p(ctx, w, (void*)va_arg(args, void*));
+						break;
+
+					case 'O':
+						knh_write__O(ctx, w, (Object*)va_arg(args, Object*));
+						break;
+
+					default:
+						knh_putc(ctx, w, '%');
+						knh_putc(ctx, w, ch);
+				}
+			}
+			else if(ch == 0) {
+				return;
+			}
+			else {
+				knh_putc(ctx, w, ch);
+			}
+		} /* while */
+		knh_write_EOL(ctx, w);
+	}
+	va_end(args);
 }
 
 /* ------------------------------------------------------------------------ */
