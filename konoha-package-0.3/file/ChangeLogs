@@ -1,0 +1,5 @@
+2009-04-08 Masahiro Ide <imasahiro@users.sourceforge.jp>
+    * file/file.k       make File class.
+    * file/file.c       
+    * file/Makefile     
+    * file/file_test.k  add File class sample file.
