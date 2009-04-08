@@ -1,13 +1,7 @@
-try {
-  print "try";
+int n = 0;
+while(n < 10000) {
+  print n;
+  n = n + 1;
 }
-catch(Type!! e) {
-  print "Type!!";
-}
-catch(Exception e) {
-  print "Exception";
-}
-finally{
-  print "finally";
-}
+
 

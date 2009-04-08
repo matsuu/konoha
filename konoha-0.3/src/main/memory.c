@@ -167,6 +167,7 @@ knh_Object_t *new_UnusedObject(Ctx *ctx)
 		else {
 			o[KONOHA_PAGESIZE / sizeof(knh_Object_t) - 1].ref = ctx->unusedObject;
 		}
+		cnt++;
 	}
 	((Context*)ctx)->unusedObject = ((knh_Object_t*)h) + 1;
 	((Context*)ctx)->unusedObjectSize += cnt;
