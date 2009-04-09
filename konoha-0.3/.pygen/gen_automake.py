@@ -69,12 +69,14 @@ for path in all_files('../src', '*.c'):
 
 def all_headers(root, patterns="*"):
     for path, subdirs, files in os.walk(root):
-        if subdirs:
-            for dir in subdirs:
-                yield "libkonoha_la_include" + dir + "dir = $(includedir)/" + os.path.join(path, dir)
-                yield "libkonoha_la_include" + dir + "_HEADERS = "
-                for i in listfiles(os.path.join(path, dir), patterns, prefix = "libkonoha_la_include" + dir + "_HEADERS += "):
-                    yield i
+        if (path.find(".svn") == -1): 
+            if subdirs:
+                for dir in subdirs:
+                    if not dir.startswith("."):
+                        yield "libkonoha_la_include" + dir + "dir = $(includedir)/" + os.path.join(path, dir)
+                        yield "libkonoha_la_include" + dir + "_HEADERS = "
+                        for i in listfiles(os.path.join(path, dir), patterns, prefix = "libkonoha_la_include" + dir + "_HEADERS += "):
+                            yield i
 
 def listfiles(root, pattern="*", prefix=""):
     files = os.listdir(root)
