@@ -39,7 +39,7 @@
 #else
 #define KONOHA_NAME     "konoha"
 #define KONOHA_MAJOR_VERSION "0.3"
-#define KONOHA_VERSION  "0.3.7"
+#define KONOHA_VERSION  "0.3.8"
 #endif
 
 #define KONOHA_URL		"http://konoha.sourceforge.jp/"
@@ -47,7 +47,6 @@
 
 #define KONOHA_BUILDID_TOOOLD  360
 #define KNH_CHECK_VERSION(id)  ((id) <= KONOHA_BUILDID_TOOOLD)
-
 
 /* ======================================================================== */
 /* COMMON */
@@ -62,7 +61,6 @@
 #define KONOHA_STACKSIZE                   4096
 
 #define KONOHA_SMALLPAGESIZE               256
-
 
 #define KONOHA_ERROR_MSG_SIZE              256
 #define KONOHA_INT_SETBUF                  256
@@ -139,11 +137,6 @@
 		#endif
 	#endif/*KONOHA_OS*/
 
-/* Linux kernel style macros */
-
-//#define likely(x)	__builtin_expect((x), 1)
-//#define unlikely(x)	__builtin_expect((x), 0)
-
 #endif/*__GNUC__*/
 
 #ifdef _MSC_VER
@@ -181,7 +174,6 @@
 #ifdef KNH_USING_DRCGC
 #define KNH_USING_RCGC 1
 #endif
-
 
 #ifdef KONOHA_CC_WITH_ECLIPSE
 	#define KONOHA_MONOLITHIC  1

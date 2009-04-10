@@ -142,6 +142,11 @@
 #undef KNH_USING_THREADEDCODE
 #endif
 
+#ifdef KNH_USING_THREAD
+#if !defined(KNH_USING_PTHREAD) && defined(KNH_USING_POSIX)
+#define KNH_USING_PTHREAD 1
+#endif
+#endif
 
 /* ======================================================================== */
 /* [CONFIG_H] */
