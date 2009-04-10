@@ -1,0 +1,6 @@
+2009-04-10 Masahiro Ide <imasahiro@users.sourceforge.jp>
+    * lua/lua.k       make Lua class.
+    * lua/lua.c
+    * lua/Makefile
+    * lua/lua_test.k  add Lua class sample file.
+    * lua/fib.lua     add sample Lua file.

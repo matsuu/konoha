@@ -1,0 +1,3 @@
+add include path /usr/include/lua5.1
+need library option -llua5.1
+
