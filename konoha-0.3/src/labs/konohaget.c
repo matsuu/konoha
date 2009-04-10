@@ -6,8 +6,13 @@
 
 #include"commons.h" // added by Kimio Kuramitsu
 
+//#ifdef KNH_USING_POSIX
+#include<unistd.h>
+//#endif
+
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <netdb.h>
 
 #ifndef SOCK_BUF_SIZE

@@ -122,25 +122,25 @@ static METHOD knh__HashMap_opHas(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__HashMap_remove(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
-	knh_Hash_t *o = (knh_Hash_t*)sfp[0].o;
-	knh_hcode_t hcode = knh_stack_hashCode(ctx, sfp + 1);
-	knh_uintptr_t h =  hcode % DP(o)->hmax;
-	knh_hashentry_t *e = DP(o)->array[h];
-	knh_hashentry_t **prev_next = &(DP(o)->array[h]);
+	if(IS_IMM(sfp[0].o)) {
+		knh_Hash_t *o = (knh_Hash_t*)sfp[0].o;
+		knh_hcode_t hcode = knh_stack_hashCode(ctx, sfp + 1);
+		knh_uintptr_t h =  hcode % DP(o)->hmax;
+		knh_hashentry_t *e = DP(o)->array[h];
+		knh_hashentry_t **prev_next = &(DP(o)->array[h]);
 
-	while(e != NULL) {
-		if(e->hcode == hcode
-				&& knh_Object_cid(sfp[1].o) == knh_Object_cid(e->key)
-				&& knh_stack_equals(ctx, sfp + 1, e->key)) {
-			prev_next[0] = e->next;
-			knh_hashentry_collect(ctx, o, e);
-			DP(o)->size--;
+		while(e != NULL) {
+			if(e->hcode == hcode
+					&& knh_Object_cid(sfp[1].o) == knh_Object_cid(e->key)
+					&& knh_stack_equals(ctx, sfp + 1, e->key)) {
+				prev_next[0] = e->next;
+				knh_hashentry_collect(ctx, o, e);
+				DP(o)->size--;
+			}
+			prev_next = &(e->next);
+			e = e->next;
 		}
-		prev_next = &(e->next);
-		e = e->next;
 	}
-	L_RETURN:;
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -149,40 +149,40 @@ static METHOD knh__HashMap_remove(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__HashMap_set(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
-	if(IS_NULL(sfp[2].o)) {
-		knh__HashMap_remove(ctx, sfp);
-		return ;
-	}
-
-	knh_Hash_t *o = (knh_Hash_t*)sfp[0].o;
-	knh_hcode_t hcode = knh_stack_hashCode(ctx, sfp + 1);
-	knh_uintptr_t h =  hcode % DP(o)->hmax;
-	knh_hashentry_t *e = DP(o)->array[h];
-
-	while(e != NULL) {
-		if(e->hcode == hcode
-				&& knh_Object_cid(sfp[1].o) == knh_Object_cid(e->key)
-				&& knh_stack_equals(ctx, sfp + 1, e->key)) {
-			knh_sfp_boxing(ctx, sfp+2);
-			KNH_SETv(ctx, e->value, sfp[2].o);
-			goto L_RETURN;
+	if(IS_IMM(sfp[0].o)) {
+		if(IS_NULL(sfp[2].o)) {
+			knh__HashMap_remove(ctx, sfp);
+			return ;
 		}
-		e = e->next;
-	}
 
-	/* add newentry */ {
-		e = new_hashentry(ctx, o);
-		e->hcode = hcode;
-		knh_sfp_boxing(ctx, sfp+1);
-		KNH_INITv(e->key, sfp[1].o);
-		knh_sfp_boxing(ctx, sfp+2);
-		KNH_INITv(e->value, sfp[2].o);
-		e->next = DP(o)->array[h];
-		DP(o)->array[h] = e;
-		DP(o)->size++;
+		knh_Hash_t *o = (knh_Hash_t*)sfp[0].o;
+		knh_hcode_t hcode = knh_stack_hashCode(ctx, sfp + 1);
+		knh_uintptr_t h =  hcode % DP(o)->hmax;
+		knh_hashentry_t *e = DP(o)->array[h];
+
+		while(e != NULL) {
+			if(e->hcode == hcode
+					&& knh_Object_cid(sfp[1].o) == knh_Object_cid(e->key)
+					&& knh_stack_equals(ctx, sfp + 1, e->key)) {
+				knh_sfp_boxing(ctx, sfp+2);
+				KNH_SETv(ctx, e->value, sfp[2].o);
+				KNH_RETURN_void(ctx, sfp);
+			}
+			e = e->next;
+		}
+
+		/* add newentry */ {
+			e = new_hashentry(ctx, o);
+			e->hcode = hcode;
+			knh_sfp_boxing(ctx, sfp+1);
+			KNH_INITv(e->key, sfp[1].o);
+			knh_sfp_boxing(ctx, sfp+2);
+			KNH_INITv(e->value, sfp[2].o);
+			e->next = DP(o)->array[h];
+			DP(o)->array[h] = e;
+			DP(o)->size++;
+		}
 	}
-	L_RETURN:;
 	KNH_RETURN_void(ctx, sfp);
 }
 

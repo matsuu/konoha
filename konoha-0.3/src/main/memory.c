@@ -142,20 +142,20 @@ knh_Object_t *new_UnusedObject(Ctx *ctx)
 	ctx->share->ObjectPageTableSize += 1;
 	KNH_UNLOCK(ctx, LOCK_MEMORY, NULL);
 
-	char *t = KNH_MALLOC(ctx, SIZEOF_OBJECTPAGE);
+	char *t = (char*)KNH_MALLOC(ctx, SIZEOF_OBJECTPAGE);
 	knh_bzero(t, SIZEOF_OBJECTPAGE);
 	ctx->share->ObjectPageTable[tindex].ctxid = ctx->ctxid;
 	ctx->share->ObjectPageTable[tindex].thead = t;
 	if((knh_uintptr_t)t % KONOHA_PAGESIZE != 0) {
-		t = (void*)((((knh_uintptr_t)t / KONOHA_PAGESIZE) + 1) * KONOHA_PAGESIZE);
+		t = (char*)((((knh_uintptr_t)t / KONOHA_PAGESIZE) + 1) * KONOHA_PAGESIZE);
 		KNH_ASSERT((knh_uintptr_t)t % KONOHA_PAGESIZE == 0);
 	}
 	char *h = t, *max = ctx->share->ObjectPageTable[tindex].thead + SIZEOF_OBJECTPAGE;
 	int cnt = 0;
 	while(t + KONOHA_PAGESIZE < max) {
-		int i;
+		size_t i;
 		knh_Object_t *o = (knh_Object_t*)t;
-		for(i = 1; i < KONOHA_PAGESIZE / sizeof(knh_Object_t) - 1; i++) {
+		for(i = 1; i < (KONOHA_PAGESIZE / sizeof(knh_Object_t)) - 1; i++) {
 			//o[i].h.magic = 0;
 			o[i].ref = &(o[i+1]);
 			cnt++;
@@ -183,7 +183,7 @@ knh_Object_t *new_UnusedObject(Ctx *ctx)
 
 static void knh_setFastMallocMemory(void *p)
 {
-	knh_uintptr_t *b = (void*)((((knh_uintptr_t)p) / KONOHA_PAGESIZE) * KONOHA_PAGESIZE);
+	knh_uintptr_t *b = (knh_uintptr_t*)((((knh_uintptr_t)p) / KONOHA_PAGESIZE) * KONOHA_PAGESIZE);
 	int n = ((knh_uintptr_t)p % KONOHA_PAGESIZE) / sizeof(knh_Object_t);
 	int x = n/(sizeof(knh_uintptr_t)*8);
 	knh_uintptr_t mask = 1 << (n % (sizeof(knh_uintptr_t)*8));
@@ -194,7 +194,7 @@ static void knh_setFastMallocMemory(void *p)
 
 static void knh_unsetFastMallocMemory(void *p)
 {
-	knh_uintptr_t *b = (void*)((((knh_uintptr_t)p) / KONOHA_PAGESIZE) * KONOHA_PAGESIZE);
+	knh_uintptr_t *b = (knh_uintptr_t*)((((knh_uintptr_t)p) / KONOHA_PAGESIZE) * KONOHA_PAGESIZE);
 	int n = ((knh_uintptr_t)p % KONOHA_PAGESIZE) / sizeof(knh_Object_t);
 	int x = n/(sizeof(knh_uintptr_t)*8);
 	knh_uintptr_t mask = 1 << (n % (sizeof(knh_uintptr_t)*8));
@@ -205,7 +205,7 @@ static void knh_unsetFastMallocMemory(void *p)
 
 int knh_isFastMallocMemory(void *p)
 {
-	knh_uintptr_t *b = (void*)((((knh_uintptr_t)p) / KONOHA_PAGESIZE) * KONOHA_PAGESIZE);
+	knh_uintptr_t *b = (knh_uintptr_t*)((((knh_uintptr_t)p) / KONOHA_PAGESIZE) * KONOHA_PAGESIZE);
 	int n = ((knh_uintptr_t)p % KONOHA_PAGESIZE) / sizeof(knh_Object_t);
 	int x = n/(sizeof(knh_uintptr_t)*8);
 	knh_uintptr_t mask = 1 << (n % (sizeof(knh_uintptr_t)*8));
@@ -440,7 +440,7 @@ void knh_Object_mark1(Ctx *ctx, Object *o)
 	else {
 		DBG2_ASSERT(o->h.magic == KNH_OBJECT_MAGIC);
 		DBG2_ASSERT(!knh_isFastMallocMemory((void*)o));
-		knh_uintptr_t *b = (void*)((((knh_uintptr_t)o) / KONOHA_PAGESIZE) * KONOHA_PAGESIZE);
+		knh_uintptr_t *b = (knh_uintptr_t*)((((knh_uintptr_t)o) / KONOHA_PAGESIZE) * KONOHA_PAGESIZE);
 		b = b + BSHIFT;
 		int n = ((knh_uintptr_t)o % KONOHA_PAGESIZE) / sizeof(knh_Object_t);
 		int x = n/(sizeof(knh_uintptr_t)*8);

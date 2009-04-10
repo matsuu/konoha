@@ -83,7 +83,7 @@ size_t f_bconv__iconv(Ctx *ctx, BytesConv *o, knh_bytes_t t, knh_Bytes_t *ba)
 #if defined(KONOHA_OS__MACOSX)
 		size_t rc = iconv(cd, &ibuf, &ilen, &obuf, &olen);
 #else
-		size_t rc = iconv(cd, (const char**)&ibuf, &ilen, &obuf, &olen);
+		size_t rc = iconv(cd, &ibuf, &ilen, &obuf, &olen);
 #endif
 		//		DBG2_P("E in=%p,%d out=%p,%d", ibuf, ilen, obuf, olen);
 		olen = sizeof(buffer) - olen;

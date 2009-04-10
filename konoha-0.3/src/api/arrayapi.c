@@ -260,15 +260,15 @@ static METHOD knh__FArray_new__init(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Array_add(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
-	Array *o = (Array*)sfp[0].o;
-	if(o->size == o->capacity) {
-		knh_Array_grow(ctx, o, knh_array_newsize(o->capacity * 2, sizeof(Object*)), KNH_NULL);
+	if(IS_IMM(sfp[0].o)) {
+		Array *o = (Array*)sfp[0].o;
+		if(o->size == o->capacity) {
+			knh_Array_grow(ctx, o, knh_array_newsize(o->capacity * 2, sizeof(Object*)), KNH_NULL);
+		}
+		knh_sfp_boxing(ctx, sfp + 1);
+		KNH_SETv(ctx, o->list[o->size], sfp[1].o);
+		o->size++;
 	}
-	knh_sfp_boxing(ctx, sfp + 1);
-	KNH_SETv(ctx, o->list[o->size], sfp[1].o);
-	o->size++;
-	L_RETURN:;
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -277,15 +277,15 @@ static METHOD knh__Array_add(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Array_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
-	Array *o = (Array*)sfp[0].o;
-	knh_sfp_t *v = sfp + 1;
-	int i, ac = knh_sfp_argc(ctx, v);
-	for(i = 0; i < ac; i++) {
-		knh_sfp_boxing(ctx, v + i);
-		knh_Array_add(ctx, o, v[i].o);
+	if(IS_IMM(sfp[0].o)) {
+		Array *o = (Array*)sfp[0].o;
+		knh_sfp_t *v = sfp + 1;
+		int i, ac = knh_sfp_argc(ctx, v);
+		for(i = 0; i < ac; i++) {
+			knh_sfp_boxing(ctx, v + i);
+			knh_Array_add(ctx, o, v[i].o);
+		}
 	}
-	L_RETURN:;
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -294,14 +294,14 @@ static METHOD knh__Array_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__IArray_add(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	IArray *o = (IArray*)sfp[0].o;
 	if(o->size == o->capacity) {
 		knh_IArray_grow(ctx, o, knh_array_newsize(o->capacity * 2, sizeof(knh_int_t)), 0);
 	}
 	o->ilist[o->size] = sfp[1].ivalue;
 	o->size++;
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -310,14 +310,14 @@ static METHOD knh__IArray_add(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__IArray_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	IArray *o = (IArray*)sfp[0].o;
 	knh_sfp_t *v = sfp + 1;
 	int i, ac = knh_sfp_argc(ctx, v);
 	for(i = 0; i < ac; i++) {
 		knh_IArray_add(ctx, o, v[i].ivalue);
 	}
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -326,14 +326,14 @@ static METHOD knh__IArray_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__FArray_add(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	FArray *o = (FArray*)sfp[0].o;
 	if(o->size == o->capacity) {
 		knh_FArray_grow(ctx, o, knh_array_newsize(o->capacity * 2, sizeof(knh_float_t)), 0.0);
 	}
 	o->flist[o->size] = sfp[1].fvalue;
 	o->size++;
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -342,14 +342,14 @@ static METHOD knh__FArray_add(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__FArray_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	FArray *o = (FArray*)sfp[0].o;
 	knh_sfp_t *v = sfp + 1;
 	int i, ac = knh_sfp_argc(ctx, v);
 	for(i = 0; i < ac; i++) {
 		knh_FArray_add(ctx, o, v[i].fvalue);
 	}
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -399,12 +399,12 @@ static METHOD knh__FArray_get(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Array_set(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	Array *o = (Array*)sfp[0].o;
 	size_t n2 = knh_array_index(ctx, p_int(sfp[1]), o->size);
 	knh_sfp_boxing(ctx, sfp + 2);
 	KNH_SETv(ctx, o->list[n2], sfp[2].o);
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -413,11 +413,11 @@ static METHOD knh__Array_set(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__IArray_set(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	IArray *o = (IArray*)sfp[0].o;
 	size_t n2 = knh_array_index(ctx, p_int(sfp[1]), o->size);
 	o->ilist[n2] = sfp[2].ivalue;
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -426,11 +426,11 @@ static METHOD knh__IArray_set(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__FArray_set(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	FArray *o = (FArray*)sfp[0].o;
 	size_t n2 = knh_array_index(ctx, p_int(sfp[1]), o->size);
 	o->flist[n2] = sfp[2].fvalue;
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -439,14 +439,14 @@ static METHOD knh__FArray_set(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Array_setAll(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	Array *o = (Array*)sfp[0].o;
 	size_t i;
 	knh_sfp_boxing(ctx, sfp + 1);
 	for(i = 0; i < o->size; i++) {
 		KNH_SETv(ctx, o->list[i], sfp[1].o);
 	}
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -632,11 +632,11 @@ static METHOD knh__Array_opHas(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Array_sort(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	TODO_THROW(ctx);
 	Array *o = (Array*)sfp[0].o;
 	knh_qsort(o->list, o->size, sizeof(Object*), (int (*)(const void*, const void*))knh_Object_compareTo);
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -645,7 +645,7 @@ static METHOD knh__Array_sort(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Array_reverse(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	Array *o = (Array*)sfp[0].o;
 	size_t i;
 	for(i = 0; i < o->size / 2; i++) {
@@ -654,7 +654,7 @@ static METHOD knh__Array_reverse(Ctx *ctx, knh_sfp_t *sfp)
 		o->list[i] = o->list[n];
 		o->list[n] = temp;
 	}
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -663,14 +663,14 @@ static METHOD knh__Array_reverse(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Array_swap(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	Array *o = (Array*)sfp[0].o;
 	size_t m = knh_array_index(ctx, p_int(sfp[1]), o->size);
 	size_t n = knh_array_index(ctx, p_int(sfp[2]), o->size);
 	Object *temp = o->list[n];
 	o->list[n] = o->list[m];
 	o->list[m] = temp;
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -679,7 +679,7 @@ static METHOD knh__Array_swap(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Array_shuffle(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	Array *o = (Array*)sfp[0].o;
 	size_t i;
 	for(i = 0; i < o->size; i++) {
@@ -689,7 +689,7 @@ static METHOD knh__Array_shuffle(Ctx *ctx, knh_sfp_t *sfp)
 		o->list[n] = o->list[m];
 		o->list[m] = temp;
 	}
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -710,10 +710,10 @@ static int qsort_icmp(const void* ap, const void* bp)
 
 static METHOD knh__IArray_sort(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	IArray *o = (IArray*)sfp[0].o;
 	knh_qsort(o->ilist, o->size, sizeof(knh_int_t), qsort_icmp);
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -722,7 +722,7 @@ static METHOD knh__IArray_sort(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__IArray_reverse(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	IArray *o = (IArray*)sfp[0].o;
 	size_t i;
 	for(i = 0; i < o->size / 2; i++) {
@@ -731,7 +731,7 @@ static METHOD knh__IArray_reverse(Ctx *ctx, knh_sfp_t *sfp)
 		o->ilist[i] = o->ilist[n];
 		o->ilist[n] = temp;
 	}
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -740,14 +740,14 @@ static METHOD knh__IArray_reverse(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__IArray_swap(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	IArray *o = (IArray*)sfp[0].o;
 	size_t m = knh_array_index(ctx, p_int(sfp[1]), o->size);
 	size_t n = knh_array_index(ctx, p_int(sfp[2]), o->size);
 	knh_int_t temp = o->ilist[n];
 	o->ilist[n] = o->ilist[m];
 	o->ilist[m] = temp;
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -756,7 +756,7 @@ static METHOD knh__IArray_swap(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__IArray_shuffle(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	IArray *o = (IArray*)sfp[0].o;
 	size_t i;
 	for(i = 0; i < o->size; i++) {
@@ -766,7 +766,7 @@ static METHOD knh__IArray_shuffle(Ctx *ctx, knh_sfp_t *sfp)
 		o->ilist[n] = o->ilist[m];
 		o->ilist[m] = temp;
 	}
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -788,10 +788,10 @@ static int qsort_fcmp(const void* ap, const void* bp)
 
 static METHOD knh__FArray_sort(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	FArray *o = (FArray*)sfp[0].o;
 	knh_qsort(o->flist, o->size, sizeof(knh_float_t), qsort_fcmp);
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -800,7 +800,7 @@ static METHOD knh__FArray_sort(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__FArray_reverse(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	FArray *o = (FArray*)sfp[0].o;
 	size_t i;
 	for(i = 0; i < o->size / 2; i++) {
@@ -809,7 +809,7 @@ static METHOD knh__FArray_reverse(Ctx *ctx, knh_sfp_t *sfp)
 		o->flist[i] = o->flist[n];
 		o->flist[n] = temp;
 	}
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -818,14 +818,14 @@ static METHOD knh__FArray_reverse(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__FArray_swap(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	FArray *o = (FArray*)sfp[0].o;
 	size_t m = knh_array_index(ctx, p_int(sfp[1]), o->size);
 	size_t n = knh_array_index(ctx, p_int(sfp[2]), o->size);
 	knh_float_t temp = o->flist[n];
 	o->flist[n] = o->flist[m];
 	o->flist[m] = temp;
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -834,7 +834,7 @@ static METHOD knh__FArray_swap(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__FArray_shuffle(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	FArray *o = (FArray*)sfp[0].o;
 	size_t i;
 	for(i = 0; i < o->size; i++) {
@@ -844,7 +844,7 @@ static METHOD knh__FArray_shuffle(Ctx *ctx, knh_sfp_t *sfp)
 		o->flist[n] = o->flist[m];
 		o->flist[m] = temp;
 	}
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -1037,14 +1037,14 @@ static METHOD knh__Array_get3D(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Array_set2D(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	Array *o = (Array*)sfp[0].o;
 	knh_darray_t *d = ((knh_darray_t*)o->list) - 1;
 	size_t x = knh_array_index(ctx, p_int(sfp[1]), d->x);
 	size_t y = knh_array_index(ctx, p_int(sfp[2]), d->y);
 	knh_sfp_boxing(ctx, sfp + 3);
 	KNH_SETv(ctx, o->list[x + y * d->x], sfp[3].o);
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -1053,7 +1053,7 @@ static METHOD knh__Array_set2D(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Array_set3D(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	Array *o = (Array*)sfp[0].o;
 	knh_darray_t *d = ((knh_darray_t*)o->list) - 1;
 	size_t x = knh_array_index(ctx, p_int(sfp[1]), d->x);
@@ -1061,7 +1061,7 @@ static METHOD knh__Array_set3D(Ctx *ctx, knh_sfp_t *sfp)
 	size_t z = knh_array_index(ctx, p_int(sfp[3]), d->z);
 	knh_sfp_boxing(ctx, sfp + 4);
 	KNH_SETv(ctx, o->list[x + y * d->x + z * d->w], sfp[4].o);
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -1129,13 +1129,13 @@ static METHOD knh__IArray_get3D(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__IArray_set2D(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	IArray *o = (IArray*)sfp[0].o;
 	knh_darray_t *d = ((knh_darray_t*)o->ilist) - 1;
 	size_t x = knh_array_index(ctx, p_int(sfp[1]), d->x);
 	size_t y = knh_array_index(ctx, p_int(sfp[2]), d->y);
 	o->ilist[x + y * d->x] = sfp[3].ivalue;
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -1144,14 +1144,14 @@ static METHOD knh__IArray_set2D(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__IArray_set3D(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	IArray *o = (IArray*)sfp[0].o;
 	knh_darray_t *d = ((knh_darray_t*)o->ilist) - 1;
 	size_t x = knh_array_index(ctx, p_int(sfp[1]), d->x);
 	size_t y = knh_array_index(ctx, p_int(sfp[2]), d->y);
 	size_t z = knh_array_index(ctx, p_int(sfp[3]), d->z);
 	o->ilist[x + y * d->x + z * d->w] = sfp[4].ivalue;
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -1219,13 +1219,13 @@ static METHOD knh__FArray_get3D(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__FArray_set2D(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	FArray *o = (FArray*)sfp[0].o;
 	knh_darray_t *d = ((knh_darray_t*)o->flist) - 1;
 	size_t x = knh_array_index(ctx, p_int(sfp[1]), d->x);
 	size_t y = knh_array_index(ctx, p_int(sfp[2]), d->y);
 	o->flist[x + y * d->x] = sfp[3].fvalue;
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -1234,14 +1234,14 @@ static METHOD knh__FArray_set2D(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__FArray_set3D(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_CHECK_IMMUTABLE(ctx, sfp[0].o, L_RETURN);
+	if(IS_IMM(sfp[0].o)) {;
 	FArray *o = (FArray*)sfp[0].o;
 	knh_darray_t *d = ((knh_darray_t*)o->flist) - 1;
 	size_t x = knh_array_index(ctx, p_int(sfp[1]), d->x);
 	size_t y = knh_array_index(ctx, p_int(sfp[2]), d->y);
 	size_t z = knh_array_index(ctx, p_int(sfp[3]), d->z);
 	o->flist[x + y * d->x + z * d->w] = sfp[4].fvalue;
-	L_RETURN:;
+	}
 	KNH_RETURN_void(ctx, sfp);
 }
 

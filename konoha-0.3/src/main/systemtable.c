@@ -100,15 +100,15 @@ void knh_Object_finalSweep(Ctx *ctx, Object *o)
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_ObjectPageTable_free(Ctx *ctx, void *thead)
+void knh_ObjectPageTable_free(Ctx *ctx, char *thead)
 {
-	void *t = thead, *max = thead + SIZEOF_OBJECTPAGE;
+	char *t = thead, *max = thead + SIZEOF_OBJECTPAGE;
 	if((knh_uintptr_t)t % KONOHA_PAGESIZE != 0) {
-		t = (void*)((((knh_uintptr_t)t / KONOHA_PAGESIZE) + 1) * KONOHA_PAGESIZE);
+		t = (char*)((((knh_uintptr_t)t / KONOHA_PAGESIZE) + 1) * KONOHA_PAGESIZE);
 		KNH_ASSERT((knh_uintptr_t)t % KONOHA_PAGESIZE == 0);
 	}
 	while(t + KONOHA_PAGESIZE < max) {
-		int i;
+		size_t i;
 		for(i = 1; i < (KONOHA_PAGESIZE / sizeof(knh_Object_t)); i++) {
 			Object *o = ((knh_Object_t*)t) + i;
 			if(o->h.magic != KNH_OBJECT_MAGIC) continue;

@@ -65,8 +65,7 @@ typedef struct knh_ObjectField_t {
 
 /* ------------------------------------------------------------------------ */
 
-#define KNH_CHECK_IMMUTABLE(ctx, o, L) \
-	if(knh_Object_isImmutable(o)) goto L;
+#define IS_IMM(o) (!knh_Object_isImmutable(o))
 
 /* ------------------------------------------------------------------------ */
 /* @class Any Object knh_Any_t @Cyclic */
