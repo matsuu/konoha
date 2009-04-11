@@ -1,0 +1,45 @@
+----------------------------------------------------
++  ImageMagick bindings for konoha
++  version 0.1
++  kindofbrown (c) 2009
++  kindofbrown@users.sourceforge.net
+----------------------------------------------------
+
+1. What is this?
+ Simple binding of ImageMagick-6.5.1 API, MagickWand.
+
+2. How to install?
+ Compile imagemagick with makefile.
+
+  > make
+
+ Suppose there are installed ImageMagick and 
+MagickWand API. Compilation needs -lWand, -lMagick 
+options. Thus, Magick-config program is needed. 
+After compilation, type;
+
+  > make konoha_install
+
+ This would install package under your enviroment.
+
+3. How to Use?
+ just type;
+
+   >>> using imagemagick.*
+
+ and goes on like this... 
+
+   >>> MagickWand mw = new MagickWand()
+   >>> mw.readImage("xxx.png")
+   >>> mw.flipImage()
+   >>> mw.writeImage("ooo.png")
+
+ As wand package is a simple binding of MagickWand API,
+you would have no trouble with it. ;)
+
+4. Bugs
+ report is always welcome.
+
+ kindofbrown@users.sourceforge.jp
+
+ 
