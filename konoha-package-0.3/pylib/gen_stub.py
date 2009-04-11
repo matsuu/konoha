@@ -29,6 +29,7 @@ for s in xrange(len(L)):
         lines.append(L[s].replace('\n','').replace(';',''))
         
 output.writelines("""#include <konoha.h>
+#include <wand/MagickWand.h>
 
 """)
 
@@ -40,14 +41,24 @@ TYPES = {
     'int': 'KNH_RETURN_Int(ctx, sfp, ret)',
     'Float': 'KNH_RETURN_Float(ctx, sfp, ret)',
     'float': 'KNH_RETURN_Float(ctx, sfp, ret)',
-    'unknown': 'KNH_RETURN(ctx, sfp, o)',
-    'new': 'KNH_RETURN(ctx, sfp, sfp[0].o)'
+    'new': 'KNH_RETURN(ctx, sfp, sfp[0].o)',
+    'String': 'KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL))'
+    }
+
+RETURNS = {
+    'void': '',
+    'Int': 'int ',
+    'int': 'int ',
+    'Float': 'double ',
+    'float': 'double ',
+    'String': 'char *',
+    'Boolean': 'int ',
     }
 
 ARGS = {
     'Object': 'Object *%s = sfp[%d].o',
     'Class': 'knh_Class_t *%s = sfp[%d].c',
-    'String': 'knh_String_t *%s = sfp[%d].s',
+    'String': 'char *%s = p_char(sfp[%d])',
     'Bytes': 'knh_Bytes_t *%s = sfp[%d].ba',
     'Iterator': 'knh_Iterator_t *%s = sfp[%d].it',
     'Closure': 'knh_Closure_t *%s = sfp[%d].cc',
@@ -62,7 +73,7 @@ ARGS = {
     'Float': 'float %s = p_float(sfp[%d])',
     'float': 'float %s = p_float(sfp[%d])',
     'Array': 'Array *%s = (Array*)sfp[%d].o',
-    'unkonow': 'knh_Glue_t *glue = sfp[%d].glue',
+    'Boolean': 'int %s = p_int(sfp[%d])'
     }
 
 PREFIX = [
@@ -71,48 +82,95 @@ PREFIX = [
     ]
 
 funcflag = False
+classflag = False
+classes = []
+
 for s in lines:
+    classflag = False
+    if 'class' in s:
+        classflag = True
+    a = re.split(ur"[ .,(){}]", s)
+    while '' in a: a.remove('')
+    if classflag is True:
+        key = a.pop()
+        print "CLASS:", key, "is defined."
+        ARGS[key] =  '%s *' % key + '%s =' + '(%s*)' % key + '((sfp[%d].glue)->ptr)'
+        TYPES[key] = 'KNH_RETURN(ctx, sfp, ret)'
+        RETURNS[key] = '%s *' % key
+        
+for s in lines:
+    funcflag = False
+
     if '(' in s:
         funcflag = True
-        
+
     a = re.split(ur"[ .,()]", s)
     while '' in a: a.remove('')
 #    if not a[0] in PREFIX and len(a) > 2:
     if funcflag is True:
-        funcname = "".join((a[1], "_" ,a[2]))
+        thisreturn = a[0];
+        thisclass = a[1];
+        thismethod = a[2];
+        bindingname = "".join((a[1], "_" ,a[2]))
         output.writelines("""
 /* %s */
 
 METHOD %s(Ctx *ctx, knh_sfp_t* sfp)
 {
-""" % (s,funcname))
+""" % (s,bindingname))
+        types=[]
+        args=[]
 
         if len(a) > 3:
             tmp = a[3:]
-            #print tmp
+            print 'tmp:',tmp
             num = 0
-            types=[]
-            args=[]
+            selfflag = 0;
             for line in tmp:
                 if num % 2 is 0:
-                    types.append(line)
+                    if 'self' in line:
+                        types.append(thisclass)
+                        args.append("self")
+                        num=num+1
+                    else:
+                        types.append(line)
                 else:
                     args.append(line)
                 num=num+1
-            #print types, args
+            
             dargs = dict(zip(args, types))
 
-            #print dargs
-            count = len(dargs)
-            for pair in dargs:
-                print dargs[pair]
-                key = dargs[pair]
+            #now, get ready to get arguments.
+
+            for idx in xrange(len(args)):
+                key = types[idx]
                 if ARGS.has_key(key):
                     val = ARGS[key]
                     output.writelines("""\t%s;
-""" % (val % (pair, count)))
-                    count = count - 1
-            
+""" % (val % (args[idx], idx)))
+                    
+        
+        else: 
+            #when no arg is set
+            print "no arg func"
+        #now, ready for library dependent part. 
+        thismethod = thismethod[0].upper() + thismethod[1:]
+        funcname = "".join((thisclass.replace("Wand",""), thismethod))
+        funccall = funcname + "("
+        
+        if args != []:
+            for idx in xrange(len(args)):
+                if idx is 0:
+                    funccall = funccall + "%s " % args[idx]
+                else:
+                    funccall = funccall + ",%s " % args[idx]
+        funccall = funccall + ")"
+        retval = RETURNS[thisreturn]
+        if not retval is '':
+            retval = retval + "ret = "
+            output.writelines("\t" + retval + funccall + ";\n")
+
+        #now, make KNH_RETURN.    
         s.replace('!','')
         key = a[0]
         if TYPES.has_key(key):
@@ -126,5 +184,13 @@ METHOD %s(Ctx *ctx, knh_sfp_t* sfp)
             output.writelines("""
 }
 """)
+output.writelines('''
 
+METHOD MagickWand_new(Ctx *ctx, knh_sfp_t* sfp)
+{
+  knh_Glue_t *glue = sfp[0].glue;
+  glue->ptr = (void *)NewMagickWand();
+  KNH_RETURN(ctx, sfp, sfp[0].o);
+}
+''')
 output.close()
