@@ -108,7 +108,7 @@ for s in lines:
     while '' in a: a.remove('')
 #    if not a[0] in PREFIX and len(a) > 2:
     if funcflag is True:
-        thisreturn = a[0];
+        thisreturn = a[0].replace("!","");
         thisclass = a[1];
         thismethod = a[2];
         bindingname = "".join((a[1], "_" ,a[2]))
