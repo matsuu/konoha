@@ -280,7 +280,6 @@ int konoha_installPackage(knh_bytes_t pkgname)
 int konohaget(Ctx *ctx, knh_bytes_t pkgname)
 {
 	char urlbuf[256] = {0};
-	char pbuf[40] = {0};
 	if (konoha_getPackageURL(pkgname, urlbuf, sizeof(urlbuf)) == -1) {
 		printf("ERROR:cannot find package on the web...\n");
 		return 0;

@@ -48,7 +48,7 @@ mapmap CLASSTN*:paths[]   @stmt   @token @new
 weave ANY:aspect CMETHODN:method @stmt @token @new
 aspect TYPEN:type cmethod.. CLASSN:class METHODN:method STT_DECL:params {:instmt  @stmt @token @new
 
-block {:block @stmt @token @new
+block {:block @stmt @new
 
 if pexpr:bool {:truecase else.. {:falsecase  @stmt @token @new @name @cmpl
 else @token
@@ -71,8 +71,8 @@ finally @token
 throw expr:expt ;   @stmt  @token @new @name @cmpl
 err ANY:msg     @stmt @cmpl
 
-let      VARN:lvalue expr:rvalue     @stmt  @name @cmpl  @expr
-local    expr*:exprs[] ; @stmt @token @new @cmpl
+let         VARN:lvalue expr:rvalue     @stmt  @name @cmpl  @expr
+register    expr*:exprs[] ; @stmt @token @new @cmpl
 #letexpr  VARN:lvalue expr:rvalue     @stmt  @name @cmpl  @expr
 letmulti VARN*:names[]               @stmt    
 

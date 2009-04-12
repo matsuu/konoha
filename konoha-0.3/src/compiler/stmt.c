@@ -79,10 +79,12 @@ void knh_Stmt_toERR(Ctx *ctx, Stmt *stmt, Term *tm)
 		fileid =  SP((Stmt*)tm)->fileid;
 		line =  SP((Stmt*)tm)->line;
 	}
-	char buf[512];
-	knh_snprintf(buf, sizeof(buf), knh_message_text(KMSG_FMTERR), FILEIDN(fileid), line);
-	KNH_SETv(ctx, DP(stmt)->errMsg, new_String(ctx, B(buf), NULL));
-	KNH_SETv(ctx, DP(stmt)->next, KNH_NULL);
+	{
+		char buf[512];
+		knh_snprintf(buf, sizeof(buf), "Script!!: running errors at %s:%d", FILEIDN(SP(stmt)->fileid), SP(stmt)->line);
+		KNH_SETv(ctx, DP(stmt)->errMsg, new_String(ctx, B(buf), NULL));
+		KNH_SETv(ctx, DP(stmt)->next, KNH_NULL);
+	}
 }
 
 /* ======================================================================== */

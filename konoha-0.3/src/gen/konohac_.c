@@ -53,7 +53,6 @@ static char* knh_token_array_tochar[] = {
     "mapmap",  /* mapmap */ 
     "weave",  /* weave */ 
     "aspect",  /* aspect */ 
-    "block",  /* block */ 
     "if",  /* if */ 
     "else",  /* else */ 
     "switch",  /* switch */ 
@@ -70,7 +69,7 @@ static char* knh_token_array_tochar[] = {
     "catch",  /* catch */ 
     "finally",  /* finally */ 
     "throw",  /* throw */ 
-    "local",  /* local */ 
+    "register",  /* register */ 
     "print",  /* print */ 
     "assert",  /* assert */ 
     "{",  /* BRACE */ 
@@ -184,7 +183,6 @@ static knh_methodn_t knh_token_array_tomethodn[] = {
     METHODN_NONAME,  /* mapmap */ 
     METHODN_NONAME,  /* weave */ 
     METHODN_NONAME,  /* aspect */ 
-    METHODN_NONAME,  /* block */ 
     METHODN_NONAME,  /* if */ 
     METHODN_NONAME,  /* else */ 
     METHODN_NONAME,  /* switch */ 
@@ -201,7 +199,7 @@ static knh_methodn_t knh_token_array_tomethodn[] = {
     METHODN_NONAME,  /* catch */ 
     METHODN_NONAME,  /* finally */ 
     METHODN_NONAME,  /* throw */ 
-    METHODN_NONAME,  /* local */ 
+    METHODN_NONAME,  /* register */ 
     METHODN_NONAME,  /* print */ 
     METHODN_NONAME,  /* assert */ 
     METHODN_NONAME,  /* BRACE */ 
@@ -315,7 +313,6 @@ static int knh_token_array_getOpPriority[] = {
     0,  /* mapmap */ 
     0,  /* weave */ 
     0,  /* aspect */ 
-    0,  /* block */ 
     0,  /* if */ 
     0,  /* else */ 
     0,  /* switch */ 
@@ -332,7 +329,7 @@ static int knh_token_array_getOpPriority[] = {
     0,  /* catch */ 
     0,  /* finally */ 
     0,  /* throw */ 
-    0,  /* local */ 
+    0,  /* register */ 
     0,  /* print */ 
     0,  /* assert */ 
     99,  /* BRACE */ 
@@ -446,7 +443,6 @@ static int knh_token_array_getOpSize[] = {
     0,  /* mapmap */ 
     0,  /* weave */ 
     0,  /* aspect */ 
-    0,  /* block */ 
     0,  /* if */ 
     0,  /* else */ 
     0,  /* switch */ 
@@ -463,7 +459,7 @@ static int knh_token_array_getOpSize[] = {
     0,  /* catch */ 
     0,  /* finally */ 
     0,  /* throw */ 
-    0,  /* local */ 
+    0,  /* register */ 
     0,  /* print */ 
     0,  /* assert */ 
     0,  /* BRACE */ 
@@ -577,7 +573,6 @@ static knh_bool_t knh_token_array_isEndOfStmt[] = {
     1,  /* mapmap */ 
     1,  /* weave */ 
     1,  /* aspect */ 
-    1,  /* block */ 
     1,  /* if */ 
     1,  /* else */ 
     1,  /* switch */ 
@@ -594,7 +589,7 @@ static knh_bool_t knh_token_array_isEndOfStmt[] = {
     1,  /* catch */ 
     1,  /* finally */ 
     1,  /* throw */ 
-    1,  /* local */ 
+    1,  /* register */ 
     1,  /* print */ 
     1,  /* assert */ 
     0,  /* BRACE */ 
@@ -835,7 +830,6 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
         if(ISB(t, "as")) { tt = TT_AS; break; }
     break;
     case 'b':
-        if(ISB(t, "block")) { tt = TT_BLOCK; break; }
         if(ISB(t, "break")) { tt = TT_BREAK; break; }
         if(ISB(t, "boolean")) { t = STEXT("Boolean!"); goto L_TAIL; }
     break;
@@ -878,7 +872,6 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
         if(ISB(t, "int")) { t = STEXT("Int!"); goto L_TAIL; }
     break;
     case 'l':
-        if(ISB(t, "local")) { tt = TT_LOCAL; break; }
         if(ISB(t, "long")) { t = STEXT("Int!"); goto L_TAIL; }
     break;
     case 'm':
@@ -901,6 +894,7 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
     break;
     case 'r':
         if(ISB(t, "return")) { tt = TT_RETURN; break; }
+        if(ISB(t, "register")) { tt = TT_REGISTER; break; }
     break;
     case 's':
         if(ISB(t, "switch")) { tt = TT_SWITCH; break; }
@@ -1066,7 +1060,7 @@ static char* knh_stmt_array_tochar[] = {
     "throw",  /* throw */ 
     "err",  /* err */ 
     "let",  /* let */ 
-    "local",  /* local */ 
+    "register",  /* register */ 
     "letmulti",  /* letmulti */ 
     "new",  /* new */ 
     "mapcast",  /* mapcast */ 
@@ -1137,7 +1131,7 @@ static size_t knh_stmt_array_size[] = {
     1,  /* throw */ 
     1,  /* err */ 
     2,  /* let */ 
-    5,  /* local */ 
+    5,  /* register */ 
     5,  /* letmulti */ 
     7,  /* new */ 
     3,  /* mapcast */ 
@@ -1209,7 +1203,7 @@ static int knh_stmt_array_isExpr[] = {
     0,  /* throw */ 
     0,  /* err */ 
     1,  /* let */ 
-    0,  /* local */ 
+    0,  /* register */ 
     0,  /* letmulti */ 
     1,  /* new */ 
     1,  /* mapcast */ 

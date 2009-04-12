@@ -525,6 +525,52 @@ void knh_ClassMap__man(Ctx *ctx, ClassMap *o, OutputStream *w, knh_class_t cid)
 
 /* ------------------------------------------------------------------------ */
 
+int konoha_addClassConst(Ctx *ctx, knh_class_t cid, String* name, Object *value)
+{
+	KNH_ASSERT_cid(cid);
+	if(ctx->share->ClassTable[cid].constPool == NULL) {
+		DBG2_ASSERT(IS_DictMap(ctx->share->ClassTable[cid].constPool));
+		KNH_INITv(ctx->share->ClassTable[cid].constPool, new_DictMap0(ctx, 0));
+	}
+	DictMap *cmap = ctx->share->ClassTable[cid].constPool;
+	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+	int res = knh_DictMap_index__b(cmap, knh_String_tobytes(name));
+	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+	if(res != -1) return 0;
+
+	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+	knh_DictMap_append(ctx, cmap, name, value);
+	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+	return 1;
+}
+
+/* ------------------------------------------------------------------------ */
+
+int konoha_existsClassConst(Ctx *ctx, knh_class_t cid, knh_bytes_t name)
+{
+	KNH_ASSERT_cid(cid);
+	if(ctx->share->ClassTable[cid].constPool == NULL) return 0;
+	DictMap *cmap = ctx->share->ClassTable[cid].constPool;
+	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+	int res = knh_DictMap_index__b(cmap, name);
+	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+	return (res != -1);
+}
+
+/* ------------------------------------------------------------------------ */
+
+Object *konoha_getClassConst(Ctx *ctx, knh_class_t cid, knh_bytes_t name)
+{
+	KNH_ASSERT_cid(cid);
+	if(ctx->share->ClassTable[cid].constPool == NULL) return KNH_NULL;
+	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+	Object *v = knh_DictMap_get__b(ctx, ctx->share->ClassTable[cid].constPool, name);
+	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+	return v;
+}
+
+/* ------------------------------------------------------------------------ */
+
 #ifdef __cplusplus
 }
 #endif

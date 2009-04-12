@@ -129,6 +129,9 @@ void knh_ClassMap_sort(Ctx *ctx, ClassMap *o);
 void knh_ClassMap_add(Ctx *ctx, ClassMap *o, Mapper *map);
 void knh_ClassMap__dump(Ctx *ctx, ClassMap *o, OutputStream *w, String *m);
 void knh_ClassMap__man(Ctx *ctx, ClassMap *o, OutputStream *w, knh_class_t cid);
+int konoha_addClassConst(Ctx *ctx, knh_class_t cid, String* name, Object *value);
+int konoha_existsClassConst(Ctx *ctx, knh_class_t cid, knh_bytes_t name);
+Object *konoha_getClassConst(Ctx *ctx, knh_class_t cid, knh_bytes_t name);
 /* ../src/class/knh_Class_type_t.c */
 knh_class_t knh_pmztype_toclass(Ctx *ctx, knh_type_t t, knh_class_t this_cid);
 knh_type_t knh_pmztype_totype(Ctx *ctx, knh_type_t t, knh_class_t this_cid);
@@ -511,6 +514,7 @@ int TERMs_isTRUE(Stmt *stmt, size_t n);
 int TERMs_isFALSE(Stmt *stmt, size_t n);
 knh_type_t TERMs_gettype(Stmt *stmt, size_t n);
 char * knh_format_mtdparam(Ctx *ctx, char *buf, size_t bufsiz, Method *mtd, int n);
+void knh_Asm_initReg(Ctx *ctx, Asm *abr);
 void knh_Stmt_setType(Ctx *ctx, Stmt *stmt, knh_type_t type);
 Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns);
 Term *knh_StmtLET_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_t reqt);

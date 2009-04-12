@@ -61,8 +61,6 @@ extern "C" {
 	fprintf(stderr, fmt, ## __VA_ARGS__); \
 	fprintf(stderr, "\n"); \
 
-#define DEBUG3_ASSERT(c)    KNH_ASSERT(c)
-
 #define DEBUG3_PTC(name, tc) \
 	fflush(stdout); \
 	fprintf(stderr, "\nDEBUG3[%s:%d/%s]: ", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
@@ -77,7 +75,7 @@ extern "C" {
 
 #define DEBUG3(fmt, ...)
 #define TODO3(fmt, ...)
-#define DEBUG3_ASSERT(c) KNH_ASSERT(c)
+#define DBG2_ASSERT(c) KNH_ASSERT(c)
 #define DEBUG3_PTC(name, tc)
 #define DEBUG3_STC(name, tc)
 

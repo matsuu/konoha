@@ -1,20 +1,20 @@
 /****************************************************************************
- * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
- *
+ * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER  
+ * 
  * Copyright (c) 2005-2009, Kimio Kuramitsu <kimio at ynu.ac.jp>
- *           (c) 2008-      Konoha Software Foundation
+ *           (c) 2008-      Konoha Software Foundation  
  * All rights reserved.
- *
- * You may choose one of the following two licenses when you use konoha.
+ * 
+ * You may choose one of the following two licenses when you use konoha. 
  * See www.konohaware.org/license.html for further information.
- *
+ * 
  * (1) GNU General Public License 2.0      (with    KONOHA_UNDER_GPL2)
  * (2) Konoha Software Foundation License 1.0
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
  * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
@@ -22,13 +22,13 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ *  
  ****************************************************************************/
 
 #include<konoha/konoha_dev.h>
 
 
-#ifdef __cplusplus
+#ifdef __cplusplus 
 extern "C" {
 #endif
 
@@ -39,7 +39,7 @@ extern "C" {
 /* ======================================================================== */
 /* [flag] */
 
-static
+static 
 METHOD knh__Object_isRelease(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Object_isRelease((knh_Object_t*)sfp[0].o));
@@ -51,25 +51,25 @@ METHOD knh__Object_isDebug(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_Boolean(ctx, sfp, !(knh_Object_isDebug((knh_Object_t*)sfp[0].o)));
 }
 
-static
+static 
 METHOD knh__Object_isImmutable(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Object_isImmutable((knh_Object_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Object_hasMetaData(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Object_hasMetaData((knh_Object_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Object_isSynchronized(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Object_isSynchronized((knh_Object_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Object_isModified(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Object_isModified((knh_Object_t*)sfp[0].o));
@@ -82,7 +82,7 @@ METHOD knh__Object_setModified(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_void(ctx, sfp);
 }
 
-static
+static 
 METHOD knh__Object_isGCMarked(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Object_isGCMarked((knh_Object_t*)sfp[0].o));
@@ -95,7 +95,7 @@ METHOD knh__Object_setGCMarked(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_void(ctx, sfp);
 }
 
-static
+static 
 METHOD knh__Object_isFormatted(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Object_isFormatted((knh_Object_t*)sfp[0].o));
@@ -108,19 +108,19 @@ METHOD knh__Object_setFormatted(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_void(ctx, sfp);
 }
 
-static
+static 
 METHOD knh__DictMap_isIgnoreCase(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_DictMap_isIgnoreCase((knh_DictMap_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__DictSet_isIgnoreCase(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_DictSet_isIgnoreCase((knh_DictSet_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Class_isRelease(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_class_isRelease(knh_Class_cid(sfp[0].c)));
@@ -132,19 +132,19 @@ METHOD knh__Class_isDebug(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_Boolean(ctx, sfp, !(knh_class_isDebug(knh_Class_cid(sfp[0].c))));
 }
 
-static
+static 
 METHOD knh__Class_isImmutable(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_class_isImmutable(knh_Class_cid(sfp[0].c)));
 }
 
-static
+static 
 METHOD knh__Class_isMetaExtensible(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_class_isMetaExtensible(knh_Class_cid(sfp[0].c)));
 }
 
-static
+static 
 METHOD knh__Class_isPrivate(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_class_isPrivate(knh_Class_cid(sfp[0].c)));
@@ -156,19 +156,19 @@ METHOD knh__Class_isPublic(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_Boolean(ctx, sfp, !(knh_class_isPublic(knh_Class_cid(sfp[0].c))));
 }
 
-static
+static 
 METHOD knh__Class_isFinal(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_class_isFinal(knh_Class_cid(sfp[0].c)));
 }
 
-static
+static 
 METHOD knh__Class_isInterface(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_class_isInterface(knh_Class_cid(sfp[0].c)));
 }
 
-static
+static 
 METHOD knh__Method_isPrivate(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Method_isPrivate((knh_Method_t*)sfp[0].o));
@@ -180,7 +180,7 @@ METHOD knh__Method_isPublic(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_Boolean(ctx, sfp, !(knh_Method_isPublic((knh_Method_t*)sfp[0].o)));
 }
 
-static
+static 
 METHOD knh__Method_isVirtual(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Method_isVirtual((knh_Method_t*)sfp[0].o));
@@ -192,67 +192,67 @@ METHOD knh__Method_isFinal(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_Boolean(ctx, sfp, !(knh_Method_isFinal((knh_Method_t*)sfp[0].o)));
 }
 
-static
+static 
 METHOD knh__Method_isConst(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Method_isConst((knh_Method_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Method_isStatic(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Method_isStatic((knh_Method_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Method_isNullBase(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Method_isNullBase((knh_Method_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Method_isVarArgs(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Method_isVarArgs((knh_Method_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Method_isAspect(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Method_isAspect((knh_Method_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Mapper_isInterface(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Mapper_isInterface((knh_Mapper_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Mapper_isSignificant(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Mapper_isSignificant((knh_Mapper_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Mapper_isFinal(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Mapper_isFinal((knh_Mapper_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Mapper_isSynonym(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Mapper_isSynonym((knh_Mapper_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Mapper_isLossLess(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Mapper_isLossLess((knh_Mapper_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Mapper_isTotal(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Mapper_isTotal((knh_Mapper_t*)sfp[0].o));
@@ -264,7 +264,7 @@ METHOD knh__Mapper_isPartial(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_Boolean(ctx, sfp, !(knh_Mapper_isPartial((knh_Mapper_t*)sfp[0].o)));
 }
 
-static
+static 
 METHOD knh__Mapper_isConst(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Mapper_isConst((knh_Mapper_t*)sfp[0].o));
@@ -276,25 +276,25 @@ METHOD knh__Mapper_isTemporal(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_Boolean(ctx, sfp, !(knh_Mapper_isTemporal((knh_Mapper_t*)sfp[0].o)));
 }
 
-static
+static 
 METHOD knh__Mapper_isLocal(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Mapper_isLocal((knh_Mapper_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Mapper_isDerived(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Mapper_isDerived((knh_Mapper_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__IntUnit_isUnsigned(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_IntUnit_isUnsigned((knh_IntUnit_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__OutputStream_isAutoFlush(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_OutputStream_isAutoFlush((knh_OutputStream_t*)sfp[0].o));
@@ -307,7 +307,7 @@ METHOD knh__OutputStream_setAutoFlush(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_void(ctx, sfp);
 }
 
-static
+static 
 METHOD knh__OutputStream_isStoringBuffer(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_OutputStream_isStoringBuffer((knh_OutputStream_t*)sfp[0].o));
@@ -320,25 +320,25 @@ METHOD knh__OutputStream_setStoringBuffer(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_void(ctx, sfp);
 }
 
-static
+static 
 METHOD knh__Exception_isFatal(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Exception_isFatal((knh_Exception_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Exception_isLogging(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Exception_isLogging((knh_Exception_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Exception_isGenerated(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Exception_isGenerated((knh_Exception_t*)sfp[0].o));
 }
 
-static
+static 
 METHOD knh__Context_isRelease(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Context_isRelease((knh_Context_t*)sfp[0].o));
@@ -364,7 +364,7 @@ METHOD knh__Context_setDebug(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_void(ctx, sfp);
 }
 
-static
+static 
 METHOD knh__Context_isVerbose(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Context_isVerbose((knh_Context_t*)sfp[0].o));
@@ -377,7 +377,7 @@ METHOD knh__Context_setVerbose(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_void(ctx, sfp);
 }
 
-static
+static 
 METHOD knh__Context_isVerbose2(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Context_isVerbose2((knh_Context_t*)sfp[0].o));

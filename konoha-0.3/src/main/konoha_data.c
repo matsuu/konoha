@@ -2296,10 +2296,11 @@ void knh_Asm_init(Ctx *ctx, Asm *abr, int init)
 //		b->vars[i].count = 0;
 		KNH_INITv(b->vars[i].value, KNH_NULL);
 	}
-
-	KNH_INITv(b->registeredStmts, new_Array0(ctx, 8));
 	b->stack = 0;
 	b->globalidx = -1;
+
+	b->regs = (knh_asmreg_t*)KNH_MALLOC(ctx, KNH_ASM_REGMAX * sizeof(knh_asmreg_t));
+	b->regs_size = 0;
 
 	b->labels = NULL;
 	b->labelmax = 0;
@@ -2337,13 +2338,15 @@ void knh_Asm_traverse(Ctx *ctx, Asm *abr, knh_ftraverse ftr)
 		if(b->labels != NULL) {
 			KNH_FREE(ctx, b->labels, b->labelcapacity * sizeof(knh_labeltbl_t));
 		}
+		KNH_FREE(ctx, b->regs, KNH_ASM_REGMAX * sizeof(knh_asmreg_t));
+		b->regs_size = 0;
 	}
 
 	ftr(ctx, UP(b->ns));
 	ftr(ctx, UP(b->mtd));
 	ftr(ctx, UP(b->elf));
 	ftr(ctx, UP(b->dwarf));
-	ftr(ctx, UP(b->registeredStmts));
+
 	ftr(ctx, UP(b->name2labelIdDictSet));
 	ftr(ctx, UP(b->lstacks));
 	ftr(ctx, UP(b->finallyStmt));

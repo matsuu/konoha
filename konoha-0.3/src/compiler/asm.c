@@ -142,12 +142,13 @@ void knh_Asm_prepare(Ctx *ctx, Asm *abr, Method *mtd, Stmt *stmt)
 //		DP(abr)->vars[i].count = 0;
 		KNH_SETv(ctx, DP(abr)->vars[i].value, KNH_NULL);
 	}
+	knh_Asm_initReg(ctx, abr);
 	DP(abr)->nnrtti  = 0;
 	DP(abr)->nnrtti0 = 0;
 
-	knh_Array_clear(ctx, DP(abr)->registeredStmts);
 	DP(abr)->stack = 1;
 	DP(abr)->globalidx = -1;
+
 	DP(abr)->llstep = 0;
 	for(i = 0; i < DP(abr)->labelmax; i++) {
 		KNH_SETv(ctx, DP(abr)->labels[i].tklabel, KNH_NULL);
@@ -194,7 +195,7 @@ void knh_Asm_gc(Ctx *ctx, Asm *abr)
 
 		KNH_SETv(ctx, DP(abr)->vars[i].value, KNH_NULL);
 	}
-	knh_Array_clear(ctx, DP(abr)->registeredStmts);
+	knh_Asm_initReg(ctx, abr);
 	for(i = 0; i < DP(abr)->labelmax; i++) {
 		KNH_SETv(ctx, DP(abr)->labels[i].tklabel, KNH_NULL);
 	}
@@ -940,7 +941,7 @@ static
 void TERMs_ASM_JIFNUL(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_labelid_t label)
 {
 	Token *tk = DP(stmt)->tokens[n];
-	if(IS_Token(tk) && SP(tk)->tt == TT_LOCAL) {
+	if(IS_Token(tk) && SP(tk)->tt == TT_STACK /*TT_LOCAL ??*/) {
 		KNH_ASM_JIFNUL_(ctx, abr, label, sfi_(DP(tk)->index));
 	}
 	else {
@@ -955,7 +956,7 @@ static
 void TERMs_ASM_JIFNN(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_labelid_t label)
 {
 	Token *tk = DP(stmt)->tokens[n];
-	if(IS_Token(tk) && SP(tk)->tt == TT_LOCAL) {
+	if(IS_Token(tk) && SP(tk)->tt == TT_STACK /*TT_LOCAL ??*/) {
 		KNH_ASM_JIFNN_(ctx, abr, label, sfi_(DP(tk)->index));
 	}
 	else {
@@ -970,7 +971,7 @@ static
 void TERMs_ASM_JIFF(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_labelid_t label)
 {
 	Token *tk = DP(stmt)->tokens[n];
-	if(IS_Token(tk) && SP(tk)->tt == TT_LOCAL) {
+	if(IS_Token(tk) && SP(tk)->tt == TT_STACK /*TT_LOCAL ??*/) {
 		KNH_ASM_bJIFF_(ctx, abr, label, sfi_(DP(tk)->index));
 	}
 	else {
@@ -994,7 +995,7 @@ static
 void TERMs_ASM_JIFF_LOOP(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_labelid_t label)
 {
 	Token *tk = DP(stmt)->tokens[n];
-	if(IS_Token(tk) && SP(tk)->tt == TT_LOCAL) {
+	if(IS_Token(tk) && SP(tk)->tt == TT_STACK /*TT_LOCAL ??*/) {
 		KNH_ASM_bJIFF_(ctx, abr, label, sfi_(DP(tk)->index));
 	}
 	else {
@@ -1018,7 +1019,7 @@ static
 void TERMs_ASM_JIFT(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_labelid_t label)
 {
 	Token *tk = DP(stmt)->tokens[n];
-	if(IS_Token(tk) && SP(tk)->tt == TT_LOCAL) {
+	if(IS_Token(tk) && SP(tk)->tt == TT_STACK /*TT_LOCAL ??*/) {
 		KNH_ASM_bJIFT_(ctx, abr, label, sfi_(DP(tk)->index));
 	}
 	else {
@@ -1042,7 +1043,7 @@ static
 void TERMs_ASM_THROW(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr)
 {
 	Token *tk = DP(stmt)->tokens[n];
-	if(IS_Token(tk) && SP(tk)->tt == TT_LOCAL) {
+	if(IS_Token(tk) && SP(tk)->tt == TT_STACK /*TT_LOCAL ??*/) {
 		KNH_ASM_THROW_(ctx, abr, sfi_(DP(tk)->index));
 	}
 	else {
@@ -2101,11 +2102,13 @@ void knh_StmtRETURN_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 static
 void knh_StmtERR_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 {
-	DBG2_P("****************ERROR************************");
-	KNH_ASSERT(IS_bString(DP(stmt)->errMsg));
-	if(IS_bString(DP(stmt)->errMsg)) {
-		KNH_ASM_THROWs_(ctx, abr, (Object*)DP(stmt)->errMsg);
+	if(!IS_bString(DP(stmt)->errMsg)) {
+		char buf[512];
+		knh_snprintf(buf, sizeof(buf), "Script!!: running errors at %s:%d", FILEIDN(SP(stmt)->fileid), SP(stmt)->line);
+		KNH_SETv(ctx, DP(stmt)->errMsg, new_String(ctx, B(buf), NULL));
+		KNH_SETv(ctx, DP(stmt)->next, KNH_NULL);
 	}
+	KNH_ASM_THROWs_(ctx, abr, (Object*)DP(stmt)->errMsg);
 }
 
 /* ======================================================================== */
@@ -2134,7 +2137,7 @@ String *knh_Term_getNameNULL(Term *tm)
 		return NULL;
 	}
 	else if(SP(tk)->tt == TT_NAME) {
-		DEBUG3_ASSERT(IS_String(DP(tk)->data));
+		DBG2_ASSERT(IS_String(DP(tk)->data));
 		return (String*)DP(tk)->data;
 	}
 	return NULL;
@@ -2191,6 +2194,16 @@ void knh_Stmt_asmBLOCK(Ctx *ctx, Stmt *stmt, Asm *abr, int isIteration)
 			knh_Stmt_asmBLOCK(ctx, DP(stmt)->stmts[0], abr, 1); break;
 		case STT_LET:
 			knh_StmtLET_asm(ctx, cur, abr, TYPE_void, DP(abr)->stack); break;
+		case STT_REGISTER:
+		{
+			size_t i;
+			for(i = 0; i < DP(cur)->size; i++) {
+				if(IS_Stmt(DP(cur)->terms[i]) && SP(DP(cur)->stmts[i])->stt == STT_LET) {
+					knh_StmtLET_asm(ctx, DP(cur)->stmts[i], abr, TYPE_void, DP(abr)->stack);
+				}
+			}
+			break;
+		}
 		case STT_IF:
 			knh_StmtIF_asm(ctx, cur, abr); break;
 		case STT_SWITCH:

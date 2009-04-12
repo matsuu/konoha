@@ -22,6 +22,18 @@ XMOVx sfx sfx
 XMOVDEF sfx cid
 XMOVSYS sfx ushort
 
+MOVxi sfi sfx
+XMOVsi sfx sfi
+XMOVxi sfx sfx
+
+MOVxf  sfi sfx
+XMOVsf sfx sfi
+XMOVxf sfx sfx
+
+MOVxb  sfi sfx
+XMOVsb sfx sfi
+XMOVxb sfx sfx
+
 SWAP  sfi sfi
 
 PINIo sfi OBJ

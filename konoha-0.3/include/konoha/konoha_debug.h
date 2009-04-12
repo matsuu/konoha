@@ -143,6 +143,13 @@
 /* ======================================================================== */
 /* [STUPID] */
 
+#define KNH_FUTURE(msg) {\
+		fprintf(stderr, "FUTURE[%s:%d] %s will be supported in the near future.\n", KNH_SAFEFILE(__FILE__), __LINE__, msg); \
+	}\
+
+/* ======================================================================== */
+/* [STUPID] */
+
 #define STUPID_NOTFOUND   0
 #define STUPID_OUTOFINDEX 1
 #define STUPID_TYPEERROR  2

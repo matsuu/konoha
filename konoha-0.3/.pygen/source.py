@@ -79,6 +79,7 @@ class Source :
 		self.add_fieldn('copy')
 		self.add_fieldn('format')
 		self.add_fieldn('GLOBAL')  ## GLOBALINDEX
+		self.add_fieldn('register')  ## register
 		for v in "abcdefghijklmnopqrstuvwxyz": self.add_fieldn(v)
 #		self.add_mf('MFN_Any_Any_', 'new_MethodField__1(ctx, KNH_FLAG_MF_VARARGS, TYPE_Any, TYPE_Any, FIELDN_o)')
 #		self.add_mf('MFN_void_OutputStream_Any', 'new_MethodField__2(ctx, 0, TYPE_void, TYPE_OutputStream, FIELDN_w, TYPE_Any, FIELDN_o)')

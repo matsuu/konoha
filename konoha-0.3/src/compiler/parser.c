@@ -77,7 +77,7 @@ static void knh_tokens_nextStmt(knh_tokens_t *tc)
 	Token **ts = tc->ts;
 	int i;
 	for(i = tc->c; i < tc->e; i++) {
-		DBG2_P("i=%d, %s", i, TOKENNo(ts[i]));
+		//DBG2_P("i=%d, '%s'", i, TOKENNo(ts[i]));
 		if(knh_Token_isBOL(ts[i])) {
 			tc->c = i;
 			knh_tokens_skipSEMICOLON(tc);
@@ -760,7 +760,7 @@ Stmt *new_StmtNAME1(Ctx *ctx, Token *tk, int lr)
 static
 Stmt *new_StmtNAME2(Ctx *ctx, Token *tk, int lr)
 {
-	DEBUG3_ASSERT(SP(tk)->tt == TT_NAME || SP(tk)->tt == TT_CMETHODN);
+	DBG2_ASSERT(SP(tk)->tt == TT_NAME || SP(tk)->tt == TT_CMETHODN);
 	knh_bytes_t t = knh_Token_tobytes(ctx, tk);
 	if(knh_bytes_rindex(t, '.') == -1) {
 		Stmt *stmt = new_Stmt(ctx, 0, STT_CALL);
@@ -1123,11 +1123,11 @@ static
 Stmt *new_StmtPROPN(Ctx *ctx, Token *tk, int lr)
 {
 	Stmt *stmt = new_Stmt(ctx, 0, STT_CALL);
-	DBG2_P("tk=%s,%d", sToken(tk), knh_Token_isTailWildCard(tk));
-	DBG2_ABORT();
-	if(lr == KNH_LVALUE) {
-		knh_Stmt_add(ctx, stmt, TM(new_TokenMN(ctx, FL(tk), METHODN_setProperty)));
-	}else{
+	KNH_ASSERT(IS_String(DP(tk)->text));
+	if(knh_bytes_index(knh_String_tobytes(DP(tk)->text), '*') > 0) {
+		knh_Stmt_add(ctx, stmt, TM(new_TokenMN(ctx, FL(tk), METHODN_listProperties)));
+	}
+	else {
 		knh_Stmt_add(ctx, stmt, TM(new_TokenMN(ctx, FL(tk), METHODN_getProperty)));
 	}
 	knh_Stmt_add(ctx, stmt, TM(new_TokenCID(ctx, FL(tk), CLASS_Context)));
@@ -1774,7 +1774,7 @@ void knh_Stmt_toLVALUE(Ctx *ctx, Stmt *stmt, int pe)
 {
 	if(SP(stmt)->stt == STT_CALL) {
 		Token *tk = (Token*)DP(stmt)->tokens[0];
-		DEBUG3_ASSERT(IS_Token(tk));
+		DBG2_ASSERT(IS_Token(tk));
 		if(knh_Token_isGetter(tk)) {
 			knh_Token_setGetter(tk, 0);
 			knh_Token_setSetter(tk, 1);
@@ -1802,6 +1802,7 @@ void knh_Stmt_toLVALUE(Ctx *ctx, Stmt *stmt, int pe)
 	DEBUG3("stt=%s", knh_stmt_tochar(SP(stmt)->stt));
 	SP(stmt)->stt = STT_ERR;
 	knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, pe, NULL);
+
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2835,9 +2836,9 @@ static Stmt *new_StmtTHROW(Ctx *ctx, knh_tokens_t *tc)
 /* ------------------------------------------------------------------------ */
 /* [local] */
 
-static Stmt *new_StmtLOCAL(Ctx *ctx, knh_tokens_t *tc)
+static Stmt *new_StmtREGISTER(Ctx *ctx, knh_tokens_t *tc)
 {
-	Stmt *o = new_StmtMETA(ctx, tc, STT_LOCAL);
+	Stmt *o = new_StmtMETA(ctx, tc, STT_REGISTER);
 	knh_Stmt_add_EXPRs(ctx, o, tc); /* expr* */
 	//knh_Stmt_add_SEMICOLON(ctx, o, tc); /* ; */
 	return o;
@@ -3020,7 +3021,7 @@ Stmt* new_StmtFUNCEXPR(Ctx *ctx, knh_tokens_t *tc)
 
 static void konohac_pragma(Ctx *ctx, knh_tokens_t *tc)
 {
-	TODO();
+	KNH_FUTURE("pargma");
 	knh_tokens_nextStmt(tc);
 }
 
@@ -3040,6 +3041,22 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 	tc->meta = -1;
 	tc->c += 1;
 	switch(SP(tkc)->tt) {
+
+	case TT_LABEL:
+		goto L_TAIL;
+	case TT_METAN:
+	{
+		DBG2_P("Found METAN '@%s', tc->meta=%d", sToken(tkc), tc->meta);
+		if(tc->meta == -1) tc->meta = tc->c - 1;
+		if(DP(tkc)->tt_next == TT_PARENTHESIS) {
+			tc->c += 1;
+		};
+		if(DP(tkc)->tt_next == TT_BRACE) {
+			DBG2_P("Found DATA '@%s', tc->meta=%d", sToken(tkc), tc->meta);
+			tc->c += 1;
+		};
+		goto L_TAIL;
+	}
 
 	case TT_NAMESPACE:
 		return new_StmtNAMESPACE(ctx, tc);
@@ -3070,8 +3087,8 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 		return new_StmtWEAVE(ctx, tc);
 	case TT_ASPECT:
 		return new_StmtASPECT(ctx, tc);
-	case TT_BLOCK:
-		return new_StmtBLOCK(ctx, tc);
+//	case TT_BLOCK:
+//		return new_StmtBLOCK(ctx, tc);
 	case TT_IF:
 		return new_StmtIF(ctx, tc);
 	case TT_ELSE:
@@ -3104,8 +3121,8 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 		break;  /* NOTHERE */
 	case TT_THROW:
 		return new_StmtTHROW(ctx, tc);
-	case TT_LOCAL:
-		return new_StmtLOCAL(ctx, tc);
+	case TT_REGISTER:
+		return new_StmtREGISTER(ctx, tc);
 	case TT_PRINT:
 		return new_StmtPRINT(ctx, tc);
 	case TT_ASSERT:
@@ -3114,16 +3131,12 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 		knh_tokens_nextStmt(tc);
 		return new_Stmt(ctx, 0, STT_DONE);
 
-	case TT_LABEL:
-		goto L_TAIL;
-	case TT_METAN:
-		if(tc->meta == -1) tc->meta = tc->c - 1;
-		if(DP(tkc)->tt_next == TT_PARENTHESIS) {
-			tc->c += 1;
-		};
-		goto L_TAIL;
-
 	case TT_BRACE:  /* BRACE */
+	{
+		DBG2_P("**** Block? ******");
+		tc->c -= 1;
+		return new_StmtBLOCK(ctx, tc);
+	}
 	case TT_PARENTHESIS:  /* PARENTHESIS */
 	case TT_BRANCET:  /* BRANCET */
 	case TT_DOTS:  /* DOTS */

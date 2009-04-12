@@ -187,13 +187,13 @@ typedef struct {
 #define KONOHA_LOCALSIZE 128
 #endif
 
-//typedef struct {
-//	knh_flag_t    flag  ;
-//	knh_type_t    type  ;
-//	knh_fieldn_t  fn    ;
-//	Object        *value;
-//	int            count;
-//} knh_cfield_t ;
+#define KNH_ASM_REGMAX 32
+
+typedef struct {
+	knh_short_t level;
+	knh_short_t varidx;
+	struct knh_Stmt_t *stmt;
+} knh_asmreg_t ;
 
 typedef struct {
 	int offset;
@@ -213,10 +213,13 @@ typedef struct knh_Asm {
 	knh_rtti_t nnrtti0;
 	knh_rtti_t nnrtti;
 	int                     level; /* 0.3 */
-	knh_Array_t *registeredStmts;
 	int stack;
 	int globalidx;
 	int llstep;
+
+	knh_asmreg_t *regs;
+	knh_ushort_t regs_size;
+	knh_ushort_t regs_usedsize;
 
 	struct knh_DictSet_t* name2labelIdDictSet;
 	size_t labelmax;

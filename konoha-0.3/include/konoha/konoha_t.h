@@ -556,6 +556,7 @@ typedef struct {
 	struct knh_ClassStruct_t  *cstruct;
 	struct knh_ClassMap_t     *cmap;
 	struct knh_Object_t       *cspec;
+	struct knh_DictMap_t      *constPool;
 	knh_fdefault               fdefault;
 	knh_mutex_t                dataLock;
 	struct knh_Array_t        *dataList;
