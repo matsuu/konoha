@@ -1051,9 +1051,11 @@ void TERMs_perrorTYPE(Ctx *ctx, Stmt *stmt, size_t n, int pe, knh_type_t reqt)
 		break;
 	default :
 		at = knh_stmt_tochar(SP(stmt)->stt);
-		DBG2_P("%s n=%d", at, (int)n);
+		DBG2_P("%s n=%d type=%s%s", at, (int)n, TYPEQN(reqt));
 	}
+	DBG2_P("reqt=%s%s", TYPEQN(reqt));
 	knh_perror__s(ctx, SP(stmt)->fileid, SP(stmt)->line, pe, at);
+	KNH_ABORT();
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2494,7 +2496,7 @@ int TERMs_typecheck(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_type_t reqt, i
 	}
 
 	if(reqt == NNTYPE_Boolean && vart != NNTYPE_Boolean) {
-		//DBG2_P("stt=%s, vart=%s%s", knh_stmt_tochar(SP(stmt)->stt), TYPEQN(vart));
+		DBG2_P("stt=%s, vart=%s%s", knh_stmt_tochar(SP(stmt)->stt), TYPEQN(vart));
 		TERMs_perrorTYPE(ctx, stmt, n, KMSG_ETYPEFMT, reqt);
 		return 0;
 	}
@@ -2517,6 +2519,7 @@ int TERMs_typecheck(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_type_t reqt, i
 		}
 		if(mode == TITERCONV_) return 0;
 	}
+	DBG_P("stt=%s reqt=%s%s, vart=%s%s", knh_stmt_tochar(SP(stmt)->stt), TYPEQN(reqt), TYPEQN(vart));
 	TERMs_perrorTYPE(ctx, stmt, n, KMSG_ETYPEFMT, reqt);
 	return 0;
 }
@@ -3568,7 +3571,7 @@ Term *knh_Stmt_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_t 
 	}
 	{
 		Stmt *rstmt = (Stmt*)knh_StmtEXPR_typing(ctx, stmt, abr, ns, reqt);
-		if(IS_Stmt(rstmt)) {
+		if(rstmt != NULL && IS_Stmt(rstmt)) {
 			return knh_Asm_lookupRegisteredStmt(ctx, abr, rstmt);
 		}
 		return TM(rstmt);
