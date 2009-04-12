@@ -189,6 +189,7 @@ output.writelines('''
 METHOD MagickWand_new(Ctx *ctx, knh_sfp_t* sfp)
 {
   knh_Glue_t *glue = sfp[0].glue;
+  MagickWandGenesis();
   glue->ptr = (void *)NewMagickWand();
   KNH_RETURN(ctx, sfp, sfp[0].o);
 }
