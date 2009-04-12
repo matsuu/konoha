@@ -397,7 +397,7 @@ knh_index_t knh_Asm_addVariableTable(Ctx *ctx, Asm *abr,
 			KNH_SETv(ctx, cf[idx].value, value);
 			return idx;
 		}
-		if(cf[idx].fn == fn) {
+		if(cf[idx].fn == fn && fn != FIELDN_register) {
 			if(cf[idx].type != type) {
 				char buf[CLASSNAME_BUFSIZ];
 				knh_snprintf(buf, sizeof(buf), "%s%s %s: %s%s", TYPEQN(cf->type), FIELDN(fn), TYPEQN(type));
@@ -2914,7 +2914,7 @@ knh_index_t knh_Asm_beginRegister(Ctx *ctx, Asm *abr, Stmt *stmt)
 		if(DP(abr)->regs[size].varidx == -1) {
 			DP(abr)->regs[size].varidx =
 				knh_Asm_addVariableTable(ctx, abr, (knh_cfield_t*)DP(abr)->vars, KONOHA_LOCALSIZE,
-						0/* flag */, TYPE_Any, FIELDN_register, KNH_NULL);
+						0/* flag */, TYPE_void, FIELDN_register, KNH_NULL);
 		}
 		DP(abr)->regs_size = size + 1;
 		if(DP(abr)->regs_size > DP(abr)->regs_usedsize) {
@@ -2996,8 +2996,9 @@ int knh_Token_equals(Ctx *ctx, Token *tk, Term *tm)
 	if(DP(tk)->type != DP(atk)->type) return 0;
 	if(DP(tk)->index != DP(atk)->index) return 0;
 	if(SP(tk)->tt == TT_CONST) {
+		//DBG2_P("*********** data ***********");
 		if(knh_Object_cid(DP(tk)->data) != knh_Object_cid(DP(atk)->data)) return 0;
-		return (knh_Object_cmp(DP(tk)->data, DP(atk)->data) != 0);
+		return (knh_Object_cmp(DP(tk)->data, DP(atk)->data) == 0);
 	}
 	return 1;
 }
@@ -3010,12 +3011,8 @@ int knh_Stmt_equals(Ctx *ctx, Stmt *stmt, Term *tm)
 	if(!IS_Stmt(tm)) return 0;
 	Stmt *astmt = (Stmt*)tm;
 	if(SP(stmt)->stt != SP(astmt)->stt) return 0;
-	if(SP(stmt)->flag != SP(astmt)->flag) {
-		DBG2_P("flag"); return 0;
-	}
-	if(DP(stmt)->type != DP(astmt)->type) {
-		DBG2_P("type"); return 0;
-	}
+//	if(SP(stmt)->flag != SP(astmt)->flag) return 0;
+	if(DP(stmt)->type != DP(astmt)->type) return 0;
 	if(DP(stmt)->size != DP(astmt)->size) return 0;
 	size_t i;
 	for(i = 0; i < DP(stmt)->size; i++) {
@@ -3038,7 +3035,7 @@ Term *knh_Asm_lookupRegisteredStmt(Ctx *ctx, Asm *abr, Stmt *stmt)
 	int i;
 	for(i = DP(abr)->regs_size - 1; i >= 0; i--) {
 		if(knh_Stmt_equals(ctx, DP(abr)->regs[i].stmt, TM(stmt))) {
-			DBG2_P("FOUND REGISTER %d, varidx=%d", i, DP(abr)->regs[i].varidx);
+			DBG_P("REGISTER(%d) TO sfp[=%d]", i, DP(abr)->regs[i].varidx);
 			if(DP(abr)->regs[i].varidx != -1) {
 				return TM(new_TokenSTACK(ctx, TM(stmt), DP(stmt)->type, DP(abr)->regs[i].varidx));
 			}

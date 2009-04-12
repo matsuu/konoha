@@ -2273,6 +2273,8 @@ void KNH_ASM_INITLOCAL(Ctx *ctx, Asm *abr)
 //	}
 
 	for(; i < DP(abr)->vars_size; i++) {
+		DBG2_P("LOCAL VARIABLE %s%s %s", TYPEQN(DP(abr)->vars[i].type), FIELDN(DP(abr)->vars[i].fn));
+		if(DP(abr)->vars[i].type == TYPE_void) continue;
 		if(IS_NNTYPE(DP(abr)->vars[i].type)) {
 			if(IS_NULL(DP(abr)->vars[i].value)) {
 				KNH_ASM_MOVDEF_(ctx, abr, sfi_(i), CLASS_type(DP(abr)->vars[i].type));
