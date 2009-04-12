@@ -2,6 +2,55 @@
 #include <wand/MagickWand.h>
 
 
+/* void MagickWand.coreGenesis(String s0, Boolean b1) */
+
+METHOD MagickWand_coreGenesis(Ctx *ctx, knh_sfp_t* sfp)
+{
+	char *s0 = p_char(sfp[0]);
+	int b1 = p_int(sfp[1]);
+
+	KNH_RETURN_void(ctx, sfp);
+}
+
+/* void MagickWand.coreTerminus() */
+
+METHOD MagickWand_coreTerminus(Ctx *ctx, knh_sfp_t* sfp)
+{
+
+	KNH_RETURN_void(ctx, sfp);
+}
+
+/* String MagickWand.toMime(String s0) */
+
+METHOD MagickWand_toMime(Ctx *ctx, knh_sfp_t* sfp)
+{
+	char *s0 = p_char(sfp[0]);
+	char *ret = MagickToMime(s0 );
+
+	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
+}
+
+/* String MagickWand.describeImage(self) */
+
+METHOD MagickWand_describeImage(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *ret = MagickDescribeImage(self );
+
+	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
+}
+
+/* String MagickWand.getImageAttribute(self, String s1) */
+
+METHOD MagickWand_getImageAttribute(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *s1 = p_char(sfp[1]);
+	char *ret = MagickGetImageAttribute(self ,s1 );
+
+	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
+}
+
 /* Int MagickWand.getImageIndex(self) */
 
 METHOD MagickWand_getImageIndex(Ctx *ctx, knh_sfp_t* sfp)
@@ -10,6 +59,74 @@ METHOD MagickWand_getImageIndex(Ctx *ctx, knh_sfp_t* sfp)
 	int ret = MagickGetImageIndex(self );
 
 	KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.clipPathImage(self, String s1, Boolean b2) */
+
+METHOD MagickWand_clipPathImage(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *s1 = p_char(sfp[1]);
+	int b2 = p_int(sfp[2]);
+	int ret = MagickClipPathImage(self ,s1 ,b2 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.setImageAttribute(self, String s1, String s2) */
+
+METHOD MagickWand_setImageAttribute(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *s1 = p_char(sfp[1]);
+	char *s2 = p_char(sfp[2]);
+	int ret = MagickSetImageAttribute(self ,s1 ,s2 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.setImageIndex(self, Int i1) */
+
+METHOD MagickWand_setImageIndex(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int i1 = p_int(sfp[1]);
+	int ret = MagickSetImageIndex(self ,i1 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.setImageOption(self, String s1, String s2, String s3) */
+
+METHOD MagickWand_setImageOption(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *s1 = p_char(sfp[1]);
+	char *s2 = p_char(sfp[2]);
+	char *s3 = p_char(sfp[3]);
+	int ret = MagickSetImageOption(self ,s1 ,s2 ,s3 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* MagickWand MagickWand.flattenImages(self) */
+
+METHOD MagickWand_flattenImages(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	MagickWand *ret = MagickFlattenImages(self );
+
+	KNH_RETURN(ctx, sfp, ret);
+}
+
+/* MagickWand MagickWand.mosaicImages(self) */
+
+METHOD MagickWand_mosaicImages(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	MagickWand *ret = MagickMosaicImages(self );
+
+	KNH_RETURN(ctx, sfp, ret);
 }
 
 /* String MagickWand.getFilename(self) */
@@ -51,6 +168,17 @@ METHOD MagickWand_getHomeURL(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
 }
 
+/* String MagickWand.getImageProperty(self, String s1) */
+
+METHOD MagickWand_getImageProperty(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *s1 = p_char(sfp[1]);
+	char *ret = MagickGetImageProperty(self ,s1 );
+
+	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
+}
+
 /* String MagickWand.getOption(self, String s1) */
 
 METHOD MagickWand_getOption(Ctx *ctx, knh_sfp_t* sfp)
@@ -62,85 +190,313 @@ METHOD MagickWand_getOption(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
 }
 
-/* String MagickWand.queryConfigureOption(String s1) */
+/* String MagickWand.queryConfigureOption(String s0) */
 
 METHOD MagickWand_queryConfigureOption(Ctx *ctx, knh_sfp_t* sfp)
 {
-	char *s1 = p_char(sfp[0]);
-	char *ret = MagickQueryConfigureOption(s1 );
+	char *s0 = p_char(sfp[0]);
+	char *ret = MagickQueryConfigureOption(s0 );
 
 	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
 }
 
-/* MagickWand MagickWand.averageImages(self) */
+/* String MagickWand.getCopyright() */
 
-METHOD MagickWand_averageImages(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_getCopyright(Ctx *ctx, knh_sfp_t* sfp)
 {
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	MagickWand *ret = MagickAverageImages(self );
+	char *ret = MagickGetCopyright();
 
-	KNH_RETURN(ctx, sfp, ret);
+	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
 }
 
-/* MagickWand MagickWand.coalesceImages(self) */
+/* String MagickWand.getPackageName() */
 
-METHOD MagickWand_coalesceImages(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_getPackageName(Ctx *ctx, knh_sfp_t* sfp)
 {
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	MagickWand *ret = MagickCoalesceImages(self );
+	char *ret = MagickGetPackageName();
 
-	KNH_RETURN(ctx, sfp, ret);
+	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
 }
 
-/* MagickWand MagickWand.deconstructImages(self) */
+/* String MagickWand.getReleaseDate() */
 
-METHOD MagickWand_deconstructImages(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_getReleaseDate(Ctx *ctx, knh_sfp_t* sfp)
 {
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	MagickWand *ret = MagickDeconstructImages(self );
+	char *ret = MagickGetReleaseDate();
 
-	KNH_RETURN(ctx, sfp, ret);
+	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
 }
 
-/* MagickWand MagickWand.fxImage(self, String s1) */
+/* Float MagickWand.getPointsize(self) */
 
-METHOD MagickWand_fxImage(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_getPointsize(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	double ret = MagickGetPointsize(self );
+
+	KNH_RETURN_Float(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.deleteOption(self, String s1) */
+
+METHOD MagickWand_deleteOption(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
 	char *s1 = p_char(sfp[1]);
-	MagickWand *ret = MagickFxImage(self ,s1 );
+	int ret = MagickDeleteOption(self ,s1 );
 
-	KNH_RETURN(ctx, sfp, ret);
+	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* MagickWand MagickWand.getImage(self) */
+/* Boolean MagickWand.deleteImageProperty(self, String s1) */
 
-METHOD MagickWand_getImage(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_deleteImageProperty(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	MagickWand *ret = MagickGetImage(self );
+	char *s1 = p_char(sfp[1]);
+	int ret = MagickDeleteImageProperty(self ,s1 );
 
-	KNH_RETURN(ctx, sfp, ret);
+	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* MagickWand MagickWand.getImageClipMask(self) */
+/* Boolean MagickWand.getAntialias(self) */
 
-METHOD MagickWand_getImageClipMask(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_getAntialias(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	MagickWand *ret = MagickGetImageClipMask(self );
+	int ret = MagickGetAntialias(self );
 
-	KNH_RETURN(ctx, sfp, ret);
+	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* MagickWand MagickWand.optimizeImageLayers(self) */
+/* Boolean MagickWand.setAntialias(self, Boolean b1) */
 
-METHOD MagickWand_optimizeImageLayers(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_setAntialias(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	MagickWand *ret = MagickOptimizeImageLayers(self );
+	int b1 = p_int(sfp[1]);
+	int ret = MagickSetAntialias(self ,b1 );
 
-	KNH_RETURN(ctx, sfp, ret);
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.setCompressionQuality(self, Int i1) */
+
+METHOD MagickWand_setCompressionQuality(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int i1 = p_int(sfp[1]);
+	int ret = MagickSetCompressionQuality(self ,i1 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.setDepth(self, Int i1) */
+
+METHOD MagickWand_setDepth(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int i1 = p_int(sfp[1]);
+	int ret = MagickSetDepth(self ,i1 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.setFilename(self, String s1) */
+
+METHOD MagickWand_setFilename(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *s1 = p_char(sfp[1]);
+	int ret = MagickSetFilename(self ,s1 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.setFormat(self, String s1) */
+
+METHOD MagickWand_setFormat(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *s1 = p_char(sfp[1]);
+	int ret = MagickSetFormat(self ,s1 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.setFont(self, String s1) */
+
+METHOD MagickWand_setFont(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *s1 = p_char(sfp[1]);
+	int ret = MagickSetFont(self ,s1 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.setImageProperty(self, String s1, String s2) */
+
+METHOD MagickWand_setImageProperty(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *s1 = p_char(sfp[1]);
+	char *s2 = p_char(sfp[2]);
+	int ret = MagickSetImageProperty(self ,s1 ,s2 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.setOption(self, String s1, String s2) */
+
+METHOD MagickWand_setOption(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *s1 = p_char(sfp[1]);
+	char *s2 = p_char(sfp[2]);
+	int ret = MagickSetOption(self ,s1 ,s2 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.setPassphrase(self, String s1) */
+
+METHOD MagickWand_setPassphrase(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *s1 = p_char(sfp[1]);
+	int ret = MagickSetPassphrase(self ,s1 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.setPointsize(self, Float f1) */
+
+METHOD MagickWand_setPointsize(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	float f1 = p_float(sfp[1]);
+	int ret = MagickSetPointsize(self ,f1 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.setResolution(self, Float f1, Float f2) */
+
+METHOD MagickWand_setResolution(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	float f1 = p_float(sfp[1]);
+	float f2 = p_float(sfp[2]);
+	int ret = MagickSetResolution(self ,f1 ,f2 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.setSize(self, Int i1, Int i2) */
+
+METHOD MagickWand_setSize(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int i1 = p_int(sfp[1]);
+	int i2 = p_int(sfp[2]);
+	int ret = MagickSetSize(self ,i1 ,i2 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Int MagickWand.getCompressionQuality(self) */
+
+METHOD MagickWand_getCompressionQuality(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int ret = MagickGetCompressionQuality(self );
+
+	KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* String MagickWand.getImageFilename(self) */
+
+METHOD MagickWand_getImageFilename(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *ret = MagickGetImageFilename(self );
+
+	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
+}
+
+/* String MagickWand.getImageFormat(self) */
+
+METHOD MagickWand_getImageFormat(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *ret = MagickGetImageFormat(self );
+
+	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
+}
+
+/* String MagickWand.getImageSignature(self) */
+
+METHOD MagickWand_getImageSignature(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *ret = MagickGetImageSignature(self );
+
+	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
+}
+
+/* String MagickWand.identifyImage(self) */
+
+METHOD MagickWand_identifyImage(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *ret = MagickIdentifyImage(self );
+
+	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
+}
+
+/* Float MagickWand.getImageGamma(self) */
+
+METHOD MagickWand_getImageGamma(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	double ret = MagickGetImageGamma(self );
+
+	KNH_RETURN_Float(ctx, sfp, ret);
+}
+
+/* Float MagickWand.getImageTotalInkDensity(self) */
+
+METHOD MagickWand_getImageTotalInkDensity(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	double ret = MagickGetImageTotalInkDensity(self );
+
+	KNH_RETURN_Float(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.adaptiveBlurImage(self, Float f1, Float f2) */
+
+METHOD MagickWand_adaptiveBlurImage(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	float f1 = p_float(sfp[1]);
+	float f2 = p_float(sfp[2]);
+	int ret = MagickAdaptiveBlurImage(self ,f1 ,f2 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.adaptiveSharpenImage(self, Float f1, Float f2) */
+
+METHOD MagickWand_adaptiveSharpenImage(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	float f1 = p_float(sfp[1]);
+	float f2 = p_float(sfp[2]);
+	int ret = MagickAdaptiveSharpenImage(self ,f1 ,f2 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
 /* Boolean MagickWand.animateImages(self, String s1) */
@@ -188,6 +544,18 @@ METHOD MagickWand_clipImage(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
+/* Boolean MagickWand.clipImagePath(self, String s1, Boolean b2) */
+
+METHOD MagickWand_clipImagePath(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *s1 = p_char(sfp[1]);
+	int b2 = p_int(sfp[2]);
+	int ret = MagickClipImagePath(self ,s1 ,b2 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
 /* Boolean MagickWand.commentImage(self, String s1) */
 
 METHOD MagickWand_commentImage(Ctx *ctx, knh_sfp_t* sfp)
@@ -218,6 +586,17 @@ METHOD MagickWand_contrastStretchImage(Ctx *ctx, knh_sfp_t* sfp)
 	float f1 = p_float(sfp[1]);
 	float f2 = p_float(sfp[2]);
 	int ret = MagickContrastStretchImage(self ,f1 ,f2 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.cycleColormapImage(self, Int i1) */
+
+METHOD MagickWand_cycleColormapImage(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int i1 = p_int(sfp[1]);
+	int ret = MagickCycleColormapImage(self ,i1 );
 
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
@@ -307,6 +686,16 @@ METHOD MagickWand_flipImage(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
+/* Boolean MagickWand.flopImage(self) */
+
+METHOD MagickWand_flopImage(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int ret = MagickFlopImage(self );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
 /* Boolean MagickWand.gammaImage(self, Float f1) */
 
 METHOD MagickWand_gammaImage(Ctx *ctx, knh_sfp_t* sfp)
@@ -356,6 +745,41 @@ METHOD MagickWand_hasPreviousImage(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
 	int ret = MagickHasPreviousImage(self );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.implodeImage(self, Float f1) */
+
+METHOD MagickWand_implodeImage(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	float f1 = p_float(sfp[1]);
+	int ret = MagickImplodeImage(self ,f1 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.labelImage(self, String s1) */
+
+METHOD MagickWand_labelImage(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *s1 = p_char(sfp[1]);
+	int ret = MagickLabelImage(self ,s1 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.levelImage(self, Float f1, Float f2, Float f3) */
+
+METHOD MagickWand_levelImage(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	float f1 = p_float(sfp[1]);
+	float f2 = p_float(sfp[2]);
+	float f3 = p_float(sfp[3]);
+	int ret = MagickLevelImage(self ,f1 ,f2 ,f3 );
 
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
@@ -425,6 +849,17 @@ METHOD MagickWand_motionBlurImage(Ctx *ctx, knh_sfp_t* sfp)
 	float f2 = p_float(sfp[2]);
 	float f3 = p_float(sfp[3]);
 	int ret = MagickMotionBlurImage(self ,f1 ,f2 ,f3 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.negateImage(self, Boolean b1) */
+
+METHOD MagickWand_negateImage(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int b1 = p_int(sfp[1]);
+	int ret = MagickNegateImage(self ,b1 );
 
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
@@ -547,7 +982,7 @@ METHOD MagickWand_removeImage(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean MagickWand.rollImage(self, int i1, int i2) */
+/* Boolean MagickWand.rollImage(self, Int i1, Int i2) */
 
 METHOD MagickWand_rollImage(Ctx *ctx, knh_sfp_t* sfp)
 {
@@ -559,7 +994,7 @@ METHOD MagickWand_rollImage(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean MagickWand.sampleImage(self, int i1, int i2) */
+/* Boolean MagickWand.sampleImage(self, Int i1, Int i2) */
 
 METHOD MagickWand_sampleImage(Ctx *ctx, knh_sfp_t* sfp)
 {
@@ -567,6 +1002,18 @@ METHOD MagickWand_sampleImage(Ctx *ctx, knh_sfp_t* sfp)
 	int i1 = p_int(sfp[1]);
 	int i2 = p_int(sfp[2]);
 	int ret = MagickSampleImage(self ,i1 ,i2 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.scaleImage(self, Int i1, Int i2) */
+
+METHOD MagickWand_scaleImage(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int i1 = p_int(sfp[1]);
+	int i2 = p_int(sfp[2]);
+	int ret = MagickScaleImage(self ,i1 ,i2 );
 
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
@@ -605,7 +1052,7 @@ METHOD MagickWand_setImageBluePrimary(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean MagickWand.setImageDelay(self, int i1) */
+/* Boolean MagickWand.setImageDelay(self, Int i1) */
 
 METHOD MagickWand_setImageDelay(Ctx *ctx, knh_sfp_t* sfp)
 {
@@ -616,7 +1063,7 @@ METHOD MagickWand_setImageDelay(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean MagickWand.setImageDepth(self, int i1) */
+/* Boolean MagickWand.setImageDepth(self, Int i1) */
 
 METHOD MagickWand_setImageDepth(Ctx *ctx, knh_sfp_t* sfp)
 {
@@ -627,7 +1074,7 @@ METHOD MagickWand_setImageDepth(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean MagickWand.setImageCompressionQuality(self, int i1) */
+/* Boolean MagickWand.setImageCompressionQuality(self, Int i1) */
 
 METHOD MagickWand_setImageCompressionQuality(Ctx *ctx, knh_sfp_t* sfp)
 {
@@ -661,7 +1108,7 @@ METHOD MagickWand_setImageGamma(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean MagickWand.setImageExtent(self, int i1, int i2) */
+/* Boolean MagickWand.setImageExtent(self, Int i1, Int i2) */
 
 METHOD MagickWand_setImageExtent(Ctx *ctx, knh_sfp_t* sfp)
 {
@@ -695,7 +1142,7 @@ METHOD MagickWand_setImageFormat(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean MagickWand.setImageIterations(self, int i1) */
+/* Boolean MagickWand.setImageIterations(self, Int i1) */
 
 METHOD MagickWand_setImageIterations(Ctx *ctx, knh_sfp_t* sfp)
 {
@@ -763,7 +1210,7 @@ METHOD MagickWand_setImageResolution(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean MagickWand.setImageScene(self, int i1) */
+/* Boolean MagickWand.setImageScene(self, Int i1) */
 
 METHOD MagickWand_setImageScene(Ctx *ctx, knh_sfp_t* sfp)
 {
@@ -774,7 +1221,7 @@ METHOD MagickWand_setImageScene(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean MagickWand.setImageTicksPerSecond(self, int i1) */
+/* Boolean MagickWand.setImageTicksPerSecond(self, Int i1) */
 
 METHOD MagickWand_setImageTicksPerSecond(Ctx *ctx, knh_sfp_t* sfp)
 {
@@ -809,7 +1256,7 @@ METHOD MagickWand_sharpenImage(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean MagickWand.shaveImage(self, int i1, int i2) */
+/* Boolean MagickWand.shaveImage(self, Int i1, Int i2) */
 
 METHOD MagickWand_shaveImage(Ctx *ctx, knh_sfp_t* sfp)
 {
@@ -908,6 +1355,18 @@ METHOD MagickWand_thresholdImage(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
+/* Boolean MagickWand.thumbnailImage(self, Int i1, Int i2) */
+
+METHOD MagickWand_thumbnailImage(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int i1 = p_int(sfp[1]);
+	int i2 = p_int(sfp[2]);
+	int ret = MagickThumbnailImage(self ,i1 ,i2 );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
 /* Boolean MagickWand.trimImage(self, Float f1) */
 
 METHOD MagickWand_trimImage(Ctx *ctx, knh_sfp_t* sfp)
@@ -952,130 +1411,295 @@ METHOD MagickWand_writeImage(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean MagickWand.writeImages(self, String s1, Boolean b1) */
+/* Boolean MagickWand.writeImages(self, String s1, Boolean b2) */
 
 METHOD MagickWand_writeImages(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
 	char *s1 = p_char(sfp[1]);
-	int b1 = p_int(sfp[2]);
-	int ret = MagickWriteImages(self ,s1 ,b1 );
+	int b2 = p_int(sfp[2]);
+	int ret = MagickWriteImages(self ,s1 ,b2 );
 
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* String MagickWand.getCopyright() */
+/* MagickWand MagickWand.appendImages(self, Boolean b1) */
 
-METHOD MagickWand_getCopyright(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_appendImages(Ctx *ctx, knh_sfp_t* sfp)
 {
-	char *ret = MagickGetCopyright();
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int b1 = p_int(sfp[1]);
+	MagickWand *ret = MagickAppendImages(self ,b1 );
 
-	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
+	KNH_RETURN(ctx, sfp, ret);
 }
 
-/* String MagickWand.getPackageName() */
+/* MagickWand MagickWand.averageImages(self) */
 
-METHOD MagickWand_getPackageName(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_averageImages(Ctx *ctx, knh_sfp_t* sfp)
 {
-	char *ret = MagickGetPackageName();
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	MagickWand *ret = MagickAverageImages(self );
 
-	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
+	KNH_RETURN(ctx, sfp, ret);
 }
 
-/* String MagickWand.getReleaseDate() */
+/* MagickWand MagickWand.coalesceImages(self) */
 
-METHOD MagickWand_getReleaseDate(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_coalesceImages(Ctx *ctx, knh_sfp_t* sfp)
 {
-	char *ret = MagickGetReleaseDate();
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	MagickWand *ret = MagickCoalesceImages(self );
 
-	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
+	KNH_RETURN(ctx, sfp, ret);
 }
 
-/* String MagickWand.getVersion(int f1) */
+/* MagickWand MagickWand.deconstructImages(self) */
 
-METHOD MagickWand_getVersion(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_deconstructImages(Ctx *ctx, knh_sfp_t* sfp)
 {
-	int f1 = p_int(sfp[0]);
-	char *ret = MagickGetVersion(f1 );
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	MagickWand *ret = MagickDeconstructImages(self );
 
-	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
+	KNH_RETURN(ctx, sfp, ret);
 }
 
-/* Boolean MagickWand.setFont(self, String s1) */
+/* MagickWand MagickWand.fxImage(self, String s1) */
 
-METHOD MagickWand_setFont(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_fxImage(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
 	char *s1 = p_char(sfp[1]);
-	int ret = MagickSetFont(self ,s1 );
+	MagickWand *ret = MagickFxImage(self ,s1 );
 
-	KNH_RETURN_Boolean(ctx, sfp, ret);
+	KNH_RETURN(ctx, sfp, ret);
 }
 
-/* Boolean MagickWand.setResolution(self, Float f1, Float f2) */
+/* MagickWand MagickWand.getImage(self) */
 
-METHOD MagickWand_setResolution(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_getImage(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	float f1 = p_float(sfp[1]);
-	float f2 = p_float(sfp[2]);
-	int ret = MagickSetResolution(self ,f1 ,f2 );
+	MagickWand *ret = MagickGetImage(self );
 
-	KNH_RETURN_Boolean(ctx, sfp, ret);
+	KNH_RETURN(ctx, sfp, ret);
 }
 
-/* Boolean MagickWand.setSize(self, int f1, int f2) */
+/* MagickWand MagickWand.getImageClipMask(self) */
 
-METHOD MagickWand_setSize(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_getImageClipMask(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	int f1 = p_int(sfp[1]);
-	int f2 = p_int(sfp[2]);
-	int ret = MagickSetSize(self ,f1 ,f2 );
+	MagickWand *ret = MagickGetImageClipMask(self );
 
-	KNH_RETURN_Boolean(ctx, sfp, ret);
+	KNH_RETURN(ctx, sfp, ret);
 }
 
-/* String MagickWand.getImageBlob(self, int i1) */
+/* MagickWand MagickWand.morphImages(self, Int i1) */
 
-METHOD MagickWand_getImageBlob(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_morphImages(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
 	int i1 = p_int(sfp[1]);
-	char *ret = MagickGetImageBlob(self ,i1 );
+	MagickWand *ret = MagickMorphImages(self ,i1 );
 
-	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
+	KNH_RETURN(ctx, sfp, ret);
 }
 
-/* String MagickWand.getImagesBlob(self, int i1) */
+/* MagickWand MagickWand.optimizeImageLayers(self) */
 
-METHOD MagickWand_getImagesBlob(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_optimizeImageLayers(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	MagickWand *ret = MagickOptimizeImageLayers(self );
+
+	KNH_RETURN(ctx, sfp, ret);
+}
+
+/* MagickWand MagickWand.transformImage(self, String s1, String s2) */
+
+METHOD MagickWand_transformImage(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *s1 = p_char(sfp[1]);
+	char *s2 = p_char(sfp[2]);
+	MagickWand *ret = MagickTransformImage(self ,s1 ,s2 );
+
+	KNH_RETURN(ctx, sfp, ret);
+}
+
+/* Int MagickWand.getImageColors(self) */
+
+METHOD MagickWand_getImageColors(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int ret = MagickGetImageColors(self );
+
+	KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Int MagickWand.getImageCompressionQuality(self) */
+
+METHOD MagickWand_getImageCompressionQuality(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int ret = MagickGetImageCompressionQuality(self );
+
+	KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Int MagickWand.getImageDelay(self) */
+
+METHOD MagickWand_getImageDelay(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int ret = MagickGetImageDelay(self );
+
+	KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Int MagickWand.getImageDepth(self) */
+
+METHOD MagickWand_getImageDepth(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int ret = MagickGetImageDepth(self );
+
+	KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Int MagickWand.getImageHeight(self) */
+
+METHOD MagickWand_getImageHeight(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int ret = MagickGetImageHeight(self );
+
+	KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Int MagickWand.getImageIterations(self) */
+
+METHOD MagickWand_getImageIterations(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int ret = MagickGetImageIterations(self );
+
+	KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Int MagickWand.getImageScene(self) */
+
+METHOD MagickWand_getImageScene(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int ret = MagickGetImageScene(self );
+
+	KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Int MagickWand.getImageTicksPerSecond(self) */
+
+METHOD MagickWand_getImageTicksPerSecond(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int ret = MagickGetImageTicksPerSecond(self );
+
+	KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Int MagickWand.getImageWidth(self) */
+
+METHOD MagickWand_getImageWidth(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int ret = MagickGetImageWidth(self );
+
+	KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Int MagickWand.getNumberImages(self) */
+
+METHOD MagickWand_getNumberImages(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int ret = MagickGetNumberImages(self );
+
+	KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Int MagickWand.getIteratorIndex(self) */
+
+METHOD MagickWand_getIteratorIndex(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int ret = MagickGetIteratorIndex(self );
+
+	KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.clearException(self) */
+
+METHOD MagickWand_clearException(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	int ret = MagickClearException(self );
+
+	KNH_RETURN_Boolean(ctx, sfp, ret);
+}
+
+/* Boolean MagickWand.setIteratorIndex(self, Int i1) */
+
+METHOD MagickWand_setIteratorIndex(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
 	int i1 = p_int(sfp[1]);
-	char *ret = MagickGetImagesBlob(self ,i1 );
+	int ret = MagickSetIteratorIndex(self ,i1 );
 
-	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
+	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Float MagickWand.getPointsize(self) */
+/* void MagickWand.wandGenesis() */
 
-METHOD MagickWand_getPointsize(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_wandGenesis(Ctx *ctx, knh_sfp_t* sfp)
 {
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	double ret = MagickGetPointsize(self );
 
-	KNH_RETURN_Float(ctx, sfp, ret);
+	KNH_RETURN_void(ctx, sfp);
 }
 
-/* Float MagickWand.getCompressionQuality(self) */
+/* void MagickWand.wandTerminus() */
 
-METHOD MagickWand_getCompressionQuality(Ctx *ctx, knh_sfp_t* sfp)
+METHOD MagickWand_wandTerminus(Ctx *ctx, knh_sfp_t* sfp)
+{
+
+	KNH_RETURN_void(ctx, sfp);
+}
+
+/* void MagickWand.resetIterator(self) */
+
+METHOD MagickWand_resetIterator(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	double ret = MagickGetCompressionQuality(self );
 
-	KNH_RETURN_Float(ctx, sfp, ret);
+	KNH_RETURN_void(ctx, sfp);
+}
+
+/* void MagickWand.setFirstIterator(self) */
+
+METHOD MagickWand_setFirstIterator(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+
+	KNH_RETURN_void(ctx, sfp);
+}
+
+/* void MagickWand.setLastIterator(self) */
+
+METHOD MagickWand_setLastIterator(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+
+	KNH_RETURN_void(ctx, sfp);
 }
 
 
