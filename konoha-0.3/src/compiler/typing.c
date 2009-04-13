@@ -1055,7 +1055,8 @@ void TERMs_perrorTYPE(Ctx *ctx, Stmt *stmt, size_t n, int pe, knh_type_t reqt)
 	}
 	DBG2_P("reqt=%s%s", TYPEQN(reqt));
 	knh_perror__s(ctx, SP(stmt)->fileid, SP(stmt)->line, pe, at);
-	KNH_ABORT();
+	DBG2_(
+	KNH_ABORT(););
 }
 
 /* ------------------------------------------------------------------------ */
