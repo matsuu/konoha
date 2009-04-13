@@ -108,9 +108,9 @@ static METHOD knh__Bytes_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Int! Bytes.opSize() */
+/* @method Int! Bytes.getSize() */
 
-static METHOD knh__Bytes_opSize(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__Bytes_getSize(Ctx *ctx, knh_sfp_t *sfp)
 {
 	Bytes *o = (Bytes*)sfp[0].o;
 	KNH_RETURN_Int(ctx, sfp, o->size);

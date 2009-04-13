@@ -99,9 +99,9 @@ knh_bytes_t knh_NameSpace_firstType(Ctx *ctx, NameSpace *o, knh_bytes_t name, kn
 
 
 /* ------------------------------------------------------------------------ */
-/* @ method Class NameSpace.geClassTable(String name) */
+/* @ method Class NameSpace.getClass(String name) */
 
-knh_class_t knh_NameSpace_geClassTable(Ctx *ctx, NameSpace *o, knh_bytes_t name)
+knh_class_t knh_NameSpace_getClass(Ctx *ctx, NameSpace *o, knh_bytes_t name)
 {
 	if(knh_bytes_equals(name, STEXT("Script")) && IS_NOTNULL(DP(o)->script)) {
 		return knh_Object_cid(DP(o)->script);
@@ -126,7 +126,7 @@ knh_class_t knh_NameSpace_geClassTable(Ctx *ctx, NameSpace *o, knh_bytes_t name)
 	if(o != knh_rootNameSpace) {
 		knh_index_t loc = knh_bytes_index(name, '<');
 		if(loc > 0) {
-			knh_class_t bcid = knh_NameSpace_geClassTable(ctx, o, knh_bytes_first(name, loc));
+			knh_class_t bcid = knh_NameSpace_getClass(ctx, o, knh_bytes_first(name, loc));
 			KNH_ASSERT_cid(bcid);
 			if(!knh_Class_isGenerics(bcid)) return bcid;
 			knh_class_t p1 = CLASS_Any, p2 = ctx->share->ClassTable[bcid].p2;
@@ -219,11 +219,11 @@ knh_type_t knh_NameSpace_getType(Ctx *ctx, NameSpace *o, knh_bytes_t name)
 	if(knh_bytes_isNotNullType(name)) {
 		knh_class_t cid;
 		name.len--;
-		cid = knh_NameSpace_geClassTable(ctx, o, name);
+		cid = knh_NameSpace_getClass(ctx, o, name);
 		return (cid == CLASS_unknown) ? cid : NNTYPE_cid(cid);
 	}
 	else {
-		return knh_NameSpace_geClassTable(ctx, o, name);
+		return knh_NameSpace_getClass(ctx, o, name);
 	}
 }
 
@@ -234,7 +234,7 @@ knh_class_t knh_tclass_classURN(Ctx *ctx, knh_class_t bcid, knh_bytes_t urn)
 {
 	char buf[CLASSNAME_BUFSIZ];
 	knh_snprintf(buf, sizeof(buf), KNH_CLASSSPEC_FMT, CLASSN(bcid), urn.buf);
-	knh_class_t cid = knh_NameSpace_geClassTable(ctx, knh_rootNameSpace, B(buf));
+	knh_class_t cid = knh_NameSpace_getClass(ctx, knh_rootNameSpace, B(buf));
 	if(cid == CLASS_unknown) {
 		cid = knh_tclass_loadURN(ctx, bcid, urn);
 	}
@@ -266,11 +266,11 @@ knh_type_t knh_NameSpace_tagcid(Ctx *ctx, NameSpace *o, knh_class_t bcid, knh_by
 	//	char buf[CLASSNAME_BUFSIZ];
 //	DBG2_P("%s:'%s'", CLASSN(bcid), tag.buf);
 //	knh_snprintf(buf, sizeof(buf), "%s:%s", CLASSN(bcid), tag.buf);
-//	knh_class_t cid = knh_NameSpace_geClassTable(ctx, o, B(buf));
+//	knh_class_t cid = knh_NameSpace_getClass(ctx, o, B(buf));
 //	if(cid == CLASS_unknown) {
 //		if(bcid == CLASS_Int) {
 //			knh_snprintf(buf, sizeof(buf), "Float:%s", tag.buf);
-//			cid = knh_NameSpace_geClassTable(ctx, o, B(buf));
+//			cid = knh_NameSpace_getClass(ctx, o, B(buf));
 //		}
 //	}
 //	return cid;

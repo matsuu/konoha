@@ -136,7 +136,7 @@ knh_class_t knh_class_Array(Ctx *ctx, knh_class_t p1)
 	char buf[CLASSNAME_BUFSIZ];
 	if(p1 == CLASS_Any) return CLASS_Array;
 	knh_snprintf(buf, sizeof(buf), "%s[]", CLASSN(p1));
-	knh_class_t cid = knh_NameSpace_geClassTable(ctx, knh_rootNameSpace, B(buf));
+	knh_class_t cid = knh_NameSpace_getClass(ctx, knh_rootNameSpace, B(buf));
 	if(cid == CLASS_unknown) {
 		//DBG2_P("Generating %s", buf);
 		return konoha_addGenericsClass(ctx, CLASS_newid, new_String(ctx, B(buf), NULL), CLASS_Array, p1, CLASS_Nue);
@@ -151,7 +151,7 @@ knh_class_t knh_class_Iterator(Ctx *ctx, knh_class_t p1)
 	char buf[CLASSNAME_BUFSIZ];
 	if(p1 == CLASS_Any) return CLASS_Iterator;
 	knh_snprintf(buf, sizeof(buf), "%s..", CLASSN(p1));
-	knh_class_t cid = knh_NameSpace_geClassTable(ctx, knh_rootNameSpace, B(buf));
+	knh_class_t cid = knh_NameSpace_getClass(ctx, knh_rootNameSpace, B(buf));
 	if(cid == CLASS_unknown) {
 		//DBG2_P("*** Generating %s ***", buf);
 		return konoha_addGenericsClass(ctx, CLASS_newid, new_String(ctx, B(buf), NULL), CLASS_Iterator, p1, CLASS_Nue);
@@ -176,7 +176,7 @@ knh_class_t knh_class_Generics(Ctx *ctx, knh_class_t bcid, knh_class_t p1, knh_c
 	else {
 		char buf[CLASSNAME_BUFSIZ];
 		knh_snprintf(buf, sizeof(buf), "%s<%s,%s>", CLASSN(bcid), CLASSN(p1), CLASSN(p2));
-		knh_class_t cid = knh_NameSpace_geClassTable(ctx, knh_rootNameSpace, B(buf));
+		knh_class_t cid = knh_NameSpace_getClass(ctx, knh_rootNameSpace, B(buf));
 		if(cid == CLASS_unknown) {
 			//DBG2_P("Generating %s", buf);
 			return konoha_addGenericsClass(ctx, CLASS_newid, new_String(ctx, B(buf), NULL), bcid, p1, p2);

@@ -75,7 +75,6 @@ extern "C" {
 
 #define DEBUG3(fmt, ...)
 #define TODO3(fmt, ...)
-#define DBG2_ASSERT(c) KNH_ASSERT(c)
 #define DEBUG3_PTC(name, tc)
 #define DEBUG3_STC(name, tc)
 

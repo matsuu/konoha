@@ -145,7 +145,7 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	char bufn[CLASSNAME_BUFSIZ];
 	knh_snprintf(bufn, sizeof(bufn), "%s.%s", knh_String_tochar(DP(ns)->nsname), sToken(StmtCLASS_class(stmt)));
 
-	knh_class_t cid  = knh_NameSpace_geClassTable(ctx, ns, B(bufn));
+	knh_class_t cid  = knh_NameSpace_getClass(ctx, ns, B(bufn));
 	if(cid == CLASS_unknown) {
 		cid = knh_ClassTable_newId(ctx);
 		KNH_ASSERT(ctx->share->ClassTable[cid].class_cid == NULL);
@@ -161,7 +161,7 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		supcid = CLASS_Object;
 	}
 	else {
-		supcid = knh_NameSpace_geClassTable(ctx, ns, knh_Token_tobytes(ctx, StmtCLASS_superclass(stmt)));
+		supcid = knh_NameSpace_getClass(ctx, ns, knh_Token_tobytes(ctx, StmtCLASS_superclass(stmt)));
 		if(supcid == CLASS_unknown) {
 			knh_Asm_perror(ctx, abr, KMSG_UCLASSN, NULL);
 			supcid = CLASS_Object;
@@ -204,7 +204,7 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		int i, n = DP(istmt)->size;
 		for(i = 0; i < n; i++) {
 			Token *tk = DP(stmt)->tokens[i];
-			knh_class_t icid = knh_NameSpace_geClassTable(ctx, ns, knh_Token_tobytes(ctx, tk));
+			knh_class_t icid = knh_NameSpace_getClass(ctx, ns, knh_Token_tobytes(ctx, tk));
 			if(icid == CLASS_unknown) {
 				knh_Token_perror(ctx, tk, KMSG_UCLASSN);
 				continue;
@@ -282,12 +282,12 @@ int knh_StmtUIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	knh_index_t loc = knh_bytes_rindex(name, '.');
 	if(loc != -1) { /* using Math.sin */
 		if(knh_System_loadPackage(ctx, knh_bytes_first(name, loc))) {
-			knh_class_t newcid = knh_NameSpace_geClassTable(ctx, knh_rootNameSpace, name);
+			knh_class_t newcid = knh_NameSpace_getClass(ctx, knh_rootNameSpace, name);
 			if(newcid == CLASS_unknown) {
 				knh_Token_perror(ctx, tk, KMSG_UCLASSN);
 				return 0;
 			}
-			knh_class_t oldcid = knh_NameSpace_geClassTable(ctx, ns, knh_bytes_last(name, loc+1));
+			knh_class_t oldcid = knh_NameSpace_getClass(ctx, ns, knh_bytes_last(name, loc+1));
 			if(oldcid != CLASS_unknown && newcid != oldcid) {
 				KNH_WARNING(ctx, "ovrriding.. %s => %s", CLASSN(oldcid), CLASSN(newcid));
 			}
@@ -360,7 +360,7 @@ int knh_StmtXCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_class
 		cid = bcid;
 	}
 
-	knh_class_t oldcid = knh_NameSpace_geClassTable(ctx, ns, knh_Token_tobytes(ctx, tkclassn));
+	knh_class_t oldcid = knh_NameSpace_getClass(ctx, ns, knh_Token_tobytes(ctx, tkclassn));
 	if(oldcid != CLASS_unknown && cid != oldcid) {
 		KNH_WARNING(ctx, "Overriding %s", knh_Token_tobytes(ctx, tkclassn));
 	}
@@ -403,7 +403,7 @@ int knh_StmtUFUNC_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	knh_bytes_t name = knh_Token_tobytes(ctx, tk);
 	if(SP(tk)->tt == TT_CMETHODN) {
 		knh_index_t loc = knh_bytes_rindex(name, '.');
-		knh_class_t cid = knh_NameSpace_geClassTable(ctx, ns, knh_bytes_first(name, loc));
+		knh_class_t cid = knh_NameSpace_getClass(ctx, ns, knh_bytes_first(name, loc));
 		if(cid == CLASS_unknown) {
 			knh_Token_perror(ctx, tk, KMSG_UCLASSN);
 			return 0;
@@ -416,7 +416,7 @@ int knh_StmtUFUNC_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		knh_NameSpace_setFuncClass(ctx, ns, mn, cid);
 	}
 	else {
-		knh_class_t cid = knh_NameSpace_geClassTable(ctx, ns, name);
+		knh_class_t cid = knh_NameSpace_getClass(ctx, ns, name);
 		if(cid == CLASS_unknown) {
 			knh_Token_perror(ctx, tk, KMSG_UCLASSN);
 			return 0;

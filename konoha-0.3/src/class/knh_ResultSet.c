@@ -136,7 +136,7 @@ KNHAPI(void) knh_ResultSet_initColumn(Ctx *ctx, ResultSet *o, size_t column_size
 /* ======================================================================== */
 /* [meta] */
 
-void knh_ResultSet_initTargeClassTable(ResultSet *o, knh_class_t tcid)
+void knh_ResultSet_initTargetClass(ResultSet *o, knh_class_t tcid)
 {
 	DP(o)->tcid = tcid;
 }

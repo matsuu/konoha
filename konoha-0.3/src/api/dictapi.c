@@ -130,9 +130,9 @@ static METHOD knh__DictMap_clear(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ======================================================================== */
-/* @method Int! DictMap.opSize() */
+/* @method Int! DictMap.getSize() */
 
-static METHOD knh__DictMap_opSize(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__DictMap_getSize(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Int(ctx, sfp, knh_DictMap_size((DictMap*)sfp[0].o));
 }
@@ -423,9 +423,9 @@ static METHOD knh__DictSet_clear(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ======================================================================== */
-/* @method Int! DictSet.opSize() */
+/* @method Int! DictSet.getSize() */
 
-static METHOD knh__DictSet_opSize(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__DictSet_getSize(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Int(ctx, sfp, knh_DictSet_size((DictSet*)sfp[0].o));
 }

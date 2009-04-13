@@ -81,9 +81,9 @@ static METHOD knh__Connection_exec(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Int! ResultSet.opSize(Any! n) */
+/* @method Int! ResultSet.getSize(Any! n) */
 
-static METHOD knh__ResultSet_opSize(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__ResultSet_getSize(Ctx *ctx, knh_sfp_t *sfp)
 {
 	ResultSet *o = (ResultSet*)sfp[0].o;
 	KNH_RETURN_Int(ctx, sfp, DP(o)->column_size);

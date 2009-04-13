@@ -90,9 +90,9 @@ static METHOD knh__String_indexOf(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[CONST|NULLBASE] Int! String.opSize() */
+/* @method[CONST|NULLBASE] Int! String.getSize() */
 
-static METHOD knh__String_opSize(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__String_getSize(Ctx *ctx, knh_sfp_t *sfp)
 {
 	if(IS_NULL(sfp[0].o)) {
 		KNH_RETURN_Int(ctx, sfp, 0);

@@ -130,7 +130,7 @@ knh_type_t knh_Token_gettype(Ctx *ctx, Token *o, NameSpace *ns, knh_class_t defc
 			cid = CLASS_Exception;
 		}
 		else {
-			cid = knh_NameSpace_geClassTable(ctx, ns, name);
+			cid = knh_NameSpace_getClass(ctx, ns, name);
 			if(cid == CLASS_unknown) {
 				cid = defc;
 				knh_Token_perror(ctx, o, KMSG_UCLASSN);
@@ -166,7 +166,7 @@ knh_class_t knh_Token_getcid(Ctx *ctx, Token *o, NameSpace *ns, knh_class_t defc
 			return CLASS_Exception;
 		}
 		knh_bytes_t name = knh_Token_tobytes(ctx, o);
-		knh_class_t cid = knh_NameSpace_geClassTable(ctx, ns, name);
+		knh_class_t cid = knh_NameSpace_getClass(ctx, ns, name);
 		if(cid == CLASS_unknown) {
 
 			if(defc == CLASS_unknown) {
@@ -561,7 +561,7 @@ int knh_TokenCONSTN_typing(Ctx *ctx, Token *o, Asm *abr, NameSpace *ns)
 		}
 	}
 	else {
-		knh_class_t cid = knh_NameSpace_geClassTable(ctx, ns, knh_bytes_first(t, loc));
+		knh_class_t cid = knh_NameSpace_getClass(ctx, ns, knh_bytes_first(t, loc));
 		if(cid != CLASS_unknown) {
 			char buf[CLASSNAME_BUFSIZ*2];
 			knh_snprintf(buf, sizeof(buf), "%s.%s", CLASSN(cid), &t.buf[loc+1]);
@@ -631,7 +631,7 @@ int knh_TokenCMETHODN_typing(Ctx *ctx, Token *o, NameSpace *ns)
 	if(idx == -1) return 0;
 
 	knh_bytes_t cname = knh_bytes_first(t, idx);
-	knh_class_t cid = knh_NameSpace_geClassTable(ctx, ns, cname);
+	knh_class_t cid = knh_NameSpace_getClass(ctx, ns, cname);
 	if(cid == CLASS_unknown) {
 		knh_Token_perror(ctx, o, KMSG_UCLASSN);
 		return 0;
@@ -923,7 +923,7 @@ static Object *TERMs_value(Ctx *ctx, Stmt *stmt, size_t n, knh_type_t type)
 		if(SP(tk)->tt == TT_CONST) return DP(tk)->data;
 		if(SP(tk)->tt == TT_ASIS) {
 			return IS_NNTYPE(type) ?
-					konoha_geClassTableDefaultValue(ctx, CLASS_type(type)) : KNH_NULL;
+					konoha_getClassDefaultValue(ctx, CLASS_type(type)) : KNH_NULL;
 		}
 	}
 	return KNH_NULL;
@@ -1110,7 +1110,7 @@ knh_bool_t knh_Asm_existsName(Ctx *ctx, Asm *abr, knh_fieldn_t fnq)
 static
 Object *knh_StmtDECL_value(Ctx *ctx, knh_type_t type)
 {
-	return IS_NNTYPE(type) ? konoha_geClassTableDefaultValue(ctx, CLASS_type(type)) : KNH_NULL;
+	return IS_NNTYPE(type) ? konoha_getClassDefaultValue(ctx, CLASS_type(type)) : KNH_NULL;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1228,7 +1228,7 @@ int TERMs_isCONSTNAME(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, NameSpace *ns)
 		for(i = 0; i < cname.len; i++) {
 			if(islower(cname.buf[i])) return 0;
 		}
-		knh_class_t cid = knh_NameSpace_geClassTable(ctx, ns, cname);
+		knh_class_t cid = knh_NameSpace_getClass(ctx, ns, cname);
 		return (cid == CLASS_unknown);
 	}
 	return 0;
@@ -1269,7 +1269,7 @@ Term *knh_StmtLET_declCONST(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int l
 			}
 			else {
 				knh_bytes_t fn = knh_bytes_first(cn, dotidx);
-				knh_class_t cid = knh_NameSpace_geClassTable(ctx, ns, fn);
+				knh_class_t cid = knh_NameSpace_getClass(ctx, ns, fn);
 				if(cid == CLASS_unknown) {
 					pe = KMSG_UCLASSN; goto L_PERROR;
 				}
@@ -2184,7 +2184,7 @@ Term *knh_StmtOP_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_
 	case METHODN_opLor:
 	{
 		if(opsize == 1) {
-			mn = METHODN_opSize;
+			mn = METHODN_getSize;
 			mtd_cid = TERMs_getcid(stmt, 1);
 		}
 		else {
@@ -2248,7 +2248,7 @@ Term *knh_StmtMAPCAST_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_
 
 	if(TERMs_isNULL(stmt, 1)) {
 		if(knh_Token_isNotNullType(tk)) {
-			knh_Token_setCONST(ctx, DP(stmt)->tokens[1], konoha_geClassTableDefaultValue(ctx, mprcid));
+			knh_Token_setCONST(ctx, DP(stmt)->tokens[1], konoha_getClassDefaultValue(ctx, mprcid));
 		}
 		return DP(stmt)->terms[1];
 	}
@@ -2711,7 +2711,7 @@ Term *knh_StmtFOREACH_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 			itrcid = TERMs_getcid(stmt, FOREACH_iter);
 			type = NNTYPE_cid(ctx->share->ClassTable[itrcid].p1);
 			type = knh_Asm_typeinfer(ctx, abr, type, FIELDN(fn));
-			knh_Asm_declareVariable(ctx, abr, 0, type, fn, konoha_geClassTableDefaultValue(ctx, CLASS_type(type)));
+			knh_Asm_declareVariable(ctx, abr, 0, type, fn, konoha_getClassDefaultValue(ctx, CLASS_type(type)));
 			if(!TERMs_typing(ctx, stmt, FOREACH_name, abr, ns, type, TCHECK_)) {
 				return NULL;
 			}
@@ -3083,7 +3083,7 @@ knh_class_t knh_StmtMETHOD_class(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, 
 			name = knh_bytes_first(name, idx);
 		}
 
-		knh_class_t cid = knh_NameSpace_geClassTable(ctx, ns, name);
+		knh_class_t cid = knh_NameSpace_getClass(ctx, ns, name);
 		if(cid == CLASS_unknown) {
 			knh_Asm_perror(ctx, abr, KMSG_UCLASSN, (char*)name.buf);
 			cid = DP(abr)->this_cid;

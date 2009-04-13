@@ -661,7 +661,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 	Token *tks[TKSTACK_MAXSIZ] = {NULL};
 	Token *blocktk = NULL;
 	tks[0] = tk;
-	int tkl = 0;
+	int tkl = 0, equote = 1;
 
 	INDENT_PART:;
 	pindent = indent;
@@ -704,7 +704,9 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 		case '{': case '[': case '(':
 			knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
 			if(tkl < (TKSTACK_MAXSIZ - 1)) {
-				Token *intk = new_Token(ctx, 0, DP(in)->fileid, DP(in)->line, knh_char_totoken(ch));
+				Token *intk = new_Token(ctx,
+						(equote == 2) ? KNH_FLAG_TKF_TAILWILDCARD : 0,
+								DP(in)->fileid, DP(in)->line, knh_char_totoken(ch));
 				knh_Token_padd(ctx, tks[tkl], &BOL, intk);
 				tkl++;
 				tks[tkl] = intk;
@@ -717,6 +719,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 				knh_InputStream_skipBLOCK(ctx, in, prev, blocktk);
 				blocktk = NULL;
 			}
+			equote= 1;
 			goto MAIN_PART;
 
 		case '}':
@@ -730,6 +733,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 				knh_InputStream_skipBLOCK(ctx, in, prev, blocktk);
 				blocktk = NULL;
 			}
+			equote = 0;
 			goto MAIN_PART;
 
 		case ')':
@@ -743,6 +747,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 				knh_InputStream_skipBLOCK(ctx, in, prev, blocktk);
 				blocktk = NULL;
 			}
+			equote = 0;
 			goto MAIN_PART;
 
 		case ']':
@@ -756,26 +761,31 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 				knh_InputStream_skipBLOCK(ctx, in, prev, blocktk);
 				blocktk = NULL;
 			}
+			equote = 0;
 			goto MAIN_PART;
 
 		case '"': case '\'': case '`' :
 			knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
 			prev = ch;
+			equote = 0;
 			goto QUOTED_PART;
 
 		case ';':
 			knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
 			knh_Token_padd(ctx, tks[tkl], &BOL, new_Token(ctx, 0, DP(in)->fileid, DP(in)->line, knh_char_totoken(ch)));
+			equote = 1;
 			break;
 
 		case ',':
 			knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
 			knh_Token_padd(ctx, tks[tkl], &BOL, new_Token(ctx, 0, DP(in)->fileid, DP(in)->line, knh_char_totoken(ch)));
+			equote = 1;
 			break;
 
 		case '$':
 			knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
 			prev = ch;
+			equote = 0;
 			goto QNAME_PART;
 
 		case '@':
@@ -783,10 +793,12 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 			ch = knh_InputStream_getc(ctx, in);
 			if(ch == '"' || ch == '\'' || ch == '`') {
 				prev = ch;
+				equote = 0;
 				goto RAWSTR_PART;
 			}
 			prev = '@';
 			knh_Bytes_putc(ctx, tbuf.ba, ch);
+			equote = 1;
 			goto QNAME_PART;
 
 		case '%':
@@ -809,15 +821,37 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 				goto MAIN_PART_INLOOP;
 			}
 
+		case '|':
+			knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
+			if(tkl > 0 && SP(tks[tkl])->tt == TT_PARENTHESIS
+					&& knh_Token_isTailWildCard(tks[tkl])) {
+				knh_Token_join(ctx, tks[tkl]);
+				tkl--;
+				knh_Bytes_write(ctx, tbuf.ba, STEXT(".size"));
+				knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
+				equote = 0;
+				goto MAIN_PART;
+			}
+
+			DBG2_P("IS EXTENDED QUOTE: %s", (equote) ? "yes" : "no");
+
+			if(equote == 1) {
+				equote = 2; /*very dirty orz */
+				ch = '(';
+				goto MAIN_PART_INLOOP;
+			}
+
 		case '+': case '-': case '*': case '=':
-		case '&': case '|': case '<':
+		case '&': case '<':
 		case '>': case '^': case '!': case '~':
 			knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
 			knh_Bytes_putc(ctx, tbuf.ba, ch);
 			prev = ch;
+			equote = 1;
 			goto OP_PART;
 
 		case '?':
+			equote = 1;
 			if(!islower(prev)) {
 				knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
 				knh_Bytes_putc(ctx, tbuf.ba, ch);
@@ -838,15 +872,26 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 			}else if(ch == '/') {
 				goto LINE_COMMENT;
 			}
-			knh_Bytes_putc(ctx, tbuf.ba, '/');
+			DBG2_P("IS EXTENDED QUOTE: %s", (equote) ? "yes" : "no");
 			prev = '/';
-			goto OP_PART_INLOOP;
+			if(equote == 0 || ch == ' ' || ch == '\t') {
+				knh_Bytes_putc(ctx, tbuf.ba, '/');
+				equote = 1;
+				goto OP_PART_INLOOP;
+			}
+			else {
+				equote = 0;
+				knh_Bytes_write(ctx, tbuf.ba, STEXT("re:"));
+				knh_Bytes_putc(ctx, tbuf.ba, ch);
+				goto RESTR_PART;
+			}
 
 		case '#':
 			knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
 			goto LINE_COMMENT;
 
 		case '.':
+			equote = 0;
 			ch = knh_InputStream_getc(ctx, in);
 			if(ch == '.') { /* .. */
 				knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
@@ -870,8 +915,10 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 
 		case ':':
 			ch = knh_InputStream_getc(ctx, in);
+			equote = 1;
 			if(knh_cwb_size(tbuf) == 0) {
 				if(ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r' || ch == ';') {
+					equote = 1;
 					knh_Bytes_putc(ctx, tbuf.ba, ':');
 					knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
 					break;
@@ -886,7 +933,6 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 			}
 			else if(ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r' || ch == ';') {
 				knh_Token_padd(ctx, tks[tkl], &BOL, new_Token__buffer(ctx, TT_LABEL, tbuf, in));
-				//knh_Bytes_putc(ctx, tbuf.ba, ':');
 				goto MAIN_PART_INLOOP;
 			}
 			else {
@@ -897,6 +943,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 
 		case '1': case '2': case '3': case '4': case '5':
 		case '6': case '7': case '8': case '9': case '0':
+			equote = 0;
 			if(knh_cwb_size(tbuf) == 0) {
 				knh_Bytes_putc(ctx, tbuf.ba, ch);
 				goto NUM_PART;
@@ -909,6 +956,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 			break;
 
 		default:
+			equote = 0;
 			if(ch > 127) {
 				knh_InputStream_perror(ctx, in, KMSG_WASCII, NULL);
 				ch = ' ';
@@ -1042,8 +1090,43 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 	}/*URN_PART*/
 	goto L_EOF;
 
+	RESTR_PART:;
+	DBG2_ASSERT(prev == '/');
+	{
+		while((ch = knh_InputStream_getc(ctx, in)) != EOF) {
+			RESTR_PART_INLOOP:;
+			if(ch == '\\') {
+				ch = knh_InputStream_getc(ctx, in);
+				if(ch == '/') {
+					knh_Bytes_putc(ctx, tbuf.ba, '/');
+				}
+				else if(ch == '\\') {
+					knh_Bytes_putc(ctx, tbuf.ba, ch);
+					knh_Bytes_putc(ctx, tbuf.ba, ch);
+				}
+				else {
+					knh_Bytes_putc(ctx, tbuf.ba, '\\');
+					goto RESTR_PART_INLOOP;
+				}
+				continue;
+			}
+			if(ch == '\n' || ch == '\r' || ch == EOF) {
+				knh_InputStream_perror(ctx, in, KMSG_WCHAR, "\\n");
+				knh_Token_padd(ctx, tks[tkl], &BOL, new_Token__buffer(ctx, knh_char_totoken(prev), tbuf, in));
+				goto MAIN_PART_INLOOP;
+			}
+			if(ch == prev) {
+				knh_Token_padd(ctx, tks[tkl], &BOL, new_Token__buffer(ctx, TT_TSTR, tbuf, in));
+				goto MAIN_PART;
+			}
+			knh_Bytes_putc(ctx, tbuf.ba, ch);
+		}
+		knh_Token_padd(ctx, tks[tkl], &BOL, new_Token__buffer(ctx, TT_TSTR, tbuf, in));
+	}/*RAWSTR_PART*/
+	goto L_EOF;
+
 	RAWSTR_PART:;
-	KNH_ASSERT(prev == '"' || prev == '\'' || prev == '`');
+	DBG2_ASSERT(prev == '"' || prev == '\'' || prev == '`');
 	{
 		//knh_Bytes_putc(ctx, tbuf.ba, prev);
 		while((ch = knh_InputStream_getc(ctx, in)) != EOF) {

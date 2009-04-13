@@ -164,7 +164,7 @@ Object *konoha_getSystemConst(Ctx *ctx, int n)
 		case _KNH_SYS_STDIN:   return (Object*)((ctx)->in);
 		case _KNH_SYS_STDOUT:  return (Object*)((ctx)->out);
 		case _KNH_SYS_STDERR:  return (Object*)((ctx)->err);
-		case _KNH_SYS_OS:      return (Object*)konoha_geClassTableDefaultValue(ctx, CLASS_System);
+		case _KNH_SYS_OS:      return (Object*)konoha_getClassDefaultValue(ctx, CLASS_System);
 		case _KNH_SYS_SCRIPT:  return (Object*)knh_NameSpace_getScript(ctx, (ctx)->ns);
 	}
 	DBG_P("unknown system const n=%d", n);
@@ -669,7 +669,7 @@ KNHAPI(void) konoha_addClassSpecFunc(Ctx *ctx, char *urn, knh_fspec func)
 }
 /* ------------------------------------------------------------------------ */
 
-ClassSpec *konoha_geClassTableSpec(Ctx *ctx, knh_class_t bcid, knh_bytes_t urn)
+ClassSpec *konoha_getClassSpec(Ctx *ctx, knh_class_t bcid, knh_bytes_t urn)
 {
 	urn = knh_Runtime_aliasURN(ctx, urn);
 	DBG2_P("finding.. '%s'", urn.buf);

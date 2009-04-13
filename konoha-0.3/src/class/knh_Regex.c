@@ -112,7 +112,7 @@ Array *knh_Regex_split(Ctx *ctx, Regex *o, String *s)
 		return a;
 	}
 	else {
-		return (Array*)konoha_geClassTableDefaultValue(ctx, ACLASS_String);
+		return (Array*)konoha_getClassDefaultValue(ctx, ACLASS_String);
 		//return (Array*)KNH_NULL;
 	}
 }

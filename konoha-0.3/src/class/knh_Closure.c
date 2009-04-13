@@ -411,7 +411,7 @@ knh_class_t knh_class_Closure(Ctx *ctx, knh_type_t r0, knh_type_t p1, knh_type_t
 		knh_format_type(ctx, tb3, sizeof(tb3), p3);
 		knh_snprintf(buf, sizeof(buf), "%s(%s,%s,%s)", tb0, tb1, tb2, tb3);
 	}
-	knh_class_t cid = knh_NameSpace_geClassTable(ctx, knh_rootNameSpace, B(buf));
+	knh_class_t cid = knh_NameSpace_getClass(ctx, knh_rootNameSpace, B(buf));
 	if(cid == CLASS_unknown) {
 		DBG2_P("*** Generating %s ***", buf);
 		cid = konoha_addClosureClass(ctx, CLASS_newid, new_String(ctx, B(buf), NULL), r0, p1, p2, p3);

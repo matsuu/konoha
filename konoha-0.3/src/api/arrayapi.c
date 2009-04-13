@@ -63,7 +63,7 @@ static METHOD knh__Array_new__array(Ctx *ctx, knh_sfp_t *sfp)
 	int init = p_int(sfp[1]);
 	if(init > 0) {
 		knh_class_t p1 = ctx->share->ClassTable[knh_Object_cid(o)].p1;
-		Object *v = konoha_geClassTableDefaultValue(ctx, p1);
+		Object *v = konoha_getClassDefaultValue(ctx, p1);
 		knh_Array_grow(ctx, o, init, v);
 		o->size = init;
 	}
@@ -354,11 +354,11 @@ static METHOD knh__FArray_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ======================================================================== */
-/* @method Int! Array.opSize() */
-/* @method Int! IArray.opSize() */
-/* @method Int! FArray.opSize() */
+/* @method Int! Array.getSize() */
+/* @method Int! IArray.getSize() */
+/* @method Int! FArray.getSize() */
 
-static METHOD knh__Array_opSize(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__Array_getSize(Ctx *ctx, knh_sfp_t *sfp)
 {
 	Array *o = (Array*)sfp[0].o;
 	KNH_RETURN_Int(ctx, sfp, o->size);
@@ -981,7 +981,7 @@ void knh_ArrayDim_init(Ctx *ctx, Array *a, size_t x, size_t y, size_t z)
 	a->list = (Object**)knh_array_dmalloc(ctx, x, y, z, sizeof(Object*));
 	a->capacity = x * y * z;
 	knh_class_t p1 = ctx->share->ClassTable[knh_Object_cid(a)].p1;
-	Object *v = (p1 == CLASS_Any) ? KNH_NULL : konoha_geClassTableDefaultValue(ctx, p1);
+	Object *v = (p1 == CLASS_Any) ? KNH_NULL : konoha_getClassDefaultValue(ctx, p1);
 	int i = 0;
 	for(i = 0; i < a->capacity; i++) {
 		KNH_INITv(a->list[i], v);

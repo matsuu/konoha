@@ -204,9 +204,9 @@ void konoha_seClassTableDefaultValue(Ctx *ctx, knh_class_t cid, Object *value, k
 
 /* ------------------------------------------------------------------------ */
 
-#define _KNH_DEF(ctx, cid)  konoha_geClassTableDefaultValue(ctx, cid)
+#define _KNH_DEF(ctx, cid)  konoha_getClassDefaultValue(ctx, cid)
 
-Object *konoha_geClassTableDefaultValue(Ctx *ctx, knh_class_t cid)
+Object *konoha_getClassDefaultValue(Ctx *ctx, knh_class_t cid)
 {
 	KNH_ASSERT_cid(cid);
 	return ctx->share->ClassTable[cid].fdefault(ctx, cid);
@@ -214,7 +214,7 @@ Object *konoha_geClassTableDefaultValue(Ctx *ctx, knh_class_t cid)
 
 /* ------------------------------------------------------------------------ */
 
-#define _KNH_DEF(ctx, cid)  konoha_geClassTableDefaultValue(ctx, cid)
+#define _KNH_DEF(ctx, cid)  konoha_getClassDefaultValue(ctx, cid)
 
 Object *konoha_getDefaultValue(Ctx *ctx, knh_type_t type)
 {

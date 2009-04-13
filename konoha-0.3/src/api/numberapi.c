@@ -221,9 +221,9 @@ static METHOD knh__Int_opPrev(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[NULLBASE|CONST] Int! Int.opSize() */
+/* @method[NULLBASE|CONST] Int! Int.getSize() */
 
-static METHOD knh__Int_opSize(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__Int_getSize(Ctx *ctx, knh_sfp_t *sfp)
 {
 	if(IS_NULL(sfp[0].o)) {
 		KNH_RETURN_Int(ctx, sfp, 0);
@@ -367,9 +367,9 @@ static METHOD knh__Float_random(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[NULLBASE|CONST] Int! Float.opSize() */
+/* @method[NULLBASE|CONST] Int! Float.getSize() */
 
-static METHOD knh__Float_opSize(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__Float_getSize(Ctx *ctx, knh_sfp_t *sfp)
 {
 	if(IS_NULL(sfp[0].o)) {
 		KNH_RETURN_Int(ctx, sfp, 0);

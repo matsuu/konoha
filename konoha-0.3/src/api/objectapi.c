@@ -170,9 +170,9 @@ static METHOD knh__Object_opTo(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[CONST] Class! Object.geClassTable() */
+/* @method[CONST] Class! Object.getClass() */
 
-static METHOD knh__Object_geClassTable(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__Object_getClass(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN(ctx, sfp, ctx->share->ClassTable[(sfp[0].o)->h.cid].class_cid);
 }
@@ -417,7 +417,7 @@ char *knh_methodop_tochar(knh_methodn_t mn)
 	case METHODN_opNext:  return "x++";
 	case METHODN_opPrev:  return "x--";
 	case METHODN_opItr:   return "x..";
-	case METHODN_opSize: return "|x|";
+	case METHODN_getSize: return "|x|";
 	case METHODN_get: return "x[n]";
 	case METHODN_set: return "x[n]=y";
 	case METHODN_setAll: return "x[]=y";
