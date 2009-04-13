@@ -6,8 +6,9 @@
 
 METHOD MagickWand_coreGenesis(Ctx *ctx, knh_sfp_t* sfp)
 {
-	char *s0 = p_char(sfp[0]);
-	int b1 = p_int(sfp[1]);
+	char *s0 = p_char(sfp[1]);
+	int b1 = p_int(sfp[2]);
+	MagickCoreGenesis(s0 ,b1 );
 
 	KNH_RETURN_void(ctx, sfp);
 }
@@ -16,6 +17,7 @@ METHOD MagickWand_coreGenesis(Ctx *ctx, knh_sfp_t* sfp)
 
 METHOD MagickWand_coreTerminus(Ctx *ctx, knh_sfp_t* sfp)
 {
+	MagickCoreTerminus();
 
 	KNH_RETURN_void(ctx, sfp);
 }
@@ -24,7 +26,7 @@ METHOD MagickWand_coreTerminus(Ctx *ctx, knh_sfp_t* sfp)
 
 METHOD MagickWand_toMime(Ctx *ctx, knh_sfp_t* sfp)
 {
-	char *s0 = p_char(sfp[0]);
+	char *s0 = p_char(sfp[1]);
 	char *ret = MagickToMime(s0 );
 
 	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
@@ -194,7 +196,7 @@ METHOD MagickWand_getOption(Ctx *ctx, knh_sfp_t* sfp)
 
 METHOD MagickWand_queryConfigureOption(Ctx *ctx, knh_sfp_t* sfp)
 {
-	char *s0 = p_char(sfp[0]);
+	char *s0 = p_char(sfp[1]);
 	char *ret = MagickQueryConfigureOption(s0 );
 
 	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
@@ -1663,6 +1665,7 @@ METHOD MagickWand_setIteratorIndex(Ctx *ctx, knh_sfp_t* sfp)
 
 METHOD MagickWand_wandGenesis(Ctx *ctx, knh_sfp_t* sfp)
 {
+	MagickWandGenesis();
 
 	KNH_RETURN_void(ctx, sfp);
 }
@@ -1671,6 +1674,7 @@ METHOD MagickWand_wandGenesis(Ctx *ctx, knh_sfp_t* sfp)
 
 METHOD MagickWand_wandTerminus(Ctx *ctx, knh_sfp_t* sfp)
 {
+	MagickWandTerminus();
 
 	KNH_RETURN_void(ctx, sfp);
 }
@@ -1680,6 +1684,7 @@ METHOD MagickWand_wandTerminus(Ctx *ctx, knh_sfp_t* sfp)
 METHOD MagickWand_resetIterator(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	MagickResetIterator(self );
 
 	KNH_RETURN_void(ctx, sfp);
 }
@@ -1689,6 +1694,7 @@ METHOD MagickWand_resetIterator(Ctx *ctx, knh_sfp_t* sfp)
 METHOD MagickWand_setFirstIterator(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	MagickSetFirstIterator(self );
 
 	KNH_RETURN_void(ctx, sfp);
 }
@@ -1698,6 +1704,7 @@ METHOD MagickWand_setFirstIterator(Ctx *ctx, knh_sfp_t* sfp)
 METHOD MagickWand_setLastIterator(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	MagickSetLastIterator(self );
 
 	KNH_RETURN_void(ctx, sfp);
 }
