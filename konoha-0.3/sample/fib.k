@@ -14,6 +14,8 @@ void test() {
 }
 
 void main(String[] argv) {
-	test()
+	for(i = 1; i < 25; i++) {
+		print "fib("+i+")=", fib(i);
+	}
 }
 
