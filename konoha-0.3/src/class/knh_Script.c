@@ -38,7 +38,7 @@ extern "C" {
 /* ======================================================================== */
 /* [constructors] */
 
-static Script *new_Script(Ctx *ctx, knh_bytes_t nsname)
+Script *new_Script(Ctx *ctx, knh_bytes_t nsname)
 {
 	knh_class_t cid = knh_ClassTable_newId(ctx);
 	knh_Script_t *o = (Script*)new_Object_init(ctx, FLAG_Script, CLASS_Script, 0);
@@ -61,14 +61,14 @@ static Script *new_Script(Ctx *ctx, knh_bytes_t nsname)
 	TC->bsize  = KNH_SCRIPT_FIELDSIZE;
 	TC->size = TC->bsize * sizeof(knh_Object_t*);
 
-	konoha_seClassTableName(ctx, cid, new_String(ctx, B(buf), NULL));
+	konoha_setClassName(ctx, cid, new_String(ctx, B(buf), NULL));
 	KNH_INITv(TC->cstruct, new_ClassStruct0(ctx, KNH_SCRIPT_FIELDSIZE, KNH_SCRIPT_FIELDSIZE/2));
 
 	KNH_ASSERT(TC->cmap == NULL);
 	KNH_INITv(TC->cmap, ctx->share->ClassTable[CLASS_Script].cmap);
 
 	KNH_ASSERT(TC->cspec == NULL);
-	konoha_seClassTableDefaultValue(ctx, cid, UP(o), NULL);
+	konoha_setClassDefaultValue(ctx, cid, UP(o), NULL);
 
 	Method *mtd = new_Method(ctx, 0, cid, METHODN_lambda, NULL);
 	KNH_SETv(ctx, DP(mtd)->mf, konoha_findMethodField0(ctx, TYPE_Any));
@@ -99,29 +99,6 @@ static Script *new_Script(Ctx *ctx, knh_bytes_t nsname)
 //	}
 //}
 
-/* ======================================================================== */
-/* [NameSpace] */
-
-Script *knh_NameSpace_getScript(Ctx *ctx, NameSpace *ns)
-{
-	if(IS_NULL(DP(ns)->script)) {
-		KNH_SETv(ctx, DP(ns)->script, new_Script(ctx, knh_String_tobytes(DP(ns)->nsname)));
-	}
-	return DP(ns)->script;
-}
-
-///* ------------------------------------------------------------------------ */
-//
-//void knh_NameSpace_restart(Ctx *ctx, NameSpace *ns)
-//{
-//	if(IS_NOTNULL(DP(ns)->script)) {
-//		knh_Script_restart(ctx, DP(ns)->script);
-//	}
-//	KNH_SETv(ctx, DP(ns)->name2cidDictSet, new_DictSet(ctx, 128));
-//	knh_NameSpace_import(ctx, ns, STEXT("konoha."));
-//	KNH_SETv(ctx, DP(ns)->tag2urnDictMap, KNH_NULL);
-//	KNH_SETv(ctx, DP(ns)->func2cidDictSet, KNH_NULL);
-//}
 
 /* ======================================================================== */
 /* [method] */

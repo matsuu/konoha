@@ -378,14 +378,14 @@ konoha_addClosureClass(Ctx *ctx, knh_class_t cid, String *name, knh_type_t r0, k
 	TC->size = ctx->share->ClassTable[CLASS_Closure].size;
 	TC->bsize  = ctx->share->ClassTable[CLASS_Closure].bsize;
 
-	konoha_seClassTableName(ctx, cid, name);
+	konoha_setClassName(ctx, cid, name);
 	KNH_INITv(TC->cstruct, ctx->share->ClassTable[CLASS_Closure].cstruct);
 	KNH_INITv(TC->cmap, ctx->share->ClassTable[CLASS_Closure].cmap);
 	TC->r0 = r0;
 	TC->p1 = p1;
 	TC->p2 = p2;
 	TC->p3 = p3;
-	konoha_seClassTableDefaultValue(ctx, cid, UP(new_ClosureDEFAULT(ctx, r0, cid)), NULL);
+	konoha_setClassDefaultValue(ctx, cid, UP(new_ClosureDEFAULT(ctx, r0, cid)), NULL);
 	return cid;
 }
 
@@ -411,7 +411,7 @@ knh_class_t knh_class_Closure(Ctx *ctx, knh_type_t r0, knh_type_t p1, knh_type_t
 		knh_format_type(ctx, tb3, sizeof(tb3), p3);
 		knh_snprintf(buf, sizeof(buf), "%s(%s,%s,%s)", tb0, tb1, tb2, tb3);
 	}
-	knh_class_t cid = knh_NameSpace_getClass(ctx, knh_rootNameSpace, B(buf));
+	knh_class_t cid = konoha_getcid(ctx, B(buf));
 	if(cid == CLASS_unknown) {
 		DBG2_P("*** Generating %s ***", buf);
 		cid = konoha_addClosureClass(ctx, CLASS_newid, new_String(ctx, B(buf), NULL), r0, p1, p2, p3);

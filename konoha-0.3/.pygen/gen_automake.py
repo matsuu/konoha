@@ -39,6 +39,7 @@ file_object.writelines("""# this Makefile is generated from ../pygen/gen_Makefil
 # shinpei@ynu(c)2008
 
 # make target for libtool.
+CFLAGS = -g3 -O3 -pipe
 lib_LTLIBRARIES = libkonoha.la
 
 libkonoha_la_LDFLAGS = -no-undefined -release 1 -version-info 0:0:0

@@ -38,110 +38,114 @@ extern "C" {
 /* ======================================================================== */
 /* [Const] */
 
-int konoha_existsConst(Ctx *ctx, knh_bytes_t name)
+int
+konoha_addClassConst(Ctx *ctx, knh_class_t cid, String* name, Object *value)
 {
-	DictMap *tcmap = DP(ctx->sys)->GlobalConstDictMap;
+	KNH_ASSERT_cid(cid);
+	if(ctx->share->ClassTable[cid].constPool == NULL) {
+		KNH_INITv(ctx->share->ClassTable[cid].constPool, new_DictMap0(ctx, 0));
+	}
+	DictMap *cmap = ctx->share->ClassTable[cid].constPool;
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-	int res = knh_DictMap_index__b(tcmap, name);
+	int res = knh_DictMap_index__b(cmap, knh_String_tobytes(name));
+	if(res != -1) return 0;
+	knh_DictMap_append(ctx, cmap, name, value);
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-	return (res != -1);
+	return 1;
 }
 
 /* ------------------------------------------------------------------------ */
 
-Object *konoha_getConst(Ctx *ctx, knh_bytes_t name)
+Object *konoha_getClassConstNULL(Ctx *ctx, knh_class_t cid, knh_bytes_t name)
 {
-	DictMap *tcmap = DP(ctx->sys)->GlobalConstDictMap;
+	KNH_ASSERT_cid(cid);
+	if(ctx->share->ClassTable[cid].constPool == NULL) return NULL;
+	DictMap *cmap = ctx->share->ClassTable[cid].constPool;
+	Object *value = NULL;
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-	Object *value = knh_DictMap_get__b(ctx, tcmap, name);
+	int res = knh_DictMap_index__b(cmap, name);
+	if(res != -1) {
+		value = knh_DictMap_valueAt(cmap, res);
+	}
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
 	return value;
 }
 
 /* ------------------------------------------------------------------------ */
 
-void konoha_addConst(Ctx *ctx, String *name, Object *value)
-{
-	DictMap *tcmap = DP(ctx->sys)->GlobalConstDictMap;
-	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-	knh_DictMap_append(ctx, tcmap, name, value);
-	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-}
-
-/* ------------------------------------------------------------------------ */
-
 KNHAPI(void) konoha_loadIntConstData(Ctx *ctx, knh_IntConstData_t *data)
 {
-	DictMap *tcmap = DP(ctx->sys)->GlobalConstDictMap;
-	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 	while(data->name != NULL) {
-		String *n = new_String__T(ctx, data->name);
-		knh_DictMap_append(ctx, tcmap, n, UP(new_Int(ctx, data->ivalue)));
+		knh_bytes_t n = B(data->name);
+		knh_index_t loc = knh_bytes_rindex(n, '.');
+		String *name = new_String__T(ctx, data->name +(loc+1));
+		Object *value = UP(new_Int(ctx, data->ivalue));
+		knh_class_t cid = CLASS_Any;
+		if(loc != -1) {
+			cid = knh_NameSpace_getcid(ctx, ctx->ns, knh_bytes_first(n, loc));
+			if(cid == CLASS_unknown) cid = CLASS_Any;
+		}
+		konoha_addClassConst(ctx, cid, name, value);
 		data++;
 	}
-	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
 }
 
 /* ------------------------------------------------------------------------ */
 
 KNHAPI(void) konoha_loadFloatConstData(Ctx *ctx, knh_FloatConstData_t *data)
 {
-	DictMap *tcmap = DP(ctx->sys)->GlobalConstDictMap;
-	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 	while(data->name != NULL) {
-		String *n = new_String__T(ctx, data->name);
-		knh_DictMap_append(ctx, tcmap, n, UP(new_Float(ctx, data->fvalue)));
+		knh_bytes_t n = B(data->name);
+		knh_index_t loc = knh_bytes_rindex(n, '.');
+		String *name = new_String__T(ctx, data->name +(loc+1));
+		Object *value = UP(new_Float(ctx, data->fvalue));
+		knh_class_t cid = CLASS_Any;
+		if(loc != -1) {
+			cid = knh_NameSpace_getcid(ctx, ctx->ns, knh_bytes_first(n, loc));
+			if(cid == CLASS_unknown) cid = CLASS_Any;
+		}
+		konoha_addClassConst(ctx, cid, name, value);
 		data++;
 	}
-	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
 }
 
 /* ------------------------------------------------------------------------ */
 
 KNHAPI(void) konoha_loadStringConstData(Ctx *ctx, knh_StringConstData_t *data)
 {
-	DictMap *tcmap = DP(ctx->sys)->GlobalConstDictMap;
-	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 	while(data->name != NULL) {
-		String *n = new_String__T(ctx, data->name);
-		knh_DictMap_append(ctx, tcmap, n, UP(new_String__T(ctx, data->value)));
+		knh_bytes_t n = B(data->name);
+		knh_index_t loc = knh_bytes_rindex(n, '.');
+		String *name = new_String__T(ctx, data->name +(loc+1));
+		Object *value = UP(new_String__T(ctx, data->value));
+		knh_class_t cid = CLASS_Any;
+		if(loc != -1) {
+			cid = knh_NameSpace_getcid(ctx, ctx->ns, knh_bytes_first(n, loc));
+			if(cid == CLASS_unknown) cid = CLASS_Any;
+		}
+		konoha_addClassConst(ctx, cid, name, value);
 		data++;
 	}
-	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
 }
-
-///* ------------------------------------------------------------------------ */
-//
-//knh_bool_t knh_tConst_addGlobalConst(Ctx *ctx, String *name, Object *value)
-//{
-//	DictMap *tcmap = DP(ctx->sys)->tConstDictMap;
-//	if(knh_DictMap_index__b(tcmap, knh_String_tobytes(name)) != -1) {
-//		return 0;
-//	}
-//	knh_DictMap_append(ctx, tcmap, name, value);
-//	return 1;
-//}
-//
 
 /* ------------------------------------------------------------------------ */
 
 void knh_Const__man(Ctx *ctx, knh_class_t cid, OutputStream *w)
 {
-	DictMap *tcmap = DP(ctx->sys)->GlobalConstDictMap;
 	KNH_ASSERT_cid(cid);
-	knh_bytes_t n = knh_String_tobytes(ctx->share->ClassTable[cid].lname);
-	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+	if(ctx->share->ClassTable[cid].constPool == NULL) return ;
+	DictMap *tcmap = ctx->share->ClassTable[cid].constPool;
 	size_t i, size = knh_DictMap_size(tcmap);
+	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 	int hasCaption = 0;
 	for(i = 0; i < size; i++) {
-		knh_bytes_t cn = knh_String_tobytes(knh_DictMap_keyAt(tcmap, i));
-		if(knh_bytes_startsWith(cn, n) && cn.buf[n.len] == '.') {
-			if(!hasCaption) {
-				knh_printf(ctx, w, "%s\n", knh_message_text(KMSG_CONST));
-				hasCaption = 1;
-			}
-			knh_printf(ctx, w, "\t%B: %O\n", knh_bytes_last(cn, knh_bytes_index(cn, '.')+1), knh_DictMap_valueAt(tcmap, i));
+		if(!hasCaption) {
+			knh_printf(ctx, w, "%s\n", knh_message_text(KMSG_CONST));
+			hasCaption = 1;
 		}
+		knh_printf(ctx, w, "\t%s.%s: %O\n", CLASSN(cid),
+				knh_String_tochar(knh_DictMap_keyAt(tcmap, i)),
+				knh_DictMap_valueAt(tcmap, i));
 	}
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
 }
@@ -614,7 +618,7 @@ NameSpace *knh_System_loadPackage(Ctx *ctx, knh_bytes_t pkgname)
 		KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
 		if(IS_NULL(ns)) {
 			String *nsname = new_String(ctx, pkgname, NULL);
-			ns = new_NameSpace(ctx, knh_rootNameSpace, nsname);
+			ns = new_NameSpace(ctx, nsname);
 			KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 			knh_DictMap_set(ctx, DP(ctx->sys)->NameSpaceTableDictMap, nsname, UP(ns));
 			KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
@@ -634,7 +638,7 @@ NameSpace *knh_System_getNameSpace(Ctx *ctx, knh_bytes_t name)
 {
 	if(knh_bytes_equals(name, STEXT("main"))) {
 		if(IS_NULL(ctx->ns)) {
-			KNH_SETv(ctx, ((Context*)ctx)->ns, new_NameSpace(ctx, knh_rootNameSpace, TS_main));
+			KNH_SETv(ctx, ((Context*)ctx)->ns, new_NameSpace(ctx, TS_main));
 		}
 		return ctx->ns;
 	}
@@ -647,7 +651,7 @@ NameSpace *knh_System_getNameSpace(Ctx *ctx, knh_bytes_t name)
 			if(ns != NULL) return ns;
 		}
 		String *nsname = new_String(ctx, name, NULL);
-		ns = new_NameSpace(ctx, knh_rootNameSpace, nsname);
+		ns = new_NameSpace(ctx, nsname);
 		KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 		knh_DictMap_set(ctx, DP(ctx->sys)->NameSpaceTableDictMap, nsname, UP(ns));
 		KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);

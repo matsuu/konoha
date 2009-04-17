@@ -78,7 +78,7 @@ KNH_XCLASS(Ctx *ctx, knh_class_t cid, knh_class_t bcid, ClassSpec *cs)
 
 	char bufcn[CLASSNAME_BUFSIZ];
 	knh_snprintf(bufcn, sizeof(bufcn), KNH_CLASSSPEC_FMT, CLASSN(bcid), knh_String_tochar(DP(cs)->urn));
-	konoha_seClassTableName(ctx, cid, new_String(ctx, B(bufcn), NULL));
+	konoha_setClassName(ctx, cid, new_String(ctx, B(bufcn), NULL));
 	DP(cs)->cid = cid;
 
 	ctx->share->ClassTable[cid].bcid   = bcid;
@@ -112,56 +112,6 @@ KNH_XCLASS(Ctx *ctx, knh_class_t cid, knh_class_t bcid, ClassSpec *cs)
 	return cid;
 }
 
-/* ------------------------------------------------------------------------ */
-
-knh_class_t konoha_getcid(Ctx *ctx, char *lname)
-{
-	DBG2_P("lname='%s'", lname);
-	return knh_NameSpace_getClass(ctx, knh_rootNameSpace, B(lname));
-}
-
-/* ------------------------------------------------------------------------ */
-
-knh_class_t konoha_findcid(Ctx *ctx, knh_bytes_t lname)
-{
-	DBG2_P("lname='%s'", lname.buf);
-	knh_class_t cid = knh_NameSpace_getClass(ctx, knh_rootNameSpace, lname);
-	if(cid != CLASS_unknown) {
-		return cid;
-	}
-	if(knh_bytes_endsWith(lname, STEXT("[]"))) {
-		lname.len -= 2;
-		cid = knh_NameSpace_getClass(ctx, knh_rootNameSpace, lname);
-		if(cid == CLASS_unknown || knh_class_isPrivate(cid)) {
-			return CLASS_Array;
-		}
-		return knh_class_Array(ctx, cid);
-	}
-	if(knh_bytes_endsWith(lname, STEXT(".."))) {
-		lname.len -= 2;
-		cid = knh_NameSpace_getClass(ctx, knh_rootNameSpace, lname);
-		if(cid == CLASS_unknown || knh_class_isPrivate(cid)) {
-			return CLASS_Iterator;
-		}
-		return knh_class_Iterator(ctx, cid);
-	}
-	if(lname.buf[lname.len-1] == '}') {
-		knh_index_t loc = knh_bytes_index(lname, '{');
-		if(loc != -1) {
-			knh_bytes_t urn = knh_bytes_last(lname, loc+1); urn.len -= 1;
-			urn = knh_Runtime_aliasURN(ctx, urn);
-			knh_class_t bcid = knh_NameSpace_getClass(ctx, knh_rootNameSpace, knh_bytes_first(lname, loc));
-			DBG2_P("cid=%d,%s", bcid, CLASSN(bcid));
-			ClassSpec *cs = (ClassSpec*)konoha_getClassSpec(ctx, bcid, urn);
-			if(IS_NOTNULL(cs)) {
-				KNH_SETv(ctx, DP(cs)->urn, new_String(ctx, urn, NULL));
-				return KNH_XCLASS(ctx, DP(cs)->cid, bcid, cs);
-			}
-			return bcid;
-		}
-	}
-	return cid;
-}
 
 /* ------------------------------------------------------------------------ */
 

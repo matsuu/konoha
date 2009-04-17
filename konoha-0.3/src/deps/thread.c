@@ -30,6 +30,11 @@
 
 #include"commons.h"
 
+#ifdef KNH_USING_PTHREAD
+#include<pthread.h>
+#endif
+
+
 /* ************************************************************************ */
 
 //機能 	pthread関数名 	win32 スレッドapi名
@@ -73,7 +78,7 @@ int thread_create(knh_thread_t *thread, void *attr, void *(*frun)(void *), void 
 {
 #ifdef KNH_USING_PTHREAD
 #undef KNH_USING_NOTHREAD
-	return pthread_create(thread, attr, frun, arg);
+	return pthread_create((pthread_t*)thread, attr, frun, arg);
 #endif
 #ifdef KNH_USING_NOTHREAD
 	return -1;
@@ -82,7 +87,6 @@ int thread_create(knh_thread_t *thread, void *attr, void *(*frun)(void *), void 
 
 /* ======================================================================== */
 /* [TLS] */
-
 
 #ifdef KNH_USING_PTHREAD
 static void destr(void *data)
@@ -96,7 +100,7 @@ static void destr(void *data)
 int knh_thread_key_create(knh_thread_key_t *key)
 {
 #ifdef KNH_USING_PTHREAD
-	return pthread_key_create(key, destr);
+	return pthread_key_create((pthread_key_t*)key, destr);
 #endif
 #ifdef KNH_USING_NOTHREAD
 	return -1;

@@ -83,7 +83,7 @@ AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
-CFLAGS = -g -O3 -pipe
+CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
@@ -190,7 +190,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-EXTRA_SUBDIRS = src .pygen sample include tbmx1 mingw windows
+EXTRA_SUBDIRS = src .pygen include windows
 EXTRA_FILES = bootstrap
 # dirs which include Makefile.in
 SUBDIRS = build 

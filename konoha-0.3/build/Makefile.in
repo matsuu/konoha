@@ -135,7 +135,9 @@ AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
-CFLAGS = @CFLAGS@
+
+# make target for libtool.
+CFLAGS = -g3 -O3 -pipe
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
@@ -242,8 +244,6 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-
-# make target for libtool.
 lib_LTLIBRARIES = libkonoha.la
 libkonoha_la_LDFLAGS = -no-undefined -release 1 -version-info 0:0:0
 #if LDL

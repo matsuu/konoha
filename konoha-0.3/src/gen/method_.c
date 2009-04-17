@@ -405,6 +405,30 @@ METHOD knh__Array_clear(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 static
+METHOD knh__InputStream_setEncoding(Ctx *ctx, knh_sfp_t *sfp)
+{
+	/* method void InputStream.setEncoding(String enc)  */
+	knh_InputStream_setEncoding(
+		ctx,
+		(knh_InputStream_t*)sfp[0].o,
+		(String*)sfp[1].o /* String sfp[1].o => String* enc */
+	);
+	KNH_RETURN(ctx, sfp, KNH_VOID);
+}
+
+static
+METHOD knh__OutputStream_setEncoding(Ctx *ctx, knh_sfp_t *sfp)
+{
+	/* method void OutputStream.setEncoding(String enc)  */
+	knh_OutputStream_setEncoding(
+		ctx,
+		(knh_OutputStream_t*)sfp[0].o,
+		(String*)sfp[1].o /* String sfp[1].o => String* enc */
+	);
+	KNH_RETURN(ctx, sfp, KNH_VOID);
+}
+
+static
 METHOD knh__Context_getProperty(Ctx *ctx, knh_sfp_t *sfp)
 {
 	/* method Any Context.getProperty(String! key)  */
@@ -442,163 +466,12 @@ METHOD knh__Context_setEncoding(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 static
-METHOD knh__InputStream_setEncoding(Ctx *ctx, knh_sfp_t *sfp)
-{
-	/* method void InputStream.setEncoding(String enc)  */
-	knh_InputStream_setEncoding(
-		ctx,
-		(knh_InputStream_t*)sfp[0].o,
-		(String*)sfp[1].o /* String sfp[1].o => String* enc */
-	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
-}
-
-static
-METHOD knh__OutputStream_setEncoding(Ctx *ctx, knh_sfp_t *sfp)
-{
-	/* method void OutputStream.setEncoding(String enc)  */
-	knh_OutputStream_setEncoding(
-		ctx,
-		(knh_OutputStream_t*)sfp[0].o,
-		(String*)sfp[1].o /* String sfp[1].o => String* enc */
-	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
-}
-
-static
-METHOD knh__Exception_new__init(Ctx *ctx, knh_sfp_t *sfp)
-{
-	/* method Exception! Exception.new:init(String e, String msg, Object bag)  */
-	Object *rv = (Object*)knh_Exception_new__init(
-		ctx,
-		(knh_Exception_t*)sfp[0].o,
-		(String*)sfp[1].o /* String sfp[1].o => String* e */,
-		(String*)sfp[2].o /* String sfp[2].o => String* msg */,
-		(Object*)sfp[3].o /* Object sfp[3].o => Object* bag */
-	);
-	KNH_RETURN(ctx, sfp, rv);
-}
-
-static
-METHOD knh__Method_isAbstract(Ctx *ctx, knh_sfp_t *sfp)
-{
-	/* method Boolean! Method.isAbstract()  */
-	knh_bool_t v = knh_Method_isAbstract(
-		(knh_Method_t*)sfp[0].o
-	);
-	Object* rv = (Object*)new_Boolean(ctx, v) /* knh_bool_t v => Boolean rv */;
-	KNH_RETURN(ctx, sfp, rv);
-}
-
-static
-METHOD knh__Method_getName(Ctx *ctx, knh_sfp_t *sfp)
-{
-	/* method String! Method.getName()  */
-	Object *rv = (Object*)knh_Method_getName(
-		ctx,
-		(knh_Method_t*)sfp[0].o
-	);
-	KNH_RETURN(ctx, sfp, rv);
-}
-
-static
-METHOD knh__System_getProperty(Ctx *ctx, knh_sfp_t *sfp)
-{
-	/* method Any System.getProperty(String! key)  */
-	Object *rv = (Object*)knh_System_getProperty(
-		ctx,
-		(knh_System_t*)sfp[0].o,
-		knh_String_tobytes((String*)sfp[1].o) /* String! sfp[1].o => knh_bytes_t key */
-	);
-	KNH_RETURN(ctx, sfp, rv);
-}
-
-static
-METHOD knh__System_setProperty(Ctx *ctx, knh_sfp_t *sfp)
-{
-	/* method void System.setProperty(String! key, Any value)  */
-	knh_System_setProperty(
-		ctx,
-		(knh_System_t*)sfp[0].o,
-		(String*)sfp[1].o /* String! sfp[1].o => String* key */,
-		(Any*)sfp[2].o /* Any sfp[2].o => Any* value */
-	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
-}
-
-static
-METHOD knh__InputStream_readLine(Ctx *ctx, knh_sfp_t *sfp)
-{
-	/* method String InputStream.readLine()  */
-	Object *rv = (Object*)knh_InputStream_readLine(
-		ctx,
-		(knh_InputStream_t*)sfp[0].o
-	);
-	KNH_RETURN(ctx, sfp, rv);
-}
-
-static
-METHOD knh__InputStream_close(Ctx *ctx, knh_sfp_t *sfp)
-{
-	/* method void InputStream.close()  */
-	knh_InputStream_close(
-		ctx,
-		(knh_InputStream_t*)sfp[0].o
-	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
-}
-
-static
 METHOD knh__Connection_close(Ctx *ctx, knh_sfp_t *sfp)
 {
 	/* method void Connection.close()  */
 	knh_Connection_close(
 		ctx,
 		(knh_Connection_t*)sfp[0].o
-	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
-}
-
-static
-METHOD knh__OutputStream_flush(Ctx *ctx, knh_sfp_t *sfp)
-{
-	/* method void OutputStream.flush()  */
-	knh_OutputStream_flush(
-		ctx,
-		(knh_OutputStream_t*)sfp[0].o
-	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
-}
-
-static
-METHOD knh__OutputStream_clear(Ctx *ctx, knh_sfp_t *sfp)
-{
-	/* method void OutputStream.clear()  */
-	knh_OutputStream_clear(
-		ctx,
-		(knh_OutputStream_t*)sfp[0].o
-	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
-}
-
-static
-METHOD knh__OutputStream_close(Ctx *ctx, knh_sfp_t *sfp)
-{
-	/* method void OutputStream.close()  */
-	knh_OutputStream_close(
-		ctx,
-		(knh_OutputStream_t*)sfp[0].o
-	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
-}
-
-static
-METHOD knh__ResultSet_close(Ctx *ctx, knh_sfp_t *sfp)
-{
-	/* method void ResultSet.close()  */
-	knh_ResultSet_close(
-		ctx,
-		(knh_ResultSet_t*)sfp[0].o
 	);
 	KNH_RETURN(ctx, sfp, KNH_VOID);
 }
@@ -660,6 +533,133 @@ METHOD knh__DictIdx_clear(Ctx *ctx, knh_sfp_t *sfp)
 	knh_DictIdx_clear(
 		ctx,
 		(knh_DictIdx_t*)sfp[0].o
+	);
+	KNH_RETURN(ctx, sfp, KNH_VOID);
+}
+
+static
+METHOD knh__Exception_new__init(Ctx *ctx, knh_sfp_t *sfp)
+{
+	/* method Exception! Exception.new:init(String e, String msg, Object bag)  */
+	Object *rv = (Object*)knh_Exception_new__init(
+		ctx,
+		(knh_Exception_t*)sfp[0].o,
+		(String*)sfp[1].o /* String sfp[1].o => String* e */,
+		(String*)sfp[2].o /* String sfp[2].o => String* msg */,
+		(Object*)sfp[3].o /* Object sfp[3].o => Object* bag */
+	);
+	KNH_RETURN(ctx, sfp, rv);
+}
+
+static
+METHOD knh__InputStream_readLine(Ctx *ctx, knh_sfp_t *sfp)
+{
+	/* method String InputStream.readLine()  */
+	Object *rv = (Object*)knh_InputStream_readLine(
+		ctx,
+		(knh_InputStream_t*)sfp[0].o
+	);
+	KNH_RETURN(ctx, sfp, rv);
+}
+
+static
+METHOD knh__InputStream_close(Ctx *ctx, knh_sfp_t *sfp)
+{
+	/* method void InputStream.close()  */
+	knh_InputStream_close(
+		ctx,
+		(knh_InputStream_t*)sfp[0].o
+	);
+	KNH_RETURN(ctx, sfp, KNH_VOID);
+}
+
+static
+METHOD knh__Method_isAbstract(Ctx *ctx, knh_sfp_t *sfp)
+{
+	/* method Boolean! Method.isAbstract()  */
+	knh_bool_t v = knh_Method_isAbstract(
+		(knh_Method_t*)sfp[0].o
+	);
+	Object* rv = (Object*)new_Boolean(ctx, v) /* knh_bool_t v => Boolean rv */;
+	KNH_RETURN(ctx, sfp, rv);
+}
+
+static
+METHOD knh__Method_getName(Ctx *ctx, knh_sfp_t *sfp)
+{
+	/* method String! Method.getName()  */
+	Object *rv = (Object*)knh_Method_getName(
+		ctx,
+		(knh_Method_t*)sfp[0].o
+	);
+	KNH_RETURN(ctx, sfp, rv);
+}
+
+static
+METHOD knh__OutputStream_flush(Ctx *ctx, knh_sfp_t *sfp)
+{
+	/* method void OutputStream.flush()  */
+	knh_OutputStream_flush(
+		ctx,
+		(knh_OutputStream_t*)sfp[0].o
+	);
+	KNH_RETURN(ctx, sfp, KNH_VOID);
+}
+
+static
+METHOD knh__OutputStream_clear(Ctx *ctx, knh_sfp_t *sfp)
+{
+	/* method void OutputStream.clear()  */
+	knh_OutputStream_clear(
+		ctx,
+		(knh_OutputStream_t*)sfp[0].o
+	);
+	KNH_RETURN(ctx, sfp, KNH_VOID);
+}
+
+static
+METHOD knh__OutputStream_close(Ctx *ctx, knh_sfp_t *sfp)
+{
+	/* method void OutputStream.close()  */
+	knh_OutputStream_close(
+		ctx,
+		(knh_OutputStream_t*)sfp[0].o
+	);
+	KNH_RETURN(ctx, sfp, KNH_VOID);
+}
+
+static
+METHOD knh__ResultSet_close(Ctx *ctx, knh_sfp_t *sfp)
+{
+	/* method void ResultSet.close()  */
+	knh_ResultSet_close(
+		ctx,
+		(knh_ResultSet_t*)sfp[0].o
+	);
+	KNH_RETURN(ctx, sfp, KNH_VOID);
+}
+
+static
+METHOD knh__System_getProperty(Ctx *ctx, knh_sfp_t *sfp)
+{
+	/* method Any System.getProperty(String! key)  */
+	Object *rv = (Object*)knh_System_getProperty(
+		ctx,
+		(knh_System_t*)sfp[0].o,
+		knh_String_tobytes((String*)sfp[1].o) /* String! sfp[1].o => knh_bytes_t key */
+	);
+	KNH_RETURN(ctx, sfp, rv);
+}
+
+static
+METHOD knh__System_setProperty(Ctx *ctx, knh_sfp_t *sfp)
+{
+	/* method void System.setProperty(String! key, Any value)  */
+	knh_System_setProperty(
+		ctx,
+		(knh_System_t*)sfp[0].o,
+		(String*)sfp[1].o /* String! sfp[1].o => String* key */,
+		(Any*)sfp[2].o /* Any sfp[2].o => Any* value */
 	);
 	KNH_RETURN(ctx, sfp, KNH_VOID);
 }

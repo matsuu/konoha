@@ -25,7 +25,7 @@
  *
  ****************************************************************************/
 
-#include "konoha_gc.h"
+#include "konoha_t.h"
 
 #ifndef KONOHA_VM_H_
 #define KONOHA_VM_H_
@@ -34,593 +34,977 @@
 extern "C" {
 #endif
 
-#ifdef OLDVM
 /* ======================================================================== */
-
-#define VM_DEBUG_ASSERT(c)        KNH_ASSERT(c)
+/* KCODE */
+/* ======================================================================== */
 
 int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
-#define _HERE_    knh_Method_file(sfp[-1].mtd), knh_Method_pctoline(sfp[-1].mtd, pc)
-
-/* ======================================================================== */
-
-//#define esp_(n)                   ((Context*)ctx)->esp[n]
-#define esp_(n)                   ((Context*)ctx)->esp[(n)].o
-#define sfp_(n)                   sfp[(n)].o
-#define ofp_(n)                   KNH_FIELDn(sfp[0].o, (n))
-#define oidx_(o,idx)              KNH_FIELDn((o), (idx))
-#define i1_(n)                    (n)
-#define u1_(n)                    (n)
-#define u2_(n)                    (n)
-#define mn_(n)                    (knh_methodn_t)(n)
-#define c2_(n)                    (knh_class_t)(n)
-#define e2_(n)                    (knh_expt_t)(n)
-#define OBJ_(o)                   (o)
+#define _HERE_    knh_Method_file(ctx, sfp[-1].mtd), knh_Method_pctoline(sfp[-1].mtd, pc)
 
 /* ------------------------------------------------------------------------ */
 
-/* ======================================================================== */
-
-#define NPC
-#define VM_ESP(ctx,n)             ((Context*)ctx)->esp[n].o
-//#define VM_FILE                   ""
-//#define VM_LINE                   0
-
-/* ======================================================================== */
-/* [BOXING/UNBOXING] */
-
-
-/* ======================================================================== */
-
-
-/* ======================================================================== */
-
-#define VM_MOV__ngc(ctx, v1, v2)   \
-	knh_Object_RCinc(v2); \
-	knh_Object_RCdec((Object*)v1); \
-	v1 = v2; \
+#define KLR_MOV__wogc(ctx, v1, v2) {\
+		Object *v2_ = (Object*)v2;\
+		knh_Object_RCinc(v2_); \
+		knh_Object_RCdec(v1); \
+		v1 = v2_; \
+	}\
 
 #ifdef KNH_USING_DRCGC
-#define VM_MOV(ctx, v1, v2)  VM_MOV__ngc(ctx, v1, v2)
+#define KLR_MOV(ctx, v1, v2)  KLR_MOV__wogc(ctx, v1, v2)
 
 #else/*KNH_USING_DRCGC*/
-#define VM_MOV(ctx, v1, v2)   \
-	knh_Object_RCinc(v2); \
-	knh_Object_RCdec(v1); \
-	if(knh_Object_isRC0(v1)) { \
-		knh_Object_free(ctx, v1); \
-	} \
-	v1 = v2; \
+
+#define KLR_MOV(ctx, v1, v2) {\
+		Object *v2_ = (Object*)v2;\
+		knh_Object_RCinc(v2_); \
+		knh_Object_RCdec(v1); \
+		if(knh_Object_isRC0(v1)) { \
+			knh_Object_free(ctx, v1); \
+		} \
+		v1 = v2_; \
+	}\
 
 #endif/*KNH_USING_DRCGC*/
 
+#define KNH_MOV(ctx, v1, v2) KLR_MOV(ctx, v1, v2)
 
-/* ======================================================================== */
+#define KNH_NGCMOV(ctx, v1, v2)  KLR_MOV__wogc(ctx, v1, v2)
 
-#define VM_HALT(ctx)  \
-	KNH_THROWs(ctx, "Halt!!");     \
-
-#define VM_RET(ctx, v)      \
-	VM_MOV__ngc(ctx, sfp[-1].o, v); \
-	return ; \
-
-#define VM_RET__OIDX(ctx, v, idx)      \
-	VM_MOV__ngc(ctx, sfp[-1].o, oidx_(v, idx)); \
-	return ; \
-
-//#define VM_MOV_(ctx,v,v2)            KNH_SETv(ctx,v,v2)
-
-#define VM_MOVE(ctx,v,v2)            VM_MOV(ctx,v,v2)
-#define VM_MOVS(ctx,v,v2)            VM_MOV(ctx,v,v2)
-#define VM_MOVO(ctx,v,v2)            VM_MOV(ctx,v,v2)
-#define VM_MOVI(ctx,o,idx,v2)        VM_MOV(ctx,oidx_(o,idx),v2)
-
-#define VM_MOVE__OIDX(ctx,v,o,idx)          VM_MOV(ctx,v,oidx_(o,idx))
-#define VM_MOVS__OIDX(ctx,v,o,idx)          VM_MOV(ctx,v,oidx_(o,idx))
-#define VM_MOVO__OIDX(ctx,v,o,idx)          VM_MOV(ctx,v,oidx_(o,idx))
-#define VM_MOVI__OIDX(ctx,o,idx,o2,idx2)    VM_MOV(ctx,oidx_(o,idx),oidx_(o2,idx2))
-
-#define VM_MOVSFP_IFNUL(ctx, n, v2) \
-	if(IS_NULL(sfp[n].o)) {\
-		KNH_SETv(ctx, sfp[n].o, v2);\
+#define KLR_SWAP(ctx, a, b) {\
+		knh_sfp_t temp = sfp[(a)];\
+		sfp[(a)] = sfp[(b)];\
+		sfp[(b)] = temp;\
 	}\
 
+#define JIT_SWAP(ctx, a, b)  KLR_SWAP(ctx, a, b)
 
-/* ======================================================================== */
-
-#define VM_BBOXS(ctx, n) { \
-		KNH_SETv(ctx, sfp[n].o, sfp[n].bvalue == 0 ? KNH_FALSE : KNH_TRUE);\
+#define KNH_SWAP(ctx, sfp, n, n2) {\
+		knh_sfp_t temp = sfp[(n)];\
+		sfp[(n)] = sfp[(n2)];\
+		sfp[(n2)] = temp;\
 	}\
 
-#define VM_BUNBOXS(ctx, n) { \
-		sfp[n].bvalue = IS_TRUE(sfp[n].o);\
-	}\
-
-#define VM_BBOXE(ctx, n) { \
-		KNH_SETv(ctx, esp[n].o, esp[n].bvalue == 0 ? KNH_FALSE : KNH_TRUE);\
-	}\
-
-#define VM_BUNBOXE(ctx, n) { \
-		esp[n].bvalue = IS_TRUE(esp[n].o);\
-	}\
-
-#define VM_IBOXS(ctx, n) { \
-		KNH_SETv(ctx, sfp[n].o, new_Int(ctx, sfp[n].ivalue));\
-	}\
-
-#define VM_IUNBOXS(ctx, n) { \
-		sfp[n].ivalue = (sfp[n].i)->value;\
-	}\
-
-#define VM_IBOXE(ctx, n) { \
-		KNH_SETv(ctx, esp[n].o, new_Int(ctx, esp[n].ivalue));\
-	}\
-
-#define VM_IUNBOXE(ctx, n) { \
-		esp[n].ivalue = (esp[n].i)->value;\
-	}\
-
-#define VM_FBOXS(ctx, n) { \
-		KNH_SETv(ctx, sfp[n].o, new_Int(ctx, sfp[n].fvalue));\
-	}\
-
-#define VM_FUNBOXS(ctx, n) { \
-		sfp[n].fvalue = (sfp[n].f)->value;\
-	}\
-
-#define VM_FBOXE(ctx, n) { \
-		KNH_SETv(ctx, esp[n].o, new_Int(ctx, esp[n].fvalue));\
-	}\
-
-#define VM_FUNBOXE(ctx, n) { \
-		esp[n].fvalue = (esp[n].f)->value;\
-	}\
-
-/* ======================================================================== */
-
-#define _VM_PUT_(ctx,v) \
-	VM_MOV(ctx, ((Context*)ctx)->esp[0].o, v); \
-
-#define _VM_PUTI_(ctx,i) \
-	((Context*)ctx)->esp[0].op = (knh_stackop_t)i; \
-
-#define _VM_PUSHI_(ctx,v) \
-	((Context*)ctx)->esp++; \
-	((Context*)ctx)->esp[0].op = (knh_stackop_t)v; \
-
-#define _VM_PUSH__MN_(ctx,mn) \
-	((Context*)ctx)->esp++; \
-	((Context*)ctx)->esp[0].op = (knh_uint_t)mn; \
-
-#define VM_PUSH(ctx,v) \
-	((Context*)ctx)->esp++; \
-	VM_MOV(ctx, ((Context*)ctx)->esp[0].o, v); \
-
-#define VM_PUSH__OIDX(ctx, v, idx) \
-	((Context*)ctx)->esp++; \
-	VM_MOV(ctx, ((Context*)ctx)->esp[0].o, oidx_(v,idx)); \
-
-#define VM_SHIFT(ctx,n) \
-	((Context*)ctx)->esp += (n); \
-
-#define VM_PUSH__DEF(ctx, cid) \
-	((Context*)ctx)->esp++; \
-	KNH_SETv(ctx, ((Context*)ctx)->esp[0].o, knh_ClassTable_defaultValue(ctx, CLASS_type(cid))); \
-
-#define KNH_SYS_CTX    0
-#define KNH_SYS_STDIN  1
-#define KNH_SYS_STDOUT 2
-#define KNH_SYS_STDERR 3
-
-#define VM_PUT_SYSCONST(ctx, n) { \
-		VM_MOV(ctx, ((Context*)ctx)->esp[0].o, knh_tConst_systemValue(ctx, n)); \
-	}\
-
-#define VM_PUSH_SYSCONST(ctx, n) { \
-		((Context*)ctx)->esp++; \
-		VM_MOV(ctx, ((Context*)ctx)->esp[0].o, knh_tConst_systemValue(ctx, n)); \
-	}\
-
-#define VM_VARGV(ctx, n) { \
-		KNH_SETv(ctx, sfp[n].o, knh_sfp_toArray(ctx, &sfp[n-1])); \
-		((Context*)ctx)->esp = &sfp[n]; \
-	} \
-
-/* ------------------------------------------------------------------------ */
-
-#define KNH_CHECKSTACK(ctx) \
-	if(unlikely((ctx)->stacksize - ((ctx)->esp - (ctx)->stack) < 256)) {\
+#define KNH_SETESP(ctx, sfp, n) \
+	((Context*)ctx)->esp = &(sfp[n]);\
+	if(unlikely((ctx)->stacksize - ((ctx)->esp - (ctx)->stack) < KNH_LOCALSIZE)) {\
 		KNH_THROWs(ctx, "StackOverflow!!"); \
 	}\
 
-#define KNH_SCALL(ctx, n) { \
-		KNH_CHECKSTACK(ctx); \
-		knh_sfp_t *mbp_ = ctx->esp - (n) ; \
-		KNH_CHECKSTACK(ctx); \
-		KNH_ASSERT(IS_Method(mbp_[0].mtd)); \
-		mbp_[0].op = 0; \
-		(mbp_[0].mtd)->fcall_1(ctx, mbp_ + 1); \
-		mbp_[0].op = 0; \
-		((Context*)ctx)->esp = mbp_; \
-	} \
+/* ======================================================================== */
 
-#define VM_SCALL(ctx, n) { \
-		KNH_CHECKSTACK(ctx); \
-		knh_sfp_t *mbp_ = ((Context*)ctx)->esp - (n) ; \
-		KNH_ASSERT(IS_Method(mbp_[0].mtd)); \
-		KNH_ASSERT(IS_NOTNULL(mbp_[1].o) || knh_Method_isNullBase(mbp_[0].mtd)); \
-		mbp_[0].op = (knh_stackop_t)pc; \
-		(mbp_[0].mtd)->fcall_1(ctx, mbp_ + 1); \
-		mbp_[0].op = 0; \
-		((Context*)ctx)->esp = mbp_; \
-	} \
+#define KLR_HALT(ctx) KNH_THROWs(ctx, "Halt!!")
+#define KLR_RET(ctx)  return
 
-#define VM_NSCALL(ctx, n) { \
-		KNH_CHECKSTACK(ctx); \
-		knh_sfp_t *mbp_ = ((Context*)ctx)->esp - (n) ; \
-		if(unlikely(IS_NULL(mbp_[1].o))) { \
-			knh_throwException(ctx, new_Exception__Nue(ctx, (Nue*)(mbp_[1].o)), _HERE_); \
-		} \
-		else { \
-			KNH_ASSERT(IS_Method(mbp_[0].mtd)); \
-			mbp_[0].op = (knh_stackop_t)pc; \
-			(mbp_[0].mtd)->fcall_1(ctx, mbp_ + 1); \
-			mbp_[0].op = 0; \
-		} \
-		((Context*)ctx)->esp = mbp_; \
-	} \
-
-#define VM_CALL(ctx, n, mn) { \
-		KNH_CHECKSTACK(ctx); \
-		knh_sfp_t *mbp_ = ctx->esp - (n) ; \
-		KNH_SETv(ctx, mbp_[0].o, konoha_lookupMethod(ctx, knh_Object_cid(mbp_[1].o), mn)); \
-		KNH_ASSERT(IS_Method(mbp_[0].mtd)); \
-		mbp_[0].op = (knh_stackop_t)pc; \
-		(mbp_[0].mtd)->fcall_1(ctx, mbp_ + 1); \
-		mbp_[0].op = 0; \
-		((Context*)ctx)->esp = mbp_; \
-	} \
-
-#define VM_DCALL(ctx, n, mn) { \
-		KNH_CHECKSTACK(ctx); \
-		knh_sfp_t *mbp_ = ((Context*)ctx)->esp - (n) ; \
-		KNH_SETv(ctx, mbp_[0].o, konoha_lookupMethod(ctx, knh_Object_cid(mbp_[1].o), mn)); \
-		KNH_ASSERT(IS_Method(mbp_[0].mtd)); \
-		mbp_[0].op = (knh_stackop_t)pc; \
-		knh_dynamiccall(ctx, mbp_); \
-		(mbp_[0].mtd)->fcall_1(ctx, mbp_ + 1); \
-		mbp_[0].op = 0; \
-		((Context*)ctx)->esp = mbp_; \
-	} \
-
-
-#define VM_SMAP(ctx, mpr)  { \
-		knh_Mapper_t *mpr_ = (knh_Mapper_t*)mpr; \
-		VM_DEBUG_ASSERT(IS_Mapper(mpr)); \
-		KNH_SETv(ctx, esp_(0), (mpr_)->fmap_1(ctx, esp_(0), mpr_)); \
-	} \
-
-#define KNH_SMAP(ctx, mpr)  { \
-		knh_Mapper_t *mpr_ = (knh_Mapper_t*)mpr; \
-		KNH_SETv(ctx, esp_(0), (mpr_)->fmap_1(ctx, esp_(0), mpr_)); \
-	} \
-
-#define VM_SMAPE(ctx, mpr)  { \
-		knh_Mapper_t *mpr_ = (knh_Mapper_t*)mpr; \
-		VM_DEBUG_ASSERT(IS_Mapper(mpr)); \
-		KNH_SETv(ctx, esp_(0), (mpr_)->fmap_1(ctx, esp_(0), mpr_)); \
-		if(unlikely(IS_NULL(esp_(0)))) { \
-			knh_throwException(ctx, new_Exception__Nue(ctx, (Nue*)esp_(0)), _HERE_); \
-		} \
-	} \
-
-#define VM_MAP(ctx, tcid)  { \
-		knh_Mapper_t *mpr_ = knh_tMapper_find(ctx, knh_Object_cid(esp_(0)), tcid); \
-		KNH_SETv(ctx, esp_(0), (mpr_)->fmap_1(ctx, esp_(0), mpr_)); \
-	} \
-
-#define VM_MAPE(ctx, tcid)  { \
-		knh_Mapper_t *mpr_ = knh_tMapper_find(ctx, knh_Object_cid(esp_(0)), tcid); \
-		KNH_SETv(ctx, esp_(0), (mpr_)->fmap_1(ctx, esp_(0), mpr_)); \
-		if(IS_NULL(esp_(0))) { \
-			knh_throwException(ctx, new_Exception__Nue(ctx, (Nue*)esp_(0)), _HERE_); \
-		} \
-	} \
-
-#define VM_ANYMAP(ctx, tcid)  { \
-		if(knh_Object_cid(esp_(0)) != tcid && !knh_class_instanceof(ctx, knh_Object_cid(esp_(0)), tcid)) { \
-			knh_Mapper_t *mpr_ = knh_tMapper_find(ctx, knh_Object_cid(esp_(0)), tcid); \
-			KNH_SETv(ctx, esp_(0), (mpr_)->fmap_1(ctx, esp_(0), mpr_)); \
-		} \
-	} \
-
-#define VM_ANYMAPE(ctx, tcid)  { \
-		if(knh_Object_cid(esp_(0)) != tcid && !knh_class_instanceof(ctx, knh_Object_cid(esp_(0)), tcid)) { \
-			knh_Mapper_t *mpr_ = knh_tMapper_find(ctx, knh_Object_cid(esp_(0)), tcid); \
-			KNH_SETv(ctx, esp_(0), (mpr_)->fmap_1(ctx, esp_(0), mpr_)); \
-		} \
-		if(unlikely(IS_NULL(esp_(0)))) { \
-			knh_throwException(ctx, new_Exception__Nue(ctx, (Nue*)esp_(0)), _HERE_); \
-		} \
-	} \
-
-#define VM_NULLCHK(ctx, v) \
-	if(unlikely(IS_NULL(v))) { \
-		knh_throwException(ctx, new_Exception__Nue(ctx, (Nue*)v), _HERE_); \
-	} \
-
-#define VM_NULLCHK__OIDX(ctx, v, idx) \
-	if(unlikely(IS_NULL(oidx_(v,idx)))) { \
-		knh_throwException(ctx, new_Exception__Nue(ctx, (Nue*)(oidx_(v,idx))), _HERE_); \
-	} \
-
-#define VM_TYPECHK(ctx, type, v) \
-	if(unlikely(!knh_Object_opTypeOf(ctx, v, type))) { \
-		knh_throwException(ctx, new_Exception__type(ctx, v, type), _HERE_); \
-	} \
-
-#define VM_TYPECHK__OIDX(ctx, type, v, idx) \
-	if(unlikely(!knh_Object_opTypeOf(ctx, oidx_(v, idx), type))) { \
-		knh_throwException(ctx, new_Exception__type(ctx, oidx_(v, idx), type), _HERE_); \
-	} \
-
-#define VM_NEW(ctx, n, flag, cid) { \
-		knh_sfp_t *mbp_ = ((Context*)ctx)->esp - (n) ; \
-		KNH_ASSERT(IS_Method(mbp_[0].mtd)); \
-		KNH_SETv(ctx, mbp_[1].o, new_Object__init(ctx, flag, cid)); \
-		mbp_[0].op = (knh_stackop_t)pc; \
-		(mbp_[0].mtd)->fcall_1(ctx, mbp_ + 1); \
-		mbp_[0].op = 0; \
-		((Context*)ctx)->esp = mbp_; \
-	} \
-
-#define VM_MT(ctx, mn) { \
-		knh_sfp_t *mbp_ = ((Context*)ctx)->esp; \
-		KNH_SETv(ctx, esp_(0), knh_Object_movableText(ctx, esp_(0), mn, KNH_NULL)); \
-		((Context*)ctx)->esp = mbp_; \
-	} \
-
-#define VM_MT__FMT(ctx, mn, opt) { \
-		knh_sfp_t *mbp_ = ((Context*)ctx)->esp; \
-		KNH_SETv(ctx, esp_(0), knh_Object_movableText(ctx, esp_(0), mn, opt)); \
-		((Context*)ctx)->esp = mbp_; \
-	} \
-
-/* ------------------------------------------------------------------------- */
-
-#define VM_JMP(ctx, PC, JUMP) \
-	PC; \
-	goto JUMP; \
-
-#define VM_SKIP(ctx, PC, JUMP) \
-	if(!knh_Object_isDebug(sfp[0].o)) { \
-		VM_JMP(ctx, PC, JUMP); \
-	} \
-
-#define VM_JMP_IFT(ctx, PC, JUMP, v) \
-	if(IS_TRUE(v)) { \
-		VM_JMP(ctx, PC, JUMP); \
-	} \
-
-#define VM_JMP_IFT__OIDX(ctx, PC, JUMP, v, idx) \
-	if(IS_TRUE(oidx_(v, idx))) { \
-		VM_JMP(ctx, PC, JUMP); \
-	} \
-
-#define VM_JMP_IFF(ctx, PC, JUMP, v) \
-	if(IS_FALSE(v)) { \
-		VM_JMP(ctx, PC, JUMP); \
-	} \
-
-#define VM_JMP_IFF_oidx_(ctx, PC, JUMP, v, idx) \
-	if(IS_FALSE(oidx_(v, idx))) { \
-		VM_JMP(ctx, PC, JUMP); \
-	} \
-
-#define VM_JMP_IFN(ctx, PC, JUMP, v) \
-	if(IS_NULL(v)) { \
-		VM_JMP(ctx, PC, JUMP); \
-	} \
-
-#define VM_JMP_IFN_oidx_(ctx, PC, JUMP, v, idx) \
-	if(IS_NULL(oidx_(v, idx))) { \
-		VM_JMP(ctx, PC, JUMP); \
-	} \
-
-#define VM_JMP_IFNN(ctx, PC, JUMP, v) \
-	if(IS_NOTNULL(v)) { \
-		VM_JMP(ctx, PC, JUMP); \
-	} \
-
-#define VM_JMP_IFNN_oidx_(ctx, PC, JUMP, v, idx) \
-	if(IS_NOTNULL(oidx_(v,idx))) { \
-		VM_JMP(ctx, PC, JUMP); \
-	} \
-
-/* ------------------------------------------------------------------------- */
-
-#define VM_NEXT(ctx, PC, JUMP, v, it) { \
-		knh_Iterator_t *it_ = (knh_Iterator_t*)it; \
-		KNH_ASSERT(IS_bIterator(it)); \
-		KNH_SETv(ctx, v, (it_)->fnext_1(ctx, it_)); \
-		if(IS_NULL(v)) { \
-			VM_JMP(ctx, PC, JUMP); \
-		} \
-	} \
-
-#define VM_SMAPNEXT(ctx, PC, JUMP, v, it, mpr)  { \
-		knh_Mapper_t *mpr_ = (knh_Mapper_t*)mpr; \
-		VM_DEBUG_ASSERT(IS_Mapper(mpr)); \
-		knh_Iterator_t *it_ = (knh_Iterator_t*)it; \
-		KNH_ASSERT(IS_bIterator(it_)); \
-		do { \
-			KNH_SETv(ctx, esp_(0), (it_)->fnext_1(ctx, it_)); \
-			if(IS_NULL(esp_(0))) { \
-				VM_JMP(ctx, PC, JUMP); \
-			} \
-			KNH_SETv(ctx, v, (mpr_)->fmap_1(ctx, esp_(0), mpr_)); \
-		}while(IS_NULL(v)); \
-	} \
-
-#define VM_MAPNEXT(ctx, PC, JUMP, v, it, tcid)  { \
-		knh_Iterator_t *it_ = (knh_Iterator_t*)it; \
-		KNH_ASSERT(IS_bIterator(it_)); \
-		do { \
-			KNH_SETv(ctx, esp_(0), (it_)->fnext_1(ctx, it_)); \
-			if(IS_NULL(esp_(0))) { \
-				VM_JMP(ctx, PC, JUMP); \
-			} \
-			knh_Mapper_t *mpr_ = knh_tMapper_find(ctx, knh_Object_cid(esp_(0)), tcid); \
-			KNH_SETv(ctx, v, (mpr_)->fmap_1(ctx, esp_(0), mpr_)); \
-		}while(IS_NULL(v)); \
-	} \
+#define JIT_HALT(ctx) knh_throw__s(ctx, "Halt!!", NULL, 0)
+#define JIT_RET(ctx)  KLR_RET(ctx)
 
 /* ------------------------------------------------------------------------ */
+#define SFX(x)   KNH_FIELDn(sfp[x.i].o, x.n)
+#define JITSFX(a, b) KNH_FIELDn(sfp[a].o, b)
 
-#define KNH_TRY(ctx, JUMP, hdr, e)  {\
-		ExceptionHandler* _hdr = (ExceptionHandler*)hdr; \
-		if(!knh_ExceptionHandler_isJumpable(_hdr)) { \
-			knh_ExceptionHandler_setJumpable(_hdr, 1); \
-			int jump = KNH_SETJUMP(_hdr); \
-			if(jump != 0) { \
-				KNH_SETv(ctx, e, DP(_hdr)->caught); \
-				VM_JMP(ctx, NPC, JUMP); \
-			} \
-		} \
-		knh_ExceptionHandler_setCatching(_hdr, 1); \
-	} \
+#define KLR_MOVn(ctx, a, b) {\
+		sfp[a].data = sfp[b].data;\
+	}\
 
-#define VM_TRY(ctx, PC, JUMP, hdr, esfp)  {\
-		ExceptionHandler* _hdr = (ExceptionHandler*)hdr; \
-		if(!IS_ExceptionHandler(_hdr)) { \
-			_hdr = new_ExceptionHandler(ctx); \
-			KNH_SETv(ctx, hdr, _hdr); \
-		} \
-		if(!knh_ExceptionHandler_isJumpable(_hdr)) { \
-			knh_ExceptionHandler_setJumpable(_hdr, 1); \
-			int jump = KNH_SETJUMP(_hdr); \
-			if(jump != 0) { \
-				pc = (knhvmc_t*)DP(_hdr)->pc; \
-				KNH_SETv(ctx, esfp, DP(_hdr)->caught); \
-				DBG2_P("JUMPED jump=%d .. %p", jump, esfp); \
-				VM_JMP(ctx, PC, JUMP); \
-			} \
-			DP(_hdr)->pc = pc; \
-		} \
-		knh_ExceptionHandler_setCatching(_hdr, 1); \
-	} \
+#define KLR_MOVa(ctx, a, b) { \
+		KLR_MOV(ctx, sfp[a].o, sfp[b].o);\
+		sfp[a].data = sfp[b].data;\
+	}\
 
-#define VM_TRY_WC(ctx, PC, JUMP, hdr)  {\
-		ExceptionHandler* _hdr = (ExceptionHandler*)hdr; \
-		if(!IS_ExceptionHandler(_hdr)) { \
-			_hdr = new_ExceptionHandler(ctx); \
-			KNH_SETv(ctx, hdr, _hdr); \
-		} \
-		if(!knh_ExceptionHandler_isJumpable(_hdr)) { \
-			knh_ExceptionHandler_setJumpable(_hdr, 1); \
-			int jump = KNH_SETJUMP(_hdr); \
-			if(jump != 0) { \
-				DBG2_P("JUMPED jump=%d ..", jump); \
-				pc = (knhvmc_t*)DP(_hdr)->pc; \
-				VM_JMP(ctx, PC, JUMP); \
-			} \
-			DP(_hdr)->pc = pc; \
-		} \
-		knh_ExceptionHandler_setCatching(_hdr, 1); \
-	} \
+#define KLR_MOVo(ctx, a, v) {\
+		KLR_MOV(ctx, sfp[a].o, v);\
+		sfp[a].data = ((Int*)v)->n.data;\
+	}\
 
-#define VM_TRY_END(ctx, hdr)  {\
-		ExceptionHandler* _hdr = (ExceptionHandler*)hdr; \
-		KNH_ASSERT(IS_ExceptionHandler(_hdr)); \
-		knh_ExceptionHandler_setCatching(_hdr, 0); \
-	} \
+#define KLR_MOVx(ctx, a, b) {\
+		Int *v_ = (Int*)SFX(b);\
+		KLR_MOV(ctx, sfp[a].o, v_);\
+		sfp[a].data = (v_)->n.data;\
+	}\
 
-#define VM_CATCH(ctx, PC, JUMP, emsg, esfp) { \
-		Exception* _e = (Exception*)esfp; \
-		KNH_ASSERT(IS_String(emsg)); \
-		KNH_ASSERT(IS_Exception(_e)); \
-		DBG2_P("CATCHING(%s eid=%d, %s).. %p", knh_String_tochar((String*)emsg), DP(_e)->eid, knh_String_tochar(DP(_e)->message), sfp); \
-		if(!knh_Exception_isa(ctx, _e, (String*)emsg)) { \
-			VM_JMP(ctx, PC, JUMP); \
-		} \
-	} \
-
-#define VM_THROW_AGAIN(ctx, hdr) { \
-		KNH_ASSERT(IS_ExceptionHandler(hdr)); \
-		Exception *_e = (Exception*)DP(((ExceptionHandler*)(hdr)))->caught; \
-		DBG2_P("THROW AGAIN .. %s", knh_String_tochar(DP(_e)->message)); \
-		knh_throwException(ctx, _e, NULL, 0); \
-	} \
-
-/* ------------------------------------------------------------------------ */
-
-#define VM_THROW(ctx, e) \
-	if(IS_bString((e))) { \
-		knh_throwException(ctx, new_Exception(ctx, (String*)(e)), _HERE_); \
-	}else if(IS_Exception((e))) { \
-		knh_throwException(ctx, (Exception*)(e), _HERE_); \
-	}else { \
-		knh_throwException(ctx, new_Exception__type(ctx, (e), CLASS_Exception), _HERE_); \
-	} \
-
-#define VM_THROW_oidx_(ctx, v, idx) {\
-		Object *e_ = oidx_(v, idx); \
-		if(IS_bString((e_))) { \
-			knh_throwException(ctx, new_Exception(ctx, (String*)(e_)), _HERE_); \
-		}else if(IS_Exception((e_))) { \
-			knh_throwException(ctx, (Exception*)(e_), _HERE_); \
-		}else { \
-			knh_throwException(ctx, new_Exception__type(ctx, (e_), CLASS_Exception), _HERE_); \
-		} \
+#define KLR_MOVDEF(ctx, a, cid) {\
+		Int *v_ = (Int*)KNH_DEF(ctx, cid);\
+		KLR_MOV(ctx, sfp[a].o, v_);\
+		sfp[a].data = (v_)->n.data;\
 	}
 
+#define KLR_MOVSYS(ctx, a, cid)  KLR_MOV(ctx, sfp[a].o, KNH_SYS(ctx, cid))
+
+
+#define JITSFX(a, b) KNH_FIELDn(sfp[a].o, b)
+
+#define JIT_MOVn(ctx, a, b) KLR_MOVn(ctx, a, b)
+
+#define JIT_MOVa(ctx, a, b) { \
+		KNH_SETv(ctx, sfp[a].o, sfp[b].o);\
+		sfp[a].data = sfp[b].data;\
+	}\
+
+#define JIT_MOVo(ctx, a, v) KLR_MOVo(ctx, a, v)
+
+#define JIT_MOVx(ctx, a, b, y) {\
+		Int *v_ = (Int*)JITSFX(b, y);\
+		KLR_MOV(ctx, sfp[a].o, v_);\
+		sfp[a].data = (v_)->n.data;\
+	}\
+
+#define JIT_MOVDEF(ctx, a, cid) KLR_MOVDEF(ctx, a, cid)
+#define JIT_MOVSYS(ctx, a, cid) KLR_MOVSYS(ctx, a, cid)
+
 /* ------------------------------------------------------------------------ */
 
-#define VM_PRINT(ctx, flag, s, mn, v) \
-	knh_sfp_print(ctx, sfp, flag, s, mn, v)
+#define KLR_XMOVs(ctx, a, b) KLR_MOV(ctx, SFX(a), sfp[b].o)
+#define KLR_XMOVo(ctx, a, b) KLR_MOV(ctx, SFX(a), b)
+#define KLR_XMOVx(ctx, a, b) KLR_MOV(ctx, SFX(a), SFX(b))
+#define KLR_XMOVDEF(ctx, a, cid)  KLR_MOV(ctx, SFX(a), KNH_DEF(ctx, cid))
+#define KLR_XMOVSYS(ctx, a, cid)  KLR_MOV(ctx, SFX(a), KNH_SYS(ctx, cid))
 
-#define VM_STACKDUMP(ctx)   knh_sfp_dump(ctx, sfp)
+#define JIT_XMOVs(ctx, a, x, b) KLR_MOV(ctx, JITSFX(a, x), sfp[b].o)
+#define JIT_XMOVo(ctx, a, x, b) KLR_MOV(ctx, JITSFX(a, x), b)
+#define JIT_XMOVx(ctx, a, x, b, y) KLR_MOV(ctx, JITSFX(a, x), JITSFX(b, y))
+#define JIT_XMOVDEF(ctx, a, x, cid)  KLR_MOV(ctx, JITSFX(a, x), KNH_DEF(ctx, cid))
+#define JIT_XMOVSYS(ctx, a, x, cid)  KLR_MOV(ctx, JITSFX(a, x), KNH_SYS(ctx, cid))
+
+#define SFXi(x)   (*((knh_int_t*)KNH_FIELDn(sfp[x.i].o, x.n)))
+#define KLR_MOVxi(ctx, a, b)    sfp[a].ivalue = SFXi(b)
+#define KLR_XMOVsi(ctx, a, b)   SFXi(a) = sfp[b].ivalue
+#define KLR_XMOVxi(ctx, a, b)   SFXi(a) = SFXi(b)
+
+#define SFXf(x)   (*((knh_float_t*)KNH_FIELDn(sfp[x.i].o, x.n)))
+#define KLR_MOVxf(ctx, a, b)    sfp[a].fvalue = SFXf(b)
+#define KLR_XMOVsf(ctx, a, b)   SFXf(a) = sfp[b].fvalue
+#define KLR_XMOVxf(ctx, a, b)   SFXf(a) = SFXf(b)
+
+#define SFXb(x)   (*((knh_bool_t*)KNH_FIELDn(sfp[x.i].o, x.n)))
+#define KLR_MOVxb(ctx, a, b)    sfp[a].bvalue = SFXb(b)
+#define KLR_XMOVsb(ctx, a, b)   SFXb(a) = sfp[b].bvalue
+#define KLR_XMOVxb(ctx, a, b)   SFXb(a) = SFXb(b)
 
 /* ------------------------------------------------------------------------ */
 
-#define VM_INIT(ctx) { \
-		KLRCode *c_ = (KLRCode*)DP(sfp[-1].mtd)->code; \
-		knhvmc_codethreading(ctx, pc, globalMachineToJump); \
-		DP(c_)->code = pc + KNH_ASMC_INIT_SIZ; \
-		DP(c_)->size = DP(c_)->size - KNH_ASMC_INIT_SIZ; \
+#define KLR_INITCODE(ctx, n) { \
+		knh_code_thread(ctx, pc, OPJUMP); \
+		((knh_kode_t*)pc)->opcode = OPCODE_SETESP;\
 		return; \
 	}\
 
-/* ------------------------------------------------------------------------ */
-
-#define VM_IADD(ctx) { \
-		((Context*)ctx)->esp--; \
-		Object *n_ = UP(new_Int(ctx, ((Int*)(esp_(0)))->value + ((Int*)(esp_(1)))->value)); \
-		VM_MOV(ctx, ((Context*)ctx)->esp[0].o, n_); \
+#define KLR_SETESP(ctx, n) \
+	((Context*)ctx)->esp = &(sfp[n]);\
+	if(unlikely((ctx)->stacksize - ((ctx)->esp - (ctx)->stack) < KNH_LOCALSIZE)) {\
+		KNH_THROWs(ctx, "StackOverflow!!"); \
 	}\
 
-#define VM_ISUB(ctx) { \
-		((Context*)ctx)->esp--; \
-		Object *n_ = UP(new_Int(ctx, ((Int*)(esp_(0)))->value - ((Int*)(esp_(1)))->value)); \
-		VM_MOV(ctx, ((Context*)ctx)->esp[0].o, n_); \
+#define KLR_CHECKESP(ctx, n) \
+	if(unlikely((ctx)->stacksize - (&sfp[n] - (ctx)->stack) < KNH_LOCALSIZE)) {\
+		KNH_THROWs(ctx, "StackOverflow!!"); \
 	}\
 
-#define VM_ILT(ctx) { \
-		((Context*)ctx)->esp--; \
-		Object *n_ = (((Int*)(esp_(0)))->value < ((Int*)(esp_(1)))->value) ? KNH_TRUE : KNH_FALSE ; \
-		VM_MOV(ctx, ((Context*)ctx)->esp[0].o, n_); \
+#define KLR_PINIo(ctx, a, v) {\
+		if(IS_NULL(sfp[a].o)) {\
+			sfp[a].data = ((Int*)v)->n.data;\
+			KLR_MOV(ctx, sfp[a].o, v);\
+		}\
 	}\
 
-#define VM_NOP(ctx)
+#define KLR_RETn(ctx, dummy, b) {\
+		KLR_MOVn(ctx, -1, b);\
+		KLR_RET(ctx);\
+	}\
+
+#define KLR_RETa(ctx, dummy, b) {\
+		sfp[-1].data = sfp[b].data;\
+		KLR_MOV__wogc(ctx, sfp[-1].o, sfp[b].o);\
+		KLR_RET(ctx);\
+	}\
+
+#define KLR_RETo(ctx, dummy, v) {\
+		sfp[-1].data = ((Int*)v)->n.data;\
+		KLR_MOV__wogc(ctx, sfp[-1].o, v);\
+		KLR_RET(ctx);\
+	}\
+
+#define KLR_RETx(ctx, dummy, b) {\
+		Int *v_ = (Int*)SFX(b);\
+		sfp[-1].data = (v_)->n.data;\
+		KLR_MOV__wogc(ctx, sfp[-1].o, v_);\
+		KLR_RET(ctx);\
+	}\
+
+#define JIT_INITCODE(ctx, n) KLR_INITCODE(ctx, n)
+#define JIT_SETESP(ctx, n) KLR_SETESP(ctx, n)
+#define JIT_CHECKESP(ctx, n) KLR_CHECKESP(ctx, n)
+#define JIT_PINIo(ctx, a, v) KLR_PINIo(ctx, a, v)
+#define JIT_RETn(ctx, dummy, b) KLR_RETn(ctx, dummy, b)
+#define JIT_RETa(ctx, dummy, b) KLR_RETa(ctx, dummy, b)
+#define JIT_RETo(ctx, dummy, v) KLR_RETo(ctx, dummy, v)
+
+#define JIT_RETx(ctx, dummy, b, y) {\
+		Int *v_ = (Int*)JITSFX(b, y);\
+		sfp[-1].data = (v_)->n.data;\
+		KLR_MOV__wogc(ctx, sfp[-1].o, v_);\
+		KLR_RET(ctx);\
+	}\
 
 /* ------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------ */
 
+#define KLR_BOX(ctx, n, cid) {\
+		KLR_MOV(ctx, sfp[n].o, new_Object_boxing(ctx, cid, &sfp[n]));\
+	}\
 
+#define KLR_BOXnc(ctx, n, cid) \
+	if(IS_NOTNULL(sfp[n].o)){ \
+		KLR_MOV(ctx, sfp[n].o, new_Object_boxing(ctx, cid, &sfp[n]));\
+	}\
+
+#define KLR_NNBOX(ctx, n, cid) {\
+		KLR_MOV(ctx, sfp[n].o, KNH_DEF(ctx, cid));\
+	}\
+
+#define KLR_NNBOXnc(ctx, n, cid) \
+	if(knh_Object_cid(sfp[n].o) != ((knh_class_t)cid)){ \
+		KLR_MOV(ctx, sfp[n].o, KNH_DEF(ctx, cid));\
+	}\
+
+#define KLR_UNBOX(ctx, a) {\
+		sfp[a].data = (sfp[a].i)->n.data;\
+	}\
 
 /* ------------------------------------------------------------------------ */
 
-#endif
+#define JIT_BOX(ctx, n, cid)  KLR_BOX(ctx, n, cid)
+#define JIT_BOXnc(ctx, n, cid)  KLR_BOXnc(ctx, n, cid)
+#define JIT_NNBOX(ctx, n, cid)  KLR_NNBOX(ctx, n, cid)
+#define JIT_NNBOXnc(ctx, n, cid)  KLR_NNBOXnc(ctx, n, cid)
+#define JIT_UNBOX(ctx, a) KLR_UNBOX(ctx, a)
+
+/* ======================================================================== */
+
+#define KLR_ISNULL(ctx, n) \
+	if(unlikely(IS_NULL(sfp[n].o))) { \
+		knh_throwException(ctx, new_Exception__Nue(ctx, sfp[n].o), _HERE_); \
+	} \
+
+#define KLR_ISNULLx(ctx, n) \
+	if(unlikely(IS_NULL(SFX(n)))) { \
+		knh_throwException(ctx, new_Exception__Nue(ctx, SFX(n)), _HERE_); \
+	} \
+
+#define KLR_ISTYPE(ctx, n, cid) \
+	if(unlikely(!knh_Object_opTypeOf(ctx, sfp[n].o, cid))) { \
+		knh_throwException(ctx, new_Exception__type(ctx, sfp[n].o, cid), _HERE_); \
+	} \
+
+#define KLR_ISNNTYPE(ctx, n, cid) {\
+		KLR_ISTYPE(ctx, n, cid);\
+		KLR_ISNULL(ctx, n);\
+	}\
+
+#define JIT_ISNULL(ctx, n)  KLR_ISNULL(ctx, n)
+#define JIT_ISTYPE(ctx, n, cid)   KLR_ISTYPE(ctx, n, cid)
+#define JIT_ISNNTYPE(ctx, n, cid)  KLR_ISNNTYPE(ctx, n, cid)
+
+#define JIT_ISNULLx(ctx, a, x) \
+	if(unlikely(IS_NULL(JITSFX(a, x)))) { \
+		knh_throwException(ctx, new_Exception__Nue(ctx, JITSFX(a, x)), _HERE_); \
+	} \
+
+/* ======================================================================== */
+
+#define KLR_RECSFP(ctx, sfp)
+#define KLR_RECSFP2(ctx, sfp)  ctx->esp[0].sp = sfp
+
+#define KLR_SCALL(ctx, n, shift, m) { \
+		KLR_MOV(ctx, sfp[n].o, m); \
+		((Context*)ctx)->esp = &(sfp[n + shift]); \
+		sfp[-1].pc = pc; \
+		sfp[n].pc = (sfp[n].mtd)->pc_start; \
+		(sfp[n].mtd)->fcall_1(ctx, sfp + n + 1); \
+		((Context*)ctx)->esp = &(sfp[n]); \
+	} \
+
+#define KNH_SCALL(ctx, lsfp, n, m, args) { \
+		KLR_MOV(ctx, lsfp[n].o, m); \
+		((Context*)ctx)->esp = &(lsfp[n+args+2]); \
+		lsfp[n].pc = (lsfp[n].mtd)->pc_start; \
+		(lsfp[n].mtd)->fcall_1(ctx, lsfp + (n + 1)); \
+		((Context*)ctx)->esp = &(lsfp[n]); \
+	} \
+
+#define KLR_FCALL(ctx, n, shift, self, m) { \
+		int n1_ = n + 1;\
+		KLR_MOVa(ctx, n1_, self); \
+		KLR_MOV(ctx, sfp[n].o, m); \
+		((Context*)ctx)->esp = &(sfp[n + shift]); \
+		sfp[-1].pc = pc; \
+		sfp[n].pc = (sfp[n].mtd)->pc_start; \
+		(sfp[n].mtd)->fcall_1(ctx, sfp + n1_); \
+		((Context*)ctx)->esp = &(sfp[n]); \
+	} \
+
+#define KLR_CALL(ctx, n, shift, mn) { \
+		KLR_MOV(ctx, sfp[n].o, konoha_lookupMethod(ctx, knh_Object_cid(sfp[n+1].o), mn)); \
+		DBG2_ASSERT(IS_Method(sfp[n].o)); \
+		((Context*)ctx)->esp = &(sfp[n + shift]); \
+		sfp[n].pc = (sfp[n].mtd)->pc_start; \
+		sfp[-1].pc = pc; \
+		(sfp[n].mtd)->fcall_1(ctx, sfp + n + 1); \
+		((Context*)ctx)->esp = &(sfp[n]); \
+	} \
+
+#define KLR_ACALL(ctx, n, shift, mn) { \
+		Method *mtd_ = konoha_lookupMethod(ctx, knh_Object_cid(sfp[n+1].o), mn);\
+		KLR_MOV(ctx, sfp[n].o, mtd_); \
+		((Context*)ctx)->esp = &(sfp[n + shift]); \
+		knh_sfp_typecheck(ctx, sfp + n + 1, mtd_, pc); \
+		sfp[-1].pc = pc; \
+		sfp[n].pc = (sfp[n].mtd)->pc_start; \
+		(mtd_)->fcall_1(ctx, sfp + n + 1); \
+		((Context*)ctx)->esp = &(sfp[n]); \
+	} \
+
+/* this is used only for Closure.invoke */
+
+#define KLR_AINVOKE(ctx, n, shift, m) { \
+		KLR_MOV(ctx, sfp[n].o, m); \
+		((Context*)ctx)->esp = &(sfp[n + shift]); \
+		DBG2_ASSERT(IS_Closure(sfp[n+1].o));\
+		knh_sfp_typecheck(ctx, sfp + n + 1, DP(sfp[n+1].cc)->mtd, pc); \
+		sfp[-1].pc = pc; \
+		sfp[n].pc = (sfp[n].mtd)->pc_start; \
+		(sfp[n].mtd)->fcall_1(ctx, sfp + n + 1); \
+		((Context*)ctx)->esp = &(sfp[n]); \
+	} \
+
+#define KLR_NEW(ctx, n, flag, cid, shift, m) { \
+		KLR_MOV(ctx, sfp[n].o, m); \
+		KLR_MOV(ctx, sfp[n+1].o, new_Object_init(ctx, flag, cid, 0)); \
+		((Context*)ctx)->esp = &(sfp[n + shift]); \
+		sfp[-1].pc = pc; \
+		sfp[n].pc = (sfp[n].mtd)->pc_start; \
+		(sfp[n].mtd)->fcall_1(ctx, sfp + n + 1); \
+		((Context*)ctx)->esp = &(sfp[n]); \
+	} \
+
+
+#define JIT_SCALL(ctx, n, shift, m) { \
+		KLR_MOV(ctx, sfp[n].o, m); \
+		((Context*)ctx)->esp = &(sfp[n + shift]); \
+		sfp[n].pc = (sfp[n].mtd)->pc_start; \
+		(sfp[n].mtd)->fcall_1(ctx, sfp + n + 1); \
+		((Context*)ctx)->esp = &(sfp[n]); \
+	} \
+
+#define JIT_FCALL(ctx, n, shift, self, m) { \
+		int n1_ = n + 1;\
+		KLR_MOVa(ctx, n1_, self); \
+		KLR_MOV(ctx, sfp[n].o, m); \
+		((Context*)ctx)->esp = &(sfp[n + shift]); \
+		sfp[n].pc = (sfp[n].mtd)->pc_start; \
+		(sfp[n].mtd)->fcall_1(ctx, sfp + n1_); \
+		((Context*)ctx)->esp = &(sfp[n]); \
+	} \
+
+#define JIT_CALL(ctx, n, shift, mn) { \
+		KLR_MOV(ctx, sfp[n].o, konoha_lookupMethod(ctx, knh_Object_cid(sfp[n+1].o), mn)); \
+		DBG2_ASSERT(IS_Method(sfp[n].o)); \
+		((Context*)ctx)->esp = &(sfp[n + shift]); \
+		sfp[n].pc = (sfp[n].mtd)->pc_start; \
+		(sfp[n].mtd)->fcall_1(ctx, sfp + n + 1); \
+		((Context*)ctx)->esp = &(sfp[n]); \
+	} \
+
+#define JIT_ACALL(ctx, n, shift, mn) { \
+		Method *mtd_ = konoha_lookupMethod(ctx, knh_Object_cid(sfp[n+1].o), mn);\
+		KLR_MOV(ctx, sfp[n].o, mtd_); \
+		((Context*)ctx)->esp = &(sfp[n + shift]); \
+		knh_sfp_typecheck(ctx, sfp + n + 1, mtd_, NULL); \
+		sfp[n].pc = (sfp[n].mtd)->pc_start; \
+		(mtd_)->fcall_1(ctx, sfp + n + 1); \
+		((Context*)ctx)->esp = &(sfp[n]); \
+	} \
+
+/* this is used only for Closure.invoke */
+
+#define JIT_AINVOKE(ctx, n, shift, m) { \
+		KLR_MOV(ctx, sfp[n].o, m); \
+		((Context*)ctx)->esp = &(sfp[n + shift]); \
+		DBG2_ASSERT(IS_Closure(sfp[n+1].o));\
+		knh_sfp_typecheck(ctx, sfp + n + 1, DP(sfp[n+1].cc)->mtd, NULL); \
+		sfp[n].pc = (sfp[n].mtd)->pc_start; \
+		(sfp[n].mtd)->fcall_1(ctx, sfp + n + 1); \
+		((Context*)ctx)->esp = &(sfp[n]); \
+	} \
+
+#define JIT_NEW(ctx, n, flag, cid, shift, m) { \
+		KLR_MOV(ctx, sfp[n].o, m); \
+		KLR_MOV(ctx, sfp[n+1].o, new_Object_init(ctx, flag, cid, 0)); \
+		((Context*)ctx)->esp = &(sfp[n + shift]); \
+		sfp[n].pc = (sfp[n].mtd)->pc_start; \
+		(sfp[n].mtd)->fcall_1(ctx, sfp + n + 1); \
+		((Context*)ctx)->esp = &(sfp[n]); \
+	} \
+
+/* ------------------------------------------------------------------------- */
+
+#define KLR_TOSTRf(ctx, n, mn, fmt) { \
+		DBG2_ASSERT(ctx->esp <= (sfp + n));\
+		KLR_SWAP(ctx, n, n+1); \
+		knh_cwb_t cwb = new_cwb(ctx);\
+		KLR_MOV(ctx, sfp[n+2].o, cwb.w);\
+		KLR_MOV(ctx, sfp[n+3].o, fmt);\
+		Method *mtd_ = konoha_lookupFormatter(ctx, knh_Object_cid(sfp[n+1].o), mn);\
+		KLR_SCALL(ctx, n, 4, mtd_);\
+		KLR_MOV(ctx, sfp[n].o, new_String__cwb(ctx, cwb)); \
+	}\
+
+#define KLR_TOSTR(ctx, n, mn)  KLR_TOSTRf(ctx, n, mn, KNH_NULL)
+
+#define JIT_TOSTRf(ctx, n, mn, fmt) { \
+		KLR_SWAP(ctx, n, n+1); \
+		knh_cwb_t cwb = new_cwb(ctx);\
+		KLR_MOV(ctx, sfp[n+2].o, cwb.w);\
+		KLR_MOV(ctx, sfp[n+3].o, fmt);\
+		Method *mtd_ = konoha_lookupFormatter(ctx, knh_Object_cid(sfp[n+1].o), mn);\
+		JIT_SCALL(ctx, n, 4, mtd_);\
+		KLR_MOV(ctx, sfp[n].o, new_String__cwb(ctx, cwb)); \
+	}\
+
+#define JIT_TOSTR(ctx, n, mn)       JIT_TOSTRf(ctx, n, mn, KNH_NULL)
+/* ------------------------------------------------------------------------- */
+
+#define KLR_SMAP(ctx, n, m)  { \
+		KLR_MOV(ctx, sfp[n+1].o, m);\
+		(sfp[n+1].mpr)->fmap_1(ctx, sfp + n); \
+	} \
+
+#define KLR_SMAPnc(ctx, n, m)  { \
+		if(likely(IS_NOTNULL(sfp[n].o))) {\
+			KLR_MOV(ctx, sfp[n+1].o, m);\
+			(sfp[n+1].mpr)->fmap_1(ctx, sfp + n); \
+		}\
+	} \
+
+#define KLR_MAP(ctx, n, tcid)  { \
+		KLR_MOV(ctx, sfp[n+1].o, knh_tMapper_find(ctx, knh_Object_cid(sfp[n].o), tcid)); \
+		(sfp[n+1].mpr)->fmap_1(ctx, sfp + n); \
+	} \
+
+#define KLR_MAPnc(ctx, n, tcid)  { \
+		if(likely(IS_NOTNULL(sfp[n].o))) {\
+			KLR_MOV(ctx, sfp[n+1].o, knh_tMapper_find(ctx, knh_Object_cid(sfp[n].o), tcid)); \
+			(sfp[n+1].mpr)->fmap_1(ctx, sfp + n); \
+		}\
+	}\
+
+#define KLR_AMAP(ctx, n, tcid)  { \
+		knh_class_t scid = knh_Object_cid(sfp[n].o);\
+		if(scid != ((knh_class_t)tcid) && !knh_class_instanceof(ctx, scid, tcid) && scid != CLASS_Nue) { \
+			KLR_MOV(ctx, sfp[n+1].o, knh_tMapper_find(ctx, scid, tcid)); \
+			(sfp[n+1].mpr)->fmap_1(ctx, sfp + n); \
+		} \
+	} \
+
+#define KLR_NNMAP(ctx, a, tcid)  { \
+		if(unlikely(IS_NULL(sfp[a].o))) {\
+			Int *v_ = (Int*)KNH_DEF(ctx, tcid);\
+			KLR_MOV(ctx, sfp[a].o, v_);\
+			sfp[a].data = (v_)->n.data;\
+		} \
+	}\
+
+#define JIT_SMAP(ctx, n, m) KLR_SMAP(ctx, n, m)
+#define JIT_SMAPnc(ctx, n, m) KLR_SMAPnc(ctx, n, m)
+#define JIT_MAP(ctx, n, tcid) KLR_MAP(ctx, n, tcid)
+#define JIT_MAPnc(ctx, n, tcid) KLR_MAPnc(ctx, n, tcid)
+#define JIT_AMAP(ctx, n, tcid) KLR_AMAP(ctx, n, tcid)
+#define JIT_NNMAP(ctx, a, tcid) KLR_NNMAP(ctx, a, tcid)
+
+/* ======================================================================== */
+
+#define KLR_JMP(ctx, PC, JUMP) {\
+		PC; \
+		goto JUMP; \
+	}\
+
+#define KLR_SKIP(ctx, PC, JUMP) \
+	if(!IS_DEBUG(ctx, sfp[0].o)) { \
+		KLR_JMP(ctx, PC, JUMP); \
+	} \
+
+#define KLR_bJIFT(ctx, PC, JUMP, n) \
+	if(sfp[n].bvalue) { \
+		KLR_JMP(ctx, PC, JUMP); \
+	} \
+
+#define KLR_bJIFF(ctx, PC, JUMP, n) \
+	if(!sfp[n].bvalue) { \
+		KLR_JMP(ctx, PC, JUMP); \
+	} \
+
+#define KLR_bJIFF_LOOP(ctx, PC, JUMP, n) \
+	if(unlikely(!sfp[n].bvalue)) { \
+		KLR_JMP(ctx, PC, JUMP); \
+	} \
+
+#define KLR_JIFNUL(ctx, PC, JUMP, n) \
+	if(IS_NULL(sfp[n].o)) { \
+		KLR_JMP(ctx, PC, JUMP); \
+	} \
+
+#define KLR_JIFNN(ctx, PC, JUMP, n) \
+	if(IS_NOTNULL(sfp[n].o)) { \
+		KLR_JMP(ctx, PC, JUMP); \
+	} \
+
+#define JIT_JMP(ctx, PC, JUMP) KLR_JMP(ctx, PC, JUMP)
+#define JIT_SKIP(ctx, PC, JUMP) KLR_SKIP(ctx, PC, JUMP)
+#define JIT_bJIFT(ctx, PC, JUMP, n) KLR_bJIFT(ctx, PC, JUMP, n)
+#define JIT_bJIFF(ctx, PC, JUMP, n) KLR_bJIFF(ctx, PC, JUMP, n)
+#define JIT_bJIFF_LOOP(ctx, PC, JUMP, n) KLR_bJIFF_LOOP(ctx, PC, JUMP, n)
+#define JIT_JIFNUL(ctx, PC, JUMP, n) KLR_JIFNUL(ctx, PC, JUMP, n)
+#define JIT_JIFNN(ctx, PC, JUMP, n) KLR_JIFNN(ctx, PC, JUMP, n)
+
+/* ------------------------------------------------------------------------- */
+
+#define KLR_NEXT(ctx, PC, JUMP, na, ib, sc) { \
+		knh_sfp_t *itrsfp_ = sfp + ib; \
+		KNH_ASSERT(IS_bIterator(itrsfp_[0].it));\
+		(itrsfp_[0].it)->fnext_1(ctx, itrsfp_, sc - ib); \
+		if(!HAS_ITRNEXT(sfp[sc].o)) { \
+			KLR_JMP(ctx, PC, JUMP); \
+		} \
+		KLR_MOV(ctx, sfp[na].o, sfp[sc].o); sfp[na].data = sfp[sc].data;\
+	} \
+
+#define KLR_INEXT(ctx, PC, JUMP, reqc, na, ib, sc) { \
+		knh_sfp_t *itrsfp_ = sfp + ib; \
+		KNH_ASSERT(IS_bIterator(itrsfp_[0].it));\
+		knh_class_t ncid_;\
+		do {\
+			(itrsfp_[0].it)->fnext_1(ctx, itrsfp_, sc - ib); \
+			if(!HAS_ITRNEXT(sfp[sc].o)) { \
+				KLR_JMP(ctx, PC, JUMP); \
+			} \
+			ncid_ = knh_Object_cid(sfp[sc].o);\
+		}while(ncid_ != reqc && !knh_class_instanceof(ctx, reqc, ncid_));\
+		KLR_MOV(ctx, sfp[na].o, sfp[sc].o); sfp[na].data = sfp[sc].data;\
+	} \
+
+#define KLR_MAPNEXT(ctx, PC, JUMP, reqc, na, ib, sc) { \
+		knh_sfp_t *itrsfp_ = sfp + ib; \
+		KNH_ASSERT(IS_bIterator(itrsfp_[0].it));\
+		knh_class_t ncid_;\
+		do {\
+			(itrsfp_[0].it)->fnext_1(ctx, itrsfp_, sc - ib); \
+			if(!HAS_ITRNEXT(sfp[sc].o)) { \
+				KLR_JMP(ctx, PC, JUMP); \
+			} \
+			ncid_ = knh_Object_cid(sfp[sc].o);\
+			if(ncid_ == reqc || knh_class_instanceof(ctx, reqc, ncid_)) break;\
+			KLR_MOV(ctx, sfp[sc+1].o, knh_tMapper_find(ctx, ncid_, reqc));\
+			(sfp[sc+1].mpr)->fmap_1(ctx, sfp + sc); \
+		}while(IS_NOTNULL(sfp[sc].o));\
+		KLR_MOV(ctx, sfp[na].o, sfp[sc].o); sfp[na].data = sfp[sc].data;\
+	} \
+
+#define KLR_SMAPNEXT(ctx, PC, JUMP, na, ib, sc, mm) { \
+		knh_sfp_t *itrsfp_ = sfp + ib; \
+		KLR_MOV(ctx, sfp[sc+1].o, mm); \
+		do {\
+			(itrsfp_[0].it)->fnext_1(ctx, itrsfp_, sc - ib); \
+			if(!HAS_ITRNEXT(sfp[sc].o)) { \
+				KLR_JMP(ctx, PC, JUMP); \
+			} \
+			(sfp[sc+1].mpr)->fmap_1(ctx, sfp + sc); \
+		}while(IS_NOTNULL(sfp[sc].o));\
+		KLR_MOV(ctx, sfp[na].o, sfp[sc].o); sfp[na].data = sfp[sc].data;\
+	} \
+
+#define JIT_NEXT(ctx, PC, JUMP, na, ib, sc) { \
+		knh_sfp_t *itrsfp_ = sfp + ib; \
+		(itrsfp_[0].it)->fnext_1(ctx, itrsfp_, sc - ib); \
+		if(!HAS_ITRNEXT(sfp[sc].o)) { \
+			KLR_JMP(ctx, PC, JUMP); \
+		} \
+		KLR_MOV(ctx, sfp[na].o, sfp[sc].o); sfp[na].data = sfp[sc].data;\
+	} \
+
+#define JIT_INEXT(ctx, PC, JUMP, reqc, na, ib, sc) { \
+		knh_sfp_t *itrsfp_ = sfp + ib; \
+		knh_class_t ncid_;\
+		do {\
+			(itrsfp_[0].it)->fnext_1(ctx, itrsfp_, sc - ib); \
+			if(!HAS_ITRNEXT(sfp[sc].o)) { \
+				KLR_JMP(ctx, PC, JUMP); \
+			} \
+			ncid_ = knh_Object_cid(sfp[sc].o);\
+		}while(ncid_ != ((knh_class_t)reqc) && !knh_class_instanceof(ctx, reqc, ncid_));\
+		KLR_MOV(ctx, sfp[na].o, sfp[sc].o); sfp[na].data = sfp[sc].data;\
+	} \
+
+#define JIT_MAPNEXT(ctx, PC, JUMP, reqc, na, ib, sc) { \
+		knh_sfp_t *itrsfp_ = sfp + ib; \
+		knh_class_t ncid_;\
+		do {\
+			(itrsfp_[0].it)->fnext_1(ctx, itrsfp_, sc - ib); \
+			if(!HAS_ITRNEXT(sfp[sc].o)) { \
+				KLR_JMP(ctx, PC, JUMP); \
+			} \
+			ncid_ = knh_Object_cid(sfp[sc].o);\
+			if(ncid_ == ((knh_class_t)reqc) || knh_class_instanceof(ctx, reqc, ncid_)) break;\
+			KLR_MOV(ctx, sfp[sc+1].o, knh_tMapper_find(ctx, ncid_, reqc));\
+			(sfp[sc+1].mpr)->fmap_1(ctx, sfp + sc); \
+		}while(IS_NOTNULL(sfp[sc].o));\
+		KLR_MOV(ctx, sfp[na].o, sfp[sc].o); sfp[na].data = sfp[sc].data;\
+	} \
+
+#define JIT_SMAPNEXT(ctx, PC, JUMP, na, ib, sc, mm) { \
+		knh_sfp_t *itrsfp_ = sfp + ib; \
+		KLR_MOV(ctx, sfp[sc+1].o, mm); \
+		do {\
+			(itrsfp_[0].it)->fnext_1(ctx, itrsfp_, sc - ib); \
+			if(!HAS_ITRNEXT(sfp[sc].o)) { \
+				KLR_JMP(ctx, PC, JUMP); \
+			} \
+			(sfp[sc+1].mpr)->fmap_1(ctx, sfp + sc); \
+		}while(IS_NOTNULL(sfp[sc].o));\
+		KLR_MOV(ctx, sfp[na].o, sfp[sc].o); sfp[na].data = sfp[sc].data;\
+	} \
+
+/* ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------- */
+
+#define NPC  /* for KNH_TRY */
+
+#define KNH_SETJUMP(hdlr) setjmp(DP(hdlr)->jmpbuf)
+
+#define KNH_TRY(ctx, JUMP, lsfp, hn)  {\
+		ExceptionHandler* _hdr = lsfp[hn].hdr; \
+		if(!knh_ExceptionHandler_isJumpable(_hdr)) { \
+			knh_ExceptionHandler_setJumpable(_hdr, 1); \
+			int jump = KNH_SETJUMP(_hdr); \
+			if(jump != 0) { \
+				((Context*)ctx)->esp = &(lsfp[hn]); \
+				KLR_JMP(ctx, NPC, JUMP); \
+			} \
+			DP(_hdr)->esp = ctx->esp; \
+		} \
+		knh_ExceptionHandler_setCatching(_hdr, 1); \
+	} \
+
+#define KLR_TRY(ctx, PC, JUMP, hn)  {\
+		ExceptionHandler* _hdr = sfp[hn].hdr; \
+		if(!IS_ExceptionHandler(_hdr)) { \
+			_hdr = new_ExceptionHandler(ctx); \
+			KLR_MOV(ctx, sfp[hn].o, _hdr); \
+		} \
+		if(!knh_ExceptionHandler_isJumpable(_hdr)) { \
+			knh_ExceptionHandler_setJumpable(_hdr, 1); \
+			int jump = KNH_SETJUMP(_hdr); \
+			if(jump != 0) { \
+				((Context*)ctx)->esp = DP(_hdr)->esp; \
+				pc = DP(_hdr)->pc; \
+				KLR_JMP(ctx, PC, JUMP); \
+			} \
+			DP(_hdr)->esp = ctx->esp; \
+			DP(_hdr)->pc  = pc; \
+		} \
+		knh_ExceptionHandler_setCatching(_hdr, 1); \
+	} \
+
+#define JIT_TRY(ctx, PC, JUMP, hn)  {\
+		ExceptionHandler* _hdr = sfp[hn].hdr; \
+		if(!IS_ExceptionHandler(_hdr)) { \
+			_hdr = new_ExceptionHandler(ctx); \
+			KLR_MOV(ctx, sfp[hn].o, _hdr); \
+		} \
+		if(!knh_ExceptionHandler_isJumpable(_hdr)) { \
+			knh_ExceptionHandler_setJumpable(_hdr, 1); \
+			int jump = KNH_SETJUMP(_hdr); \
+			if(jump != 0) { \
+				((Context*)ctx)->esp = DP(_hdr)->esp; \
+				KLR_JMP(ctx, PC, JUMP); \
+			} \
+			DP(_hdr)->esp = ctx->esp; \
+		} \
+		knh_ExceptionHandler_setCatching(_hdr, 1); \
+	} \
+
+#define KLR_TRYEND(ctx, hn)  {\
+		KNH_ASSERT(IS_ExceptionHandler(sfp[hn].o)); \
+		knh_ExceptionHandler_setCatching(sfp[hn].hdr, 0); \
+	} \
+
+#define JIT_TRYEND(ctx, hn)  {\
+		knh_ExceptionHandler_setCatching(sfp[hn].hdr, 0); \
+	} \
+
+#define KLR_CATCH(ctx, PC, JUMP, hn, en, emsg) { \
+		Exception* _e = DP(sfp[hn].hdr)->caught; \
+		if(!knh_Exception_isa(ctx, _e, (String*)emsg)) { \
+			KLR_JMP(ctx, PC, JUMP); \
+		} \
+		else { \
+			KLR_MOV(ctx, sfp[en].o, _e); \
+		} \
+	} \
+
+#define JIT_CATCH(ctx, PC, JUMP, hn, en, emsg) { \
+		Exception* _e = DP(sfp[hn].hdr)->caught; \
+		if(!knh_Exception_isa(ctx, _e, (String*)emsg)) { \
+			KLR_JMP(ctx, PC, JUMP); \
+		} \
+		else { \
+			KLR_MOV(ctx, sfp[en].o, _e); \
+		} \
+	} \
+
+#define KLR_THROW_AGAIN(ctx, hn) { \
+		KNH_ASSERT(IS_ExceptionHandler(sfp[hn].o)); \
+		Exception *_e = DP(sfp[hn].hdr)->caught; \
+		if(IS_Exception(_e)) {\
+			DBG2_P("THROW AGAIN .. %s", knh_String_tochar(DP(_e)->message)); \
+			knh_throwException(ctx, _e, NULL, 0); \
+		} \
+	} \
+
+#define JIT_THROW_AGAIN(ctx, hn) { \
+		KNH_ASSERT(IS_ExceptionHandler(sfp[hn].o)); \
+		Exception *_e = DP(sfp[hn].hdr)->caught; \
+		if(IS_Exception(_e)) {\
+			knh_throwException(ctx, _e, NULL, 0); \
+		} \
+	} \
+
+#define KLR_THROW(ctx, n) \
+	if(IS_bString((sfp[n].o))) { \
+		knh_throwException(ctx, new_Exception(ctx, sfp[n].s), _HERE_); \
+	}else { \
+		KNH_ASSERT(IS_Exception(sfp[n].e)); \
+		knh_throwException(ctx, sfp[n].e, _HERE_); \
+	}\
+
+#define JIT_THROW(ctx, n) \
+	if(IS_bString((sfp[n].o))) { \
+		knh_throwException(ctx, new_Exception(ctx, sfp[n].s), NULL, 0); \
+	}else { \
+		KNH_ASSERT(IS_Exception(sfp[n].e)); \
+		knh_throwException(ctx, sfp[n].e, NULL, 0); \
+	}\
+
+#define KLR_THROWs(ctx, v) \
+	if(IS_bString((Object*)v)) { \
+		knh_throwException(ctx, new_Exception(ctx, (String*)v), _HERE_); \
+	}else { \
+		KNH_ASSERT(IS_Exception((Object*)v)); \
+		knh_throwException(ctx, (Exception*)v, _HERE_); \
+	}\
+
+#define JIT_THROWs(ctx, v) \
+	if(IS_bString((Object*)v)) { \
+		knh_throwException(ctx, new_Exception(ctx, (String*)v), NULL, 0); \
+	}else { \
+		KNH_ASSERT(IS_Exception((Object*)v)); \
+		knh_throwException(ctx, (Exception*)v, NULL, 0); \
+	}\
+
+/* ------------------------------------------------------------------------ */
+
+#define KLR_P(ctx, flag, mn, n) knh_stack_p(ctx, sfp, flag, mn, n)
+#define KLR_PMSG(ctx, flag, v) knh_stack_pmsg(ctx, sfp, flag, (String*)v)
+
+#define JIT_P(ctx, flag, mn, n) KLR_P(ctx, flag, mn, n)
+#define JIT_PMSG(ctx, flag, v)  KLR_PMSG(ctx, flag, v)
+
+/* ------------------------------------------------------------------------ */
+
+#define KLR_iCAST(ctx, a) {\
+		knh_int_t n_ = (knh_int_t)sfp[a].fvalue; \
+		sfp[a].ivalue = n_; \
+	}\
+
+#define KLR_inCAST(ctx, a) {\
+		if(IS_NULL(sfp[a].o)) { \
+			sfp[a].ivalue = 0; \
+		}else{\
+			knh_int_t n_ = (knh_int_t)sfp[a].fvalue; \
+			sfp[a].ivalue = n_; \
+		}\
+	}\
+
+#define KLR_fCAST(ctx, a) {\
+		knh_float_t n_ = (knh_float_t)sfp[a].ivalue; \
+		sfp[a].fvalue = n_; \
+	}\
+
+#define KLR_fnCAST(ctx, a) {\
+		if(IS_NULL(sfp[a].o)) { \
+			sfp[a].fvalue = 0; \
+		}else{\
+			knh_float_t n_ = (knh_float_t)sfp[a].ivalue; \
+			sfp[a].fvalue = n_; \
+		}\
+	}\
+
+#define JIT_iCAST(ctx, a) KLR_iCAST(ctx, a)
+#define JIT_inCAST(ctx, a) KLR_inCAST(ctx, a)
+#define JIT_fCAST(ctx, a) KLR_fCAST(ctx, a)
+#define JIT_fnCAST(ctx, a) KLR_fnCAST(ctx, a)
+
+/* ------------------------------------------------------------------------ */
+
+#define SFb(x)   sfp[x].bvalue
+#define SFi(x)   sfp[x].ivalue
+#define SFf(x)   sfp[x].fvalue
+
+#define KLR_bNOT(ctx, c, a)     SFb(c) = !(SFb(a))
+
+#define KLR_iNEG(ctx, c, a)     SFi(c) = -(SFi(a))
+#define KLR_iADD(ctx, c, a, b)  SFi(c) = (SFi(a) + SFi(b))
+#define KLR_iADDn(ctx, c, a, n) SFi(c) = (SFi(a) + n)
+#define KLR_iSUB(ctx, c, a, b)  SFi(c) = (SFi(a) - SFi(b))
+#define KLR_iSUBn(ctx, c, a, n) SFi(c) = (SFi(a) - n)
+#define KLR_iMUL(ctx, c, a, b)  SFi(c) = (SFi(a) * SFi(b))
+#define KLR_iMULn(ctx, c, a, n) SFi(c) = (SFi(a) * n)
+#define KLR_iDIV(ctx, c, a, b)  SFi(c) = (SFi(a) / SFi(b))
+#define KLR_iDIVn(ctx, c, a, n)  SFi(c) = (SFi(a) / n)
+#define KLR_iMOD(ctx, c, a, b)  SFi(c) = (SFi(a) % SFi(b))
+#define KLR_iMODn(ctx, c, a, n)  SFi(c) = (SFi(a) % n)
+
+#define KLR_iEQ(ctx, c, a, b)  SFi(c) = (SFi(a) == SFi(b))
+#define KLR_iEQn(ctx, c, a, n)  SFi(c) = (SFi(a) == n)
+#define KLR_iNEQ(ctx, c, a, b)  SFi(c) = (SFi(a) != SFi(b))
+#define KLR_iNEQn(ctx, c, a, n)  SFi(c) = (SFi(a) != n)
+
+#define KLR_iLT(ctx, c, a, b)  SFb(c) = (SFi(a) < SFi(b))
+#define KLR_iLTn(ctx, c, a, n)  SFb(c) = (SFi(a) < n)
+#define KLR_iLTE(ctx, c, a, b)  SFb(c) = (SFi(a) <= SFi(b))
+#define KLR_iLTEn(ctx, c, a, n)  SFb(c) = (SFi(a) <= n)
+#define KLR_iGT(ctx, c, a, b)  SFb(c) = (SFi(a) > SFi(b))
+#define KLR_iGTn(ctx, c, a, n)  SFb(c) = (SFi(a) > n)
+#define KLR_iGTE(ctx, c, a, b)  SFb(c) = (SFi(a) >= SFi(b))
+#define KLR_iGTEn(ctx, c, a, n)  SFb(c) = (SFi(a) >= n)
+
+/* ------------------------------------------------------------------------ */
+
+#define KLR_fNEG(ctx, c, a)     SFf(c) = -(SFf(a))
+#define KLR_fADD(ctx, c, a, b)  SFf(c) = (SFf(a) + SFf(b))
+#define KLR_fADDn(ctx, c, a, n) SFf(c) = (SFf(a) + n)
+#define KLR_fSUB(ctx, c, a, b)  SFf(c) = (SFf(a) - SFf(b))
+#define KLR_fSUBn(ctx, c, a, n) SFf(c) = (SFf(a) - n)
+#define KLR_fMUL(ctx, c, a, b)  SFf(c) = (SFf(a) * SFf(b))
+#define KLR_fMULn(ctx, c, a, n) SFf(c) = (SFf(a) * n)
+#define KLR_fDIV(ctx, c, a, b)  SFf(c) = (SFf(a) / SFf(b))
+#define KLR_fDIVn(ctx, c, a, n)  SFf(c) = (SFf(a) / n)
+
+#define KLR_fEQ(ctx, c, a, b)  SFf(c) = (SFf(a) == SFf(b))
+#define KLR_fEQn(ctx, c, a, n)  SFf(c) = (SFf(a) == n)
+#define KLR_fNEQ(ctx, c, a, b)  SFf(c) = (SFf(a) != SFf(b))
+#define KLR_fNEQn(ctx, c, a, n)  SFf(c) = (SFf(a) != n)
+#define KLR_fLT(ctx, c, a, b)  SFb(c) = (SFf(a) < SFf(b))
+#define KLR_fLTn(ctx, c, a, n)  SFb(c) = (SFf(a) < n)
+#define KLR_fLTE(ctx, c, a, b)  SFb(c) = (SFf(a) <= SFf(b))
+#define KLR_fLTEn(ctx, c, a, n)  SFb(c) = (SFf(a) <= n)
+#define KLR_fGT(ctx, c, a, b)  SFb(c) = (SFf(a) > SFf(b))
+#define KLR_fGTn(ctx, c, a, n)  SFb(c) = (SFf(a) > n)
+#define KLR_fGTE(ctx, c, a, b)  SFb(c) = (SFf(a) >= SFf(b))
+#define KLR_fGTEn(ctx, c, a, n)  SFb(c) = (SFf(a) >= n)
+
+/* ------------------------------------------------------------------------ */
+
+#define JIT_bNOT(ctx, c, a)     SFb(c) = !(SFb(a))
+
+#define JIT_iNEG(ctx, c, a)     SFi(c) = -(SFi(a))
+#define JIT_iADD(ctx, c, a, b)  SFi(c) = (SFi(a) + SFi(b))
+#define JIT_iADDn(ctx, c, a, n) SFi(c) = (SFi(a) + n)
+#define JIT_iSUB(ctx, c, a, b)  SFi(c) = (SFi(a) - SFi(b))
+#define JIT_iSUBn(ctx, c, a, n) SFi(c) = (SFi(a) - n)
+#define JIT_iMUL(ctx, c, a, b)  SFi(c) = (SFi(a) * SFi(b))
+#define JIT_iMULn(ctx, c, a, n) SFi(c) = (SFi(a) * n)
+#define JIT_iDIV(ctx, c, a, b)  SFi(c) = (SFi(a) / SFi(b))
+#define JIT_iDIVn(ctx, c, a, n)  SFi(c) = (SFi(a) / n)
+#define JIT_iMOD(ctx, c, a, b)  SFi(c) = (SFi(a) % SFi(b))
+#define JIT_iMODn(ctx, c, a, n)  SFi(c) = (SFi(a) % n)
+
+#define JIT_iEQ(ctx, c, a, b)  SFi(c) = (SFi(a) == SFi(b))
+#define JIT_iEQn(ctx, c, a, n)  SFi(c) = (SFi(a) == n)
+#define JIT_iNEQ(ctx, c, a, b)  SFi(c) = (SFi(a) != SFi(b))
+#define JIT_iNEQn(ctx, c, a, n)  SFi(c) = (SFi(a) != n)
+
+#define JIT_iLT(ctx, c, a, b)  SFb(c) = (SFi(a) < SFi(b))
+#define JIT_iLTn(ctx, c, a, n)  SFb(c) = (SFi(a) < n)
+#define JIT_iLTE(ctx, c, a, b)  SFb(c) = (SFi(a) <= SFi(b))
+#define JIT_iLTEn(ctx, c, a, n)  SFb(c) = (SFi(a) <= n)
+#define JIT_iGT(ctx, c, a, b)  SFb(c) = (SFi(a) > SFi(b))
+#define JIT_iGTn(ctx, c, a, n)  SFb(c) = (SFi(a) > n)
+#define JIT_iGTE(ctx, c, a, b)  SFb(c) = (SFi(a) >= SFi(b))
+#define JIT_iGTEn(ctx, c, a, n)  SFb(c) = (SFi(a) >= n)
+
+#define JIT_fNEG(ctx, c, a)     SFf(c) = -(SFf(a))
+#define JIT_fADD(ctx, c, a, b)  SFf(c) = (SFf(a) + SFf(b))
+#define JIT_fADDn(ctx, c, a, n) SFf(c) = (SFf(a) + n)
+#define JIT_fSUB(ctx, c, a, b)  SFf(c) = (SFf(a) - SFf(b))
+#define JIT_fSUBn(ctx, c, a, n) SFf(c) = (SFf(a) - n)
+#define JIT_fMUL(ctx, c, a, b)  SFf(c) = (SFf(a) * SFf(b))
+#define JIT_fMULn(ctx, c, a, n) SFf(c) = (SFf(a) * n)
+#define JIT_fDIV(ctx, c, a, b)  SFf(c) = (SFf(a) / SFf(b))
+#define JIT_fDIVn(ctx, c, a, n)  SFf(c) = (SFf(a) / n)
+
+#define JIT_fEQ(ctx, c, a, b)  SFf(c) = (SFf(a) == SFf(b))
+#define JIT_fEQn(ctx, c, a, n)  SFf(c) = (SFf(a) == n)
+#define JIT_fNEQ(ctx, c, a, b)  SFf(c) = (SFf(a) != SFf(b))
+#define JIT_fNEQn(ctx, c, a, n)  SFf(c) = (SFf(a) != n)
+#define JIT_fLT(ctx, c, a, b)  SFb(c) = (SFf(a) < SFf(b))
+#define JIT_fLTn(ctx, c, a, n)  SFb(c) = (SFf(a) < n)
+#define JIT_fLTE(ctx, c, a, b)  SFb(c) = (SFf(a) <= SFf(b))
+#define JIT_fLTEn(ctx, c, a, n)  SFb(c) = (SFf(a) <= n)
+#define JIT_fGT(ctx, c, a, b)  SFb(c) = (SFf(a) > SFf(b))
+#define JIT_fGTn(ctx, c, a, n)  SFb(c) = (SFf(a) > n)
+#define JIT_fGTE(ctx, c, a, b)  SFb(c) = (SFf(a) >= SFf(b))
+#define JIT_fGTEn(ctx, c, a, n)  SFb(c) = (SFf(a) >= n)
+
+/* ------------------------------------------------------------------------ */
+
+#define KLR_NOP(ctx)
+#define JIT_NOP(ctx)
+
+/* ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------ */
+
+#define KNH_LOCAL(ctx)  ((Context*)ctx)->esp
+#define KNH_SHIFTESP(ctx, newesp)  ((Context*)ctx)->esp = (newesp)
+#define KNH_LOCALBACK(ctx, lsfp)  ((Context*)ctx)->esp = lsfp
+
+#define KNH_LPUSH(ctx, v)  {\
+		KLR_MOV(ctx, ((Context*)ctx)->esp[0].o, v); \
+		((Context*)ctx)->esp += 1;\
+	}
+
+#define KNH_SMAP(ctx, lsfp, n, m)  { \
+		KLR_MOV(ctx, lsfp[n+1].o, m);\
+		KNH_ASSERT(IS_Mapper(m)); \
+		(lsfp[n+1].mpr)->fmap_1(ctx, lsfp + n); \
+	} \
+
+
+#define KNH_PRINT_STACKTRACE(ctx, lsfp, hn) {\
+		KNH_ASSERT(IS_ExceptionHandler(lsfp[hn].hdr));\
+		knh_format(ctx, KNH_STDERR, METHODN__dump, UP(DP(lsfp[hn].hdr)->caught), KNH_NULL);\
+		KNH_LOCALBACK(ctx, lsfp);\
+	}\
+
+/* ------------------------------------------------------------------------ */
+
+
+#define KNH_SECURE(ctx) \
+	if(((ctx)->flag & KNH_FLAG_CTXF_ADMIN) != KNH_FLAG_CTXF_ADMIN) { \
+		knh_throwException(ctx, new_Exception(ctx, TS_SecurityException), KNH_SAFEFILE(__FILE__), __LINE__); \
+	} \
+
+/* ------------------------------------------------------------------------ */
+
 
 #ifdef __cplusplus
 }

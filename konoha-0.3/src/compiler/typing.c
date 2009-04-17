@@ -111,85 +111,80 @@ knh_methodn_t knh_Token_getmn(Ctx *ctx, Token *o)
 /* [type] */
 
 static
-knh_type_t knh_Token_gettype(Ctx *ctx, Token *o, NameSpace *ns, knh_class_t defc)
+int knh_Token_isNullable(Ctx *ctx, Token *o)
 {
-	KNH_ASSERT(IS_Token(o));
-	if(SP(o)->tt == TT_ASIS) {
-		return TYPE_Any;
-	}
-	else if(SP(o)->tt == TT_CID) {
-		return NNTYPE_cid(DP(o)->cid);
-	}
-	else {
-		knh_bytes_t name = knh_Token_tobytes(ctx, o);
-		knh_type_t cid;
-		if(ISB(name, "void")) {
-			return TYPE_void;
-		}
-		if(knh_Token_isExceptionType(o)) {
-			cid = CLASS_Exception;
-		}
-		else {
-			cid = knh_NameSpace_getClass(ctx, ns, name);
-			if(cid == CLASS_unknown) {
-				cid = defc;
-				knh_Token_perror(ctx, o, KMSG_UCLASSN);
-				knh_Token_perrata(ctx, o, CLASSN(defc));
-			}
-		}
-		if(knh_Token_isIteratorType(o)) {
-			cid = knh_class_Generics(ctx, CLASS_Iterator, cid, CLASS_Any);
-		}
-		else if(knh_Token_isArrayType(o)) {
-			cid = knh_class_Generics(ctx, CLASS_Array, cid, CLASS_Any);
-		}
-		if(knh_Token_isNotNullType(o)) {
-			return NNTYPE_cid(cid);
-		}
-		else {
-			return cid;
-		}
-	}
+	DBG2_ASSERT(IS_Token(o));
+	if(knh_Token_isNullableType(o)) return 1;
+	if(knh_Token_isNotNullType(o)) return 0;
+	return 0; /* Default */
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-knh_class_t knh_Token_getcid(Ctx *ctx, Token *o, NameSpace *ns, knh_class_t defc)
+knh_type_t knh_Token_gettype(Ctx *ctx, Token *o, NameSpace *ns, knh_class_t defc)
 {
-	DBG2_ASSERT(IS_Token(o));
-	if(SP(o)->tt == TT_CID) {
-		return DP(o)->cid;
+	KNH_ASSERT(IS_Token(o));
+	if(SP(o)->tt == TT_ASIS) {
+		DBG2_ABORT();
+		return TYPE_var;
 	}
-	else {
-		if(knh_Token_isExceptionType(o)) {
-			return CLASS_Exception;
-		}
-		knh_bytes_t name = knh_Token_tobytes(ctx, o);
-		knh_class_t cid = knh_NameSpace_getClass(ctx, ns, name);
-		if(cid == CLASS_unknown) {
+	if(SP(o)->tt == TT_CID) {
+		return NNTYPE_cid(DP(o)->cid);
+	}
+	if(knh_Token_isExceptionType(o)) {
+		if(!knh_Token_isNullable(ctx, o)) return NNTYPE_Exception;
+		return CLASS_Exception;
+	}
 
-			if(defc == CLASS_unknown) {
-				return cid;
-			}
-			cid = defc;
-			if(knh_Token_isIteratorType(o)) {
-				cid = knh_class_Generics(ctx, CLASS_Iterator, cid, CLASS_Nue);
-			}
-			else if(knh_Token_isArrayType(o)) {
-				cid = knh_class_Generics(ctx, CLASS_Array, cid, CLASS_Nue);
-			}
-			knh_Token_perror(ctx, o, KMSG_UCLASSN);
-			knh_Token_perrata(ctx, o, CLASSN(cid));
+	knh_bytes_t name = knh_Token_tobytes(ctx, o);
+	knh_type_t type = knh_NameSpace_gettype(ctx, ns, name, knh_Token_isNullable(ctx, o));
+	if(type == CLASS_unknown) {
+		type = defc;
+		if(defc != CLASS_Any) {
+			if(!knh_Token_isNullable(ctx, o)) type = NNTYPE_cid(defc);
 		}
-		if(knh_Token_isIteratorType(o)) {
-			cid = knh_class_Generics(ctx, CLASS_Iterator, cid, CLASS_Nue);
-		}
-		else if(knh_Token_isArrayType(o)) {
-			cid = knh_class_Generics(ctx, CLASS_Array, cid, CLASS_Nue);
-		}
+		knh_Token_perror(ctx, o, KMSG_UCLASSN);
+		knh_Token_perrata(ctx, o, CLASSN(defc));
+	}
+
+	if(knh_Token_isIteratorType(o)) {
+		knh_class_t cid = knh_class_Generics(ctx, CLASS_Iterator, CLASS_type(type), CLASS_Any);
+		return NNTYPE_cid(cid);
+	}
+	else if(knh_Token_isArrayType(o)) {
+		knh_class_t cid = knh_class_Generics(ctx, CLASS_Array, CLASS_type(type), CLASS_Any);
+		if(!knh_Token_isNullableType(o)) return NNTYPE_cid(cid);
 		return cid;
 	}
+	return type;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+knh_class_t knh_Token_getcid(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t defc)
+{
+	DBG2_ASSERT(IS_Token(tk));
+	if(SP(tk)->tt == TT_CID) return DP(tk)->cid;
+	if(knh_Token_isExceptionType(tk)) return CLASS_Exception;
+
+	knh_bytes_t name = knh_Token_tobytes(ctx, tk);
+	knh_class_t cid = knh_NameSpace_getcid(ctx, ns, name);
+
+	if(cid == CLASS_unknown) {
+		if(defc == CLASS_unknown) return cid;
+		cid = defc;
+		knh_Token_perror(ctx, tk, KMSG_UCLASSN);
+		knh_Token_perrata(ctx, tk, CLASSN(cid));
+	}
+	if(knh_Token_isIteratorType(tk)) {
+		cid = knh_class_Generics(ctx, CLASS_Iterator, cid, CLASS_Nue);
+	}
+	else if(knh_Token_isArrayType(tk)) {
+		cid = knh_class_Generics(ctx, CLASS_Array, cid, CLASS_Nue);
+	}
+	return cid;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -547,32 +542,19 @@ static int knh_TokenNAME_typing(Ctx *ctx, Token *tk, Asm *abr)
 /* ------------------------------------------------------------------------ */
 
 static
-int knh_TokenCONSTN_typing(Ctx *ctx, Token *o, Asm *abr, NameSpace *ns)
+int knh_TokenCONSTN_typing(Ctx *ctx, Token *tk, Asm *abr, NameSpace *ns)
 {
-	knh_bytes_t t = knh_Token_tobytes(ctx, o);
-	knh_index_t loc = knh_bytes_rindex(t, '.');
-	if(loc == -1) {
-		if(knh_Token_toSYSVAL(ctx, o, abr)) {
-			return 1;
-		}
-		if(knh_NameSpace_existsConst(ctx, ns, t)) {
-			knh_Token_setCONST(ctx, o, knh_NameSpace_getConst(ctx, ns, t));
-			return 1;
-		}
+	if(knh_Token_toSYSVAL(ctx, tk, abr)) {
+		return 1;
 	}
 	else {
-		knh_class_t cid = knh_NameSpace_getClass(ctx, ns, knh_bytes_first(t, loc));
-		if(cid != CLASS_unknown) {
-			char buf[CLASSNAME_BUFSIZ*2];
-			knh_snprintf(buf, sizeof(buf), "%s.%s", CLASSN(cid), &t.buf[loc+1]);
-			t = B(buf);
-			if(konoha_existsConst(ctx, t)) {
-				knh_Token_setCONST(ctx, o, konoha_getConst(ctx, t));
-				return 1;
-			}
+		Object *value = knh_NameSpace_getConstNULL(ctx, ns, knh_Token_tobytes(ctx, tk));
+		if(value != NULL) {
+			knh_Token_setCONST(ctx, tk, value);
+			return 1;
 		}
 	}
-	knh_Token_perror(ctx, o, KMSG_UCONSTN);
+	knh_Token_perror(ctx, tk, KMSG_UCONSTN);
 	return 0;
 }
 
@@ -610,8 +592,9 @@ int knh_TokenTYEPN_typing(Ctx *ctx, Token *o, Asm *abr, NameSpace *ns)
 			return 1;
 		}
 		knh_bytes_t t = knh_Token_tobytes(ctx, o);
-		if(knh_NameSpace_existsConst(ctx, ns, t)) {
-			knh_Token_setCONST(ctx, o, knh_NameSpace_getConst(ctx, ns, t));
+		Object *value = knh_NameSpace_getConstNULL(ctx, ns, t);
+		if(value != NULL) {
+			knh_Token_setCONST(ctx, o, value);
 			return 1;
 		}
 		knh_Token_perror(ctx, o, KMSG_UCLASSN);
@@ -631,7 +614,7 @@ int knh_TokenCMETHODN_typing(Ctx *ctx, Token *o, NameSpace *ns)
 	if(idx == -1) return 0;
 
 	knh_bytes_t cname = knh_bytes_first(t, idx);
-	knh_class_t cid = knh_NameSpace_getClass(ctx, ns, cname);
+	knh_class_t cid = knh_NameSpace_getcid(ctx, ns, cname);
 	if(cid == CLASS_unknown) {
 		knh_Token_perror(ctx, o, KMSG_UCLASSN);
 		return 0;
@@ -1229,7 +1212,7 @@ int TERMs_isCONSTNAME(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, NameSpace *ns)
 		for(i = 0; i < cname.len; i++) {
 			if(islower(cname.buf[i])) return 0;
 		}
-		knh_class_t cid = knh_NameSpace_getClass(ctx, ns, cname);
+		knh_class_t cid = knh_NameSpace_getcid(ctx, ns, cname);
 		return (cid == CLASS_unknown);
 	}
 	return 0;
@@ -1238,7 +1221,7 @@ int TERMs_isCONSTNAME(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, NameSpace *ns)
 /* ------------------------------------------------------------------------ */
 
 static
-Term *knh_StmtLET_declCONST(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int level)
+Term *knh_StmtLET_declConst(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int level)
 {
 	Token *tk = DP(stmt)->tokens[0];
 	knh_bytes_t cn = knh_Token_tobytes(ctx, tk);
@@ -1262,7 +1245,7 @@ Term *knh_StmtLET_declCONST(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int l
 
 		if(level == 0) {
 			if(dotidx == -1) {
-				if(knh_NameSpace_existsConst(ctx, ns, cn)) {
+				if(knh_NameSpace_getConstNULL(ctx, ns, cn)) {
 					pe = KMSG_DUPCONST; goto L_PERROR;
 				}
 				KNH_ASSERT(IS_String(DP(tk)->text));
@@ -1270,7 +1253,7 @@ Term *knh_StmtLET_declCONST(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int l
 			}
 			else {
 				knh_bytes_t fn = knh_bytes_first(cn, dotidx);
-				knh_class_t cid = knh_NameSpace_getClass(ctx, ns, fn);
+				knh_class_t cid = knh_NameSpace_getcid(ctx, ns, fn);
 				if(cid == CLASS_unknown) {
 					pe = KMSG_UCLASSN; goto L_PERROR;
 				}
@@ -1303,7 +1286,7 @@ Term *knh_StmtLET_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type
 {
 	int level = DP(abr)->level;
 	if(TERMs_isCONSTNAME(ctx, stmt, 0, abr, ns)) {
-		return knh_StmtLET_declCONST(ctx, stmt, abr, ns, level);
+		return knh_StmtLET_declConst(ctx, stmt, abr, ns, level);
 	}
 	if(knh_Token_isTyped(DP(stmt)->tokens[0])) {
 		if(!TERMs_typing(ctx, stmt, 1, abr, ns, TERMs_gettype(stmt, 0), TCHECK_)) {
@@ -3084,7 +3067,7 @@ knh_class_t knh_StmtMETHOD_class(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, 
 			name = knh_bytes_first(name, idx);
 		}
 
-		knh_class_t cid = knh_NameSpace_getClass(ctx, ns, name);
+		knh_class_t cid = knh_NameSpace_getcid(ctx, ns, name);
 		if(cid == CLASS_unknown) {
 			knh_Asm_perror(ctx, abr, KMSG_UCLASSN, (char*)name.buf);
 			cid = DP(abr)->this_cid;
@@ -3431,7 +3414,7 @@ void knh_Asm_iniClassTableField(Ctx *ctx, Asm *abr, knh_class_t cid)
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_Asm_declareClassField(Ctx *ctx, Asm *abr, knh_class_t cid)
+void knh_Asm_declareClassField(Ctx *ctx, Asm *abr, NameSpace* ns, knh_class_t cid)
 {
 	knh_ClassTable_t *TC = (knh_ClassTable_t*)(&ctx->share->ClassTable[cid]);
 	DBG2_ASSERT(IS_ClassStruct(TC->cstruct));
@@ -3448,11 +3431,11 @@ void knh_Asm_declareClassField(Ctx *ctx, Asm *abr, knh_class_t cid)
 		}
 		(TC->cstruct)->fields =cf;
 		(TC->cstruct)->fsize = fsize;
-//		(TC->cstruct)->sid = BSIZE_TOSID(fsize);
 		TC->sid = BSIZE_TOSID(fsize);
 		TC->bsize = fsize + TC->offset;
 		TC->size = sizeof(Object*) * TC->bsize;
-		knh_NameSpace_seClassTable(ctx, knh_rootNameSpace, TC->lname, cid);
+
+		knh_NameSpace_setcid(ctx, ns, TC->sname, cid);
 		DBG2_({
 			DBG2_P("HERE IS DEFINED STRUCT");
 			knh_cfield_dump(ctx, cf, 0, fsize, KNH_STDOUT);
@@ -3483,7 +3466,7 @@ Term *knh_StmtCLASS_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		}
 		instmt = DP(instmt)->next;
 	}
-	knh_Asm_declareClassField(ctx, abr, this_cid);
+	knh_Asm_declareClassField(ctx, abr, ns, this_cid);
 
 	knh_Asm_iniClassTableField(ctx, abr, this_cid);
 	instmt = StmtCLASS_instmt(stmt);

@@ -782,14 +782,13 @@ typedef struct knh_Script_t {
 //typedef knh_pkgmeta_t* (*f_pkgload)(Ctx *ctx);
 
 typedef struct knh_NameSpace {
-	struct knh_NameSpace_t* parent;
 	knh_String_t*           nsname;
-	knh_Array_t*            imports;
+	struct knh_Script_t*    script;
+	knh_Array_t*            importedNameSpaces;
 	struct knh_DictSet_t*   name2cidDictSet;
 	struct knh_DictSet_t*   func2cidDictSet;
 	struct knh_DictMap_t*   lconstDictMap;
 	struct knh_DictMap_t*   tag2urnDictMap;
-	struct knh_Script_t*    script;
 //	void                   *dlhdr;
 //	knh_pkgmeta_t          *pkgmeta;
 } knh_NameSpace_struct;
@@ -801,7 +800,6 @@ typedef struct knh_System {
 	knh_uintptr_t sysid;
 	size_t     ctxcount;
 
-	struct knh_NameSpace_t*    ns;
 	struct knh_DictMap_t*      props;
 	struct knh_InputStream_t*  in;
 	struct knh_OutputStream_t* out;
@@ -809,11 +807,15 @@ typedef struct knh_System {
 	struct knh_String_t*       enc;
 	knh_String_t              *homeDir;
 
+
 	struct knh_DictMap_t *GlobalConstDictMap;
 	struct knh_DictIdx_t *FileNameDictIdx;
 	struct knh_DictIdx_t *FieldNameDictIdx;
 	struct knh_HashMap_t* MethodFieldHashMap;
+
+	struct knh_DictSet_t *ClassNameDictSet;
 	struct knh_DictSet_t *ExptNameDictSet;
+
 	struct knh_DictMap_t* NameSpaceTableDictMap;
 	struct knh_DictMap_t* URNAliasDictMap;
 	struct knh_DictSet_t *DriversTableDictSet;

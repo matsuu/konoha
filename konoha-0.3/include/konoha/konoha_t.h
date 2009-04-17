@@ -278,6 +278,7 @@ typedef knh_uint16_t       knh_expt_t;    /* knh_expt_t */
 // @NOUSE
 #define TYPEQN(t)                     TYPEN(t), TYPEQ(t)
 
+#define TYPE_var                      CLASS_Nue
 #define TYPE_void                     NNTYPE_cid(CLASS_Nue)
 #define NNTYPE_void                   NNTYPE_cid(CLASS_Nue)
 #define TYPE_any                      CLASS_Any
@@ -393,9 +394,9 @@ typedef struct {
 #define KNH_USING_NOTHREAD 1
 #ifdef KNH_USING_PTHREAD
 #undef KNH_USING_NOTHREAD
-typedef pthread_t knh_thread_t;
-typedef pthread_key_t knh_thread_key_t;
-typedef pthread_mutex_t  knh_mutex_t;
+#define knh_thread_t pthread_t
+#define knh_thread_key_t pthread_key_t
+typedef knh_mutex_t pthread_mutex_t
 #endif
 
 #ifdef KNH_USING_NOTHREAD
@@ -620,7 +621,6 @@ typedef struct {
 #define SIZEOF_TINT (sizeof(knh_Object_t*) * (KNH_TINT_MAX - KNH_TINT_MIN + 1))
 #define SIZEOF_TSTRING (sizeof(knh_Object_t*) * KNH_TSTRING_SIZE)
 
-#define knh_rootNameSpace     DP(ctx->sys)->ns
 #define knh_systemEncoding    DP(ctx->sys)->enc
 
 #define KNH_NULL            (ctx->share->constNull)

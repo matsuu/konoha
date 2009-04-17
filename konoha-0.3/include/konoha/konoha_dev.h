@@ -53,7 +53,7 @@
 
 #include"konoha_glue.h"
 #include"konoha_gc.h"
-#include"konohac_t.h"
+#include"konoha_vm.h"
 
 #ifndef LIBKONOHA
 	#include"gen/konoha_proto_.h"

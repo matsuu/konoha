@@ -2007,12 +2007,11 @@ void knh_NameSpace_init(Ctx *ctx, NameSpace *ns, int init)
 {
 	knh_NameSpace_struct *b = DP(ns);
 	if(init != KNH_OBJECT_RAWINIT) { /* @see(new_NameSpace) */
-		KNH_INITv(b->parent, KNH_NULL);
 		KNH_INITv(b->nsname, KNH_NULL);
-		KNH_INITv(b->name2cidDictSet, KNH_NULL);
 	}
+	KNH_INITv(b->name2cidDictSet, new_DictSet(ctx, 64));
 	KNH_INITv(b->script, KNH_NULL);
-	KNH_INITv(b->imports, KNH_NULL);
+	KNH_INITv(b->importedNameSpaces, KNH_NULL);
 	KNH_INITv(b->lconstDictMap, KNH_NULL);
 	KNH_INITv(b->tag2urnDictMap, KNH_NULL);
 	KNH_INITv(b->func2cidDictSet, KNH_NULL);
@@ -2024,23 +2023,13 @@ static
 void knh_NameSpace_traverse(Ctx *ctx, NameSpace *ns, knh_ftraverse ftr)
 {
 	knh_NameSpace_struct *b = DP(ns);
-	ftr(ctx, UP(b->parent));
 	ftr(ctx, UP(b->nsname));
 	ftr(ctx, UP(b->script));
-	ftr(ctx, UP(b->imports));
+	ftr(ctx, UP(b->importedNameSpaces));
 	ftr(ctx, UP(b->lconstDictMap));
 	ftr(ctx, UP(b->name2cidDictSet));
 	ftr(ctx, UP(b->tag2urnDictMap));
 	ftr(ctx, UP(b->func2cidDictSet));
-//	if(b->pkgmeta != NULL && b->pkgmeta->ftraverse != NULL) {
-//		b->pkgmeta->ftraverse(ctx, ftr);
-//	}
-//	if(IS_SWEEP(ftr)) {
-//		if(b->dlhdr != NULL) {
-//			knh_dlclose(ctx, b->dlhdr);
-//			b->dlhdr = NULL;
-//		}
-//	}
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2075,8 +2064,8 @@ void knh_System_init(Ctx *ctx, System *o, int init)
 	sys->sysid = knh_autoSystemId++;
 	sys->ctxcount = 0;
 
-	KNH_INITv(sys->ns, new_NameSpace(ctx, (NameSpace*)KNH_NULL, TS_EMPTY));
-	KNH_INITv(sys->ExptNameDictSet, new_DictSet(ctx, KNH_TEXPT_SIZE));
+	KNH_INITv(sys->ClassNameDictSet, new_DictSet(ctx, KNH_TCLASS_SIZE/2));
+	KNH_INITv(sys->ExptNameDictSet, new_DictSet(ctx, KNH_TEXPT_SIZE/2));
 
 	KNH_INITv(sys->enc,   new_String__T(ctx, konoha_encoding()));
 	KNH_INITv(sys->in,    new_InputStream__stdio(ctx, stdin, sys->enc));
@@ -2117,7 +2106,6 @@ static void knh_System_traverse(Ctx *ctx, System *o, knh_ftraverse ftr)
 {
 	knh_System_struct *sys = DP(o);
 
-	ftr(ctx, UP(sys->ns));
 	ftr(ctx, UP(sys->enc));
 	ftr(ctx, UP(sys->in));
 	ftr(ctx, UP(sys->out));
@@ -2126,6 +2114,7 @@ static void knh_System_traverse(Ctx *ctx, System *o, knh_ftraverse ftr)
 	ftr(ctx, UP(sys->props));
 	ftr(ctx, UP(sys->GlobalConstDictMap));
 	ftr(ctx, UP(sys->ExptNameDictSet));
+	ftr(ctx, UP(sys->ClassNameDictSet));
 
 	ftr(ctx, UP(sys->FieldNameDictIdx));
 	ftr(ctx, UP(sys->FileNameDictIdx));
@@ -2555,7 +2544,7 @@ Object *knh_StringX_fdefault(Ctx *ctx, knh_class_t cid)
 static
 Object *knh_NameSpace_fdefault(Ctx *ctx, knh_class_t cid)
 {
-	return (Object*)DP(ctx->sys)->ns;
+	return UP(ctx->ns);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2721,7 +2710,7 @@ void konoha_loadClassData(Ctx *ctx, knh_ClassData_t *data)
 			ctx->share->ClassTableSize = cid;
 		}
 
-		konoha_seClassTableName(ctx, cid, new_String__T(ctx, data->name));
+		konoha_setClassName(ctx, cid, new_String__T(ctx, data->name));
 
 		ctx->share->ClassTable[cid].cflag  = data->flag;
 		ctx->share->ClassTable[cid].oflag  = KNH_FLAG_CF2OF(data->flag);
@@ -2763,7 +2752,7 @@ void konoha_loadClassData(Ctx *ctx, knh_ClassData_t *data)
 			cm = new_ClassMap0(ctx, data->mapper_size);
 		}
 		KNH_INITv(ctx->share->ClassTable[cid].cmap, cm);
-		konoha_seClassTableDefaultValue(ctx, cid, KNH_NULL, data->fdefault);
+		konoha_setClassDefaultValue(ctx, cid, KNH_NULL, data->fdefault);
 		data++;
 	}
 }
@@ -2951,12 +2940,12 @@ static void konoha_loadClassProperties(Ctx *ctx)
 	KNH_SETv(ctx, ctx->share->ClassTable[CLASS_String].cspec,
 			new_StringUnit(ctx, 0, CLASS_String, TS_EMPTY));
 
-	konoha_seClassTableParam(ctx, CLASS_Array, CLASS_Any, CLASS_Nue);
-	konoha_seClassTableParam(ctx, CLASS_Iterator, CLASS_Any, CLASS_Nue);
-	konoha_seClassTableParam(ctx, CLASS_DictMap, CLASS_Any, CLASS_Nue);
-	konoha_seClassTableParam(ctx, CLASS_DictSet, CLASS_Any, CLASS_Nue);
-	konoha_seClassTableParam(ctx, CLASS_HashMap, CLASS_Any, CLASS_Any);
-	konoha_seClassTableParam(ctx, CLASS_HashSet, CLASS_Any, CLASS_Any);
+	konoha_setClassParam(ctx, CLASS_Array, CLASS_Any, CLASS_Nue);
+	konoha_setClassParam(ctx, CLASS_Iterator, CLASS_Any, CLASS_Nue);
+	konoha_setClassParam(ctx, CLASS_DictMap, CLASS_Any, CLASS_Nue);
+	konoha_setClassParam(ctx, CLASS_DictSet, CLASS_Any, CLASS_Nue);
+	konoha_setClassParam(ctx, CLASS_HashMap, CLASS_Any, CLASS_Any);
+	konoha_setClassParam(ctx, CLASS_HashSet, CLASS_Any, CLASS_Any);
 	ctx->share->ClassTable[CLASS_Closure].r0 = CLASS_Any;
 	ctx->share->ClassTable[CLASS_Closure].p1 = CLASS_Any;
 	ctx->share->ClassTable[CLASS_Closure].p2 = CLASS_Any;

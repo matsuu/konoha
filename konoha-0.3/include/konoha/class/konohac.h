@@ -55,7 +55,7 @@ typedef knh_ushort_t   knh_stmt_t;
 /* @flag Token.NotNullType TKF SP(%s)->flag 'is:set:*:*' */
 /* @flag Token.IteratorType TKF SP(%s)->flag 'is:set:*:*' */
 /* @flag Token.ArrayType TKF SP(%s)->flag 'is:set:*:*' */
-/* @flag Token.PluralType TKF SP(%s)->flag 'is:set:*:*' */
+/* @flag Token.NullableType TKF SP(%s)->flag 'is:set:*:*' */
 
 /* ------------------------------------------------------------------------ */
 

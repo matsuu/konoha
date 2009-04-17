@@ -104,7 +104,7 @@ KNHAPI(void) knh_Glue_init(Ctx *ctx, knh_Glue_t *g, void *ptr, knh_fgfree gfree)
 
 KNHAPI(Object*) new_Glue(Ctx *ctx, char *lname, void *ptr, knh_fgfree gfree)
 {
-	knh_class_t cid = konoha_getcid(ctx, lname);
+	knh_class_t cid = konoha_getcid(ctx, B(lname));
 	if(cid == CLASS_unknown) {
 		KNH_THROWf(ctx, "Unknown!!: %s", lname);
 	}

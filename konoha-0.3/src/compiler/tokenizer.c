@@ -383,7 +383,7 @@ void knh_Token_add_space(Ctx *ctx, Token *tk, int *BOL, knh_cwb_t tbuf, InputStr
 			*BOL = 0; goto L_CLEAR;
 		}
 		if(t.buf[0] == '?' && t.buf[2] == '\0') {
-			knh_Token_setPluralType(tkp, 1);
+			knh_Token_setNullableType(tkp, 1);
 			*BOL = 0; goto L_CLEAR;
 		}
 	}
