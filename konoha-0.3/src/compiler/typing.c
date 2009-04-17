@@ -808,11 +808,8 @@ int knh_Token_typing(Ctx *ctx, Token *tk, Asm *abr, NameSpace *ns, knh_type_t re
 		return knh_TokenCONSTN_typing(ctx, tk, abr, ns);
 
 	case TT_FN :
-	case TT_NAME: {
-		int res = knh_TokenNAME_typing(ctx, tk, abr);
-		//DBG2_P("NAME tt=%s, index=%d, res=%d", knh_token_tochar(SP(tk)->tt), DP(tk)->index, res);
-		return res;
-	}
+	case TT_NAME:
+		return knh_TokenNAME_typing(ctx, tk, abr);
 	case TT_NUM:
 		return knh_TokenNUM_typing(ctx, tk, ns, reqc);
 	case TT_CMETHODN:
@@ -825,9 +822,9 @@ int knh_Token_typing(Ctx *ctx, Token *tk, Asm *abr, NameSpace *ns, knh_type_t re
 	case TT_STR:
 		KNH_ASSERT(IS_String(DP(tk)->data));
 		knh_Token_toCONST(tk);
-//		if(ctx->share->ClassTable[reqc].bcid == CLASS_String) {
-//			DP(o)->type = reqc;
-//		}
+		if(ctx->share->ClassTable[reqc].bcid == CLASS_String && reqc != CLASS_String) {
+			TODO();
+		}
 		return 1;
 
 	case TT_TSTR:
@@ -1118,9 +1115,12 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	knh_fieldn_t fn  = FIELDN_UNMASK(fnq);
 	knh_flag_t flag  = knh_Stmt_metaflag__field(ctx, stmt);
 
-	knh_type_t pmztype  = knh_Token_gettype(ctx, StmtDECL_type(stmt), ns, CLASS_Any);
+	knh_type_t pmztype  = knh_Token_gettype(ctx, StmtDECL_type(stmt), ns, TYPE_var);
 	knh_type_t type = knh_pmztype_totype(ctx, pmztype, DP(abr)->this_cid);
-	//knh_class_t var_cid = CLASS_type(type);
+	if(TERMs_isNULL(stmt, 2) && !TERMs_isASIS(stmt, 2)) {
+		DBG2_P("type inferencing: Nullable");
+		type = CLASS_type(type);
+	}
 
 	/* Type name value */
 	if(!TERMs_typing(ctx, stmt, 2, abr, ns, type, TCHECK_)) {
@@ -1129,6 +1129,7 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 
 	if(level == 0) {  /* SCRIPT VARIABLE */
 		flag = flag | KNH_FLAG_CFF_GETTER | KNH_FLAG_CFF_SETTER;
+		if(type == TYPE_var) type = TYPE_Any;
 		Object *value = knh_StmtDECL_value(ctx, type);
 		if(!knh_Asm_declareScriptVariable(ctx, abr, flag, type, fn, value)) {
 			return NULL;
@@ -1144,6 +1145,7 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		}
 	}
 	else if(level == 1) { /* FIELD VARIABLE */
+		if(type == TYPE_var) type = TYPE_Any;
 		if(!FIELDN_IS_U1(fnq)) {
 			flag |= KNH_FLAG_CFF_GETTER | KNH_FLAG_CFF_SETTER;
 		}
