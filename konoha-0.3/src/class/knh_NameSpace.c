@@ -325,7 +325,12 @@ knh_type_t knh_NameSpace_gettype(Ctx *ctx, NameSpace *ns, knh_bytes_t name, int 
 Object *
 knh_NameSpace_getConstNULL(Ctx *ctx, NameSpace *ns, knh_bytes_t name)
 {
-	knh_index_t idx;
+	knh_index_t idx = knh_bytes_index(name, '.');
+	if(idx > 0) {
+		knh_class_t cid = knh_NameSpace_getcid(ctx, ns, knh_bytes_first(name, idx));
+		if(cid == CLASS_unknown) return NULL;
+		return konoha_getClassConstNULL(ctx, cid, knh_bytes_last(name, idx+1));
+	}
 	if(knh_bytes_index(name, '_') == -1) {
 		if(IS_NOTNULL(DP(ns)->lconstDictMap)) {
 			idx = knh_DictMap_index__b(DP(ns)->lconstDictMap, name);
@@ -340,12 +345,6 @@ knh_NameSpace_getConstNULL(Ctx *ctx, NameSpace *ns, knh_bytes_t name)
 			}
 		}
 		return NULL;
-	}
-	idx = knh_bytes_index(name, '.');
-	if(idx > 0) {
-		knh_class_t cid = knh_NameSpace_getcid(ctx, ns, knh_bytes_first(name, idx));
-		if(cid == CLASS_unknown) return NULL;
-		return konoha_getClassConstNULL(ctx, cid, knh_bytes_last(name, idx+1));
 	}
 	return konoha_getClassConstNULL(ctx, CLASS_Any, name);
 }

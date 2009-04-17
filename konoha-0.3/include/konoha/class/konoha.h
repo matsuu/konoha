@@ -807,8 +807,6 @@ typedef struct knh_System {
 	struct knh_String_t*       enc;
 	knh_String_t              *homeDir;
 
-
-	struct knh_DictMap_t *GlobalConstDictMap;
 	struct knh_DictIdx_t *FileNameDictIdx;
 	struct knh_DictIdx_t *FieldNameDictIdx;
 	struct knh_HashMap_t* MethodFieldHashMap;

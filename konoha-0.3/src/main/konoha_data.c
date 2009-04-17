@@ -2074,8 +2074,6 @@ void knh_System_init(Ctx *ctx, System *o, int init)
 
 	KNH_INITv(sys->props, new_DictMap0(ctx, 64));
 
-	KNH_INITv(sys->GlobalConstDictMap, new_DictMap0(ctx, 256));
-
 	KNH_INITv(sys->FieldNameDictIdx, new_DictIdx0__ignoreCase(ctx, KNH_TFIELDN_SIZE * 2, 0));
 	KNH_INITv(sys->FileNameDictIdx, new_DictIdx0(ctx, 32, 0));
 	knh_DictIdx_add__fast(ctx, sys->FileNameDictIdx, new_String__T(ctx, "(unknown)"));
@@ -2112,7 +2110,6 @@ static void knh_System_traverse(Ctx *ctx, System *o, knh_ftraverse ftr)
 	ftr(ctx, UP(sys->err));
 
 	ftr(ctx, UP(sys->props));
-	ftr(ctx, UP(sys->GlobalConstDictMap));
 	ftr(ctx, UP(sys->ExptNameDictSet));
 	ftr(ctx, UP(sys->ClassNameDictSet));
 
