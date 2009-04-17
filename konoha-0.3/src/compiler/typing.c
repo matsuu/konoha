@@ -1117,6 +1117,7 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 
 	knh_type_t pmztype  = knh_Token_gettype(ctx, StmtDECL_type(stmt), ns, TYPE_var);
 	knh_type_t type = knh_pmztype_totype(ctx, pmztype, DP(abr)->this_cid);
+
 	if(TERMs_isNULL(stmt, 2) && !TERMs_isASIS(stmt, 2)) {
 		DBG2_P("type inferencing: Nullable");
 		type = CLASS_type(type);
@@ -1127,25 +1128,20 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		return NULL;
 	}
 
+	if(type == TYPE_var) {
+		type = TERMs_gettype(stmt, 2);
+		DBG2_P("type inferencing: var => %s%s", TYPEQN(type));
+		if(type == TYPE_var) type = TYPE_Any;
+	}
+
 	if(level == 0) {  /* SCRIPT VARIABLE */
 		flag = flag | KNH_FLAG_CFF_GETTER | KNH_FLAG_CFF_SETTER;
-		if(type == TYPE_var) type = TYPE_Any;
 		Object *value = knh_StmtDECL_value(ctx, type);
 		if(!knh_Asm_declareScriptVariable(ctx, abr, flag, type, fn, value)) {
 			return NULL;
 		}
-		if(TERMs_isASIS(stmt, 2)) {
-			knh_Stmt_done(ctx, stmt);
-		}
-		else {
-			knh_StmtDECL_toLET(ctx, stmt);
-			if(!TERMs_typing(ctx, stmt, 0, abr, ns, TYPE_Any, TWARN_)) {
-				return NULL;
-			}
-		}
 	}
 	else if(level == 1) { /* FIELD VARIABLE */
-		if(type == TYPE_var) type = TYPE_Any;
 		if(!FIELDN_IS_U1(fnq)) {
 			flag |= KNH_FLAG_CFF_GETTER | KNH_FLAG_CFF_SETTER;
 		}
@@ -1155,6 +1151,7 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		}
 		knh_Asm_declareVariable(ctx, abr, flag, type, fn, value);
 		knh_Stmt_done(ctx, stmt);
+		return TM(stmt);
 	}
 	else if(level == -1 || level == -2) {  /* -1 OUTER_PARAM, -2: INNER_PARAM */
 		Object *value = KNH_NULL;
@@ -1173,22 +1170,23 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 			}
 		}
 		knh_Asm_declareVariable(ctx, abr, flag, type, fn, value);
+		return TM(stmt);
 	}
 	else {
 		if(FIELDN_IS_U2(fnq) || FIELDN_IS_U1(fnq)) {
 			knh_Asm_perror(ctx, abr, KMSG_IGQNAME, sToken(StmtDECL_name(stmt)));
 		}
 		Object *value = knh_StmtDECL_value(ctx, type);
-		if(TERMs_isASIS(stmt, 2)) {
-			knh_Asm_declareVariable(ctx, abr, flag, type, fn, value);
-			knh_Stmt_done(ctx, stmt);
-		}
-		else {
-			knh_Asm_declareVariable(ctx, abr, flag, type, fn, value);
-			knh_StmtDECL_toLET(ctx, stmt);
-			if(!TERMs_typing(ctx, stmt, 0, abr, ns, TYPE_Any, TWARN_)) {
-				return NULL;
-			}
+		knh_Asm_declareVariable(ctx, abr, flag, type, fn, value);
+	}
+
+	if(TERMs_isASIS(stmt, 2)) {
+		knh_Stmt_done(ctx, stmt);
+	}
+	else {
+		knh_StmtDECL_toLET(ctx, stmt);
+		if(!TERMs_typing(ctx, stmt, 0, abr, ns, TYPE_Any, TWARN_)) {
+			return NULL;
 		}
 	}
 	return TM(stmt);
@@ -2516,6 +2514,7 @@ static
 int TERMs_typing(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, NameSpace *ns, knh_type_t reqt, int mode)
 {
 	if(SP(stmt)->stt == STT_ERR) return 0;
+	if(reqt == TYPE_var) reqt = TYPE_Any;
 
 	if(IS_Token(DP(stmt)->tokens[n])) {
 		Token *tk = DP(stmt)->tokens[n];

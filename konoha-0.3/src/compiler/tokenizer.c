@@ -244,6 +244,9 @@ Token *new_Token__NAME(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t
 			if(name[0] == 'v' && name[1] == 'o' && name[2] == 'i' && name[3] == 'd' && name[4] == 0) {
 				tt = TT_TYPEN;
 			}
+			if(name[0] == 'v' && name[1] == 'a' && name[2] == 'r' && name[3] == 0) {
+				tt = TT_TYPEN;
+			}
 			if(name[0] == 'a' && name[1] == 'n' && name[2] == 'y' && name[3] == 0) {
 				name[0] = 'A';
 				tt = TT_TYPEN;
@@ -486,7 +489,6 @@ int knh_Token_toClosureType(Ctx *ctx, Token *tkt, Token *tkp)
 	if(tc.e == 0) {
 		knh_cwb_clear(cwb);
 		return 0;
-		//knh_write(ctx, cwb.w, STEXT("void"));
 	}
 	knh_putc(ctx, cwb.w, ')');
 	KNH_SETv(ctx, DP(tkt)->data, new_String__cwb(ctx, cwb));

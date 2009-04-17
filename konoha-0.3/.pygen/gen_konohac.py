@@ -210,9 +210,6 @@ const   TT_METAN        @alias
 
 mod     TT_MOD          @alias
 
-#void    TT_TYPEN        @alias
-#any     TT_TYPEN        @alias
-
 char    Int!            @alias
 short   Int!            @alias
 int     Int!            @alias
@@ -516,10 +513,6 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
     knh_bytes_t t = token;
     knh_token_t tt = ((knh_token_t)-1);
     L_TAIL:;
-    //if(t.buf[0] == '.' && islower(t.buf[1])) {   /* .name   => name */
-        //flag |= KNH_FLAG_TKF_TOPDOT;
-        //t.buf++; t.len--;
-    //}
     if(isalpha(t.buf[0])) {
         if(t.buf[t.len-2]=='.' && t.buf[t.len-1]=='.') {
             flag |= KNH_FLAG_TKF_ITERATORTYPE;

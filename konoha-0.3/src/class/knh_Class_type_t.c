@@ -193,6 +193,10 @@ char* knh_format_type(Ctx *ctx, char *buf, size_t bufsiz, knh_type_t type)
 		knh_snprintf(buf, bufsiz, "void");
 		return buf;
 	}
+	if(type == TYPE_void) {
+		knh_snprintf(buf, bufsiz, "var");
+		return buf;
+	}
 	knh_class_t cid = CLASS_type(type);
 	if(!(cid < ctx->share->ClassTableSize)) {
 		cid = CLASS_Any;
@@ -221,7 +225,7 @@ char *TYPEQ(knh_type_t type)
 	if(IS_NNTYPE(type)) {
 		return "!";
 	}
-	return "";
+	return "?";
 }
 
 /* ------------------------------------------------------------------------ */
@@ -231,6 +235,7 @@ char *TYPEQ(knh_type_t type)
 char *knh_TYPEN(Ctx *ctx, knh_type_t type)
 {
 	if(type == TYPE_void) return "void";
+	if(type == TYPE_var)  return "var";
 	knh_class_t cid = CLASS_type(type);
 	return CLASSN(cid);
 }
