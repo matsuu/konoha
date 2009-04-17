@@ -392,8 +392,6 @@ knh_NameSpace_getFuncClass(Ctx *ctx, NameSpace *o, knh_bytes_t funcname)
 	return CLASS_unknown; /* if it isn't found */
 }
 
-
-
 /* ======================================================================== */
 /* [tag] */
 

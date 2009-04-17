@@ -1118,7 +1118,8 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	knh_type_t pmztype  = knh_Token_gettype(ctx, StmtDECL_type(stmt), ns, TYPE_var);
 	knh_type_t type = knh_pmztype_totype(ctx, pmztype, DP(abr)->this_cid);
 
-	if(TERMs_isNULL(stmt, 2) && !TERMs_isASIS(stmt, 2)) {
+	if(TERMs_isNULL(stmt, 2) && !TERMs_isASIS(stmt, 2)
+			&& !knh_Token_isNotNullType(DP(stmt)->tokens[0])) {
 		DBG2_P("type inferencing: Nullable");
 		type = CLASS_type(type);
 	}
