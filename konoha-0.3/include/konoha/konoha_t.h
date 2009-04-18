@@ -396,7 +396,7 @@ typedef struct {
 #undef KNH_USING_NOTHREAD
 #define knh_thread_t pthread_t
 #define knh_thread_key_t pthread_key_t
-typedef knh_mutex_t pthread_mutex_t
+#define knh_mutex_t pthread_mutex_t
 #endif
 
 #ifdef KNH_USING_NOTHREAD

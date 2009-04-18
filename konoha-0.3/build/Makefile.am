@@ -118,7 +118,6 @@ libkonoha_la_includekonoha_HEADERS += ../include/konoha/konoha_glue.h
 libkonoha_la_includekonoha_HEADERS += ../include/konoha/konoha_macros.h
 libkonoha_la_includekonoha_HEADERS += ../include/konoha/konoha_t.h
 libkonoha_la_includekonoha_HEADERS += ../include/konoha/konoha_vm.h
-libkonoha_la_includekonoha_HEADERS += ../include/konoha/konohac_t.h
 libkonoha_la_includekonoha_HEADERS += ../include/konoha/license.h
 libkonoha_la_includeclassdir = $(includedir)/../include/konoha/class
 libkonoha_la_includeclass_HEADERS = 
