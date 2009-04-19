@@ -241,11 +241,32 @@ void knh_Object__k(Ctx *ctx, Object *o, OutputStream *w, String *m)
 			knh_putc(ctx, w, '{');
 			for(i = 0; i < bsize; i++) {
 				knh_cfield_t *cf = knh_Class_fieldAt(ctx, knh_Object_cid(o), i);
+				if(cf->fn == FIELDN_NONAME) break;
+				if(cf->fn == FIELDN_register) continue;
 				if(i > 0) {
 					knh_write_delim(ctx, w);
 				}
 				knh_printf(ctx, w, "%s: ", FIELDN(cf->fn));
+#ifdef KNH_USING_UNBOXFIELD
+				if(cf->type == NNTYPE_Int) {
+					knh_int_t *data = (knh_int_t*)(v + i);
+					knh_write__i(ctx, w, data[0]);
+					continue;
+				}
+				else if(cf->type == NNTYPE_Float) {
+					knh_float_t *data = (knh_float_t*)(v + i);
+					knh_write__f(ctx, w, data[0]);
+					continue;
+				}
+				else if(cf->type == NNTYPE_Boolean) {
+					knh_boolean_t *data = (knh_boolean_t*)(v + i);
+					if(data[0]) knh_write(ctx, w, STEXT("true"));
+					else knh_write(ctx, w, STEXT("false"));
+					continue;
+				}
+#else
 				knh_format(ctx, w, METHODN__k, v[i], KNH_NULL);
+#endif
 			}
 			knh_putc(ctx, w, '}');
 		}
@@ -261,30 +282,31 @@ void knh_Object__k(Ctx *ctx, Object *o, OutputStream *w, String *m)
 static
 void knh_Object__dump(Ctx *ctx, Object *b, OutputStream *w, String *m)
 {
-	knh_class_t cid = knh_Object_cid(b);
-	if(cid < KONOHA_TSTRUCT_SIZE) {
-		knh_format(ctx, w, METHODN__s, b, KNH_NULL);
-		return ;
-	}
-	knh_intptr_t i, c = 0;
-	knh_putc(ctx, w, '[');
-	for(i = 0; i < ctx->share->ClassTable[cid].bsize; i++) {
-		knh_cfield_t *cf = knh_Class_fieldAt(ctx, cid, i);
-		if(cf->fn == FIELDN_NONAME || KNH_FLAG_IS(cf->flag, KNH_FLAG_CFF_HIDDEN)) continue;
-		if(c > 0) {
-			knh_write_delim(ctx, w);
-		}
-		knh_printf(ctx, w, "%s=", /* cf->type, */ FIELDN(cf->fn));
-		Object *v = KNH_FIELDn(b, i);
-		if(IS_bString(v)) {
-			knh_format(ctx, w, METHODN__dump, v, KNH_NULL);
-		}
-		else {
-			knh_format(ctx, w, METHODN__s, v, KNH_NULL);
-		}
-		c++;
-	}
-	knh_putc(ctx, w, ']');
+	TODO();
+//	knh_class_t cid = knh_Object_cid(b);
+//	if(cid < KONOHA_TSTRUCT_SIZE) {
+//		knh_format(ctx, w, METHODN__s, b, KNH_NULL);
+//		return ;
+//	}
+//	knh_intptr_t i, c = 0;
+//	knh_putc(ctx, w, '[');
+//	for(i = 0; i < ctx->share->ClassTable[cid].bsize; i++) {
+//		knh_cfield_t *cf = knh_Class_fieldAt(ctx, cid, i);
+//		if(cf->fn == FIELDN_NONAME || KNH_FLAG_IS(cf->flag, KNH_FLAG_CFF_HIDDEN)) continue;
+//		if(c > 0) {
+//			knh_write_delim(ctx, w);
+//		}
+//		knh_printf(ctx, w, "%s=", /* cf->type, */ FIELDN(cf->fn));
+//		Object *v = KNH_FIELDn(b, i);
+//		if(IS_bString(v)) {
+//			knh_format(ctx, w, METHODN__dump, v, KNH_NULL);
+//		}
+//		else {
+//			knh_format(ctx, w, METHODN__s, v, KNH_NULL);
+//		}
+//		c++;
+//	}
+//	knh_putc(ctx, w, ']');
 }
 
 /* ------------------------------------------------------------------------ */

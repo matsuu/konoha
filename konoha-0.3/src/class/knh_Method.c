@@ -474,7 +474,7 @@ METHOD knh_fmethod_igetter(Ctx *ctx, knh_sfp_t *sfp)
 {
 	DBG2_ASSERT(IS_Method(sfp[-1].mtd));
 #ifdef KNH_USING_UNBOXFIELD
-	knh_int_t *data = (knh_int_t*)KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta);
+	knh_int_t *data = (knh_int_t*)(&(KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta)));
 	KNH_RETURN_Int(ctx, sfp, data[0]);
 #else/*KNH_USING_UNBOXFIELD*/
 	Int *o = (Int*)KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta);
@@ -489,7 +489,7 @@ METHOD knh_fmethod_fgetter(Ctx *ctx, knh_sfp_t *sfp)
 {
 	DBG2_ASSERT(IS_Method(sfp[-1].mtd));
 #ifdef KNH_USING_UNBOXFIELD
-	knh_float_t *data = (knh_float_t*)KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta);
+	knh_float_t *data = (knh_float_t*)(&(KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta)));
 	KNH_RETURN_Float(ctx, sfp, data[0]);
 #else/*KNH_USING_UNBOXFIELD*/
 	Float *o = (Float*)KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta);
@@ -504,7 +504,7 @@ METHOD knh_fmethod_bgetter(Ctx *ctx, knh_sfp_t *sfp)
 {
 	DBG2_ASSERT(IS_Method(sfp[-1].mtd));
 #ifdef KNH_USING_UNBOXFIELD
-	knh_bool_t *data = (knh_bool_t*)KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta);
+	knh_bool_t *data = (knh_bool_t*)(&(KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta)));
 	KNH_RETURN_Boolean(ctx, sfp, data[0]);
 #else/*KNH_USING_UNBOXFIELD*/
 	Boolean *o = (Boolean*)KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta);
@@ -529,7 +529,7 @@ METHOD knh_fmethod_bsetter(Ctx *ctx, knh_sfp_t *sfp)
 {
 	DBG2_ASSERT(IS_Method(sfp[-1].mtd));
 #ifdef KNH_USING_UNBOXFIELD
-	knh_bool_t *data = (knh_bool_t*)KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta);
+	knh_bool_t *data = (knh_bool_t*)(&(KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta)));
 	data[0] = sfp[1].bvalue;
 #else/*KNH_USING_UNBOXFIELD*/
 	KNH_MOV(ctx, KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta), new_Boolean(ctx, sfp[1].bvalue));
@@ -544,7 +544,7 @@ METHOD knh_fmethod_isetter(Ctx *ctx, knh_sfp_t *sfp)
 {
 	DBG2_ASSERT(IS_Method(sfp[-1].mtd));
 #ifdef KNH_USING_UNBOXFIELD
-	knh_int_t *data = (knh_int_t*)KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta);
+	knh_int_t *data = (knh_int_t*)(&(KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta)));
 	data[0] = sfp[1].ivalue;
 #else/*KNH_USING_UNBOXFIELD*/
 	Int *n = new_Int(ctx, sfp[1].ivalue);
@@ -571,7 +571,7 @@ METHOD knh_fmethod_fsetter(Ctx *ctx, knh_sfp_t *sfp)
 {
 	DBG2_ASSERT(IS_Method(sfp[-1].mtd));
 #ifdef KNH_USING_UNBOXFIELD
-	knh_float_t *data = (knh_float_t*)KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta);
+	knh_float_t *data = (knh_float_t*)(&(KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta)));
 	data[0] = sfp[1].fvalue;
 #else/*KNH_USING_UNBOXFIELD*/
 	Float *n = new_Float(ctx, sfp[1].fvalue);

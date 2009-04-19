@@ -29,6 +29,8 @@
 
 #include"commons.h"
 
+#define KNH_USING_UNBOXFIELD 1
+
 /* ************************************************************************ */
 
 #ifdef __cplusplus
@@ -421,7 +423,35 @@ int knh_Asm_declareScriptVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_
 	knh_cfield_t *cf = (ctx->share->ClassTable[cid].cstruct)->fields;
 	knh_index_t idx = knh_Asm_addVariableTable(ctx, abr, cf, KNH_SCRIPT_FIELDSIZE, flag, type, fn, value);
 	if(idx != -1) {
-		KNH_SETv(ctx, scr->fields[idx], value);
+#ifdef KNH_USING_UNBOXFIELD
+		if(type == NNTYPE_Int) {
+			if(sizeof(knh_int_t) > sizeof(void*)) {
+				if(knh_Asm_addVariableTable(ctx, abr, cf, KNH_SCRIPT_FIELDSIZE, 0, CLASS_unknown, FIELDN_register, value) == -1) {
+					return 0;
+				}
+			}
+			knh_int_t *v = (knh_int_t*)(scr->fields + idx);
+			v[0] = (IS_NULL(value)) ? 0 : ((Int*)value)->n.ivalue;
+		}
+		else if(type == NNTYPE_Float) {
+			if(sizeof(knh_float_t) > sizeof(void*)) {
+				if(knh_Asm_addVariableTable(ctx, abr, cf, KNH_SCRIPT_FIELDSIZE, 0, CLASS_unknown, FIELDN_register, value) == -1) {
+					return 0;
+				}
+			}
+			knh_float_t *v = (knh_float_t*)(scr->fields + idx);
+			v[0] = (IS_NULL(value)) ? 0.0 : ((Float*)value)->n.fvalue;
+		}
+		else if(type == NNTYPE_Boolean) {
+			knh_boolean_t *v = (knh_boolean_t*)(scr->fields + idx);
+			v[0] = (IS_NULL(value)) ? 0 : ((Int*)value)->n.bvalue;
+		}
+		else {
+			KNH_INITv(scr->fields[idx], value);
+		}
+#else
+		KNH_INITv(scr->fields[idx], value);
+#endif/*KNH_USING_UNBOXFIELD*/
 		return 1;
 	}
 	return 0;
@@ -430,7 +460,49 @@ int knh_Asm_declareScriptVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_
 /* ------------------------------------------------------------------------ */
 
 static
-knh_index_t knh_Asm_declareVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_t type, knh_fieldn_t fn, Object *value)
+int knh_Asm_declareFieldVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_t type, knh_fieldn_t fn, Object *value)
+{
+	knh_index_t idx =
+		knh_Asm_addVariableTable(ctx, abr, (knh_cfield_t*)DP(abr)->vars, KONOHA_LOCALSIZE, flag, type, fn, value);
+	if(idx != -1) {
+#ifdef KNH_USING_UNBOXFIELD
+		if(type == NNTYPE_Int) {
+			if(sizeof(knh_int_t) > sizeof(void*)) {
+				if(knh_Asm_addVariableTable(ctx, abr,
+						(knh_cfield_t*)DP(abr)->vars, KONOHA_LOCALSIZE, 0, CLASS_unknown, FIELDN_register, value) == -1) {
+					return -1;
+				}
+				if((idx + 1) > DP(abr)->vars_size) {
+					DP(abr)->vars_size = (knh_ushort_t)(idx + 2);
+				}
+				return idx;
+			}
+		}
+		else if(type == NNTYPE_Float) {
+			if(sizeof(knh_float_t) > sizeof(void*)) {
+				if(knh_Asm_addVariableTable(ctx, abr,
+						(knh_cfield_t*)DP(abr)->vars, KONOHA_LOCALSIZE, 0, CLASS_unknown, FIELDN_register, value) == -1) {
+					return -1;
+				}
+				if((idx + 1) > DP(abr)->vars_size) {
+					DP(abr)->vars_size = (knh_ushort_t)(idx + 2);
+				}
+				return idx;
+			}
+		}
+#endif/*KNH_USING_UNBOXFIELD*/
+		if((idx + 1) > DP(abr)->vars_size) {
+			DP(abr)->vars_size = (knh_ushort_t)(idx + 1);
+		}
+		return idx;
+	}
+	return -1;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+knh_index_t knh_Asm_declareLocalVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_t type, knh_fieldn_t fn, Object *value)
 {
 	knh_index_t idx =
 		knh_Asm_addVariableTable(ctx, abr, (knh_cfield_t*)DP(abr)->vars, KONOHA_LOCALSIZE, flag, type, fn, value);
@@ -481,7 +553,7 @@ int knh_Asm_globalIndex(Ctx *ctx, Asm *abr)
 {
 	if(DP(abr)->globalidx == -1) {
 		DP(abr)->globalidx =
-			knh_Asm_declareVariable(ctx, abr, 0, NNTYPE_Script, FIELDN_GLOBAL, UP(knh_Asm_getScript(ctx, abr)));
+			knh_Asm_declareLocalVariable(ctx, abr, 0, NNTYPE_Script, FIELDN_GLOBAL, UP(knh_Asm_getScript(ctx, abr)));
 		if(DP(abr)->globalidx == -1) return 0;
 	}
 	return 1;
@@ -1150,7 +1222,7 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		if(!TERMs_isCONST(stmt, 2) && !TERMs_isASIS(stmt, 2)) {
 			knh_Asm_perror(ctx, abr, KMSG_IGFIELDVALUE, FIELDN(fn));
 		}
-		knh_Asm_declareVariable(ctx, abr, flag, type, fn, value);
+		knh_Asm_declareFieldVariable(ctx, abr, flag, type, fn, value);
 		knh_Stmt_done(ctx, stmt);
 		return TM(stmt);
 	}
@@ -1170,7 +1242,7 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 				}
 			}
 		}
-		knh_Asm_declareVariable(ctx, abr, flag, type, fn, value);
+		knh_Asm_declareLocalVariable(ctx, abr, flag, type, fn, value);
 		return TM(stmt);
 	}
 	else {
@@ -1178,7 +1250,7 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 			knh_Asm_perror(ctx, abr, KMSG_IGQNAME, sToken(StmtDECL_name(stmt)));
 		}
 		Object *value = knh_StmtDECL_value(ctx, type);
-		knh_Asm_declareVariable(ctx, abr, flag, type, fn, value);
+		knh_Asm_declareLocalVariable(ctx, abr, flag, type, fn, value);
 	}
 
 	if(TERMs_isASIS(stmt, 2)) {
@@ -1343,12 +1415,12 @@ Term *knh_StmtLET_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type
 				knh_Asm_perror(ctx, abr, KMSG_IGFIELDVALUE, FIELDN(fn));
 			}
 			// flag |= KNH_FLAG_CFF_GETTER | KNH_FLAG_CFF_SETTER;
-			knh_Asm_declareVariable(ctx, abr, flag, type, fn, value);
+			knh_Asm_declareFieldVariable(ctx, abr, flag, type, fn, value);
 			knh_Stmt_done(ctx, stmt);
 			return TM(stmt);
 		}
 		else if(level > 1) { /* LOCAL_LEVEL */
-			knh_Asm_declareVariable(ctx, abr, flag, type, fn, value);
+			knh_Asm_declareLocalVariable(ctx, abr, flag, type, fn, value);
 		}
 		if(!TERMs_typing(ctx, stmt, 0, abr, ns, TYPE_Any, TCHECK_)) {
 			return NULL;
@@ -2697,7 +2769,7 @@ Term *knh_StmtFOREACH_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 			itrcid = TERMs_getcid(stmt, FOREACH_iter);
 			type = NNTYPE_cid(ctx->share->ClassTable[itrcid].p1);
 			type = knh_Asm_typeinfer(ctx, abr, type, FIELDN(fn));
-			knh_Asm_declareVariable(ctx, abr, 0, type, fn, konoha_getClassDefaultValue(ctx, CLASS_type(type)));
+			knh_Asm_declareLocalVariable(ctx, abr, 0, type, fn, konoha_getClassDefaultValue(ctx, CLASS_type(type)));
 			if(!TERMs_typing(ctx, stmt, FOREACH_name, abr, ns, type, TCHECK_)) {
 				return NULL;
 			}
@@ -2709,7 +2781,7 @@ Term *knh_StmtFOREACH_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		type = knh_pmztype_totype(ctx, type, DP(abr)->this_cid);
 		knh_index_t idx = knh_Asm_indexOfVariable(abr, fn);
 		if(idx == -1) { //DEBUG3("defining new type ..");
-			knh_Asm_declareVariable(ctx, abr, /*flag*/0, type, fn, KNH_NULL);
+			knh_Asm_declareLocalVariable(ctx, abr, /*flag*/0, type, fn, KNH_NULL);
 		}
 	}
 	//DBG2_P("type=%s%s", TYPEQN(type));
@@ -2732,7 +2804,7 @@ Term *knh_StmtFOREACH_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	L_BLOCK:;
 	KNH_ASSERT(itrcid != CLASS_unknown);
 	{
-		int sfpidx = knh_Asm_declareVariable(ctx, abr, 0, TYPE_Any,
+		int sfpidx = knh_Asm_declareLocalVariable(ctx, abr, 0, TYPE_Any,
 				knh_tName_local(ctx, "__S%d__", DP(abr)->level), KNH_NULL);
 		//DBG2_P("sfpidx=%d", sfpidx);
 		if(sfpidx == -1) return NULL;
@@ -2757,7 +2829,7 @@ Term *knh_StmtFOREACH_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 static
 Term *knh_StmtTRY_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 {
-	int sfpidx = knh_Asm_declareVariable(ctx, abr,
+	int sfpidx = knh_Asm_declareLocalVariable(ctx, abr,
 			0, TYPE_Any, knh_tName_local(ctx, "__E%d__", DP(abr)->level), KNH_NULL);
 	DBG2_P("sfpidx=%d", sfpidx);
 	if(sfpidx == -1) return NULL;
@@ -2774,7 +2846,7 @@ Term *knh_StmtTRY_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 				knh_Asm_perror(ctx, abr, KMSG_ESYNTAX, sToken(DP(instmt)->tokens[1]));
 				return NULL;
 			}
-			knh_Asm_declareVariable(ctx, abr, 0, TYPE_Exception, fn, KNH_NULL);
+			knh_Asm_declareLocalVariable(ctx, abr, 0, TYPE_Exception, fn, KNH_NULL);
 			if(TERMs_typing(ctx, instmt, 1, abr, ns, TYPE_Exception, TCHECK_)) {
 				knh_Stmt_done(ctx, instmt);
 			}

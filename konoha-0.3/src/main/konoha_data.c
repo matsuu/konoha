@@ -158,16 +158,19 @@ void knh_ClassStruct_initField(Ctx *ctx, ClassStruct *cs, knh_class_t self_cid, 
 	for(i = 0; i < cs->fsize; i++) {
 #ifdef KNH_USING_UNBOXFIELD
 		if(cf[i].type == NNTYPE_Int) {
-			knh_int_t *data = (knh_int_t*)v[i];
-			data[0] = 0; continue;
+			knh_int_t *data = (knh_int_t*)(v + i);
+			data[0] = IS_NULL(cf[i].value) ? 0 : ((Int*)cf[i].value)->n.ivalue;
+			continue;
 		}
 		if(cf[i].type == NNTYPE_Float) {
-			knh_float_t *data = (knh_float_t*)v[i];
-			data[0] = 0.0; continue;
+			knh_float_t *data = (knh_float_t*)(v + i);
+			data[0] = IS_NULL(cf[i].value) ? 0.0 : ((Int*)cf[i].value)->n.fvalue;
+			continue;
 		}
 		if(cf[i].type == NNTYPE_Boolean) {
-			knh_bool_t *data = (knh_bool_t*)v[i];
-			data[0] = 0; continue;
+			knh_bool_t *data = (knh_bool_t*)(v + i);
+			data[0] = IS_NULL(cf[i].value) ? 0 : ((Int*)cf[i].value)->n.bvalue;
+			continue;
 		}
 		if(cf[i].type == CLASS_unknown) {
 			continue;
@@ -212,7 +215,6 @@ void knh_ObjectField_init(Ctx *ctx, knh_ObjectField_t *of, int init)
 static
 void knh_ObjectField_traverse(Ctx *ctx, knh_ObjectField_t *of, knh_ftraverse ftr)
 {
-#ifdef KNH_USING_UNBOXFIELD
 	knh_class_t cid = knh_Object_cid(of);
 	while(cid != CLASS_Object) {
 		knh_ClassStruct_t *cs = ctx->share->ClassTable[cid].cstruct;
@@ -224,16 +226,11 @@ void knh_ObjectField_traverse(Ctx *ctx, knh_ObjectField_t *of, knh_ftraverse ftr
 			if(cs->fields[i].type == CLASS_unknown) {
 				continue;
 			}
+			if(cs->fields[i].fn == FIELDN_NONAME) break;
 			ftr(ctx, of->fields[i + offset]);
 		}
 		cid = ctx->share->ClassTable[cid].supcid;
 	}
-#else/*KNH_USING_UNBOXFIELD*/
-	size_t i;
-	for(i = 0; i < of->bsize; i++) {
-		ftr(ctx, of->fields[i]);
-	}
-#endif/*KNH_USING_UNBOXFIELD*/
 }
 
 /* ======================================================================== */
@@ -1959,7 +1956,7 @@ knh_ExceptionHandler_traverse(Ctx *ctx, ExceptionHandler *hdr, knh_ftraverse gc)
 
 #define knh_Script_init_ NULL
 #define knh_Script_copy NULL
-#define knh_Script_traverse_ NULL
+#define knh_Script_traverse knh_ObjectField_traverse
 #define knh_Script_compareTo NULL
 #define knh_Script_hashCode NULL
 #define knh_Script_newClass NULL
@@ -1968,26 +1965,8 @@ knh_ExceptionHandler_traverse(Ctx *ctx, ExceptionHandler *hdr, knh_ftraverse gc)
 static
 void knh_Script_init(Ctx *ctx, Script *s, int init)
 {
-	int i;
 	s->fields = (Object**)KNH_MALLOC(ctx, sizeof(Object*) * KNH_SCRIPT_FIELDSIZE);
-	for(i = 0; i < KNH_SCRIPT_FIELDSIZE; i++) {
-		KNH_INITv(s->fields[i], KNH_NULL);
-	}
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-void knh_Script_traverse(Ctx *ctx, Script *s, knh_ftraverse ftr)
-{
-	int i;
-	for(i = 0; i < KNH_SCRIPT_FIELDSIZE; i++) {
-		ftr(ctx, s->fields[i]);
-	}
-//	automatically free
-//	if(IS_SWEEP(ftr)) {
-//		KNH_FREE(ctx, s->fields, sizeof(Object*) * KNH_SCRIPT_FIELDSIZE);
-//	}
+	knh_bzero(s->fields, sizeof(Object*) * KNH_SCRIPT_FIELDSIZE);
 }
 
 /* ======================================================================== */
