@@ -2,6 +2,7 @@
 
 void readfile(String filename)
 {
+	OUT << "opening.. " << filename << EOL;
 	foreach(String line from new InputStream(filename)) {
 		OUT << line << EOL;
 	}

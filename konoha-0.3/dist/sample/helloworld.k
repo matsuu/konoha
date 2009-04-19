@@ -1,6 +1,7 @@
 #!/usr/local/bin/konoha
 
 void main(String[] argv) {
-	OUT << "hello,world" << EOL
+	// print "hello,world"
+	OUT << "hello,world" << EOL;
 }
 
