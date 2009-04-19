@@ -24,14 +24,21 @@ XMOVSYS sfx ushort
 
 MOVxi sfi sfx
 XMOVsi sfx sfi
+XMOVoi sfx OBJ
 XMOVxi sfx sfx
+XMOVxio sfx sfx
+XMOVxBXi sfx sfx cid
 
 MOVxf  sfi sfx
 XMOVsf sfx sfi
+XMOVof sfx OBJ
 XMOVxf sfx sfx
+XMOVxfo sfx sfx
+XMOVxBXf sfx sfx cid
 
 MOVxb  sfi sfx
 XMOVsb sfx sfi
+XMOVob sfx OBJ
 XMOVxb sfx sfx
 
 SWAP  sfi sfi

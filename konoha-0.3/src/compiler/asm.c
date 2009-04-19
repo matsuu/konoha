@@ -413,12 +413,12 @@ static
 void KNH_ASM_BOX(Ctx *ctx, Asm *abr, knh_type_t atype, int a)
 {
 	if(knh_rtti_issync(abr, a)) return;
-	DBG2_P("@@@ atype=%s%s", TYPEQN(atype));
 	knh_class_t cid = CLASS_type(atype);
 	KNH_ASSERT_cid(cid);
 	knh_class_t bcid = ctx->share->ClassTable[cid].bcid;
 	if(bcid == CLASS_Boolean || bcid == CLASS_Int || bcid == CLASS_Float) {
 		if(IS_NNTYPE(atype)) {
+			DBG2_P("@@@ atype=%s%s", TYPEQN(atype));
 			KNH_ASM_BOX_(ctx, abr, a, cid);
 		}
 		else {
@@ -452,13 +452,35 @@ void KNH_ASM_NNBOX(Ctx *ctx, Asm *abr, knh_type_t atype, int a)
 static
 void KNH_ASM_SMOVx(Ctx *ctx, Asm *abr, knh_type_t atype, int a, knh_type_t btype, knh_sfx_t bx)
 {
+#ifdef KNH_USING_UNBOXFIELD
+	if(btype == NNTYPE_Int) {
+		KNH_ASM_MOVxi_(ctx, abr, sfi_(a), bx);
+		if(!IS_NNTYPE(atype)) {
+			KNH_ASM_NNBOX_(ctx, abr, sfi_(a), CLASS_type(btype));
+		}
+		return;
+	}
+	if(btype == NNTYPE_Float) {
+		KNH_ASM_MOVxf_(ctx, abr, sfi_(a), bx);
+		if(!IS_NNTYPE(atype)) {
+			KNH_ASM_NNBOX_(ctx, abr, sfi_(a), CLASS_type(btype));
+		}
+		return;
+	}
+	if(btype == NNTYPE_Boolean) {
+		KNH_ASM_MOVxb_(ctx, abr, sfi_(a), bx);
+		if(!IS_NNTYPE(atype)) {
+			KNH_ASM_NNBOX_(ctx, abr, sfi_(a), CLASS_type(btype));
+		}
+		return;
+	}
+#endif
 	if(IS_NNTYPE(atype) && !IS_NNTYPE(btype)) {
 		KNH_ASM_ISNULLx_(ctx, abr, bx);
 		btype = NNTYPE_cid(btype);
 	}
 	knh_rtti_async(abr, a);
 	KNH_ASM_MOVx_(ctx, abr, sfi_(a), bx);
-	//KNH_ASM_UNBOX(ctx, abr, atype, a);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -561,6 +583,47 @@ void KNH_ASM_SMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, Token *tkb)
 /* ------------------------------------------------------------------------ */
 
 static
+void KNH_ASM_XMOVx(Ctx *ctx, Asm *abr, knh_type_t atype, knh_sfx_t ax, knh_type_t btype, knh_sfx_t bx)
+{
+	if(IS_NNTYPE(atype) && !IS_NNTYPE(btype)) {
+		KNH_ASM_ISNULLx_(ctx, abr, bx);
+	}
+	if(atype == NNTYPE_Int) {
+		if(btype == NNTYPE_Int) {
+			KNH_ASM_XMOVxi_(ctx, abr, ax, bx);
+		}
+		else {
+			KNH_ASM_XMOVxio_(ctx, abr, ax, bx);
+		}
+		return;
+	}
+	if(atype == NNTYPE_Float) {
+		if(btype == NNTYPE_Float) {
+			KNH_ASM_XMOVxf_(ctx, abr, ax, bx);
+		}
+		else {
+			KNH_ASM_XMOVxfo_(ctx, abr, ax, bx);
+		}
+		return;
+	}
+	if(atype == NNTYPE_Boolean && btype == NNTYPE_Boolean) {
+		KNH_ASM_XMOVxb_(ctx, abr, ax, bx);
+		return;
+	}
+	if(atype == TYPE_Int && btype == NNTYPE_Int) {
+		KNH_ASM_XMOVxBXi_(ctx, abr, ax, bx, CLASS_type(btype));
+		return;
+	}
+	if(atype == TYPE_Int && btype == NNTYPE_Int) {
+		KNH_ASM_XMOVxBXf_(ctx, abr, ax, bx, CLASS_type(btype));
+		return;
+	}
+	KNH_ASM_XMOVx_(ctx, abr, ax, bx);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
 void KNH_ASM_XMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, size_t an, Token *tkb)
 {
 	KNH_ASSERT(IS_Token(tkb) && knh_Token_isTyped(tkb));
@@ -570,6 +633,20 @@ void KNH_ASM_XMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, size_t an, Token 
 		case TT_CLASSID:
 		case TT_CONST: {
 			Object *v = DP(tkb)->data;
+#ifdef KNH_USING_UNBOXFIELD
+			if(atype == NNTYPE_Int) {
+				KNH_ASM_XMOVoi_(ctx, abr, ax, v);
+				break;
+			}
+			if(atype == NNTYPE_Float) {
+				KNH_ASM_XMOVof_(ctx, abr, ax, v);
+				break;
+			}
+			if(atype == NNTYPE_Boolean) {
+				KNH_ASM_XMOVob_(ctx, abr, ax, v);
+				break;
+			}
+#endif/*KNU_USING_UNBOXFIED*/
 			KNH_ASM_XMOVo_(ctx, abr, ax, v);
 			break;
 		}
@@ -580,44 +657,63 @@ void KNH_ASM_XMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, size_t an, Token 
 				KNH_ASM_ISNULL_(ctx, abr, b);
 				knh_rtti_nullChecked(abr, b);
 			}
+#ifdef KNH_USING_UNBOXFIELD
+			if(atype == NNTYPE_Int) {
+				KNH_ASM_XMOVsi_(ctx, abr, ax, sfi_(b));
+				break;
+			}
+			if(atype == NNTYPE_Float) {
+				KNH_ASM_XMOVsf_(ctx, abr, ax, sfi_(b));
+				break;
+			}
+			if(atype == NNTYPE_Boolean) {
+				KNH_ASM_XMOVsb_(ctx, abr, ax, sfi_(b));
+				break;
+			}
+#endif/*KNU_USING_UNBOXFIED*/
 			KNH_ASM_BOX(ctx, abr, btype, b);
 			KNH_ASM_XMOVs_(ctx, abr, ax, sfi_(b));
-			break; /* int <=> float */
+			break;
 		}
 
 		case TT_FIELD: {
 			int b = (int)DP(tkb)->index;
 			knh_sfx_t bx = {(knh_sfi_t)0, (size_t)b};
-			if(IS_NNTYPE(atype) && !IS_NNTYPE(btype)) {
-				KNH_ASM_ISNULLx_(ctx, abr, bx);
-			}
-			KNH_ASM_XMOVx_(ctx, abr, ax, bx);
-			break; /* int <=> float */
+			KNH_ASM_XMOVx(ctx, abr, atype, ax, btype, bx);
+			break;
 		}
 
 		case TT_GLOBAL: {
 			int b = (int)DP(tkb)->index;
 			knh_sfx_t bx = {(knh_sfi_t)DP(abr)->globalidx, (size_t)b};
 			KNH_ASM_ASSERT(ctx, abr, bx.i != -1);
-			if(IS_NNTYPE(atype) && !IS_NNTYPE(btype)) {
-				KNH_ASM_ISNULLx_(ctx, abr, bx);
-			}
-			KNH_ASM_XMOVx_(ctx, abr, ax, bx);
-			break; /* int <=> float */
+			KNH_ASM_XMOVx(ctx, abr, atype, ax, btype, bx);
+			break;
 		}
 
 		case TT_MEMBER : {
 			int idx = (int)DP(tkb)->index;
 			size_t b = (size_t)(DP(tkb)->num)->n.ivalue;
 			knh_sfx_t bx = {sfi_(idx), b};
-			if(IS_NNTYPE(atype) && !IS_NNTYPE(btype)) {
-				KNH_ASM_ISNULLx_(ctx, abr, bx);
-			}
-			KNH_ASM_XMOVx_(ctx, abr, ax, bx);
+			KNH_ASM_XMOVx(ctx, abr, atype, ax, btype, bx);
 			break;
 
 		}
 		case TT_DEFVAL: {
+#ifdef KNH_USING_UNBOXFIELD
+			if(atype == NNTYPE_Int) {
+				KNH_ASM_XMOVoi_(ctx, abr, ax, UP(KNH_INT0));
+				break;
+			}
+			if(atype == NNTYPE_Float) {
+				KNH_ASM_XMOVof_(ctx, abr, ax, UP(KNH_FLOAT0));
+				break;
+			}
+			if(atype == NNTYPE_Boolean) {
+				KNH_ASM_XMOVob_(ctx, abr, ax, KNH_FALSE);
+				break;
+			}
+#endif/*KNU_USING_UNBOXFIED*/
 			knh_class_t cid = DP(tkb)->cid;
 			KNH_ASM_XMOVDEF_(ctx, abr, ax, cid);
 			break;

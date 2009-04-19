@@ -166,19 +166,26 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 #define JIT_XMOVDEF(ctx, a, x, cid)  KLR_MOV(ctx, JITSFX(a, x), KNH_DEF(ctx, cid))
 #define JIT_XMOVSYS(ctx, a, x, cid)  KLR_MOV(ctx, JITSFX(a, x), KNH_SYS(ctx, cid))
 
-#define SFXi(x)   (*((knh_int_t*)KNH_FIELDn(sfp[x.i].o, x.n)))
+#define SFXi(x)   (*((knh_int_t*)(&KNH_FIELDn(sfp[x.i].o, x.n))))
 #define KLR_MOVxi(ctx, a, b)    sfp[a].ivalue = SFXi(b)
 #define KLR_XMOVsi(ctx, a, b)   SFXi(a) = sfp[b].ivalue
+#define KLR_XMOVoi(ctx, a, o)   SFXi(a) = ((knh_Int_t*)o)->n.ivalue
 #define KLR_XMOVxi(ctx, a, b)   SFXi(a) = SFXi(b)
+#define KLR_XMOVxio(ctx, a, b)  SFXi(a) = ((knh_Int_t*)SFX(b))->n.ivalue
+#define KLR_XMOVxBXi(ctx, a, b, cid) KLR_MOV(ctx, SFX(a), new_IntX(ctx, cid, SFXi(b)))
 
-#define SFXf(x)   (*((knh_float_t*)KNH_FIELDn(sfp[x.i].o, x.n)))
+#define SFXf(x)   (*((knh_float_t*)(&KNH_FIELDn(sfp[x.i].o, x.n))))
 #define KLR_MOVxf(ctx, a, b)    sfp[a].fvalue = SFXf(b)
 #define KLR_XMOVsf(ctx, a, b)   SFXf(a) = sfp[b].fvalue
+#define KLR_XMOVof(ctx, a, o)   SFXf(a) = ((knh_Float_t*)o)->n.fvalue
 #define KLR_XMOVxf(ctx, a, b)   SFXf(a) = SFXf(b)
+#define KLR_XMOVxfo(ctx, a, b)  SFXf(a) = ((knh_Float_t*)SFX(b))->n.fvalue
+#define KLR_XMOVxBXf(ctx, a, b, cid) KLR_MOV(ctx, SFX(a), new_FloatX(ctx, cid, SFXf(b)))
 
-#define SFXb(x)   (*((knh_bool_t*)KNH_FIELDn(sfp[x.i].o, x.n)))
+#define SFXb(x)   (*((knh_bool_t*)(&KNH_FIELDn(sfp[x.i].o, x.n))))
 #define KLR_MOVxb(ctx, a, b)    sfp[a].bvalue = SFXb(b)
 #define KLR_XMOVsb(ctx, a, b)   SFXb(a) = sfp[b].bvalue
+#define KLR_XMOVob(ctx, a, o)   SFXb(a) = ((knh_Int_t*)o)->n.bvalue
 #define KLR_XMOVxb(ctx, a, b)   SFXb(a) = SFXb(b)
 
 /* ------------------------------------------------------------------------ */

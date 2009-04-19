@@ -489,6 +489,42 @@ METHOD jc3_XMOVSI(Ctx *ctx, knh_sfp_t *sfp)
 
 
 static
+METHOD jc0_XMOVOI(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVoi(ctx, (-1), (-1), ((Object*)-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_XMOVOI(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVoi(ctx, (1), (-1), ((Object*)-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_XMOVOI(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVoi(ctx, (-1), (2), ((Object*)-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_XMOVOI(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVoi(ctx, (-1), (-1), ((Object*)3));
+	__asm__ __volatile__("int3");
+}
+
+
+static
 METHOD jc0_XMOVXI(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
@@ -529,6 +565,105 @@ METHOD jc4_XMOVXI(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
 	JIT_XMOVxi(ctx, (-1), (-1), (-1), (4));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_XMOVXIO(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxio(ctx, (-1), (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_XMOVXIO(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxio(ctx, (1), (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_XMOVXIO(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxio(ctx, (-1), (2), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_XMOVXIO(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxio(ctx, (-1), (-1), (3), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc4_XMOVXIO(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxio(ctx, (-1), (-1), (-1), (4));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_XMOVXBXI(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxBXi(ctx, (-1), (-1), (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_XMOVXBXI(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxBXi(ctx, (1), (-1), (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_XMOVXBXI(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxBXi(ctx, (-1), (2), (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_XMOVXBXI(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxBXi(ctx, (-1), (-1), (3), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc4_XMOVXBXI(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxBXi(ctx, (-1), (-1), (-1), (4), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc5_XMOVXBXI(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxBXi(ctx, (-1), (-1), (-1), (-1), (5));
 	__asm__ __volatile__("int3");
 }
 
@@ -606,6 +741,42 @@ METHOD jc3_XMOVSF(Ctx *ctx, knh_sfp_t *sfp)
 
 
 static
+METHOD jc0_XMOVOF(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVof(ctx, (-1), (-1), ((Object*)-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_XMOVOF(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVof(ctx, (1), (-1), ((Object*)-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_XMOVOF(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVof(ctx, (-1), (2), ((Object*)-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_XMOVOF(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVof(ctx, (-1), (-1), ((Object*)3));
+	__asm__ __volatile__("int3");
+}
+
+
+static
 METHOD jc0_XMOVXF(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
@@ -646,6 +817,105 @@ METHOD jc4_XMOVXF(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
 	JIT_XMOVxf(ctx, (-1), (-1), (-1), (4));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_XMOVXFO(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxfo(ctx, (-1), (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_XMOVXFO(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxfo(ctx, (1), (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_XMOVXFO(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxfo(ctx, (-1), (2), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_XMOVXFO(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxfo(ctx, (-1), (-1), (3), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc4_XMOVXFO(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxfo(ctx, (-1), (-1), (-1), (4));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_XMOVXBXF(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxBXf(ctx, (-1), (-1), (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_XMOVXBXF(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxBXf(ctx, (1), (-1), (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_XMOVXBXF(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxBXf(ctx, (-1), (2), (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_XMOVXBXF(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxBXf(ctx, (-1), (-1), (3), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc4_XMOVXBXF(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxBXf(ctx, (-1), (-1), (-1), (4), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc5_XMOVXBXF(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVxBXf(ctx, (-1), (-1), (-1), (-1), (5));
 	__asm__ __volatile__("int3");
 }
 
@@ -718,6 +988,42 @@ METHOD jc3_XMOVSB(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
 	JIT_XMOVsb(ctx, (-1), (-1), (3));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_XMOVOB(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVob(ctx, (-1), (-1), ((Object*)-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_XMOVOB(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVob(ctx, (1), (-1), ((Object*)-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_XMOVOB(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVob(ctx, (-1), (2), ((Object*)-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_XMOVOB(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_XMOVob(ctx, (-1), (-1), ((Object*)3));
 	__asm__ __volatile__("int3");
 }
 
@@ -3908,7 +4214,7 @@ METHOD jc3_FGTEN(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 
-static knh_fmethod codeTempList[120][6] = {
+static knh_fmethod codeTempList[127][6] = {
 	{jc0_HALT},
 	{jc0_MOVA,jc1_MOVA,jc2_MOVA},
 	{jc0_MOVN,jc1_MOVN,jc2_MOVN},
@@ -3923,12 +4229,19 @@ static knh_fmethod codeTempList[120][6] = {
 	{jc0_XMOVSYS,jc1_XMOVSYS,jc2_XMOVSYS,jc3_XMOVSYS},
 	{jc0_MOVXI,jc1_MOVXI,jc2_MOVXI,jc3_MOVXI},
 	{jc0_XMOVSI,jc1_XMOVSI,jc2_XMOVSI,jc3_XMOVSI},
+	{jc0_XMOVOI,jc1_XMOVOI,jc2_XMOVOI,jc3_XMOVOI},
 	{jc0_XMOVXI,jc1_XMOVXI,jc2_XMOVXI,jc3_XMOVXI,jc4_XMOVXI},
+	{jc0_XMOVXIO,jc1_XMOVXIO,jc2_XMOVXIO,jc3_XMOVXIO,jc4_XMOVXIO},
+	{jc0_XMOVXBXI,jc1_XMOVXBXI,jc2_XMOVXBXI,jc3_XMOVXBXI,jc4_XMOVXBXI,jc5_XMOVXBXI},
 	{jc0_MOVXF,jc1_MOVXF,jc2_MOVXF,jc3_MOVXF},
 	{jc0_XMOVSF,jc1_XMOVSF,jc2_XMOVSF,jc3_XMOVSF},
+	{jc0_XMOVOF,jc1_XMOVOF,jc2_XMOVOF,jc3_XMOVOF},
 	{jc0_XMOVXF,jc1_XMOVXF,jc2_XMOVXF,jc3_XMOVXF,jc4_XMOVXF},
+	{jc0_XMOVXFO,jc1_XMOVXFO,jc2_XMOVXFO,jc3_XMOVXFO,jc4_XMOVXFO},
+	{jc0_XMOVXBXF,jc1_XMOVXBXF,jc2_XMOVXBXF,jc3_XMOVXBXF,jc4_XMOVXBXF,jc5_XMOVXBXF},
 	{jc0_MOVXB,jc1_MOVXB,jc2_MOVXB,jc3_MOVXB},
 	{jc0_XMOVSB,jc1_XMOVSB,jc2_XMOVSB,jc3_XMOVSB},
+	{jc0_XMOVOB,jc1_XMOVOB,jc2_XMOVOB,jc3_XMOVOB},
 	{jc0_XMOVXB,jc1_XMOVXB,jc2_XMOVXB,jc3_XMOVXB,jc4_XMOVXB},
 	{jc0_SWAP,jc1_SWAP,jc2_SWAP},
 	{jc0_PINIO,jc1_PINIO,jc2_PINIO},
