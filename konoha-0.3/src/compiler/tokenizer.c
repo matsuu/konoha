@@ -980,7 +980,9 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 				case '5': case '6': case '7': case '8': case '9':
 				case '_':
 					knh_Bytes_putc(ctx, tbuf.ba, ch);
+					prev = ch;
 				break;
+
 				case '.':
 					ch = knh_InputStream_getc(ctx, in);
 					if(ch == '.') {
@@ -990,6 +992,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 					}
 					else {
 						knh_Bytes_putc(ctx, tbuf.ba, '.');
+						prev = ch;
 						goto NUM_PART_INLOOP;
 					}
 				break;
@@ -1006,6 +1009,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 						goto MAIN_PART_INLOOP;
 					}
 					else if(unit == 0) {
+						prev = ch;
 						knh_Bytes_putc(ctx, tbuf.ba, ch);
 						knh_Token_padd(ctx, tks[tkl], &BOL, new_Token__buffer(ctx, TT_NUM, tbuf, in));
 						goto MAIN_PART;
@@ -1014,9 +1018,15 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 
 				default:
 					if(unit > 0 || isalnum(ch) || ch > 127) {  /* 1.0a */
+						prev = ch;
 						knh_Bytes_putc(ctx, tbuf.ba, ch);
 					}
 					else {
+						if(ch == '-' && (prev == 'e' || prev == 'E')) {
+							prev = ch;
+							knh_Bytes_putc(ctx, tbuf.ba, ch);
+							break;
+						}
 						knh_Token_padd(ctx, tks[tkl], &BOL, new_Token__buffer(ctx, TT_NUM, tbuf, in));
 						goto MAIN_PART_INLOOP;
 					}

@@ -717,19 +717,6 @@ knh_class_t knh_Token_tagcNUM(Ctx *ctx, Token *o, knh_class_t reqc, NameSpace *n
 	}
 	for(; i < t.len; i++) {
 		if(isdigit(t.buf[i]) || t.buf[i] == '_' || t.buf[i] == '.') continue;
-		if((t.buf[i] == 'L' || t.buf[i] == 'l')) {
-			if(t.buf[i+1] == 0) {
-				return reqc;
-			}
-			else if(t.buf[i+1] == '[' || t.buf[i+1] == ':') {
-				continue;
-			}
-		}
-		if((t.buf[i] == 'E' || t.buf[i] == 'e')) {
-			if(isdigit(t.buf[i+1]) || t.buf[i+1] == '-') {
-				continue;
-			}
-		}
 		if(t.buf[i] == '[') {
 			int loc;
 			tag.buf = t.buf + i + 1;
@@ -746,6 +733,12 @@ knh_class_t knh_Token_tagcNUM(Ctx *ctx, Token *o, knh_class_t reqc, NameSpace *n
 			break;
 		}
 		else {
+			if((t.buf[i] == 'E' || t.buf[i] == 'e')) {
+				if(isdigit(t.buf[i+1]) || t.buf[i+1] == '-') {
+					i++;
+					continue;
+				}
+			}
 			tag.buf = t.buf + i;
 			tag.len = t.len - (i);
 			break;
