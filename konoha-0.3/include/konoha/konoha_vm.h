@@ -41,6 +41,9 @@ extern "C" {
 int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 #define _HERE_    knh_Method_file(ctx, sfp[-1].mtd), knh_Method_pctoline(sfp[-1].mtd, pc)
 
+#define KFUNC FIELDN(DP(sfp[-1].mtd)->mn)
+#define KLINE knh_Method_pctoline(sfp[-1].mtd, pc)
+
 /* ------------------------------------------------------------------------ */
 
 #define KLR_MOV__wogc(ctx, v1, v2) {\
