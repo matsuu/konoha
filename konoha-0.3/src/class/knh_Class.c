@@ -154,6 +154,9 @@ void konoha_setClassName(Ctx *ctx, knh_class_t cid, String *lname)
 
 char *knh_ClassTable_CLASSN(Ctx *ctx, knh_class_t cid)
 {
+	if(cid == CLASS_unknown) {
+		return "unknown";
+	}
 	KNH_ASSERT_cid(cid);
 	DBG2_ASSERT(ctx->share->ClassTable[cid].sname != NULL);
 	if(knh_String_startsWith(ctx->share->ClassTable[cid].lname, STEXT("konoha."))) {

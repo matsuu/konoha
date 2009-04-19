@@ -173,6 +173,8 @@
 /* ======================================================================== */
 /* [OPTIONS_DEPS] */
 
+#define KNH_USING_RCGC 1
+
 #ifdef KNH_USING_DRCGC
 #define KNH_USING_RCGC 1
 #endif

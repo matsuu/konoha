@@ -1,7 +1,6 @@
 #!/usr/local/bin/konoha
 
 using math.*;
-using aobench.*;
 
 WIDTH = 256
 HEIGHT = 256
@@ -13,26 +12,19 @@ class Vec {
   double x;
   double y;
   double z;
-  
-  /*
-	Vec(double x, double y, double z) {
-    _x = x; _y = y; _z = z;
-  }
-  */
 }
-  
-  double dot(Vec! v0, Vec! v1) {
+
+double dot(Vec v0, Vec v1) {
 	return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z;
-  }
+}
 
-
-void cross(Vec! v0, Vec! v1, Vec! v2) {
+void cross(Vec v0, Vec v1, Vec v2) {
 	v2.x = v0.y * v1.z - v0.z * v1.y;
 	v2.y = v0.z * v1.x - v0.x * v1.z;
 	v2.z = v0.x * v1.y - v0.y * v1.x;
 }
 
-void normalize(Vec! v1) {
+void normalize(Vec v1) {
   double q = dot(v1, v1);
   double length = Math.sqrt(q);
   if (length > 0.0000000001) //1e-10
@@ -46,16 +38,16 @@ void normalize(Vec! v1) {
 
 
 class RayIntersection {
-  Vec! rayPosition;
-  Vec! rayDirection;
+  Vec rayPosition;
+  Vec rayDirection;
   double distance;
-  Vec!    hitPosition;
-  Vec!    normal;
+  Vec    hitPosition;
+  Vec    normal;
   Boolean    isHit;
 }
 
 class Sphere {
-  Vec! center;
+  Vec center;
   double radius;
 
   void printing()
@@ -64,9 +56,9 @@ class Sphere {
   }
 }
 
-void interSectsSphere(Sphere! s, RayIntersection! isect)
+void interSectsSphere(Sphere s, RayIntersection isect)
 {
-	Vec! rs = new Vec();
+	Vec rs = new Vec();
 	rs.x = isect.rayPosition.x - s.center.x;
 	rs.y = isect.rayPosition.y - s.center.y;
 	rs.z = isect.rayPosition.z - s.center.z;
@@ -100,11 +92,11 @@ void interSectsSphere(Sphere! s, RayIntersection! isect)
 
 
 class Plane {
-  Vec! position;
-  Vec! normal;
+  Vec position;
+  Vec normal;
 }
 
-void interSectsPlane(Plane! plane, RayIntersection! isect)
+void interSectsPlane(Plane plane, RayIntersection isect)
 {
   double d = -1.0 *dot(plane.position, plane.normal);
   double v = dot(isect.rayDirection, plane.normal);
@@ -123,21 +115,23 @@ void interSectsPlane(Plane! plane, RayIntersection! isect)
 		isect.normal.y = plane.normal.y;
 		isect.normal.z = plane.normal.z;
 	  }
+	
   }
 }
 
 
-Sphere[]! spheres;
-Plane! plane;
+Sphere[] spheres;
+Plane plane;
 
-void getOrthoBasis (Vec! normal, Vec[]! orthoBasis)
+
+void getOrthoBasis (Vec normal, Vec[] orthoBasis)
 {
   orthoBasis[0] = new Vec();
   orthoBasis[1] = new Vec();
   orthoBasis[2] = new Vec();
-  Vec! o0 = orthoBasis[0];
-  Vec! o1 = orthoBasis[1];
-  Vec! o2 = orthoBasis[2];
+  Vec o0 = orthoBasis[0];
+  Vec o1 = orthoBasis[1];
+  Vec o2 = orthoBasis[2];
 
   o2.x = normal.x;
   o2.y = normal.y;
@@ -159,14 +153,14 @@ void getOrthoBasis (Vec! normal, Vec[]! orthoBasis)
 }
 
 
-void getAmbientOcclusion(RayIntersection! isect, Vec! ambientOcclusion)
+void getAmbientOcclusion(RayIntersection isect, Vec ambientOcclusion)
 {
   int i, j;
   int ntheta = NAO_SAMPLES;
   int nphi = NAO_SAMPLES;
   double eps = 0.0001;
 
-  RayIntersection! occlsect = new RayIntersection();
+  RayIntersection occlsect = new RayIntersection();
   occlsect.rayPosition = new Vec();
   occlsect.rayDirection = new Vec();
   occlsect.hitPosition = new Vec();
@@ -175,7 +169,7 @@ void getAmbientOcclusion(RayIntersection! isect, Vec! ambientOcclusion)
   occlsect.rayPosition.x = isect.hitPosition.x + eps * isect.normal.x;
   occlsect.rayPosition.y = isect.hitPosition.y + eps * isect.normal.y;
   occlsect.rayPosition.z = isect.hitPosition.z + eps * isect.normal.z;
-  Vec[]! basis = new Vec[3];
+  Vec[] basis = new Vec[3];
 
   getOrthoBasis(isect.normal, basis);
   
@@ -212,16 +206,16 @@ void getAmbientOcclusion(RayIntersection! isect, Vec! ambientOcclusion)
 
 int clamp(double value)
 {
-  int i = (value * 255.5);
+  int i = (int)(value * 255.5);
   if (i > 255) i = 255;
   else if (i < 0) i = 0;
   return i;
 }
 
-void render(int[]! byteImage, int width, int height, int numberOfSubSamples)
+void render(int[] byteImage, int width, int height, int numberOfSubSamples)
 {
   Float[] fimg = new Float[width * height * 3];
-  RayIntersection! isect = new RayIntersection();
+  RayIntersection isect = new RayIntersection();
   int y, x,v,u;
   isect.rayPosition = new Vec();
   isect.rayDirection = new Vec();
@@ -245,7 +239,7 @@ void render(int[]! byteImage, int width, int height, int numberOfSubSamples)
 		  
 		  if (isect.isHit == true) {
 
-			Vec! ambientOcclusion = new Vec();
+			Vec ambientOcclusion = new Vec();
 
 			getAmbientOcclusion(isect, ambientOcclusion);
 
@@ -262,12 +256,12 @@ void render(int[]! byteImage, int width, int height, int numberOfSubSamples)
 	  fimg[p1] = fimg[p1] / (double)(num);
 	  fimg[p1 + 1] = fimg[p1 + 1] / (double)(num);
 	  fimg[p1 + 2] = fimg[p1 + 2] / (double)(num);
-	  //AOBench.write(p1, clamp(fimg[p1]));
-	  //AOBench.write(p1+1, clamp(fimg[p1+1]));
-	  //AOBench.write(p1+2, clamp(fimg[p1+2]));
-	  byteImage[p1] = clamp(fimg[p1]);
-	  byteImage[p1 + 1] = clamp(fimg[p1 +1]);
-	  byteImage[p1 + 2] = clamp(fimg[p1 + 2]);
+	  AOBench.write(p1, clamp(fimg[p1]));
+	  AOBench.write(p1+1, clamp(fimg[p1+1]));
+	  AOBench.write(p1+2, clamp(fimg[p1+2]));
+	  //	  byteImage[p1] = clamp(fimg[p1]);
+	  //	  byteImage[p1 + 1] = clamp(fimg[p1 +1]);													  
+	  //  byteImage[p1 + 2] = clamp(fimg[p1 + 2]);
 	}
   }
 
@@ -276,13 +270,11 @@ void render(int[]! byteImage, int width, int height, int numberOfSubSamples)
 void setupScene()
 {
   spheres[0] = new Sphere();
-  //  ((Sphere)spheres[0]).center = new Vec(-2.0, 0.0, -3.5);
-  ((Sphere)spheres[1]).center = new Vec();
-  ((Sphere)spheres[1]).center.x = -2.0;
-  ((Sphere)spheres[1]).center.y = 0.0;
-  ((Sphere)spheres[1]).center.z = -3.5;
+  ((Sphere)spheres[0]).center = new Vec();
+  ((Sphere)spheres[0]).center.x = -2.0;
+  ((Sphere)spheres[0]).center.y = 0.0;
+  ((Sphere)spheres[0]).center.z = -3.5;
   ((Sphere)spheres[0]).radius = 0.5;
-  
   spheres[1] = new Sphere();
   ((Sphere)spheres[1]).center = new Vec();
   ((Sphere)spheres[1]).center.x = -0.5;
@@ -290,16 +282,15 @@ void setupScene()
   ((Sphere)spheres[1]).center.z = -3.0;
   ((Sphere)spheres[1]).radius = 0.5;  
 
-  
   ((Sphere)spheres[2]).center = new Vec();
   ((Sphere)spheres[2]).center.x = 1.0;
   ((Sphere)spheres[2]).center.y = 0.0;
   ((Sphere)spheres[2]).center.z = -2.2;
   ((Sphere)spheres[2]).radius = 0.5;
 
-  //  spheres[0].printing();
-  //spheres[1].printing();
-  //spheres[2].printing();
+  spheres[0].printing();
+  spheres[1].printing();
+  spheres[2].printing();
   
   plane.position = new Vec();
   plane.position.x = 0.0;
@@ -313,26 +304,16 @@ void setupScene()
 void run()
 {
   int[] img = new int[WIDTH * HEIGHT * 3];
-  int i;
   setupScene();
-  //AOBench.open();
+  AOBench.open();
   render(img, WIDTH, HEIGHT, NSUBSAMPLES);
-  //AOBench.close();
-  
-  OutputStream out = new OutputStream("test2.ppm", "wb");
-  out << "P6" << EOL;
-  out << WIDTH << " " << HEIGHT << EOL;
-  out << "255" << EOL;
-  for (i = 0; i<|img| < i++) {
-	out.putc(img[i]);
-  }
-  out.close();
-  
+  AOBench.close();
+
 }
 
   
 
-int main(String[] args) {
+void main(String[] args) {
   spheres = new Sphere[3];
   
   plane = new Plane();

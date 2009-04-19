@@ -415,33 +415,39 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 
 	for(i = 0; i < ctx->share->StructTableSize; i++) {
 		DBG2_ASSERT(ctx->share->ClassTable[i].sname != NULL);
-		ftr(ctx, UP(ctx->share->ClassTable[i].sname));
-		ftr(ctx, UP(ctx->share->ClassTable[i].lname));
 		ftr(ctx, UP(ctx->share->ClassTable[i].class_cid));
 		ftr(ctx, UP(ctx->share->ClassTable[i].cstruct));
 		ftr(ctx, UP(ctx->share->ClassTable[i].cmap));
 		ftr(ctx, UP(ctx->share->ClassTable[i].cspec));
+		if(ctx->share->ClassTable[i].constPool != NULL) {
+			ftr(ctx, UP(ctx->share->ClassTable[i].constPool));
+		}
 		if(ctx->share->ClassTable[i].dataList != NULL) {
 			ftr(ctx, UP(ctx->share->ClassTable[i].dataList));
 		}
 		if(ctx->share->ClassTable[i].dataMap != NULL) {
 			ftr(ctx, UP(ctx->share->ClassTable[i].dataMap));
 		}
+		ftr(ctx, UP(ctx->share->ClassTable[i].lname));
+		ftr(ctx, UP(ctx->share->ClassTable[i].sname));
 	}
 	for(i = ctx->share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
 		DBG2_ASSERT(ctx->share->ClassTable[i].sname != NULL);
-		ftr(ctx, UP(ctx->share->ClassTable[i].sname));
-		ftr(ctx, UP(ctx->share->ClassTable[i].lname));
 		ftr(ctx, UP(ctx->share->ClassTable[i].class_cid));
 		ftr(ctx, UP(ctx->share->ClassTable[i].cstruct));
 		ftr(ctx, UP(ctx->share->ClassTable[i].cmap));
 		ftr(ctx, UP(ctx->share->ClassTable[i].cspec));
+		if(ctx->share->ClassTable[i].constPool != NULL) {
+			ftr(ctx, UP(ctx->share->ClassTable[i].constPool));
+		}
 		if(ctx->share->ClassTable[i].dataList != NULL) {
 			ftr(ctx, UP(ctx->share->ClassTable[i].dataList));
 		}
 		if(ctx->share->ClassTable[i].dataMap != NULL) {
 			ftr(ctx, UP(ctx->share->ClassTable[i].dataMap));
 		}
+		ftr(ctx, UP(ctx->share->ClassTable[i].lname));
+		ftr(ctx, UP(ctx->share->ClassTable[i].sname));
 	}
 
 	/* System Table */
