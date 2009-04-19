@@ -186,8 +186,6 @@ void knh_NameSpace_setLocalName(Ctx *ctx, NameSpace *o, knh_class_t cid)
 
 knh_class_t knh_NameSpace_getcid(Ctx *ctx, NameSpace *o, knh_bytes_t name)
 {
-	if(o == NULL) return konoha_getcid(ctx, name);
-
 	if(knh_bytes_equals(name, STEXT("This"))) return CLASS_This;
 	if(knh_bytes_equals(name, STEXT("Script"))) {
 		Script *scr = knh_NameSpace_getScript(ctx, o);

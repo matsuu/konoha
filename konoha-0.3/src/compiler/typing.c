@@ -116,6 +116,7 @@ static
 int knh_Token_isNullable(Ctx *ctx, Token *o)
 {
 	DBG2_ASSERT(IS_Token(o));
+	DBG2_P("Type!=%d, Type?=%d", knh_Token_isNotNullType(o), knh_Token_isNullableType(o));
 	if(knh_Token_isNullableType(o)) return 1;
 	if(knh_Token_isNotNullType(o)) return 0;
 	return 0; /* Default */

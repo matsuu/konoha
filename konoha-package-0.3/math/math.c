@@ -117,8 +117,8 @@ METHOD Math_tanh(Ctx *ctx, knh_sfp_t *sfp)
 
 static
 knh_FloatConstData_t FloatConstData[] = {
-    {"math.Math.PI", M_PI},
-    {"math.Math.E", M_E},
+    {"Math.PI", M_PI},
+    {"Math.E", M_E},
     {NULL}
 };
 

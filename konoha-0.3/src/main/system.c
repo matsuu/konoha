@@ -73,19 +73,35 @@ Object *konoha_getClassConstNULL(Ctx *ctx, knh_class_t cid, knh_bytes_t name)
 
 /* ------------------------------------------------------------------------ */
 
+static void konoha_addConstData(Ctx *ctx, char *dname, Object *value)
+{
+	knh_bytes_t n = B(dname);
+	knh_index_t loc = knh_bytes_rindex(n, '.');
+	String *name = new_String__T(ctx, dname +(loc+1));
+	knh_class_t cid = CLASS_Any;
+	if(loc != -1) {
+		if(ctx->ns == NULL) {
+			cid = konoha_getcid(ctx, knh_bytes_first(n, loc));
+		}
+		else {
+			KNH_ASSERT(IS_Asm(ctx->cmpr));
+			DBG_P("nsname=%s", knh_String_tochar(DP(DP(ctx->cmpr)->ns)->nsname));
+			cid = knh_NameSpace_getcid(ctx, DP(ctx->cmpr)->ns, knh_bytes_first(n, loc));
+		}
+		if(cid == CLASS_unknown) {
+			DBG_P("unknown class const: %s", dname);
+			cid = CLASS_Any;
+		}
+	}
+	konoha_addClassConst(ctx, cid, name, value);
+}
+
+/* ------------------------------------------------------------------------ */
+
 KNHAPI(void) konoha_loadIntConstData(Ctx *ctx, knh_IntConstData_t *data)
 {
 	while(data->name != NULL) {
-		knh_bytes_t n = B(data->name);
-		knh_index_t loc = knh_bytes_rindex(n, '.');
-		String *name = new_String__T(ctx, data->name +(loc+1));
-		Object *value = UP(new_Int(ctx, data->ivalue));
-		knh_class_t cid = CLASS_Any;
-		if(loc != -1) {
-			cid = knh_NameSpace_getcid(ctx, ctx->ns, knh_bytes_first(n, loc));
-			if(cid == CLASS_unknown) cid = CLASS_Any;
-		}
-		konoha_addClassConst(ctx, cid, name, value);
+		konoha_addConstData(ctx, data->name, UP(new_Int(ctx, data->ivalue)));
 		data++;
 	}
 }
@@ -95,16 +111,8 @@ KNHAPI(void) konoha_loadIntConstData(Ctx *ctx, knh_IntConstData_t *data)
 KNHAPI(void) konoha_loadFloatConstData(Ctx *ctx, knh_FloatConstData_t *data)
 {
 	while(data->name != NULL) {
-		knh_bytes_t n = B(data->name);
-		knh_index_t loc = knh_bytes_rindex(n, '.');
-		String *name = new_String__T(ctx, data->name +(loc+1));
 		Object *value = UP(new_Float(ctx, data->fvalue));
-		knh_class_t cid = CLASS_Any;
-		if(loc != -1) {
-			cid = knh_NameSpace_getcid(ctx, ctx->ns, knh_bytes_first(n, loc));
-			if(cid == CLASS_unknown) cid = CLASS_Any;
-		}
-		konoha_addClassConst(ctx, cid, name, value);
+		konoha_addConstData(ctx, data->name, value);
 		data++;
 	}
 }
@@ -114,16 +122,8 @@ KNHAPI(void) konoha_loadFloatConstData(Ctx *ctx, knh_FloatConstData_t *data)
 KNHAPI(void) konoha_loadStringConstData(Ctx *ctx, knh_StringConstData_t *data)
 {
 	while(data->name != NULL) {
-		knh_bytes_t n = B(data->name);
-		knh_index_t loc = knh_bytes_rindex(n, '.');
-		String *name = new_String__T(ctx, data->name +(loc+1));
 		Object *value = UP(new_String__T(ctx, data->value));
-		knh_class_t cid = CLASS_Any;
-		if(loc != -1) {
-			cid = knh_NameSpace_getcid(ctx, ctx->ns, knh_bytes_first(n, loc));
-			if(cid == CLASS_unknown) cid = CLASS_Any;
-		}
-		konoha_addClassConst(ctx, cid, name, value);
+		konoha_addConstData(ctx, data->name, value);
 		data++;
 	}
 }
@@ -622,6 +622,7 @@ NameSpace *knh_System_loadPackage(Ctx *ctx, knh_bytes_t pkgname)
 			KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 			knh_DictMap_set(ctx, DP(ctx->sys)->NameSpaceTableDictMap, nsname, UP(ns));
 			KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+
 			NameSpace *curns = knh_Context_switchNameSpace(ctx, ns);
 			knh_NameSpace_loadScript(ctx, ns, B(fpath), 1 /* isEval */);
 			knh_Context_switchNameSpace(ctx, curns);

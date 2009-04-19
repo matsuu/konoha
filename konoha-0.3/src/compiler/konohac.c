@@ -280,7 +280,7 @@ int knh_StmtUIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	Token *tk = DP(stmt)->tokens[0];
 	knh_bytes_t name = knh_Token_tobytes(ctx, tk);
 	knh_index_t loc = knh_bytes_rindex(name, '.');
-	if(loc != -1) { /* using Math.sin */
+	if(loc != -1) { /* using math.Math */
 		if(knh_System_loadPackage(ctx, knh_bytes_first(name, loc))) {
 			knh_class_t newcid = konoha_getcid(ctx, name);
 			if(newcid == CLASS_unknown) {
@@ -599,6 +599,15 @@ int knh_Stmt_complie(Ctx *ctx, Stmt *stmt, String *nsname, int isEval)
 		cur = DP(cur)->next;
 	}
 
+	if(DP(abr)->dlhdr != NULL) {
+		DBG2_P("init function");
+		knh_finit finit = (knh_finit)knh_dlsym(ctx, DP(abr)->dlhdr, "init");
+		if(finit != NULL) {
+			finit(ctx);
+		}
+		DP(abr)->dlhdr = NULL;
+	}
+
 	cur = stmt;
 	while(IS_Stmt(cur)) {
 		knh_stmt_t stt = SP(cur)->stt;
@@ -720,7 +729,6 @@ void knh_Asm_openlib(Ctx *ctx, Asm *abr, knh_bytes_t fpath)
 	knh_Bytes_putc(ctx, cwb.ba, 0);
 
 	if(DP(abr)->dlhdr != NULL) {
-		//knh_dlclose(ctx, DP(abr)->dlhdr);
 		DP(abr)->dlhdr = NULL;
 	}
 
@@ -728,10 +736,6 @@ void knh_Asm_openlib(Ctx *ctx, Asm *abr, knh_bytes_t fpath)
 	DP(abr)->dlhdr =knh_dlopen(ctx, (char*)f.buf, KNH_RTLD_LAZY);
 	if(DP(abr)->dlhdr != NULL) {
 		KNH_NOTICE(ctx, "opened dynamic library: %s", f.buf);
-		knh_finit finit = (knh_finit)knh_dlsym(ctx, DP(abr)->dlhdr, "init");
-		if(finit != NULL) {
-			finit(ctx);
-		}
 	}
 	else {
 		if(knh_isfile(ctx, f)) {
