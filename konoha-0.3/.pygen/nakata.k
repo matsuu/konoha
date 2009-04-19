@@ -1,4 +1,4 @@
-using math.*;
+//using math.*;
 
 WIDTH = 256
 HEIGHT = 256
@@ -48,8 +48,8 @@ class Sphere {
    }
 
    void printing() {
-       print _center, _radius
-           }
+       print this.center, this.radius;
+   }
 
 }
 

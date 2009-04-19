@@ -255,7 +255,6 @@ static METHOD knh__FArray_new__init(Ctx *ctx, knh_sfp_t *sfp)
 /* ======================================================================== */
 /* [add] */
 
-/* ------------------------------------------------------------------------ */
 /* @method void Array.add(Any1! value) */
 
 static METHOD knh__Array_add(Ctx *ctx, knh_sfp_t *sfp)

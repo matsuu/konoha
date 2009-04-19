@@ -399,7 +399,7 @@ void konoha_addMethodFieldTable(Ctx *ctx, MethodField *mf)
 		KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 		MethodField *mf2 = (MethodField*)knh_HashMap_get__hcode(ctx, hmap, h);
 		if(IS_MethodField(mf2)) {
-			DBG2_P("MISS!! %lu", h);
+			DBG2_P("MISS!! %lu  rtype=%s%s psize=%d", h, TYPEQN(mf2->rtype), mf2->psize);
 		}
 		if(mf2->psize != 0) {
 			knh_HashMap_set__hcode(ctx, hmap, h, UP(mf));

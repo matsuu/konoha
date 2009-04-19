@@ -2800,8 +2800,10 @@ void konoha_loadFieldNameData(Ctx *ctx, knh_FieldNameData_t *data)
 static
 void konoha_loadMethodFieldData(Ctx *ctx, knh_MethodFieldData_t *data, MethodField **pools)
 {
+	int chk = -1;
 	while(data->mfindex != -1) {
 		DBG2_ASSERT(data->mfindex < KNH_TMETHODFIELD_SIZE);
+		DBG2_ASSERT(data->mfindex > chk); chk = data->mfindex;
 		MethodField *mf = new_MethodField(ctx, data->rtype, data->psize);
 		if(mf->psize == 1) {
 			mf->p0.type = data->t1; mf->p0.fn = data->f1;
@@ -2829,7 +2831,6 @@ void konoha_loadMethodFieldData(Ctx *ctx, knh_MethodFieldData_t *data, MethodFie
 			}
 		}
 		pools[data->mfindex] = mf;
-		konoha_addMethodFieldTable(ctx, mf);
 		data++;
 	}
 }
@@ -2957,6 +2958,10 @@ void konoha_loadSystemData(Ctx *ctx)
 		MethodField *pools[KNH_TMETHODFIELD_SIZE];
 		konoha_loadMethodFieldData(ctx, MethodFieldData, pools);
 		konoha_loadMethodData(ctx, MethodData, pools);
+		int i;
+		for(i = 0; i < KNH_TMETHODFIELD_SIZE; i++) {
+			konoha_addMethodFieldTable(ctx, pools[i]);
+		}
 	}
 	konoha_loadMapperData(ctx, MapperData);
 
