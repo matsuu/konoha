@@ -599,15 +599,6 @@ int knh_Stmt_complie(Ctx *ctx, Stmt *stmt, String *nsname, int isEval)
 		cur = DP(cur)->next;
 	}
 
-	if(DP(abr)->dlhdr != NULL) {
-		DBG2_P("init function");
-		knh_finit finit = (knh_finit)knh_dlsym(ctx, DP(abr)->dlhdr, "init");
-		if(finit != NULL) {
-			finit(ctx);
-		}
-		DP(abr)->dlhdr = NULL;
-	}
-
 	cur = stmt;
 	while(IS_Stmt(cur)) {
 		knh_stmt_t stt = SP(cur)->stt;
@@ -637,6 +628,15 @@ int knh_Stmt_complie(Ctx *ctx, Stmt *stmt, String *nsname, int isEval)
 		}
 		if(tm == NULL) return 0;
 		cur = DP(cur)->next;
+	}
+
+	if(DP(abr)->dlhdr != NULL) {
+		DBG2_P("init function");
+		knh_finit finit = (knh_finit)knh_dlsym(ctx, DP(abr)->dlhdr, "init");
+		if(finit != NULL) {
+			finit(ctx);
+		}
+		DP(abr)->dlhdr = NULL;
 	}
 
 	cur = stmt;
