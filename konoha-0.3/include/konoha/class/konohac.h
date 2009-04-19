@@ -57,6 +57,9 @@ typedef knh_ushort_t   knh_stmt_t;
 /* @flag Token.ArrayType TKF SP(%s)->flag 'is:set:*:*' */
 /* @flag Token.NullableType TKF SP(%s)->flag 'is:set:*:*' */
 
+#define knh_Token_isUnsafeType(o)  knh_Token_isTailWildCard(o)
+#define knh_Token_setUnsafeType(o, b) knh_Token_setTailWildCard(o, b)
+
 /* ------------------------------------------------------------------------ */
 
 #define knh_Token_isTyped(o)    (TT_CONST <= SP(o)->tt && SP(o)->tt <=TT_NOP)

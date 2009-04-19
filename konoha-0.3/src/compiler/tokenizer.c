@@ -148,6 +148,10 @@ Token *new_Token__NAME(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t
 				}
 				continue; /* ignoring '_' */
 			}
+			if(t.buf[i] == '?') {
+				flag |= KNH_FLAG_TKF_NULLABLETYPE;
+				goto TOKEN_PART;
+			}
 			if(!isalnum(t.buf[i]) && t.buf[i] != ':') {
 				char cb[2] = {t.buf[i], 0};
 				knh_InputStream_perror(ctx, in, KMSG_WCHAR, cb);

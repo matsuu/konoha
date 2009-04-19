@@ -3046,15 +3046,21 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 		goto L_TAIL;
 	case TT_METAN:
 	{
-		DBG2_P("Found METAN '@%s', tc->meta=%d", sToken(tkc), tc->meta);
 		if(tc->meta == -1) tc->meta = tc->c - 1;
+		//DBG2_P("Found METAN '@%s', tc->meta=%d", sToken(tkc), tc->meta);
 		if(DP(tkc)->tt_next == TT_PARENTHESIS) {
 			tc->c += 1;
-		};
+		}
 		if(DP(tkc)->tt_next == TT_BRACE) {
 			DBG2_P("Found DATA '@%s', tc->meta=%d", sToken(tkc), tc->meta);
 			tc->c += 1;
-		};
+		}
+		if(DP(tkc)->tt_next == TT_TYPEN) {
+			DBG2_ASSERT(IS_String(DP(tc->ts[tc->c])->text));
+			if(knh_String_equals(DP(tc->ts[tc->c])->text, STEXT("Unsafe"))) {
+				knh_Token_setUnsafeType(tc->ts[tc->c], 1);
+			}
+		}
 		goto L_TAIL;
 	}
 

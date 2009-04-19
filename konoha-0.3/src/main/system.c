@@ -44,6 +44,7 @@ konoha_addClassConst(Ctx *ctx, knh_class_t cid, String* name, Object *value)
 	KNH_ASSERT_cid(cid);
 	if(ctx->share->ClassTable[cid].constPool == NULL) {
 		KNH_INITv(ctx->share->ClassTable[cid].constPool, new_DictMap0(ctx, 0));
+		DBG2_P("@@@@@@@@@@ DictMap ptr = %p", ctx->share->ClassTable[cid].constPool);
 	}
 	DictMap *cmap = ctx->share->ClassTable[cid].constPool;
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
