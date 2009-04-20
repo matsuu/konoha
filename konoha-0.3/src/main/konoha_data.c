@@ -220,13 +220,14 @@ void knh_ObjectField_traverse(Ctx *ctx, knh_ObjectField_t *of, knh_ftraverse ftr
 		knh_ClassStruct_t *cs = ctx->share->ClassTable[cid].cstruct;
 		size_t i, offset = ctx->share->ClassTable[cid].offset;
 		for(i = 0; i < cs->fsize; i++) {
-			if(cs->fields[i].type == NNTYPE_Int || cs->fields[i].type == NNTYPE_Float || cs->fields[i].type == NNTYPE_Boolean) {
-				continue;
-			}
-			if(cs->fields[i].type == CLASS_unknown) {
+			knh_type_t type = cs->fields[i].type;
+			//DBG2_P("i=%d, fn=%s, type=%s%s", i, FIELDN(cs->fields[i].fn), TYPEQN(type));
+			if(type == NNTYPE_Int || type == NNTYPE_Float ||
+					type == NNTYPE_Boolean || type == TYPE_void) {
 				continue;
 			}
 			if(of->fields[i + offset] == NULL) return; /* for Script */
+			if(cs->fields[i].fn == FIELDN_register) continue;
 			ftr(ctx, of->fields[i + offset]);
 		}
 		cid = ctx->share->ClassTable[cid].supcid;
@@ -1120,16 +1121,18 @@ void knh_ClassStruct_init(Ctx *ctx, ClassStruct *b, int init)
 static
 void knh_ClassStruct_traverse(Ctx *ctx, ClassStruct *b, knh_ftraverse ftr)
 {
+	ftr(ctx, UP(b->methods));
 	if(b->fields != NULL) {
 		knh_intptr_t i;
 		for(i = 0; i < b->fsize; i++) {
 			ftr(ctx, b->fields[i].value);
 		}
 		if(IS_SWEEP(ftr)) {
+			//DBG2_P("freeing b->fields=%p", b->fields);
 			KNH_FREE(ctx, b->fields, b->fsize * sizeof(knh_cfield_t));
+			b->fields = NULL;
 		}
 	}
-	ftr(ctx, UP(b->methods));
 }
 
 /* ======================================================================== */

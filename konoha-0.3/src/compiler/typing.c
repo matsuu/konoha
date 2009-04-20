@@ -426,7 +426,7 @@ int knh_Asm_declareScriptVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_
 #ifdef KNH_USING_UNBOXFIELD
 		if(type == NNTYPE_Int) {
 			if(sizeof(knh_int_t) > sizeof(void*)) {
-				if(knh_Asm_addVariableTable(ctx, abr, cf, KNH_SCRIPT_FIELDSIZE, 0, CLASS_unknown, FIELDN_register, value) == -1) {
+				if(knh_Asm_addVariableTable(ctx, abr, cf, KNH_SCRIPT_FIELDSIZE, 0, TYPE_void, FIELDN_register, value) == -1) {
 					return 0;
 				}
 			}
@@ -435,7 +435,7 @@ int knh_Asm_declareScriptVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_
 		}
 		else if(type == NNTYPE_Float) {
 			if(sizeof(knh_float_t) > sizeof(void*)) {
-				if(knh_Asm_addVariableTable(ctx, abr, cf, KNH_SCRIPT_FIELDSIZE, 0, CLASS_unknown, FIELDN_register, value) == -1) {
+				if(knh_Asm_addVariableTable(ctx, abr, cf, KNH_SCRIPT_FIELDSIZE, 0, TYPE_void, FIELDN_register, value) == -1) {
 					return 0;
 				}
 			}
@@ -469,7 +469,7 @@ int knh_Asm_declareFieldVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_t
 		if(type == NNTYPE_Int) {
 			if(sizeof(knh_int_t) > sizeof(void*)) {
 				if(knh_Asm_addVariableTable(ctx, abr,
-						(knh_cfield_t*)DP(abr)->vars, KONOHA_LOCALSIZE, 0, CLASS_unknown, FIELDN_register, value) == -1) {
+						(knh_cfield_t*)DP(abr)->vars, KONOHA_LOCALSIZE, 0, TYPE_void, FIELDN_register, value) == -1) {
 					return -1;
 				}
 				if((idx + 1) > DP(abr)->vars_size) {
@@ -481,7 +481,7 @@ int knh_Asm_declareFieldVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_t
 		else if(type == NNTYPE_Float) {
 			if(sizeof(knh_float_t) > sizeof(void*)) {
 				if(knh_Asm_addVariableTable(ctx, abr,
-						(knh_cfield_t*)DP(abr)->vars, KONOHA_LOCALSIZE, 0, CLASS_unknown, FIELDN_register, value) == -1) {
+						(knh_cfield_t*)DP(abr)->vars, KONOHA_LOCALSIZE, 0, TYPE_void, FIELDN_register, value) == -1) {
 					return -1;
 				}
 				if((idx + 1) > DP(abr)->vars_size) {
@@ -2155,12 +2155,12 @@ Term *knh_StmtOP_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_
 		if(!knh_Stmt_checkOPSIZE(ctx, stmt, 2)) {
 			return NULL;
 		}
-		if(TERMs_isNULL(stmt, 1)) {
+		if(TERMs_isNULL(stmt, 1) || TERMs_isTRUE(stmt, 1) || TERMs_isFALSE(stmt, 1)) {
 			Term *temp = DP(stmt)->terms[1];
 			DP(stmt)->terms[1] = DP(stmt)->terms[2];
 			DP(stmt)->terms[2] = temp;
 		}
-		if(TERMs_isNULL(stmt, 2)) {
+		if(TERMs_isNULL(stmt, 2)) { /* o == null */
 			if(IS_NNTYPE(TERMs_gettype(stmt,1))) {
 				return TM(new_TokenCONST(ctx, FL(stmt), KNH_FALSE));
 			}
@@ -2168,6 +2168,19 @@ Term *knh_StmtOP_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_
 			mtd_cid = CLASS_Object;
 			DP(stmt)->size = 2;
 			break;
+		}
+		if(TERMs_isTRUE(stmt, 2)) {  /* b == true */
+			if(TERMs_gettype(stmt, 1) == NNTYPE_Boolean) {
+				return DP(stmt)->terms[1];
+			}
+		}
+		if(TERMs_isFALSE(stmt, 2)) { /* b == false */
+			if(TERMs_gettype(stmt, 1) == NNTYPE_Boolean) {
+				mn = METHODN_opNot;
+				mtd_cid = CLASS_Boolean;
+				DP(stmt)->size = 2;
+				break;
+			}
 		}
 		mtd_cid = knh_StmtOPEQ_basecid(ctx, stmt);
 		if(mtd_cid == CLASS_unknown) {
@@ -2182,12 +2195,12 @@ Term *knh_StmtOP_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_
 		if(!knh_Stmt_checkOPSIZE(ctx, stmt, 2)) {
 			return NULL;
 		}
-		if(TERMs_isNULL(stmt, 1)) {
+		if(TERMs_isNULL(stmt, 1) || TERMs_isTRUE(stmt, 1) || TERMs_isFALSE(stmt, 1)) {
 			Term *temp = DP(stmt)->terms[1];
 			DP(stmt)->terms[1] = DP(stmt)->terms[2];
 			DP(stmt)->terms[2] = temp;
 		}
-		if(TERMs_isNULL(stmt, 2)) {
+		if(TERMs_isNULL(stmt, 2)) { /* o != null */
 			if(IS_NNTYPE(TERMs_gettype(stmt,1))) {
 				return TM(new_TokenCONST(ctx, FL(stmt), KNH_TRUE));
 			}
@@ -2195,6 +2208,19 @@ Term *knh_StmtOP_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_
 			mtd_cid = CLASS_Object;
 			DP(stmt)->size = 2;
 			break;
+		}
+		if(TERMs_isTRUE(stmt, 2)) { /* b != true */
+			if(TERMs_gettype(stmt, 1) == NNTYPE_Boolean) {
+				mn = METHODN_opNot;
+				mtd_cid = CLASS_Boolean;
+				DP(stmt)->size = 2;
+				break;
+			}
+		}
+		if(TERMs_isFALSE(stmt, 2)) { /* b != false */
+			if(TERMs_gettype(stmt, 1) == NNTYPE_Boolean) {
+				return DP(stmt)->terms[1];
+			}
 		}
 		mtd_cid = knh_StmtOPEQ_basecid(ctx, stmt);
 		if(mtd_cid == CLASS_unknown) {

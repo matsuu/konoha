@@ -272,9 +272,14 @@ void run()
     render(img, WIDTH, HEIGHT, NSUBSAMPLES);
 
     OutputStream out = new OutputStream("test2.ppm", "wb");
-    out << "P6" << EOL;
-    out << WIDTH << " " << HEIGHT << EOL;
-    out << "255" << EOL;
+    out << "P6";
+    out  << EOL;
+    out << WIDTH;
+    out  << " ";
+    out  << HEIGHT;
+    out  << EOL;
+    out << "255";
+    out  << EOL;
   
     //out.putc(img[0]);
     for (i = 0; i < |img|; i++) {

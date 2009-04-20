@@ -372,8 +372,6 @@ void KNH_ASM_SETLINE(Ctx *ctx, Asm *abr, int line)
 /* ======================================================================== */
 /* [ASM] */
 
-/* ======================================================================== */
-
 /* ------------------------------------------------------------------------ */
 
 #define sfi_(n)    ((knh_sfi_t)(n))
@@ -418,7 +416,6 @@ void KNH_ASM_BOX(Ctx *ctx, Asm *abr, knh_type_t atype, int a)
 	knh_class_t bcid = ctx->share->ClassTable[cid].bcid;
 	if(bcid == CLASS_Boolean || bcid == CLASS_Int || bcid == CLASS_Float) {
 		if(IS_NNTYPE(atype)) {
-			DBG2_P("@@@ atype=%s%s", TYPEQN(atype));
 			KNH_ASM_BOX_(ctx, abr, a, cid);
 		}
 		else {
@@ -1483,6 +1480,7 @@ int knh_StmtOP_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 			return 0;
 		}
 	} /* CLASS_Float */
+
 	return 0;
 }
 
