@@ -626,7 +626,10 @@ int knh_Stmt_complie(Ctx *ctx, Stmt *stmt, String *nsname, int isEval)
 			break;
 		}
 		}
-		if(tm == NULL) return 0;
+		if(tm == NULL) {
+			knh_Stmt_done(ctx, stmt);
+			return 0;
+		}
 		cur = DP(cur)->next;
 	}
 

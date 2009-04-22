@@ -822,6 +822,11 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 
 /* ------------------------------------------------------------------------ */
 
+#define KNH_THROW_BUGSTOP(ctx) \
+	knh_throw_bugstop(ctx, __FILE__, __LINE__, __FUNCTION__)
+
+/* ------------------------------------------------------------------------ */
+
 #define KLR_P(ctx, flag, mn, n) knh_stack_p(ctx, sfp, flag, mn, n)
 #define KLR_PMSG(ctx, flag, v) knh_stack_pmsg(ctx, sfp, flag, (String*)v)
 

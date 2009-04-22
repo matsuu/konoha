@@ -144,10 +144,6 @@ void knh_sfp_typecheck(Ctx *ctx, knh_sfp_t *sfp, Method *mtd, knh_code_t *pc)
 }
 
 /* ======================================================================== */
-/* [movabletext] */
-
-
-/* ======================================================================== */
 /* [macros] */
 
 #define _KNH_THROW(ctx, e) knh_throw(ctx, UP(e), KNH_SAFEFILE(__FILE__), __LINE__)
@@ -180,6 +176,13 @@ KNHAPI(void) knh_throw_TODO(Ctx *ctx, char *file, int line, char *func)
 	fprintf(stderr, "for your cooperation.\n");
 	fprintf(stderr, "**************************************************************************\n");
 	knh_throwException(ctx, new_Exception__b(ctx, STEXT("UnsupportedOperation!!")), KNH_SAFEFILE(file), line);
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(void) knh_throw_bugstop(Ctx *ctx, char *file, int line, char *func)
+{
+	knh_throwException(ctx, new_Exception__b(ctx, STEXT("ReportedBugStop!!")), KNH_SAFEFILE(file), line);
 }
 
 /* ======================================================================== */

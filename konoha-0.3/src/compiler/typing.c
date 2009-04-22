@@ -3567,11 +3567,15 @@ Term *knh_StmtCLASS_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		DP(abr)->line = SP(instmt)->line;
 		DP(abr)->level = 1;
 		if(SP(instmt)->stt == STT_METHOD) {
-			knh_StmtMETHOD_typing(ctx, instmt, abr, ns);
+			if(knh_StmtMETHOD_typing(ctx, instmt, abr, ns) == NULL) {
+				knh_Stmt_done(ctx, instmt);
+			}
 		}
 		else if(SP(instmt)->stt == STT_FORMAT) {
 			DP(abr)->line = SP(instmt)->line;
-			knh_StmtFORMAT_typing(ctx, instmt, abr, ns);
+			if(knh_StmtFORMAT_typing(ctx, instmt, abr, ns) == NULL) {
+				knh_Stmt_done(ctx, instmt);
+			}
 		}
 		else if(SP(instmt)->stt == STT_DONE || SP(instmt)->stt == STT_ERR) {
 			;; /* NO perror */

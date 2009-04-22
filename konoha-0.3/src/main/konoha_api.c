@@ -493,6 +493,7 @@ KNHAPI(void) konoha_shell(konoha_t konoha)
 
 METHOD knh__Script_eval(Ctx *ctx, knh_sfp_t *sfp)
 {
+	if(knh_Context_isInteractive(ctx)) KNH_THROW_BUGSTOP(ctx);
 	if(IS_NOTNULL(sfp[1].s)) {
 		knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 		knh_cwb_t cwb = new_cwb(ctx);
