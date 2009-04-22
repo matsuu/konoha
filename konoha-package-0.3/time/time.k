@@ -11,3 +11,7 @@ Int Time.getMinute();
 Int Time.getSecond();
 
 String Time.getTime(String f);
+
+String Time.asctime();
+String Time.mktime(Time t);
+Time! Time.gmtime();
