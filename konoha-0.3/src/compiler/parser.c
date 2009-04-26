@@ -1438,7 +1438,7 @@ Stmt *new_StmtCAST(Ctx *ctx, Token *tk_cast, knh_tokens_t *tc)
 
 /* ------------------------------------------------------------------------ */
 
-int knh_Token_isNEW(Ctx *ctx, Token *tk)
+static int knh_Token_isNEW(Ctx *ctx, Token *tk)
 {
 	char *p = sToken(tk);
 	return (p[0]=='n' && p[1] == 'e' && p[2] == 'w' && (p[3]==0 || p[3]==':'));
@@ -1572,7 +1572,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 					pc = oc + 2;
 					goto L_PARAM;
 				}
-				if(DP(ts[oc+1])->tt_next == TT_BRANCET) {   /* @TEST new Int[10] */
+				else if(DP(ts[oc+1])->tt_next == TT_BRANCET) {   /* @TEST new Int[10] */
 					stmt = new_Stmt(ctx, 0, STT_NEW);
 #ifdef METHODN_new__array2D
 					knh_tokens_t cma_tc;
@@ -1596,9 +1596,13 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 					SP(ts[pc])->tt = TT_PARENTHESIS;
 					goto L_PARAM;
 				}
-				tc->c = oc + 2;
-				knh_Token_perror(ctx, ts[oc+2], KMSG_ESYNTAX);
-				return TM(new_StmtERR(ctx, tc));
+				else {
+					Token *tke = ts[oc];
+					knh_Token_perror(ctx, tke, KMSG_ESYNTAX);
+					SP(tke)->tt = TT_ERR;
+					tc->c = oc + 2; knh_tokens_nextStmt(tc);
+					return TM(tke);
+				}
 			}
 			else if(DP(ts[oc])->tt_next == TT_NAME && ISB(knh_Token_tobytes(ctx, ts[oc+1]), "byte") && DP(ts[oc+1])->tt_next == TT_BRANCET) {
 				stmt = new_Stmt(ctx, 0, STT_NEW);

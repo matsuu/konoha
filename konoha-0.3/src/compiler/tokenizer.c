@@ -516,10 +516,7 @@ void knh_Token_join(Ctx *ctx, Token *o)
 					knh_Token_addTypeParam(ctx, tk, a, i+1);
 				}
 				if(SP(tkn)->tt == TT_PARENTHESIS) {
-					if(i > 0 && knh_Token_isNEW(ctx, (Token*)knh_Array_n(a, i-1))) {
-						/* new Person() is not closure */
-					}
-					else if(knh_Token_toClosureType(ctx, tk, tkn)) {
+					if(knh_Token_toClosureType(ctx, tk, tkn)) {
 						knh_Array_remove(ctx, a, i+1);
 					}
 				}
