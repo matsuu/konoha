@@ -529,6 +529,8 @@ void knh_System_removeContext(Ctx *ctx, System *o, Context *c)
 
 static knh_ushort_t contextId = 1;
 
+/* ------------------------------------------------------------------------ */
+
 Ctx *new_Context(Ctx *parent)
 {
 	knh_Context_t *ctx = (knh_Context_t*)KNH_MALLOC(parent, sizeof(knh_Context_t));

@@ -76,7 +76,7 @@ static METHOD knh__HashMap_new(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method void HashMap.get(Any1 key) */
+/* @method Any2 HashMap.get(Any1 key) */
 
 static METHOD knh__HashMap_get(Ctx *ctx, knh_sfp_t *sfp)
 {
