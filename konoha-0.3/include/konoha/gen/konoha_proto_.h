@@ -578,8 +578,6 @@ knh_uint64_t konoha_gettime();
 /* ../src/konoha.c */
 int main(int argc, char **argv);
 /* ../src/labs/b4.c */
-METHOD knh__Script_initfibo(Ctx *ctx, knh_sfp_t *sfp);
-METHOD knh__Script_fibo(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_changeChannel(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_hook(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/main/filesystem.c */

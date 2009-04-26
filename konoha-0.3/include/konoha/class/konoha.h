@@ -753,7 +753,7 @@ typedef struct knh_ExceptionHandler {
 } knh_ExceptionHandler_struct;
 
 /* ------------------------------------------------------------------------ */
-/* @class Script Object knh_Script_t */
+/* @class Script Object knh_Script_t @Private */
 
 #define KNH_SCRIPT_FIELDSIZE   128
 
@@ -764,22 +764,6 @@ typedef struct knh_Script_t {
 
 /* ------------------------------------------------------------------------ */
 /* @class NameSpace Object knh_NameSpace_struct @Private */
-
-//typedef int (*f_pkginit)(Ctx *ctx);
-//typedef void (*f_pkgtraverse)(Ctx *ctx, knh_ftraverse ftr);
-//
-//typedef struct knh_pkgmeta_t {
-//	const int buildid;
-//	const char *name;  /* "unix" */
-//	const char *version; /* "version" */
-//	const char *desc;
-//	const char *url;
-//	f_pkginit finit;
-//	f_pkgtraverse ftraverse;
-//	const char *script;
-//} knh_pkgmeta_t;
-//
-//typedef knh_pkgmeta_t* (*f_pkgload)(Ctx *ctx);
 
 typedef struct knh_NameSpace {
 	knh_String_t*           nsname;

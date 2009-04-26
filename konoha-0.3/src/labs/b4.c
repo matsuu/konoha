@@ -38,35 +38,35 @@ extern "C" {
 
 /* ======================================================================== */
 
-static Object *fiboMethod = NULL;
-
-/* ------------------------------------------------------------------------ */
-/* @method Int! Script.initfibo() */
-
-METHOD knh__Script_initfibo(Ctx *ctx, knh_sfp_t *sfp)
-{
-	fiboMethod = (Object*)knh_Class_getMethod(ctx, CLASS_Script, METHODN_fibo);
-	KNH_ASSERT(IS_Method(fiboMethod));
-}
-
-
-/* ------------------------------------------------------------------------ */
-/* @method Int! Script.fibo(Int! n) */
-
-METHOD knh__Script_fibo(Ctx *ctx, knh_sfp_t *sfp)
-{
-	JIT_SETESP(ctx, 2);
-	JIT_iLTn(ctx, 2, 1, 3);
-	JIT_bJIFF(ctx, NPC, L_JUMP, 2);
-	JIT_RETo(ctx, -1, ctx->share->tInt[1  - KNH_TINT_MIN]);
-	L_JUMP:;
-	JIT_iSUBn(ctx, 5, 1, 1);
-	JIT_FCALL(ctx, 3, 3, 0, fiboMethod);
-	JIT_iSUBn(ctx, 6, 1, 2);
-	JIT_FCALL(ctx, 4, 3, 0, fiboMethod);
-	JIT_iADD(ctx, -1, 3, 4);
-	JIT_RET(ctx);
-}
+//static Object *fiboMethod = NULL;
+//
+///* ------------------------------------------------------------------------ */
+///* @method Int! Script.initfibo() */
+//
+//METHOD knh__Script_initfibo(Ctx *ctx, knh_sfp_t *sfp)
+//{
+//	fiboMethod = (Object*)knh_Class_getMethod(ctx, CLASS_Script, METHODN_fibo);
+//	KNH_ASSERT(IS_Method(fiboMethod));
+//}
+//
+//
+///* ------------------------------------------------------------------------ */
+///* @method Int! Script.fibo(Int! n) */
+//
+//METHOD knh__Script_fibo(Ctx *ctx, knh_sfp_t *sfp)
+//{
+//	JIT_SETESP(ctx, 2);
+//	JIT_iLTn(ctx, 2, 1, 3);
+//	JIT_bJIFF(ctx, NPC, L_JUMP, 2);
+//	JIT_RETo(ctx, -1, ctx->share->tInt[1  - KNH_TINT_MIN]);
+//	L_JUMP:;
+//	JIT_iSUBn(ctx, 5, 1, 1);
+//	JIT_FCALL(ctx, 3, 3, 0, fiboMethod);
+//	JIT_iSUBn(ctx, 6, 1, 2);
+//	JIT_FCALL(ctx, 4, 3, 0, fiboMethod);
+//	JIT_iADD(ctx, -1, 3, 4);
+//	JIT_RET(ctx);
+//}
 
 /* ------------------------------------------------------------------------ */
 /* @method void Script.changeChannel(Int! ch) */
