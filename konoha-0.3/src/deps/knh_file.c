@@ -30,10 +30,29 @@
 
 #include"commons.h"
 
-#ifdef KNH_USING_WIN32
+#define KNH_USING_NOAPI 1
 
+#ifdef KNH_USING_POSIX
+#undef KNH_USING_NOAPI
+#include <unistd.h>
+#include <signal.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include<dlfcn.h>
 #include<time.h>
+#include<sys/time.h>
+
+#ifdef KONOHA_OS__MACOSX
+#include <mach-o/dyld.h>
+#endif
+
+#endif/*KNH_USING_POSIX*/
+
+#ifdef KNH_USING_WINDOWS
+#undef KNH_USING_NOAPI
 #include<windows.h>
+#endif
+
 
 /* ************************************************************************ */
 
@@ -42,36 +61,50 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-/* [dlopen] */
+/* [file] */
 
-void *knh_dlopen(Ctx *ctx, const char* path, int mode)
+int knh_isfile(Ctx *ctx, knh_bytes_t path)
 {
-	char buff[FILENAME_BUFSIZ];
-	knh_format_ospath(NULL, buff, sizeof(buff), B((char*)path));
-	void *hdr = (void*)LoadLibraryA((LPCTSTR)buff);
-	fprintf(stderr, "dlopen .. '%s' hdr=%p\n", buff, hdr);
-	return hdr;
+	char dirname[FILENAME_BUFSIZ];
+	knh_format_ospath(ctx, dirname, sizeof(dirname), path);
+#ifdef KNH_USING_WINDOWS
+	DWORD attr = GetFileAttributesA(dirname);
+	if(attr == -1) return 0;
+	if((attr & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) return 0;
+	return 1;
+#endif/*KNH_USING_WINDOWS*/
+#ifdef KNH_USING_POSIX
+    struct stat buf;
+	if(stat(dirname, &buf) == -1) return 0;
+	return S_ISREG(buf.st_mode);
+#endif/*KNH_USING_POSIX*/
+#ifdef KNH_USING_NOAPI
+	return 0;
+#endif
 }
 
 /* ------------------------------------------------------------------------ */
 
-void *knh_dlsym(Ctx *ctx, void* handle, const char* symbol)
+int knh_isdir(Ctx *ctx, knh_bytes_t path)
 {
-	//char buff[FILENAME_BUFSIZ];
-	//knh_snprintf(buff, sizeof(buff), "_%s@4", symbol);
-}
-
-/* ------------------------------------------------------------------------ */
-
-const char *knh_dlerror(Ctx *ctx)
-{
-	return "DLLERROR";
-}
-
-/* ------------------------------------------------------------------------ */
-
-int knh_dlclose(Ctx *ctx, void* handle)
-{
+	char dirname[FILENAME_BUFSIZ];
+	knh_format_ospath(ctx, dirname, sizeof(dirname), path);
+#ifdef KNH_USING_WINDOWS
+	DWORD attr = GetFileAttributesA(dirname);
+	if(attr == -1) return 0;
+	return ((attr & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
+#endif
+#ifdef KNH_USING_NOAPI
+	return 0;
+#endif/*KNH_USING_WINDOWS*/
+#ifdef KNH_USING_POSIX
+    struct stat buf;
+	if(stat(dirname, &buf) == -1) return 0;
+	return S_ISDIR(buf.st_mode);
+#endif/*KNH_USING_POSIX*/
+#ifdef KNH_USING_NOAPI
+	return 0;
+#endif
 }
 
 /* ======================================================================== */
@@ -82,51 +115,38 @@ knh_format_homepath(char *buf, size_t bufsiz)
 {
 	// @url(http://shinh.skr.jp/binary/b2con.html)
 	char bufl[FILENAME_BUFSIZ];
+#ifdef KNH_USING_WINDOWS
+#define HOMEPATH
 	HMODULE h = LoadLibrary(NULL);
 	GetModuleFileNameA(h, buf, bufsiz);
 	knh_format_nzpath(bufl, sizeof(bufl), B(buf));
 	//DBG2_P("nzpath='%s'", bufl);
 	knh_format_parentpath(buf, bufsiz, B(bufl), 2);
+#endif/*KNH_USING_WINDOWS*/
+#ifdef KNH_USING_POSIX
+#ifdef KONOHA_OS__LINUX
+#define HOMEPATH
+	// @url(http://shinh.skr.jp/binary/b2con.html)
+	// http://doc.trolltech.com/3.3/qapplication.html#applicationDirPath
+	readlink("/proc/self/exe", buf, bufsiz);
+	knh_format_nzpath(bufl, sizeof(bufl), B(buf));
+	knh_format_parentpath(buf, bufsiz, B(bufl), 2);
+#endif/*KONOHA_OS__LINUX*/
+#ifdef KONOHA_OS__MACOSX
+#define HOMEPATH
+	const char *s = _dyld_get_image_name(0);
+	s = realpath(s, bufl);
+	knh_format_parentpath(buf, bufsiz, B((char*)s), 2);
+	//DBG_P("'%s', homepath='%s'", s, buf);
+#endif
+#ifndef HOMEPATH
+	knh_snprintf(bufl, sizeof(bufl), "/usr/konoha");
+#endif
+#endif/*KNH_USING_POSIX*/
+#ifdef KNH_USING_NOAPI
+	knh_snprintf(bufl, sizeof(bufl), "/Konoha");
+#endif
 	return buf;
-}
-
-/* ======================================================================== */
-/* [file] */
-
-int knh_isfile(Ctx *ctx, knh_bytes_t path)
-{
-	char dirname[FILENAME_BUFSIZ];
-	knh_format_ospath(ctx, dirname, sizeof(dirname), path);
-	DWORD attr = GetFileAttributesA(dirname);
-	if(attr == -1) return 0;
-	if((attr & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) return 0;
-	return 1;
-}
-
-/* ------------------------------------------------------------------------ */
-
-int knh_isdir(Ctx *ctx, knh_bytes_t path)
-{
-	char dirname[FILENAME_BUFSIZ];
-	knh_format_ospath(ctx, dirname, sizeof(dirname), path);
-	DWORD attr = GetFileAttributesA(dirname);
-	if(attr == -1) return 0;
-	return ((attr & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
-}
-
-/* ======================================================================== */
-/* [time] */
-
-knh_uint_t knh_initseed()
-{
-	return time(NULL);
-}
-/* ------------------------------------------------------------------------ */
-
-knh_uint64_t konoha_gettime()
-{
-	DWORD tickCount = GetTickCount();
-	return (knh_int64_t)tickCount;
 }
 
 /* ======================================================================== */
@@ -135,4 +155,3 @@ knh_uint64_t konoha_gettime()
 }
 #endif
 
-#endif/* KNH_USING_WIN32 */

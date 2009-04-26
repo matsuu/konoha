@@ -30,9 +30,28 @@
 
 #include"commons.h"
 
-#ifdef KNH_USING_TBMX1
+#define KNH_USING_NOAPI 1
 
-//#include<windows.h>
+#ifdef KNH_USING_POSIX
+#undef KNH_USING_NOAPI
+#include <unistd.h>
+#include <signal.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include<dlfcn.h>
+#include<time.h>
+#include<sys/time.h>
+
+#ifdef KONOHA_OS__MACOSX
+#include <mach-o/dyld.h>
+#endif
+
+#endif/*KNH_USING_POSIX*/
+
+#ifdef KNH_USING_WINDOWS
+#undef KNH_USING_NOAPI
+#include<windows.h>
+#endif
 
 /* ************************************************************************ */
 
@@ -41,53 +60,41 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-/* [dlopen] */
+/* [time] */
 
-void *knh_dlopen(Ctx *ctx, const char* path, int mode)
+knh_uint_t knh_initseed()
 {
-	return NULL;
+#ifdef KNH_USING_WINDOWS
+	return (knh_uint_t)time(NULL);
+#endif/*KNH_USING_WINDOWS*/
+#ifdef KNH_USING_POSIX
+	return (knh_uint_t)time(NULL) + getpid();
+#endif/*KNH_USING_POSIX*/
+#ifdef KNH_USING_NOAPI
+	return 0;
+#endif
 }
 
 /* ------------------------------------------------------------------------ */
 
-void *knh_dlsym(Ctx *ctx, void* handle, const char* symbol)
+knh_uint64_t konoha_gettime()
 {
-	return NULL;
-}
-
-/* ------------------------------------------------------------------------ */
-
-const char *knh_dlerror(Ctx *ctx)
-{
-	return "DLLERROR";
-}
-
-/* ------------------------------------------------------------------------ */
-
-int knh_dlclose(Ctx *ctx, void* handle)
-{
-	return 1;
+#ifdef KNH_USING_WINDOWS
+	DWORD tickCount = GetTickCount();
+	return (knh_int64_t)tickCount;
+#endif/*KNH_USING_WINDOWS*/
+#ifdef KNH_USING_POSIX
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+#endif/*KNH_USING_POSIX*/
+#ifdef KNH_USING_NOAPI
+	return 0;
+#endif
 }
 
 /* ======================================================================== */
-/* [homepath] */
-
-char *
-knh_format_homepath(char *buf, size_t bufsiz)
-{
-	char bufl[FILENAME_BUFSIZ];
-	knh_snprintf(bufl, sizeof(bufl), "/SYS");
-	return buf;
-}
-
-/* ======================================================================== */
-/* [file] */
-
-
-
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif/* KNH_USING_WIN32 */
