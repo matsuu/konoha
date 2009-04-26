@@ -507,8 +507,8 @@ void knh_Token_join(Ctx *ctx, Token *o)
 {
 	Array *a = (Array*)DP(o)->data;
 	if(IS_Array(a)) {
-		size_t i;
-		for(i = 0; i < knh_Array_size(a) - 1; i++) {
+		int i, size = knh_Array_size(a) - 1;
+		for(i = 0; i < size ; i++) {
 			Token *tk = (Token*)knh_Array_n(a, i);
 			if(SP(tk)->tt == TT_TYPEN) {
 				Token *tkn = (Token*)knh_Array_n(a, i+1);
@@ -737,6 +737,11 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 			else {
 				knh_InputStream_perror(ctx, in, KMSG_EMISMATCH, " ...}");
 				knh_InputStream_skipBLOCK(ctx, in, prev, blocktk);
+				while(tkl > 0) {
+					tks[tkl]->tt = TT_ERR;
+					if(SP(tks[tkl])->tt == TT_BRACE) break;
+					tkl--;
+				}
 				blocktk = NULL;
 			}
 			equote = 0;
@@ -751,6 +756,11 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 			else {
 				knh_InputStream_perror(ctx, in, KMSG_EMISMATCH, " ...)");
 				knh_InputStream_skipBLOCK(ctx, in, prev, blocktk);
+				while(tkl > 0) {
+					tks[tkl]->tt = TT_ERR;
+					if(SP(tks[tkl])->tt == TT_BRACE) break;
+					tkl--;
+				}
 				blocktk = NULL;
 			}
 			equote = 0;
@@ -765,6 +775,11 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 			else {
 				knh_InputStream_perror(ctx, in, KMSG_EMISMATCH, " ...]");
 				knh_InputStream_skipBLOCK(ctx, in, prev, blocktk);
+				while(tkl > 0) {
+					tks[tkl]->tt = TT_ERR;
+					if(SP(tks[tkl])->tt == TT_BRACE) break;
+					tkl--;
+				}
 				blocktk = NULL;
 			}
 			equote = 0;

@@ -258,6 +258,7 @@ KNHAPI(void) knh_sfp_unboxing(Ctx *ctx, knh_sfp_t *sfp);
 KNHAPI(void) knh_esp1_sformat(Ctx *ctx, Method *mtd, OutputStream *w, Any *m);
 KNHAPI(void) knh_esp1_format(Ctx *ctx, knh_methodn_t mn, OutputStream *w, Any *m);
 KNHAPI(void) knh_throw_TODO(Ctx *ctx, char *file, int line, char *func);
+KNHAPI(void) knh_throw_bugstop(Ctx *ctx, char *file, int line, char *func);
 KNHAPI(void) knh_throwException(Ctx *ctx, Exception *e, char *file, int line);
 KNHAPI(void) knh_throw__s(Ctx *ctx, char *msg, char *file, int line);
 KNHAPI(void) knh_throw(Ctx *ctx, Object *e, char *file, int line);
