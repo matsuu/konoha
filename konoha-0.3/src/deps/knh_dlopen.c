@@ -45,9 +45,11 @@
 #include <mach-o/dyld.h>
 #endif
 
-#ifdef KONOHA_OS__CYGWIN
+#ifdef KNH_USING_WINDOWS
 #include<windows.h>
 #endif
+
+#define KNH_USING_NOAPI 1
 
 /* ************************************************************************ */
 
@@ -62,28 +64,63 @@ void *knh_dlopen(Ctx *ctx, const char* path, int mode)
 {
 	char buff[FILENAME_BUFSIZ];
 	knh_format_ospath(ctx, buff, sizeof(buff), B((char*)path));
+	DBG_P("dlopen .. '%s'\n", buff);
+#ifdef KNH_USING_WINDOWS
+#undef KNH_USING_NOAPI
+	return (void*)LoadLibraryA((LPCTSTR)buff);
+#endif
+#ifdef KNH_USING_POSIX
+#undef KNH_USING_NOAPI
 	return dlopen(buff, mode);
+#endif
+#ifdef KNH_USING_NOAPI
+	return NULL;
+#endif
 }
 
 /* ------------------------------------------------------------------------ */
 
 void *knh_dlsym(Ctx *ctx, void* hdr, const char* symbol)
 {
+#ifdef KNH_USING_WINDOWS
+	return GetProcAddress((HMODULE)handle, (LPCSTR)symbol);
+#endif
+#ifdef KNH_USING_POSIX
 	return dlsym(hdr, symbol);
+#endif
+#ifdef KNH_USING_NOAPI
+	return NULL;
+#endif
 }
 
 /* ------------------------------------------------------------------------ */
 
 const char *knh_dlerror(Ctx *ctx)
 {
+#ifdef KNH_USING_WINDOWS
+	return "TODO: dlerror()";
+#endif
+#ifdef KNH_USING_POSIX
 	return dlerror();
+#endif
+#ifdef KNH_USING_NOAPI
+	return "Unsupported dlopen APIs";
+#endif
 }
 
 /* ------------------------------------------------------------------------ */
 
 int knh_dlclose(Ctx *ctx, void* hdr)
 {
+#ifdef KNH_USING_WINDOWS
+	return (int)FreeLibrary((HMODULE)handle);
+#endif
+#ifdef KNH_USING_POSIX
 	return dlclose(hdr);
+#endif
+#ifdef KNH_USING_NOAPI
+	return 1;
+#endif
 }
 
 /* ======================================================================== */

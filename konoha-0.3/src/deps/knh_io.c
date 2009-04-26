@@ -29,11 +29,91 @@
 
 #include"commons.h"
 
+#define KNH_USING_NOAPI 1
+
 /* ************************************************************************ */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* ======================================================================== */
+/* [FILE] */
+
+KNHAPI(FILE*) knh_fopen(Ctx *ctx, char *filename, char *mode)
+{
+#ifdef KNH_USING_WINDOWS
+#undef KNH_USING_NOAPI
+	return fopen(filename, mode);
+#endif
+#ifdef KNH_USING_POSIX
+#undef KNH_USING_NOAPI
+	return fopen(filename, mode);
+#endif
+#ifdef KNH_USING_NOAPI
+	return NULL;
+#endif
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(size_t) knh_fread(Ctx *ctx, void *ptr, size_t size, FILE *fp)
+{
+#ifdef KNH_USING_WINDOWS
+	return fread(ptr, 1, size, fp);
+#endif
+#ifdef KNH_USING_POSIX
+	return fread(ptr, 1, size, fp);
+#endif
+#ifdef KNH_USING_NOAPI
+	return 0;
+#endif
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(size_t) knh_fwrite(Ctx *ctx, void *ptr, size_t size, FILE *fp)
+{
+#ifdef KNH_USING_WINDOWS
+	return fwrite(ptr, 1, size, fp);
+#endif
+#ifdef KNH_USING_POSIX
+	return fwrite(ptr, 1, size, fp);
+#endif
+#ifdef KNH_USING_NOAPI
+	return 0;
+#endif
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(int) knh_fflush(Ctx *ctx, FILE *fp)
+{
+#ifdef KNH_USING_WINDOWS
+	return fflush(fp);
+#endif
+#ifdef KNH_USING_POSIX
+	return fflush(fp);
+#endif
+#ifdef KNH_USING_NOAPI
+	return 0;
+#endif
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(int) knh_fclose(Ctx *ctx, FILE *fp)
+{
+#ifdef KNH_USING_WINDOWS
+	return fclose(fp);
+#endif
+#ifdef KNH_USING_POSIX
+	return fclose(fp);
+#endif
+#ifdef KNH_USING_NOAPI
+	return 0;
+#endif
+}
 
 /* ======================================================================== */
 /* [NOP] */
@@ -74,7 +154,7 @@ static knh_io_t knh_iodrv_open__FILE(Ctx *ctx, InputStream *in, OutputStream *ou
 	knh_format_ospath(ctx, buf, sizeof(buf), file);
 	DBG2_P("opening '%s'", buf);
 	{
-		FILE *fp = knh_fopen(buf, mode);
+		FILE *fp = knh_fopen(ctx, buf, mode);
 		if(fp == NULL) {
 			KNH_PERRNO(ctx, "IO!!", "fopen");
 			return (knh_io_t)-1;
@@ -88,9 +168,7 @@ static knh_io_t knh_iodrv_open__FILE(Ctx *ctx, InputStream *in, OutputStream *ou
 static
 knh_intptr_t knh_iodrv_read__FILE(Ctx *ctx, knh_io_t fd, char *buf, size_t bufsiz)
 {
-	FILE *fp = (FILE*)fd;
-	size_t ssize = fread(buf, 1, bufsiz, fp);
-	return ssize;
+	return knh_fread(ctx, buf, bufsiz, (FILE*)fd);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -98,9 +176,8 @@ knh_intptr_t knh_iodrv_read__FILE(Ctx *ctx, knh_io_t fd, char *buf, size_t bufsi
 static
 knh_intptr_t knh_iodrv_write__FILE(Ctx *ctx, knh_io_t fd, char *buf, size_t bufsiz)
 {
-	FILE *fp = (FILE*)fd;
-	size_t ssize = fwrite(buf, 1, bufsiz, fp);
-	fflush(fp);
+	size_t ssize = knh_fwrite(ctx, buf, bufsiz, (FILE*)fd);
+	knh_fflush(ctx, (FILE*)fd);
 	return ssize;
 }
 
@@ -109,8 +186,7 @@ knh_intptr_t knh_iodrv_write__FILE(Ctx *ctx, knh_io_t fd, char *buf, size_t bufs
 static
 void knh_iodrv_close__FILE(Ctx *ctx, knh_io_t fd)
 {
-	FILE *fp = (FILE*)fd;
-	knh_fclose(fp);
+	knh_fclose(ctx, (FILE*)fd);
 }
 
 /* ======================================================================== */
@@ -221,8 +297,6 @@ OutputStream *new_OutputStream__stdio(Ctx *ctx, FILE *fp, String *enc)
 }
 
 /* ------------------------------------------------------------------------ */
-
-
 
 #ifdef __cplusplus
 }

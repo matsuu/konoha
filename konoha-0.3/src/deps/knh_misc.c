@@ -59,9 +59,6 @@ void *knh_dlsym(Ctx *ctx, void* handle, const char* symbol)
 {
 	//char buff[FILENAME_BUFSIZ];
 	//knh_snprintf(buff, sizeof(buff), "_%s@4", symbol);
-	void *p = (void*)GetProcAddress((HMODULE)handle, (LPCSTR)symbol);
-//	fprintf(stderr, "dlsym .. '%s', hdr=%p, *p=%p\n", buff, handle, p);
-	return p;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -75,7 +72,6 @@ const char *knh_dlerror(Ctx *ctx)
 
 int knh_dlclose(Ctx *ctx, void* handle)
 {
-	return (int)FreeLibrary((HMODULE)handle);
 }
 
 /* ======================================================================== */

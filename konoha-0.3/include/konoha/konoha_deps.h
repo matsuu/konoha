@@ -196,15 +196,6 @@
 #define  knh_qsort(b,s,w,f)    qsort(b,s,w,f)
 #endif
 
-/* ------------------------------------------------------------------------ */
-
-#ifdef ALT_FOPEN
-	#define knh_fopen(p,o)           ALT_fopen(p,o)
-#else
-	#define knh_fopen(p,o)           fopen(p,o)
-#endif
-#define knh_fclose(fp)               fclose(fp)
-
 /* ======================================================================== */
 
 #ifdef KNH_USING_POSIX
