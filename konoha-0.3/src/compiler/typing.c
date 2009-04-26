@@ -2001,7 +2001,7 @@ Term *knh_StmtNEW_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_clas
 
 	KNH_ASSERT_cid(mtd_cid);
 	Method *mtd = knh_Class_getMethod(ctx, mtd_cid, mn);
-	if(IS_NULL(mtd)) {
+	if(IS_NULL(mtd) || knh_class_isPrivate(mtd_cid)) {
 		char bufnw[CLASSNAME_BUFSIZ];
 		knh_snprintf(bufnw, sizeof(bufnw), "%s %s(...)", sToken(DP(stmt)->tokens[0]), CLASSN(mtd_cid));
 		knh_Asm_perror(ctx, abr, KMSG_UNEW, bufnw);
