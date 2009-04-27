@@ -204,6 +204,80 @@ knh_iodrv_t *konoha_getSocketDriver()
 	return &IO__SOCKET;
 }
 
+/* ------------------------------------------------------------------------ */
+/* [HTTP DRIVER] */
+
+/* 'ip:127.0.0.1:80' */
+/* 'host:localhost:80' */
+/* 'socket:localhost:80' */
+
+static
+knh_io_t knh_iodrv_open__HTTP(Ctx *ctx, knh_bytes_t url, char *mode)
+{
+	knh_bytes_t host = knh_bytes_last(url, 7);
+	knh_index_t loc = knh_bytes_index(host, '/');
+	knh_bytes_t path = STEXT("/");
+	if(loc != -1) {
+		path = knh_bytes_last(host, loc);
+		host = knh_bytes_first(host, loc);
+	}
+	int port = 80; /* default */
+	loc = knh_bytes_index(host, ':');
+	if(loc != -1) {
+		port = (int)knh_bytes_toint(knh_bytes_last(host, loc+1));
+		host = knh_bytes_first(host, loc);
+	}
+	char host_or_ip[128];
+	knh_format_bytes(host_or_ip, sizeof(host_or_ip), host);
+
+	DBG2_P("socket host='%s', port=%d, path='%s'", host_or_ip, port, path.buf);
+	knh_intptr_t sd = knh_socket_open(ctx, host_or_ip, port);
+	if(sd != -1) {
+		char msgbuf[512];
+		knh_snprintf(msgbuf, sizeof(msgbuf),
+			"GET %s HTTP/1.1\r\nHost: %s\r\n\r\n", (char*)path.buf, host_or_ip);
+		DBG2_P("MSG='%s'", msgbuf);
+		knh_socket_send(ctx, sd, msgbuf, knh_strlen(msgbuf), 0);
+	}
+	return sd;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+knh_intptr_t knh_iodrv_read__HTTP(Ctx *ctx, knh_io_t sd, char *buf, size_t bufsiz)
+{
+	return knh_socket_recv(ctx, (knh_intptr_t)sd, buf, bufsiz, 0);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+knh_intptr_t knh_iodrv_write__HTTP(Ctx *ctx, knh_io_t sd, char *buf, size_t bufsiz)
+{
+	return 0; //knh_socket_send(ctx, (knh_intptr_t)sd, buf, bufsiz, 0);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_iodrv_close__HTTP(Ctx *ctx, knh_io_t sd)
+{
+	knh_socket_close(ctx, (knh_intptr_t)sd);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @data */
+
+static knh_iodrv_t IO__HTTP = {
+	KNH_DRVAPI_TYPE__IO, "http",
+	4096,
+	knh_iodrv_open__HTTP,
+	knh_iodrv_read__HTTP,
+	knh_iodrv_write__HTTP,
+	knh_iodrv_close__HTTP
+};
+
 
 /* ======================================================================== */
 /* [KNHAPI] */
@@ -213,6 +287,7 @@ void KNHINIT init_SocketDriver(Ctx *ctx)
 	konoha_addIODriver(ctx, NULL, &IO__SOCKET);
 	konoha_addIODriver(ctx, "ip", &IO__SOCKET);
 	konoha_addIODriver(ctx, "host", &IO__SOCKET);
+	konoha_addIODriver(ctx, "http", &IO__HTTP);
 }
 
 /* ------------------------------------------------------------------------ */
