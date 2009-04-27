@@ -866,6 +866,38 @@ void knh_Array__k(Ctx *ctx, Array *o, OutputStream *w, String *m)
 	knh_putc(ctx, w, ']');
 }
 
+/* ------------------------------------------------------------------------ */
+/* @method void IArray.%k(OutputStream w, String m) */
+
+void knh_IArray__k(Ctx *ctx, IArray *o, OutputStream *w, String *m)
+{
+	knh_putc(ctx, w, '[');
+	size_t c;
+	for(c = 0; c < o->size; c++) {
+		if(c > 0) {
+			knh_write_delim(ctx,w);
+		}
+		knh_write__i(ctx, w, o->ilist[c]);
+	}
+	knh_putc(ctx, w, ']');
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method void FArray.%k(OutputStream w, String m) */
+
+void knh_FArray__k(Ctx *ctx, FArray *o, OutputStream *w, String *m)
+{
+	knh_putc(ctx, w, '[');
+	size_t c;
+	for(c = 0; c < o->size; c++) {
+		if(c > 0) {
+			knh_write_delim(ctx,w);
+		}
+		knh_write__f(ctx, w, o->flist[c]);
+	}
+	knh_putc(ctx, w, ']');
+}
+
 /* ======================================================================== */
 /* [mapping] */
 

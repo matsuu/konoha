@@ -611,8 +611,8 @@ static knh_ClassData_t ClassData[] = {
 	{"konoha.Tuple2", CLASS_Tuple2, CFLAG_Tuple2, STRUCT_Tuple2, CLASS_Object, 0, 0, 0, knh_Tuple2_fdefault},
 	{"konoha.Range", CLASS_Range, CFLAG_Range, STRUCT_Range, CLASS_Object, 0, 0, 0, knh_Range_fdefault},
 	{"konoha.Array", CLASS_Array, CFLAG_Array, STRUCT_Array, CLASS_Object, 0, 31, 0, knh_Array_fdefault},
-	{"Int[]", CLASS_IArray, CFLAG_IArray, STRUCT_IArray, CLASS_Object, 0, 18, 0, knh_IArray_fdefault},
-	{"Float[]", CLASS_FArray, CFLAG_FArray, STRUCT_FArray, CLASS_Object, 0, 18, 0, knh_FArray_fdefault},
+	{"Int[]", CLASS_IArray, CFLAG_IArray, STRUCT_IArray, CLASS_Object, 0, 19, 0, knh_IArray_fdefault},
+	{"Float[]", CLASS_FArray, CFLAG_FArray, STRUCT_FArray, CLASS_Object, 0, 19, 0, knh_FArray_fdefault},
 	{"konoha.Iterator", CLASS_Iterator, CFLAG_Iterator, STRUCT_Iterator, CLASS_Object, 0, 1, 0, knh_Iterator_fdefault},
 	{"konoha.DictMap", CLASS_DictMap, CFLAG_DictMap, STRUCT_DictMap, CLASS_Object, 0, 12, 0, knh_DictMap_fdefault},
 	{"konoha.DictSet", CLASS_DictSet, CFLAG_DictSet, STRUCT_DictSet, CLASS_Object, 0, 13, 0, knh_DictSet_fdefault},
@@ -1068,6 +1068,8 @@ static knh_MethodData_t MethodData[] = {
 	{knh__FArray_swap, 0, CLASS_FArray, METHODN_swap, 0, MFN_void_nInt_nInt, (void*)NULL},
 	{knh__FArray_shuffle, 0, CLASS_FArray, METHODN_shuffle, 0, MFN_void, (void*)NULL},
 	{knh_fmethod_movableText, 0, CLASS_Array, METHODN__k, 0, MFN_void_OutputStream_Any, (void*)knh_Array__k},
+	{knh_fmethod_movableText, 0, CLASS_IArray, METHODN__k, 0, MFN_void_OutputStream_Any, (void*)knh_IArray__k},
+	{knh_fmethod_movableText, 0, CLASS_FArray, METHODN__k, 0, MFN_void_OutputStream_Any, (void*)knh_FArray__k},
 	{knh__Array_opItr, 0, CLASS_Array, METHODN_opItr, 0, MFN_iAny1, (void*)NULL},
 	{knh__Array_new__array2D, 0, CLASS_Array, METHODN_new__array2D, 0, MFN_nThis_nInt_nInt, (void*)NULL},
 	{knh__Array_new__array3D, 0, CLASS_Array, METHODN_new__array3D, 0, MFN_nThis_nInt_nInt_nInt, (void*)NULL},
@@ -1415,9 +1417,9 @@ static knh_MapperData_t MapperData[] = {
 typedef void (*knh_finit_)(Ctx *);
 
 static knh_finit_ InitFuncData[] = {
-	init_DB,
 	init_IO,
 	init_Regex,
+	init_DB,
 	NULL
 };
 

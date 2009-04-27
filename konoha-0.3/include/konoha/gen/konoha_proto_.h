@@ -1,20 +1,20 @@
 /****************************************************************************
- * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
- *
+ * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER  
+ * 
  * Copyright (c) 2005-2009, Kimio Kuramitsu <kimio at ynu.ac.jp>
- *           (c) 2008-      Konoha Software Foundation
+ *           (c) 2008-      Konoha Software Foundation  
  * All rights reserved.
- *
- * You may choose one of the following two licenses when you use konoha.
+ * 
+ * You may choose one of the following two licenses when you use konoha. 
  * See www.konohaware.org/license.html for further information.
- *
+ * 
  * (1) GNU General Public License 2.0      (with    KONOHA_UNDER_GPL2)
  * (2) Konoha Software Foundation License 1.0
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
  * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ *  
  ****************************************************************************/
 
 #ifndef KONOHA_PROTO__H
@@ -31,7 +31,7 @@
 #include<konoha/gen/konoha_class_.h>
 
 
-#ifdef __cplusplus
+#ifdef __cplusplus 
 extern "C" {
 #endif
 
@@ -42,6 +42,8 @@ extern "C" {
 /* ../src/api/arrayapi.c */
 void knh_Array_clear(Ctx *ctx, Array *o);
 void knh_Array__k(Ctx *ctx, Array *o, OutputStream *w, String *m);
+void knh_IArray__k(Ctx *ctx, IArray *o, OutputStream *w, String *m);
+void knh_FArray__k(Ctx *ctx, FArray *o, OutputStream *w, String *m);
 MAPPER knh_Array_Iterator(Ctx *ctx, knh_sfp_t *sfp);
 MAPPER knh_Iterator_Array(Ctx *ctx, knh_sfp_t *sfp);
 Mapper *knh_tMapper_newIteratorArray(Ctx *ctx, knh_class_t icid, knh_class_t acid);
@@ -524,54 +526,40 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns);
 Term *knh_StmtFORMAT_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns);
 Term *knh_StmtCLASS_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns);
 int knh_Stmt_typingBLOCK(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int isIteration);
-/* ../src/deps/driver_db.c */
-void knh_dbcurfree__NOP(knh_dbcur_t *dbcur);
-void knh_write_USING_SQLITE3(Ctx *ctx, OutputStream *w);
-knh_db_drvapi_t *knh_System_getDefaultDBDriver();
-knh_db_drvapi_t *knh_System_getDBDriver(Ctx *ctx, knh_bytes_t name);
-void  init_DB(Ctx *ctx);
-/* ../src/deps/driver_io.c */
+/* ../src/deps/knh_dlopen.c */
+void *knh_dlopen(Ctx *ctx, const char* path, int mode);
+void *knh_dlsym(Ctx *ctx, void* hdr, const char* symbol);
+const char *knh_dlerror(Ctx *ctx);
+int knh_dlclose(Ctx *ctx, void* hdr);
+/* ../src/deps/knh_file.c */
+int knh_isfile(Ctx *ctx, knh_bytes_t path);
+int knh_isdir(Ctx *ctx, knh_bytes_t path);
+char * knh_format_homepath(char *buf, size_t bufsiz);
+/* ../src/deps/knh_io.c */
 knh_iodrv_t *knh_System_getIODriver(Ctx *ctx, knh_bytes_t name);
 knh_iodrv_t knh_System_getDefaultIODriver();
 void  init_IO(Ctx *ctx);
 InputStream *new_InputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
 OutputStream *new_OutputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
-/* ../src/deps/driver_regex.c */
+/* ../src/deps/knh_regex.c */
 void knh_write_USING_REGEX(Ctx *ctx, OutputStream *w);
 knh_regex_drvapi_t *knh_System_getRegexDriver(Ctx *ctx, knh_bytes_t name);
 void  init_Regex(Ctx *ctx);
-/* ../src/deps/posix.c */
-void *knh_dlopen(Ctx *ctx, const char* path, int mode);
-void *knh_dlsym(Ctx *ctx, void* hdr, const char* symbol);
-const char *knh_dlerror(Ctx *ctx);
-int knh_dlclose(Ctx *ctx, void* hdr);
-char * knh_format_homepath(char *buf, size_t bufsiz);
-int knh_isfile(Ctx *ctx, knh_bytes_t path);
-int knh_isdir(Ctx *ctx, knh_bytes_t path);
-int knh_isnewerfile(Ctx *ctx, char *path, char *path2);
-knh_uint_t knh_initseed();
-knh_uint64_t konoha_gettime();
-/* ../src/deps/tbmx1.c */
-void *knh_dlopen(Ctx *ctx, const char* path, int mode);
-void *knh_dlsym(Ctx *ctx, void* handle, const char* symbol);
-const char *knh_dlerror(Ctx *ctx);
-int knh_dlclose(Ctx *ctx, void* handle);
-char * knh_format_homepath(char *buf, size_t bufsiz);
-/* ../src/deps/thread.c */
+/* ../src/deps/knh_socket.c */
+/* ../src/deps/knh_sqlite3.c */
+void knh_dbcurfree__NOP(knh_dbcur_t *dbcur);
+void knh_write_USING_SQLITE3(Ctx *ctx, OutputStream *w);
+knh_db_drvapi_t *knh_System_getDefaultDBDriver();
+knh_db_drvapi_t *knh_System_getDBDriver(Ctx *ctx, knh_bytes_t name);
+void  init_DB(Ctx *ctx);
+/* ../src/deps/knh_thread.c */
 knh_thread_t knh_thread_self();
 int thread_create(knh_thread_t *thread, void *attr, void *(*frun)(void *), void * arg);
 int knh_thread_key_create(knh_thread_key_t *key);
 int knh_thread_setspecific(knh_thread_key_t key, const void *data);
 void* knh_thread_getspecific(knh_thread_key_t key);
 int knh_thread_key_delete(knh_thread_key_t key);
-/* ../src/deps/win32.c */
-void *knh_dlopen(Ctx *ctx, const char* path, int mode);
-void *knh_dlsym(Ctx *ctx, void* handle, const char* symbol);
-const char *knh_dlerror(Ctx *ctx);
-int knh_dlclose(Ctx *ctx, void* handle);
-char * knh_format_homepath(char *buf, size_t bufsiz);
-int knh_isfile(Ctx *ctx, knh_bytes_t path);
-int knh_isdir(Ctx *ctx, knh_bytes_t path);
+/* ../src/deps/knh_time.c */
 knh_uint_t knh_initseed();
 knh_uint64_t konoha_gettime();
 /* ../src/konoha.c */
@@ -661,6 +649,7 @@ NameSpace *knh_System_loadPackage(Ctx *ctx, knh_bytes_t pkgname);
 NameSpace *knh_System_getNameSpace(Ctx *ctx, knh_bytes_t name);
 ClassSpec *konoha_getClassSpec(Ctx *ctx, knh_class_t bcid, knh_bytes_t urn);
 /* ../src/main/systemtable.c */
+Ctx *new_Context(Ctx *parent);
 void knh_Context_traverse(Ctx *ctx, knh_Context_t *o, knh_ftraverse ftr);
 void konoha_traverse(Ctx* ctx, knh_ftraverse ftr);
 /* ../src/main/typesystem.c */

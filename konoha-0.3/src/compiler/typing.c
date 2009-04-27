@@ -1972,8 +1972,10 @@ Term *knh_StmtNEW_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_clas
 	}
 
 	if(mtd_cid == CLASS_Array) {
-		knh_class_t reqc = CLASS_type(reqt); KNH_ASSERT_cid(reqc);
-		if(ctx->share->ClassTable[reqc].bcid == CLASS_Array) {
+		knh_class_t reqc = CLASS_type(reqt);
+		KNH_ASSERT_cid(reqc);
+		knh_class_t bcid = ctx->share->ClassTable[reqc].bcid;
+		if(bcid == CLASS_Array || bcid == CLASS_IArray || bcid == CLASS_FArray) {
 			mtd_cid = reqc;
 		}
 		else if(reqc == CLASS_Any && mn == METHODN_new__init && DP(stmt)->size > 2) {

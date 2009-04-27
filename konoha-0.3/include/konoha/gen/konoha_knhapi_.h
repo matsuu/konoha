@@ -236,9 +236,16 @@ KNHAPI(void) konoha_addParserDriver(Ctx *ctx, char *alias, knh_parser_drvapi_t *
 KNHAPI(ClassSpec*) new_Vocabulary(Ctx *ctx, char *lang, char *defval, ...);
 KNHAPI(void) konoha_addVocabularyMapper(Ctx *ctx, knh_class_t scid, char *text);
 KNHAPI(void) konoha_addAliasURN(Ctx *ctx, char *alias, char *urn);
-KNHAPI(void) konoha_addDBDriver(Ctx *ctx, char *alias, knh_db_drvapi_t *d);
+KNHAPI(FILE*) knh_fopen(Ctx *ctx, char *filename, char *mode);
+KNHAPI(size_t) knh_fread(Ctx *ctx, void *ptr, size_t size, FILE *fp);
+KNHAPI(size_t) knh_fwrite(Ctx *ctx, void *ptr, size_t size, FILE *fp);
+KNHAPI(int) knh_fflush(Ctx *ctx, FILE *fp);
+KNHAPI(int) knh_fclose(Ctx *ctx, FILE *fp);
 KNHAPI(void) konoha_addIODriver(Ctx *ctx, char *alias, knh_iodrv_t *d);
 KNHAPI(void) konoha_addRegexDriver(Ctx *ctx, char *alias, knh_regex_drvapi_t *d);
+KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port);
+KNHAPI(void) knh_socket_close(Ctx *ctx, knh_intptr_t sd);
+KNHAPI(void) konoha_addDBDriver(Ctx *ctx, char *alias, knh_db_drvapi_t *d);
 KNHAPI(char*) knh_format_ospath(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t path);
 KNHAPI(Ctx*) konoha_getCurrentContext(void);
 KNHAPI(Ctx*) konoha_getThreadContext(Ctx *ctx);

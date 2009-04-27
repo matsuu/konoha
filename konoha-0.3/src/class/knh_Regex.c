@@ -117,19 +117,10 @@ Array *knh_Regex_split(Ctx *ctx, Regex *o, String *s)
 	}
 }
 
-///* ------------------------------------------------------------------------ */
-///* @MAPMAP String DictMap */
-//
-//Object *knh_Regex_mapmap(Ctx *ctx, Regex *o, Object *source, knh_class_t tcid)
-//{
-//
-//}
-
 /* ======================================================================== */
 /* [movabletext] */
 
 /* @method void Regex.%s(OutputStream w, String m) */
-
 
 void knh_Regex__s(Ctx *ctx, Regex *o, OutputStream *w, String *m)
 {
