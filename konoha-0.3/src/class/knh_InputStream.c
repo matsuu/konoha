@@ -36,6 +36,43 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
+/* [Bytes] */
+
+KNHAPI(InputStream*) new_InputStream__io(Ctx *ctx, String *urn, knh_io_t fd, knh_iodrv_t *drv)
+{
+	InputStream* o = (InputStream*)new_Object_bcid(ctx, CLASS_InputStream, 0);
+	KNH_SETv(ctx, DP(o)->urn, urn);
+	DP(o)->fd = fd;
+	if(fd != -1) {
+		DP(o)->driver = drv;
+		if(DP(o)->bufsiz > 0) {
+			KNH_SETv(ctx, DP(o)->ba, new_Bytes(ctx, DP(o)->bufsiz));
+			DP(o)->buf = (char*)(DP(o)->ba)->buf;
+		}
+		else {
+			knh_InputStream_setFILE(o, 1);
+		}
+		DP(o)->bufpos = 0;
+		DP(o)->bufend = 0;  /* empty */
+	}
+	return o;
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(InputStream*) new_InputStream__FILE(Ctx *ctx, String *urn, FILE *fp, knh_iodrv_t *drv)
+{
+	InputStream* o = (InputStream*)new_Object_bcid(ctx, CLASS_InputStream, 0);
+	KNH_SETv(ctx, DP(o)->urn, urn);
+	if(fp != NULL) {
+		DP(o)->fp = fp;
+		DP(o)->driver = drv;
+		knh_InputStream_setFILE(o, 1);
+	}
+	return o;
+}
+
+/* ======================================================================== */
 /* [methods] */
 
 Object *knh_InputStream_open(Ctx *ctx, InputStream *o, String *urn)
@@ -43,27 +80,27 @@ Object *knh_InputStream_open(Ctx *ctx, InputStream *o, String *urn)
 	knh_bytes_t fname = knh_String_tobytes(urn);
 	knh_index_t loc = knh_bytes_index(fname, ':');
 	if(loc == -1 || (loc == 1 && isalpha(fname.buf[0]))) {  /* 'C:/' */
-		DP(o)->driver = *(knh_System_getIODriver(ctx, STEXT("file")));
+		DP(o)->driver = konoha_getIODriver(ctx, STEXT("file"));
 	}
 	else {
-		DP(o)->driver = *(knh_System_getIODriver(ctx, knh_bytes_first(fname, loc)));
+		DP(o)->driver = konoha_getIODriver(ctx, knh_bytes_first(fname, loc));
 	}
-	DP(o)->fd = DP(o)->driver.fopen(ctx, o, NULL, fname, "r");
+	KNH_SETv(ctx, DP(o)->urn, new_String(ctx, fname, NULL));
+	DP(o)->fd = DP(o)->driver->fopen(ctx, fname, "r");
 	if(DP(o)->fd != -1) {
-		DP(o)->bufsiz = DP(o)->driver.bufsiz;
+		DP(o)->bufsiz = DP(o)->driver->bufsiz;
 		if(DP(o)->bufsiz > 0) {
 			KNH_SETv(ctx, DP(o)->ba, new_Bytes(ctx, DP(o)->bufsiz));
 			DP(o)->buf = (char*)(DP(o)->ba)->buf;
 		}
+		else {
+			knh_InputStream_setFILE(o, 1);
+		}
 		DP(o)->bufpos = 0;
 		DP(o)->bufend = 0;  /* empty */
-		KNH_SETv(ctx, DP(o)->urn, new_String(ctx, fname, NULL));
 	}
 	else {
-		DP(o)->driver = knh_System_getDefaultIODriver();
-		char buff[FILENAME_BUFSIZ];
-		knh_snprintf(buff, sizeof(buff), "IO!!: '%s'", (char*)fname.buf);
-		return (Object*)new_Nue__s(ctx, buff);
+		DP(o)->driver = konoha_getDefaultIODriver();
 	}
 	return (Object*)o;
 }
@@ -73,8 +110,8 @@ Object *knh_InputStream_open(Ctx *ctx, InputStream *o, String *urn)
 int knh_InputStream_getc(Ctx *ctx, InputStream *o)
 {
 	int ch;
-	if(knh_InputStream_isSTDIN(o)) {
-		ch = fgetc(DP(o)->fp);
+	if(knh_InputStream_isFILE(o)) {
+		ch = knh_fgetc(ctx, DP(o)->fp);
 	}
 	else {
 		while(1) {
@@ -84,7 +121,7 @@ int knh_InputStream_getc(Ctx *ctx, InputStream *o)
 				break;
 			}
 			DP(o)->bufpos = 0;
-			DP(o)->bufend = DP(o)->driver.fread(ctx, DP(o)->fd, DP(o)->buf, DP(o)->bufsiz);
+			DP(o)->bufend = DP(o)->driver->fread(ctx, DP(o)->fd, DP(o)->buf, DP(o)->bufsiz);
 			if(DP(o)->bufend == 0) return EOF;
 		}
 	}
@@ -107,8 +144,8 @@ int knh_InputStream_getc(Ctx *ctx, InputStream *o)
 size_t
 knh_InputStream_read(Ctx *ctx, InputStream *o, char *buf, size_t bufsiz)
 {
-	if(knh_InputStream_isSTDIN(o)) {
-		return fread(buf, 1, bufsiz, DP(o)->fp);
+	if(knh_InputStream_isFILE(o)) {
+		return knh_fread(ctx, buf, bufsiz, DP(o)->fp);
 	}
 	else {
 		size_t inbufsiz = (DP(o)->bufend - DP(o)->bufpos);
@@ -124,7 +161,7 @@ knh_InputStream_read(Ctx *ctx, InputStream *o, char *buf, size_t bufsiz)
 		DP(o)->bufpos += inbufsiz;
 		DP(o)->size += bufsiz;
 		buf += inbufsiz;
-		size_t s = DP(o)->driver.fread(ctx, DP(o)->fd, buf+inbufsiz, bufsiz-inbufsiz);
+		size_t s = DP(o)->driver->fread(ctx, DP(o)->fd, buf+inbufsiz, bufsiz-inbufsiz);
 		DP(o)->size += s;
 		return s + inbufsiz;
 	}
@@ -158,15 +195,9 @@ String* knh_InputStream_readLine(Ctx *ctx, InputStream *o)
 
 void knh_InputStream_close(Ctx *ctx, InputStream *o)
 {
-	if(knh_InputStream_isSTDIN(o)) {
-		KNH_ASSERT(DP(o)->fp == stdin);
-		knh_InputStream_setSTDIN(o, 0);
-	}
-	else {
-		f_io_close f = DP(o)->driver.fclose;
-		DP(o)->driver = knh_System_getDefaultIODriver();
-		f(ctx, DP(o)->fd);
-	}
+	f_io_close f = DP(o)->driver->fclose;
+	DP(o)->driver = konoha_getDefaultIODriver();
+	f(ctx, DP(o)->fd);
 	DP(o)->fd = -1;
 }
 
@@ -182,23 +213,9 @@ int knh_InputStream_isClosed(InputStream *o)
 
 KNHAPI(InputStream*) new_FileInputStream(Ctx *ctx, knh_bytes_t file)
 {
-	InputStream* o = (InputStream*)new_Object_bcid(ctx, CLASS_InputStream, 0);
-	DP(o)->driver = *(knh_System_getIODriver(ctx, STEXT("file")));
-	DP(o)->fd = DP(o)->driver.fopen(ctx, o, NULL, file, "r");
-	if(DP(o)->fd != -1) {
-		DP(o)->bufsiz = DP(o)->driver.bufsiz;
-		if(DP(o)->bufsiz > 0) {
-			KNH_SETv(ctx, DP(o)->ba, new_Bytes(ctx, DP(o)->bufsiz));
-			DP(o)->buf = (char*)(DP(o)->ba)->buf;
-		}
-		DP(o)->bufpos = 0;
-		DP(o)->bufend = 0;  /* empty */
-		KNH_SETv(ctx, DP(o)->urn, new_String(ctx, file, NULL));
-	}
-	else {
-		DP(o)->driver = knh_System_getDefaultIODriver();
-	}
-	return o;
+	knh_iodrv_t *drv = konoha_getIODriver(ctx, STEXT("file"));
+	knh_io_t fd = drv->fopen(ctx, file, "r");
+	return new_InputStream__io(ctx, new_String(ctx, file, NULL), fd, drv);
 }
 
 /* ======================================================================== */

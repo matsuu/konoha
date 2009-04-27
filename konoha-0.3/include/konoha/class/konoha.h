@@ -626,14 +626,14 @@ typedef struct knh_StringUnit {
 
 /* ------------------------------------------------------------------------ */
 /* @class InputStream Object knh_InputStream_struct */
-/* @flag InputStream.STDIN IN:1 (%s)->h.flag 'is:set:*:*' */
+/* @flag InputStream.FILE IN:1 (%s)->h.flag 'is:set:*:*' */
 
 typedef struct knh_InputStream {
 	union {
 		knh_io_t fd;
 		FILE *fp;
 	};
-	knh_iodrv_t driver;
+	knh_iodrv_t *driver;
 	union {
 		struct knh_Bytes_t *ba;
 		struct knh_String_t *str;
@@ -657,9 +657,9 @@ typedef struct knh_InputStream {
 /* @flag OutputStream.AutoFlush OUT:2 (%s)->h.flag 'is:set:is:set' */
 /* @flag OutputStream.StoringBuffer OUT:3 (%s)->h.flag 'is:set:is:set' */
 
-typedef struct knh_OutputStream {
+typedef struct {
 	knh_io_t fd;
-	knh_iodrv_t driver;
+	knh_iodrv_t *driver;
 	knh_Bytes_t* ba;
 	knh_String_t *enc;
 	struct knh_BytesConv_t* bconv;
@@ -671,6 +671,17 @@ typedef struct knh_OutputStream {
 	knh_short_t indent;
 	knh_flag_t flag;  /*unused */
 } knh_OutputStream_struct;
+
+/* ------------------------------------------------------------------------ */
+/* @class Socket Object knh_Socket_struct */
+
+typedef struct {
+	knh_intptr_t sd;
+	knh_intptr_t port;
+	struct knh_String_t *urn;
+	struct knh_InputStream_t  *in;
+	struct knh_OutputStream_t *out;
+} knh_Socket_struct;
 
 /* ======================================================================== */
 /* @class Connection Object knh_Connection_struct */

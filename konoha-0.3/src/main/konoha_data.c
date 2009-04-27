@@ -1709,7 +1709,7 @@ void knh_InputStream_init(Ctx *ctx, InputStream *in, int init)
 	b->bufpos = 0;
 	b->bufend = 0;
 	b->bufsiz = 0;
-	b->driver = knh_System_getDefaultIODriver();
+	b->driver = konoha_getDefaultIODriver();
 	KNH_INITv(b->bconv, KNH_NULL);
 	KNH_INITv(b->enc, TS_ENCODING);
 	KNH_INITv(b->urn, TS_DEVNULL);
@@ -1726,7 +1726,7 @@ void knh_InputStream_traverse(Ctx *ctx, InputStream *in, knh_ftraverse ftr)
 {
 	knh_InputStream_struct *b = DP(in);
 	if(IS_SWEEP(ftr) && b->fd != -1) {
-		b->driver.fclose(ctx, b->fd);
+		b->driver->fclose(ctx, b->fd);
 		b->fd = -1;
 	}
 	ftr(ctx, UP(b->ba));
@@ -1758,7 +1758,7 @@ knh_OutputStream_init(Ctx *ctx, OutputStream *out, int init)
 {
 	knh_OutputStream_struct *b = DP(out);
 	b->fd = -1;
-	b->driver = knh_System_getDefaultIODriver();
+	b->driver = konoha_getDefaultIODriver();
 	if(init == -1) {
 		KNH_INITv(b->ba, KNH_NULL);
 	}
@@ -1779,19 +1779,19 @@ knh_OutputStream_init(Ctx *ctx, OutputStream *out, int init)
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_OutputStream_traverse(Ctx *ctx, OutputStream *out, knh_ftraverse gc)
+void knh_OutputStream_traverse(Ctx *ctx, OutputStream *out, knh_ftraverse ftr)
 {
 	knh_OutputStream_struct *b = DP(out);
-	if(IS_SWEEP(gc) && b->fd != -1) {
-		b->driver.fclose(ctx, b->fd);
+	if(IS_SWEEP(ftr) && b->fd != -1) {
+		b->driver->fclose(ctx, b->fd);
 		b->fd = -1;
 	}
-	gc(ctx, UP(b->ba));
-	gc(ctx, UP(b->enc));
-	gc(ctx, UP(b->bconv));
-	gc(ctx, UP(b->urn));
-	gc(ctx, UP(b->NEWLINE));
-	gc(ctx, UP(b->TAB));
+	ftr(ctx, UP(b->ba));
+	ftr(ctx, UP(b->enc));
+	ftr(ctx, UP(b->bconv));
+	ftr(ctx, UP(b->urn));
+	ftr(ctx, UP(b->NEWLINE));
+	ftr(ctx, UP(b->TAB));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1800,6 +1800,54 @@ static
 String* knh_OutputStream_getkey(Ctx *ctx, knh_sfp_t *lsfp)
 {
 	return DP((OutputStream*)lsfp[0].o)->urn;
+}
+
+/* ======================================================================== */
+/* Socket */
+
+#define knh_Socket_init_ NULL
+#define knh_Socket_copy NULL
+#define knh_Socket_traverse_ NULL
+#define knh_Socket_compareTo NULL
+#define knh_Socket_hashCode NULL
+#define knh_Socket_newClass NULL
+
+static
+void knh_Socket_init(Ctx *ctx, Socket *o, int init)
+{
+	knh_Socket_struct *so = DP(o);
+	so->sd = -1;
+	so->port = init;
+	KNH_INITv(so->urn, TS_EMPTY);
+	KNH_INITv(so->in, konoha_getDefaultValue(ctx, CLASS_InputStream));
+	KNH_INITv(so->out, konoha_getDefaultValue(ctx, CLASS_OutputStream));
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_Socket_traverse(Ctx *ctx, Socket *o, knh_ftraverse ftr)
+{
+	knh_Socket_struct *so = DP(o);
+	if(IS_SWEEP(ftr)) {
+		if(so->sd != -1) {
+			knh_InputStream_close(ctx, so->in);
+			knh_OutputStream_close(ctx, so->out);
+			knh_socket_close(ctx, so->sd);
+			so->sd = -1;
+		}
+	}
+	ftr(ctx, UP(so->urn));
+	ftr(ctx, UP(so->in));
+	ftr(ctx, UP(so->out));
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+String* knh_Socket_getkey(Ctx *ctx, knh_sfp_t *lsfp)
+{
+	return DP((Socket*)lsfp[0].o)->urn;
 }
 
 /* ======================================================================== */
@@ -2418,6 +2466,7 @@ void knh_KLRCode_traverse(Ctx *ctx, KLRCode *o, knh_ftraverse ftr)
 #define knh_StringUnit_fdefault NULL
 #define knh_InputStream_fdefault NULL
 #define knh_OutputStream_fdefault NULL
+#define knh_Socket_fdefault NULL
 #define knh_Connection_fdefault NULL
 #define knh_ResultSet_fdefault NULL
 #define knh_Exception_fdefault NULL

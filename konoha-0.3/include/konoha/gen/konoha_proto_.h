@@ -62,6 +62,11 @@ void knh_Method__k(Ctx *ctx, Method *o, OutputStream *w, String *m);
 void knh_Method__dump(Ctx *ctx, Method *o, OutputStream *w, String *m);
 /* ../src/api/streamapi.c */
 void knh_OutputStream__k(Ctx *ctx, OutputStream *o, OutputStream *w, String *m);
+METHOD knh__Socket_new(Ctx *ctx, knh_sfp_t *sfp);
+METHOD knh__Socket_getInputStream(Ctx *ctx, knh_sfp_t *sfp);
+METHOD knh__Socket_getOutputStream(Ctx *ctx, knh_sfp_t *sfp);
+METHOD knh__Socket_close(Ctx *ctx, knh_sfp_t *sfp);
+METHOD knh__Socket_isClosed(Ctx *ctx, knh_sfp_t *sfp);
 void knh_InputStream_setEncoding(Ctx *ctx, InputStream *o, String *enc);
 void knh_OutputStream_setEncoding(Ctx *ctx, OutputStream *o, String *enc);
 /* ../src/api/stringapi.c */
@@ -536,8 +541,8 @@ int knh_isfile(Ctx *ctx, knh_bytes_t path);
 int knh_isdir(Ctx *ctx, knh_bytes_t path);
 char * knh_format_homepath(char *buf, size_t bufsiz);
 /* ../src/deps/io.c */
-knh_iodrv_t *knh_System_getIODriver(Ctx *ctx, knh_bytes_t name);
-knh_iodrv_t knh_System_getDefaultIODriver();
+knh_iodrv_t *konoha_getIODriver(Ctx *ctx, knh_bytes_t name);
+knh_iodrv_t *konoha_getDefaultIODriver();
 void  init_IO(Ctx *ctx);
 InputStream *new_InputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
 OutputStream *new_OutputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
@@ -546,6 +551,8 @@ void knh_write_USING_REGEX(Ctx *ctx, OutputStream *w);
 knh_regex_drvapi_t *knh_System_getRegexDriver(Ctx *ctx, knh_bytes_t name);
 void  init_Regex(Ctx *ctx);
 /* ../src/deps/socket.c */
+knh_iodrv_t *konoha_getSocketDriver();
+void  init_SocketDriver(Ctx *ctx);
 /* ../src/deps/sqlite3.c */
 void knh_dbcurfree__NOP(knh_dbcur_t *dbcur);
 void knh_write_USING_SQLITE3(Ctx *ctx, OutputStream *w);

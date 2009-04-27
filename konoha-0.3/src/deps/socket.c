@@ -91,29 +91,33 @@ KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port)
 
 KNHAPI(int) knh_socket_send(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz, int flags)
 {
+	int res = -1;
 #ifdef KNH_USING_POSIX
-	return send(sd, buf, bufsiz, flags);
+	res = send(sd, buf, bufsiz, flags);
 #endif/*KNH_USING_POSIX*/
 #ifdef KNH_USING_WINDOWS
-	return send((SOCKET)sd, buf, bufsiz, flag);
+	res = send((SOCKET)sd, buf, bufsiz, flags);
 #endif
-#ifdef KNH_USING_NOAPI
-	return -1;
-#endif
+	if(res == -1) {
+		KNH_PERRNO(ctx, "Socket!!", "send");
+	}
+	return res;
 }
 /* ------------------------------------------------------------------------ */
 
 KNHAPI(int) knh_socket_recv(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz, int flags)
 {
+	int res = -1;
 #ifdef KNH_USING_POSIX
-	return recv(sd, buf, bufsiz, flags);
+	res = recv(sd, buf, bufsiz, flags);
 #endif/*KNH_USING_POSIX*/
 #ifdef KNH_USING_WINDOWS
-	return recv((SOCKET)sd, buf, bufsiz, flag);
+	res = recv((SOCKET)sd, buf, bufsiz, flags);
 #endif
-#ifdef KNH_USING_NOAPI
-	return -1;
-#endif
+	if(res == -1) {
+		KNH_PERRNO(ctx, "Socket!!", "recv");
+	}
+	return res;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -129,6 +133,86 @@ KNHAPI(int) knh_socket_close(Ctx *ctx, knh_intptr_t sd)
 #ifdef KNH_USING_NOAPI
 	return -1;
 #endif
+}
+
+
+/* ------------------------------------------------------------------------ */
+/* [IO DRIVER] */
+
+/* 'ip:127.0.0.1:80' */
+/* 'host:localhost:80' */
+/* 'socket:localhost:80' */
+
+static
+knh_io_t knh_iodrv_open__SOCKET(Ctx *ctx, knh_bytes_t file, char *mode)
+{
+	knh_bytes_t urn = knh_bytes_skipscheme(file);
+	knh_index_t loc = knh_bytes_rindex(urn, ':');
+	int port = 80; /* default */
+	if(loc != -1) {
+		port = (int)knh_bytes_toint(knh_bytes_last(urn, loc+1));
+		urn = knh_bytes_first(urn, loc);
+	}
+	char host_or_ip[128];
+	knh_format_bytes(host_or_ip, sizeof(host_or_ip), urn);
+
+	KNH_WARNING(ctx, "opening socket host='%s', port=%d", host_or_ip, port);
+	KNH_SECURE(ctx);
+	return (knh_io_t)knh_socket_open(ctx, host_or_ip, port);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+knh_intptr_t knh_iodrv_read__SOCKET(Ctx *ctx, knh_io_t sd, char *buf, size_t bufsiz)
+{
+	return knh_socket_recv(ctx, (knh_intptr_t)sd, buf, bufsiz, 0);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+knh_intptr_t knh_iodrv_write__SOCKET(Ctx *ctx, knh_io_t sd, char *buf, size_t bufsiz)
+{
+	return knh_socket_send(ctx, (knh_intptr_t)sd, buf, bufsiz, 0);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_iodrv_close__SOCKET(Ctx *ctx, knh_io_t sd)
+{
+	knh_socket_close(ctx, (knh_intptr_t)sd);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @data */
+
+static knh_iodrv_t IO__SOCKET = {
+	KNH_DRVAPI_TYPE__IO, "socket",
+	1024,
+	knh_iodrv_open__SOCKET,
+	knh_iodrv_read__SOCKET,
+	knh_iodrv_write__SOCKET,
+	knh_iodrv_close__SOCKET
+};
+
+/* ------------------------------------------------------------------------ */
+
+knh_iodrv_t *konoha_getSocketDriver()
+{
+	return &IO__SOCKET;
+}
+
+
+/* ======================================================================== */
+/* [KNHAPI] */
+
+void KNHINIT init_SocketDriver(Ctx *ctx)
+{
+	konoha_addIODriver(ctx, NULL, &IO__SOCKET);
+	konoha_addIODriver(ctx, "ip", &IO__SOCKET);
+	konoha_addIODriver(ctx, "host", &IO__SOCKET);
 }
 
 /* ------------------------------------------------------------------------ */

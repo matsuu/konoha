@@ -57,6 +57,21 @@ KNHAPI(FILE*) knh_fopen(Ctx *ctx, char *filename, char *mode)
 
 /* ------------------------------------------------------------------------ */
 
+KNHAPI(size_t) knh_fgetc(Ctx *ctx, FILE *fp)
+{
+#ifdef KNH_USING_WINDOWS
+	return fgetc(fp);
+#endif
+#ifdef KNH_USING_POSIX
+	return fgetc(fp);
+#endif
+#ifdef KNH_USING_NOAPI
+	return 0;
+#endif
+}
+
+/* ------------------------------------------------------------------------ */
+
 KNHAPI(size_t) knh_fread(Ctx *ctx, void *ptr, size_t size, FILE *fp)
 {
 #ifdef KNH_USING_WINDOWS
@@ -119,7 +134,7 @@ KNHAPI(int) knh_fclose(Ctx *ctx, FILE *fp)
 /* [NOP] */
 
 static
-knh_io_t knh_iodrv_open__NOP(Ctx *ctx, InputStream *in, OutputStream *out, knh_bytes_t n, char *mode)
+knh_io_t knh_iodrv_open__NOP(Ctx *ctx, knh_bytes_t n, char *mode)
 {
 	return 0;
 }
@@ -148,7 +163,7 @@ static void knh_iodrv_close__NOP(Ctx *ctx, knh_io_t fd)
 /* ======================================================================== */
 /* [FILE] */
 
-static knh_io_t knh_iodrv_open__FILE(Ctx *ctx, InputStream *in, OutputStream *out, knh_bytes_t file, char *mode)
+static knh_io_t knh_iodrv_open__FILE(Ctx *ctx, knh_bytes_t file, char *mode)
 {
 	char buf[FILENAME_BUFSIZ];
 	knh_format_ospath(ctx, buf, sizeof(buf), file);
@@ -203,7 +218,7 @@ static knh_iodrv_t IO__NOP = {
 
 static knh_iodrv_t IO__FILE = {
 	KNH_DRVAPI_TYPE__IO, "file",
-	4096,
+	0,
 	knh_iodrv_open__FILE,
 	knh_iodrv_read__FILE,
 	knh_iodrv_write__FILE,
@@ -213,7 +228,7 @@ static knh_iodrv_t IO__FILE = {
 /* ======================================================================== */
 /* [drivers] */
 
-knh_iodrv_t *knh_System_getIODriver(Ctx *ctx, knh_bytes_t name)
+knh_iodrv_t *konoha_getIODriver(Ctx *ctx, knh_bytes_t name)
 {
 	knh_iodrv_t *p = (knh_iodrv_t*)konoha_getDriverAPI(ctx, KNH_DRVAPI_TYPE__IO, name);
 	if(p == NULL) {
@@ -225,9 +240,9 @@ knh_iodrv_t *knh_System_getIODriver(Ctx *ctx, knh_bytes_t name)
 
 /* ------------------------------------------------------------------------ */
 
-knh_iodrv_t knh_System_getDefaultIODriver()
+knh_iodrv_t *konoha_getDefaultIODriver()
 {
-	return IO__NOP;
+	return &IO__NOP;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -252,7 +267,7 @@ void KNHINIT init_IO(Ctx *ctx)
 
 static knh_iodrv_t IO__stdio = {
 	KNH_DRVAPI_TYPE__IO, "stdio",
-	4096,
+	0,
 	knh_iodrv_open__NOP,
 	knh_iodrv_read__FILE,
 	knh_iodrv_write__FILE,
@@ -263,15 +278,7 @@ static knh_iodrv_t IO__stdio = {
 
 InputStream *new_InputStream__stdio(Ctx *ctx, FILE *fp, String *enc)
 {
-	InputStream* o = (InputStream*)new_Object_bcid(ctx, CLASS_InputStream, 0);
-	KNH_ASSERT(fp == stdin);
-	DP(o)->driver = IO__stdio;
-	knh_InputStream_setSTDIN(o, 1);
-	DP(o)->fp = fp;
-	DP(o)->bufsiz = 0;
-	DP(o)->bufpos = 0;
-	DP(o)->bufend = 0;  /* empty */
-	KNH_SETv(ctx, DP(o)->urn, TS_DEVSTDIN);
+	InputStream* o = new_InputStream__FILE(ctx, TS_DEVSTDIN, stdin, &IO__stdio);
 	knh_InputStream_setEncoding(ctx, o, enc);
 	return o;
 }
@@ -281,17 +288,14 @@ InputStream *new_InputStream__stdio(Ctx *ctx, FILE *fp, String *enc)
 OutputStream *new_OutputStream__stdio(Ctx *ctx, FILE *fp, String *enc)
 {
 	KNH_ASSERT(fp == stdout || fp == stderr);
-	OutputStream* o = (OutputStream*)new_Object_bcid(ctx, CLASS_OutputStream, 0);
-	knh_OutputStream_setBOL(o, 1);
-	DP(o)->driver = IO__stdio;
-	DP(o)->fd = (knh_io_t)fp;
-	knh_OutputStream_setAutoFlush(o, 1);
+	OutputStream* o = NULL;
 	if(fp == stdout) {
-		KNH_SETv(ctx, DP(o)->urn, TS_DEVSTDOUT);
+		o = new_OutputStream__FILE(ctx, TS_DEVSTDOUT, stdout, &IO__stdio);
 	}
-	else if(fp == stderr) {
-		KNH_SETv(ctx, DP(o)->urn, TS_DEVSTDERR);
+	else {
+		o = new_OutputStream__FILE(ctx, TS_DEVSTDERR, stderr, &IO__stdio);
 	}
+	knh_OutputStream_setAutoFlush(o, 1);
 	knh_OutputStream_setEncoding(ctx, o, enc);
 	return o;
 }

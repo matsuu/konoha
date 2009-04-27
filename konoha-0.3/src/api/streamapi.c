@@ -119,8 +119,8 @@ static METHOD knh__OutputStream_putc(Ctx *ctx, knh_sfp_t *sfp)
 	Bytes *ba = DP(sfp[0].w)->ba;
 	KNH_ASSERT(IS_Bytes(ba));
 	knh_Bytes_putc(ctx, ba, sfp[1].ivalue);
-	if(!knh_OutputStream_isStoringBuffer(sfp[0].w) && ba->size > DP(sfp[0].w)->driver.bufsiz) {
-		DP(sfp[0].w)->driver.fwrite(ctx, DP(sfp[0].w)->fd, (char*)(ba)->buf, (ba)->size);
+	if(!knh_OutputStream_isStoringBuffer(sfp[0].w) && ba->size > DP(sfp[0].w)->driver->bufsiz) {
+		DP(sfp[0].w)->driver->fwrite(ctx, DP(sfp[0].w)->fd, (char*)(ba)->buf, (ba)->size);
 		knh_Bytes_clear(ba, 0);
 	}
 	DP(sfp[0].w)->size++;
@@ -226,6 +226,80 @@ void knh_OutputStream__k(Ctx *ctx, OutputStream *o, OutputStream *w, String *m)
 	knh_putc(ctx, w, '\'');
 }
 
+/* ======================================================================== */
+/* [Socket] */
+
+/* ------------------------------------------------------------------------ */
+/* @method Socket! Socket.new(String! host, Int! port); */
+
+METHOD knh__Socket_new(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_Socket_t *so = (knh_Socket_t*)sfp[0].o;
+	knh_bytes_t urn = knh_String_tobytes(sfp[1].s);
+	char *ip_or_host = NULL;
+	if(knh_bytes_startsWith(urn, STEXT("socket:"))) {
+		ip_or_host = (char*)(knh_bytes_last(urn, 7)).buf;
+	}
+	else if(knh_bytes_startsWith(urn, STEXT("ip:"))) {
+		ip_or_host = (char*)(knh_bytes_last(urn, 3)).buf;
+	}
+	else {
+		ip_or_host = (char*)urn.buf;
+	}
+	KNH_SETv(ctx, DP(so)->urn, sfp[1].o);
+	DP(so)->port = (int)sfp[2].ivalue;
+	DP(so)->sd = knh_socket_open(ctx, ip_or_host, DP(so)->port);
+	if(DP(so)->sd != -1) {
+		KNH_SETv(ctx, DP(so)->in,  new_InputStream__io(ctx, DP(so)->urn, (knh_io_t)DP(so)->sd, konoha_getSocketDriver()));
+		KNH_SETv(ctx, DP(so)->out, new_OutputStream__io(ctx, DP(so)->urn, (knh_io_t)DP(so)->sd, konoha_getSocketDriver()));
+	}
+	KNH_RETURN(ctx, sfp, sfp[0].o);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method InputStream! Socket.getInputStream() */
+
+METHOD knh__Socket_getInputStream(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_Socket_t *so = (knh_Socket_t*)sfp[0].o;
+	KNH_RETURN(ctx, sfp, DP(so)->in);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method OutputStream! Socket.getOutputStream() */
+
+METHOD knh__Socket_getOutputStream(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_Socket_t *so = (knh_Socket_t*)sfp[0].o;
+	KNH_RETURN(ctx, sfp, DP(so)->out);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method void Socket.close() */
+
+METHOD knh__Socket_close(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_Socket_t *so = (knh_Socket_t*)sfp[0].o;
+	if(DP(so)->sd != -1) {
+		knh_InputStream_close(ctx, DP(so)->in);
+		knh_OutputStream_close(ctx, DP(so)->out);
+		knh_socket_close(ctx, DP(so)->sd);
+		DP(so)->sd = -1;
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Boolean! Socket.isClosed() */
+
+METHOD knh__Socket_isClosed(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_Socket_t *so = (knh_Socket_t*)sfp[0].o;
+	KNH_RETURN_Boolean(ctx, sfp, (DP(so)->sd == -1));
+}
+
+/* ------------------------------------------------------------------------ */
+
+
 #else /*KNH_CC_METHODAPI*/
 
 /* ------------------------------------------------------------------------ */
@@ -284,7 +358,6 @@ void knh_OutputStream_setEncoding(Ctx *ctx, OutputStream *o, String *enc)
 
 #endif /*KNH_CC_METHODAPI*/
 
-/* ------------------------------------------------------------------------ */
 
 #ifdef __cplusplus
 }
