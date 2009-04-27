@@ -28,8 +28,10 @@
 /* ************************************************************************ */
 
 #include"commons.h"
+#define KNH_USING_NOAPI 1
 
 #ifdef KNH_USING_POSIX
+#undef KNH_USING_NOPAI
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -37,8 +39,6 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #endif
-
-#define KNH_USING_NOAPI 1
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,7 +50,6 @@ extern "C" {
 KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port)
 {
 #ifdef KNH_USING_POSIX
-#undef KNH_USING_NOAPI
 	struct in_addr addr = {0};
 	struct hostent	*host;
 	struct sockaddr_in	server = {0};
@@ -62,7 +61,6 @@ KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port)
 		host = gethostbyname(ip_or_host);
 		if (host == NULL) {
 			KNH_PERRNO(ctx, "Socket!!", "gethostbyname");
-			//KNH_THROWf(ctx, "Socket!!: no such host %s", ip_or_host);
 			return -1;
 		}
 		memcpy(&addr, (struct in_addr *)*host->h_addr_list, sizeof(struct in_addr));
@@ -80,19 +78,53 @@ KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port)
 		return -1;
 	}
 	return sd;
+#endif/*KNH_USING_POSIX*/
+#ifdef KNH_USING_WINDOWS
+	return -1;
 #endif
 #ifdef KNH_USING_NOAPI
 	return -1;
 #endif
-
 }
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) knh_socket_close(Ctx *ctx, knh_intptr_t sd)
+KNHAPI(int) knh_socket_send(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz, int flags)
 {
 #ifdef KNH_USING_POSIX
-	close((int)sd);
+	return send(sd, buf, bufsiz, flags);
+#endif/*KNH_USING_POSIX*/
+#ifdef KNH_USING_WINDOWS
+	return send((SOCKET)sd, buf, bufsiz, flag);
+#endif
+#ifdef KNH_USING_NOAPI
+	return -1;
+#endif
+}
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(int) knh_socket_recv(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz, int flags)
+{
+#ifdef KNH_USING_POSIX
+	return recv(sd, buf, bufsiz, flags);
+#endif/*KNH_USING_POSIX*/
+#ifdef KNH_USING_WINDOWS
+	return recv((SOCKET)sd, buf, bufsiz, flag);
+#endif
+#ifdef KNH_USING_NOAPI
+	return -1;
+#endif
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(int) knh_socket_close(Ctx *ctx, knh_intptr_t sd)
+{
+#ifdef KNH_USING_POSIX
+	return close((int)sd);
+#endif/*KNH_USING_POSIX*/
+#ifdef KNH_USING_WINDOWS
+	return closesocket((SOCKET)sd);
 #endif
 #ifdef KNH_USING_NOAPI
 	return -1;

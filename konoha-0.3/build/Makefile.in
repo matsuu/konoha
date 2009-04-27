@@ -81,8 +81,8 @@ am_libkonoha_la_OBJECTS = anyapi.lo arrayapi.lo bytesapi.lo dbapi.lo \
 	knh_StringUnit.lo knh_String_mbytes.lo knh_System.lo \
 	knh_Tuple2.lo knh_bytes_t.lo knh_cwb_t.lo asm.lo kcode.lo \
 	konohac.lo parser.lo perror.lo stmt.lo token.lo tokenizer.lo \
-	typing.lo driver_db.lo driver_io.lo driver_regex.lo posix.lo \
-	tbmx1.lo thread.lo win32.lo mt19937-64.lo mt19937ar.lo \
+	typing.lo dlopen.lo file.lo io.lo regex.lo socket.lo \
+	sqlite3.lo thread.lo time.lo mt19937-64.lo mt19937ar.lo \
 	codetemplate.lo fibo.lo konoha_klr_.lo konoha_message_.lo \
 	konohac_.lo method_.lo b4.lo konohaget.lo filesystem.lo \
 	glue.lo knh_tClass.lo konoha_api.lo konoha_data.lo \
@@ -281,22 +281,22 @@ libkonoha_la_SOURCES = ../src/api/anyapi.c ../src/api/arrayapi.c \
 	../src/compiler/konohac.c ../src/compiler/parser.c \
 	../src/compiler/perror.c ../src/compiler/stmt.c \
 	../src/compiler/token.c ../src/compiler/tokenizer.c \
-	../src/compiler/typing.c ../src/deps/driver_db.c \
-	../src/deps/driver_io.c ../src/deps/driver_regex.c \
-	../src/deps/posix.c ../src/deps/tbmx1.c ../src/deps/thread.c \
-	../src/deps/win32.c ../src/ext/mt19937-64.c \
-	../src/ext/mt19937ar.c ../src/gen/codetemplate.c \
-	../src/gen/fibo.c ../src/gen/konoha_klr_.c \
-	../src/gen/konoha_message_.c ../src/gen/konohac_.c \
-	../src/gen/method_.c ../src/labs/b4.c ../src/labs/konohaget.c \
-	../src/main/filesystem.c ../src/main/glue.c \
-	../src/main/knh_tClass.c ../src/main/konoha_api.c \
-	../src/main/konoha_data.c ../src/main/konoha_ext.c \
-	../src/main/konoha_libknh.c ../src/main/konoha_locale.c \
-	../src/main/logging.c ../src/main/memory.c \
-	../src/main/metadata.c ../src/main/stack.c \
-	../src/main/system.c ../src/main/systemtable.c \
-	../src/main/typesystem.c
+	../src/compiler/typing.c ../src/deps/dlopen.c \
+	../src/deps/file.c ../src/deps/io.c ../src/deps/regex.c \
+	../src/deps/socket.c ../src/deps/sqlite3.c \
+	../src/deps/thread.c ../src/deps/time.c \
+	../src/ext/mt19937-64.c ../src/ext/mt19937ar.c \
+	../src/gen/codetemplate.c ../src/gen/fibo.c \
+	../src/gen/konoha_klr_.c ../src/gen/konoha_message_.c \
+	../src/gen/konohac_.c ../src/gen/method_.c ../src/labs/b4.c \
+	../src/labs/konohaget.c ../src/main/filesystem.c \
+	../src/main/glue.c ../src/main/knh_tClass.c \
+	../src/main/konoha_api.c ../src/main/konoha_data.c \
+	../src/main/konoha_ext.c ../src/main/konoha_libknh.c \
+	../src/main/konoha_locale.c ../src/main/logging.c \
+	../src/main/memory.c ../src/main/metadata.c \
+	../src/main/stack.c ../src/main/system.c \
+	../src/main/systemtable.c ../src/main/typesystem.c
 libkonoha_la_includedir = $(includedir)
 libkonoha_la_include_HEADERS = ../include/konoha.h
 libkonoha_la_includekonohadir = $(includedir)/../include/konoha
@@ -440,13 +440,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codetemplate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dbapi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dictapi.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/driver_db.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/driver_io.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/driver_regex.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlopen.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fibo.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filesystem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glue.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hashapi.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kcode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_AffineConv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Array.Plo@am__quote@
@@ -507,7 +507,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/objectapi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/perror.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/posix.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/regex.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socket.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sqlite3.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stack.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stmt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/streamapi.Plo@am__quote@
@@ -515,13 +517,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/systemapi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/systemtable.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tbmx1.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/thread.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/time.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/token.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tokenizer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/typesystem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/typing.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/win32.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -943,40 +944,47 @@ typing.lo: ../src/compiler/typing.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o typing.lo `test -f '../src/compiler/typing.c' || echo '$(srcdir)/'`../src/compiler/typing.c
 
-driver_db.lo: ../src/deps/driver_db.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT driver_db.lo -MD -MP -MF $(DEPDIR)/driver_db.Tpo -c -o driver_db.lo `test -f '../src/deps/driver_db.c' || echo '$(srcdir)/'`../src/deps/driver_db.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/driver_db.Tpo $(DEPDIR)/driver_db.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/driver_db.c' object='driver_db.lo' libtool=yes @AMDEPBACKSLASH@
+dlopen.lo: ../src/deps/dlopen.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT dlopen.lo -MD -MP -MF $(DEPDIR)/dlopen.Tpo -c -o dlopen.lo `test -f '../src/deps/dlopen.c' || echo '$(srcdir)/'`../src/deps/dlopen.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/dlopen.Tpo $(DEPDIR)/dlopen.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/dlopen.c' object='dlopen.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o driver_db.lo `test -f '../src/deps/driver_db.c' || echo '$(srcdir)/'`../src/deps/driver_db.c
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o dlopen.lo `test -f '../src/deps/dlopen.c' || echo '$(srcdir)/'`../src/deps/dlopen.c
 
-driver_io.lo: ../src/deps/driver_io.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT driver_io.lo -MD -MP -MF $(DEPDIR)/driver_io.Tpo -c -o driver_io.lo `test -f '../src/deps/driver_io.c' || echo '$(srcdir)/'`../src/deps/driver_io.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/driver_io.Tpo $(DEPDIR)/driver_io.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/driver_io.c' object='driver_io.lo' libtool=yes @AMDEPBACKSLASH@
+file.lo: ../src/deps/file.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT file.lo -MD -MP -MF $(DEPDIR)/file.Tpo -c -o file.lo `test -f '../src/deps/file.c' || echo '$(srcdir)/'`../src/deps/file.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/file.Tpo $(DEPDIR)/file.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/file.c' object='file.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o driver_io.lo `test -f '../src/deps/driver_io.c' || echo '$(srcdir)/'`../src/deps/driver_io.c
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o file.lo `test -f '../src/deps/file.c' || echo '$(srcdir)/'`../src/deps/file.c
 
-driver_regex.lo: ../src/deps/driver_regex.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT driver_regex.lo -MD -MP -MF $(DEPDIR)/driver_regex.Tpo -c -o driver_regex.lo `test -f '../src/deps/driver_regex.c' || echo '$(srcdir)/'`../src/deps/driver_regex.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/driver_regex.Tpo $(DEPDIR)/driver_regex.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/driver_regex.c' object='driver_regex.lo' libtool=yes @AMDEPBACKSLASH@
+io.lo: ../src/deps/io.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT io.lo -MD -MP -MF $(DEPDIR)/io.Tpo -c -o io.lo `test -f '../src/deps/io.c' || echo '$(srcdir)/'`../src/deps/io.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/io.Tpo $(DEPDIR)/io.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/io.c' object='io.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o driver_regex.lo `test -f '../src/deps/driver_regex.c' || echo '$(srcdir)/'`../src/deps/driver_regex.c
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o io.lo `test -f '../src/deps/io.c' || echo '$(srcdir)/'`../src/deps/io.c
 
-posix.lo: ../src/deps/posix.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT posix.lo -MD -MP -MF $(DEPDIR)/posix.Tpo -c -o posix.lo `test -f '../src/deps/posix.c' || echo '$(srcdir)/'`../src/deps/posix.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/posix.Tpo $(DEPDIR)/posix.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/posix.c' object='posix.lo' libtool=yes @AMDEPBACKSLASH@
+regex.lo: ../src/deps/regex.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT regex.lo -MD -MP -MF $(DEPDIR)/regex.Tpo -c -o regex.lo `test -f '../src/deps/regex.c' || echo '$(srcdir)/'`../src/deps/regex.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/regex.Tpo $(DEPDIR)/regex.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/regex.c' object='regex.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o posix.lo `test -f '../src/deps/posix.c' || echo '$(srcdir)/'`../src/deps/posix.c
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o regex.lo `test -f '../src/deps/regex.c' || echo '$(srcdir)/'`../src/deps/regex.c
 
-tbmx1.lo: ../src/deps/tbmx1.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tbmx1.lo -MD -MP -MF $(DEPDIR)/tbmx1.Tpo -c -o tbmx1.lo `test -f '../src/deps/tbmx1.c' || echo '$(srcdir)/'`../src/deps/tbmx1.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/tbmx1.Tpo $(DEPDIR)/tbmx1.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/tbmx1.c' object='tbmx1.lo' libtool=yes @AMDEPBACKSLASH@
+socket.lo: ../src/deps/socket.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT socket.lo -MD -MP -MF $(DEPDIR)/socket.Tpo -c -o socket.lo `test -f '../src/deps/socket.c' || echo '$(srcdir)/'`../src/deps/socket.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/socket.Tpo $(DEPDIR)/socket.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/socket.c' object='socket.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tbmx1.lo `test -f '../src/deps/tbmx1.c' || echo '$(srcdir)/'`../src/deps/tbmx1.c
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o socket.lo `test -f '../src/deps/socket.c' || echo '$(srcdir)/'`../src/deps/socket.c
+
+sqlite3.lo: ../src/deps/sqlite3.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sqlite3.lo -MD -MP -MF $(DEPDIR)/sqlite3.Tpo -c -o sqlite3.lo `test -f '../src/deps/sqlite3.c' || echo '$(srcdir)/'`../src/deps/sqlite3.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sqlite3.Tpo $(DEPDIR)/sqlite3.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/sqlite3.c' object='sqlite3.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sqlite3.lo `test -f '../src/deps/sqlite3.c' || echo '$(srcdir)/'`../src/deps/sqlite3.c
 
 thread.lo: ../src/deps/thread.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT thread.lo -MD -MP -MF $(DEPDIR)/thread.Tpo -c -o thread.lo `test -f '../src/deps/thread.c' || echo '$(srcdir)/'`../src/deps/thread.c
@@ -985,12 +993,12 @@ thread.lo: ../src/deps/thread.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o thread.lo `test -f '../src/deps/thread.c' || echo '$(srcdir)/'`../src/deps/thread.c
 
-win32.lo: ../src/deps/win32.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT win32.lo -MD -MP -MF $(DEPDIR)/win32.Tpo -c -o win32.lo `test -f '../src/deps/win32.c' || echo '$(srcdir)/'`../src/deps/win32.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/win32.Tpo $(DEPDIR)/win32.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/win32.c' object='win32.lo' libtool=yes @AMDEPBACKSLASH@
+time.lo: ../src/deps/time.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT time.lo -MD -MP -MF $(DEPDIR)/time.Tpo -c -o time.lo `test -f '../src/deps/time.c' || echo '$(srcdir)/'`../src/deps/time.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/time.Tpo $(DEPDIR)/time.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/time.c' object='time.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o win32.lo `test -f '../src/deps/win32.c' || echo '$(srcdir)/'`../src/deps/win32.c
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o time.lo `test -f '../src/deps/time.c' || echo '$(srcdir)/'`../src/deps/time.c
 
 mt19937-64.lo: ../src/ext/mt19937-64.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT mt19937-64.lo -MD -MP -MF $(DEPDIR)/mt19937-64.Tpo -c -o mt19937-64.lo `test -f '../src/ext/mt19937-64.c' || echo '$(srcdir)/'`../src/ext/mt19937-64.c

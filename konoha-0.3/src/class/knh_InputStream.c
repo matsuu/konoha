@@ -38,31 +38,6 @@ extern "C" {
 /* ======================================================================== */
 /* [methods] */
 
-//static
-//void knh_InputStream_setbuf(Ctx *ctx, InputStream *in)
-//{
-//	KNH_ASSERT(!IS_Bytes(DP(in)->ba));
-//	if(DP(o)->fd != -1) {
-//		DP(o)->bufsiz = DP(o)->driver.bufsiz;
-//		if(DP(o)->bufsiz > 0) {
-//			KNH_SETv(ctx, DP(o)->ba, new_Bytes(ctx, DP(o)->bufsiz));
-//			DP(o)->buf = (char*)(DP(o)->ba)->buf;
-//		}
-//		DP(o)->bufpos = 0;
-//		DP(o)->bufend = 0;  /* empty */
-//		KNH_SETv(ctx, DP(o)->urn, new_String(ctx, fname, NULL));
-//	}
-//	else {
-//		DP(o)->driver = knh_System_getDefaultIODriver();
-//		char buff[FILENAME_BUFSIZ];
-//		knh_snprintf(buff, sizeof(buff), "IO!!: '%s'", (char*)fname.buf);
-//		return (Object*)new_Nue__s(ctx, buff);
-//	}
-//}
-
-/* ------------------------------------------------------------------------ */
-
-
 Object *knh_InputStream_open(Ctx *ctx, InputStream *o, String *urn)
 {
 	knh_bytes_t fname = knh_String_tobytes(urn);
@@ -110,7 +85,6 @@ int knh_InputStream_getc(Ctx *ctx, InputStream *o)
 			}
 			DP(o)->bufpos = 0;
 			DP(o)->bufend = DP(o)->driver.fread(ctx, DP(o)->fd, DP(o)->buf, DP(o)->bufsiz);
-			//DBG2_P("* bufpos=%d, bufend=%d, bufsiz=%d", DP(o)->bufpos, DP(o)->bufend, DP(o)->bufsiz)
 			if(DP(o)->bufend == 0) return EOF;
 		}
 	}

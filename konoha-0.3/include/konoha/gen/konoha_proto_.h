@@ -526,40 +526,40 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns);
 Term *knh_StmtFORMAT_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns);
 Term *knh_StmtCLASS_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns);
 int knh_Stmt_typingBLOCK(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int isIteration);
-/* ../src/deps/knh_dlopen.c */
+/* ../src/deps/dlopen.c */
 void *knh_dlopen(Ctx *ctx, const char* path, int mode);
 void *knh_dlsym(Ctx *ctx, void* hdr, const char* symbol);
 const char *knh_dlerror(Ctx *ctx);
 int knh_dlclose(Ctx *ctx, void* hdr);
-/* ../src/deps/knh_file.c */
+/* ../src/deps/file.c */
 int knh_isfile(Ctx *ctx, knh_bytes_t path);
 int knh_isdir(Ctx *ctx, knh_bytes_t path);
 char * knh_format_homepath(char *buf, size_t bufsiz);
-/* ../src/deps/knh_io.c */
+/* ../src/deps/io.c */
 knh_iodrv_t *knh_System_getIODriver(Ctx *ctx, knh_bytes_t name);
 knh_iodrv_t knh_System_getDefaultIODriver();
 void  init_IO(Ctx *ctx);
 InputStream *new_InputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
 OutputStream *new_OutputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
-/* ../src/deps/knh_regex.c */
+/* ../src/deps/regex.c */
 void knh_write_USING_REGEX(Ctx *ctx, OutputStream *w);
 knh_regex_drvapi_t *knh_System_getRegexDriver(Ctx *ctx, knh_bytes_t name);
 void  init_Regex(Ctx *ctx);
-/* ../src/deps/knh_socket.c */
-/* ../src/deps/knh_sqlite3.c */
+/* ../src/deps/socket.c */
+/* ../src/deps/sqlite3.c */
 void knh_dbcurfree__NOP(knh_dbcur_t *dbcur);
 void knh_write_USING_SQLITE3(Ctx *ctx, OutputStream *w);
 knh_db_drvapi_t *knh_System_getDefaultDBDriver();
 knh_db_drvapi_t *knh_System_getDBDriver(Ctx *ctx, knh_bytes_t name);
 void  init_DB(Ctx *ctx);
-/* ../src/deps/knh_thread.c */
+/* ../src/deps/thread.c */
 knh_thread_t knh_thread_self();
 int thread_create(knh_thread_t *thread, void *attr, void *(*frun)(void *), void * arg);
 int knh_thread_key_create(knh_thread_key_t *key);
 int knh_thread_setspecific(knh_thread_key_t key, const void *data);
 void* knh_thread_getspecific(knh_thread_key_t key);
 int knh_thread_key_delete(knh_thread_key_t key);
-/* ../src/deps/knh_time.c */
+/* ../src/deps/time.c */
 knh_uint_t knh_initseed();
 knh_uint64_t konoha_gettime();
 /* ../src/konoha.c */
