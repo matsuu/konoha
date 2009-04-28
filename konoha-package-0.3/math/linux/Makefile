@@ -1,18 +1,18 @@
-#Makefile for math.so
+#Makefile for "macosx/math.dylib"
 
 CC = gcc
 CFLAGS = -O2 -Wall -fmessage-length=0 -fpic
 LDLIBS = -lm -lkonoha
+target = linux 
 
-library = math.so
-#library = math.dylib
+library = "$(target)/math.so"
 
 .PHONY: all
 all: $(library)
 
-objs = math.o
+objs = "$(target)/math.o"
 
-math.o: math.c
+"$(target)/math.o": math.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 $(library): $(objs)
@@ -22,8 +22,3 @@ $(library): $(objs)
 clean:
 	$(RM) -rf $(objs) $(library)
 
-.PHONY: konoha_install
-konoha_install: $(library)
-	mkdir -p .konoha/math
-	cp $(library) .konoha/math
-	cp math.k .konoha/math

@@ -20,5 +20,5 @@ $(library): $(objs)
 
 .PHONY: clean
 clean:
-	$(RM) -rf $(objs)
+	$(RM) -rf $(objs) $(library)
 
