@@ -725,17 +725,11 @@ void konohac_eval(Ctx *ctx, String *nsname, InputStream *in)
 void knh_Asm_openlib(Ctx *ctx, Asm *abr, knh_bytes_t fpath)
 {
 	knh_cwb_t cwb = new_cwb(ctx);
-	knh_index_t idx = knh_bytes_rindex(fpath, '/');
-	if(idx != -1) {
-		knh_Bytes_write(ctx, cwb.ba, knh_bytes_first(fpath, idx));
-		knh_Bytes_putc(ctx, cwb.ba, '/');
-	}
-	fpath = knh_bytes_last(fpath, idx + 1);
-	knh_Bytes_write(ctx, cwb.ba, STEXT(KONOHA_PLATFORM));
-	knh_Bytes_putc(ctx, cwb.ba, '/');
-	idx = knh_bytes_rindex(fpath, '.');
-	if(idx > 0) fpath.len = idx;
+	knh_index_t idx = knh_bytes_rindex(fpath, '.');
+	if(idx > 0) fpath = knh_bytes_first(fpath, idx);
 	knh_Bytes_write(ctx, cwb.ba, fpath);
+	knh_Bytes_putc(ctx, cwb.ba, '_');
+	knh_Bytes_write(ctx, cwb.ba, STEXT(KONOHA_PLATFORM));
 	knh_Bytes_write(ctx, cwb.ba, STEXT(KONOHA_OS_DLLEXT));
 	knh_Bytes_putc(ctx, cwb.ba, 0);
 

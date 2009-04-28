@@ -1,4 +1,4 @@
-#Makefile for "macosx/math.dylib"
+# Last modified by Kimio Kuramitsu kkuramitsu@sourceforge.jp
 
 CC = gcc
 CFLAGS = -O2 -Wall -fmessage-length=0 -fpic
@@ -7,14 +7,14 @@ LDLIBS = -lm -lkonoha
 target = linux_32
 pkgname = math
 
-library = "$(target)/$(pkgname).so"
+library = "$(pkgname)_$(target).so"
 
 .PHONY: all
 all: $(library)
 
-objs = "$(target)/$(pkgname).o"
+objs = "$(pkgname).o"
 
-"$(target)/$(pkgname).o": $(pkgname).c
+"$(pkgname).o": $(pkgname).c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 $(library): $(objs)
