@@ -234,14 +234,14 @@ char *knh_lookup_includeScript(Ctx *ctx, knh_bytes_t path, char *buf, size_t buf
 	char *filename = (char*)path.buf + loc + 1;
 
 #ifdef KNH_PREFIX
-	knh_snprintf(buf, bufsiz, "%s/lib/konoha/%s", KNH_PREFIX, filename);
+	knh_snprintf(buf, bufsiz, "%s/lib/konoha/include/%s", KNH_PREFIX, filename);
 #else
 	knh_snprintf(buf, bufsiz, "%s/include/%s", knh_String_tochar(DP(ctx->sys)->homeDir), filename);
 #endif
 	if(knh_isfile(ctx, B(buf))) return buf;
 	char *p = knh_getenv("HOME");
 	if(p != NULL) {
-		knh_snprintf(buf, bufsiz, "%s/.konoha/%s", p, filename);
+		knh_snprintf(buf, bufsiz, "%s/.konoha/include/%s", p, filename);
 		if(knh_isfile(ctx, B(buf))) return buf;
 	}
 	return NULL;
