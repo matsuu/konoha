@@ -5,17 +5,17 @@ CFLAGS = -O2 -Wall -fmessage-length=0 -fPIC
 LDLIBS = -lm -lkonoha
 
 target = macosx_32
-pkgname = math 
+pkgname = math
 
 library = "$(pkgname)_$(target).dylib"
 
 .PHONY: all
 all: $(library)
 
-objs = $(pkgname).o
+objs = "$(pkgname).o"
 
 "$(pkgname).o": $(pkgname).c
-	$(CC) $(CFLAGS) -o $@ -c $^
+	$(CC) $(CFLAGS) -c $^ -o $@
 
 $(library): $(objs)
 	$(CC) -dynamiclib -o $@ $^ $(LDLIBS)
