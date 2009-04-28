@@ -45,7 +45,7 @@ static void separate_domain_path(char *url, char *domain, char *path){
 	strncpy(domain, domain_path, strlen(domain_path) + 1);
 }
 
-int knhget_openSocket(char *url, struct knhget_sock_t *sock){
+int knhget_openSocket(Ctx *ctx, char *url, struct knhget_sock_t *sock){
 	char domain[SOCK_BUF_SIZE] = {0};
 	char path[SOCK_BUF_SIZE] = {0};
 	int port = 80;
@@ -55,24 +55,27 @@ int knhget_openSocket(char *url, struct knhget_sock_t *sock){
 	int sd = -1;
 
 	separate_domain_path(url, domain, path);
-
+	//	if (domain[0] = '\0')
+	//	  return -1;
 	if((addr.s_addr = inet_addr(domain)) == -1){
-		host = gethostbyname(domain);
-		if(host == NULL){
-			return -1;
-		}
+	  host = gethostbyname(domain);
+		if (host == NULL) {
+		  printf("%s %s\n", domain, hstrerror(h_errno));
+		  return -1;
+		  }
 		memcpy(&addr, (struct in_addr *)*host->h_addr_list, sizeof(struct in_addr));
 	}
-
 	server.sin_family = AF_INET;
 	server.sin_addr = addr;
 	server.sin_port = htons(port);
 
 	if((sd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
-		return -1;
+	  KNH_PERRNO(ctx, "Socket!!", "open_socket");
+	  return -1;
 	}
 	if(connect(sd, (struct sockaddr *)&server, sizeof(server)) == -1){
-		return -1;
+	  KNH_PERRNO(ctx, "Socket!!", "open_socket");
+	  return -1;
 	}
 	sock->sd = sd;
 	strncpy(sock->domain, domain, sizeof(domain));
@@ -82,14 +85,16 @@ int knhget_openSocket(char *url, struct knhget_sock_t *sock){
 }
 
 static
-int knhget_parseHtml(char *url, char *new_url){
+int knhget_parseHtml(Ctx *ctx, char *url, char *new_url){
 	char send_buf[SOCK_BUF_SIZE] = {0};
 	struct knhget_sock_t sock;
 	int read_size;
 	int sd;
 
-	knhget_openSocket(url, &sock);
-
+	if (knhget_openSocket(ctx, url, &sock) == -1) {
+	  // error 
+	  return -1;
+	}
 	sd = sock.sd;
 	snprintf(send_buf, SOCK_BUF_SIZE, "GET %s HTTP/1.0\r\n", sock.path);
 	write(sd, send_buf, strlen(send_buf));
@@ -105,7 +110,7 @@ int knhget_parseHtml(char *url, char *new_url){
 		if(read_size > 0){
 			char *p, *end;
 			if((p = strstr(buf, str)) != NULL){
-				DBG_P("%s", p);
+			    DBG_P("%s", p);
 				if((end = strstr(p, "\">")) != NULL){
 					*end = '\0';
 				}
@@ -122,10 +127,13 @@ int knhget_parseHtml(char *url, char *new_url){
 }
 
 static
-int knhget_getID(char *check_url, char *id){
+int knhget_getID(Ctx *ctx, char *check_url, char *id){
 	struct knhget_sock_t *sock = (struct knhget_sock_t*)malloc(sizeof(struct knhget_sock_t));
-	knhget_openSocket(check_url, sock);
 
+	if (knhget_openSocket(ctx, check_url, sock) == -1) {
+	  printf("hi");
+	  return -1;
+	}
 	int sd = sock->sd;
 	char send_buf[SOCK_BUF_SIZE];
 	memset(send_buf, 0, SOCK_BUF_SIZE);
@@ -156,7 +164,7 @@ int knhget_getID(char *check_url, char *id){
 }
 
 static
-int konoha_getPackageURL(knh_bytes_t pkgname, char *url, size_t bufsiz)
+int konoha_getPackageURL(Ctx *ctx, knh_bytes_t pkgname, char *url, size_t bufsiz)
 {
 	char check_url[] = "http://www.ubicg.ynu.ac.jp/cgi-bin/knh_rss_read.pl";
 	char baseurl[] = "http://sourceforge.jp/projects/konoha/downloads/";
@@ -164,38 +172,39 @@ int konoha_getPackageURL(knh_bytes_t pkgname, char *url, size_t bufsiz)
 	size_t package_len = pkgname.len;
 	char id[16] = {0};
 
-	knhget_getID(check_url, id);
+	if (knhget_getID(ctx, check_url, id) == -1) {
+	  return -1;
+	}
 
 	strncpy(url, baseurl, strlen(baseurl));
 	strncat(url, id, strlen(id));
 	strncat(url, "/", 1);
 	strncat(url, (char *)package, package_len);
 	strncat(url, "-0.1.0.tar.gz", 13);
-	DBG_P("url:%s", url);
+	//	DBG_P("url:%s", url);
 	return 0;
 }
 
 static
-int konoha_getPackageArchive(knh_bytes_t pkgname, char *argurl)
+int konoha_getPackageArchive(Ctx *ctx, knh_bytes_t pkgname, char *argurl)
 {
 	unsigned char *package = pkgname.buf;
 	char send_buf[SOCK_BUF_SIZE] = {0};
 	char url[SOCK_BUF_SIZE] = {0};
 	char old_url[SOCK_BUF_SIZE] = {0};
 	memcpy(old_url, argurl, SOCK_BUF_SIZE);
-	knhget_parseHtml(old_url, url);
-	DBG_P("'%s' '%s'", old_url, url);
+	knhget_parseHtml(ctx, old_url, url);
 
-	//  struct knhget_sock_t *sock = (struct knhget_sock_t*)malloc(sizeof(struct knhget_sock_t));
-	//  struct knhget_sock_t *sock = (struct knhget_sock_t *)alloca(sizeof(struct knhget_sock_t));
 	struct knhget_sock_t sock;
 
-	knhget_openSocket(url, &sock);
-
+	if (knhget_openSocket(ctx, url, &sock) == -1){
+	  KNH_PERRNO(ctx,  "Socket!!", "getPackageArchive");
+	  return -1;
+	}
 	int sd = sock.sd;
 	snprintf(send_buf, SOCK_BUF_SIZE,  "GET %s HTTP/1.0\r\n", sock.path);
 	write(sd, send_buf, strlen(send_buf));
-	DBG_P("host:%s", sock.domain);
+	//DBG_P("host:%s", sock.domain);
 	snprintf(send_buf, SOCK_BUF_SIZE, "Host: %s:%d\r\n", sock.domain, sock.port);
 	write(sd, send_buf, strlen(send_buf));
 	write(sd, "\r\n", 2);
@@ -215,9 +224,9 @@ int konoha_getPackageArchive(knh_bytes_t pkgname, char *argurl)
 		read_size = read(sd, buf, SOCK_BUF_SIZE);
 		if(read_size > 0){
 			if(content_flag){
-				fwrite(buf, read_size, sizeof(char), f);
+			  fwrite(buf, read_size, sizeof(char), f);
 			}else{
-				char *p;
+			  char *p;
 				if((p = strstr(buf, "\r\n\r\n")) != NULL){
 					p+=4;
 					content_flag = 1;
@@ -225,18 +234,17 @@ int konoha_getPackageArchive(knh_bytes_t pkgname, char *argurl)
 				}
 			}
 		}else{
-			break;
+		  break;
 		}
 	}
 
 	close(sd);
 	fclose(f);
-	//  free(sock);
 	return 0;
 }
 
 static
-int konoha_installPackage(knh_bytes_t pkgname)
+int konoha_installPackage(Ctx *ctx, knh_bytes_t pkgname)
 {
 	/* have a flexibility for archive types */
 
@@ -255,7 +263,7 @@ int konoha_installPackage(knh_bytes_t pkgname)
 	strncpy(cur, extends, extends_len);
 	cur += extends_len;
 	cur[0] = '\0';
-	DBG_P("%s", command);
+
 
 	if (system(command) == -1) return -1;
 #ifdef KONOHA_OS__MACOSX
@@ -264,7 +272,7 @@ int konoha_installPackage(knh_bytes_t pkgname)
 	if (system(command) == -1) return -1;
 	memset(command, 0, sizeof(command));
 	snprintf(command, sizeof(command), "cp %s.dylib %s.k .konoha/%s", pkgname.buf, pkgname.buf, pkgname.buf);
-	DBG_P("%s", command);
+
 	if (system(command) == -1) return -1;
 #else
 	if (system("make") == -1) return -1;
@@ -281,17 +289,17 @@ int konoha_installPackage(knh_bytes_t pkgname)
 int konohaget(Ctx *ctx, knh_bytes_t pkgname)
 {
 	char urlbuf[256] = {0};
-	if (konoha_getPackageURL(pkgname, urlbuf, sizeof(urlbuf)) == -1) {
+	if (konoha_getPackageURL(ctx, pkgname, urlbuf, sizeof(urlbuf)) == -1) {
 		printf("ERROR:cannot find package on the web...\n");
 		return 0;
 	}
 
-	if (konoha_getPackageArchive(pkgname, urlbuf) == -1) {
+	if (konoha_getPackageArchive(ctx, pkgname, urlbuf) == -1) {
 		printf("ERROR:cannot fetch package from web...\n");
 		return 0;
 	}
 
-	if (konoha_installPackage(pkgname) == -1) {
+	if (konoha_installPackage(ctx, pkgname) == -1) {
 		printf("ERROR: cannot make package...\n");
 		return 0;
 	}
