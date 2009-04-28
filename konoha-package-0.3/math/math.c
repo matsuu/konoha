@@ -10,14 +10,17 @@ METHOD Math_abs(Ctx *ctx, knh_sfp_t *sfp)
 {
     KNH_RETURN_Float(ctx, sfp, fabs(p_double(sfp[1])));
 }
+
 METHOD Math_pow(Ctx *ctx, knh_sfp_t *sfp)
 {
     KNH_RETURN_Float(ctx, sfp, pow(p_double(sfp[1]),p_double(sfp[2])));
 }
+
 METHOD Math_ldexp(Ctx *ctx, knh_sfp_t *sfp)
 {
     KNH_RETURN_Float(ctx, sfp, ldexp(p_double(sfp[1]),p_int(sfp[2])));
 }
+
 METHOD Math_modf(Ctx *ctx, knh_sfp_t *sfp)
 {
     double iprt = p_double(sfp[2]);
@@ -122,17 +125,10 @@ knh_FloatConstData_t FloatConstData[] = {
     {NULL}
 };
 
-static
-knh_StringConstData_t StringConstData[] = {
-    {NULL}
-};
-
 KNHAPI(int) init(Ctx *ctx)
 {
     KNH_NOTICE(ctx, "loading math...");
-    //  konoha_loadIntConstData(ctx, IntConstData);
     konoha_loadFloatConstData(ctx, FloatConstData);
-    //konoha_loadStringConstData(ctx, StringConstData);
     return 1;
 }
 

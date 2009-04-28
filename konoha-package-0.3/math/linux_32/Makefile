@@ -3,16 +3,18 @@
 CC = gcc
 CFLAGS = -O2 -Wall -fmessage-length=0 -fpic
 LDLIBS = -lm -lkonoha
-target = linux 
 
-library = "$(target)/math.so"
+target = linux_32
+pkgname = math
+
+library = "$(target)/$(pkgname).so"
 
 .PHONY: all
 all: $(library)
 
-objs = "$(target)/math.o"
+objs = "$(target)/$(pkgname).o"
 
-"$(target)/math.o": math.c
+"$(target)/$(pkgname).o": $(pkgname).c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 $(library): $(objs)

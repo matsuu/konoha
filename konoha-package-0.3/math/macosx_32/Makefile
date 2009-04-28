@@ -3,16 +3,18 @@
 CC = gcc
 CFLAGS = -O2 -Wall -fmessage-length=0 -fPIC
 LDLIBS = -lm -lkonoha
-target = macosx
 
-library = "$(target)/math.dylib"
+target = macosx_32
+pkgname = math
+
+library = "$(target)/$(pkgname).dylib"
 
 .PHONY: all
 all: $(library)
 
-objs = "$(target)/math.o"
+objs = "$(target)/$(pkgname).o"
 
-"$(target)/math.o": math.c
+"$(target)/$(pkgname).o": $(pkgname).c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 $(library): $(objs)
