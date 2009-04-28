@@ -602,17 +602,17 @@ NameSpace *knh_System_loadPackage(Ctx *ctx, knh_bytes_t pkgname)
 {
 	char buff[FILENAME_BUFSIZ];
 	char *fpath = knh_lookup_packageScript(ctx, buff, sizeof(buff), pkgname);
-#ifdef KNH_USING_KONOHAGET
-	if(fpath == NULL && knh_Context_isInteractive(ctx)) {
-		fprintf(stdout,
-				"Package '%s' isn't found on your computer.\n"
-				"Would you like to fetch from web?\n", (char*)pkgname.buf);
-		if(!knh_readline_askYesNo("Please enter [y/N]: ", 0)) return 0;
-		if(konohaget(ctx, pkgname)) {
-			fpath = knh_lookup_packageScript(ctx, buff, sizeof(buff), pkgname);
-		}
-	}
-#endif
+//#ifdef KNH_USING_KONOHAGET
+//	if(fpath == NULL && knh_Context_isInteractive(ctx)) {
+//		fprintf(stdout,
+//				"Package '%s' isn't found on your computer.\n"
+//				"Would you like to fetch from web?\n", (char*)pkgname.buf);
+//		if(!knh_readline_askYesNo("Please enter [y/N]: ", 0)) return 0;
+//		if(konohaget(ctx, pkgname)) {
+//			fpath = knh_lookup_packageScript(ctx, buff, sizeof(buff), pkgname);
+//		}
+//	}
+//#endif
 	if(fpath != NULL) {
 		KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 		NameSpace *ns = (NameSpace*)knh_DictMap_get__b(ctx,  DP(ctx->sys)->NameSpaceTableDictMap, pkgname);

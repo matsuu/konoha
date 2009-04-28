@@ -206,7 +206,6 @@ knh_iodrv_t *konoha_getSocketDriver()
 
 /* ------------------------------------------------------------------------ */
 /* [HTTP DRIVER] */
-
 /* 'ip:127.0.0.1:80' */
 /* 'host:localhost:80' */
 /* 'socket:localhost:80' */

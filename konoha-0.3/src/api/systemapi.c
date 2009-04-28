@@ -363,7 +363,7 @@ void knh_System__dump(Ctx *ctx, System *o, OutputStream *w, String *m)
 {
 	knh_System__k(ctx, o, w, m);
 	knh_write_EOL(ctx, w);
-	knh_printf(ctx, w, "[%s] on %s (%d, %s, %s)\n", KONOHA_CC_VERSION, KONOHA_OS,
+	knh_printf(ctx, w, "[%s] on %s (%d, %s, %s)\n", KONOHA_CC_VERSION, KONOHA_PLATFORM,
 			sizeof(void*) * 8, konoha_encoding(), knh_message_text(KMSG_LANG));
 	knh_write__s(ctx, w, "Options:");
 

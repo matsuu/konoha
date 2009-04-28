@@ -2955,6 +2955,8 @@ static knh_StringConstData_t StringConstData[] = {
 
 static knh_StringConstData_t StringPropertyData[] = {
 	{"konoha.version", KONOHA_VERSION},
+	{"konoha.os", KONOHA_OS},
+	{"konoha.platform", KONOHA_PLATFORM},
 	{NULL, NULL}
 };
 

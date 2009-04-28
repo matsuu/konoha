@@ -39,7 +39,7 @@
 #else
 #define KONOHA_NAME     "konoha"
 #define KONOHA_MAJOR_VERSION "0.3"
-#define KONOHA_VERSION  "0.3.9"
+#define KONOHA_VERSION  "0.3.10"
 #endif
 
 #define KONOHA_URL		"http://konoha.sourceforge.jp/"
@@ -168,6 +168,16 @@
 #ifndef likely
 #define likely(x)	   x
 #define unlikely(x)	   x
+#endif
+
+#ifndef KONOHA_CPU
+#define KONOHA_CPU ""
+#endif
+
+#if defined(__LP64__)
+#define KONOHA_PLATFORM (KONOHA_OS KONOHA_CPU "_64")
+#else
+#define KONOHA_PLATFORM KONOHA_OS "_32"
 #endif
 
 /* ======================================================================== */
