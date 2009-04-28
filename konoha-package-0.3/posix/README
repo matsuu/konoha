@@ -1,0 +1,13 @@
+make informaiton
+
+Apple MacOSX
+============
+
+	$ make -f macosx_32.mk
+
+ubuntu
+======
+
+	$ make -f linux_32.mk
+
+
