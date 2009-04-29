@@ -109,35 +109,39 @@ extern "C" {
 		return; \
 	}\
 
+/* --------------------------------------------------------------------------- */
+/* [Iterator] */
+
 #define KNH_ITRNEXT(ctx, sfp, i, v) {\
 		KNH_MOV(ctx, sfp[i].o, v);\
 		sfp[i].data = ((Int*)v)->n.data;\
-		return; \
+		return 1; \
+	}\
+
+#define KNH_ITRNEXT_Int(ctx, sfp, i, n) {\
+		KNH_MOV(ctx, sfp[i].o, KNH_INT0);\
+		sfp[i].ivalue = n;\
+		return 1; \
+	}\
+
+#define KNH_ITRNEXT_Float(ctx, sfp, i, n) {\
+		KNH_MOV(ctx, sfp[i].o, KNH_FLOAT0);\
+		sfp[i].fvalue = n;\
+		return 1; \
 	}\
 
 #define KNH_ITREND(ctx, sfp, n) {\
 		knh_Iterator_close(ctx, sfp[0].it);\
 		KNH_MOV(ctx, sfp[n].o, KNH_VOID);\
-		return; \
+		return 0; \
 	}\
 
 #define HAS_ITRNEXT(v)   IS_NOTNULL(v)
 
-#define KNH_ITRNEXT_Int(ctx, sfp, n, value) {\
-		sfp[n].ivalue = value;\
-		KNH_MOV(ctx, sfp[n].o, KNH_INT0);\
-		return; \
-	}\
-
-#define KNH_ITRNEXT_Float(ctx, sfp, n, value) {\
-		sfp[n].fvalue = value;\
-		KNH_MOV(ctx, sfp[n].o, KNH_FLOAT0);\
-		return; \
-	}\
-
 #define KNH_MAPPED(ctx, sfp, v) {\
-		KNH_MOV(ctx, sfp[0].o, v);\
-		sfp[0].data = ((Int*)v)->n.data;\
+		Int *vn_ = (Int*)(v);\
+		KNH_MOV(ctx, sfp[0].o, vn_);\
+		sfp[0].data = (vn_)->n.data;\
 		return; \
 	}\
 

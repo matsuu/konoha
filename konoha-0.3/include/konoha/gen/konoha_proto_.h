@@ -46,6 +46,8 @@ void knh_IArray__k(Ctx *ctx, IArray *o, OutputStream *w, String *m);
 void knh_FArray__k(Ctx *ctx, FArray *o, OutputStream *w, String *m);
 MAPPER knh_Array_Iterator(Ctx *ctx, knh_sfp_t *sfp);
 MAPPER knh_Iterator_Array(Ctx *ctx, knh_sfp_t *sfp);
+MAPPER knh_IArray_Iterator(Ctx *ctx, knh_sfp_t *sfp);
+MAPPER knh_FArray_Iterator(Ctx *ctx, knh_sfp_t *sfp);
 Mapper *knh_tMapper_newIteratorArray(Ctx *ctx, knh_class_t icid, knh_class_t acid);
 Mapper *knh_tMapper_newArrayIterator(Ctx *ctx, knh_class_t acid, knh_class_t icid);
 void knh_array_dfree(Ctx *ctx, void *ptr, size_t capacity, size_t usize);

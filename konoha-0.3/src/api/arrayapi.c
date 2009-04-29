@@ -944,11 +944,112 @@ MAPPER knh_Iterator_Array(Ctx *ctx, knh_sfp_t *sfp)
 	Array *a = new_Array(ctx, ctx->share->ClassTable[it->h.cid].p1, 0);
 	it->fnext_1(ctx, sfp, 1);
 	while(HAS_ITRNEXT(sfp[1].o)) {
+		knh_sfp_boxing(ctx, sfp + 1);
 		knh_Array_add(ctx, a, sfp[1].o);
 		it->fnext_1(ctx, sfp, 1);
 	}
 	KNH_MAPPED(ctx, sfp, a);
 }
+
+/* ------------------------------------------------------------------------ */
+/* [IArray] */
+
+static
+ITRNEXT knh_IArray_var_next(Ctx *ctx, knh_sfp_t *sfp, int n)
+{
+	IArray *o = (IArray*)DP(sfp[0].it)->source;
+	KNH_ASSERT(IS_bIArray(o));
+	size_t pos = DP(sfp[0].it)->pos;
+	while(pos < o->size) {
+		DP(sfp[0].it)->pos = pos+1;
+		KNH_ITRNEXT_Int(ctx, sfp, n, o->ilist[pos]);
+		pos++;
+	}
+	KNH_ITREND(ctx, sfp, n);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @map IArray Iterator! */
+
+MAPPER knh_IArray_Iterator(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_MAPPED(ctx, sfp,
+		new_Iterator(ctx, ctx->share->ClassTable[(sfp[0].o)->h.cid].p1, sfp[0].o, knh_IArray_var_next));
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Int.. IArray.opItr() */
+
+static METHOD knh__IArray_opItr(Ctx *ctx, knh_sfp_t *sfp)
+{
+	IArray *o = (IArray*)sfp[0].o;
+	KNH_RETURN(ctx, sfp, new_Iterator(ctx, ctx->share->ClassTable[o->h.cid].p1, UP(o), knh_IArray_var_next));
+}
+
+///* ------------------------------------------------------------------------ */
+///* @map Iterator IArray! */
+//
+//MAPPER knh_Iterator_IArray(Ctx *ctx, knh_sfp_t *sfp)
+//{
+//	Iterator *it = sfp[0].it;
+//	IArray *a = new_IArray(ctx, ctx->share->ClassTable[it->h.cid].p1, 0);
+//	it->fnext_1(ctx, sfp, 1);
+//	while(HAS_ITRNEXT(sfp[1].o)) {
+//		knh_IArray_add(ctx, a, sfp[1].ivalue);
+//		it->fnext_1(ctx, sfp, 1);
+//	}
+//	KNH_MAPPED(ctx, sfp, a);
+//}
+
+/* ------------------------------------------------------------------------ */
+/* [FArray] */
+
+static
+ITRNEXT knh_FArray_var_next(Ctx *ctx, knh_sfp_t *sfp, int n)
+{
+	FArray *o = (FArray*)DP(sfp[0].it)->source;
+	KNH_ASSERT(IS_bFArray(o));
+	size_t pos = DP(sfp[0].it)->pos;
+	while(pos < o->size) {
+		DP(sfp[0].it)->pos = pos+1;
+		KNH_ITRNEXT_Float(ctx, sfp, n, o->flist[pos]);
+		pos++;
+	}
+	KNH_ITREND(ctx, sfp, n);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @map FArray Iterator! */
+
+MAPPER knh_FArray_Iterator(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_MAPPED(ctx, sfp,
+		new_Iterator(ctx, ctx->share->ClassTable[(sfp[0].o)->h.cid].p1, sfp[0].o, knh_FArray_var_next));
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Any1.. FArray.opItr() */
+
+static METHOD knh__FArray_opItr(Ctx *ctx, knh_sfp_t *sfp)
+{
+	FArray *o = (FArray*)sfp[0].o;
+	KNH_RETURN(ctx, sfp, new_Iterator(ctx, ctx->share->ClassTable[o->h.cid].p1, UP(o), knh_FArray_var_next));
+}
+
+///* ------------------------------------------------------------------------ */
+///* @map Iterator FArray! */
+//
+//MAPPER knh_Iterator_FArray(Ctx *ctx, knh_sfp_t *sfp)
+//{
+//	Iterator *it = sfp[0].it;
+//	FArray *a = new_FArray(ctx, ctx->share->ClassTable[it->h.cid].p1, 0);
+//	it->fnext_1(ctx, sfp, 1);
+//	while(HAS_ITRNEXT(sfp[1].o)) {
+//		knh_FArray_add(ctx, a, sfp[1].fvalue);
+//		it->fnext_1(ctx, sfp, 1);
+//	}
+//	KNH_MAPPED(ctx, sfp, a);
+//}
 
 /* ------------------------------------------------------------------------ */
 

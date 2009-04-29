@@ -239,7 +239,7 @@ typedef struct knh_FArray_t {
 /* @class Iterator Object knh_Iterator_struct @Param1 */
 
 #ifdef _MSC_VER
-typedef void   (KNH_CC_FASTCALL *knh_fitrnext)(Ctx *, knh_sfp_t *, int n);
+typedef int   (KNH_CC_FASTCALL *knh_fitrnext)(Ctx *, knh_sfp_t *, int n);
 #else
 typedef ITRNEXT (*knh_fitrnext)(Ctx *, knh_sfp_t *, int n);
 #endif

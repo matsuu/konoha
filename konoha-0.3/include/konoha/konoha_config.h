@@ -42,6 +42,7 @@
 #define KONOHA_VERSION  "0.3.10"
 #endif
 
+#define KONOHA_XCODE    "(Rufy)"
 #define KONOHA_URL		"http://konoha.sourceforge.jp/"
 #define KONOHA_URLBASE  "kttp://konoha.sourceforge.jp/wiki/"
 

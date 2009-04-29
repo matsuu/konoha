@@ -76,9 +76,6 @@ for(i = 0; i < 10; i++)  {
 	if(i > 4) continue;
 	n += i;
 }
-
-utest("continue", n == 10);
-
 try {
 	print "hello";
 }

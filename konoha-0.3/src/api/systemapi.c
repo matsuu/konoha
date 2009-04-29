@@ -347,11 +347,10 @@ void knh_Exception__dump(Ctx *ctx, Exception *o, OutputStream *w, String *m)
 
 void knh_System__k(Ctx *ctx, System *o, OutputStream *w, String *m)
 {
-	char *_PREVIEW_ = (KONOHA_BUILDID % 2 == 1) ? " _PREVIEW_" : "";
 #ifdef KONOHA_UNDER_GPL2
-	knh_printf(ctx, w, "Konoha %s%s GPL2 (#%d, %s, %s)", KONOHA_VERSION, _PREVIEW_, KONOHA_BUILDID, __DATE__, __TIME__);
+	knh_printf(ctx, w, "Konoha %s %s GPL2 (#%d, %s, %s)", KONOHA_VERSION, KONOHA_XCODE, KONOHA_BUILDID, __DATE__, __TIME__);
 #else
-	knh_printf(ctx, w, "Konoha %s%s (#%d, %s, %s)" TERM_INIT, KONOHA_VERSION, _PREVIEW_, KONOHA_BUILDID, __DATE__, __TIME__);
+	knh_printf(ctx, w, "Konoha %s %s (#%d, %s, %s)" TERM_INIT, KONOHA_VERSION, KONOHA_XCODE, KONOHA_BUILDID, __DATE__, __TIME__);
 #endif
 }
 

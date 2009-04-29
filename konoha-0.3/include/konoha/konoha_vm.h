@@ -580,7 +580,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 
 #define KLR_NEXT(ctx, PC, JUMP, na, ib, sc) { \
 		knh_sfp_t *itrsfp_ = sfp + ib; \
-		KNH_ASSERT(IS_bIterator(itrsfp_[0].it));\
+		DBG2_ASSERT(IS_bIterator(itrsfp_[0].it));\
 		(itrsfp_[0].it)->fnext_1(ctx, itrsfp_, sc - ib); \
 		if(!HAS_ITRNEXT(sfp[sc].o)) { \
 			KLR_JMP(ctx, PC, JUMP); \
