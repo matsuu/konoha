@@ -187,7 +187,7 @@ static METHOD knh__OutputStream_println(Ctx *ctx, knh_sfp_t *sfp)
 static METHOD knh__OutputStream_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 {
 	OutputStream *out = (OutputStream*)sfp[0].o;
-	knh_sfp_t *v = sfp + 1;
+	knh_sfp_t *v = sfp + 1, *esp1 = ctx->esp + 1;
 	int ac = knh_sfp_argc(ctx, v);
 	size_t i;
 	for(i = 0; i < ac; i++) {
@@ -206,7 +206,9 @@ static METHOD knh__OutputStream_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 			}
 		}
 		else {
-			KNH_SHIFTESP(ctx, sfp + i); // Trickey
+			KNH_SETv(ctx, esp1[0].o, v[i].o);
+			esp1[0].data = v[i].data;
+			KNH_ASSERT(ctx->esp + 1 == esp1);
 			knh_esp1_format(ctx, METHODN__s, out, KNH_NULL);
 		}
 	}

@@ -114,26 +114,22 @@ static METHOD knh__String_getSize(Ctx *ctx, knh_sfp_t *sfp)
 static METHOD knh__String_opAdd(Ctx *ctx, knh_sfp_t *sfp)
 {
 	knh_cwb_t cwb = new_cwb(ctx);
-//	if(IS_bString(sfp[0].o)) {
-//		knh_Bytes_write(ctx, cwb.ba, knh_String_tobytes(sfp[0].s));
-//	}
-//	else {
-//		KNH_SETESP(ctx, sfp, 2);
-//		knh_sfp_format(ctx, sfp, METHODN__s, cwb.w, KNH_NULL);
-//	}
-//	if(IS_bString(sfp[1].o)) {
-//		knh_Bytes_write(ctx, cwb.ba, knh_String_tobytes(sfp[1].s));
-//	}
-//	else {
-//		KNH_SETESP(ctx, sfp, 2);
-//		knh_sfp_format(ctx, sfp+1, METHODN__s, cwb.w, KNH_NULL);
-//	}
 	knh_sfp_t *esp = KNH_LOCAL(ctx);
-	KNH_SETv(ctx, esp[1].o, sfp[0].o); esp[1].data = sfp[0].data;
-	knh_esp1_format(ctx, METHODN__s, cwb.w, KNH_NULL);
-	KNH_ASSERT(esp == ctx->esp);
-	KNH_SETv(ctx, esp[1].o, sfp[1].o); esp[1].data = sfp[1].data;
-	knh_esp1_format(ctx, METHODN__s, cwb.w, KNH_NULL);
+	if(IS_bString(sfp[0].o)) {
+		knh_Bytes_write(ctx, cwb.ba, knh_String_tobytes(sfp[0].s));
+	}
+	else {
+		KNH_SETv(ctx, esp[1].o, sfp[0].o); esp[1].data = sfp[0].data;
+		knh_esp1_format(ctx, METHODN__s, cwb.w, KNH_NULL);
+	}
+	if(IS_bString(sfp[1].o)) {
+		knh_Bytes_write(ctx, cwb.ba, knh_String_tobytes(sfp[1].s));
+	}
+	else {
+		KNH_ASSERT(esp == ctx->esp);
+		KNH_SETv(ctx, esp[1].o, sfp[1].o); esp[1].data = sfp[1].data;
+		knh_esp1_format(ctx, METHODN__s, cwb.w, KNH_NULL);
+	}
 	KNH_RETURN(ctx, sfp, new_String__cwb(ctx, cwb));
 }
 
