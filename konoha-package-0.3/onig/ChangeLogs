@@ -1,3 +1,8 @@
+2009-04-29 Masahiro Ide <imasahiro@users.sourceforge.jp>
+	* linux_32.mk  make file for linux 32bit
+	* onig.c       remove global var;
+	* onig_drv.c   make oniguguma driver
+
 2009-04-07 Masahiro Ide <imasahiro@users.sourceforge.jp>
     * Makefile  make Makefile.
     * onig.c    make prototype.
