@@ -516,8 +516,8 @@ int knh_Stmt_eval(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int isEval)
 		KNH_LOCALBACK(ctx, lsfp);
 		return 0;
 	}
-	int isVOID = knh_Stmt_isVOID(stmt);
 
+	int isVOID = knh_Stmt_isVOID(stmt);
 	if(isEval) {
 		ExceptionHandler *hdr = new_ExceptionHandler(ctx);
 		KNH_MOV(ctx, lsfp[0].o, hdr);

@@ -1933,7 +1933,7 @@ knh_labelid_t knh_Asm_stackLabelId(Ctx *ctx, Asm *abr, Stmt *stmt)
 		tk = DP(stmt)->tokens[0];
 	}
 	if(tk != NULL) {
-		size_t i;
+		int i;
 		for(i = s - 1; i >= 0; i--) {
 			Token *tk2 = (Token*)knh_Array_n(DP(abr)->lstacks, i);
 			if(knh_String_equals(DP(tk)->text, knh_String_tobytes(DP(tk2)->text))) {
