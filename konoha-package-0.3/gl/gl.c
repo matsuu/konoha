@@ -1,6 +1,13 @@
 #include <konoha.h>
+
+#ifdef KONOHA_OS__MACOSX
 #include <OpenGL/gl.h>
 #include <GLUT/glut.h>
+#endif
+
+#ifdef KONOHA_OS__LINUX
+#include <GL/glut.h>
+#endif
 
 Method *displayfunc;
 
