@@ -459,14 +459,14 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 /* ------------------------------------------------------------------------- */
 
 #define KLR_TOSTRf(ctx, n, mn, fmt) { \
-		DBG2_ASSERT(ctx->esp <= (sfp + n));\
+		KNH_ASSERT(ctx->esp <= (sfp + n));\
 		KLR_SWAP(ctx, n, n+1); \
 		knh_cwb_t cwb = new_cwb(ctx);\
 		KLR_MOV(ctx, sfp[n+2].o, cwb.w);\
 		KLR_MOV(ctx, sfp[n+3].o, fmt);\
 		Method *mtd_ = konoha_lookupFormatter(ctx, knh_Object_cid(sfp[n+1].o), mn);\
 		KLR_SCALL(ctx, n, 4, mtd_);\
-		KLR_MOV(ctx, sfp[n].o, new_String__cwb(ctx, cwb)); \
+		KNH_SETv(ctx, sfp[n].o, new_String__cwb(ctx, cwb)); \
 	}\
 
 #define KLR_TOSTR(ctx, n, mn)  KLR_TOSTRf(ctx, n, mn, KNH_NULL)

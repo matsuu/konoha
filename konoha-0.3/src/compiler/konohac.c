@@ -512,21 +512,22 @@ int knh_Stmt_eval(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int isEval)
 	}
 	KNH_LPUSH(ctx, stmt);
 	KNH_ASM_METHOD(ctx, abr, mtd, NULL, stmt, 0 /* isIteration */);
-
-	if(knh_Method_isAbstract(mtd)) {
+	if(knh_Method_isAbstract(mtd) || SP(stmt)->stt == STT_ERR) {
 		KNH_LOCALBACK(ctx, lsfp);
 		return 0;
 	}
+	int isVOID = knh_Stmt_isVOID(stmt);
 
 	if(isEval) {
 		ExceptionHandler *hdr = new_ExceptionHandler(ctx);
 		KNH_MOV(ctx, lsfp[0].o, hdr);
 		KNH_TRY(ctx, L_CATCH, lsfp, 0);
 		{
+			KNH_MOV(ctx, lsfp[1].o, DP(mtd)->code); // TO AVOID RCGC
 			KNH_MOV(ctx, lsfp[3].o, scr);
 			KNH_SCALL(ctx, lsfp, 2, mtd, 0/*args*/);
-			if(isExpr && !knh_Stmt_isVOID(stmt)) {
-				//DBG2_P("returning %s %lld", CTXCLASSN(knh_Object_cid(lsfp[1].o)), lsfp[1].ivalue);
+			if(isExpr && !isVOID) {
+				//DBG_P("returning %s %lld", CLASSN(knh_Object_cid(lsfp[2].o)), lsfp[2].ivalue);
 				((Context*)ctx)->esp = lsfp+1;
 				knh_esp1_format(ctx, mt, KNH_STDOUT, KNH_NULL);
 				knh_write_EOL(ctx, KNH_STDOUT);
