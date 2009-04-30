@@ -2,7 +2,7 @@
 
 CC = gcc
 CFLAGS = -O2 -Wall -fmessage-length=0 -fPIC
-LDLIBS = -framework GLUT -framework OpenGL -lkonoha
+LDLIBS = -framework GLUT -framework OpenGL -lkonoha -lpthread
 
 target = macosx_32
 pkgname = gl

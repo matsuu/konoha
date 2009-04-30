@@ -2,8 +2,8 @@ using gl.*
 
 void display()
 {
-	GL.glClear();
-	GL.glBegin();
+	GL.glClear(GL.GL_COLOR_BUFFER_BIT);
+	GL.glBegin(GL.GL_LINE_LOOP);
 	GL.glVertex2d(-0.9, -0.9);
 	GL.glVertex2d(0.9, -0.9);
 	GL.glVertex2d(0.9, 0.9);
@@ -15,9 +15,10 @@ void display()
 int main(String[] args)
 {
   GL.glutInit(args);
-  GL.glutInitDisplayMode();
+  GL.glutInitDisplayMode(GL.GLUT_RGBA);
   GL.glutCreateWindow("hello world");
-  GL.glutDisplayFunc(Script.display);
+  Closure c = delegate(display);
+  GL.glutDisplayFunc(c);
   GL.glutMainLoop();
   return 0;
 }
