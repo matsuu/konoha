@@ -69,7 +69,7 @@ KNHAPI(OutputStream*) new_OutputStream__FILE(Ctx *ctx, String *urn, FILE *fp, kn
 /* ======================================================================== */
 /* [methods] */
 
-Object *knh_OutputStream_open(Ctx *ctx, OutputStream *o, String *urn, String *mode)
+Object *knh_OutputStream_open(Ctx *ctx, OutputStream *o, String *urn, String *m)
 {
 	knh_bytes_t fname = knh_String_tobytes(urn);
 	knh_index_t loc = knh_bytes_index(fname, ':');
@@ -80,20 +80,18 @@ Object *knh_OutputStream_open(Ctx *ctx, OutputStream *o, String *urn, String *mo
 	else {
 		DP(o)->driver = konoha_getIODriver(ctx, knh_bytes_first(fname, loc));
 	}
-	if(IS_NULL(mode)) {
-		DP(o)->fd = DP(o)->driver->fopen(ctx, fname, "w");
-	}
-	else {
-		DP(o)->fd = DP(o)->driver->fopen(ctx, fname, knh_String_tochar(mode));
-	}
-
+	char *mode = "r";
+	if(IS_NOTNULL(m)) mode = knh_String_tochar(m);
+	DP(o)->fd = DP(o)->driver->fopen(ctx, fname, mode);
 	if(DP(o)->fd != -1) {
-		KNH_SETv(ctx, DP(o)->ba, new_Bytes(ctx, DP(o)->driver->bufsiz));
+		KNH_SETv(ctx, DP(o)->ba, new_Bytes(ctx, 4096));
 		knh_OutputStream_setBOL(o,1);
+		DP(o)->driver->finit(ctx, (Object*)o, mode);
 	}
 	else {
 		DP(o)->driver = konoha_getDefaultIODriver();
 	}
+	knh_OutputStream_setBOL(o,1);
 	return (Object*)o;
 }
 

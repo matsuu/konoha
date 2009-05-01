@@ -141,6 +141,13 @@ knh_io_t knh_iodrv_open__NOP(Ctx *ctx, knh_bytes_t n, char *mode)
 
 /* ------------------------------------------------------------------------ */
 
+static
+void knh_iodrv_init__NOP(Ctx *ctx, Object *stream, char *mode)
+{
+}
+
+/* ------------------------------------------------------------------------ */
+
 static knh_intptr_t knh_iodrv_read__NOP(Ctx *ctx, knh_io_t fd, char *buf, size_t bufsiz)
 {
 	return 0;
@@ -211,6 +218,7 @@ static knh_iodrv_t IO__NOP = {
 	KNH_DRVAPI_TYPE__IO, "NOP",
 	0,
 	knh_iodrv_open__NOP,
+	knh_iodrv_init__NOP,
 	knh_iodrv_read__NOP,
 	knh_iodrv_write__NOP,
 	knh_iodrv_close__NOP
@@ -220,6 +228,7 @@ static knh_iodrv_t IO__FILE = {
 	KNH_DRVAPI_TYPE__IO, "file",
 	0,
 	knh_iodrv_open__FILE,
+	knh_iodrv_init__NOP,
 	knh_iodrv_read__FILE,
 	knh_iodrv_write__FILE,
 	knh_iodrv_close__FILE
@@ -269,6 +278,7 @@ static knh_iodrv_t IO__stdio = {
 	KNH_DRVAPI_TYPE__IO, "stdio",
 	0,
 	knh_iodrv_open__NOP,
+	knh_iodrv_init__NOP,
 	knh_iodrv_read__FILE,
 	knh_iodrv_write__FILE,
 	knh_iodrv_close__NOP

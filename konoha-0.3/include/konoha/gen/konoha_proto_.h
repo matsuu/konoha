@@ -244,7 +244,7 @@ void knh_Hash_rehash(Ctx *ctx, knh_Hash_t *o);
 void knh_HashMap_set__hcode(Ctx *ctx, HashMap *o, knh_hcode_t hcode, Any *value);
 void knh_HashSet_set__hcode(Ctx *ctx, HashSet *o, knh_hcode_t hcode, knh_uintptr_t uvalue);
 /* ../src/class/knh_InputStream.c */
-Object *knh_InputStream_open(Ctx *ctx, InputStream *o, String *urn);
+Object *knh_InputStream_open(Ctx *ctx, InputStream *o, String *urn, String *m);
 int knh_InputStream_getc(Ctx *ctx, InputStream *o);
 size_t knh_InputStream_read(Ctx *ctx, InputStream *o, char *buf, size_t bufsiz);
 String* knh_InputStream_readLine(Ctx *ctx, InputStream *o);

@@ -813,6 +813,7 @@ typedef struct {
 typedef knh_intptr_t knh_io_t;
 
 typedef knh_io_t (*f_io_open)(Ctx *ctx, knh_bytes_t urn, char *mode);
+typedef void (*f_io_init)(Ctx *ctx, Object *stream, char *mode);
 typedef knh_intptr_t (*f_io_read)(Ctx *ctx, knh_io_t fd, char *buf, size_t bufsiz);
 typedef knh_intptr_t (*f_io_write)(Ctx *ctx, knh_io_t fd, char *buf, size_t bufsiz);
 typedef void   (*f_io_close)(Ctx *ctx, knh_io_t fd);
@@ -822,6 +823,7 @@ typedef struct {
 	char *name;
 	size_t bufsiz;  /* knh_io_t == FILE* if bufsiz == 0 */
 	f_io_open    fopen;
+	f_io_init    finit;
 	f_io_read    fread;
 	f_io_write   fwrite;
 	f_io_close   fclose;

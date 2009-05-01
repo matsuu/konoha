@@ -164,6 +164,12 @@ knh_io_t knh_iodrv_open__SOCKET(Ctx *ctx, knh_bytes_t file, char *mode)
 /* ------------------------------------------------------------------------ */
 
 static
+void knh_iodrv_init__SOCKET(Ctx *ctx, Object *stream, char *mode)
+{
+}
+
+/* ------------------------------------------------------------------------ */
+static
 knh_intptr_t knh_iodrv_read__SOCKET(Ctx *ctx, knh_io_t sd, char *buf, size_t bufsiz)
 {
 	return knh_socket_recv(ctx, (knh_intptr_t)sd, buf, bufsiz, 0);
@@ -192,6 +198,7 @@ static knh_iodrv_t IO__SOCKET = {
 	KNH_DRVAPI_TYPE__IO, "socket",
 	1024,
 	knh_iodrv_open__SOCKET,
+	knh_iodrv_init__SOCKET,
 	knh_iodrv_read__SOCKET,
 	knh_iodrv_write__SOCKET,
 	knh_iodrv_close__SOCKET
@@ -244,6 +251,20 @@ knh_io_t knh_iodrv_open__HTTP(Ctx *ctx, knh_bytes_t url, char *mode)
 /* ------------------------------------------------------------------------ */
 
 static
+void knh_iodrv_init__HTTP(Ctx *ctx, Object *stream, char *mode)
+{
+	if(IS_InputStream(stream) && mode[0] != 'h') {
+		InputStream *in = (InputStream*)stream;
+		knh_sfp_t *esp = ctx->esp + 1;
+		do {
+			KNH_SETv(ctx, esp[0].o, knh_InputStream_readLine(ctx, in));
+		}while((esp[0].s)->size > 0);
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
 knh_intptr_t knh_iodrv_read__HTTP(Ctx *ctx, knh_io_t sd, char *buf, size_t bufsiz)
 {
 	return knh_socket_recv(ctx, (knh_intptr_t)sd, buf, bufsiz, 0);
@@ -272,11 +293,11 @@ static knh_iodrv_t IO__HTTP = {
 	KNH_DRVAPI_TYPE__IO, "http",
 	4096,
 	knh_iodrv_open__HTTP,
+	knh_iodrv_init__HTTP,
 	knh_iodrv_read__HTTP,
 	knh_iodrv_write__HTTP,
 	knh_iodrv_close__HTTP
 };
-
 
 /* ======================================================================== */
 /* [KNHAPI] */

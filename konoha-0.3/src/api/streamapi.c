@@ -40,12 +40,12 @@ extern "C" {
 #ifdef KNH_CC_METHODAPI
 
 /* ------------------------------------------------------------------------ */
-/* @method InputStream InputStream.new(String! urn) */
+/* @method InputStream InputStream.new(String! urn, String mode) */
 
 static METHOD knh__InputStream_new(Ctx *ctx, knh_sfp_t *sfp)
 {
 	InputStream *o = (InputStream*)sfp[0].o;
-	KNH_RETURN(ctx, sfp, knh_InputStream_open(ctx, o, sfp[1].s));
+	KNH_RETURN(ctx, sfp, knh_InputStream_open(ctx, o, sfp[1].s, sfp[2].s));
 }
 
 /* ------------------------------------------------------------------------ */
