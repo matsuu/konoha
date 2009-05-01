@@ -6,13 +6,18 @@ class Rect;
 class PixelFormat;
 class Color;
 class Cursor;
-class GLattr;
 class Overlay;
 class Eventaction;
 class Joystick;
 class AudioSpec;
 class AudioCVT;
 class CD;
+
+
+
+void SDL.sample()
+
+
 
 //	General
 void SDL.init(int flags);
@@ -28,13 +33,15 @@ VideoInfo SDL.getVideoInfo();
 void SDL.videoDriverName(String namebuf, int maxlen);
 
 // TODO
-// SDL_Rect **SDL.listModes(PixelFormat format, int flags);
+//Rect[] SDL.listModes(PixelFormat fmt, int flags);
 
 void SDL.videoModeOK(int width, int height, int bpp, int flags);
 Surface SDL.setVideoMode(int width, int height, int bpp, int flags);
 
 
+//void Surface.updateRect(int x, int y, int w, int h);
 void Surface.updateRect(int x, int y, int w, int h);
+
 //void SDL.updateRects(Surface screen, int numrects, Rect rects);
 void Surface.flip();
 
@@ -56,7 +63,7 @@ void Surface.unLockSurface();
 Surface SDL.loadBMP(String file);
 void Surface.saveBMP(String file);
 
-//void Surface.setColorKey(int flag, int key);
+void Surface.setColorKey(int flag, int key);
 
 void Surface.setAlpha(int flag, int alpha);
 
@@ -64,21 +71,28 @@ void Surface.setAlpha(int flag, int alpha);
 //void SDL.getCliprect(Surface surface, Rect rect);
 //Surface SDL.converSurface(Surface s, PixelFormat f, int flags);
 
-void SDL.blitSurface(Surface screen, Surface image);
+void Surface.blitSurface(Surface s);
 
-//void SDL.fillRect(Surface dst, Rect dstrect, int color);
-//Surface SDL.displayFormat(Surface s);
+//void Surface.fillRect(Rect dstrect, int color);
+
+//TODO
+//void Surface.displayFormat();
+
 //Surface SDL.displayFormatalpha(Surface s);
-//void SDL.warpMouse(int x,int y);
-// Cursor SDL.createCursor(int* data, int* mask, int w, int h, int hot_x, int hot_y);
+
+void SDL.warpMouse(int x,int y);
+
+//Cursor SDL.createCursor(int w, int h, int hot_x, int hot_y);
 //void SDL.freeCursor(Cursor c);
 //void* SDL.setCursor(Cursor c);
 //Cursor SDL.getCursor();
-//int SDL.showCursor(int toggle);
-//void SDL.glLoadlibrary(String path);
-// void* SDL.glGetprocaddress(String proc);
-// void SDL.glGetattribute(GLattr attr, int* value);
-// void SDL.glSetattribute(GLattr attr, int value);
+
+int SDL.showCursor(int toggle);
+void SDL.glLoadLibrary(String path);
+
+// void* SDL.glGetProcAddress(String proc);
+// void SDL.glGetAttribute(GLattr attr, int* value);
+//void SDL.glSetAttribute(int attr, int value);
 //void SDL.glSwapbuffers();
 //Overlay SDL.createYUVoverlay(int w, int h, int format, Surface display);
 //void SDL.lockYUVoverlay(Overlay o);
@@ -87,12 +101,14 @@ void SDL.blitSurface(Surface screen, Surface image);
 //void SDL.freeYUVoverlay(Overlay o);
 
 //   	Window Management
-void SDL.wmSetCaption(String title,String icon);
-// void SDL.wmGetcaption(String *title, String *icon); 
+void SDL.wmSetCaption(String title);
+
+//void SDL.wmGetCaption(String[] title, String[] icon); 
 // void SDL.wmSeticon(Surface icon, int *mask);
-//void SDL.wmIconifywindow();
-//void SDL.wmTogglefullscreen(Surface s);
-//int SDL.wmGrabinput(int grabmode);
+
+void SDL.wmIconifyWindow();
+void Surface.wmToggleFullScreen();
+int SDL.wmGrabInput(int grabmode);
 
 //   	Event
 //void SDL.pumpEvents();
@@ -160,7 +176,7 @@ void SDL.wmSetCaption(String title,String icon);
 
 
 //	Time
-//float SDL.getTicks();
+float SDL.getTicks();
 void SDL.delay(int ms);
 
 
