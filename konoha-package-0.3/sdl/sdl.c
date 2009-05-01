@@ -1,5 +1,9 @@
 #include<konoha.h>
+#ifdef KONOHA_OS__MACOSX
+#include <SDL.h>
+#else
 #include<SDL/SDL.h>
+#endif
 //#include<SDL/SDL_image.h>
 
 /* General */
