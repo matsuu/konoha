@@ -135,7 +135,7 @@ knh_Object_t *new_UnusedObject(Ctx *ctx)
 	KNH_LOCK(ctx, LOCK_MEMORY, NULL);
 	int tindex = ctx->share->ObjectPageTableSize;
 	if(unlikely(!(tindex < KNH_TOBJECTPAGE_SIZE))) {
-		KNH_EXIT("Enlarge %s x %s", KNH_OBJECTPAGE_SIZE, KNH_TOBJECTPAGE_SIZE);
+		KNH_EXIT("Enlarge %d x %d", KNH_OBJECTPAGE_SIZE, KNH_TOBJECTPAGE_SIZE);
 		KNH_UNLOCK(ctx, LOCK_MEMORY, NULL);
 		return NULL;
 	}
@@ -171,7 +171,7 @@ knh_Object_t *new_UnusedObject(Ctx *ctx)
 	}
 	((Context*)ctx)->unusedObject = ((knh_Object_t*)h) + 1;
 	((Context*)ctx)->unusedObjectSize += cnt;
-	DBG2_P("*** new page tindex=%d, ctxid=%d unused=%p,%d ***",
+	DBG_P("*** new object page tindex=%d, ctxid=%d unused=%p,%d ***",
 			tindex, ctx->ctxid, ctx->unusedObject, (int)ctx->unusedObjectSize);
 	return ctx->unusedObject;
 }

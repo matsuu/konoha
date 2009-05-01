@@ -20,8 +20,8 @@
 	konoha_says(ctx, KONOHA_WARNING, fmt, ## __VA_ARGS__) \
 
 #define KNH_EXIT(fmt, ...) {\
-		fprintf(stderr, "konoha[%s]: Exiting .. \n", __FUNCTION__); \
-		konoha_says(NULL, KONOHA_FATAL, fmt, ## __VA_ARGS__); \
+		fprintf(stderr, "konoha: Emergency Exit at %s\n\t", __FUNCTION__); \
+		fprintf(stderr, fmt, ## __VA_ARGS__); \
 		exit(1); \
 	} \
 

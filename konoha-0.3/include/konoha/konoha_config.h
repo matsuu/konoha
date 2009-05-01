@@ -31,6 +31,12 @@
 #include"license.h"
 
 /* ======================================================================== */
+/* configure */
+
+//#define KNH_USING_RCGC       1
+#define KNH_USING_UNBOXFIELD 1
+
+/* ======================================================================== */
 /* Manifesto */
 
 #ifdef PACKAGE_NAME
@@ -76,12 +82,6 @@
 #define KONOHA_ENCODING                    "UTF-8"
 
 /* ======================================================================== */
-/* [OPTIONS] */
-
-//#define KNH_USING_RCGC    1                /* Reference Counting */
-//#define KNH_USING_DRCGC   1
-
-/* ======================================================================== */
 
 #ifdef KONOHA_OS__LINUX
 #define KONOHA_OS "linux"
@@ -111,7 +111,6 @@
 	#define KONOHA_CC_VERSION "GCC " __VERSION__
 	#ifdef __i386__
 		#define KNH_CC_FASTCALL   __attribute__((fastcall))
-		#define KNH_USING_UNBOXFIELD 1
 	#else
 		#define KNH_CC_FASTCALL   /* __attribute__((fastcall)) */
 	#endif
@@ -144,7 +143,6 @@
 #ifdef _MSC_VER
 //#define KNH_DBGMODE2
 #define KNH_CC_FASTCALL  /* __fastcall */
-#define KNH_USING_UNBOXFIELD 1
 #if _MSC_VER == 1500
 	#define KONOHA_CC_VERSION "Microsoft Visual C++ 9.0 (1500)"
 #else
