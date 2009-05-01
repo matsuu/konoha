@@ -84,6 +84,7 @@ Object *knh_OutputStream_open(Ctx *ctx, OutputStream *o, String *urn, String *m)
 	if(IS_NOTNULL(m)) mode = knh_String_tochar(m);
 	DP(o)->fd = DP(o)->driver->fopen(ctx, fname, mode);
 	if(DP(o)->fd != -1) {
+		KNH_SETv(ctx, DP(o)->urn, urn);
 		KNH_SETv(ctx, DP(o)->ba, new_Bytes(ctx, 4096));
 		knh_OutputStream_setBOL(o,1);
 		DP(o)->driver->finit(ctx, (Object*)o, mode);
