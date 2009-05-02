@@ -1991,6 +1991,7 @@ knh_labelid_t knh_Asm_stackLabelId(Ctx *ctx, Asm *abr, Stmt *stmt)
 	Token *tk = NULL;
 	if(DP(stmt)->size == 1) {
 		tk = DP(stmt)->tokens[0];
+		if(SP(tk)->tt == TT_ASIS) tk = NULL;
 	}
 	if(tk != NULL) {
 		int i;
@@ -2026,6 +2027,9 @@ void knh_StmtCONTINUE_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 	if(labelid != -1) {
 		KNH_ASM_JMP(ctx, abr, labelid);
 	}
+	else {
+		KNH_ASM_PANIC(ctx, abr, "unknown continue label");
+	}
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2035,7 +2039,10 @@ void knh_StmtBREAK_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 {
 	knh_labelid_t labelid = knh_Asm_stackLabelId(ctx, abr, stmt);
 	if(labelid != -1) {
-		KNH_ASM_JMP(ctx, abr, labelid);
+		KNH_ASM_JMP(ctx, abr, labelid + 1);
+	}
+	else {
+		KNH_ASM_PANIC(ctx, abr, "unknown break label");
 	}
 }
 
