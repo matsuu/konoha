@@ -84,6 +84,7 @@ void knh_Context_setEncoding(Ctx *ctx, knh_Context_t *o, String *enc);
 AffineConv *new_AffineConv(Ctx *ctx, knh_float_t fa, knh_float_t fb);
 /* ../src/class/knh_Array.c */
 size_t knh_array_newsize(size_t newsize, size_t usize);
+size_t knh_array_index0(Ctx *ctx, knh_intptr_t n, size_t size);
 size_t knh_array_index(Ctx *ctx, knh_intptr_t n, size_t size);
 void knh_Array_grow(Ctx *ctx, Array *a, size_t newsize, Object *v);
 knh_Array_t* new_Array0(Ctx *ctx, size_t capacity);
@@ -338,7 +339,7 @@ int knh_Object_cmp(Object *o1, Object *o2);
 knh_bool_t knh_Object_equals(Ctx *ctx, Object *o1, Object *o2);
 knh_bytes_t knh_Object_tobytes(Ctx *ctx, Object *o);
 /* ../src/class/knh_OutputStream.c */
-Object *knh_OutputStream_open(Ctx *ctx, OutputStream *o, String *urn, String *mode);
+Object *knh_OutputStream_open(Ctx *ctx, OutputStream *o, String *urn, String *m);
 void knh_OutputStream_putc(Ctx *ctx, OutputStream *o, knh_int_t ch);
 void knh_OutputStream_write(Ctx *ctx, OutputStream *o, knh_bytes_t buf);
 void knh_OutputStream_flush(Ctx *ctx, OutputStream *o);
@@ -518,6 +519,7 @@ void knh_Token_setCONST(Ctx *ctx, Token *o, Any *data);
 Token* knh_Token_toCONST(Token *o);
 Token* new_TokenNULL(Ctx *ctx, Any *fln, knh_type_t type);
 knh_index_t knh_Asm_indexOfVariable(Asm *abr, knh_fieldn_t fnq);
+int TERMs_isCONST(Stmt *stmt, size_t n);
 int TERMs_isTRUE(Stmt *stmt, size_t n);
 int TERMs_isFALSE(Stmt *stmt, size_t n);
 knh_type_t TERMs_gettype(Stmt *stmt, size_t n);

@@ -165,6 +165,21 @@ fGTn  sfi sfi float
 fGTE  sfi sfi sfi
 fGTEn  sfi sfi float
 
+AGET    sfi sfi sfi
+AGETn   sfi sfi intptr
+IAGET   sfi sfi sfi
+IAGETn  sfi sfi intptr
+FAGET   sfi sfi sfi
+FAGETn  sfi sfi intptr
+
+ASET    sfi sfi sfi
+ASETn   sfi sfi intptr
+IASET   sfi sfi sfi
+IASETn  sfi sfi intptr
+FASET   sfi sfi sfi
+FASETn  sfi sfi intptr
+
+
 INITCODE  sfi
 NOP
 """
@@ -211,6 +226,7 @@ CTYPE = {
 	'boolean': 'knh_boolean_t',
 	'integer': 'knh_int_t',
 	'float': 'knh_float_t',
+	'intptr': 'knh_intptr_t',
 	'cid': 'knh_class_t',
 	'type': 'knh_type_t',
 	'mn': 'knh_methodn_t',
@@ -446,6 +462,7 @@ def write_dump(f):
 #define knh_write__cid(ctx, w, a) knh_write_cid(ctx, w, a)
 #define knh_write__float(ctx, w, a) knh_write__f(ctx, w, a)
 #define knh_write__integer(ctx, w, a) knh_write_integerfmt(ctx, w, KNH_INT_FMT, a)
+#define knh_write__intptr(ctx, w, a)  knh_write__i(ctx, w, a)
 #define knh_write__OBJ(ctx, w, a)  knh_format(ctx, w, METHODN__k, a, KNH_NULL)
 #define knh_write__sfi(ctx, w, a)  knh_printf(ctx, w, "sfp[%d]", (int)a);
 #define knh_write__sfx(ctx, w, a)  knh_printf(ctx, w, "sfp[%d]+%d", (int)a.i, (int)a.n)

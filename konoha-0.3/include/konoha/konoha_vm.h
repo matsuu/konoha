@@ -193,6 +193,82 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 
 /* ------------------------------------------------------------------------ */
 
+#define KLR_ARRAY_INDEX(ctx, n, size)   (size_t)n
+
+#define KLR_AGET(ctx, b, a, n)  {\
+		size_t idxn_ = KLR_ARRAY_INDEX(ctx, sfp[n].ivalue, ((Array*)sfp[a].o)->size);\
+		if(idxn_ >= ((Array*)sfp[a].o)->size) knh_throw_OutOfIndex(ctx, idxn_, ((Array*)sfp[a].o)->size, _HERE_); \
+		KLR_MOV(ctx, sfp[b].o, KNH_FIELDn(sfp[a].o, idxn_));\
+	}\
+
+#define KLR_AGETn(ctx, b, a, n)  {\
+		size_t idxn_ = KLR_ARRAY_INDEX(ctx, n, ((Array*)sfp[a].o)->size);\
+		if(idxn_ >= ((Array*)sfp[a].o)->size) knh_throw_OutOfIndex(ctx, idxn_, ((Array*)sfp[a].o)->size, _HERE_); \
+		KLR_MOV(ctx, sfp[b].o, KNH_FIELDn(sfp[n].o, idxn_));\
+	}\
+
+#define KLR_IAGET(ctx, b, a, n)  {\
+		size_t idxn_ = KLR_ARRAY_INDEX(ctx, sfp[n].ivalue, ((IArray*)sfp[a].o)->size);\
+		if(idxn_ >= ((IArray*)sfp[a].o)->size) knh_throw_OutOfIndex(ctx, idxn_, ((Array*)sfp[a].o)->size, _HERE_); \
+		sfp[b].ivalue = ((IArray*)sfp[a].o)->ilist[idxn_];\
+	}\
+
+#define KLR_IAGETn(ctx, b, a, n)  {\
+		size_t idxn_ = KLR_ARRAY_INDEX(ctx, n, ((IArray*)sfp[a].o)->size);\
+		if(idxn_ >= ((IArray*)sfp[a].o)->size) knh_throw_OutOfIndex(ctx, idxn_, ((Array*)sfp[a].o)->size, _HERE_); \
+		sfp[b].ivalue = ((IArray*)sfp[a].o)->ilist[idxn_];\
+	}\
+
+#define KLR_FAGET(ctx, b, a, n)  {\
+		size_t idxn_ = KLR_ARRAY_INDEX(ctx, sfp[n].ivalue, ((FArray*)sfp[a].o)->size);\
+		if(idxn_ >= ((FArray*)sfp[a].o)->size) knh_throw_OutOfIndex(ctx, idxn_, ((Array*)sfp[a].o)->size, _HERE_); \
+		sfp[b].fvalue = ((FArray*)sfp[a].o)->flist[idxn_];\
+	}\
+
+#define KLR_FAGETn(ctx, b, a, n)  {\
+		size_t idxn_ = KLR_ARRAY_INDEX(ctx, n, ((FArray*)sfp[a].o)->size);\
+		if(idxn_ >= ((FArray*)sfp[a].o)->size) knh_throw_OutOfIndex(ctx, idxn_, ((Array*)sfp[a].o)->size, _HERE_); \
+		sfp[b].fvalue = ((FArray*)sfp[a].o)->flist[idxn_];\
+	}\
+
+#define KLR_ASET(ctx, b, a, n)  {\
+		size_t idxn_ = KLR_ARRAY_INDEX(ctx, sfp[n].ivalue, ((Array*)sfp[a].o)->size);\
+		if(idxn_ >= ((Array*)sfp[a].o)->size) knh_throw_OutOfIndex(ctx, idxn_, ((Array*)sfp[a].o)->size, _HERE_); \
+		KLR_MOV(ctx, KNH_FIELDn(sfp[a].o, idxn_), sfp[b].o);\
+	}\
+
+#define KLR_ASETn(ctx, b, a, n)  {\
+		size_t idxn_ = KLR_ARRAY_INDEX(ctx, n, ((Array*)sfp[a].o)->size);\
+		if(idxn_ >= ((Array*)sfp[a].o)->size) knh_throw_OutOfIndex(ctx, idxn_, ((Array*)sfp[a].o)->size, _HERE_); \
+		KLR_MOV(ctx, KNH_FIELDn(sfp[n].o, idxn_), sfp[b].o);\
+	}\
+
+#define KLR_IASET(ctx, b, a, n)  {\
+		size_t idxn_ = KLR_ARRAY_INDEX(ctx, sfp[n].ivalue, ((IArray*)sfp[a].o)->size);\
+		if(idxn_ >= ((IArray*)sfp[a].o)->size) knh_throw_OutOfIndex(ctx, idxn_, ((Array*)sfp[a].o)->size, _HERE_); \
+		((IArray*)sfp[a].o)->ilist[idxn_] = sfp[b].ivalue;\
+	}\
+
+#define KLR_IASETn(ctx, b, a, n)  {\
+		size_t idxn_ = KLR_ARRAY_INDEX(ctx, n, ((IArray*)sfp[a].o)->size);\
+		if(idxn_ >= ((IArray*)sfp[a].o)->size) knh_throw_OutOfIndex(ctx, idxn_, ((Array*)sfp[a].o)->size, _HERE_); \
+		((IArray*)sfp[a].o)->ilist[idxn_] = sfp[b].ivalue;\
+	}\
+
+#define KLR_FASET(ctx, b, a, n)  {\
+		size_t idxn_ = KLR_ARRAY_INDEX(ctx, sfp[n].ivalue, ((FArray*)sfp[a].o)->size);\
+		if(idxn_ >= ((FArray*)sfp[a].o)->size) knh_throw_OutOfIndex(ctx, idxn_, ((Array*)sfp[a].o)->size, _HERE_); \
+		((FArray*)sfp[a].o)->flist[idxn_] = sfp[b].fvalue;\
+	}\
+
+#define KLR_FASETn(ctx, b, a, n)  {\
+		size_t idxn_ = KLR_ARRAY_INDEX(ctx, n, ((FArray*)sfp[a].o)->size);\
+		if(idxn_ >= ((FArray*)sfp[a].o)->size) knh_throw_OutOfIndex(ctx, idxn_, ((Array*)sfp[a].o)->size, _HERE_); \
+		((FArray*)sfp[a].o)->flist[idxn_] = sfp[b].fvalue;\
+	}\
+
+/* ------------------------------------------------------------------------ */
+
 #define KLR_INITCODE(ctx, n) { \
 		knh_code_thread(ctx, pc, OPJUMP); \
 		((knh_kode_t*)pc)->opcode = OPCODE_SETESP;\

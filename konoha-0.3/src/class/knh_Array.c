@@ -54,14 +54,19 @@ size_t knh_array_newsize(size_t newsize, size_t usize)
 
 /* ------------------------------------------------------------------------ */
 
+size_t knh_array_index0(Ctx *ctx, knh_intptr_t n, size_t size)
+{
+	size_t idx = (size_t)n;
+	if(!(idx < size)) KNH_THROW_OUTOFINDEX(ctx, n, size);
+	return idx;
+}
+
+/* ------------------------------------------------------------------------ */
+
 size_t knh_array_index(Ctx *ctx, knh_intptr_t n, size_t size)
 {
 	size_t idx = (n < 0) ? size + n : n;
-	if(!(idx < size)) {
-		char buf[80];
-		knh_snprintf(buf, sizeof(buf), "OutOfIndex!!: %d < %d", (int)n, (int)size);
-		KNH_THROWs(ctx, buf);
-	}
+	if(!(idx < size)) KNH_THROW_OUTOFINDEX(ctx, n, size);
 	return idx;
 }
 

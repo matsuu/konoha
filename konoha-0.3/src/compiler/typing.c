@@ -913,7 +913,6 @@ int knh_Token_typing(Ctx *ctx, Token *tk, Asm *abr, NameSpace *ns, knh_type_t re
 /* ======================================================================== */
 /* [TERMs] */
 
-static
 int TERMs_isCONST(Stmt *stmt, size_t n)
 {
 	Token *tk = DP(stmt)->tokens[n];

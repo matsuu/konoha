@@ -4214,7 +4214,439 @@ METHOD jc3_FGTEN(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 
-static knh_fmethod codeTempList[127][6] = {
+static
+METHOD jc0_AGET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_AGET(ctx, (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_AGET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_AGET(ctx, (1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_AGET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_AGET(ctx, (-1), (2), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_AGET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_AGET(ctx, (-1), (-1), (3));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_AGETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_AGETn(ctx, (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_AGETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_AGETn(ctx, (1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_AGETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_AGETn(ctx, (-1), (2), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_AGETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_AGETn(ctx, (-1), (-1), (3));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_IAGET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_IAGET(ctx, (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_IAGET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_IAGET(ctx, (1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_IAGET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_IAGET(ctx, (-1), (2), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_IAGET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_IAGET(ctx, (-1), (-1), (3));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_IAGETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_IAGETn(ctx, (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_IAGETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_IAGETn(ctx, (1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_IAGETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_IAGETn(ctx, (-1), (2), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_IAGETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_IAGETn(ctx, (-1), (-1), (3));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_FAGET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_FAGET(ctx, (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_FAGET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_FAGET(ctx, (1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_FAGET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_FAGET(ctx, (-1), (2), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_FAGET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_FAGET(ctx, (-1), (-1), (3));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_FAGETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_FAGETn(ctx, (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_FAGETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_FAGETn(ctx, (1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_FAGETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_FAGETn(ctx, (-1), (2), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_FAGETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_FAGETn(ctx, (-1), (-1), (3));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_ASET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_ASET(ctx, (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_ASET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_ASET(ctx, (1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_ASET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_ASET(ctx, (-1), (2), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_ASET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_ASET(ctx, (-1), (-1), (3));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_ASETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_ASETn(ctx, (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_ASETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_ASETn(ctx, (1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_ASETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_ASETn(ctx, (-1), (2), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_ASETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_ASETn(ctx, (-1), (-1), (3));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_IASET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_IASET(ctx, (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_IASET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_IASET(ctx, (1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_IASET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_IASET(ctx, (-1), (2), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_IASET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_IASET(ctx, (-1), (-1), (3));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_IASETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_IASETn(ctx, (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_IASETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_IASETn(ctx, (1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_IASETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_IASETn(ctx, (-1), (2), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_IASETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_IASETn(ctx, (-1), (-1), (3));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_FASET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_FASET(ctx, (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_FASET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_FASET(ctx, (1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_FASET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_FASET(ctx, (-1), (2), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_FASET(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_FASET(ctx, (-1), (-1), (3));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_FASETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_FASETn(ctx, (-1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_FASETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_FASETn(ctx, (1), (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_FASETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_FASETn(ctx, (-1), (2), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc3_FASETN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_FASETn(ctx, (-1), (-1), (3));
+	__asm__ __volatile__("int3");
+}
+
+
+static knh_fmethod codeTempList[139][6] = {
 	{jc0_HALT},
 	{jc0_MOVA,jc1_MOVA,jc2_MOVA},
 	{jc0_MOVN,jc1_MOVN,jc2_MOVN},
@@ -4342,6 +4774,18 @@ static knh_fmethod codeTempList[127][6] = {
 	{jc0_FGTN,jc1_FGTN,jc2_FGTN,jc3_FGTN},
 	{jc0_FGTE,jc1_FGTE,jc2_FGTE,jc3_FGTE},
 	{jc0_FGTEN,jc1_FGTEN,jc2_FGTEN,jc3_FGTEN},
+	{jc0_AGET,jc1_AGET,jc2_AGET,jc3_AGET},
+	{jc0_AGETN,jc1_AGETN,jc2_AGETN,jc3_AGETN},
+	{jc0_IAGET,jc1_IAGET,jc2_IAGET,jc3_IAGET},
+	{jc0_IAGETN,jc1_IAGETN,jc2_IAGETN,jc3_IAGETN},
+	{jc0_FAGET,jc1_FAGET,jc2_FAGET,jc3_FAGET},
+	{jc0_FAGETN,jc1_FAGETN,jc2_FAGETN,jc3_FAGETN},
+	{jc0_ASET,jc1_ASET,jc2_ASET,jc3_ASET},
+	{jc0_ASETN,jc1_ASETN,jc2_ASETN,jc3_ASETN},
+	{jc0_IASET,jc1_IASET,jc2_IASET,jc3_IASET},
+	{jc0_IASETN,jc1_IASETN,jc2_IASETN,jc3_IASETN},
+	{jc0_FASET,jc1_FASET,jc2_FASET,jc3_FASET},
+	{jc0_FASETN,jc1_FASETN,jc2_FASETN,jc3_FASETN},
 
 };
 

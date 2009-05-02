@@ -1227,7 +1227,7 @@ int knh_StmtOP_checkConst(Ctx *ctx, Stmt *stmt, knh_methodn_t *mn, int swap)
 /* ------------------------------------------------------------------------ */
 
 static
-knh_int_t TERMs_integer(Stmt *stmt, size_t n)
+knh_int_t TERMs_int(Stmt *stmt, size_t n)
 {
 	Token *tk = DP(stmt)->tokens[n];
 	KNH_ASSERT(SP(tk)->tt == TT_CONST);
@@ -1292,7 +1292,7 @@ int knh_StmtOP_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 		if(IS_OPSIM(mn)) {
 			if(knh_StmtOP_checkConst(ctx, stmt, &mn, /*swap*/ 1)) {
 				int a = TERMs_putSTACK(ctx, stmt, 1, abr, NNTYPE_Int, local + 1);
-				knh_int_t b = TERMs_integer(stmt, 2);
+				knh_int_t b = TERMs_int(stmt, 2);
 				switch(mn) {
 				case METHODN_opAdd:
 					KNH_ASM_iADDn_(ctx, abr, sfi_(sfpidx), sfi_(a), b);
@@ -1356,7 +1356,7 @@ int knh_StmtOP_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 		else if(IS_OPASIM(mn)) {
 			if(knh_StmtOP_checkConst(ctx, stmt, &mn, /*swap*/ 0)) {
 				int a = TERMs_putSTACK(ctx, stmt, 1, abr, NNTYPE_Int, local + 1);
-				knh_int_t b = TERMs_integer(stmt, 2);
+				knh_int_t b = TERMs_int(stmt, 2);
 				switch(mn) {
 				case METHODN_opSub:
 					KNH_ASM_iSUBn_(ctx, abr, sfi_(sfpidx), sfi_(a), b);
@@ -1480,7 +1480,6 @@ int knh_StmtOP_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 			return 0;
 		}
 	} /* CLASS_Float */
-
 	return 0;
 }
 
@@ -1511,6 +1510,68 @@ void knh_StmtCALL_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpid
 		KNH_ASM_AINVOKE_(ctx, abr, sfi_(local), (knh_ushort_t)DP(stmt)->size, UP(mtd));
 		return;
 	}
+	/* INSTRUCTION */
+	if(cid == CLASS_Array || cid == CLASS_IArray || cid == CLASS_FArray) {
+		if(DP(mtd)->mn == METHODN_get) {
+			int a = TERMs_putSTACK(ctx, stmt, 1, abr, NNTYPE_Array, local + 1);
+			if(TERMs_isCONST(stmt, 2)) {
+				knh_intptr_t n = (knh_intptr_t)TERMs_int(stmt, 2);
+				if(cid == CLASS_Array) {
+					KNH_ASM_AGETn_(ctx, abr, sfi_(sfpidx), sfi_(a), n);
+				}
+				else if(cid == CLASS_IArray) {
+					KNH_ASM_IAGETn_(ctx, abr, sfi_(sfpidx), sfi_(a), n);
+				}
+				else {
+					KNH_ASM_FAGETn_(ctx, abr, sfi_(sfpidx), sfi_(a), n);
+				}
+			}
+			else {
+				int an = TERMs_putSTACK(ctx, stmt, 2, abr, NNTYPE_Int, local + 2);
+				if(cid == CLASS_Array) {
+					KNH_ASM_AGET_(ctx, abr, sfi_(sfpidx), sfi_(a), sfi_(an));
+				}
+				else if(cid == CLASS_IArray) {
+					KNH_ASM_IAGET_(ctx, abr, sfi_(sfpidx), sfi_(a), sfi_(an));
+				}
+				else {
+					KNH_ASM_FAGET_(ctx, abr, sfi_(sfpidx), sfi_(a), sfi_(an));
+				}
+			}
+			return;
+		}
+		if(DP(mtd)->mn == METHODN_set) {
+			int a = TERMs_putSTACK(ctx, stmt, 1, abr, NNTYPE_Array, local + 1);
+			knh_type_t ptype = knh_Method_ptype(ctx, cid, mtd, 1);
+			int v = TERMs_putSTACK(ctx, stmt, 3, abr, ptype, local + 3);
+			if(TERMs_isCONST(stmt, 2)) {
+				knh_intptr_t n = (knh_intptr_t)TERMs_int(stmt, 2);
+				if(cid == CLASS_Array) {
+					KNH_ASM_ASETn_(ctx, abr, sfi_(v), sfi_(a), n);
+				}
+				else if(cid == CLASS_IArray) {
+					KNH_ASM_IASETn_(ctx, abr, sfi_(v), sfi_(a), n);
+				}
+				else {
+					KNH_ASM_FASETn_(ctx, abr, sfi_(v), sfi_(a), n);
+				}
+			}
+			else {
+				int an = TERMs_putSTACK(ctx, stmt, 2, abr, NNTYPE_Int, local + 2);
+				if(cid == CLASS_Array) {
+					KNH_ASM_ASET_(ctx, abr, sfi_(v), sfi_(a), sfi_(an));
+				}
+				else if(cid == CLASS_IArray) {
+					KNH_ASM_IASET_(ctx, abr, sfi_(v), sfi_(a), sfi_(an));
+				}
+				else {
+					KNH_ASM_FASET_(ctx, abr, sfi_(v), sfi_(a), sfi_(an));
+				}
+			}
+			return;
+		}
+	}/* INSTRUCTION*/
+
 	/* PEEPHOLE */
 	if(IS_Method(mtd) && knh_Method_isFinal(mtd) && TERMs_isSTACK(stmt, 1)) {
 		int a = DP(DP(stmt)->tokens[1])->index;
@@ -1527,7 +1588,6 @@ void knh_StmtCALL_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpid
 		KNH_ASM_FCALL_(ctx, abr, sfi_(local), (knh_ushort_t)DP(stmt)->size, sfi_(a), UP(mtd));
 		goto L_RTYPE;
 	}/*PEEPHOLE*/
-
 	for(i = 1; i < DP(stmt)->size; i++) {
 		knh_type_t reqt2 = knh_Method_reqtTERMs(mtd, cid, stmt, i);
 		TERMs_asm(ctx, stmt, i, abr, reqt2, local + i);
