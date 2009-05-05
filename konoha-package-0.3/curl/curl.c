@@ -222,7 +222,7 @@ METHOD Curl_perform(Ctx *ctx, knh_sfp_t *sfp)
 
 static
 knh_IntConstData_t IntConstData[] = {
-	{"CURLOPT_URL", CURLOPT_URL},
+	{"Curl.CURLOPT_URL", CURLOPT_URL},
 	{NULL}  // end of const data
 };
 
