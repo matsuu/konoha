@@ -126,7 +126,7 @@ static int debugMode = 0;
 
 /* ----------------------------------------------------------------------- */
 
-KNHAPI(int) konoha_isDebugMode()
+KNHAPI(int) konoha_isDebugMode(void)
 {
 	return debugMode;
 }
@@ -134,7 +134,7 @@ KNHAPI(int) konoha_isDebugMode()
 /* ----------------------------------------------------------------------- */
 
 static
-void konoha_checksize()
+void konoha_checksize(void)
 {
 	fprintf(stderr, "sizeof(knh_int_t)=%lu, sizeof(void*)=%lu\n", sizeof(knh_intptr_t), sizeof(void*));
 	KNH_ASSERT(sizeof(knh_intptr_t) == sizeof(void*));
