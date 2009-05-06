@@ -61,7 +61,7 @@ extern "C" {
 /* ======================================================================== */
 /* [TLS] */
 
-knh_thread_t knh_thread_self()
+knh_thread_t knh_thread_self(void)
 {
 #ifdef KNH_USING_PTHREAD
 #undef KNH_USING_NOTHREAD

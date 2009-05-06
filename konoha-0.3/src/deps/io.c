@@ -249,7 +249,7 @@ knh_iodrv_t *konoha_getIODriver(Ctx *ctx, knh_bytes_t name)
 
 /* ------------------------------------------------------------------------ */
 
-knh_iodrv_t *konoha_getDefaultIODriver()
+knh_iodrv_t *konoha_getDefaultIODriver(void)
 {
 	return &IO__NOP;
 }

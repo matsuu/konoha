@@ -79,7 +79,7 @@ METHOD knh__System_setRandomSeed(Ctx *ctx, knh_sfp_t *sfp)
 
 /* ------------------------------------------------------------------------ */
 
-knh_uint_t knh_rand()
+knh_uint_t knh_rand(void)
 {
 #ifdef KNH_USING_INT32
 	return (knh_uint_t)genrand_int31();
@@ -90,7 +90,7 @@ knh_uint_t knh_rand()
 
 /* ------------------------------------------------------------------------ */
 
-knh_float_t knh_float_rand()
+knh_float_t knh_float_rand(void)
 {
 #ifdef KNH_USING_INT32
 	return (knh_float_t)genrand_real1();

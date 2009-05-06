@@ -206,7 +206,7 @@ static knh_iodrv_t IO__SOCKET = {
 
 /* ------------------------------------------------------------------------ */
 
-knh_iodrv_t *konoha_getSocketDriver()
+knh_iodrv_t *konoha_getSocketDriver(void)
 {
 	return &IO__SOCKET;
 }

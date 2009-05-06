@@ -62,7 +62,7 @@ extern "C" {
 /* ======================================================================== */
 /* [time] */
 
-knh_uint_t knh_initseed()
+knh_uint_t knh_initseed(void)
 {
 #ifdef KNH_USING_WINDOWS
 	return (knh_uint_t)time(NULL);
@@ -77,7 +77,7 @@ knh_uint_t knh_initseed()
 
 /* ------------------------------------------------------------------------ */
 
-knh_uint64_t konoha_gettime()
+knh_uint64_t konoha_gettime(void)
 {
 #ifdef KNH_USING_WINDOWS
 	DWORD tickCount = GetTickCount();
