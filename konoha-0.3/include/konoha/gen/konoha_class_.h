@@ -699,7 +699,14 @@ extern "C" {
 #define knh_Context_setInteractive(o,b)  \
 	if(b) ((Context*)o)->flag |= KNH_FLAG_CTXF_INTERACTIVE; else ((Context*)o)->flag &= ~(KNH_FLAG_CTXF_INTERACTIVE);
 
-
+#define KNH_FLAG_CTXF_EVAL       KNH_FLAG_T7
+	
+#define knh_Context_isEval(o)  \
+((((Context*)o)->flag & KNH_FLAG_CTXF_EVAL) == KNH_FLAG_CTXF_EVAL)
+	
+#define knh_Context_setEval(o,b)  \
+if(b) ((Context*)o)->flag |= KNH_FLAG_CTXF_EVAL; else ((Context*)o)->flag &= ~(KNH_FLAG_CTXF_EVAL);
+	
 /* ------------------------------------------------------------------------ */
 /* Token */
 #define KNH_FLAG_TKF_BOL                KNH_FLAG_T0

@@ -41,8 +41,13 @@ main(int argc, char **argv)
 		konoha_shell(konoha);
 	}
 	else {
-		konoha_read(konoha, argv[n]);
-		konoha_main(konoha, argc - n, argv + n);
+		if(knh_Context_isEval(konoha.ctx)){
+			fprintf(stdout,"%s",konoha_eval(konoha,argv[n]));
+		}
+		else {
+			konoha_read(konoha, argv[n]);
+			konoha_main(konoha, argc - n, argv + n);
+		}
 	}
 	konoha_close(konoha);
 	return 0;

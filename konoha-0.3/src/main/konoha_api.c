@@ -168,6 +168,9 @@ KNHAPI(int) konoha_parseopt(konoha_t konoha, int argc, char **argv)
 			debugMode = 1;
 			konoha_checksize();
 		}
+		if(t[1] == 'e' && t[2] == 0) {
+			knh_Context_setEval(konoha.ctx, 1);
+		}
 	}
 	return n;
 }
