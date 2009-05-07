@@ -575,6 +575,7 @@ knh_token_t knh_char_totoken(int ch)
 		case '"': return TT_STR;
 		case '\'': return TT_TSTR;
 		case '`': return TT_EVAL;
+		case '/': return TT_ERR;
 	}
 	KNH_ASSERT(ch == -1);
 	return TT_ERR;
