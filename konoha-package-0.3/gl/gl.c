@@ -12,6 +12,8 @@
 #include <OpenGL/gl.h>
 #include <GLUT/glut.h>
 #include <pthread.h>
+
+pthread_mutex_t mytex;
 #endif
 
 #ifdef KONOHA_OS__LINUX
@@ -22,8 +24,7 @@ Closure *displayfunc;
 Closure *initfunc = NULL;
 Closure *reshapefunc;
 Closure *mousefunc;
-Closure *idlefunc;
-
+Closure *idlefunc = NULL;
 
 Ctx gl_ctx;
 
@@ -41,6 +42,12 @@ knh_IntConstData_t IntConstData[] = {
   {"GL.GL_MODELVIEW", GL_MODELVIEW},
   {"GL.GL_FLAT", GL_FLAT},
   {"GL.GLUT_DOUBLE", GLUT_DOUBLE},
+
+
+  {"GL.GLUT_LEFT_BUTTON", GLUT_LEFT_BUTTON},
+  {"GL.GLUT_RIGHT_BUTTON", GLUT_RIGHT_BUTTON},
+  {"GL.GLUT_MIDDLE_BUTTON", GLUT_MIDDLE_BUTTON},
+  {"GL.GLUT_DOWN", GLUT_DOWN},
   {NULL} // end of const
 };
 
@@ -85,11 +92,8 @@ void knh_glut_reshape(int w, int h)
   Ctx *lctx = &gl_ctx;
 #endif
   knh_sfp_t *lsfp = KNH_LOCAL(lctx);
-  //  Object *arg1 = (Object*)new_IntX__fast(lctx, CLASS_Int, w);
-  //  Object *arg2 = (Object*)new_IntX__fast(lctx, CLASS_Int, h);
   Int *arg1 = new_Int(lctx, w);
   Int *arg2 = new_Int(lctx, h);
-  //  knh_putsfp(lctx, lsfp, 1, reshapefunc);
   knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
   knh_putsfp(lctx, lsfp, 3, (Object *)arg2);
   knh_Closure_invokesfp(lctx, reshapefunc, lsfp, 2);
@@ -107,6 +111,7 @@ void knh_glut_idle (void)
   knh_sfp_t *lsfp = KNH_LOCAL(lctx);
 
   knh_Closure_invokesfp(lctx, idlefunc, lsfp, 0);
+
 }
 
 void knh_glut_mouse(int button, int state, int x, int y)
@@ -199,6 +204,20 @@ METHOD GL_glutReshapeFunc(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD GL_glutIdleFunc(Ctx *ctx, knh_sfp_t *sfp)
 {
+  /*  if (idle_lock == 0) {
+	pthread_mutex_lock(&mytex);
+	idlefunc = sfp[1].cc;
+	pthread_mutex_unlock(&mytex);
+	glutIdleFunc(knh_glut_idle);
+	idle_lock = 1;
+  } else {
+	pthread_mutex_lock(&mytex);
+	idlefunc_switch = sfp[1].cc;
+	pthread_mutex_unlock(&mytex);
+	glutIdleFunc(knh_glut_idle_switch);
+	idle_lock = 0;
+  }
+  */
   idlefunc = sfp[1].cc;
   glutIdleFunc(knh_glut_idle);
   KNH_RETURN_void(ctx, sfp);
