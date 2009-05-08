@@ -390,6 +390,19 @@ METHOD knh__Context_setVerbose2(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_void(ctx, sfp);
 }
 
+static 
+METHOD knh__Context_isEval(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN_Boolean(ctx, sfp, knh_Context_isEval((knh_Context_t*)sfp[0].o));
+}
+
+static
+METHOD knh__Context_setEval(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_Context_setEval((knh_Context_t*)sfp[0].o, p_bool(sfp[1]));
+	KNH_RETURN_void(ctx, sfp);
+}
+
 /* ======================================================================== */
 /* [method] */
 

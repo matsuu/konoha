@@ -653,7 +653,7 @@ static knh_ClassData_t ClassData[] = {
 	{"konoha.Script", CLASS_Script, CFLAG_Script, STRUCT_Script, CLASS_Object, 0, 8, 0, knh_Script_fdefault},
 	{"konoha.NameSpace", CLASS_NameSpace, CFLAG_NameSpace, STRUCT_NameSpace, CLASS_Object, 0, 0, 0, knh_NameSpace_fdefault},
 	{"konoha.System", CLASS_System, CFLAG_System, STRUCT_System, CLASS_Object, 0, 15, 0, knh_System_fdefault},
-	{"konoha.Context", CLASS_Context, CFLAG_Context, STRUCT_Context, CLASS_Object, 0, 16, 0, knh_Context_fdefault},
+	{"konoha.Context", CLASS_Context, CFLAG_Context, STRUCT_Context, CLASS_Object, 0, 18, 0, knh_Context_fdefault},
 	{"konoha.Token", CLASS_Token, CFLAG_Token, STRUCT_Token, CLASS_Object, 0, 3, 0, knh_Token_fdefault},
 	{"konoha.Stmt", CLASS_Stmt, CFLAG_Stmt, STRUCT_Stmt, CLASS_Object, 0, 2, 0, knh_Stmt_fdefault},
 	{"konoha.Asm", CLASS_Asm, CFLAG_Asm, STRUCT_Asm, CLASS_Object, 0, 0, 0, knh_Asm_fdefault},
@@ -772,6 +772,7 @@ static knh_FieldNameData_t FieldNameData[] = {
 	{"isConst", FIELDN_isConst},
 	{"isDebug", FIELDN_isDebug},
 	{"isDerived", FIELDN_isDerived},
+	{"isEval", FIELDN_isEval},
 	{"isFatal", FIELDN_isFatal},
 	{"isFinal", FIELDN_isFinal},
 	{"isFormatted", FIELDN_isFormatted},
@@ -1411,6 +1412,8 @@ static knh_MethodData_t MethodData[] = {
 	{knh__Context_setVerbose, 0, CLASS_Context, METHODN_setVerbose, 0, MFN_void_Boolean, (void*)NULL},
 	{knh__Context_isVerbose2, 0, CLASS_Context, METHODN_isVerbose2, 0, MFN_nBoolean, (void*)NULL},
 	{knh__Context_setVerbose2, 0, CLASS_Context, METHODN_setVerbose2, 0, MFN_void_Boolean, (void*)NULL},
+	{knh__Context_isEval, 0, CLASS_Context, METHODN_isEval, 0, MFN_nBoolean, (void*)NULL},
+	{knh__Context_setEval, 0, CLASS_Context, METHODN_setEval, 0, MFN_void_Boolean, (void*)NULL},
 	{NULL, 0}
 };
 

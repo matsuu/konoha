@@ -831,6 +831,7 @@ typedef struct knh_System {
 /* @flag Context.Verbose CTXF ((Context*)%s)->flag 'is:set:is:set' */
 /* @flag Context.Verbose2 CTXF ((Context*)%s)->flag 'is:set:is:set' */
 /* @flag Context.Interactive CTXF ((Context*)%s)->flag 'is:set:*:*' */
+/* @flag Context.Eval CTXF ((Context*)%s)->flag 'is:set:is:set' */
 
 ///* ------------------------------------------------------------------------ */
 ///* class Mutex Object knh_ */
