@@ -84,13 +84,14 @@ void knh_glut_reshape(int w, int h)
 #else
   Ctx *lctx = &gl_ctx;
 #endif
-  fprintf(stderr, "%d, %d\n",  w, h);
   knh_sfp_t *lsfp = KNH_LOCAL(lctx);
-  Object *arg1 = (Object*)new_Int(lctx, w);
-  Object *arg2 = (Object*)new_Int(lctx, h);
-
-  knh_putsfp(lctx, lsfp, 2, arg1);
-  knh_putsfp(lctx, lsfp, 3, arg2);
+  //  Object *arg1 = (Object*)new_IntX__fast(lctx, CLASS_Int, w);
+  //  Object *arg2 = (Object*)new_IntX__fast(lctx, CLASS_Int, h);
+  Int *arg1 = new_Int(lctx, w);
+  Int *arg2 = new_Int(lctx, h);
+  //  knh_putsfp(lctx, lsfp, 1, reshapefunc);
+  knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
+  knh_putsfp(lctx, lsfp, 3, (Object *)arg2);
   knh_Closure_invokesfp(lctx, reshapefunc, lsfp, 2);
 
 }
@@ -116,15 +117,15 @@ void knh_glut_mouse(int button, int state, int x, int y)
   Ctx *lctx = &gl_ctx;
 #endif
   knh_sfp_t *lsfp = KNH_LOCAL(lctx);
-  Object *arg1 = (Object*)new_Int(lctx, button);
-  Object *arg2 = (Object*)new_Int(lctx, state);
-  Object *arg3 = (Object*)new_Int(lctx, x);
-  Object *arg4 = (Object*)new_Int(lctx, y);
+  Int *arg1 = new_Int(lctx, button);
+  Int *arg2 = new_Int(lctx, state);
+  Int *arg3 = new_Int(lctx, x);
+  Int *arg4 = new_Int(lctx, y);
 
-  knh_putsfp(lctx, lsfp, 2, arg1);
-  knh_putsfp(lctx, lsfp, 3, arg2);
-  knh_putsfp(lctx, lsfp, 4, arg3);
-  knh_putsfp(lctx, lsfp, 5, arg4);
+  knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
+  knh_putsfp(lctx, lsfp, 3, (Object *)arg2);
+  knh_putsfp(lctx, lsfp, 4, (Object *)arg3);
+  knh_putsfp(lctx, lsfp, 5, (Object *)arg4);
   
   knh_Closure_invokesfp(lctx, mousefunc, lsfp, 4);
 

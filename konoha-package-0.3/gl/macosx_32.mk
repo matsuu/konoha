@@ -1,7 +1,7 @@
 # Last modified by Kimio Kuramitsu kkuramitsu@sourceforge.jp
 
 CC = gcc
-CFLAGS = -O2 -Wall -fmessage-length=0 -fPIC
+CFLAGS = -O0 -g3 -Wall -fmessage-length=0 -fPIC
 LDLIBS = -framework GLUT -framework OpenGL -lkonoha -lpthread
 
 target = macosx_32
