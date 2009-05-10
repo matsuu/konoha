@@ -7,11 +7,11 @@
 AC_PREREQ(2.61)
 #initiate Autoconf
 
-AC_INIT([konoha], [0.3.10], [konoha-bugs@list.sourceforge.jp])
+AC_INIT([konoha], [0.3.11], [konoha-bugs@list.sourceforge.jp])
 
 # initiate automake with program name, version, -wall option
 
-AM_INIT_AUTOMAKE([konoha], [0.3.10], -Wall)
+AM_INIT_AUTOMAKE([konoha], [0.3.11], -Wall)
 
 AC_CONFIG_SRCDIR([build/Makefile.in])
 AC_CONFIG_HEADER([config.h])

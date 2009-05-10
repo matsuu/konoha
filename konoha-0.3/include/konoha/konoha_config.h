@@ -45,7 +45,7 @@
 #else
 #define KONOHA_NAME     "konoha"
 #define KONOHA_MAJOR_VERSION "0.3"
-#define KONOHA_VERSION  "0.3.10"
+#define KONOHA_VERSION  "0.3.11"
 #endif
 
 #define KONOHA_XCODE    "(Rufy)"
