@@ -40,8 +40,6 @@ host_triplet = @host@
 bin_PROGRAMS = konoha$(EXEEXT)
 subdir = build
 DIST_COMMON = $(libkonoha_la_include_HEADERS) \
-	$(libkonoha_la_includeclass_HEADERS) \
-	$(libkonoha_la_includedeps_HEADERS) \
 	$(libkonoha_la_includegen_HEADERS) \
 	$(libkonoha_la_includekonoha_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -60,8 +58,6 @@ am__vpath_adj = case $$p in \
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(libkonoha_la_includedir)" \
-	"$(DESTDIR)$(libkonoha_la_includeclassdir)" \
-	"$(DESTDIR)$(libkonoha_la_includedepsdir)" \
 	"$(DESTDIR)$(libkonoha_la_includegendir)" \
 	"$(DESTDIR)$(libkonoha_la_includekonohadir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
@@ -81,14 +77,13 @@ am_libkonoha_la_OBJECTS = anyapi.lo arrayapi.lo bytesapi.lo dbapi.lo \
 	knh_StringUnit.lo knh_String_mbytes.lo knh_System.lo \
 	knh_Tuple2.lo knh_bytes_t.lo knh_cwb_t.lo asm.lo kcode.lo \
 	konohac.lo parser.lo perror.lo stmt.lo token.lo tokenizer.lo \
-	typing.lo dlopen.lo file.lo io.lo regex.lo socket.lo \
-	sqlite3.lo thread.lo time.lo mt19937-64.lo mt19937ar.lo \
-	codetemplate.lo fibo.lo konoha_klr_.lo konoha_message_.lo \
-	konohac_.lo method_.lo b4.lo konohaget.lo filesystem.lo \
-	glue.lo knh_tClass.lo konoha_api.lo konoha_data.lo \
-	konoha_ext.lo konoha_libknh.lo konoha_locale.lo logging.lo \
-	memory.lo metadata.lo stack.lo system.lo systemtable.lo \
-	typesystem.lo
+	typing.lo dlopen.lo fileio.lo filesystem.lo konoha_locale.lo \
+	regex.lo socket.lo sqlite3.lo thread.lo time.lo mt19937-64.lo \
+	mt19937ar.lo codetemplate.lo fibo.lo konoha_klr_.lo \
+	konoha_message_.lo konohac_.lo method_.lo b4.lo konohaget.lo \
+	classapi.lo exports.lo fileutils.lo glue.lo konoha_api.lo \
+	konoha_ext.lo logging.lo memory.lo metadata.lo objectdbms.lo \
+	stack.lo system.lo systemtable.lo typesystem.lo
 libkonoha_la_OBJECTS = $(am_libkonoha_la_OBJECTS)
 libkonoha_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -113,13 +108,9 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 SOURCES = $(libkonoha_la_SOURCES) $(konoha_SOURCES)
 DIST_SOURCES = $(libkonoha_la_SOURCES) $(konoha_SOURCES)
 libkonoha_la_includeHEADERS_INSTALL = $(INSTALL_HEADER)
-libkonoha_la_includeclassHEADERS_INSTALL = $(INSTALL_HEADER)
-libkonoha_la_includedepsHEADERS_INSTALL = $(INSTALL_HEADER)
 libkonoha_la_includegenHEADERS_INSTALL = $(INSTALL_HEADER)
 libkonoha_la_includekonohaHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(libkonoha_la_include_HEADERS) \
-	$(libkonoha_la_includeclass_HEADERS) \
-	$(libkonoha_la_includedeps_HEADERS) \
 	$(libkonoha_la_includegen_HEADERS) \
 	$(libkonoha_la_includekonoha_HEADERS)
 ETAGS = etags
@@ -135,9 +126,7 @@ AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
-
-# make target for libtool.
-CFLAGS = -g3 -O3 -pipe
+CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
@@ -244,8 +233,11 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+
+# make target for libtool.
+AM_CFLAGS = -g3 -O3 -pipe
 lib_LTLIBRARIES = libkonoha.la
-libkonoha_la_LDFLAGS = -no-undefined -release 1 -version-info 0:0:0
+libkonoha_la_LDFLAGS = -no-undefined -release 0 -version-info 5:0:0
 #if LDL
 #libkonoha_la_LDFLAGS += -ldl
 #endif
@@ -282,21 +274,22 @@ libkonoha_la_SOURCES = ../src/api/anyapi.c ../src/api/arrayapi.c \
 	../src/compiler/perror.c ../src/compiler/stmt.c \
 	../src/compiler/token.c ../src/compiler/tokenizer.c \
 	../src/compiler/typing.c ../src/deps/dlopen.c \
-	../src/deps/file.c ../src/deps/io.c ../src/deps/regex.c \
+	../src/deps/fileio.c ../src/deps/filesystem.c \
+	../src/deps/konoha_locale.c ../src/deps/regex.c \
 	../src/deps/socket.c ../src/deps/sqlite3.c \
 	../src/deps/thread.c ../src/deps/time.c \
 	../src/ext/mt19937-64.c ../src/ext/mt19937ar.c \
 	../src/gen/codetemplate.c ../src/gen/fibo.c \
 	../src/gen/konoha_klr_.c ../src/gen/konoha_message_.c \
 	../src/gen/konohac_.c ../src/gen/method_.c ../src/labs/b4.c \
-	../src/labs/konohaget.c ../src/main/filesystem.c \
-	../src/main/glue.c ../src/main/knh_tClass.c \
-	../src/main/konoha_api.c ../src/main/konoha_data.c \
-	../src/main/konoha_ext.c ../src/main/konoha_libknh.c \
-	../src/main/konoha_locale.c ../src/main/logging.c \
+	../src/labs/konohaget.c ../src/main/classapi.c \
+	../src/main/exports.c ../src/main/fileutils.c \
+	../src/main/glue.c ../src/main/konoha_api.c \
+	../src/main/konoha_ext.c ../src/main/logging.c \
 	../src/main/memory.c ../src/main/metadata.c \
-	../src/main/stack.c ../src/main/system.c \
-	../src/main/systemtable.c ../src/main/typesystem.c
+	../src/main/objectdbms.c ../src/main/stack.c \
+	../src/main/system.c ../src/main/systemtable.c \
+	../src/main/typesystem.c
 libkonoha_la_includedir = $(includedir)
 libkonoha_la_include_HEADERS = ../include/konoha.h
 libkonoha_la_includekonohadir = $(includedir)/../include/konoha
@@ -307,19 +300,6 @@ libkonoha_la_includekonoha_HEADERS = ../include/konoha/konoha_class.h \
 	../include/konoha/konoha_gc.h ../include/konoha/konoha_glue.h \
 	../include/konoha/konoha_macros.h ../include/konoha/konoha_t.h \
 	../include/konoha/konoha_vm.h ../include/konoha/license.h
-libkonoha_la_includeclassdir = $(includedir)/../include/konoha/class
-libkonoha_la_includeclass_HEADERS = ../include/konoha/class/konoha.h \
-	../include/konoha/class/konohac.h
-libkonoha_la_includedepsdir = $(includedir)/../include/konoha/deps
-libkonoha_la_includedeps_HEADERS =  \
-	../include/konoha/deps/konoha_btron.h \
-	../include/konoha/deps/konoha_cygwin.h \
-	../include/konoha/deps/konoha_freebsd.h \
-	../include/konoha/deps/konoha_linux.h \
-	../include/konoha/deps/konoha_macosx.h \
-	../include/konoha/deps/konoha_mingw.h \
-	../include/konoha/deps/konoha_unknown.h \
-	../include/konoha/deps/konoha_windows.h
 libkonoha_la_includegendir = $(includedir)/../include/konoha/gen
 libkonoha_la_includegen_HEADERS =  \
 	../include/konoha/gen/konoha_class_.h \
@@ -437,16 +417,18 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/asm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/b4.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bytesapi.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/classapi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/codetemplate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dbapi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dictapi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dlopen.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exports.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fibo.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fileio.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/filesystem.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fileutils.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glue.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hashapi.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kcode.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_AffineConv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Array.Plo@am__quote@
@@ -485,13 +467,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Tuple2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_bytes_t.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_cwb_t.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_tClass.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/konoha.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/konoha_api.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/konoha_data.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/konoha_ext.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/konoha_klr_.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/konoha_libknh.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/konoha_locale.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/konoha_message_.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/konohac.Plo@am__quote@
@@ -505,6 +484,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mt19937ar.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/numberapi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/objectapi.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/objectdbms.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/perror.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/regex.Plo@am__quote@
@@ -951,19 +931,26 @@ dlopen.lo: ../src/deps/dlopen.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o dlopen.lo `test -f '../src/deps/dlopen.c' || echo '$(srcdir)/'`../src/deps/dlopen.c
 
-file.lo: ../src/deps/file.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT file.lo -MD -MP -MF $(DEPDIR)/file.Tpo -c -o file.lo `test -f '../src/deps/file.c' || echo '$(srcdir)/'`../src/deps/file.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/file.Tpo $(DEPDIR)/file.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/file.c' object='file.lo' libtool=yes @AMDEPBACKSLASH@
+fileio.lo: ../src/deps/fileio.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fileio.lo -MD -MP -MF $(DEPDIR)/fileio.Tpo -c -o fileio.lo `test -f '../src/deps/fileio.c' || echo '$(srcdir)/'`../src/deps/fileio.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/fileio.Tpo $(DEPDIR)/fileio.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/fileio.c' object='fileio.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o file.lo `test -f '../src/deps/file.c' || echo '$(srcdir)/'`../src/deps/file.c
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fileio.lo `test -f '../src/deps/fileio.c' || echo '$(srcdir)/'`../src/deps/fileio.c
 
-io.lo: ../src/deps/io.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT io.lo -MD -MP -MF $(DEPDIR)/io.Tpo -c -o io.lo `test -f '../src/deps/io.c' || echo '$(srcdir)/'`../src/deps/io.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/io.Tpo $(DEPDIR)/io.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/io.c' object='io.lo' libtool=yes @AMDEPBACKSLASH@
+filesystem.lo: ../src/deps/filesystem.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT filesystem.lo -MD -MP -MF $(DEPDIR)/filesystem.Tpo -c -o filesystem.lo `test -f '../src/deps/filesystem.c' || echo '$(srcdir)/'`../src/deps/filesystem.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/filesystem.Tpo $(DEPDIR)/filesystem.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/filesystem.c' object='filesystem.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o io.lo `test -f '../src/deps/io.c' || echo '$(srcdir)/'`../src/deps/io.c
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o filesystem.lo `test -f '../src/deps/filesystem.c' || echo '$(srcdir)/'`../src/deps/filesystem.c
+
+konoha_locale.lo: ../src/deps/konoha_locale.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT konoha_locale.lo -MD -MP -MF $(DEPDIR)/konoha_locale.Tpo -c -o konoha_locale.lo `test -f '../src/deps/konoha_locale.c' || echo '$(srcdir)/'`../src/deps/konoha_locale.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/konoha_locale.Tpo $(DEPDIR)/konoha_locale.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/konoha_locale.c' object='konoha_locale.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o konoha_locale.lo `test -f '../src/deps/konoha_locale.c' || echo '$(srcdir)/'`../src/deps/konoha_locale.c
 
 regex.lo: ../src/deps/regex.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT regex.lo -MD -MP -MF $(DEPDIR)/regex.Tpo -c -o regex.lo `test -f '../src/deps/regex.c' || echo '$(srcdir)/'`../src/deps/regex.c
@@ -1070,12 +1057,26 @@ konohaget.lo: ../src/labs/konohaget.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o konohaget.lo `test -f '../src/labs/konohaget.c' || echo '$(srcdir)/'`../src/labs/konohaget.c
 
-filesystem.lo: ../src/main/filesystem.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT filesystem.lo -MD -MP -MF $(DEPDIR)/filesystem.Tpo -c -o filesystem.lo `test -f '../src/main/filesystem.c' || echo '$(srcdir)/'`../src/main/filesystem.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/filesystem.Tpo $(DEPDIR)/filesystem.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/filesystem.c' object='filesystem.lo' libtool=yes @AMDEPBACKSLASH@
+classapi.lo: ../src/main/classapi.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT classapi.lo -MD -MP -MF $(DEPDIR)/classapi.Tpo -c -o classapi.lo `test -f '../src/main/classapi.c' || echo '$(srcdir)/'`../src/main/classapi.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/classapi.Tpo $(DEPDIR)/classapi.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/classapi.c' object='classapi.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o filesystem.lo `test -f '../src/main/filesystem.c' || echo '$(srcdir)/'`../src/main/filesystem.c
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o classapi.lo `test -f '../src/main/classapi.c' || echo '$(srcdir)/'`../src/main/classapi.c
+
+exports.lo: ../src/main/exports.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT exports.lo -MD -MP -MF $(DEPDIR)/exports.Tpo -c -o exports.lo `test -f '../src/main/exports.c' || echo '$(srcdir)/'`../src/main/exports.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/exports.Tpo $(DEPDIR)/exports.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/exports.c' object='exports.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o exports.lo `test -f '../src/main/exports.c' || echo '$(srcdir)/'`../src/main/exports.c
+
+fileutils.lo: ../src/main/fileutils.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fileutils.lo -MD -MP -MF $(DEPDIR)/fileutils.Tpo -c -o fileutils.lo `test -f '../src/main/fileutils.c' || echo '$(srcdir)/'`../src/main/fileutils.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/fileutils.Tpo $(DEPDIR)/fileutils.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/fileutils.c' object='fileutils.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fileutils.lo `test -f '../src/main/fileutils.c' || echo '$(srcdir)/'`../src/main/fileutils.c
 
 glue.lo: ../src/main/glue.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT glue.lo -MD -MP -MF $(DEPDIR)/glue.Tpo -c -o glue.lo `test -f '../src/main/glue.c' || echo '$(srcdir)/'`../src/main/glue.c
@@ -1084,13 +1085,6 @@ glue.lo: ../src/main/glue.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o glue.lo `test -f '../src/main/glue.c' || echo '$(srcdir)/'`../src/main/glue.c
 
-knh_tClass.lo: ../src/main/knh_tClass.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_tClass.lo -MD -MP -MF $(DEPDIR)/knh_tClass.Tpo -c -o knh_tClass.lo `test -f '../src/main/knh_tClass.c' || echo '$(srcdir)/'`../src/main/knh_tClass.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/knh_tClass.Tpo $(DEPDIR)/knh_tClass.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/knh_tClass.c' object='knh_tClass.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_tClass.lo `test -f '../src/main/knh_tClass.c' || echo '$(srcdir)/'`../src/main/knh_tClass.c
-
 konoha_api.lo: ../src/main/konoha_api.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT konoha_api.lo -MD -MP -MF $(DEPDIR)/konoha_api.Tpo -c -o konoha_api.lo `test -f '../src/main/konoha_api.c' || echo '$(srcdir)/'`../src/main/konoha_api.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/konoha_api.Tpo $(DEPDIR)/konoha_api.Plo
@@ -1098,33 +1092,12 @@ konoha_api.lo: ../src/main/konoha_api.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o konoha_api.lo `test -f '../src/main/konoha_api.c' || echo '$(srcdir)/'`../src/main/konoha_api.c
 
-konoha_data.lo: ../src/main/konoha_data.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT konoha_data.lo -MD -MP -MF $(DEPDIR)/konoha_data.Tpo -c -o konoha_data.lo `test -f '../src/main/konoha_data.c' || echo '$(srcdir)/'`../src/main/konoha_data.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/konoha_data.Tpo $(DEPDIR)/konoha_data.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/konoha_data.c' object='konoha_data.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o konoha_data.lo `test -f '../src/main/konoha_data.c' || echo '$(srcdir)/'`../src/main/konoha_data.c
-
 konoha_ext.lo: ../src/main/konoha_ext.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT konoha_ext.lo -MD -MP -MF $(DEPDIR)/konoha_ext.Tpo -c -o konoha_ext.lo `test -f '../src/main/konoha_ext.c' || echo '$(srcdir)/'`../src/main/konoha_ext.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/konoha_ext.Tpo $(DEPDIR)/konoha_ext.Plo
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/konoha_ext.c' object='konoha_ext.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o konoha_ext.lo `test -f '../src/main/konoha_ext.c' || echo '$(srcdir)/'`../src/main/konoha_ext.c
-
-konoha_libknh.lo: ../src/main/konoha_libknh.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT konoha_libknh.lo -MD -MP -MF $(DEPDIR)/konoha_libknh.Tpo -c -o konoha_libknh.lo `test -f '../src/main/konoha_libknh.c' || echo '$(srcdir)/'`../src/main/konoha_libknh.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/konoha_libknh.Tpo $(DEPDIR)/konoha_libknh.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/konoha_libknh.c' object='konoha_libknh.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o konoha_libknh.lo `test -f '../src/main/konoha_libknh.c' || echo '$(srcdir)/'`../src/main/konoha_libknh.c
-
-konoha_locale.lo: ../src/main/konoha_locale.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT konoha_locale.lo -MD -MP -MF $(DEPDIR)/konoha_locale.Tpo -c -o konoha_locale.lo `test -f '../src/main/konoha_locale.c' || echo '$(srcdir)/'`../src/main/konoha_locale.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/konoha_locale.Tpo $(DEPDIR)/konoha_locale.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/konoha_locale.c' object='konoha_locale.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o konoha_locale.lo `test -f '../src/main/konoha_locale.c' || echo '$(srcdir)/'`../src/main/konoha_locale.c
 
 logging.lo: ../src/main/logging.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT logging.lo -MD -MP -MF $(DEPDIR)/logging.Tpo -c -o logging.lo `test -f '../src/main/logging.c' || echo '$(srcdir)/'`../src/main/logging.c
@@ -1146,6 +1119,13 @@ metadata.lo: ../src/main/metadata.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/metadata.c' object='metadata.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o metadata.lo `test -f '../src/main/metadata.c' || echo '$(srcdir)/'`../src/main/metadata.c
+
+objectdbms.lo: ../src/main/objectdbms.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT objectdbms.lo -MD -MP -MF $(DEPDIR)/objectdbms.Tpo -c -o objectdbms.lo `test -f '../src/main/objectdbms.c' || echo '$(srcdir)/'`../src/main/objectdbms.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/objectdbms.Tpo $(DEPDIR)/objectdbms.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/objectdbms.c' object='objectdbms.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o objectdbms.lo `test -f '../src/main/objectdbms.c' || echo '$(srcdir)/'`../src/main/objectdbms.c
 
 stack.lo: ../src/main/stack.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT stack.lo -MD -MP -MF $(DEPDIR)/stack.Tpo -c -o stack.lo `test -f '../src/main/stack.c' || echo '$(srcdir)/'`../src/main/stack.c
@@ -1210,40 +1190,6 @@ uninstall-libkonoha_la_includeHEADERS:
 	  f=$(am__strip_dir) \
 	  echo " rm -f '$(DESTDIR)$(libkonoha_la_includedir)/$$f'"; \
 	  rm -f "$(DESTDIR)$(libkonoha_la_includedir)/$$f"; \
-	done
-install-libkonoha_la_includeclassHEADERS: $(libkonoha_la_includeclass_HEADERS)
-	@$(NORMAL_INSTALL)
-	test -z "$(libkonoha_la_includeclassdir)" || $(MKDIR_P) "$(DESTDIR)$(libkonoha_la_includeclassdir)"
-	@list='$(libkonoha_la_includeclass_HEADERS)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f=$(am__strip_dir) \
-	  echo " $(libkonoha_la_includeclassHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(libkonoha_la_includeclassdir)/$$f'"; \
-	  $(libkonoha_la_includeclassHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(libkonoha_la_includeclassdir)/$$f"; \
-	done
-
-uninstall-libkonoha_la_includeclassHEADERS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(libkonoha_la_includeclass_HEADERS)'; for p in $$list; do \
-	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(libkonoha_la_includeclassdir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(libkonoha_la_includeclassdir)/$$f"; \
-	done
-install-libkonoha_la_includedepsHEADERS: $(libkonoha_la_includedeps_HEADERS)
-	@$(NORMAL_INSTALL)
-	test -z "$(libkonoha_la_includedepsdir)" || $(MKDIR_P) "$(DESTDIR)$(libkonoha_la_includedepsdir)"
-	@list='$(libkonoha_la_includedeps_HEADERS)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f=$(am__strip_dir) \
-	  echo " $(libkonoha_la_includedepsHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(libkonoha_la_includedepsdir)/$$f'"; \
-	  $(libkonoha_la_includedepsHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(libkonoha_la_includedepsdir)/$$f"; \
-	done
-
-uninstall-libkonoha_la_includedepsHEADERS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(libkonoha_la_includedeps_HEADERS)'; for p in $$list; do \
-	  f=$(am__strip_dir) \
-	  echo " rm -f '$(DESTDIR)$(libkonoha_la_includedepsdir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(libkonoha_la_includedepsdir)/$$f"; \
 	done
 install-libkonoha_la_includegenHEADERS: $(libkonoha_la_includegen_HEADERS)
 	@$(NORMAL_INSTALL)
@@ -1360,7 +1306,7 @@ all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS)
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libkonoha_la_includedir)" "$(DESTDIR)$(libkonoha_la_includeclassdir)" "$(DESTDIR)$(libkonoha_la_includedepsdir)" "$(DESTDIR)$(libkonoha_la_includegendir)" "$(DESTDIR)$(libkonoha_la_includekonohadir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libkonoha_la_includedir)" "$(DESTDIR)$(libkonoha_la_includegendir)" "$(DESTDIR)$(libkonoha_la_includekonohadir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -1409,8 +1355,6 @@ info: info-am
 info-am:
 
 install-data-am: install-libkonoha_la_includeHEADERS \
-	install-libkonoha_la_includeclassHEADERS \
-	install-libkonoha_la_includedepsHEADERS \
 	install-libkonoha_la_includegenHEADERS \
 	install-libkonoha_la_includekonohaHEADERS
 
@@ -1450,8 +1394,6 @@ ps-am:
 
 uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	uninstall-libkonoha_la_includeHEADERS \
-	uninstall-libkonoha_la_includeclassHEADERS \
-	uninstall-libkonoha_la_includedepsHEADERS \
 	uninstall-libkonoha_la_includegenHEADERS \
 	uninstall-libkonoha_la_includekonohaHEADERS
 
@@ -1466,8 +1408,6 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	install-exec install-exec-am install-html install-html-am \
 	install-info install-info-am install-libLTLIBRARIES \
 	install-libkonoha_la_includeHEADERS \
-	install-libkonoha_la_includeclassHEADERS \
-	install-libkonoha_la_includedepsHEADERS \
 	install-libkonoha_la_includegenHEADERS \
 	install-libkonoha_la_includekonohaHEADERS install-man \
 	install-pdf install-pdf-am install-ps install-ps-am \
@@ -1477,8 +1417,6 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
 	uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	uninstall-libkonoha_la_includeHEADERS \
-	uninstall-libkonoha_la_includeclassHEADERS \
-	uninstall-libkonoha_la_includedepsHEADERS \
 	uninstall-libkonoha_la_includegenHEADERS \
 	uninstall-libkonoha_la_includekonohaHEADERS
 

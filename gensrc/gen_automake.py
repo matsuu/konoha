@@ -42,7 +42,7 @@ file_object.writelines("""# this Makefile is generated from ../pygen/gen_Makefil
 CFLAGS = -g3 -O3 -pipe
 lib_LTLIBRARIES = libkonoha.la
 
-libkonoha_la_LDFLAGS = -no-undefined -release 1 -version-info 0:0:0
+libkonoha_la_LDFLAGS = -no-undefined -release 0 -version-info 5:0:0
 #if LDL
 #libkonoha_la_LDFLAGS += -ldl
 #endif
