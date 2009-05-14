@@ -125,6 +125,9 @@ Object *konoha_getClassDefaultValue(Ctx *ctx, knh_class_t cid);
 Object *konoha_getDefaultValue(Ctx *ctx, knh_type_t type);
 void konoha_setClassParam(Ctx *ctx, knh_class_t cid, knh_class_t p1, knh_class_t p2);
 knh_class_t konoha_addGenericsClass(Ctx *ctx, knh_class_t cid, String *name, knh_class_t bcid, knh_class_t p1, knh_class_t p2);
+void KNH_ACLASS(Ctx *ctx, knh_class_t cid, knh_class_t p1);
+void KNH_ICLASS(Ctx *ctx, knh_class_t cid, knh_class_t p1);
+knh_class_t KNH_XCLASS(Ctx *ctx, knh_class_t cid, knh_class_t bcid, ClassSpec *cs);
 ClassStruct* new_ClassStruct0(Ctx *ctx, int field_size, int method_size);
 knh_index_t knh_Class_indexOfField(Ctx *ctx, knh_class_t cid, knh_fieldn_t fn);
 knh_index_t knh_Class_queryField(Ctx *ctx, knh_class_t cid, knh_fieldn_t fnq);
@@ -540,16 +543,19 @@ void *knh_dlopen(Ctx *ctx, const char* path, int mode);
 void *knh_dlsym(Ctx *ctx, void* hdr, const char* symbol);
 const char *knh_dlerror(Ctx *ctx);
 int knh_dlclose(Ctx *ctx, void* hdr);
-/* ../src/deps/file.c */
-int knh_isfile(Ctx *ctx, knh_bytes_t path);
-int knh_isdir(Ctx *ctx, knh_bytes_t path);
-char * knh_format_homepath(char *buf, size_t bufsiz);
-/* ../src/deps/io.c */
+/* ../src/deps/fileio.c */
 knh_iodrv_t *konoha_getIODriver(Ctx *ctx, knh_bytes_t name);
 knh_iodrv_t *konoha_getDefaultIODriver();
 void  init_IO(Ctx *ctx);
 InputStream *new_InputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
 OutputStream *new_OutputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
+/* ../src/deps/filesystem.c */
+int knh_isfile(Ctx *ctx, knh_bytes_t path);
+int knh_isdir(Ctx *ctx, knh_bytes_t path);
+char * knh_format_homepath(char *buf, size_t bufsiz);
+/* ../src/deps/konoha_locale.c */
+char *konoha_encoding();
+char *knh_format_lang(char *buf, size_t bufsiz);
 /* ../src/deps/regex.c */
 void knh_write_USING_REGEX(Ctx *ctx, OutputStream *w);
 knh_regex_drvapi_t *knh_System_getRegexDriver(Ctx *ctx, knh_bytes_t name);
@@ -578,17 +584,21 @@ int main(int argc, char **argv);
 /* ../src/labs/b4.c */
 METHOD knh__Script_changeChannel(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_hook(Ctx *ctx, knh_sfp_t *sfp);
-/* ../src/main/filesystem.c */
+/* ../src/main/classapi.c */
+knh_hcode_t knh_MethodField_hachCode(Ctx *ctx, MethodField *o);
+size_t f_bconv__NOP(Ctx *ctx, BytesConv *bc, knh_bytes_t t, knh_Bytes_t *ba);
+void knh_OutputStream_init(Ctx *ctx, OutputStream *out, int init);
+void knh_ExceptionHandler_traverse(Ctx *ctx, ExceptionHandler *hdr, knh_ftraverse gc);
+void knh_Context_init(Ctx *ctx, knh_Context_t *o, int init);
+void knh_Stmt_done(Ctx *ctx, Stmt *o);
+/* ../src/main/exports.c */
+/* ../src/main/fileutils.c */
 char * knh_format_parentpath(char *buf, size_t bufsiz, knh_bytes_t path, int n);
 char * knh_format_nzpath(char *buf, size_t bufsiz, knh_bytes_t path);
 char * knh_format_catpath(char *buf, size_t bufsiz, knh_bytes_t path, knh_bytes_t file);
 /* ../src/main/glue.c */
 int knh_fcallback_cmpr(Object *obj, Object *obj2);
 void *konoha_generateCallBackFunc(Ctx *ctx, void *func, Closure *c);
-/* ../src/main/knh_tClass.c */
-void KNH_ACLASS(Ctx *ctx, knh_class_t cid, knh_class_t p1);
-void KNH_ICLASS(Ctx *ctx, knh_class_t cid, knh_class_t p1);
-knh_class_t KNH_XCLASS(Ctx *ctx, knh_class_t cid, knh_class_t bcid, ClassSpec *cs);
 /* ../src/main/konoha_api.c */
 void konoha_init(void);
 int knh_readline_askYesNo(char *prompt, int def);
@@ -596,22 +606,11 @@ METHOD knh__Script_eval(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_isStatement(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_readLine(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_addHistory(Ctx *ctx, knh_sfp_t *sfp);
-/* ../src/main/konoha_data.c */
-knh_hcode_t knh_MethodField_hachCode(Ctx *ctx, MethodField *o);
-size_t f_bconv__NOP(Ctx *ctx, BytesConv *bc, knh_bytes_t t, knh_Bytes_t *ba);
-void knh_OutputStream_init(Ctx *ctx, OutputStream *out, int init);
-void knh_ExceptionHandler_traverse(Ctx *ctx, ExceptionHandler *hdr, knh_ftraverse gc);
-void knh_Context_init(Ctx *ctx, knh_Context_t *o, int init);
-void knh_Stmt_done(Ctx *ctx, Stmt *o);
 /* ../src/main/konoha_ext.c */
 void knh_srand(knh_uint_t seed);
 METHOD knh__System_setRandomSeed(Ctx *ctx, knh_sfp_t *sfp);
 knh_uint_t knh_rand();
 knh_float_t knh_float_rand();
-/* ../src/main/konoha_libknh.c */
-/* ../src/main/konoha_locale.c */
-char *konoha_encoding();
-char *knh_format_lang(char *buf, size_t bufsiz);
 /* ../src/main/logging.c */
 void knh_stack_pmsg(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, String *s);
 void knh_stack_p(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, knh_methodn_t mn, int sfpidx);

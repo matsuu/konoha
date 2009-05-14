@@ -46,6 +46,18 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 
 /* ------------------------------------------------------------------------ */
 
+#define KNH_THROW_iZERODIV(n)  \
+	if(unlikely(n == 0)) { \
+		KNH_THROWs(ctx, "Arithmetic!!: Zero Divided"); \
+	}\
+
+#define KNH_THROW_fZERODIV(n)  \
+	if(unlikely(n == 0.0)) { \
+		KNH_THROWs(ctx, "Arithmetic!!: Zero Divided"); \
+	}\
+
+/* ------------------------------------------------------------------------ */
+
 #define KLR_MOV__wogc(ctx, v1, v2) {\
 		Object *v2_ = (Object*)v2;\
 		knh_Object_RCinc(v2_); \
@@ -959,9 +971,17 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 #define KLR_iSUBn(ctx, c, a, n) SFi(c) = (SFi(a) - n)
 #define KLR_iMUL(ctx, c, a, b)  SFi(c) = (SFi(a) * SFi(b))
 #define KLR_iMULn(ctx, c, a, n) SFi(c) = (SFi(a) * n)
-#define KLR_iDIV(ctx, c, a, b)  SFi(c) = (SFi(a) / SFi(b))
+#define KLR_iDIV(ctx, c, a, b)  { \
+		KNH_THROW_iZERODIV(SFi(b)); \
+		SFi(c) = (SFi(a) / SFi(b)); \
+	} \
+
 #define KLR_iDIVn(ctx, c, a, n)  SFi(c) = (SFi(a) / n)
-#define KLR_iMOD(ctx, c, a, b)  SFi(c) = (SFi(a) % SFi(b))
+#define KLR_iMOD(ctx, c, a, b)  { \
+		KNH_THROW_iZERODIV(SFi(b)); \
+		SFi(c) = (SFi(a) / SFi(b)); \
+	} \
+
 #define KLR_iMODn(ctx, c, a, n)  SFi(c) = (SFi(a) % n)
 
 #define KLR_iEQ(ctx, c, a, b)  SFi(c) = (SFi(a) == SFi(b))
@@ -987,7 +1007,11 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 #define KLR_fSUBn(ctx, c, a, n) SFf(c) = (SFf(a) - n)
 #define KLR_fMUL(ctx, c, a, b)  SFf(c) = (SFf(a) * SFf(b))
 #define KLR_fMULn(ctx, c, a, n) SFf(c) = (SFf(a) * n)
-#define KLR_fDIV(ctx, c, a, b)  SFf(c) = (SFf(a) / SFf(b))
+#define KLR_fDIV(ctx, c, a, b)  { \
+		KNH_THROW_fZERODIV(SFf(b)); \
+		SFf(c) = (SFf(a) / SFf(b)); \
+	} \
+
 #define KLR_fDIVn(ctx, c, a, n)  SFf(c) = (SFf(a) / n)
 
 #define KLR_fEQ(ctx, c, a, b)  SFb(c) = (SFf(a) == SFf(b))
@@ -1014,10 +1038,19 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 #define JIT_iSUBn(ctx, c, a, n) SFi(c) = (SFi(a) - n)
 #define JIT_iMUL(ctx, c, a, b)  SFi(c) = (SFi(a) * SFi(b))
 #define JIT_iMULn(ctx, c, a, n) SFi(c) = (SFi(a) * n)
-#define JIT_iDIV(ctx, c, a, b)  SFi(c) = (SFi(a) / SFi(b))
+#define JIT_iDIV(ctx, c, a, b)  { \
+		KNH_THROW_iZERODIV(SFi(b)); \
+		SFi(c) = (SFi(a) / SFi(b)); \
+	} \
+
 #define JIT_iDIVn(ctx, c, a, n)  SFi(c) = (SFi(a) / n)
-#define JIT_iMOD(ctx, c, a, b)  SFi(c) = (SFi(a) % SFi(b))
+#define JIT_iMOD(ctx, c, a, b) { \
+		KNH_THROW_iZERO(SFi(b)); \
+		SFi(c) = (SFi(a) % SFi(b)); \
+	} \
+
 #define JIT_iMODn(ctx, c, a, n)  SFi(c) = (SFi(a) % n)
+
 
 #define JIT_iEQ(ctx, c, a, b)  SFi(c) = (SFi(a) == SFi(b))
 #define JIT_iEQn(ctx, c, a, n)  SFi(c) = (SFi(a) == n)
@@ -1040,7 +1073,11 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 #define JIT_fSUBn(ctx, c, a, n) SFf(c) = (SFf(a) - n)
 #define JIT_fMUL(ctx, c, a, b)  SFf(c) = (SFf(a) * SFf(b))
 #define JIT_fMULn(ctx, c, a, n) SFf(c) = (SFf(a) * n)
-#define JIT_fDIV(ctx, c, a, b)  SFf(c) = (SFf(a) / SFf(b))
+#define JIT_fDIV(ctx, c, a, b)  { \
+		KNH_THROW_fZERODIV(SFf(b)); \
+		SFf(c) = (SFf(a) / SFf(b)); \
+	} \
+
 #define JIT_fDIVn(ctx, c, a, n)  SFf(c) = (SFf(a) / n)
 
 #define JIT_fEQ(ctx, c, a, b)  SFb(c) = (SFf(a) == SFf(b))

@@ -253,6 +253,8 @@ KNHAPI(int) knh_socket_send(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz,
 KNHAPI(int) knh_socket_recv(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz, int flags);
 KNHAPI(int) knh_socket_close(Ctx *ctx, knh_intptr_t sd);
 KNHAPI(void) konoha_addDBDriver(Ctx *ctx, char *alias, knh_db_drvapi_t *d);
+KNHAPI(void) konoha_SETv(Ctx *ctx, Object **v, Object *o);
+KNHAPI(void) konoha_FINALv(Ctx *ctx, Object **v);
 KNHAPI(char*) knh_format_ospath(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t path);
 KNHAPI(Ctx*) konoha_getCurrentContext(void);
 KNHAPI(Ctx*) konoha_getThreadContext(Ctx *ctx);
@@ -263,8 +265,6 @@ KNHAPI(void) konoha_readFile(Ctx *ctx, char *fpath);
 KNHAPI(void) konoha_read(konoha_t konoha, char *fpath);
 KNHAPI(int) konoha_main(konoha_t konoha, int argc, char **argv);
 KNHAPI(void) konoha_shell(konoha_t konoha);
-KNHAPI(void) konoha_SETv(Ctx *ctx, Object **v, Object *o);
-KNHAPI(void) konoha_FINALv(Ctx *ctx, Object **v);
 KNHAPI(char*) KNH_SAFEFILE(char *file);
 KNHAPI(Object*) new_Object_boxing(Ctx *ctx, knh_class_t cid, knh_sfp_t *sfp);
 KNHAPI(void) knh_sfp_boxing(Ctx *ctx, knh_sfp_t *sfp);

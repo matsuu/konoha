@@ -1362,9 +1362,18 @@ int knh_StmtOP_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 					KNH_ASM_iSUBn_(ctx, abr, sfi_(sfpidx), sfi_(a), b);
 					return 1;
 				case METHODN_opDiv:
+					if(b == 0) {
+						b = 1;
+						knh_Asm_perror(ctx, abr, KMSG_EZERODIV, NULL);
+					}
 					KNH_ASM_iDIVn_(ctx, abr, sfi_(sfpidx), sfi_(a), b);
 					return 1;
+
 				case METHODN_opMod:
+					if(b == 0) {
+						b = 1;
+						knh_Asm_perror(ctx, abr, KMSG_EZERODIV, NULL);
+					}
 					KNH_ASM_iMODn_(ctx, abr, sfi_(sfpidx), sfi_(a), b);
 					return 1;
 				}
@@ -1461,6 +1470,10 @@ int knh_StmtOP_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 					KNH_ASM_fSUBn_(ctx, abr, sfi_(sfpidx), sfi_(a), b);
 					return 1;
 				case METHODN_opDiv:
+					if(b == 0.0) {
+						b = 1.0;
+						knh_Asm_perror(ctx, abr, KMSG_EZERODIV, NULL);
+					}
 					KNH_ASM_fDIVn_(ctx, abr, sfi_(sfpidx), sfi_(a), b);
 					return 1;
 				}

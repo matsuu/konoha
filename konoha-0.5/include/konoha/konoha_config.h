@@ -116,6 +116,8 @@
 	#define KONOHA_CC_VERSION "GCC " __VERSION__
 	#ifdef __i386__
 		#define KNH_CC_FASTCALL   __attribute__((fastcall))
+		#define likely(x)       __builtin_expect(!!(x), 1)
+		#define unlikely(x)     __builtin_expect(!!(x), 0)
 	#else
 		#define KNH_CC_FASTCALL   /* __attribute__((fastcall)) */
 	#endif

@@ -83,6 +83,7 @@ static METHOD knh__Int_opMul(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Int_opDiv(Ctx *ctx, knh_sfp_t *sfp)
 {
+	KNH_THROW_iZERODIV(p_integer(sfp[1]));
 	KNH_RETURN_Int(ctx, sfp, p_integer(sfp[0]) / p_integer(sfp[1]));
 }
 
@@ -91,6 +92,7 @@ static METHOD knh__Int_opDiv(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Int_opMod(Ctx *ctx, knh_sfp_t *sfp)
 {
+	KNH_THROW_iZERODIV(p_integer(sfp[1]));
 	KNH_RETURN_Int(ctx, sfp, p_integer(sfp[0]) % p_integer(sfp[1]));
 }
 
@@ -291,6 +293,7 @@ static METHOD knh__Float_opMul(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Float_opDiv(Ctx *ctx, knh_sfp_t *sfp)
 {
+	KNH_THROW_fZERODIV(p_float(sfp[1]));
 	KNH_RETURN_Float(ctx, sfp, p_float(sfp[0]) / p_float(sfp[1]));
 }
 
