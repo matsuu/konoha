@@ -1,0 +1,118 @@
+= 正規表現の拡張方法
+
+Konoha の正規表現(Regex)は、正規表現ドライバーAPIにより、拡張することができます。
+
+== 正規表現のドライバー
+
+Konoha の正規表現ドライバーは、次の４つの関数からなります。
+APIの設計は、POSIX API をベースにしています。
+'''knh_regmatch_t'''は、名前付きの部分文字列マッチングに対応するように拡張してあります。
+
+{{{
+typedef knh_regex_t* (*knh_fregmalloc)(Ctx *);
+typedef int (*knh_fregcomp)(Ctx *, knh_regex_t *, char *pattern, int flags);
+typedef int (*knh_fregexec)(Ctx *, knh_regex_t *, char *str, size_t nmatch, knh_regmatch_t p[], int flags);
+typedef void (*knh_fregfree)(Ctx *, knh_regex_t *);
+}}}
+
+== PCRE の拡張
+
+基本的な使い方は、'''knh_regex.c'''を参考にすればわかると思います。
+ここは、PCREをPOSIX 互換インターフェースを用いてドライバーを作成する場合は説明します。
+
+{{{
+
+#include<regex.h>
+
+knh_regex_t* knh_regex_malloc(Ctx *ctx)
+{
+	return (regex_t*)KNH_MALLOC(ctx, sizeof(regex_t));
+}
+
+void knh_regex_regfree(Ctx *ctx, knh_regex_t *reg)
+{
+	regfree((regex_t*)reg);
+	KNH_FREE(ctx, reg, sizeof(regex_t));
+}
+
+int knh_regex_regcomp(Ctx *ctx, knh_regex_t *reg, char *pattern, int flags)
+{
+	int res = regcomp((regex_t*)reg, pattern, REG_EXTENDED);
+	if(res != 0) {
+		char buf[ERROR_BUFSIZ];
+		regerror(res, (regex_t*)reg, buf, sizeof(buf));
+		KNH_WARNING(ctx, "regex(error): %s", buf);
+	}
+	return res;
+}
+}}}
+
+'''knh_regmatch_t''' のみ、名前フィールド(rm_name.buf,rm_name.len)が追加してあります。
+名前付きの部分文字列マッチングに対応しているときは、これらのフィールドを追加してください。
+
+{{{
+int knh_regex_regexec(Ctx *ctx, knh_regex_t *reg, char *str, size_t nmatch, knh_regmatch_t p[], int flags)
+{
+	regmatch_t pmatch[KNH_REGEX_NMATCH_SIZE];
+	int res = regexec((const regex_t*)reg, str, KNH_REGEX_NMATCH_SIZE, pmatch, 0);
+	if(res == 0) {
+		size_t i;
+		for(i = 0; i < KNH_REGEX_NMATCH_SIZE; i++) {
+			p[i].rm_so = pmatch[i].rm_so;
+			p[i].rm_eo = pmatch[i].rm_eo;
+			p[i].rm_name.buf = NULL;
+			p[i].rm_name.len = 0;
+		}
+	}
+	return res;
+}
+}}}
+
+== ドライバー関数の登録
+
+次のようにドライバー登録のための構造体を作ります。
+
+{{{
+static knh_regex_drvapi_t RE__pcre = {
+	KNH_DRVAPI_TYPE__REGEX, 
+	"pcre", // ドライバー名
+	knh_regex_malloc, // 作成した関数
+	knh_regex_regcomp, 
+	knh_regex_regexec,
+	knh_regex_regfree
+};
+}}}
+
+そして、パッケージの初期化関数の中で、ドライバー登録を追加します。
+
+{{{
+int init(Ctx *ctx)
+{
+	...
+	konoha_addRegexDriver(ctx, "pcre", &RE__pcre);
+	// "pcre" を、"re"（標準名）としても登録する
+	konoha_addRegexDriver(ctx, "re", &RE__pcre);
+	...
+}
+}}}
+
+== Konoha からの使い方
+
+新しく登録したドライバーは、パッケージをロードすれば、
+ドライバー名は、セマンティックタグのタグ文字列として
+利用できます。
+
+{{{
+>>> using pcre;  // ドライバーがロードされる
+>>> s.split('pcre:Context-Type:(.*)$')
+}}}
+
+ちなみに、正規表現の標準ドライバー名は're'です。
+pcreを標準名としても登録（上書き）すれば、
+次のとおり、/patern/ の記法で利用することができます。
+
+{{{
+>>> using pcre;  // ドライバーがロードされる
+>>> s.split(/Context-Type:(.*)/')
+}}}
+

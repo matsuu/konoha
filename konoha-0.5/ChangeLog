@@ -1,0 +1,56 @@
+1009-05-14 Kimio Kuramitsu <kimio AT ynu.ac.jp>
+	* Renewal for konoha-0.5 series
+
+2008-11-24 Kimio Kuramitsu <kimio AT ynu.ac.jp>
+	* The XOP instruction added
+
+2008-11-16 Kimio Kuramitsu <kimio AT ynu.ac.jp>
+	* throw errno message
+	
+2008-11-14 Kimio Kuramitsu <kimio AT ynu.ac.jp>
+	* global const is added
+	* Bugs fixes on Array and try-catch parser
+
+2008-11-13 Kimio Kuramitsu <kimio AT ynu.ac.jp>
+	* new %man() is available
+
+2008-10-29 Kimio Kuramitsu <kimio AT ynu.ac.jp>
+	* nmake for Microsoft Windows Visual C++
+
+2008-10-26 Kimio Kuramitsu <kimio AT ynu.ac.jp>
+	* Stupid bugs fixes around %% %bits and %3.2d
+
+2008-10-19 Kimio Kuramitsu <kimio AT ynu.ac.jp>
+	* new IODriver(knh_iodrv_t) launched
+	* Bugs fixes around String.
+
+2008-10-15 Kimio Kuramitsu <kimio AT ynu.ac.jp>
+	* Now, you can throw Exception.
+	* Floating overflow fixes
+
+2008-10-11 Kimio Kuramitsu <kimio AT ynu.ac.jp>
+	* Now "1*-1" is passed.
+	* Int64 class was deleted. 
+
+2008-10-06 Kimio Kuramitsu <kimio AT ynu.ac.jp>
+	* Very simple unit test is now running.
+
+2008-10-03 Kimio Kuramitsu <kimio AT ynu.ac.jp>
+	* new lightweight DictMap, DictSet
+	* new parser to detect the end of statement
+	* bugs fixes around Boolean
+
+2008-09-23  Kimio Kuramitsu <kimio AT ynu.ac.jp>
+	* added opFmt
+	* Optional formatter is newly supported!!
+	* Array is waiting for tested. 
+
+2008-09-15  Kimio Kuramitsu <kimio AT ynu.ac.jp>
+	* Built-in function 'defined' is added.
+	* String formatter is added.
+	* New formatter %man for Class
+	* METHOD Macros refactored.
+
+2008-09-08  Kimio Kuramitsu <kimio AT ynu.ac.jp>
+	* Version 0.1 released.
+	* This day could be Konoha Day!!
