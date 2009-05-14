@@ -3427,8 +3427,10 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		if(!knh_StmtMETA_isOverride(ctx, stmt) &&
 				!knh_Method_isAbstract(mtd) && DP(mtd)->mn != METHODN_main) {
 			/* Konoha: To override, you need @Override */
-			knh_Asm_perrorMTD(ctx, abr, KMSG_AOVERRIDE, mtd_cid, mn);
-			return NULL;
+			if(!knh_Context_isInteractive(ctx)) {
+				knh_Asm_perrorMTD(ctx, abr, KMSG_AOVERRIDE, mtd_cid, mn);
+			}
+			//return NULL;
 		}
 
 		if(mfsize != mf->psize+1) {
