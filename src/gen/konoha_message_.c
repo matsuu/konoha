@@ -144,6 +144,7 @@ static int knh_message_typedata[] = {
     /* KMSG_EOVERRIDE */ 1,
     /* KMSG_EEXTENDS */ 1,
     /* KMSG_EIMPLEMENTS */ 1,
+    /* KMSG_EZERODIV */ 1,
     /* KMSG_EABORT */ 1,
     /* KMSG_ULABEL */ 1,
     /* KMSG_ETRY */ 1,
@@ -767,6 +768,14 @@ static char* knh_message_data[] = {
 
 #endif
         "EIMPLEMENTS",
+    
+    /* KMSG_EZERODIV */ 
+        /* en */ "Zero divided. Ignored this operation",
+#ifdef KNH_USING_I18N
+        /* ja */ "ゼロ除算です. この演算は無視されます" ,
+
+#endif
+        "EZERODIV",
     
     /* KMSG_EABORT */ 
         /* en */ "Syntax Error. Otherwise, you'll find some compiler bugs.",

@@ -119,11 +119,12 @@ extern "C" {
 #define KMSG_EOVERRIDE                  73
 #define KMSG_EEXTENDS                   74
 #define KMSG_EIMPLEMENTS                75
-#define KMSG_EABORT                     76
-#define KMSG_ULABEL                     77
-#define KMSG_ETRY                       78
-#define KMSG_TOABSTRACT                 79
-#define KMSG_MAXSIZ                     80
+#define KMSG_EZERODIV                   76
+#define KMSG_EABORT                     77
+#define KMSG_ULABEL                     78
+#define KMSG_ETRY                       79
+#define KMSG_TOABSTRACT                 80
+#define KMSG_MAXSIZ                     81
 
 /* ------------------------------------------------------------------------ */
 
