@@ -208,6 +208,9 @@ KNHAPI(InputStream*) new_InputStream__FILE(Ctx *ctx, String *urn, FILE *fp, knh_
 KNHAPI(InputStream*) new_FileInputStream(Ctx *ctx, knh_bytes_t file);
 KNHAPI(InputStream*) new_BytesInputStream(Ctx *ctx, Bytes *ba, size_t s, size_t e);
 KNHAPI(InputStream*) new_StringInputStream(Ctx *ctx, String *str, size_t s, size_t e);
+KNHAPI(Int*) new_Int(Ctx *ctx, knh_int_t value);
+KNHAPI(Int*) new_IntX__fast(Ctx *ctx, knh_class_t cid, knh_int_t value);
+KNHAPI(Int *)new_IntX(Ctx *ctx, knh_class_t cid, knh_int_t value);
 KNHAPI(void) knh_Glue_init(Ctx *ctx, knh_Glue_t *g, void *ptr, knh_fgfree gfree);
 KNHAPI(Object*) new_Glue(Ctx *ctx, char *lname, void *ptr, knh_fgfree gfree);
 KNHAPI(OutputStream*) new_OutputStream__io(Ctx *ctx, String *urn, knh_io_t fd, knh_iodrv_t *drv);
