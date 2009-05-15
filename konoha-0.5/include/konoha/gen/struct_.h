@@ -602,7 +602,7 @@ static knh_StructData_t StructData[] = {
 };
 
 static knh_ClassData_t ClassData[] = {
-	{"konoha.Object", CLASS_Object, CFLAG_Object, STRUCT_Object, CLASS_Object, 0, 33, 0, knh_Object_fdefault},
+	{"konoha.Object", CLASS_Object, CFLAG_Object, STRUCT_Object, CLASS_Object, 0, 35, 0, knh_Object_fdefault},
 	{"konoha.Any", CLASS_Any, CFLAG_Any, STRUCT_Any, CLASS_Object, 0, 0, 0, knh_Any_fdefault},
 	{"konoha.This", CLASS_This, CFLAG_This, STRUCT_This, CLASS_Any, 0, 0, 0, knh_This_fdefault},
 	{"konoha.Any0", CLASS_Any0, CFLAG_Any0, STRUCT_Any0, CLASS_Any, 0, 0, 0, knh_Any0_fdefault},
@@ -832,6 +832,7 @@ static knh_FieldNameData_t FieldNameData[] = {
 	{"o", FIELDN_o},
 	{"offset", FIELDN_offset},
 	{"opAdd", FIELDN_opAdd},
+	{"opAddr", FIELDN_opAddr},
 	{"opDiv", FIELDN_opDiv},
 	{"opEq", FIELDN_opEq},
 	{"opFill", FIELDN_opFill},
@@ -1214,6 +1215,7 @@ static knh_MethodData_t MethodData[] = {
 	{knh__Float__bits, 0, CLASS_Float, METHODN__bits, 0, MFN_void_OutputStream_Any, (void*)NULL},
 	{knh__Float__k, 0, CLASS_Float, METHODN__k, 0, MFN_void_OutputStream_Any, (void*)NULL},
 	{knh__Object_new__init, KNH_FLAG_MF_VARARGS, CLASS_Object, METHODN_new__init, 0, MFN_nThis_Any_, (void*)NULL},
+	{knh__Object_opAddr, KNH_FLAG_MF_NULLBASE, CLASS_Object, METHODN_opAddr, 0, MFN_nInt, (void*)NULL},
 	{knh__Object_opEq, KNH_FLAG_MF_CONST|KNH_FLAG_MF_NULLBASE, CLASS_Object, METHODN_opEq, 0, MFN_nBoolean_Any, (void*)NULL},
 	{knh__Object_opNeq, KNH_FLAG_MF_CONST|KNH_FLAG_MF_NULLBASE, CLASS_Object, METHODN_opNeq, 0, MFN_nBoolean_Any, (void*)NULL},
 	{knh__Object_opLt, KNH_FLAG_MF_CONST|KNH_FLAG_MF_NULLBASE, CLASS_Object, METHODN_opLt, 0, MFN_nBoolean_Any, (void*)NULL},
@@ -1228,6 +1230,7 @@ static knh_MethodData_t MethodData[] = {
 	{knh__Object_isNotNull, KNH_FLAG_MF_CONST|KNH_FLAG_MF_NULLBASE, CLASS_Object, METHODN_isNotNull, 0, MFN_nBoolean, (void*)NULL},
 	{knh__Object_opItr, 0, CLASS_Object, METHODN_opItr, 0, MFN_iThis, (void*)NULL},
 	{knh_fmethod_movableText, 0, CLASS_Object, METHODN__s, 0, MFN_void_OutputStream_Any, (void*)knh_Object__s},
+	{knh__Object__p, 0, CLASS_Object, METHODN__p, 0, MFN_void_OutputStream_Any, (void*)NULL},
 	{knh_fmethod_movableText, 0, CLASS_Object, METHODN__k, 0, MFN_void_OutputStream_Any, (void*)knh_Object__k},
 	{knh_fmethod_movableText, 0, CLASS_Object, METHODN__dump, 0, MFN_void_OutputStream_Any, (void*)knh_Object__dump},
 	{knh_fmethod_movableText, 0, CLASS_Object, METHODN__empty, 0, MFN_void_OutputStream_Any, (void*)knh_Object__empty},

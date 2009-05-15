@@ -112,16 +112,16 @@ static char* knh_token_array_tochar[] = {
     ">",  /* Gt */ 
     ">=",  /* Gte */ 
     "=~",  /* Match */ 
-    "|",  /* Lor */ 
-    "%%",  /* Fmt */ 
     "<<",  /* Lshift */ 
     ">>",  /* Rshift */ 
     "+",  /* Add */ 
     "-",  /* Sub */ 
     "/",  /* Div */ 
     "%",  /* Mod */ 
+    "%%",  /* Fmt */ 
     "*",  /* Mul */ 
     "&",  /* Land */ 
+    "|",  /* Lor */ 
     "~",  /* Lnot */ 
     "^",  /* Xor */ 
     "++",  /* Next */ 
@@ -242,16 +242,16 @@ static knh_methodn_t knh_token_array_tomethodn[] = {
     METHODN_opGt,  /* Gt */ 
     METHODN_opGte,  /* Gte */ 
     METHODN_opMatch,  /* Match */ 
-    METHODN_opLor,  /* Lor */ 
-    METHODN_opFmt,  /* Fmt */ 
     METHODN_opLshift,  /* Lshift */ 
     METHODN_opRshift,  /* Rshift */ 
     METHODN_opAdd,  /* Add */ 
     METHODN_opSub,  /* Sub */ 
     METHODN_opDiv,  /* Div */ 
     METHODN_opMod,  /* Mod */ 
+    METHODN_opFmt,  /* Fmt */ 
     METHODN_opMul,  /* Mul */ 
     METHODN_opLand,  /* Land */ 
+    METHODN_opLor,  /* Lor */ 
     METHODN_opLnot,  /* Lnot */ 
     METHODN_opXor,  /* Xor */ 
     METHODN_opNext,  /* Next */ 
@@ -372,16 +372,16 @@ static int knh_token_array_getOpPriority[] = {
     9,  /* Gt */ 
     9,  /* Gte */ 
     9,  /* Match */ 
-    11,  /* Lor */ 
-    12,  /* Fmt */ 
     15,  /* Lshift */ 
     15,  /* Rshift */ 
     20,  /* Add */ 
     20,  /* Sub */ 
     24,  /* Div */ 
     24,  /* Mod */ 
+    24,  /* Fmt */ 
     24,  /* Mul */ 
     27,  /* Land */ 
+    27,  /* Lor */ 
     27,  /* Lnot */ 
     27,  /* Xor */ 
     28,  /* Next */ 
@@ -502,16 +502,16 @@ static int knh_token_array_getOpSize[] = {
     2,  /* Gt */ 
     2,  /* Gte */ 
     2,  /* Match */ 
-    0,  /* Lor */ 
-    0,  /* Fmt */ 
     0,  /* Lshift */ 
     0,  /* Rshift */ 
     0,  /* Add */ 
     2,  /* Sub */ 
     2,  /* Div */ 
     2,  /* Mod */ 
+    0,  /* Fmt */ 
     2,  /* Mul */ 
     0,  /* Land */ 
+    0,  /* Lor */ 
     1,  /* Lnot */ 
     2,  /* Xor */ 
     1,  /* Next */ 
@@ -632,16 +632,16 @@ static knh_bool_t knh_token_array_isEndOfStmt[] = {
     0,  /* Gt */ 
     0,  /* Gte */ 
     0,  /* Match */ 
-    0,  /* Lor */ 
-    0,  /* Fmt */ 
     0,  /* Lshift */ 
     0,  /* Rshift */ 
     0,  /* Add */ 
     0,  /* Sub */ 
     0,  /* Div */ 
     0,  /* Mod */ 
+    0,  /* Fmt */ 
     0,  /* Mul */ 
     0,  /* Land */ 
+    0,  /* Lor */ 
     0,  /* Lnot */ 
     0,  /* Xor */ 
     0,  /* Next */ 
@@ -726,8 +726,8 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
     break;
     case '%':
         if(ISB(t, "%=")) { tt = TT_MODE; break; }
-        if(ISB(t, "%%")) { tt = TT_FMT; break; }
         if(ISB(t, "%")) { tt = TT_MOD; break; }
+        if(ISB(t, "%%")) { tt = TT_FMT; break; }
     break;
     case '&':
         if(ISB(t, "&=")) { tt = TT_BITANDE; break; }

@@ -114,16 +114,16 @@ extern "C" {
 #define TT_GT                           ((knh_token_t)71)
 #define TT_GTE                          ((knh_token_t)72)
 #define TT_MATCH                        ((knh_token_t)73)
-#define TT_LOR                          ((knh_token_t)74)
-#define TT_FMT                          ((knh_token_t)75)
-#define TT_LSHIFT                       ((knh_token_t)76)
-#define TT_RSHIFT                       ((knh_token_t)77)
-#define TT_ADD                          ((knh_token_t)78)
-#define TT_SUB                          ((knh_token_t)79)
-#define TT_DIV                          ((knh_token_t)80)
-#define TT_MOD                          ((knh_token_t)81)
-#define TT_MUL                          ((knh_token_t)82)
-#define TT_LAND                         ((knh_token_t)83)
+#define TT_LSHIFT                       ((knh_token_t)74)
+#define TT_RSHIFT                       ((knh_token_t)75)
+#define TT_ADD                          ((knh_token_t)76)
+#define TT_SUB                          ((knh_token_t)77)
+#define TT_DIV                          ((knh_token_t)78)
+#define TT_MOD                          ((knh_token_t)79)
+#define TT_FMT                          ((knh_token_t)80)
+#define TT_MUL                          ((knh_token_t)81)
+#define TT_LAND                         ((knh_token_t)82)
+#define TT_LOR                          ((knh_token_t)83)
 #define TT_LNOT                         ((knh_token_t)84)
 #define TT_XOR                          ((knh_token_t)85)
 #define TT_NEXT                         ((knh_token_t)86)
@@ -238,12 +238,6 @@ extern "C" {
 #ifndef METHODN_opMatch
 #define METHODN_opMatch                 METHODN_NONAME
 #endif
-#ifndef METHODN_opLor
-#define METHODN_opLor                   METHODN_NONAME
-#endif
-#ifndef METHODN_opFmt
-#define METHODN_opFmt                   METHODN_NONAME
-#endif
 #ifndef METHODN_opLshift
 #define METHODN_opLshift                METHODN_NONAME
 #endif
@@ -262,11 +256,17 @@ extern "C" {
 #ifndef METHODN_opMod
 #define METHODN_opMod                   METHODN_NONAME
 #endif
+#ifndef METHODN_opFmt
+#define METHODN_opFmt                   METHODN_NONAME
+#endif
 #ifndef METHODN_opMul
 #define METHODN_opMul                   METHODN_NONAME
 #endif
 #ifndef METHODN_opLand
 #define METHODN_opLand                  METHODN_NONAME
+#endif
+#ifndef METHODN_opLor
+#define METHODN_opLor                   METHODN_NONAME
 #endif
 #ifndef METHODN_opLnot
 #define METHODN_opLnot                  METHODN_NONAME
