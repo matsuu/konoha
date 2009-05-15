@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# shinpei@ynu(c)2008
+touch AUTHORS ChangeLog NEWS README
+test -e config || mkdir config
+aclocal -I config
+libtoolize --force --copy
+autoheader
+automake -af
+autoconf
+
