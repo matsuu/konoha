@@ -35,7 +35,6 @@
 extern "C" {
 #endif
 
-
 /* ======================================================================== */
 /* [macros] */
 
@@ -44,7 +43,7 @@ extern "C" {
 /* ======================================================================== */
 /* [constructors] */
 
-Int* new_Int(Ctx *ctx, knh_int_t value)
+KNHAPI(Int*) new_Int(Ctx *ctx, knh_int_t value)
 {
 	knh_Int_t *b = (knh_Int_t*)new_hObject(ctx, FLAG_Int, CLASS_Int, CLASS_Int);
 	b->n.ivalue = value;
@@ -53,7 +52,7 @@ Int* new_Int(Ctx *ctx, knh_int_t value)
 
 /* ------------------------------------------------------------------------ */
 
-Int* new_IntX__fast(Ctx *ctx, knh_class_t cid, knh_int_t value)
+KNHAPI(Int*) new_IntX__fast(Ctx *ctx, knh_class_t cid, knh_int_t value)
 {
 	knh_Int_t *b = (knh_Int_t*)new_hObject(ctx, FLAG_Int, CLASS_Int, cid);
 	b->n.ivalue = value;
@@ -62,14 +61,10 @@ Int* new_IntX__fast(Ctx *ctx, knh_class_t cid, knh_int_t value)
 
 /* ------------------------------------------------------------------------ */
 
-Int *new_IntX(Ctx *ctx, knh_class_t cid, knh_int_t value)
+KNHAPI(Int *)new_IntX(Ctx *ctx, knh_class_t cid, knh_int_t value)
 {
 	IntUnit *u = (IntUnit*)ctx->share->ClassTable[cid].cspec;
 	KNH_ASSERT(IS_IntUnit(u));
-
-//	if(knh_IntUnit_isBuffered(u, value)) {
-//		return DP(u)->bfarray[value - DP(u)->bfoffset];
-//	}
 
 	if(DP(u)->fchk(u, value)) {
 		Int *n = (knh_Int_t*)new_hObject(ctx, FLAG_Int, CLASS_Int, cid);
@@ -88,50 +83,6 @@ Int *new_IntX(Ctx *ctx, knh_class_t cid, knh_int_t value)
 		return (Int*)new_Nue__s(ctx, buf);
 	}
 }
-
-
-///* ------------------------------------------------------------------------ */
-//
-//char *knh_format_Int(char *buf, size_t bufsiz, Int *n)
-//{
-//	IntUnit *u = (IntUnit*)ctx->share->ClassTable[n->h.cid].cspec;
-//	KNH_ASSERT(IS_IntUnit(u));
-//	DP(u)->ffmt(u, buf, bufsiz, n->value);
-//	return buf;
-//}
-
-///* ======================================================================== */
-///* [utils] */
-//
-//
-//knh_int_t knh_int_max(knh_int_t a, knh_int_t b)
-//{
-//	return (a > b) ? a : b;
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//
-//knh_int_t knh_int_min(knh_int_t a, knh_int_t b)
-//{
-//	return (a < b) ? a : b;
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//
-//knh_uint_t knh_uint_max(knh_uint_t a, knh_uint_t b)
-//{
-//	return (a > b) ? a : b;
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//
-//knh_uint_t knh_uint_min(knh_uint_t a, knh_uint_t b)
-//{
-//	return (a < b) ? a : b;
-//}
 
 /* ======================================================================== */
 

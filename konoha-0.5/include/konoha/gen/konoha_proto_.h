@@ -256,9 +256,6 @@ void knh_InputStream_close(Ctx *ctx, InputStream *o);
 int knh_InputStream_isClosed(InputStream *o);
 MAPPER knh_Bytes_InputStream(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/class/knh_Int.c */
-Int* new_Int(Ctx *ctx, knh_int_t value);
-Int* new_IntX__fast(Ctx *ctx, knh_class_t cid, knh_int_t value);
-Int *new_IntX(Ctx *ctx, knh_class_t cid, knh_int_t value);
 knh_int_t knh_IntNULL_toint(Int *v);
 /* ../src/class/knh_IntUnit.c */
 void knh_IntUnit_initMinMax(Ctx *ctx, IntUnit *b, knh_int_t min, knh_int_t max);
