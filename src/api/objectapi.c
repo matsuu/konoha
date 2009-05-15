@@ -66,6 +66,26 @@ static METHOD knh__Object_new__init(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ======================================================================== */
+
+/* ------------------------------------------------------------------------ */
+/* @method[NULLBASE] Int! Object.opAddr() */
+
+static METHOD knh__Object_opAddr(Ctx *ctx, knh_sfp_t *sfp)
+{
+	void *p = NULL;
+	if(IS_bInt(sfp[0].o) || IS_bFloat(sfp[0].o)) {
+		p = (void*)(&sfp[0] + sizeof(void*));
+	}
+	else if(IS_Boolean(sfp[0].o)) {
+		p = (sfp[0].bvalue) ? (void*)(KNH_TRUE) : (void*)(KNH_FALSE);
+	}
+	else if(IS_NOTNULL(sfp[0].o)) {
+		p = (void*)sfp[0].o;
+	}
+	KNH_RETURN_Int(ctx, sfp, (knh_intptr_t)p);
+}
+
+/* ------------------------------------------------------------------------ */
 /* @method[CONST|NULLBASE] Boolean! Object.opEq(Any value) */
 
 static METHOD knh__Object_opEq(Ctx *ctx, knh_sfp_t *sfp)
@@ -227,6 +247,24 @@ void knh_Object__s(Ctx *ctx, Object *b, OutputStream *w, String *m)
 }
 
 /* ------------------------------------------------------------------------ */
+/* @method void Object.%p(OutputStream w, String m) */
+
+static METHOD knh__Object__p(Ctx *ctx, knh_sfp_t *sfp)
+{
+	void *p = NULL;
+	if(IS_bInt(sfp[0].o) || IS_bFloat(sfp[0].o)) {
+		p = (void*)(&sfp[0] + sizeof(void*));
+	}
+	else if(IS_Boolean(sfp[0].o)) {
+		p = (sfp[0].bvalue) ? (void*)(KNH_TRUE) : (void*)(KNH_FALSE);
+	}
+	else if(IS_NOTNULL(sfp[0].o)) {
+		p = (void*)sfp[0].o;
+	}
+	knh_write__p(ctx, sfp[1].w, p);
+}
+
+/* ------------------------------------------------------------------------ */
 /* @method void Object.%k(OutputStream w, String m) */
 
 static
@@ -315,15 +353,6 @@ void knh_Object__dump(Ctx *ctx, Object *b, OutputStream *w, String *m)
 static
 void knh_Object__empty(Ctx *ctx, Object *b, OutputStream *w, String *m)
 {
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method void Object.%addr(OutputStream w, String m) */
-
-static
-void knh_Object__addr(Ctx *ctx, Object *b, OutputStream *w, String *m)
-{
-	knh_write__p(ctx, w, (void*)b);
 }
 
 /* ------------------------------------------------------------------------ */

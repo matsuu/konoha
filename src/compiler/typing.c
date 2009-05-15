@@ -2260,9 +2260,21 @@ Term *knh_StmtOP_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_
 
 	case METHODN_opLor:
 	{
+//		if(opsize == 1) {
+//			mn = METHODN_getSize;
+//			mtd_cid = TERMs_getcid(stmt, 1);
+//		}
+//		else {
+			mtd_cid = CLASS_Int;
+//		}
+	}
+	break;
+
+	case METHODN_opLand:
+	{
 		if(opsize == 1) {
-			mn = METHODN_getSize;
-			mtd_cid = TERMs_getcid(stmt, 1);
+			mn = METHODN_opAddr;
+			mtd_cid = CLASS_Object;
 		}
 		else {
 			mtd_cid = CLASS_Int;
