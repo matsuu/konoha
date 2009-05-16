@@ -119,7 +119,7 @@
 
 #define DBG_(stmt)
 #define DBG_P(fmt, ...) \
-	if(konoha_isDebugMode()) {\
+	if(konoha_isDebugMode2()) {\
 		fflush(stdout); \
 		fprintf(stderr, "DBG[%s:%d/%s]: ", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
 		fprintf(stderr, fmt, ## __VA_ARGS__); \

@@ -53,7 +53,7 @@ static METHOD knh__System_getIn(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__System_setIn(Ctx *ctx, knh_sfp_t *sfp)
 {
-	if(knh_Context_isAdmin(ctx)) {
+	if(knh_Context_isTrusted(ctx)) {
 		if(IS_NULL(sfp[1].o)) {
 			KNH_SETv(ctx, DP(ctx->sys)->in, konoha_getClassDefaultValue(ctx, CLASS_InputStream));
 		}
@@ -77,7 +77,7 @@ static METHOD knh__System_getOut(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__System_setOut(Ctx *ctx, knh_sfp_t *sfp)
 {
-	if(knh_Context_isAdmin(ctx)) {
+	if(knh_Context_isTrusted(ctx)) {
 		if(IS_NULL(sfp[1].o)) {
 			KNH_SETv(ctx, DP(ctx->sys)->out, konoha_getClassDefaultValue(ctx, CLASS_OutputStream));
 		}
@@ -101,7 +101,7 @@ static METHOD knh__System_getErr(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__System_setErr(Ctx *ctx, knh_sfp_t *sfp)
 {
-	if(knh_Context_isAdmin(ctx)) {
+	if(knh_Context_isTrusted(ctx)) {
 		if(IS_NULL(sfp[1].o)) {
 			KNH_SETv(ctx, DP(ctx->sys)->err, konoha_getClassDefaultValue(ctx, CLASS_OutputStream));
 		}
