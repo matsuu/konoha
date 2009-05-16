@@ -2695,7 +2695,6 @@ Term *knh_StmtIF_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	return TM(stmt);
 }
 
-
 /* ------------------------------------------------------------------------ */
 
 static
@@ -2974,6 +2973,17 @@ Term *knh_StmtASSERT_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	if(!TERMs_typing(ctx, stmt, 0, abr, ns, NNTYPE_Boolean, TWARN_)) {
 		return NULL;
 	}
+
+	if(TERMs_isCONST(stmt, 0)) {
+		if(IS_TRUE(TERMs_const(stmt, 0))) {
+			knh_Stmt_done(ctx, DP(stmt)->stmts[2]);
+			return TM(stmt);
+		}
+		if(IS_FALSE(TERMs_const(stmt, 0))) {
+			TODO(); /* Always throw Assert!! */
+		}
+	}
+	TERMs_typingBLOCK(ctx, stmt, 1, abr, ns);
 	return TM(stmt);
 }
 

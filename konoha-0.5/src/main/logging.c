@@ -57,13 +57,8 @@ OutputStream *knh_stack_pstream(Ctx *ctx, knh_flag_t flag)
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_stack_phead(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, OutputStream *w)
+void knh_stack_beginPRINT(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, OutputStream *w)
 {
-	if(KNH_FLAG_IS(flag, KNH_FLAG_PF_NAME)) {
-		knh_putc(ctx, w, '=');
-		return;
-	}
-
 	if(KNH_FLAG_IS(flag, KNH_FLAG_PF_BOL)) {
 		if(KNH_FLAG_IS(flag, KNH_FLAG_PF_TIME)) {
 	//		char buf[80];
@@ -74,6 +69,25 @@ void knh_stack_phead(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, OutputStream *w)
 	//		knh_snprintf(buf, sizeof(buf), "[%d/%d/%d %d/%d/%d] ", now->tm_year, now->tm_mon, now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
 	//		knh_write__s(ctx, w, buf);
 		}
+		knh_putc(ctx, w, '[');
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_stack_endPRINT(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, OutputStream *w)
+{
+	if(KNH_FLAG_IS(flag, KNH_FLAG_PF_BOL)) {
+		knh_putc(ctx, w, ']');
+		knh_putc(ctx, w, ' ');
+	}
+	else if(KNH_FLAG_IS(flag, KNH_FLAG_PF_EOL)) {
+		knh_write_EOL(ctx, w);
+		knh_flush(ctx, w);
+	}
+	else if(KNH_FLAG_IS(flag, KNH_FLAG_PF_NAME)) {
+		knh_putc(ctx, w, '=');
 	}
 	else {
 		knh_putc(ctx, w, ',');
@@ -86,14 +100,11 @@ void knh_stack_phead(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, OutputStream *w)
 void knh_stack_pmsg(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, String *s)
 {
 	OutputStream *w = knh_stack_pstream(ctx, flag);
-	knh_stack_phead(ctx, sfp, flag, w);
+	knh_stack_beginPRINT(ctx, sfp, flag, w);
 	if(IS_bString(s)) {
 		knh_print(ctx, w, knh_String_tobytes(s));
 	}
-	if(KNH_FLAG_IS(flag, KNH_FLAG_PF_EOL)) {
-		knh_write_EOL(ctx, w);
-		knh_flush(ctx, w);
-	}
+	knh_stack_endPRINT(ctx, sfp, flag, w);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -101,16 +112,12 @@ void knh_stack_pmsg(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, String *s)
 void knh_stack_p(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, knh_methodn_t mn, int sfpidx)
 {
 	OutputStream *w = knh_stack_pstream(ctx, flag);
-	knh_stack_phead(ctx, sfp, flag, w);
-
+	knh_stack_beginPRINT(ctx, sfp, flag, w);
 	knh_sfp_t *esp = ctx->esp;
 	KNH_SETv(ctx, esp[1].o, sfp[sfpidx].o);
 	esp[1].data = sfp[sfpidx].data;
 	knh_esp1_format(ctx, mn, w, KNH_NULL);
-	if(KNH_FLAG_IS(flag, KNH_FLAG_PF_EOL)) {
-		knh_write_EOL(ctx, w);
-		knh_flush(ctx, w);
-	}
+	knh_stack_endPRINT(ctx, sfp, flag, w);
 }
 
 /* ------------------------------------------------------------------------ */

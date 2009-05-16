@@ -1089,7 +1089,7 @@ void TERMs_ASM_JIFF_LOOP(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_labelid_t
 {
 	Token *tk = DP(stmt)->tokens[n];
 	if(IS_Token(tk) && SP(tk)->tt == TT_STACK /*TT_LOCAL ??*/) {
-		KNH_ASM_bJIFF_(ctx, abr, label, sfi_(DP(tk)->index));
+		KNH_ASM_bJIFF_LOOP_(ctx, abr, label, sfi_(DP(tk)->index));
 	}
 	else {
 		if(TERMs_isCALLISNUL(stmt, n)) {
@@ -2303,56 +2303,67 @@ knh_methodn_t knh_Stmt_getMT(Ctx *ctx, Stmt *stmt, size_t n)
 
 /* ------------------------------------------------------------------------ */
 
-static
-String *knh_Term_getNameNULL(Term *tm)
-{
-	Token *tk = (Token*)tm;
-	if(!IS_Token(tk)) {
-		return NULL;
-	}
-	else if(SP(tk)->tt == TT_NAME) {
-		DBG2_ASSERT(IS_String(DP(tk)->data));
-		return (String*)DP(tk)->data;
-	}
-	return NULL;
-}
-
-/* ------------------------------------------------------------------------ */
-
 void knh_StmtPRINT_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 {
+	if(!knh_Context_isDebug(ctx) || DP(stmt)->size == 0) {
+		return ;
+	}
 	knh_flag_t flag = knh_StmtPRINT_flag(ctx, stmt);
-	if(DP(stmt)->size == 0) {
-		Object *o = (Object*)TS_EMPTY;
-		KNH_ASM_PMSG_(ctx, abr, flag | KNH_FLAG_PF_EOL, o);
+	knh_labelid_t lbskip = knh_Asm_newLabelId(ctx, abr, NULL);
+	KNH_ASM_SKIP_(ctx, abr, lbskip);
+	/* header */ {
+		char buf[128];
+		knh_snprintf(buf, sizeof(buf), "%s:%d", FILEIDN(DP(abr)->fileid), DP(abr)->line);
+		KNH_ASM_PMSG_(ctx, abr, flag | KNH_FLAG_PF_BOL, new_String(ctx, B(buf), NULL));
 	}
-	else {
-		int i;
+
+	int i;
+	for(i = 0; i < DP(stmt)->size; i++) {
+		L_REDO:;
 		knh_flag_t mask = 0;
-		for(i = 0; i < DP(stmt)->size; i++) {
-			if(i == 0) {
-				mask |= KNH_FLAG_PF_BOL;
-			}
-			if(i == DP(stmt)->size - 1) {
-				mask |= KNH_FLAG_PF_EOL;
-			}
-			String *name = knh_Term_getNameNULL(DP(stmt)->terms[i]);
-			if(name != NULL) {
-				mask |= KNH_FLAG_PF_NAME;
-				KNH_ASM_PMSG_(ctx, abr, flag, UP(name));
-			}
-			knh_methodn_t mn = knh_Stmt_getMT(ctx, stmt, i);
-			TERMs_asm(ctx, stmt, i, abr, TYPE_Any, DP(abr)->stack);
-			KNH_ASM_P_(ctx, abr, flag | mask, mn, DP(abr)->stack);
-			mask = 0;
+		if(i == DP(stmt)->size - 1) {
+			mask |= KNH_FLAG_PF_EOL;
 		}
+		/* name= */ {
+			Token *tkn = DP(stmt)->tokens[i];
+			if(IS_Token(tkn) && knh_Token_isPNAME(tkn)) {
+				KNH_ASM_PMSG_(ctx, abr, flag | mask | KNH_FLAG_PF_NAME, DP(tkn)->data);
+				i++;
+				KNH_ASSERT(i < DP(stmt)->size);
+				goto L_REDO;
+			}
+		}
+		/* "literal"*/ {
+			Token *tkn = DP(stmt)->tokens[i];
+			if(IS_Token(tkn) && knh_Token_isCONST(tkn) && IS_String(DP(tkn)->data)) {
+				KNH_ASM_PMSG_(ctx, abr, flag | mask, DP(tkn)->data);
+				continue;
+			}
+		}
+		TERMs_asm(ctx, stmt, i, abr, TYPE_Any, DP(abr)->stack);
+		knh_methodn_t mn = knh_Stmt_getMT(ctx, stmt, i);
+		KNH_ASM_P_(ctx, abr, flag | mask, mn, DP(abr)->stack);
 	}
+	KNH_ASM_LLABEL(ctx, abr, lbskip);
 }
 
-
 /* ------------------------------------------------------------------------ */
 
-/* ------------------------------------------------------------------------ */
+void knh_StmtASSERT_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
+{
+	if(!knh_Context_isDebug(ctx)) {
+		return ;
+	}
+	knh_labelid_t lbskip = knh_Asm_newLabelId(ctx, abr, NULL);
+	KNH_ASM_SKIP_(ctx, abr, lbskip);
+
+	/* if */
+	TERMs_ASM_JIFT(ctx, stmt, 0, abr, lbskip);
+	/*then*/
+	TERMs_asmBLOCK(ctx, stmt, 1, abr);
+	KNH_ASM_THROWs_(ctx, abr, TS_AssertionException);
+	KNH_ASM_LLABEL(ctx, abr, lbskip);
+}
 
 /* ------------------------------------------------------------------------ */
 
@@ -2402,6 +2413,8 @@ void knh_Stmt_asmBLOCK(Ctx *ctx, Stmt *stmt, Asm *abr, int isIteration)
 			knh_StmtRETURN_asm(ctx, cur, abr); break;
 		case STT_PRINT:
 			knh_StmtPRINT_asm(ctx, cur, abr); break;
+		case STT_ASSERT:
+			knh_StmtASSERT_asm(ctx, cur, abr); break;
 		case STT_ERR:
 			knh_StmtERR_asm(ctx, cur, abr); break;
 

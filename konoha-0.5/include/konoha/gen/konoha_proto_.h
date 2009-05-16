@@ -437,6 +437,7 @@ void knh_StmtTRI_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx
 void knh_StmtLET_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx);
 void knh_StmtEXPR_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx);
 void knh_StmtPRINT_asm(Ctx *ctx, Stmt *stmt, Asm *abr);
+void knh_StmtASSERT_asm(Ctx *ctx, Stmt *stmt, Asm *abr);
 void knh_Stmt_asmBLOCK(Ctx *ctx, Stmt *stmt, Asm *abr, int isIteration);
 void KNH_ASM_METHOD(Ctx *ctx, Asm *abr, Method *mtd, Stmt *params, Stmt *body, int isIteration);
 void knh_StmtMETHOD_asm(Ctx *ctx, Stmt *stmt, Asm *abr);

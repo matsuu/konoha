@@ -2001,6 +2001,24 @@ METHOD jc1_JMP(Ctx *ctx, knh_sfp_t *sfp)
 
 
 static
+METHOD jc0_SKIP(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_SKIP(ctx, NPC, JUMP0);
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_SKIP(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_SKIP(ctx, NPC, JUMP1);
+	__asm__ __volatile__("int3");
+}
+
+
+static
 METHOD jc0_BJIFT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
@@ -4646,7 +4664,7 @@ METHOD jc3_FASETN(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 
-static knh_fmethod codeTempList[139][6] = {
+static knh_fmethod codeTempList[140][6] = {
 	{jc0_HALT},
 	{jc0_MOVA,jc1_MOVA,jc2_MOVA},
 	{jc0_MOVN,jc1_MOVN,jc2_MOVN},
@@ -4708,6 +4726,7 @@ static knh_fmethod codeTempList[139][6] = {
 	{jc0_AMAP,jc1_AMAP,jc2_AMAP},
 	{jc0_NNMAP,jc1_NNMAP,jc2_NNMAP},
 	{jc0_JMP,jc1_JMP},
+	{jc0_SKIP,jc1_SKIP},
 	{jc0_BJIFT,jc1_BJIFT,jc2_BJIFT},
 	{jc0_BJIFF,jc1_BJIFF,jc2_BJIFF},
 	{jc0_BJIFF_LOOP,jc1_BJIFF_LOOP,jc2_BJIFF_LOOP},

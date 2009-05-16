@@ -57,6 +57,7 @@ static knh_StringData_t StringData[] = {
 	{"/dev/stdout", TSN_DEVSTDOUT}, 
 	{"@label", TSN_ATlabel}, 
 	{"Security!!", TSN_SecurityException}, 
+	{"Assertion!!", TSN_AssertionException}, 
 	{"(", TSN_LP}, 
 	{")", TSN_RP}, 
 	{"{", TSN_LB}, 
