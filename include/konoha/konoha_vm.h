@@ -627,7 +627,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 	}\
 
 #define KLR_SKIP(ctx, PC, JUMP) \
-	if(!IS_DEBUG(ctx, sfp[0].o)) { \
+	if(!knh_Context_isDebug(ctx)) { \
 		KLR_JMP(ctx, PC, JUMP); \
 	} \
 

@@ -2851,34 +2851,33 @@ static Stmt *new_StmtREGISTER(Ctx *ctx, knh_tokens_t *tc)
 /* ------------------------------------------------------------------------ */
 /* [print] */
 
-//static
-//String *knh_tokens_toString(Ctx *ctx, knh_tokens_t *tc, char *premsg, char *postmsg)
-//{
-//	if(tc->c + 1 == tc->e && premsg == NULL && postmsg == NULL && IS_String(DP(tc->ts[tc->c])->data)) {
-//		switch(SP(tc->ts[tc->c])->tt) {
-//		case TT_NAME: case TT_STR: case TT_NUM:
-//		case TT_TSTR: case TT_CONSTN:
-//			return (String*)DP(tc->ts[tc->c])->data;
-//		}
-//	}
-//
-//	int i;
-//	knh_cwb_t cwb = knh_Context_cwb(ctx);
-//	if(premsg != NULL) knh_write__s(ctx, cwb.w, premsg);
-//	for(i = tc->c; i <tc->e; i++) {
-//		knh_Token__k(ctx, tc->ts[i], cwb.w, (String*)KNH_NULL);
-//	}
-//	if(postmsg != NULL) knh_write__s(ctx, cwb.w, postmsg);
-//	return new_String__cwb(ctx, cwb);
-//}
+static
+void knh_Stmt_add_PRINTEXPRs(Ctx *ctx, Stmt *stmt, knh_tokens_t *tc)
+{
+	knh_tokens_t expr_tc = knh_tokens_splitSTMT(ctx, tc);
+	while(expr_tc.c < expr_tc.e) {
+		knh_tokens_t sub_tc = knh_tokens_splitEXPR(ctx, &expr_tc, TT_COMMA);
+		if(sub_tc.c < sub_tc.e) {
+			if(sub_tc.c + 1 == sub_tc.e) {
+				Token *tkn = sub_tc.ts[sub_tc.c];
+				if(SP(tkn)->tt == TT_NAME || SP(tkn)->tt == TT_CONSTN) {
+					tkn = new_TokenCONST(ctx, FL(tkn), DP(tkn)->data);
+					knh_Token_setPNAME(tkn, 1);
+					knh_Stmt_add(ctx, stmt, TM(tkn));
+				}
+			}
+			knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &sub_tc, KNH_RVALUE));
+		}
+	}
+}
 
 /* ------------------------------------------------------------------------ */
 
 static Stmt *new_StmtPRINT(Ctx *ctx, knh_tokens_t *tc)
 {
 	Stmt *o = new_StmtMETA(ctx, tc, STT_PRINT);
-	knh_Stmt_add_EXPRs(ctx, o, tc); /* expr* */
-	//knh_Stmt_add_SEMICOLON(ctx, o, tc); /* ; */
+	knh_Stmt_add_PRINTEXPRs(ctx, o, tc); /* expr* */
+	knh_Stmt_add_SEMICOLON(ctx, o, tc); /* ; */
 	return o;
 }
 
@@ -2889,7 +2888,7 @@ static Stmt *new_StmtASSERT(Ctx *ctx, knh_tokens_t *tc)
 {
 	Stmt *o = new_StmtMETA(ctx, tc, STT_ASSERT);
 	knh_Stmt_add_PEXPR(ctx, o, tc); /* pexpr */
-	knh_Stmt_add_SEMICOLON(ctx, o, tc); /* ; */
+	knh_Stmt_add_STMT1(ctx, o, tc); /* { */
 	return o;
 }
 

@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-#define KONOHA_BUILDID                  553
+#define KONOHA_BUILDID                  554
 
 /* ======================================================================== */
 
@@ -1855,19 +1855,21 @@ extern "C" {
 #define TS_ATlabel                      ((ctx)->share->tString[TSN_ATlabel])
 #define TSN_SecurityException   18
 #define TS_SecurityException            ((ctx)->share->tString[TSN_SecurityException])
-#define TSN_LP                  19
+#define TSN_AssertionException  19
+#define TS_AssertionException           ((ctx)->share->tString[TSN_AssertionException])
+#define TSN_LP                  20
 #define TS_LP                           ((ctx)->share->tString[TSN_LP])
-#define TSN_RP                  20
+#define TSN_RP                  21
 #define TS_RP                           ((ctx)->share->tString[TSN_RP])
-#define TSN_LB                  21
+#define TSN_LB                  22
 #define TS_LB                           ((ctx)->share->tString[TSN_LB])
-#define TSN_RB                  22
+#define TSN_RB                  23
 #define TS_RB                           ((ctx)->share->tString[TSN_RB])
-#define TSN_LS                  23
+#define TSN_LS                  24
 #define TS_LS                           ((ctx)->share->tString[TSN_LS])
-#define TSN_RS                  24
+#define TSN_RS                  25
 #define TS_RS                           ((ctx)->share->tString[TSN_RS])
-#define KNH_TSTRING_SIZE        25
+#define KNH_TSTRING_SIZE        26
 
 /* ======================================================================== */
 /* [field] */
