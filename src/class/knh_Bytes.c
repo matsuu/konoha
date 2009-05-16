@@ -135,6 +135,16 @@ KNHAPI(void) knh_Bytes_clear(Bytes *o, size_t pos)
 
 /* ------------------------------------------------------------------------ */
 
+KNHAPI(void) knh_Bytes_ensureSize(Ctx *ctx, Bytes *o, size_t len)
+{
+	if(o->capacity < len) {
+		knh_Bytes_expands(ctx, o, len);
+	}
+	o->size = len;
+}
+
+/* ------------------------------------------------------------------------ */
+
 KNHAPI(void) knh_Bytes_putc(Ctx *ctx, Bytes *o, int ch)
 {
 	if(o->size == o->capacity) {

@@ -174,6 +174,7 @@ KNHAPI(void) knh_Array_add(Ctx *ctx, Array *o, Any *value);
 KNHAPI(Bytes*) new_Bytes(Ctx *ctx, size_t capacity);
 KNHAPI(knh_bytes_t) knh_Bytes_tobytes(Bytes *o);
 KNHAPI(void) knh_Bytes_clear(Bytes *o, size_t pos);
+KNHAPI(void) knh_Bytes_ensureSize(Ctx *ctx, Bytes *o, size_t len);
 KNHAPI(void) knh_Bytes_putc(Ctx *ctx, Bytes *o, int ch);
 KNHAPI(void) knh_Bytes_write(Ctx *ctx, Bytes *o, knh_bytes_t v);
 KNHAPI(knh_bytes_t) new_bytes(char *c);
