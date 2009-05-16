@@ -823,13 +823,13 @@ typedef struct knh_System {
 /* ------------------------------------------------------------------------ */
 /* @class Context Object knh_Context_t */
 /* @ flag Context.System CTXF ((Context*)%s)->flag 'is:set:*:*' */
-/* @flag Context.Release!Debug CTXF ((Context*)%s)->flag 'is:set:is:set' */
-/* @flag Context.Admin CTXF ((Context*)%s)->flag 'is:set:*:*' */
-/* @flag Context.Strict CTXF ((Context*)%s)->flag 'is:set:*:*' */
-/* @flag Context.Compiling CTXF ((Context*)%s)->flag 'is:set:*:*' */
+/* @flag Context.Strict CTXF ((Context*)%s)->flag 'is:set:is:set' */
+/* @flag Context.Debug  CTXF ((Context*)%s)->flag 'is:set:is:set' */
 /* @flag Context.Verbose CTXF ((Context*)%s)->flag 'is:set:is:set' */
-/* @flag Context.Verbose2 CTXF ((Context*)%s)->flag 'is:set:is:set' */
-/* @flag Context.Interactive CTXF ((Context*)%s)->flag 'is:set:*:*' */
+
+/* @flag Context.Trusted CTXF ((Context*)%s)->flag 'is:set:is:*' */
+/* @flag Context.Interactive CTXF ((Context*)%s)->flag 'is:set:is:*' */
+/* @flag Context.Compiling CTXF ((Context*)%s)->flag 'is:set:*:*' */
 
 /* ------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------ */

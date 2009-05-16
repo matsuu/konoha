@@ -339,22 +339,22 @@ METHOD knh__Exception_isGenerated(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 static 
-METHOD knh__Context_isRelease(Ctx *ctx, knh_sfp_t *sfp)
+METHOD knh__Context_isStrict(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Boolean(ctx, sfp, knh_Context_isRelease((knh_Context_t*)sfp[0].o));
+	KNH_RETURN_Boolean(ctx, sfp, knh_Context_isStrict((knh_Context_t*)sfp[0].o));
 }
 
 static
+METHOD knh__Context_setStrict(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_Context_setStrict((knh_Context_t*)sfp[0].o, p_bool(sfp[1]));
+	KNH_RETURN_void(ctx, sfp);
+}
+
+static 
 METHOD knh__Context_isDebug(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Boolean(ctx, sfp, !(knh_Context_isDebug((knh_Context_t*)sfp[0].o)));
-}
-
-static
-METHOD knh__Context_setRelease(Ctx *ctx, knh_sfp_t *sfp)
-{
-	knh_Context_setRelease((knh_Context_t*)sfp[0].o, p_bool(sfp[1]));
-	KNH_RETURN_void(ctx, sfp);
+	KNH_RETURN_Boolean(ctx, sfp, knh_Context_isDebug((knh_Context_t*)sfp[0].o));
 }
 
 static
@@ -378,16 +378,15 @@ METHOD knh__Context_setVerbose(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 static 
-METHOD knh__Context_isVerbose2(Ctx *ctx, knh_sfp_t *sfp)
+METHOD knh__Context_isTrusted(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Boolean(ctx, sfp, knh_Context_isVerbose2((knh_Context_t*)sfp[0].o));
+	KNH_RETURN_Boolean(ctx, sfp, knh_Context_isTrusted((knh_Context_t*)sfp[0].o));
 }
 
-static
-METHOD knh__Context_setVerbose2(Ctx *ctx, knh_sfp_t *sfp)
+static 
+METHOD knh__Context_isInteractive(Ctx *ctx, knh_sfp_t *sfp)
 {
-	knh_Context_setVerbose2((knh_Context_t*)sfp[0].o, p_bool(sfp[1]));
-	KNH_RETURN_void(ctx, sfp);
+	KNH_RETURN_Boolean(ctx, sfp, knh_Context_isInteractive((knh_Context_t*)sfp[0].o));
 }
 
 /* ======================================================================== */

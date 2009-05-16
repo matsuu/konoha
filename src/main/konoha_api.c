@@ -123,19 +123,18 @@ KNHAPI(Ctx*) konoha_getThreadContext(Ctx *ctx)
 /* ======================================================================== */
 /* [option] */
 
-static int debugMode = 0;
+static int debugMode2 = 0;    // this is -d2 debug mode for konoha itself
 
 /* ----------------------------------------------------------------------- */
 
-KNHAPI(int) konoha_isDebugMode()
+KNHAPI(int) konoha_isDebugMode2()
 {
-	return debugMode;
+	return debugMode2;
 }
 
 /* ----------------------------------------------------------------------- */
 
-static
-void konoha_checksize()
+static void konoha_dumpInit()
 {
 	fprintf(stderr, "sizeof(knh_int_t)=%lu, sizeof(void*)=%lu\n", sizeof(knh_intptr_t), sizeof(void*));
 	KNH_ASSERT(sizeof(knh_intptr_t) == sizeof(void*));
@@ -157,7 +156,7 @@ KNHAPI(int) konoha_parseopt(konoha_t konoha, int argc, char **argv)
 		char *t = argv[n];
 		if(t[0] != '-') return n;
 		if(t[1] == 's' && t[2] == 0) {
-			knh_Context_setAdmin(konoha.ctx, 1);
+			knh_Context_setTrusted(konoha.ctx, 1);
 		}
 		if(t[1] == 'c' && t[2] == 0) {
 			knh_Context_setCompiling(konoha.ctx, 1);
@@ -165,9 +164,12 @@ KNHAPI(int) konoha_parseopt(konoha_t konoha, int argc, char **argv)
 		if(t[1] == 'v') {
 			knh_Context_setVerbose(konoha.ctx, 1);
 		}
+		if(t[1] == 'g') {
+			knh_Context_setDebug(konoha.ctx, 1);
+		}
 		if(t[1] == 'd' && t[2] == '2' && t[3] == 0) {
-			debugMode = 1;
-			konoha_checksize();
+			debugMode2 = 1;
+			konoha_dumpInit();
 		}
 	}
 	return n;
@@ -403,6 +405,7 @@ KNHAPI(void) konoha_shell(konoha_t konoha)
 	Ctx *ctx = konoha.ctx;
 	konoha_setCurrenContext(ctx);
 	knh_Context_setInteractive(ctx, 1);
+	knh_Context_setDebug(ctx, 1);
 	{
 		knh_System__dump(ctx, ctx->sys, KNH_STDOUT, (String*)KNH_NULL);
 		int linenum, linecnt = 0;
