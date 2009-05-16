@@ -49,13 +49,49 @@ static METHOD knh__InputStream_new(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
+/* @method Int! InputStream.getChar() */
+
+static METHOD knh__InputStream_getChar(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN_Int(ctx, sfp, knh_InputStream_getc(ctx, (InputStream*)sfp[0].o));
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Int! InputStream.read(Bytes! buf, Int offset, Int len) */
+
+static METHOD knh__InputStream_read(Ctx *ctx, knh_sfp_t *sfp)
+{
+	Bytes *ba = (Bytes*)sfp[1].o;
+	knh_bytes_t buf = knh_Bytes_tobytes(ba);
+	size_t offset = 0;
+	if(IS_Int(sfp[2].o)) {
+		offset = (size_t)sfp[2].ivalue;
+		KNH_THROW_OUTOFINDEX(ctx, offset, buf.len);
+		buf = knh_bytes_last(buf, offset);
+	}
+	if(IS_Int(sfp[3].o)) {
+		size_t len = (size_t)sfp[3].ivalue;
+		knh_Bytes_ensureSize(ctx, ba, offset + len);
+		buf.len = len;
+	}
+	KNH_RETURN_Int(ctx, sfp, knh_InputStream_read(ctx, (InputStream*)sfp[0].o, (char*)buf.buf, buf.len));
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method String! InputStream.getEncoding() */
+
+static METHOD knh__InputStream_getEncoding(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN(ctx, sfp, DP((InputStream*)sfp[0].o)->enc);
+}
+
+/* ------------------------------------------------------------------------ */
 /* @method Boolean! InputStream.isClosed() */
 
 static METHOD knh__InputStream_isClosed(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_InputStream_isClosed((InputStream*)sfp[0].o));
 }
-
 
 /* ======================================================================== */
 /* [iterators] */
@@ -112,9 +148,9 @@ static METHOD knh__OutputStream_new(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method void OutputStream.putc(Int! ch) */
+/* @method void OutputStream.putChar(Int! ch) */
 
-static METHOD knh__OutputStream_putc(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__OutputStream_putChar(Ctx *ctx, knh_sfp_t *sfp)
 {
 	Bytes *ba = DP(sfp[0].w)->ba;
 	KNH_ASSERT(IS_Bytes(ba));
@@ -226,6 +262,14 @@ void knh_OutputStream__k(Ctx *ctx, OutputStream *o, OutputStream *w, String *m)
 	knh_putc(ctx, w, '\'');
 	knh_print(ctx, w, knh_String_tobytes(DP(o)->urn));
 	knh_putc(ctx, w, '\'');
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method String! OutputStream.getEncoding() */
+
+static METHOD knh__OutputStream_getEncoding(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN(ctx, sfp, DP((OutputStream*)sfp[0].o)->enc);
 }
 
 /* ======================================================================== */
