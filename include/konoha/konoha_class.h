@@ -444,6 +444,7 @@ typedef struct knh_MethodField_t {
 /* @class Method Object knh_Method_struct */
 /* @flag Method.Private!Public MF DP((Method*)%s)->flag 'is:set:is:*' */
 /* @flag Method.Virtual!Final MF DP((Method*)%s)->flag 'is:set:is:*' */
+/* @flag Method.Release!Debug MF DP((Method*)%s)->flag 'is:set:*:*' */
 /* @flag Method.Const  MF DP((Method*)%s)->flag 'is:*:is:*' */
 /* @flag Method.Static MF DP((Method*)%s)->flag 'is:*:is:*' */
 /* @flag Method.NullBase MF DP((Method*)%s)->flag 'is:*:is:*' */
@@ -902,6 +903,9 @@ typedef struct knh_tokens_t {
 /* @flag Stmt.Memo1 STMTF SP(%s)->flag 'is:set:*:*' */
 
 /* MAPCAST */
+/* DEBUG {} */
+#define knh_Stmt_isDEBUG(s)       knh_Stmt_isMemo1(s)
+#define knh_Stmt_setDEBUG(s,b)    knh_Stmt_setMemo1(s,b)
 
 #define knh_Stmt_isNNCAST(s)       knh_Stmt_isMemo1(s)
 #define knh_Stmt_setNNCAST(s,b)    knh_Stmt_setMemo1(s,b)

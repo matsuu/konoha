@@ -244,19 +244,6 @@ knh_flag_t knh_StmtPRINT_flag(Ctx *ctx, Stmt *o)
 /* ======================================================================== */
 /* [Annotation] */
 
-//knh_bool_t knh_StmtMETA_isHistoric(Stmt *o)
-//{
-//	if(IS_NOTNULL(DP(o)->metaDictMap)) {
-//		Object *v = knh_DictMap_get__b(ctx, DP(o)->metaDictMap, STEXT("Historic"));
-//		if(IS_NOTNULL(v)) return 1;
-////		v = knh_DictMap_get__b(ctx, DP(o)->metaDictMap, STEXT("historic"));
-////		if(IS_NOTNULL(v)) return 1;
-//	}
-//	return 0;  /* @Historic */
-//}
-
-/* ------------------------------------------------------------------------ */
-
 knh_bool_t knh_StmtMETA_isOverride(Ctx *ctx, Stmt *o)
 {
 	if(IS_DictMap(DP(o)->metaDictMap)) {
@@ -264,6 +251,17 @@ knh_bool_t knh_StmtMETA_isOverride(Ctx *ctx, Stmt *o)
 		if(IS_NOTNULL(v)) return 1;
 	}
 	return 0;  /* @Historic */
+}
+
+/* ------------------------------------------------------------------------ */
+
+int knh_Stmt_hasMETA(Ctx *ctx, Stmt *stmt, knh_bytes_t name)
+{
+	if(IS_DictMap(DP(stmt)->metaDictMap)) {
+		Object *v = knh_DictMap_get__b(ctx, DP(stmt)->metaDictMap, name);
+		if(IS_NOTNULL(v)) return 1;
+	}
+	return 0;
 }
 
 /* ======================================================================== */

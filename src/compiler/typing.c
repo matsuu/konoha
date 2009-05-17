@@ -1519,7 +1519,7 @@ static Term *knh_StmtCALL_toCONST(Ctx *ctx, Stmt *stmt, Method *mtd)
 		KNH_MOV(ctx, lsfp[i].o, DP(tk)->data);
 		KNH_UNBOX(ctx, &lsfp[i]);
 	}
-	DEBUG3("STMT TO CONST ..");
+	DBG2_P("STMT TO CONST ..");
 	KNH_SCALL(ctx, lsfp, 0, mtd, DP(stmt)->size);
 	KNH_BOX(ctx, &lsfp[0], knh_Method_rztype(mtd));
 	knh_Token_setCONST(ctx, DP(stmt)->tokens[0], lsfp[0].o);
@@ -1549,7 +1549,7 @@ Term *knh_StmtPARAMS_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_c
 
 	for(i = 0; i < knh_Method_psize(mtd); i++) {
 		knh_type_t reqt = knh_pmztype_totype(ctx, knh_Method_pztype(mtd, i), mtd_cid);
-		size_t n = i + 2; //DEBUG3("reqt[%d]=%d,%s%s", n, reqt, TYPEQN(reqt));
+		size_t n = i + 2; //DBG2_P("reqt[%d]=%d,%s%s", n, reqt, TYPEQN(reqt));
 		if(n < size) {
 			if(!TERMs_typing(ctx, stmt, n, abr, ns, reqt, TCHECK_)) {
 				return NULL;
@@ -1843,12 +1843,12 @@ Term *knh_StmtCALLBASE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh
 	else {
 		char bufmn[CLASSNAME_BUFSIZ];
 		knh_format_methodn(ctx, bufmn, sizeof(bufmn), mn);
-		//DEBUG3("0. lookup closure..");
+		//DBG2_P("0. lookup closure..");
 		if(knh_TokenNAME_isClosure(ctx, DP(stmt)->tokens[0], abr)) {
 			return knh_StmtINVOKE_typing(ctx, stmt, abr, ns);
 		}
 
-		//DEBUG3("1. lookup function.. %s()", bufmn);
+		//DBG2_P("1. lookup function.. %s()", bufmn);
 		knh_class_t mtd_cid = knh_NameSpace_getFuncClass(ctx, ns, B(bufmn));
 		if(mtd_cid != CLASS_unknown) {
 			KNH_ASSERT_cid(mtd_cid);
@@ -1856,7 +1856,7 @@ Term *knh_StmtCALLBASE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh
 			return TM(stmt);
 		}
 
-		//DEBUG3("2. lookup this.%s()", bufmn);
+		//DBG2_P("2. lookup this.%s()", bufmn);
 		if(DP(abr)->vars[0].fn == FIELDN_this) {
 			mtd_cid = CLASS_type(DP(abr)->vars[0].type);
 			Method *mtd = knh_Class_getMethod(ctx, mtd_cid, mn);
@@ -1866,7 +1866,7 @@ Term *knh_StmtCALLBASE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh
 			}
 		}
 
-		//DEBUG3("3. lookup script function %s()", bufmn);
+		//DBG2_P("3. lookup script function %s()", bufmn);
 		Script *scr = knh_Asm_getScript(ctx, abr);
 		mtd_cid = knh_Object_cid(scr);
 		Method *mtd = knh_Class_getMethod(ctx, mtd_cid, mn);
@@ -2353,14 +2353,14 @@ Term *knh_StmtMAPCAST_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_
 
 	if(mprcid == exprc || knh_class_instanceof(ctx, mprcid, exprc)) {
 		if(knh_Token_isNotNullType(tk)) {
-			DEBUG3("Nonnull cast");
+			DBG2_P("Nonnull cast");
 			if(!IS_NNTYPE(exprt)) {
 				knh_Stmt_setNNCAST(stmt, 1);
 				knh_Token_toMPR(ctx, tk, mprcid, (Mapper*)KNH_NULL);
 				return TM(stmt);
 			}
 		}
-		DEBUG3("UPCAST (%s)%s", CLASSN(mprcid), CLASSN(exprc));
+		DBG2_P("UPCAST (%s)%s", CLASSN(mprcid), CLASSN(exprc));
 		return DP(stmt)->terms[1];
 	}
 
@@ -2371,7 +2371,7 @@ Term *knh_StmtMAPCAST_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_
 	}
 
 	if(knh_Mapper_isConst(mpr) && TERMs_isCONST(stmt, 1)) {
-		DEBUG3("MAPCAST TO CONST ..");
+		DBG2_P("MAPCAST TO CONST ..");
 		Token *tk2 = DP(stmt)->tokens[1];
 		knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 		KNH_MOV(ctx, lsfp[0].o, DP(tk2)->data);
@@ -2524,7 +2524,7 @@ Term *knh_StmtEXPR_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_cla
 	case STT_TRI:
 		return knh_StmtTRI_typing(ctx, stmt, abr, ns, reqt);
 	default:
-		DEBUG3("undefined stmt=%s", knh_stmt_tochar(stt));
+		DBG2_P("undefined stmt=%s", knh_stmt_tochar(stt));
 	}
 	return NULL;
 }
@@ -2783,7 +2783,7 @@ Term *knh_StmtFOREACH_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	knh_class_t itrcid = CLASS_unknown;
 	if(TERMs_isASIS(stmt, FOREACH_type)) {  /* foreach(n in itr) */
 		knh_index_t idx = knh_Asm_indexOfVariable(abr, fn);
-		if(idx == -1) { //DEBUG3("type inferencing..");
+		if(idx == -1) { //DBG2_P("type inferencing..");
 			if(!TERMs_typing(ctx, stmt, FOREACH_iter, abr, ns, TYPE_Any, TWARN_)) {
 				return NULL;
 			}
@@ -2807,11 +2807,11 @@ Term *knh_StmtFOREACH_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 			goto L_BLOCK;
 		}
 	}
-	else { //DEBUG3("defined type .."); /* foreach(String line in itr) */
+	else { //DBG2_P("defined type .."); /* foreach(String line in itr) */
 		type = knh_Token_gettype(ctx, StmtFOREACH_type(stmt), ns, CLASS_Any);
 		type = knh_pmztype_totype(ctx, type, DP(abr)->this_cid);
 		knh_index_t idx = knh_Asm_indexOfVariable(abr, fn);
-		if(idx == -1) { //DEBUG3("defining new type ..");
+		if(idx == -1) { //DBG2_P("defining new type ..");
 			knh_Asm_declareLocalVariable(ctx, abr, /*flag*/0, type, fn, KNH_NULL);
 		}
 	}
@@ -3435,7 +3435,7 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	else {
 		size_t i, mfsize = DP(abr)->vars_size;
 		MethodField *mf = DP(mtd)->mf;
-		//DEBUG3("(mtd)->cid=%s, mtd_cid=%s", CLASSN(DP(mtd)->cid), CLASSN(mtd_cid));
+		//DBG2_P("(mtd)->cid=%s, mtd_cid=%s", CLASSN(DP(mtd)->cid), CLASSN(mtd_cid));
 		if(DP(mtd)->cid != mtd_cid) { /* Overriding */
 			if(knh_Method_isFinal(mtd)) { /* CHECK @Final */
 				knh_Asm_perrorMTD(ctx, abr, KMSG_EOVERRIDE, DP(mtd)->cid, mn);
@@ -3478,7 +3478,7 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		DBG2_(knh_Method__dump(ctx, mtd, KNH_STDOUT, (String*)KNH_NULL););
 		knh_Token_setCONST(ctx, StmtMETHOD_method(stmt), UP(mtd));
 		if(DP(stmt)->size == 4) {
-			DEBUG3("@Abstract");
+			DBG2_P("@Abstract");
 		}
 		else {
 			knh_Stmt_checkLastReturn(ctx, StmtMETHOD_instmt(stmt), mtd);
@@ -3540,7 +3540,7 @@ void knh_Asm_declareClassField(Ctx *ctx, Asm *abr, NameSpace* ns, knh_class_t ci
 	{
 		int i, fsize = DP(abr)->vars_size;
 		knh_cfield_t *cf = (knh_cfield_t*)KNH_MALLOC(ctx, sizeof(knh_cfield_t) * fsize);
-		//DEBUG3("class %s fsize=%d", CLASSN(cid), fsize);
+		//DBG2_P("class %s fsize=%d", CLASSN(cid), fsize);
 		for(i = 0; i < fsize; i++) {
 			cf[i].flag = DP(abr)->vars[i].flag;
 			cf[i].type = DP(abr)->vars[i].type;

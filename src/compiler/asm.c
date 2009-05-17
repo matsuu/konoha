@@ -1977,7 +1977,7 @@ knh_labelid_t knh_Asm_pushLabelStack(Ctx *ctx, Asm *abr, Stmt *stmt)
 		SP(ltk)->tt = TT_LABEL;
 	}
 	else {
-		DEBUG3("label=%s", sToken(ltk));
+		DBG2_P("label=%s", sToken(ltk));
 	}
 	DP(ltk)->index = (DP(abr)->llstep)++;
 	knh_Array_add(ctx, DP(abr)->lstacks, UP(ltk));
@@ -2288,6 +2288,14 @@ void knh_StmtERR_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 /* ======================================================================== */
 /* [PRINT] */
 
+static int knh_Asm_isDEBUG(Ctx *ctx, Asm *abr)
+{
+	if(knh_Method_isRelease(DP(abr)->mtd)) return 0;
+	return knh_Context_isDebug(ctx);
+}
+
+/* ------------------------------------------------------------------------ */
+
 static
 knh_methodn_t knh_Stmt_getMT(Ctx *ctx, Stmt *stmt, size_t n)
 {
@@ -2305,7 +2313,7 @@ knh_methodn_t knh_Stmt_getMT(Ctx *ctx, Stmt *stmt, size_t n)
 
 void knh_StmtPRINT_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 {
-	if(!knh_Context_isDebug(ctx) || DP(stmt)->size == 0) {
+	if(!knh_Asm_isDEBUG(ctx, abr) || DP(stmt)->size == 0) {
 		return ;
 	}
 	knh_flag_t flag = knh_StmtPRINT_flag(ctx, stmt);
@@ -2351,11 +2359,15 @@ void knh_StmtPRINT_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 
 void knh_StmtASSERT_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 {
-	if(!knh_Context_isDebug(ctx)) {
-		return ;
+	if(!knh_Stmt_hasMETA(ctx, stmt, STEXT("@Release"))) {
+		if(!knh_Asm_isDEBUG(ctx, abr)) {
+			return ;
+		}
 	}
 	knh_labelid_t lbskip = knh_Asm_newLabelId(ctx, abr, NULL);
-	KNH_ASM_SKIP_(ctx, abr, lbskip);
+	if(!knh_Stmt_hasMETA(ctx, stmt, STEXT("@Release"))) {
+		KNH_ASM_SKIP_(ctx, abr, lbskip);
+	}
 
 	/* if */
 	TERMs_ASM_JIFT(ctx, stmt, 0, abr, lbskip);
@@ -2376,7 +2388,14 @@ void knh_Stmt_asmBLOCK(Ctx *ctx, Stmt *stmt, Asm *abr, int isIteration)
 		KNH_ASM_SETLINE(ctx, abr, SP(cur)->line);
 		switch(SP(cur)->stt) {
 		case STT_BLOCK:
-			knh_Stmt_asmBLOCK(ctx, DP(stmt)->stmts[0], abr, 1); break;
+			if(!knh_Stmt_isDEBUG(stmt)) {
+				knh_Stmt_asmBLOCK(ctx, DP(stmt)->stmts[0], abr, 1); break;
+			}
+			else {
+				if(knh_Asm_isDEBUG(ctx, abr)) {
+					knh_Stmt_asmBLOCK(ctx, DP(stmt)->stmts[0], abr, 1); break;
+				}
+			}
 		case STT_LET:
 			knh_StmtLET_asm(ctx, cur, abr, TYPE_void, DP(abr)->stack); break;
 		case STT_REGISTER:

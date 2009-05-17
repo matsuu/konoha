@@ -35,8 +35,8 @@
 extern "C" {
 #endif
 
-#undef DEBUG3
-#define DEBUG3(fmt, ...)
+#undef DBG2_P
+#define DBG2_P(fmt, ...)
 
 /* ======================================================================== */
 /* [data] */
@@ -988,7 +988,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 	NUM_PART:;  /* 0x0000 */
 	{
 		int unit = 0;
-		//DEBUG3("=> NUM_PART");
+		//DBG2_P("=> NUM_PART");
 		while((ch = knh_InputStream_getc(ctx, in)) != EOF) {
 			NUM_PART_INLOOP:;
 			switch(ch) {
@@ -1090,7 +1090,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 
 	URN_PART:;
 	{
-		DEBUG3("=> URN_PART");
+		DBG2_P("=> URN_PART");
 		while((ch = knh_InputStream_getc(ctx, in)) != EOF) {
 			URN_PART_INLOOP:;
 			switch(ch) {
