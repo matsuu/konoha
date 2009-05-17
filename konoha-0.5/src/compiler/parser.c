@@ -1803,7 +1803,7 @@ void knh_Stmt_toLVALUE(Ctx *ctx, Stmt *stmt, int pe)
 			TODO();
 		}
 	}
-	DEBUG3("stt=%s", knh_stmt_tochar(SP(stmt)->stt));
+	DBG2_P("stt=%s", knh_stmt_tochar(SP(stmt)->stt));
 	SP(stmt)->stt = STT_ERR;
 	knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, pe, NULL);
 
@@ -1857,7 +1857,6 @@ Stmt *new_StmtLETMULTI(Ctx *ctx, knh_tokens_t *lvalue_tc, knh_tokens_t *rvalue_t
 	Stmt *stmt_head = new_StmtLET(ctx, &cma_tc, rvalue_tc);
 	Stmt *stmt = new_Stmt(ctx, 0, STT_LETMULTI);
 	while(cma_tc.c < cma_tc.e) {
-		DEBUG3_STC("cma_tc", cma_tc);
 		knh_Stmt_add_VARN(ctx, stmt, &cma_tc);
 		cma_tc = knh_tokens_splitEXPR(ctx, lvalue_tc, TT_COMMA);
 	}
@@ -2027,18 +2026,18 @@ void knh_Stmt_addMETA(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 	int i;
 	for(i = tc->meta; i < tc->c; i++) {
 		if(SP(ts[i])->tt == TT_LABEL) {
-			DEBUG3("LABEL!! %s", sToken(ts[i]));
+			DBG2_P("LABEL!! %s", sToken(ts[i]));
 			knh_StmtMETA_addLabel(ctx, o, ts[i]);
 			continue;
 		}
 		if(SP(ts[i])->tt == TT_METAN) {
 			if(DP(ts[i])->tt_next == TT_PARENTHESIS) {
-				DEBUG3("META2!! %s", sToken(ts[i-1]));
+				DBG2_P("META2!! %s", sToken(ts[i-1]));
 				knh_StmtMETA_addMeta2(ctx, o, (String*)DP(ts[i-1])->data, ts[i]);
 				i++;
 			}
 			else {
-				DEBUG3("META!! %s", sToken(ts[i]));
+				DBG2_P("META!! %s", sToken(ts[i]));
 				knh_StmtMETA_addMeta(ctx, o, (String*)DP(ts[i])->data);
 			}
 			continue;
@@ -2632,7 +2631,7 @@ knh_Stmt_add_PEACH(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 	}
 
 	if(!(from_tc.c < from_tc.e)) {
-		DEBUG3("NO FROM!! c=%d, e=%d", from_tc.c, from_tc.e);
+		DBG2_P("NO FROM!! c=%d, e=%d", from_tc.c, from_tc.e);
 		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_ESYNTAX);
 		return;
 	}
@@ -3029,11 +3028,27 @@ static void konohac_pragma(Ctx *ctx, knh_tokens_t *tc)
 }
 
 /* ------------------------------------------------------------------------ */
+/* [SPECIAL] */
+
+static int knh_Token_isDEBUG(Token *tk)
+{
+	if(DP(tk)->tt_next == TT_BRACE) {
+		String *s = DP(tk)->text;
+		if(IS_String(s)) {
+			return (knh_bytes_strcasecmp(knh_String_tobytes(s), STEXT("DEBUG")) == 0);
+		}
+	}
+	return 0;
+}
+
+/* ------------------------------------------------------------------------ */
 /* [STMT1] */
 
 static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 {
 	Token *tkc = NULL;
+	tc->meta = -1;
+
 	L_TAIL:;
 	if(!(tc->c < tc->e)) {
 		DBG2_P("c = %d, e = %d", tc->c, tc->e);
@@ -3041,8 +3056,13 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 	}
 
 	tkc = tc->ts[tc->c];
-	tc->meta = -1;
 	tc->c += 1;
+	if(knh_Token_isDEBUG(tkc)) {
+		Stmt *stmt = new_StmtBLOCK(ctx, tc);
+		knh_Stmt_setDEBUG(stmt, 1);
+		return stmt;
+	}
+
 	switch(SP(tkc)->tt) {
 
 	case TT_LABEL:
@@ -3055,7 +3075,7 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 			tc->c += 1;
 		}
 		if(DP(tkc)->tt_next == TT_BRACE) {
-			DBG2_P("Found DATA '@%s', tc->meta=%d", sToken(tkc), tc->meta);
+			//DBG2_P("Found DATA '@%s', tc->meta=%d", sToken(tkc), tc->meta);
 			tc->c += 1;
 		}
 		if(DP(tkc)->tt_next == TT_TYPEN) {
@@ -3096,8 +3116,6 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 		return new_StmtWEAVE(ctx, tc);
 	case TT_ASPECT:
 		return new_StmtASPECT(ctx, tc);
-//	case TT_BLOCK:
-//		return new_StmtBLOCK(ctx, tc);
 	case TT_IF:
 		return new_StmtIF(ctx, tc);
 	case TT_ELSE:

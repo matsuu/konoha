@@ -489,6 +489,7 @@ knh_flag_t knh_StmtMETHOD_flag(Ctx *ctx, Stmt *o);
 knh_flag_t knh_Stmt_metaflag__field(Ctx *ctx, Stmt *b);
 knh_flag_t knh_StmtPRINT_flag(Ctx *ctx, Stmt *o);
 knh_bool_t knh_StmtMETA_isOverride(Ctx *ctx, Stmt *o);
+int knh_Stmt_hasMETA(Ctx *ctx, Stmt *stmt, knh_bytes_t name);
 void knh_Stmt__s(Ctx *ctx, Stmt *o, OutputStream *w, String *m);
 void knh_Stmt__dump(Ctx *ctx, Stmt *o, OutputStream *w, String *m);
 /* ../src/compiler/token.c */

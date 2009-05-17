@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-#define KONOHA_BUILDID                  554
+#define KONOHA_BUILDID                  555
 
 /* ======================================================================== */
 
@@ -370,19 +370,34 @@ extern "C" {
 #define knh_Method_setFinal(o,b)  \
 	if(b) DP((Method*)o)->flag &= ~(KNH_FLAG_MF_VIRTUAL); else DP((Method*)o)->flag |= KNH_FLAG_MF_VIRTUAL;
 
-#define KNH_FLAG_MF_CONST               KNH_FLAG_T2
+#define KNH_FLAG_MF_RELEASE             KNH_FLAG_T2
+
+#define knh_Method_isRelease(o)  \
+	((DP((Method*)o)->flag & KNH_FLAG_MF_RELEASE) == KNH_FLAG_MF_RELEASE)
+
+#define knh_Method_isDebug(o)   \
+	((DP((Method*)o)->flag & KNH_FLAG_MF_RELEASE) != KNH_FLAG_MF_RELEASE)
+
+#define knh_Method_setRelease(o,b)  \
+	if(b) DP((Method*)o)->flag |= KNH_FLAG_MF_RELEASE; else DP((Method*)o)->flag &= ~(KNH_FLAG_MF_RELEASE);
+
+
+#define knh_Method_setDebug(o,b)  \
+	if(b) DP((Method*)o)->flag &= ~(KNH_FLAG_MF_RELEASE); else DP((Method*)o)->flag |= KNH_FLAG_MF_RELEASE;
+
+#define KNH_FLAG_MF_CONST               KNH_FLAG_T3
 
 #define knh_Method_isConst(o)  \
 	((DP((Method*)o)->flag & KNH_FLAG_MF_CONST) == KNH_FLAG_MF_CONST)
-#define KNH_FLAG_MF_STATIC              KNH_FLAG_T3
+#define KNH_FLAG_MF_STATIC              KNH_FLAG_T4
 
 #define knh_Method_isStatic(o)  \
 	((DP((Method*)o)->flag & KNH_FLAG_MF_STATIC) == KNH_FLAG_MF_STATIC)
-#define KNH_FLAG_MF_NULLBASE            KNH_FLAG_T4
+#define KNH_FLAG_MF_NULLBASE            KNH_FLAG_T5
 
 #define knh_Method_isNullBase(o)  \
 	((DP((Method*)o)->flag & KNH_FLAG_MF_NULLBASE) == KNH_FLAG_MF_NULLBASE)
-#define KNH_FLAG_MF_VARARGS             KNH_FLAG_T5
+#define KNH_FLAG_MF_VARARGS             KNH_FLAG_T6
 
 #define knh_Method_isVarArgs(o)  \
 	((DP((Method*)o)->flag & KNH_FLAG_MF_VARARGS) == KNH_FLAG_MF_VARARGS)
@@ -390,7 +405,7 @@ extern "C" {
 #define knh_Method_setVarArgs(o,b)  \
 	if(b) DP((Method*)o)->flag |= KNH_FLAG_MF_VARARGS; else DP((Method*)o)->flag &= ~(KNH_FLAG_MF_VARARGS);
 
-#define KNH_FLAG_MF_GENERATOR           KNH_FLAG_T6
+#define KNH_FLAG_MF_GENERATOR           KNH_FLAG_T7
 
 #define knh_Method_isGenerator(o)  \
 	((DP((Method*)o)->flag & KNH_FLAG_MF_GENERATOR) == KNH_FLAG_MF_GENERATOR)
@@ -398,7 +413,7 @@ extern "C" {
 #define knh_Method_setGenerator(o,b)  \
 	if(b) DP((Method*)o)->flag |= KNH_FLAG_MF_GENERATOR; else DP((Method*)o)->flag &= ~(KNH_FLAG_MF_GENERATOR);
 
-#define KNH_FLAG_MF_ASPECT              KNH_FLAG_T7
+#define KNH_FLAG_MF_ASPECT              KNH_FLAG_T8
 
 #define knh_Method_isAspect(o)  \
 	((DP((Method*)o)->flag & KNH_FLAG_MF_ASPECT) == KNH_FLAG_MF_ASPECT)
@@ -406,7 +421,7 @@ extern "C" {
 #define knh_Method_setAspect(o,b)  \
 	if(b) DP((Method*)o)->flag |= KNH_FLAG_MF_ASPECT; else DP((Method*)o)->flag &= ~(KNH_FLAG_MF_ASPECT);
 
-#define KNH_FLAG_MF_OBJECTCODE          KNH_FLAG_T8
+#define KNH_FLAG_MF_OBJECTCODE          KNH_FLAG_T9
 
 #define knh_Method_isObjectCode(o)  \
 	((DP((Method*)o)->flag & KNH_FLAG_MF_OBJECTCODE) == KNH_FLAG_MF_OBJECTCODE)
@@ -414,7 +429,7 @@ extern "C" {
 #define knh_Method_setObjectCode(o,b)  \
 	if(b) DP((Method*)o)->flag |= KNH_FLAG_MF_OBJECTCODE; else DP((Method*)o)->flag &= ~(KNH_FLAG_MF_OBJECTCODE);
 
-#define KNH_FLAG_MF_GENERATED           KNH_FLAG_T9
+#define KNH_FLAG_MF_GENERATED           KNH_FLAG_T10
 
 #define knh_Method_isGenerated(o)  \
 	((DP((Method*)o)->flag & KNH_FLAG_MF_GENERATED) == KNH_FLAG_MF_GENERATED)
