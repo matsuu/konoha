@@ -268,38 +268,6 @@ static void knh_Stmt_add_PATH(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 	}
 }
 
-///* ------------------------------------------------------------------------ */
-//
-//static int knh_Token_isMETHODN(Token *tk)
-//{
-//	if(SP(tk)->tt == TT_NAME) {
-//		knh_bytes_t t = knh_Token_tobytes(ctx, tk);
-//		if(isupper(t.buf[0])) {
-//			size_t i;
-//			for(i = 0; i < t.len; i++) {
-//				if(t.buf[i] == '_' || t.buf[i] == '.') return 0;
-//			}
-//		}
-//		return 1;
-//	}
-//	return 0;
-//}
-//
-///* ------------------------------------------------------------------------ */
-///* [METHODN] */
-//
-//static void knh_Stmt_add_METHODN(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
-//{
-//	if(SP(o)->stt == STT_ERR) return;
-//	if(tc->c < tc->e && knh_Token_isMETHODN(tc->ts[tc->c])) {
-//		knh_Stmt_add(ctx, o, UP(tc->ts[tc->c]));
-//		tc->c += 1;
-//	}
-//	else {
-//		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_TNAME);
-//	}
-//}
-
 /* ------------------------------------------------------------------------ */
 
 static int knh_Token_isVARN(Token *tk)

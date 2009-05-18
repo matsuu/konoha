@@ -255,7 +255,7 @@ knh_bool_t knh_StmtMETA_isOverride(Ctx *ctx, Stmt *o)
 
 /* ------------------------------------------------------------------------ */
 
-int knh_Stmt_hasMETA(Ctx *ctx, Stmt *stmt, knh_bytes_t name)
+int knh_StmtMETA_is(Ctx *ctx, Stmt *stmt, knh_bytes_t name)
 {
 	if(IS_DictMap(DP(stmt)->metaDictMap)) {
 		Object *v = knh_DictMap_get__b(ctx, DP(stmt)->metaDictMap, name);

@@ -2359,13 +2359,13 @@ void knh_StmtPRINT_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 
 void knh_StmtASSERT_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 {
-	if(!knh_Stmt_hasMETA(ctx, stmt, STEXT("@Release"))) {
+	if(!knh_StmtMETA_is(ctx, stmt, STEXT("@Release"))) {
 		if(!knh_Asm_isDEBUG(ctx, abr)) {
 			return ;
 		}
 	}
 	knh_labelid_t lbskip = knh_Asm_newLabelId(ctx, abr, NULL);
-	if(!knh_Stmt_hasMETA(ctx, stmt, STEXT("@Release"))) {
+	if(!knh_StmtMETA_is(ctx, stmt, STEXT("@Release"))) {
 		KNH_ASM_SKIP_(ctx, abr, lbskip);
 	}
 
