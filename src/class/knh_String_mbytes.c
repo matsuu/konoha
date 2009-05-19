@@ -171,6 +171,117 @@ knh_bytes_t knh_bytes_mofflen(knh_bytes_t m, size_t moff, size_t mlen)
 	return knh_bytes_offlen(m, moff, mlen); /* if KONOHA_ENCODING is not set */
 }
 
+  /*
+static void show_binary(unsigned int n)
+{
+  int buf[32];
+  int i=0, j=0;
+  while (n > 0) {
+	buf[i] = n % 2;
+	n = (unsigned int)(n / 2);
+	i++;
+  }
+  for(j=0; j < i; j++){
+	printf("%d", buf[j]);
+  }
+  printf("\n");
+  
+}
+  */
+
+  /* utf8 -> ucs4 */
+knh_int_t knh_uchar_toucs4(knh_uchar_t *utf8)
+{
+  /* BOM bigendinan */
+  size_t len  = strlen((char *)utf8);
+  knh_int_t ucs4 = 0;
+  int i= 0;
+  knh_uchar_t ret = 0;
+  if (!knh_bytes_checkUTF8_isSingleton(utf8[0])) {
+	knh_ushort_t length_utf8 = knh_bytes_checkUTF8_getBytes(utf8[i]);
+	knh_uchar_t mask = (knh_uchar_t)(1 << 0 | 1 << 1 | 1 << 2 | 1 << 3);
+	
+	switch(length_utf8){
+	case 2:
+	  /* 110xxxxx 10xxxxxx */
+	  
+	  break;
+	case 3:
+	  /* format 1110xxxx 10xxxxxx 10xxxxxx */
+	  //first bit;
+	  ucs4 = 1 << 3 | 1 << 2 | 1 << 1;
+	  ucs4 = ucs4 << 4;
+	  ret = mask & utf8[0];
+	  ucs4 = ucs4 | ret;
+	  // second bit
+	  ucs4 = ucs4 << 2 | 1 << 1;
+	  mask = mask | 1 << 4 | 1 << 5;
+	  ret = mask & utf8[1];
+	  ucs4 = ucs4 << 6 | ret;
+	  //third bit
+	  ucs4 = ucs4 << 2 | 1 << 1;
+	  ret = mask & utf8[2];
+	  ucs4 = ucs4 << 6 | ret;
+	  break;
+	default:
+	  /* TODO: */
+	  break;
+	}
+  } else {
+	/* ASCII, let it goes...*/
+
+	ucs4 = utf8[0];
+  }
+
+  return ucs4;
+}
+
+/* ucs4 -> utf8 */
+char *knh_format_utf8(char *buf, size_t bufsiz, knh_int_t ucs4)
+{
+  /* TODO: first, check BOM
+	 here, we assume that BOM bigEndian
+	 and only 3 bytes or 1 byte UTF
+  */
+  knh_uint_t mask = 0xFFF;
+  mask = mask << 16;
+  knh_uint_t byte1 = 0;
+  knh_uint_t byte2 = 0x80 << 16;
+  knh_uint_t byte3 = 0x800 << 16;
+
+  char *ret = buf;
+  char utf8[8];
+  if ((ucs4 & mask) == byte1) {
+	/* 7 bits */
+	snprintf(buf, bufsiz, "%c", 0xffff & ucs4);
+	ret = buf;
+  } else if ((mask & ucs4) <= byte2) {
+	/* cut last 6 bits */
+	
+	/* first 5 bits */
+  } else if ((mask & ucs4) <= byte3) {
+	/* cut last 6 bits */
+	utf8[2] = 0xffffff & ucs4;
+	utf8[2] = utf8[2] | 1 << 7;
+	/* cut next 6 bits */
+	ucs4 = ucs4 >> 8;
+	utf8[1] = 0xffffff & ucs4;
+	utf8[1] = utf8[1] | 1 << 7;
+	/* first 4 bits */
+	ucs4 = ucs4 >> 8;
+	utf8[0] = 0xffff & ucs4;
+	utf8[0] = utf8[0] | 1 << 7 | 1 << 6 | 1 << 5;
+	utf8[3] = '\0';
+	snprintf(buf, bufsiz, "%s", utf8);
+	
+  } else {
+	/* TODO: */
+  }
+
+  return ret;
+}
+
+
 /* ------------------------------------------------------------------------ */
 
 #ifdef __cplusplus
