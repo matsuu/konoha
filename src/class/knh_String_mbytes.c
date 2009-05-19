@@ -189,7 +189,7 @@ static void show_binary(unsigned int n)
 }
   */
 
-  /* utf8 -> ucs4 */
+/* utf8 -> ucs4 */
 knh_int_t knh_uchar_toucs4(knh_uchar_t *utf8)
 {
   /* BOM bigendinan */
@@ -208,20 +208,19 @@ knh_int_t knh_uchar_toucs4(knh_uchar_t *utf8)
 	  break;
 	case 3:
 	  /* format 1110xxxx 10xxxxxx 10xxxxxx */
-	  //first bit;
-	  ucs4 = 1 << 3 | 1 << 2 | 1 << 1;
-	  ucs4 = ucs4 << 4;
-	  ret = mask & utf8[0];
+	  // first 4 bits
+	  ucs4 = 0;
+	  ret = utf8[0] & mask;
 	  ucs4 = ucs4 | ret;
 	  // second bit
-	  ucs4 = ucs4 << 2 | 1 << 1;
+	  ucs4 = ucs4 << 6;
 	  mask = mask | 1 << 4 | 1 << 5;
-	  ret = mask & utf8[1];
-	  ucs4 = ucs4 << 6 | ret;
-	  //third bit
-	  ucs4 = ucs4 << 2 | 1 << 1;
+	  ret = utf8[1] & mask;
+	  ucs4 = ucs4  | ret;
+	  // third bit
+	  ucs4 = ucs4 << 6;
 	  ret = mask & utf8[2];
-	  ucs4 = ucs4 << 6 | ret;
+	  ucs4 = ucs4 | ret;
 	  break;
 	default:
 	  /* TODO: */
@@ -239,48 +238,48 @@ knh_int_t knh_uchar_toucs4(knh_uchar_t *utf8)
 /* ucs4 -> utf8 */
 char *knh_format_utf8(char *buf, size_t bufsiz, knh_int_t ucs4)
 {
-  /* TODO: first, check BOM
-	 here, we assume that BOM bigEndian
+  /* TODO: here, we assume that BOM bigEndian
 	 and only 3 bytes or 1 byte UTF
   */
-  knh_uint_t mask = 0xFFF;
-  mask = mask << 16;
-  knh_uint_t byte1 = 0;
-  knh_uint_t byte2 = 0x80 << 16;
-  knh_uint_t byte3 = 0x800 << 16;
+  knh_uint_t mask = 0x0;
+  knh_uint_t byte1 = 0x7F;
+  knh_uint_t byte2 = 0x7FF;
+  knh_uint_t byte3 = 0xFFFF;
 
   char *ret = buf;
-  char utf8[8];
-  if ((ucs4 & mask) == byte1) {
+  unsigned char utf8[8];
+  if (ucs4 <= byte1) {
 	/* 7 bits */
 	snprintf(buf, bufsiz, "%c", 0xffff & ucs4);
 	ret = buf;
-  } else if ((mask & ucs4) <= byte2) {
+  } else if (ucs4 <= byte2) {
 	/* cut last 6 bits */
 	
 	/* first 5 bits */
-  } else if ((mask & ucs4) <= byte3) {
+  } else if (ucs4 <= byte3) {
 	/* cut last 6 bits */
-	utf8[2] = 0xffffff & ucs4;
+	mask = 1 << 0 | 1 << 1 | 1 << 2 | 1 << 3| 1 << 4 | 1 << 5;
+	utf8[2] = ucs4 & mask;
 	utf8[2] = utf8[2] | 1 << 7;
 	/* cut next 6 bits */
-	ucs4 = ucs4 >> 8;
-	utf8[1] = 0xffffff & ucs4;
+	ucs4 = ucs4 >> 6;
+	utf8[1] = ucs4 & mask;
 	utf8[1] = utf8[1] | 1 << 7;
 	/* first 4 bits */
-	ucs4 = ucs4 >> 8;
-	utf8[0] = 0xffff & ucs4;
+	mask = 1 << 0 | 1 << 1 | 1 << 2 | 1 << 3;
+	ucs4 = ucs4 >> 6;
+	utf8[0] = ucs4 & mask;
 	utf8[0] = utf8[0] | 1 << 7 | 1 << 6 | 1 << 5;
 	utf8[3] = '\0';
 	snprintf(buf, bufsiz, "%s", utf8);
 	
   } else {
-	/* TODO: */
+
   }
 
   return ret;
+  
 }
-
 
 /* ------------------------------------------------------------------------ */
 
