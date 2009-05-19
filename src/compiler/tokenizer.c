@@ -928,8 +928,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 
 		case '#':
 			knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
-			goto LINE_COMMENT;
-
+			goto LINE_STRING;
 		case '.':
 			equote = 0;
 			ch = knh_InputStream_getc(ctx, in);
@@ -1284,6 +1283,23 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 			}
 		}
 		knh_Token_padd(ctx, tks[tkl], &BOL, new_Token__buffer(ctx, knh_char_totoken(prev), tbuf, in));
+	}
+	goto L_EOF; /* EOF */
+
+	/** COMMENT **/
+	LINE_STRING:
+	{
+		ch = knh_InputStream_getc(ctx, in);
+		if(ch == '!') goto LINE_COMMENT; /* #! /usr/local/bin */
+		if(ch != ' ') goto LINE_STRING_INLOOP;
+		while((ch = knh_InputStream_getc(ctx, in)) != EOF) {
+			LINE_STRING_INLOOP:
+			if(ch == '\n') {
+				knh_Token_padd(ctx, tks[tkl], &BOL, new_Token__buffer(ctx, TT_STR, tbuf, in));
+				goto MAIN_PART_INLOOP;
+			}
+			knh_Bytes_putc(ctx, tbuf.ba, ch);
+		}
 	}
 	goto L_EOF; /* EOF */
 

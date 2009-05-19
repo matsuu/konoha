@@ -884,6 +884,8 @@ int knh_Token_typing(Ctx *ctx, Token *tk, Asm *abr, NameSpace *ns, knh_type_t re
 		knh_Token_toCONST(tk);
 		return 1;
 
+	case TT_EVAL:
+		TODO();
 	case TT_STR:
 		KNH_ASSERT(IS_String(DP(tk)->data));
 		knh_Token_toCONST(tk);
