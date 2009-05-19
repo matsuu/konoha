@@ -1,0 +1,7 @@
+To: Bug reporters,
+
+Please add a sequential prefix like "X001_" to your script.
+If bugs are fixed, it will be renamed with "O001_".
+
+- K
+
