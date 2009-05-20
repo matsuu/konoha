@@ -54,13 +54,7 @@ Stmt* new_Stmt(Ctx *ctx, knh_flag_t flag, knh_stmt_t stt)
 Stmt* new_StmtDONE(Ctx *ctx)
 {
 	return new_Stmt(ctx, 0, STT_DONE);
-	//	if(tglobalStmtDONE == NULL) {
-//		tglobalStmtDONE = (Object*)new_Stmt(ctx, 0, STT_DONE);
-//		KNH_TSTATICOBJ(&tglobalStmtDONE);
-//	}
-//	return (Stmt*)tglobalStmtDONE;
 }
-
 
 /* ======================================================================== */
 /* [ERR] */

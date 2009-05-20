@@ -3041,7 +3041,7 @@ void knh_Asm_endRegister(Ctx *ctx, Asm *abr, int level)
 		if(DP(abr)->regs[i].level == level) {
 			DP(abr)->regs_size = i;
 			DP(abr)->regs[i].stmt = NULL; /* NullPointerException */
-			DBG2_P("level=%d, regs_size=%d", level, i);
+			//DBG2_P("level=%d, regs_size=%d", level, i);
 			return;
 		}
 	}
@@ -3326,16 +3326,14 @@ int knh_Stmt_checkLastReturn(Ctx *ctx, Stmt *stmt, Method *mtd)
 		}
 	}
 	if(mtd == NULL) return 0;
-
 	/* Generate default return statement */
 	Stmt *rstmt = new_Stmt(ctx, 0, STT_RETURN);
 	if(knh_Method_isConstructor(ctx, mtd) || knh_Method_rztype(mtd) == TYPE_void) {
-		//last_stmt = knh_StmtNULL_tail_append(ctx, last_stmt, rstmt);
+
 	}
 	else { /* return default value */
 		knh_perror(ctx, SP(last_stmt)->fileid, SP(last_stmt)->line, KMSG_NORETURNVALUE, NULL);
-		knh_StmtRETURN_addValue(ctx, rstmt,
-				knh_pmztype_totype(ctx, knh_Method_rztype(mtd), DP(mtd)->cid));
+		knh_StmtRETURN_addValue(ctx, rstmt, knh_Method_rtype(ctx, mtd, DP(mtd)->cid));
 	}
 	last_stmt = knh_StmtNULL_tail_append(ctx, last_stmt, rstmt);
 	return 1;
@@ -3477,12 +3475,9 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		}
 	}
 	{
-		DBG2_(knh_Method__dump(ctx, mtd, KNH_STDOUT, (String*)KNH_NULL););
+		//DBG2_(knh_Method__dump(ctx, mtd, KNH_STDOUT, (String*)KNH_NULL););
 		knh_Token_setCONST(ctx, StmtMETHOD_method(stmt), UP(mtd));
-		if(DP(stmt)->size == 4) {
-			DBG2_P("@Abstract");
-		}
-		else {
+		if(DP(stmt)->size != 4) {
 			knh_Stmt_checkLastReturn(ctx, StmtMETHOD_instmt(stmt), mtd);
 		}
 	}
@@ -3646,7 +3641,6 @@ Term *knh_Stmt_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_t 
 		case STT_FOREACH:
 			return knh_StmtFOREACH_typing(ctx, stmt, abr, ns);
 		case STT_BREAK:
-			return TM(stmt);
 		case STT_CONTINUE:
 			return TM(stmt);
 		case STT_TRY:

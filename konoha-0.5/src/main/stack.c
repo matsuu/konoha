@@ -119,7 +119,7 @@ void knh_sfp_typecheck(Ctx *ctx, knh_sfp_t *sfp, Method *mtd, knh_code_t *pc)
 	knh_class_t this_cid = knh_Object_cid(sfp[0].o);
 	int i, argc = knh_Method_isVarArgs(mtd) ? (ctx->esp - sfp) : knh_Method_psize(mtd);
 	for(i = 1; i < argc; i++) {
-		knh_type_t type = knh_Method_ptype(ctx, this_cid, mtd, i);
+		knh_type_t type = knh_Method_ptype(ctx, mtd, this_cid, i);
 		if(IS_NULL(sfp[i].o)) {
 			if(IS_NNTYPE(type)) {
 				emsg = "Null!!: "; goto L_THROWERR;

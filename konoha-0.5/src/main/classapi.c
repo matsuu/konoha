@@ -2224,7 +2224,7 @@ void knh_Stmt_init(Ctx *ctx, Stmt *stmt, int init)
 	knh_Stmt_struct *b = DP(stmt);
 	b->size = 0;
 	b->capacity = init;
-	b->type = CLASS_Any;
+	b->type = TYPE_void;
 	b->line_end = 0;
 	if(b->capacity > 0) {
 		b->terms = (Object**)KNH_MALLOC(ctx, sizeof(Term*) * b->capacity);
@@ -2368,7 +2368,6 @@ void knh_Asm_traverse(Ctx *ctx, Asm *abr, knh_ftraverse ftr)
 	ftr(ctx, UP(b->finallyStmt));
 
 	if(IS_SWEEP(ftr) && b->dlhdr != NULL) {
-		//knh_dlclose(ctx, b->dlhdr);
 		b->dlhdr = NULL;
 	}
 	ftr(ctx, UP(b->exportsMethods));

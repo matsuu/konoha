@@ -133,14 +133,14 @@ knh_mparam_t knh_MethodField_param(MethodField *o, size_t n)
 
 /* ------------------------------------------------------------------------ */
 
-knh_type_t knh_Method_rtype(Ctx *ctx, knh_class_t cid, Method *mtd)
+knh_type_t knh_Method_rtype(Ctx *ctx, Method *mtd, knh_class_t cid)
 {
 	return knh_pmztype_totype(ctx, DP(mtd)->mf->rtype, cid);
 }
 
 /* ------------------------------------------------------------------------ */
 
-knh_type_t knh_Method_ptype(Ctx *ctx, knh_class_t cid, Method *o, size_t n)
+knh_type_t knh_Method_ptype(Ctx *ctx, Method *o, knh_class_t cid, size_t n)
 {
 	return knh_pmztype_totype(ctx, knh_MethodField_pztype(DP(o)->mf, n), cid);
 }

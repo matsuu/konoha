@@ -1555,7 +1555,7 @@ void knh_StmtCALL_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpid
 		}
 		if(DP(mtd)->mn == METHODN_set) {
 			int a = TERMs_putSTACK(ctx, stmt, 1, abr, NNTYPE_Array, local + 1);
-			knh_type_t ptype = knh_Method_ptype(ctx, cid, mtd, 1);
+			knh_type_t ptype = knh_Method_ptype(ctx, mtd, cid, 1);
 			int v = TERMs_putSTACK(ctx, stmt, 3, abr, ptype, local + 3);
 			if(TERMs_isCONST(stmt, 2)) {
 				knh_intptr_t n = (knh_intptr_t)TERMs_int(stmt, 2);
