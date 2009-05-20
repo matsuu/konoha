@@ -27,8 +27,12 @@
 
 /* ************************************************************************ */
 
+#ifdef KNH_USING_WINDOWS
+#include <windows.h>
+#include <winsock2.h>
+#endif
+
 #include"commons.h"
-#define KNH_USING_NOAPI 1
 
 #ifdef KNH_USING_POSIX
 #undef KNH_USING_NOPAI
@@ -40,9 +44,6 @@
 #include <unistd.h>
 #endif
 
-#ifdef KNH_USING_WINDOWS
-#include <windows.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,7 +54,11 @@ extern "C" {
 
 KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port)
 {
-#ifdef KNH_USING_POSIX
+
+#ifdef KNH_USING_WINDOWS
+  WSADATA wsaData;
+  WSAStartup(MAKEWORD(2,0), &wsaData);
+#endif
 	struct in_addr addr = {0};
 	struct hostent	*host;
 	struct sockaddr_in	server = {0};
@@ -82,10 +87,7 @@ KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port)
 		return -1;
 	}
 	return sd;
-#endif/*KNH_USING_POSIX*/
-#ifdef KNH_USING_WINDOWS
-	return -1;
-#endif
+
 #ifdef KNH_USING_NOAPI
 	return -1;
 #endif
