@@ -424,13 +424,13 @@ knh_class_t knh_class_Closure(Ctx *ctx, knh_type_t r0, knh_type_t p1, knh_type_t
 knh_class_t knh_class_MethodClosure(Ctx *ctx, knh_class_t cid, Method *mtd)
 {
 	if(knh_Method_psize(mtd) > 3) return CLASS_Closure;
-	knh_type_t r0 = knh_Method_rtype(ctx, cid, mtd);
+	knh_type_t r0 = knh_Method_rtype(ctx, mtd, cid);
 	knh_type_t p1 = TYPE_void;
-	if(0 < knh_Method_psize(mtd)) p1 = knh_Method_ptype(ctx, cid, mtd, 0);
+	if(0 < knh_Method_psize(mtd)) p1 = knh_Method_ptype(ctx, mtd, cid, 0);
 	knh_type_t p2 = TYPE_void;
-	if(1 < knh_Method_psize(mtd)) p2 = knh_Method_ptype(ctx, cid, mtd, 1);
+	if(1 < knh_Method_psize(mtd)) p2 = knh_Method_ptype(ctx, mtd, cid, 1);
 	knh_type_t p3 = TYPE_void;
-	if(2 < knh_Method_psize(mtd)) p3 = knh_Method_ptype(ctx, cid, mtd, 2);
+	if(2 < knh_Method_psize(mtd)) p3 = knh_Method_ptype(ctx, mtd, cid, 2);
 	return knh_class_Closure(ctx, r0, p1, p2, p3);
 }
 
