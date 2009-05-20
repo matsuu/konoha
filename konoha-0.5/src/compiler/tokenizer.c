@@ -573,6 +573,7 @@ void knh_Token_join(Ctx *ctx, Token *o)
 					knh_Bytes_putc(ctx, cwb.ba, '\n');
 				}
 				knh_Bytes_write(ctx, cwb.ba, knh_String_tobytes(DP(tkn)->text));
+				tkp = tkn;
 				knh_Array_remove(ctx, a, i+1);
 			}while(i + 1 < knh_Array_size(a));
 			KNH_SETv(ctx, DP(tk)->data, new_String__cwb(ctx, cwb));
