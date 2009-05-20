@@ -40,6 +40,10 @@
 #include <unistd.h>
 #endif
 
+#ifdef KNH_USING_WINDOWS
+#include <windows.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

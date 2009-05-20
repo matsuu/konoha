@@ -76,7 +76,7 @@ void *knh_dlopen(Ctx *ctx, const char* path, int mode)
 void *knh_dlsym(Ctx *ctx, void* hdr, const char* symbol)
 {
 #ifdef KNH_USING_WINDOWS
-	return GetProcAddress((HMODULE)handle, (LPCSTR)symbol);
+	return GetProcAddress((HMODULE)hdr, (LPCSTR)symbol);
 #endif
 #ifdef KNH_USING_POSIX
 	return dlsym(hdr, symbol);
@@ -106,7 +106,7 @@ const char *knh_dlerror(Ctx *ctx)
 int knh_dlclose(Ctx *ctx, void* hdr)
 {
 #ifdef KNH_USING_WINDOWS
-	return (int)FreeLibrary((HMODULE)handle);
+	return (int)FreeLibrary((HMODULE)hdr);
 #endif
 #ifdef KNH_USING_POSIX
 	return dlclose(hdr);

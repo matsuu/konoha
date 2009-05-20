@@ -2322,7 +2322,7 @@ void knh_StmtPRINT_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 	/* header */ {
 		char buf[128];
 		knh_snprintf(buf, sizeof(buf), "%s:%d", FILEIDN(DP(abr)->fileid), DP(abr)->line);
-		KNH_ASM_PMSG_(ctx, abr, flag | KNH_FLAG_PF_BOL, new_String(ctx, B(buf), NULL));
+		KNH_ASM_PMSG_(ctx, abr, flag | KNH_FLAG_PF_BOL, UP(new_String(ctx, B(buf), NULL)));
 	}
 
 	int i;
@@ -2373,7 +2373,7 @@ void knh_StmtASSERT_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 	TERMs_ASM_JIFT(ctx, stmt, 0, abr, lbskip);
 	/*then*/
 	TERMs_asmBLOCK(ctx, stmt, 1, abr);
-	KNH_ASM_THROWs_(ctx, abr, TS_AssertionException);
+	KNH_ASM_THROWs_(ctx, abr, UP(TS_AssertionException));
 	KNH_ASM_LLABEL(ctx, abr, lbskip);
 }
 

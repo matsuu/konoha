@@ -51,6 +51,7 @@
 #ifdef KNH_USING_WINDOWS
 #undef KNH_USING_NOAPI
 #include<windows.h>
+#include <time.h>
 #endif
 
 /* ************************************************************************ */
