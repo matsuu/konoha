@@ -188,7 +188,7 @@ static METHOD knh__String_opSub(Ctx *ctx, knh_sfp_t *sfp)
 
 /* ------------------------------------------------------------------------ */
 
- static
+static
 int knh_bytes_equals_(knh_bytes_t base, size_t s, knh_bytes_t target)
 {
 	size_t i;
@@ -207,26 +207,25 @@ static METHOD knh__String_replace(Ctx *ctx, knh_sfp_t *sfp)
 	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
 	knh_bytes_t target = knh_String_tobytes(sfp[1].s);
 	knh_bytes_t alt = knh_String_tobytes(sfp[2].s);
-	if (base.len == 0 || target.len == 0) KNH_RETURN(ctx, sfp, sfp[0].o);
 	knh_cwb_t cwb = new_cwb(ctx);
+	int search_flag= 0, ch = target.buf[0], i;
 
-	size_t i;
-	int s = 0, ch = target.buf[0];
+	if (base.len == 0 || target.len == 0) KNH_RETURN(ctx, sfp, sfp[0].o);
 	for(i = 0; i < base.len - target.len+1; i++) {
 		if(base.buf[i] == ch && knh_bytes_equals_(base, i, target)) {
-			knh_Bytes_write(ctx, cwb.ba, alt);
+		    knh_Bytes_write(ctx, cwb.ba, alt);
 			i += target.len - 1;
-			s = i;
+			search_flag = 1;
 		}else {
 			knh_Bytes_putc(ctx, cwb.ba, base.buf[i]);
 		}
 	}
-	if(s == 0) {
+	if(search_flag == 0) {
 		KNH_RETURN(ctx, sfp, sfp[0].o);
 	}
 	else {
-		knh_bytes_t hs = {base.buf + i, base.len - i};
-		knh_Bytes_write(ctx, cwb.ba, hs);
+		knh_bytes_t leftover = {base.buf + i, base.len - i};
+		knh_Bytes_write(ctx, cwb.ba, leftover);
 		KNH_RETURN(ctx, sfp, new_String__cwb(ctx, cwb));
 	}
 }
