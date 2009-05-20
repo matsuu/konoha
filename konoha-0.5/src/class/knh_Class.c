@@ -439,7 +439,7 @@ knh_index_t knh_Class_queryField(Ctx *ctx, knh_class_t cid, knh_fieldn_t fnq)
 knh_cfield_t *knh_Class_fieldAt(Ctx *ctx, knh_class_t cid, size_t n)
 {
 	KNH_ASSERT_cid(cid);
-	KNH_ASSERT(0 <= n && n < ctx->share->ClassTable[cid].size);
+	KNH_ASSERT(/*0 <= n &&*/ n < ctx->share->ClassTable[cid].size);
 	L_TAIL:;
 	{
 		ClassStruct *cs = ctx->share->ClassTable[cid].cstruct;;

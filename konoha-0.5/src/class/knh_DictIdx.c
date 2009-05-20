@@ -128,7 +128,7 @@ knh_index_t knh_DictIdx_add__b(Ctx *ctx, DictIdx *o, knh_bytes_t term)
 String* knh_DictIdx_get__fast(DictIdx *o, knh_intptr_t termid)
 {
 	size_t n = termid_toarrayn(termid);
-	KNH_ASSERT(0 <= n && n < knh_Array_size(o->terms));
+	KNH_ASSERT(/*0 <= n &&*/ n < knh_Array_size(o->terms));
 	return (String*)knh_Array_n(o->terms, n);
 }
 
@@ -138,7 +138,7 @@ String* knh_DictIdx_get__fast(DictIdx *o, knh_intptr_t termid)
 String* knh_DictIdx_get(Ctx *ctx, DictIdx *o, knh_intptr_t termid)
 {
 	size_t n = termid_toarrayn(termid);
-	if(0 <= n && n < knh_Array_size(o->terms)) {
+	if(/*0 <= n &&*/ n < knh_Array_size(o->terms)) {
 		return (String*)knh_Array_n(o->terms, n);
 	}
 	return (String*)KNH_NULL;

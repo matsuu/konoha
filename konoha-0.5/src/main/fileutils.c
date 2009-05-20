@@ -82,7 +82,8 @@ knh_format_parentpath(char *buf, size_t bufsiz, knh_bytes_t path, int n)
 char *
 knh_format_nzpath(char *buf, size_t bufsiz, knh_bytes_t path)
 {
-	size_t i, j = 0;
+	//size_t i, j = 0;
+	int i, j = 0;
 	for(i = 0; i < path.len; i++) {
 		if(path.buf[i] == '/' || path.buf[i] == '\\') {
 			int ch = path.buf[i];
