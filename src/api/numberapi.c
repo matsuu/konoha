@@ -370,6 +370,22 @@ static METHOD knh__Float_random(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
+/* @method[STATIC] Int! Float.floatToIntBits(Float! n) */
+
+static METHOD knh__Float_floatToIntBits(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN_Int(ctx, sfp, sfp[1].ivalue);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[STATIC] Float! Float.intToFloatBits(Int! n) */
+
+static METHOD knh__Float_intToFloatBits(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN_Float(ctx, sfp, sfp[1].ivalue);
+}
+
+/* ------------------------------------------------------------------------ */
 /* @method[NULLBASE|CONST] Int! Float.getSize() */
 
 static METHOD knh__Float_getSize(Ctx *ctx, knh_sfp_t *sfp)
