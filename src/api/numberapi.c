@@ -523,6 +523,16 @@ static METHOD knh__Int__bits(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
+/* @method void Int.%c(OutputStream w, String m) */
+
+static METHOD knh__Int__c(Ctx *ctx, knh_sfp_t *sfp)
+{
+	char buf[16];
+	knh_format_utf8(buf, sizeof(buf), sfp[0].ivalue);
+	knh_write(ctx, sfp[1].w, B(buf));
+}
+
+/* ------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------ */
 /* @method void Float.%s(OutputStream w, String m) */
 

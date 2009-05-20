@@ -407,6 +407,8 @@ Object *new_Object_parseOf(Ctx *ctx, String *s);
 knh_bool_t knh_bytes_checkENCODING(knh_bytes_t s);
 size_t knh_bytes_mlen(knh_bytes_t s);
 knh_bytes_t knh_bytes_mofflen(knh_bytes_t m, size_t moff, size_t mlen);
+knh_int_t knh_uchar_toucs4(knh_uchar_t *utf8);
+char *knh_format_utf8(char *buf, size_t bufsiz, knh_int_t ucs4);
 /* ../src/class/knh_StringUnit.c */
 StringUnit *new_StringUnit(Ctx *ctx, knh_flag_t flag, knh_class_t cid, String *tag);
 String *new_StringX__FormatException(Ctx *ctx, knh_class_t cid, knh_bytes_t t, String *orign);

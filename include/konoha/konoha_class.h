@@ -893,7 +893,7 @@ typedef struct knh_tokens_t {
 	int e;
 } knh_tokens_t;
 
-#define TT_RAW   TT_CONST
+//#define TT_RAW   TT_CONST
 
 /* ------------------------------------------------------------------------ */
 /* @class Stmt Object knh_Stmt_struct */
@@ -925,7 +925,7 @@ typedef struct knh_tokens_t {
 
 typedef struct knh_Stmt {
 	knh_type_t   type;
-	knh_short_t   line_end;
+	knh_short_t  line_end;
 	knh_ushort_t size;
 	knh_ushort_t capacity;
 	union {
