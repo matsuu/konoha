@@ -207,7 +207,7 @@ static METHOD knh__String_replace(Ctx *ctx, knh_sfp_t *sfp)
 	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
 	knh_bytes_t target = knh_String_tobytes(sfp[1].s);
 	knh_bytes_t alt = knh_String_tobytes(sfp[2].s);
-
+	if (base.len == 0 || target.len == 0) KNH_RETURN(ctx, sfp, sfp[0].o);
 	knh_cwb_t cwb = new_cwb(ctx);
 
 	size_t i;
