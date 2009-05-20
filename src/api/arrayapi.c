@@ -598,7 +598,8 @@ static METHOD knh__Array_lastIndexOf(Ctx *ctx, knh_sfp_t *sfp)
 {
 	Array *o = (Array*)sfp[0].o;
 	knh_sfp_boxing(ctx, sfp + 1);
-	size_t i;
+	/* size_t i; */
+	int i;
 	for(i = o->size - 1; i >= 0; i--) {
 		if(knh_Object_compareTo(ctx, o->list[i], sfp[1].o) == 0) {
 			KNH_RETURN_Int(ctx, sfp, i);

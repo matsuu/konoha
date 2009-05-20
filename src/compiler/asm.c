@@ -268,7 +268,7 @@ static knh_rtti_t RuntimeNullCheck [] = {
 static
 void knh_rtti_nullChecked(Asm *abr, size_t n)
 {
-	if(0 <= n && n < (sizeof(knh_rtti_t) * 8)) {
+	if(/*0 <= n &&*/ n < (sizeof(knh_rtti_t) * 8)) {
 		DP(abr)->nnrtti = DP(abr)->nnrtti | RuntimeNullCheck[n];
 	}
 }
@@ -278,7 +278,7 @@ void knh_rtti_nullChecked(Asm *abr, size_t n)
 static
 void knh_rtti_nullable(Asm *abr, size_t n)
 {
-	if(0 <= n && n < (sizeof(knh_rtti_t) * 8)) {
+	if(/*0 <= n &&*/ n < (sizeof(knh_rtti_t) * 8)) {
 		DP(abr)->nnrtti = DP(abr)->nnrtti & (~RuntimeNullCheck[n]);
 	}
 }
