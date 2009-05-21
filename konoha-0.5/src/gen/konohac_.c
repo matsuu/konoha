@@ -130,7 +130,7 @@ static char* knh_token_array_tochar[] = {
     "NUM",  /* NUM */ 
     "STR",  /* STR */ 
     "TSTR",  /* TSTR */ 
-    "EVAL",  /* EVAL */ 
+    "ESTR",  /* ESTR */ 
     "LABEL",  /* LABEL */ 
     "METAN",  /* METAN */ 
     "PROPN",  /* PROPN */ 
@@ -260,7 +260,7 @@ static knh_methodn_t knh_token_array_tomethodn[] = {
     METHODN_NONAME,  /* NUM */ 
     METHODN_NONAME,  /* STR */ 
     METHODN_NONAME,  /* TSTR */ 
-    METHODN_NONAME,  /* EVAL */ 
+    METHODN_NONAME,  /* ESTR */ 
     METHODN_NONAME,  /* LABEL */ 
     METHODN_NONAME,  /* METAN */ 
     METHODN_NONAME,  /* PROPN */ 
@@ -390,7 +390,7 @@ static int knh_token_array_getOpPriority[] = {
     99,  /* NUM */ 
     99,  /* STR */ 
     99,  /* TSTR */ 
-    99,  /* EVAL */ 
+    99,  /* ESTR */ 
     0,  /* LABEL */ 
     0,  /* METAN */ 
     99,  /* PROPN */ 
@@ -520,7 +520,7 @@ static int knh_token_array_getOpSize[] = {
     0,  /* NUM */ 
     0,  /* STR */ 
     0,  /* TSTR */ 
-    0,  /* EVAL */ 
+    0,  /* ESTR */ 
     0,  /* LABEL */ 
     0,  /* METAN */ 
     0,  /* PROPN */ 
@@ -650,7 +650,7 @@ static knh_bool_t knh_token_array_isEndOfStmt[] = {
     0,  /* NUM */ 
     0,  /* STR */ 
     0,  /* TSTR */ 
-    0,  /* EVAL */ 
+    0,  /* ESTR */ 
     0,  /* LABEL */ 
     1,  /* METAN */ 
     0,  /* PROPN */ 

@@ -308,8 +308,6 @@ Token *new_Token__buffer(Ctx *ctx, knh_token_t tt, knh_cwb_t tbuf, InputStream *
 	return o;
 }
 
-
-
 /* ------------------------------------------------------------------------ */
 #define knh_token_isNested(tt)  (tt == TT_BRACE || tt == TT_PARENTHESIS || tt == TT_BRANCET)
 
@@ -556,17 +554,19 @@ void knh_Token_join(Ctx *ctx, Token *o)
 				}
 			}
 		}
+
 		if(SP(tk)->tt == TT_STR || SP(tk)->tt == TT_TSTR || SP(tk)->tt == TT_TSTR) {
-			Token *tkn = (Token*)knh_Array_n(a, i+1);
-			if(SP(tkn)->tt != TT_STR && SP(tkn)->tt != TT_TSTR && SP(tk)->tt != TT_EVAL) {
+			size_t next = i + 1;
+			Token *tkn = (Token*)knh_Array_n(a, next);
+			if(SP(tkn)->tt != TT_STR && SP(tkn)->tt != TT_TSTR && SP(tk)->tt != TT_ESTR) {
 				return;
 			}
 			knh_cwb_t cwb = new_cwb(ctx);
-			knh_Bytes_write(ctx, cwb.ba, knh_String_tobytes(DP(tk)->text));
 			Token *tkp = tk;
+			knh_Bytes_write(ctx, cwb.ba, knh_String_tobytes(DP(tk)->text));
 			do {
-				tkn = (Token*)knh_Array_n(a, i+1);
-				if(SP(tkn)->tt != TT_STR && SP(tkn)->tt != TT_TSTR && SP(tk)->tt != TT_EVAL) {
+				tkn = (Token*)knh_Array_n(a, next);
+				if(SP(tkn)->tt != TT_STR && SP(tkn)->tt != TT_TSTR && SP(tk)->tt != TT_ESTR) {
 					break;
 				}
 				if(SP(tkp)->line < SP(tkn)->line) {
@@ -574,10 +574,11 @@ void knh_Token_join(Ctx *ctx, Token *o)
 				}
 				knh_Bytes_write(ctx, cwb.ba, knh_String_tobytes(DP(tkn)->text));
 				tkp = tkn;
-				knh_Array_remove(ctx, a, i+1);
-			}while(i + 1 < knh_Array_size(a));
+				knh_Array_remove(ctx, a, next);
+			}while(next < knh_Array_size(a));
 			KNH_SETv(ctx, DP(tk)->data, new_String__cwb(ctx, cwb));
-		}
+			size = knh_Array_size(a) - 1;
+		} /* "a" "b" "c" */
 	}
 
 }
@@ -597,7 +598,7 @@ knh_token_t knh_char_totoken(int ch)
 		case ',': return TT_COMMA;
 		case '"': return TT_STR;
 		case '\'': return TT_TSTR;
-		case '`': return TT_EVAL;
+		case '`': return TT_ESTR;
 	}
 	KNH_ASSERT(ch == -1);
 	return TT_ERR;
@@ -844,22 +845,19 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 
 		case '%':
 			knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
+			DBG2_P("IS EXTENDED QUOTE: %s", (equote) ? "yes" : "no");
+
 			ch = knh_InputStream_getc(ctx, in);
-			if(isalnum(ch)) {
-				prev = '%';
-				knh_Bytes_putc(ctx, tbuf.ba, ch);
-				goto QNAME_PART;
-			}
-			else if(ch == '%') {
+			prev = '%';
+			if(equote == 0 || ch == ' ' || ch == '\t') {
 				knh_Bytes_putc(ctx, tbuf.ba, '%');
-				knh_Bytes_putc(ctx, tbuf.ba, '%');
-				knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
-				break;
+				equote = 1;
+				goto OP_PART_INLOOP;
 			}
 			else {
-				knh_Bytes_putc(ctx, tbuf.ba, '%');
-				knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
-				goto MAIN_PART_INLOOP;
+				equote = 0;
+				knh_Bytes_putc(ctx, tbuf.ba, ch);
+				goto QNAME_PART;
 			}
 
 		case '|':
@@ -930,6 +928,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 		case '#':
 			knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
 			goto LINE_STRING;
+
 		case '.':
 			equote = 0;
 			ch = knh_InputStream_getc(ctx, in);
@@ -1296,7 +1295,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 		while((ch = knh_InputStream_getc(ctx, in)) != EOF) {
 			LINE_STRING_INLOOP:
 			if(ch == '\n') {
-				knh_Token_padd(ctx, tks[tkl], &BOL, new_Token__buffer(ctx, TT_STR, tbuf, in));
+				knh_Token_padd(ctx, tks[tkl], &BOL, new_Token__buffer(ctx, TT_ESTR, tbuf, in));
 				goto MAIN_PART_INLOOP;
 			}
 			knh_Bytes_putc(ctx, tbuf.ba, ch);
