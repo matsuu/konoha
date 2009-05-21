@@ -1136,7 +1136,7 @@ Term *new_TermVALUE(Ctx *ctx, Token *tk, int lr)
 			return TM(new_StmtDICTMAP(ctx, (Token*)KNH_NULL, tk));
 		case TT_PROPN:
 			return TM(new_StmtPROPN(ctx, tk, lr));
-		case TT_EVAL:
+		case TT_ESTR:
 			TODO();
 		case TT_STR:
 		case TT_NUM:
@@ -3149,7 +3149,7 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 	case TT_NUM:  /* NUM */
 	case TT_STR:  /* STR */
 	case TT_TSTR:  /* TSTR */
-	case TT_EVAL:  /* EVAL */
+	case TT_ESTR:  /* EVAL */
 	case TT_PROPN:  /* PROPN */
 	case TT_URN:  /* URN */
 	case TT_MT:  /* MT */
