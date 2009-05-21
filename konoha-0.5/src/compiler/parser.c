@@ -297,82 +297,6 @@ static void knh_Stmt_add_VARN(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 	}
 }
 
-///* ------------------------------------------------------------------------ */
-///* [STR] */
-//
-//static void knh_Stmt_add_STR(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
-//{
-//	if(SP(o)->stt == STT_ERR) return;
-//	if(tc->c < tc->e && knh_Token_isSTR(tc->ts[tc->c])) {
-//		knh_Stmt_add(ctx, o, UP(tc->ts[tc->c]));
-//		tc->c += 1;
-//	}
-//	else {
-//		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_TSTR);
-//	}
-//}
-//
-//
-//
-///* ------------------------------------------------------------------------ */
-///* [CMETHODN] */
-//
-//static void knh_Stmt_add_CMETHODN(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
-//{
-//	if(SP(o)->stt == STT_ERR) return;
-//	if(tc->c < tc->e && knh_Token_isCMETHODN(tc->ts[tc->c])) {
-//		knh_Stmt_add(ctx, o, UP(tc->ts[tc->c]));
-//		tc->c += 1;
-//	}
-//	else {
-//		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_TCMETHODN);
-//	}
-//}
-//
-///* ------------------------------------------------------------------------ */
-///* [MT] */
-//
-//static void knh_Stmt_add_MT(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
-//{
-//	if(SP(o)->stt == STT_ERR) return;
-//	if(tc->c < tc->e && knh_Token_isMT(tc->ts[tc->c])) {
-//		knh_Stmt_add(ctx, o, UP(tc->ts[tc->c]));
-//		tc->c += 1;
-//	}
-//	else {
-//		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_TMT);
-//	}
-//}
-//
-///* ------------------------------------------------------------------------ */
-///* [ANY] */
-//
-//static void knh_Stmt_add_ANY(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
-//{
-//	if(SP(o)->stt == STT_ERR) return;
-//	if(tc->c < tc->e && knh_Token_isANY(tc->ts[tc->c])) {
-//		knh_Stmt_add(ctx, o, UP(tc->ts[tc->c]));
-//		tc->c += 1;
-//	}
-//	else {
-//		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_TANY);
-//	}
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//static int knh_Token_isANY(Token *tk)
-//{
-//	switch(SP(tk)->tt) {
-//		case TT_STR: case TT_TSTR:
-//		case TT_URN:
-//		case TT_NAME:
-//			return 1;
-//		default :
-//			return 0;
-//	}
-//}
-
 /* ======================================================================== */
 /* [COMMONS STMT] */
 
@@ -422,34 +346,37 @@ static
 void knh_Stmt_add_PARAMs(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 {
 	if(SP(o)->stt == STT_ERR) return;
-	if(tc->c < tc->e && SP(tc->ts[tc->c])->tt == TT_PARENTHESIS) {
-		knh_tokens_t param_tc;
-		Stmt *stmt = NULL;
-		knh_Token_tc(tc->ts[tc->c], &param_tc); tc->c += 1;
-		if(param_tc.c == param_tc.e) {
-			knh_Stmt_add(ctx, o, TM(new_Stmt(ctx, 0, STT_DONE)));
-			return;
-		}
-		while(param_tc.c <param_tc.e) {
-			Stmt *o2 = new_Stmt(ctx, 0, STT_DECL);
-			knh_tokens_t ptc = knh_tokens_splitEXPR(ctx, &param_tc, TT_COMMA);
-			knh_Stmt_add_TYPEVARN(ctx, o2, &ptc);
-			if(ptc.c + 1 < ptc.e && SP(ptc.ts[ptc.c])->tt == TT_LET) {
-				ptc.c += 1;
-				knh_Stmt_add(ctx, o2, new_TermEXPR(ctx, &ptc, KNH_RVALUE));
-			}
-			else {
-				knh_tokens_ignore(ctx, &ptc);
-				knh_Stmt_add_ASIS(ctx, o2);
-			}
-			stmt =knh_StmtNULL_tail_append(ctx, stmt, o2);
-		}
-		knh_Stmt_add(ctx, o, TM(stmt));
-		return ;
-	}
-	else {
+	if(tc->c < tc->e && SP(tc->ts[tc->c])->tt != TT_PARENTHESIS) {
 		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_ESYNTAX);
 	}
+	knh_tokens_t param_tc;
+	knh_Token_tc(tc->ts[tc->c], &param_tc); tc->c += 1;
+	if(param_tc.c == param_tc.e) {
+		knh_Stmt_add(ctx, o, TM(new_Stmt(ctx, 0, STT_DONE)));
+		return;
+	}
+
+	Stmt *stmt = NULL;
+	while(param_tc.c <param_tc.e) {
+		Stmt *o2 = new_Stmt(ctx, 0, STT_DECL);
+		knh_tokens_t ptc = knh_tokens_splitEXPR(ctx, &param_tc, TT_COMMA);
+		if(SP(ptc.ts[ptc.c])->tt == TT_METAN) {
+			ptc.meta = ptc.c;
+			knh_Stmt_addMETA(ctx, o2, &ptc);
+		}
+		knh_Stmt_add_TYPEVARN(ctx, o2, &ptc);
+		if(ptc.c + 1 < ptc.e && SP(ptc.ts[ptc.c])->tt == TT_LET) {
+			ptc.c += 1;
+			knh_Stmt_add(ctx, o2, new_TermEXPR(ctx, &ptc, KNH_RVALUE));
+		}
+		else {
+			knh_tokens_ignore(ctx, &ptc);
+			knh_Stmt_add_ASIS(ctx, o2);
+		}
+		stmt =knh_StmtNULL_tail_append(ctx, stmt, o2);
+	}
+	knh_Stmt_add(ctx, o, TM(stmt));
+	return;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1449,7 +1376,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 
 	if(SP(ts[oc])->tt == TT_NAME || SP(ts[oc])->tt == TT_CMETHODN) {
 		/* @TEST a.f "text" + 1 */
-		if(DP(ts[oc])->tt_next == TT_STR || DP(ts[oc])->tt_next == TT_TSTR) {
+		if(DP(ts[oc])->tt_next == TT_STR || DP(ts[oc])->tt_next == TT_TSTR || DP(ts[oc])->tt_next == TT_ESTR) {
 			DP(ts[oc])->tt_next = TT_PARENTHESIS; // needed
 			stmt = new_StmtNAME2(ctx,ts[oc], KNH_RVALUE);
 			tc->c = oc + 1;
@@ -1460,7 +1387,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 
 	if(SP(ts[oc])->tt == TT_PARENTHESIS && DP(ts[oc])->tt_next == TT_NAME && knh_Token_isTopDot(ts[oc+1])) {
 		 /* @TEST (a).f "text" + 1 */
-		if(DP(ts[oc+1])->tt_next == TT_STR || DP(ts[oc+1])->tt_next == TT_TSTR) {
+		if(DP(ts[oc+1])->tt_next == TT_STR || DP(ts[oc+1])->tt_next == TT_TSTR || DP(ts[oc+1])->tt_next == TT_TSTR) {
 			DP(ts[oc])->tt_next = TT_PARENTHESIS;
 			stmt = new_Stmt(ctx, 0, STT_CALL);
 			knh_Stmt_add(ctx, stmt, new_TermVALUE(ctx, ts[oc], KNH_RVALUE));
@@ -1989,29 +1916,47 @@ void knh_Stmt_addMETA(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 	if(SP(o)->stt == STT_DONE || SP(o)->stt == STT_ERR || tc->meta == -1) {
 		return ;
 	}
-
 	Token **ts = tc->ts;
 	int i;
-	for(i = tc->meta; i < tc->c; i++) {
-		if(SP(ts[i])->tt == TT_LABEL) {
-			DBG2_P("LABEL!! %s", sToken(ts[i]));
-			knh_StmtMETA_addLabel(ctx, o, ts[i]);
-			continue;
+	if(tc->meta < tc->c) {
+		for(i = tc->meta; i < tc->c; i++) {
+			if(SP(ts[i])->tt == TT_LABEL) {
+				knh_StmtMETA_addLabel(ctx, o, ts[i]);
+			}
+			else if(SP(ts[i])->tt == TT_METAN) {
+				if(DP(ts[i])->tt_next == TT_PARENTHESIS) {
+					knh_StmtMETA_addMeta2(ctx, o, (String*)DP(ts[i-1])->data, ts[i]);
+					i++;
+				}
+				else {
+					DBG2_P("META!! %s", sToken(ts[i]));
+					knh_StmtMETA_addMeta(ctx, o, (String*)DP(ts[i])->data);
+				}
+			}
 		}
-		if(SP(ts[i])->tt == TT_METAN) {
-			if(DP(ts[i])->tt_next == TT_PARENTHESIS) {
-				DBG2_P("META2!! %s", sToken(ts[i-1]));
-				knh_StmtMETA_addMeta2(ctx, o, (String*)DP(ts[i-1])->data, ts[i]);
-				i++;
+		tc->meta = -1;
+	}
+	else {
+		for(i = tc->meta; i < tc->e; i++) {
+			if(SP(ts[i])->tt == TT_LABEL) {
+				knh_StmtMETA_addLabel(ctx, o, ts[i]);
+			}
+			else if(SP(ts[i])->tt == TT_METAN) {
+				if(DP(ts[i])->tt_next == TT_PARENTHESIS) {
+					knh_StmtMETA_addMeta2(ctx, o, (String*)DP(ts[i-1])->data, ts[i]);
+					i++;
+				}
+				else {
+					knh_StmtMETA_addMeta(ctx, o, (String*)DP(ts[i])->data);
+				}
 			}
 			else {
-				DBG2_P("META!! %s", sToken(ts[i]));
-				knh_StmtMETA_addMeta(ctx, o, (String*)DP(ts[i])->data);
+				break;
 			}
-			continue;
 		}
+		tc->meta = -1;
+		tc->c = i;
 	}
-	tc->meta = -1;
 }
 
 /* ------------------------------------------------------------------------ */

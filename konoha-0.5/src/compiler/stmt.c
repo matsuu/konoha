@@ -133,7 +133,7 @@ Stmt *knh_Stmt_tail(Stmt *o)
 {
 	Stmt *tail = o;
 	while(IS_NOTNULL(DP(tail)->next)) {
-		DBG_P("stt=%s", knh_stmt_tochar(SP(tail)->stt));
+		//DBG_P("stt=%s", knh_stmt_tochar(SP(tail)->stt));
 		tail = DP(tail)->next;
 	}
 	return tail;
@@ -160,8 +160,6 @@ knh_bool_t knh_Stmt_hasMeta(Stmt *o)
 {
 	return (IS_bDictMap(DP(o)->metaDictMap));
 }
-
-
 
 /* ------------------------------------------------------------------------ */
 
