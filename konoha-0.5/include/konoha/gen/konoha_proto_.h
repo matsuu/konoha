@@ -648,7 +648,7 @@ char *knh_format_newFMT(char *buf, size_t bufsiz, knh_bytes_t t, int dot, char *
 String *konoha_getFieldName(Ctx *ctx, knh_fieldn_t fn);
 knh_fieldn_t knh_tName_get_fnq(Ctx *ctx, knh_bytes_t tname, knh_fieldn_t def);
 String *new_String__mn(Ctx *ctx, knh_methodn_t mn);
-knh_methodn_t knh_tName_getMethodn(Ctx *ctx, knh_bytes_t tname, knh_methodn_t def);
+knh_methodn_t konoha_getMethodName(Ctx *ctx, knh_bytes_t tname, knh_methodn_t def);
 char *knh_format_methodn(Ctx *ctx, char *buf, size_t bufsiz, knh_methodn_t mn);
 char * knh_format_cmethodn(Ctx *ctx, char *buf, size_t bufsiz, knh_class_t cid, knh_methodn_t mn);
 knh_fileid_t konoha_getFileId(Ctx *ctx, knh_bytes_t t);

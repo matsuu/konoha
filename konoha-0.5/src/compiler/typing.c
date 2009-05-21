@@ -83,7 +83,7 @@ knh_methodn_t knh_Token_getmn(Ctx *ctx, Token *o)
 
 	knh_bytes_t name = knh_Token_tobytes(ctx, o);
 	if(SP(o)->tt == TT_NAME) {
-		knh_methodn_t mn = knh_tName_getMethodn(ctx, name, METHODN_NEWID);
+		knh_methodn_t mn = konoha_getMethodName(ctx, name, METHODN_NEWID);
 		if(knh_Token_isGetter(o)) {
 			return mn | KNH_FLAG_MN_GETTER;
 		}
@@ -97,11 +97,11 @@ knh_methodn_t knh_Token_getmn(Ctx *ctx, Token *o)
 		if(idx != -1) {
 			name = knh_bytes_last(name, idx+1);
 		}
-		knh_methodn_t mn = knh_tName_getMethodn(ctx, name, METHODN_NEWID);
+		knh_methodn_t mn = konoha_getMethodName(ctx, name, METHODN_NEWID);
 		return mn;
 	}
 	else if(SP(o)->tt == TT_MT) {
-		return knh_tName_getMethodn(ctx, name, METHODN_NEWID) | KNH_FLAG_MN_MOVTEXT;
+		return konoha_getMethodName(ctx, name, METHODN_NEWID) | KNH_FLAG_MN_MOVTEXT;
 	}
 	DBG2_P("SP(o)->tt=%s, '%s'", knh_token_tochar(SP(o)->tt), (char*)name.buf);
 	TODO();
@@ -692,7 +692,7 @@ int knh_TokenCMETHODN_typing(Ctx *ctx, Token *o, NameSpace *ns)
 		return 0;
 	}
 	t = knh_bytes_last(t, idx+1);
-	knh_methodn_t mn = knh_tName_getMethodn(ctx, t, METHODN_NONAME);
+	knh_methodn_t mn = konoha_getMethodName(ctx, t, METHODN_NONAME);
 	Method *mtd = knh_Class_getMethod(ctx, cid, mn);
 	if(IS_NULL(mtd)) {
 		knh_Token_perror(ctx, o, KMSG_UMETHODN);

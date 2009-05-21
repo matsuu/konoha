@@ -281,7 +281,7 @@ static METHOD knh__String_opFmt(Ctx *ctx, knh_sfp_t *sfp)
 		}
 		knh_bytes_t mtn = knh_bytes_first(fmt, loc);
 		knh_methodn_t mt =
-			(mtn.len > 1) ? knh_tName_getMethodn(ctx, mtn, METHODN__empty) : METHODN__empty;
+			(mtn.len > 1) ? konoha_getMethodName(ctx, mtn, METHODN__empty) : METHODN__empty;
 		int idx = -1;
 		if(fmt.buf[loc+2] == '}') { /* %s{1} */
 			idx = fmt.buf[loc+1] - '0';

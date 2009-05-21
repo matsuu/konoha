@@ -476,7 +476,7 @@ KNHAPI(void) konoha_shell(konoha_t konoha)
 				knh_cwb_clear(cwb);
 				knh_Bytes_write(ctx, cwb.ba, B(bufc));
 			}
-			knh_Bytes_putc(ctx, cwb.ba, ';');
+			//knh_Bytes_putc(ctx, cwb.ba, ';');
 			knh_Bytes_putc(ctx, cwb.ba, '\n');
 			{
 				InputStream *in = new_BytesInputStream(ctx, cwb.ba, cwb.pos, knh_Bytes_size(cwb.ba));

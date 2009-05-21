@@ -386,7 +386,7 @@ String *new_String__mn(Ctx *ctx, knh_methodn_t mn)
 
 /* ------------------------------------------------------------------------ */
 
-knh_methodn_t knh_tName_getMethodn(Ctx *ctx, knh_bytes_t tname, knh_methodn_t def)
+knh_methodn_t konoha_getMethodName(Ctx *ctx, knh_bytes_t tname, knh_methodn_t def)
 {
 	if(tname.len == 0 || tname.len > 64) {
 		DBG2_P("invalid method name '%s'", tname.buf);
