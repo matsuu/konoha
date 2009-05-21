@@ -13,7 +13,7 @@
 #include <GLUT/glut.h>
 #include <pthread.h>
 
-pthread_mutex_t mytex;
+pthread_mutex_t mytex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
 #ifdef KONOHA_OS__LINUX
@@ -109,9 +109,9 @@ void knh_glut_idle (void)
   Ctx *lctx = &gl_ctx;
 #endif
   knh_sfp_t *lsfp = KNH_LOCAL(lctx);
-
+  //  pthread_mutex_lock(&mytex);
   knh_Closure_invokesfp(lctx, idlefunc, lsfp, 0);
-
+  //  pthread_mutex_unlock(&mytex);
 }
 
 void knh_glut_mouse(int button, int state, int x, int y)
@@ -218,7 +218,9 @@ METHOD GL_glutIdleFunc(Ctx *ctx, knh_sfp_t *sfp)
 	idle_lock = 0;
   }
   */
+  //  pthread_mutex_lock(&mytex);
   idlefunc = sfp[1].cc;
+  //  pthread_mutex_unlock(&mytex);
   glutIdleFunc(knh_glut_idle);
   KNH_RETURN_void(ctx, sfp);
 }
