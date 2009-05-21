@@ -2661,7 +2661,7 @@ static void knh_ftraverse__default(Ctx *ctx, Object *o, knh_ftraverse f)
 
 static int knh_fcompareTo__default(Object *o1, Object *o2)
 {
-	return ((int)o1 - (int)o2);
+	return (int)((knh_intptr_t)o1 - (knh_intptr_t)o2);
 }
 
 /* ------------------------------------------------------------------------ */
