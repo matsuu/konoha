@@ -427,7 +427,7 @@ void knh_Stmt_add_PARAMs(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		Stmt *stmt = NULL;
 		knh_Token_tc(tc->ts[tc->c], &param_tc); tc->c += 1;
 		if(param_tc.c == param_tc.e) {
-			knh_Stmt_add(ctx, o, TM(new_StmtDONE(ctx)));
+			knh_Stmt_add(ctx, o, TM(new_Stmt(ctx, 0, STT_DONE)));
 			return;
 		}
 		while(param_tc.c <param_tc.e) {
@@ -1159,14 +1159,12 @@ Term *new_TermVALUE(Ctx *ctx, Token *tk, int lr)
 
 Stmt *new_StmtINSTMT(Ctx *ctx, Token *tk)
 {
-	knh_tokens_t tc;
-	Stmt *first_stmt = NULL;
-#if defined(KNH_DBGMODE2)
-	int prev = 0;
-#endif
+	DBG2_ASSERT(SP(tk)->tt == TT_BRACE);
 
-	KNH_ASSERT(SP(tk)->tt == TT_BRACE);
+	knh_tokens_t tc;
 	knh_Token_tc(tk, &tc);
+	Stmt *first_stmt = NULL, *last_stmt = NULL;
+	int prev = 0;
 
 	while(tc.c < tc.e) {
 		//DBG2_P("S c = %d, e = %d", (int)tc.c, (int)tc.e);
@@ -1174,22 +1172,24 @@ Stmt *new_StmtINSTMT(Ctx *ctx, Token *tk)
 			tc.c += 1;
 			continue;
 		}
-#if defined(KNH_DBGMODE2)
 		prev = tc.c;
-#endif
-		first_stmt = knh_StmtNULL_tail_append(ctx, first_stmt, new_StmtSTMT1(ctx, &tc));
-#if defined(KNH_DBGMODE2)
+		if(first_stmt == NULL) {
+			first_stmt = new_StmtSTMT1(ctx, &tc);
+			last_stmt = first_stmt;
+		}
+		else {
+			KNH_SETv(ctx, DP(last_stmt)->next, new_StmtSTMT1(ctx, &tc));
+			last_stmt = DP(last_stmt)->next;
+		}
 		if(prev == tc.c) { /* infinate loop */
-			DBG2_P("Infinate loop? prev = %d, c = %d, e = %d", prev, tc.c, tc.e);
+			DBG_P("Infinate loop? prev = %d, c = %d, e = %d", prev, tc.c, tc.e);
 			KNH_ABORT();
 			break;
 		}
-#endif
 	}
 	if(first_stmt == NULL) {
-		first_stmt = new_StmtDONE(ctx);
+		first_stmt = new_Stmt(ctx, 0, STT_DONE);
 	}
-	//DBG2_P("E c = %d, e = %d", (int)tc.c, (int)tc.e);
 	return first_stmt;
 }
 
@@ -2352,7 +2352,7 @@ static void knh_Stmt_add_EXTENDS(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		knh_Stmt_add(ctx, o, TM(new_StmtIMPLEMENTS(ctx, tc)));
 	}
 	else {
-		knh_Stmt_add(ctx, o, TM(new_StmtDONE(ctx)));
+		knh_Stmt_add(ctx, o, TM(new_Stmt(ctx, 0, STT_DONE)));
 	}
 	knh_Stmt_add_STMT1(ctx, o, tc);
 }
@@ -2374,7 +2374,7 @@ static Stmt *new_StmtFORMAT(Ctx *ctx, knh_tokens_t *tc)
 {
 	knh_Token_perror(ctx, tc->ts[tc->c-1], KMSG_EFUTURE);
 	knh_tokens_nextStmt(tc);
-	return new_StmtDONE(ctx);
+	return new_Stmt(ctx, 0, STT_DONE);
 //	Stmt *o = new_StmtMETA(ctx, tc, STT_FORMAT);
 //	knh_Stmt_add_MT(ctx, o, tc); /* MT */
 //	knh_Stmt_add_PARAMs(ctx, o, tc); /* PARAM* */
@@ -2427,7 +2427,7 @@ static Stmt *new_StmtWEAVE(Ctx *ctx, knh_tokens_t *tc)
 {
 	knh_Token_perror(ctx, tc->ts[tc->c-1], KMSG_EFUTURE);
 	knh_tokens_nextStmt(tc);
-	return new_StmtDONE(ctx);
+	return new_Stmt(ctx, 0, STT_DONE);
 //	Stmt *o = new_StmtMETA(ctx, tc, STT_WEAVE);
 //	knh_Stmt_add_ANY(ctx, o, tc); /* ANY */
 //	knh_Stmt_add_CMETHODN(ctx, o, tc); /* CMETHODN */
@@ -2441,7 +2441,7 @@ static Stmt *new_StmtASPECT(Ctx *ctx, knh_tokens_t *tc)
 {
 	knh_Token_perror(ctx, tc->ts[tc->c-1], KMSG_EFUTURE);
 	knh_tokens_nextStmt(tc);
-	return new_StmtDONE(ctx);
+	return new_Stmt(ctx, 0, STT_DONE);
 //	Stmt *o = new_StmtMETA(ctx, tc, STT_ASPECT);
 //	knh_Stmt_add_TYPEN(ctx, o, tc); /* TYPEN */
 //	knh_Stmt_add_CMETHOD(ctx, o, tc); /* cmethod */
@@ -2470,7 +2470,7 @@ static void knh_Stmt_add_ELSE(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		knh_Stmt_add_STMT1(ctx, o, tc);
 	}
 	else {
-		knh_Stmt_add(ctx, o, TM(new_StmtDONE(ctx)));
+		knh_Stmt_add(ctx, o, TM(new_Stmt(ctx, 0, STT_DONE)));
 	}
 }
 
@@ -2492,7 +2492,7 @@ static Stmt *new_StmtSWITCH(Ctx *ctx, knh_tokens_t *tc)
 {
 	knh_Token_perror(ctx, tc->ts[tc->c-1], KMSG_EFUTURE);
 	knh_tokens_nextStmt(tc);
-	return new_StmtDONE(ctx);
+	return new_Stmt(ctx, 0, STT_DONE);
 //	Stmt *o = new_StmtMETA(ctx, tc, STT_SWITCH);
 //	knh_Stmt_add_PEXPR(ctx, o, tc); /* pexpr */
 //	knh_Stmt_add_STMT1(ctx, o, tc); /* { */
@@ -2655,7 +2655,7 @@ void knh_Stmt_add_PSTMT3(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		knh_Stmt_add(ctx, o, TM(new_StmtLETEXPR(ctx, &stmt_tc)));
 	}
 	else {
-		knh_Stmt_add(ctx, o, TM(new_StmtDONE(ctx)));
+		knh_Stmt_add(ctx, o, TM(new_Stmt(ctx, 0, STT_DONE)));
 	}
 
 	stmt_tc = knh_tokens_splitEXPR(ctx, &ptc, TT_SEMICOLON);
@@ -2672,7 +2672,7 @@ void knh_Stmt_add_PSTMT3(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		knh_Stmt_add(ctx, o, TM(new_StmtLETEXPR(ctx, &ptc)));
 	}
 	else {
-		knh_Stmt_add(ctx, o, TM(new_StmtDONE(ctx)));
+		knh_Stmt_add(ctx, o, TM(new_Stmt(ctx, 0, STT_DONE)));
 	}
 
 	tc->c += 1;
@@ -2771,7 +2771,7 @@ static void knh_Stmt_add_CATCH(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		knh_Stmt_add(ctx, o, TM(new_StmtCATCH(ctx, tc)));
 	}
 	else {
-		knh_Stmt_add(ctx, o, TM(new_StmtDONE(ctx)));
+		knh_Stmt_add(ctx, o, TM(new_Stmt(ctx, 0, STT_DONE)));
 	}
 
 	if(tc->c < tc->e && SP(tc->ts[tc->c])->tt == TT_FINALLY) {
@@ -2779,7 +2779,7 @@ static void knh_Stmt_add_CATCH(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		knh_Stmt_add_STMT1(ctx, o, tc);
 	}
 	else {
-		knh_Stmt_add(ctx, o, TM(new_StmtDONE(ctx)));
+		knh_Stmt_add(ctx, o, TM(new_Stmt(ctx, 0, STT_DONE)));
 	}
 }
 
@@ -3020,7 +3020,7 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 	L_TAIL:;
 	if(!(tc->c < tc->e)) {
 		DBG2_P("c = %d, e = %d", tc->c, tc->e);
-		return new_StmtDONE(ctx);
+		return new_Stmt(ctx, 0, STT_DONE);
 	}
 
 	tkc = tc->ts[tc->c];
@@ -3124,6 +3124,7 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 		return new_StmtASSERT(ctx, tc);
 	case TT_SEMICOLON:
 		knh_tokens_nextStmt(tc);
+		DBG2_P("EMPTY STATEMENT tc->c=%d, tc->e=%d", tc->c, tc->e);
 		return new_Stmt(ctx, 0, STT_DONE);
 
 	case TT_BRACE:  /* BRACE */

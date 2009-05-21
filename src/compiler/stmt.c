@@ -49,14 +49,6 @@ Stmt* new_Stmt(Ctx *ctx, knh_flag_t flag, knh_stmt_t stt)
 }
 
 /* ======================================================================== */
-/* [DONE] */
-
-Stmt* new_StmtDONE(Ctx *ctx)
-{
-	return new_Stmt(ctx, 0, STT_DONE);
-}
-
-/* ======================================================================== */
 /* [ERR] */
 
 void knh_Stmt_toERR(Ctx *ctx, Stmt *stmt, Term *tm)
@@ -74,7 +66,7 @@ void knh_Stmt_toERR(Ctx *ctx, Stmt *stmt, Term *tm)
 		line =  SP((Stmt*)tm)->line;
 	}
 	{
-		char buf[512];
+		char buf[256];
 		knh_snprintf(buf, sizeof(buf), "Script!!: running errors at %s:%d", FILEIDN(SP(stmt)->fileid), SP(stmt)->line);
 		KNH_SETv(ctx, DP(stmt)->errMsg, new_String(ctx, B(buf), NULL));
 		KNH_SETv(ctx, DP(stmt)->next, KNH_NULL);
@@ -110,7 +102,7 @@ void knh_Stmt_add(Ctx *ctx, Stmt *o, Term *tm)
 	}
 	KNH_SETv(ctx, DP(o)->terms[DP(o)->size], tm);
 	DP(o)->size++;
-	if(IS_Stmt((Stmt*)tm)) {
+	if(IS_Stmt(tm)) {
 		Stmt *stmt = (Stmt*)tm;
 		DP(o)->line_end = SP(stmt)->line;
 		if(SP(o)->line == 0) {
@@ -141,6 +133,7 @@ Stmt *knh_Stmt_tail(Stmt *o)
 {
 	Stmt *tail = o;
 	while(IS_NOTNULL(DP(tail)->next)) {
+		DBG_P("stt=%s", knh_stmt_tochar(SP(tail)->stt));
 		tail = DP(tail)->next;
 	}
 	return tail;
@@ -151,16 +144,11 @@ Stmt *knh_Stmt_tail(Stmt *o)
 Stmt* knh_StmtNULL_tail_append(Ctx *ctx, Stmt *o, Stmt *stmt)
 {
 	if(o == NULL) {
-		if(SP(stmt)->stt != STT_DONE) {
-			return stmt;
-		}
-		return NULL;
+		return stmt;
 	}
 	else {
-		if(SP(stmt)->stt != STT_DONE) {
-			Stmt *tail = knh_Stmt_tail(o);
-			KNH_SETv(ctx, DP(tail)->next, stmt);
-		}
+		Stmt *tail = knh_Stmt_tail(o);
+		KNH_SETv(ctx, DP(tail)->next, stmt);
 		return o;
 	}
 }
@@ -207,19 +195,6 @@ knh_flag_t knh_Stmt_metaflag__field(Ctx *ctx, Stmt *b)
 {
 	return 0;
 }
-
-///* ------------------------------------------------------------------------ */
-//
-//knh_bool_t knh_StmtMETA_istime(Stmt *o)
-//{
-//	if(IS_NOTNULL(DP(o)->metaDictMap)) {
-//		Object *v = knh_DictMap_get__b(ctx, DP(o)->metaDictMap, STEXT("Time"));
-//		if(IS_NOTNULL(v)) {
-//			return 1;
-//		}
-//	}
-//	return 0;
-//}
 
 /* ------------------------------------------------------------------------ */
 

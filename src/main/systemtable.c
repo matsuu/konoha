@@ -117,7 +117,7 @@ void knh_ObjectPageTable_free(Ctx *ctx, char *thead)
 			{
 				switch(o->h.bcid) {
 				case CLASS_Class:
-					fprintf(stderr, "\t%s cid=%d\n", STRUCTN(o->h.bcid), (int)((knh_Class_t*)o)->cid);
+					fprintf(stderr, "async mem cid=%d, refc=%d\n", (int)((knh_Class_t*)o)->cid, (int)o->h.refc);
 				break;
 				case CLASS_Int:
 					fprintf(stderr, "async mem cid=%s(%d), refc=%d ivalue='%d'\n", STRUCTN(o->h.bcid), (int)o->h.cid, (int)o->h.refc, (int)((Int*)o)->n.ivalue);
@@ -126,7 +126,7 @@ void knh_ObjectPageTable_free(Ctx *ctx, char *thead)
 					fprintf(stderr, "async mem cid=%s(%d), refc=%d str='%s'\n", STRUCTN(o->h.bcid), (int)o->h.cid, (int)o->h.refc, (char*)((knh_String_t*)o)->str);
 				break;
 				case CLASS_Stmt:
-					fprintf(stderr, "\t%s stmt='%s'\n", STRUCTN(o->h.bcid), knh_stmt_tochar((SP(Stmt*)o)->stt));
+					fprintf(stderr, "async mem stmt='%s', refc=%d\n", knh_stmt_tochar((SP(Stmt*)o)->stt), (int)o->h.refc);
 				break;
 				default:
 					fprintf(stderr, "async mem cid=%s(%d), refc=%d\n", STRUCTN(o->h.bcid), (int)o->h.cid, (int)o->h.refc);
