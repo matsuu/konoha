@@ -407,12 +407,12 @@ static METHOD knh__String_getChar(Ctx *ctx, knh_sfp_t *sfp)
 	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
 	if(knh_String_isASCII(sfp[0].s)) {
 		size_t n = knh_array_index(ctx, p_int(sfp[1]), knh_String_strlen(sfp[0].s));
-		KNH_RETURN_Int(ctx, sfp, base.buf[n]);
+		KNH_RETURN_Int(ctx, sfp, knh_uchar_toucs4(&base.buf[n]));
 	}
 	else {
 		size_t off = knh_array_index(ctx, p_int(sfp[1]), knh_bytes_mlen(base));
 		knh_bytes_t sub = knh_bytes_mofflen(base, off, 1);
-		KNH_RETURN_Int(ctx, sfp, sub.buf[0]);
+		KNH_RETURN_Int(ctx, sfp, knh_uchar_toucs4(&sub.buf[0]));
 	}
 }
 
