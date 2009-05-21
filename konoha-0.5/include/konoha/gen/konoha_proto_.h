@@ -462,7 +462,7 @@ void knh_Asm_loadCompiledMethod(Ctx *ctx, Asm *abr);
 knh_fmethod knh_Asm_getCompiledMethod(Ctx *ctx, Asm *abr, knh_bytes_t cname, knh_bytes_t mname);
 /* ../src/compiler/konohac.c */
 int knh_Stmt_complie(Ctx *ctx, Stmt *stmt, String *nsname, int isEval);
-Stmt *knh_bytes_parseStmt(Ctx *ctx, knh_bytes_t kscript);
+Stmt *knh_bytes_parseStmt(Ctx *ctx, knh_bytes_t kscript, int fileid, int line);
 void konohac_eval(Ctx *ctx, String *nsname, InputStream *in);
 void knh_Asm_openlib(Ctx *ctx, Asm *abr, knh_bytes_t fpath);
 int knh_NameSpace_loadScript(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isEval);
@@ -481,7 +481,6 @@ void knh_Asm_perror(Ctx *ctx, Asm *abr, int pe, char *msg);
 void knh_Asm_assert(Ctx *ctx, Asm *abr, int c);
 /* ../src/compiler/stmt.c */
 Stmt* new_Stmt(Ctx *ctx, knh_flag_t flag, knh_stmt_t stt);
-Stmt* new_StmtDONE(Ctx *ctx);
 void knh_Stmt_toERR(Ctx *ctx, Stmt *stmt, Term *tm);
 void knh_Stmt_add(Ctx *ctx, Stmt *o, Term *tm);
 Stmt *knh_Stmt_tail(Stmt *o);

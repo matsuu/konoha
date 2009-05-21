@@ -62,6 +62,10 @@ knh_flag_t knh_StmtCLASS_flag(Ctx *ctx, Stmt *o)
 		if(IS_NOTNULL(v)) {
 			flag |= KNH_FLAG_CF_SINGLETON;
 		}
+		v = knh_DictMap_get__b(ctx, DP(o)->metaDictMap, STEXT("Release"));
+		if(IS_NOTNULL(v)) {
+			flag |= KNH_FLAG_CF_RELEASE;
+		}
 	}
 	return flag;
 }
@@ -451,39 +455,6 @@ int knh_StmtUMAPMAP_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	return 1;
 }
 
-///* ------------------------------------------------------------------------ */
-//
-//void knh_stmtvisit_declc__weave(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int level)
-//{
-//	//DEBUG_STMT(ctx, stmt);
-//	//Asm *mc = (Asm*)v;
-//	/* ['weave', 'ANY', 'METHODFN'] */
-//	fprintf(stdout, "weaving %s into %s..\n", sToken((Token*)stmt->terms[1]), sToken((Token*)stmt->terms[2]));
-//	Method *mtd = knh_Class_getMethod(ctx, CLASS_Amazon, METHODN_placeOrder);
-//	if(IS_Method(mtd)) {
-//		String *aspect = ((Token*)stmt->terms[1])->data;
-//		if(IS_NULL(aspect)) {
-//			knh_weave(ctx, NULL, mtd);
-//		}
-//		else if(knh_String_equals(aspect, STEXT("null"))) {
-//			knh_weave(ctx, NULL, mtd);
-//		}
-//		else if(knh_String_equals(aspect, STEXT("RBAC"))) {
-//			knh_weave(ctx, knh_security_RBAC, mtd);
-//		}
-//		else if(knh_String_equals(aspect, STEXT("Audit"))) {
-//			knh_weave(ctx, knh_security_Audit, mtd);
-//		}
-//		else {
-//			KNH_THROWf(ctx, "NoSuchAspect!!: %s", knh_String_tochar(aspect));
-//		}
-//	}
-//	else{
-//		DEBUG("what?");
-//	}
-//	knh_Stmt_done(ctx, stmt);
-//}
-
 /* ------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------ */
@@ -510,7 +481,6 @@ int knh_Stmt_eval(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int isEval)
 			stmt = newstmt;
 		}
 	}
-	KNH_LPUSH(ctx, stmt);
 	KNH_ASM_METHOD(ctx, abr, mtd, NULL, stmt, 0 /* isIteration */);
 	if(knh_Method_isAbstract(mtd) || SP(stmt)->stt == STT_ERR) {
 		KNH_LOCALBACK(ctx, lsfp);
@@ -549,8 +519,10 @@ int knh_Stmt_complie(Ctx *ctx, Stmt *stmt, String *nsname, int isEval)
 {
 	Asm *abr = knh_Context_getAsm(ctx);
 	NameSpace *ns = knh_Context_setNameSpace(ctx, nsname);
-	Stmt *cur = stmt;
+	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
+	KNH_LPUSH(ctx, stmt);
 
+	Stmt *cur = stmt;
 	DP(abr)->fileid = SP(stmt)->fileid;
 	while(IS_Stmt(cur)) {
 		knh_stmt_t stt = SP(cur)->stt;
@@ -595,7 +567,7 @@ int knh_Stmt_complie(Ctx *ctx, Stmt *stmt, String *nsname, int isEval)
 			break;
 		}
 		if(res == 0) {
-			return 0;
+			goto L_FAILED;
 		}
 		cur = DP(cur)->next;
 	}
@@ -620,16 +592,16 @@ int knh_Stmt_complie(Ctx *ctx, Stmt *stmt, String *nsname, int isEval)
 			knh_Asm_initThisScript(ctx, abr);
 			tm = knh_StmtDECL_typing(ctx, cur, abr, ns);
 			break;
-		}
+			}
 		case STT_LET: {
 			knh_Asm_initThisScript(ctx, abr);
 			tm = knh_StmtLET_typing(ctx, cur, abr, ns, TYPE_void);
 			break;
-		}
+			}
 		}
 		if(tm == NULL) {
 			knh_Stmt_done(ctx, stmt);
-			return 0;
+			goto L_FAILED;
 		}
 		cur = DP(cur)->next;
 	}
@@ -659,13 +631,19 @@ int knh_Stmt_complie(Ctx *ctx, Stmt *stmt, String *nsname, int isEval)
 			break;
 		default:
 			if(!knh_Stmt_eval(ctx, cur, abr, ns, isEval)) {
-				return 0;
+				goto L_FAILED;
 			}
 		}
 		knh_Stmt_done(ctx, cur);
 		cur = DP(cur)->next;
 	}
+
+	KNH_LOCALBACK(ctx, lsfp);
 	return 1;
+
+	L_FAILED:;
+	KNH_LOCALBACK(ctx, lsfp);
+	return 0;
 }
 
 /* ======================================================================== */
@@ -679,21 +657,21 @@ Stmt *knh_InputStream_parseStmt(Ctx *ctx, InputStream *in)
 	KNH_LPUSH(ctx, in);
 	knh_Token_parse(ctx, tk, in);
 	DBG2_DUMP(ctx, tk, KNH_NULL, "tokens");
-	Stmt *stmt = new_StmtINSTMT(ctx, tk); // new_StmtDONE(ctx);
+	Stmt *stmt = new_StmtINSTMT(ctx, tk); // new_Stmt(ctx, 0, STT_DONE)(ctx);
 	return stmt;
 }
 
 
 /* ------------------------------------------------------------------------ */
 
-Stmt *knh_bytes_parseStmt(Ctx *ctx, knh_bytes_t kscript)
+Stmt *knh_bytes_parseStmt(Ctx *ctx, knh_bytes_t kscript, int fileid, int line)
 {
 	knh_cwb_t cwb = new_cwb(ctx);
 	knh_Bytes_write(ctx, cwb.ba, kscript);
 	knh_Bytes_putc(ctx, cwb.ba, ';');
 	InputStream *in = new_BytesInputStream(ctx, cwb.ba, cwb.pos, knh_Bytes_size(cwb.ba));
-	DP(in)->fileid = 0;
-	DP(in)->line = 0;
+	DP(in)->fileid = (knh_fileid_t)fileid;
+	DP(in)->line = line;
 	Stmt *stmt = knh_InputStream_parseStmt(ctx, in);
 	knh_cwb_clear(cwb);
 	return stmt;
@@ -709,7 +687,7 @@ void konohac_eval(Ctx *ctx, String *nsname, InputStream *in)
 	{
 		Stmt *stmt = knh_InputStream_parseStmt(ctx, in);
 		KNH_LPUSH(ctx, stmt);
-		DBG2_DUMP(ctx, stmt, KNH_NULL, "stmt");
+		DBG_DUMP(ctx, stmt, KNH_NULL, "stmt");
 		knh_Stmt_complie(ctx, stmt, nsname, !knh_Context_isCompiling(ctx) /* isrun 1 */);
 	}
 	KNH_LOCALBACK(ctx, lsfp);

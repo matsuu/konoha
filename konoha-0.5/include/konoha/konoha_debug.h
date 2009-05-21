@@ -92,7 +92,8 @@
 
 #define DBG_DUMP(ctx, o, opt, msg) \
 	fprintf(stdout, "DBG[%s]: %s\n", __FUNCTION__, msg); \
-	knh_format(ctx, KNH_STDOUT, METHODN__dump, o, opt); \
+	knh_format(ctx, KNH_STDOUT, METHODN__dump, UP(o), UP(opt)); \
+	knh_flush(ctx, KNH_STDOUT);\
 	fprintf(stdout, "\n"); \
 
 #define TODO() \
@@ -126,7 +127,14 @@
 		fprintf(stderr, "\n"); \
 	}\
 
-#define DBG_DUMP(ctx, o, opt, msg)
+#define DBG_DUMP(ctx, o, opt, msg) \
+	if(konoha_isDebugMode2()) {\
+		fprintf(stdout, "DBG[%s]: %s\n", __FUNCTION__, msg); \
+		knh_format(ctx, KNH_STDOUT, METHODN__dump, UP(o), UP(opt)); \
+		knh_flush(ctx, KNH_STDOUT);\
+		fprintf(stdout, "\n"); \
+	}\
+
 #define TODO()
 #define DBG_ASSERT(c, fmt, ...)   KNH_ASSERT(c)
 
