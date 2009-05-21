@@ -474,7 +474,7 @@ Token *new_TokenFUNCNAME(Ctx *ctx, Token *tk, knh_bytes_t name, int isfunc, int 
 		return tkfunc;
 	}
 	else {
-		knh_methodn_t mn = knh_tName_getMethodn(ctx, name, METHODN_NEWID);
+		knh_methodn_t mn = konoha_getMethodName(ctx, name, METHODN_NEWID);
 		Token *tkfunc = new_TokenMN(ctx, FL(tk), mn);
 		knh_Token_setTopDot(tkfunc, 1);
 		return tkfunc;

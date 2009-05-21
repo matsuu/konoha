@@ -412,7 +412,7 @@ int knh_StmtUFUNC_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 			knh_Token_perror(ctx, tk, KMSG_UCLASSN);
 			return 0;
 		}
-		knh_methodn_t mn = knh_tName_getMethodn(ctx, knh_bytes_last(name, loc+1), METHODN_NONAME);
+		knh_methodn_t mn = konoha_getMethodName(ctx, knh_bytes_last(name, loc+1), METHODN_NONAME);
 		if(mn == METHODN_NONAME) {
 			knh_Token_perror(ctx, tk, KMSG_UMETHODN);
 			return 0;
@@ -456,8 +456,6 @@ int knh_StmtUMAPMAP_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 }
 
 /* ------------------------------------------------------------------------ */
-/* ------------------------------------------------------------------------ */
-/* ------------------------------------------------------------------------ */
 
 static
 int knh_Stmt_eval(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int isEval)
@@ -467,9 +465,28 @@ int knh_Stmt_eval(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int isEval)
 	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 
 	int isExpr = knh_stmt_isExpr(SP(stmt)->stt);
-	knh_methodn_t mt = SP(stmt)->stt == STT_MT ? METHODN__s : METHODN__k ;
+
+	knh_methodn_t mt = METHODN__k;
+	if(SP(stmt)->stt == STT_MT) {
+		Token *tk0 = DP(stmt)->tokens[0];
+		knh_methodn_t mn = konoha_getMethodName(ctx, knh_Token_tobytes(ctx, tk0), METHODN_NEWID);
+		char *name = FIELDN(METHODN_TOFIELDN(mn));
+		if(name[1] != 0) mt = METHODN__s;
+	}
+
 	if(isExpr) {
 		if(SP(stmt)->stt == STT_CALL1) {
+			Token *tk0 = DP(stmt)->tokens[0];
+			if(SP(tk0)->tt == TT_STR) {
+				if(isEval) {
+					knh_write(ctx, KNH_STDOUT, knh_String_tobytes(DP(tk0)->text));
+					knh_write_EOL(ctx, KNH_STDOUT);
+				}
+				return 1;
+			}
+			if(SP(tk0)->tt == TT_ESTR) {
+				mt = METHODN__s;
+			}
 			SP(stmt)->stt = STT_RETURN;
 		}
 		else if(SP(stmt)->stt == STT_LET) {
@@ -479,8 +496,10 @@ int knh_Stmt_eval(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int isEval)
 			Stmt *newstmt = new_Stmt(ctx, 0, STT_RETURN);
 			knh_Stmt_add(ctx, newstmt, UP(stmt));
 			stmt = newstmt;
+			KNH_LPUSH(ctx, stmt);
 		}
 	}
+
 	KNH_ASM_METHOD(ctx, abr, mtd, NULL, stmt, 0 /* isIteration */);
 	if(knh_Method_isAbstract(mtd) || SP(stmt)->stt == STT_ERR) {
 		KNH_LOCALBACK(ctx, lsfp);
@@ -510,6 +529,7 @@ int knh_Stmt_eval(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int isEval)
 		L_CATCH:;
 		KNH_PRINT_STACKTRACE(ctx, lsfp, 0);
 	}
+	KNH_LOCALBACK(ctx, lsfp);
 	return 1;
 }
 
