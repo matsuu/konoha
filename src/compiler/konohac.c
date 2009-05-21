@@ -681,7 +681,6 @@ Stmt *knh_InputStream_parseStmt(Ctx *ctx, InputStream *in)
 	return stmt;
 }
 
-
 /* ------------------------------------------------------------------------ */
 
 Stmt *knh_bytes_parseStmt(Ctx *ctx, knh_bytes_t kscript, int fileid, int line)
