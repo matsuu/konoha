@@ -913,6 +913,120 @@ int knh_Token_typing(Ctx *ctx, Token *tk, Asm *abr, NameSpace *ns, knh_type_t re
 }
 
 /* ======================================================================== */
+/* [ESTR] */
+
+int knh_ismtchar(int c)
+{
+	return isalnum(c);
+}
+
+/* ------------------------------------------------------------------------ */
+
+int knh_bytes_findMT(Ctx *ctx, knh_bytes_t text, knh_bytes_t *mt, knh_bytes_t *expr, knh_bytes_t *next)
+{
+	int i;
+	mt->buf = (knh_uchar_t*)""; mt->len = 0;
+	expr->buf = (knh_uchar_t*)""; expr->len = 0;
+	next->buf = (knh_uchar_t*)""; next->len = 0;
+
+	for(i = 0; i < (int)text.len - 1; i++) {
+		if(text.buf[i] == '%') {
+			i++;
+			if(knh_ismtchar(text.buf[i])) {
+				mt->buf = text.buf + (i);
+				goto L_MT;
+			}
+		}
+	}
+	return 0;
+
+	L_MT:;
+	for(; i < (int)text.len - 1; i++) {
+		if(knh_ismtchar(text.buf[i])) {
+			mt->len += 1; continue;
+		}
+		if(text.buf[i] == '{') {
+			i++;
+			goto L_EXPR;
+		}
+		break;
+	}
+	next->buf = text.buf + i;
+	next->len = text.len - i;
+	return 0;
+
+	L_EXPR: {
+		int level = 1;
+		expr->buf = text.buf + i;
+		for(; i < text.len; i++) {
+			if(text.buf[i] == '}') {
+				level--;
+				if(level == 0) {
+					if(i + 1 < text.len) {
+						next->buf = text.buf + (i+1);
+						next->len = text.len - (i+1);
+					}
+					return 1;
+				}
+			}
+			expr->len += 1;
+			if(text.buf[i] == '{') level++;
+		}
+	}
+	return 0;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+Term *knh_TokenESTR_toTerm(Ctx *ctx, Token *tk, Asm *abr)
+{
+	knh_bytes_t text = knh_Token_tobytes(ctx, tk);
+	knh_bytes_t mt, expr, next;
+	int res = knh_bytes_findMT(ctx, text, &mt, &expr, &next);
+	if(res == 0) {
+		SP(tk)->tt = TT_STR;
+		return TM(tk);
+	}
+	else {
+		knh_sfp_t *lsfp = KNH_LOCAL(ctx);
+		KNH_LPUSH(ctx, KNH_NULL);   // lsfp[0]
+		Stmt *stmt = new_Stmt(ctx, 0, STT_OP);
+		Token *tkop = new_Token(ctx, 0, SP(tk)->fileid, SP(tk)->line, TT_ADD);
+		knh_Stmt_add(ctx, stmt, TM(tkop));
+		while(res) {
+			//DBG2_P("mt='%s', len=%d", mt.buf, mt.len);
+			//DBG2_P("expr='%s', len=%d", expr.buf, expr.len);
+			//DBG2_P("next='%s', len=%d", next.buf, next.len);
+			text.len = (mt.buf - text.buf) - 1;
+			if(text.len > 0) {
+				knh_Stmt_add(ctx, stmt, new_TermCONST(ctx, FL(tk), UP(new_String(ctx, text, NULL))));
+			}
+			Stmt *stmt_expr = knh_bytes_parseStmt(ctx, expr, SP(tk)->fileid, SP(tk)->line);
+			KNH_SETv(ctx, lsfp[0].o, stmt_expr);
+			if(knh_stmt_isExpr(SP(stmt_expr)->stt)) {
+				Stmt *stmt_mt = new_Stmt(ctx, 0, STT_MT);
+				knh_Stmt_add(ctx, stmt, TM(stmt_mt));
+				tkop = new_Token(ctx, 0, SP(tk)->fileid, SP(tk)->line, TT_MT);
+				KNH_SETv(ctx, DP(tkop)->data, new_String(ctx, mt, NULL));
+				knh_Stmt_add(ctx, stmt_mt, TM(tkop));
+				knh_Stmt_add(ctx, stmt_mt, TM(stmt_expr));
+			}
+			else {
+				knh_Asm_perror(ctx, abr, KMSG_NOTHERE, (char*)expr.buf);
+			}
+			text = next;
+			res = knh_bytes_findMT(ctx, text, &mt, &expr, &next);
+		}
+		if(text.len > 0) {
+			knh_Stmt_add(ctx, stmt, new_TermCONST(ctx, FL(tk), UP(new_String(ctx, text, NULL))));
+		}
+		KNH_LOCALBACK(ctx, lsfp);
+		return TM(stmt);
+	}
+}
+
+/* ======================================================================== */
 /* [TERMs] */
 
 int TERMs_isCONST(Stmt *stmt, size_t n)
@@ -1101,8 +1215,6 @@ void TERMs_perrorTYPE(Ctx *ctx, Stmt *stmt, size_t n, int pe, knh_type_t reqt)
 	}
 	DBG2_P("reqt=%s%s", TYPEQN(reqt));
 	knh_perror__s(ctx, SP(stmt)->fileid, SP(stmt)->line, pe, at);
-	DBG2_(
-	KNH_ABORT(););
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2622,6 +2734,10 @@ int TERMs_typing(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, NameSpace *ns, knh_ty
 {
 	if(SP(stmt)->stt == STT_ERR) return 0;
 	if(reqt == TYPE_var) reqt = TYPE_Any;
+
+	if(IS_Token(DP(stmt)->tokens[n]) && SP(DP(stmt)->tokens[n])->tt == TT_ESTR) {
+		KNH_SETv(ctx, DP(stmt)->terms[n], knh_TokenESTR_toTerm(ctx, DP(stmt)->tokens[n], abr));
+	}
 
 	if(IS_Token(DP(stmt)->tokens[n])) {
 		Token *tk = DP(stmt)->tokens[n];
