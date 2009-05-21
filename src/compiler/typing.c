@@ -3335,7 +3335,8 @@ int knh_Stmt_checkLastReturn(Ctx *ctx, Stmt *stmt, Method *mtd)
 		knh_perror(ctx, SP(last_stmt)->fileid, SP(last_stmt)->line, KMSG_NORETURNVALUE, NULL);
 		knh_StmtRETURN_addValue(ctx, rstmt, knh_Method_rtype(ctx, mtd, DP(mtd)->cid));
 	}
-	last_stmt = knh_StmtNULL_tail_append(ctx, last_stmt, rstmt);
+	KNH_ASSERT(last_stmt != NULL);
+	KNH_SETv(ctx, DP(last_stmt)->next, rstmt);
 	return 1;
 }
 
