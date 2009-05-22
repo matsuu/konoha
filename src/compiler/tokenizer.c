@@ -35,9 +35,6 @@
 extern "C" {
 #endif
 
-#undef DBG2_P
-#define DBG2_P(fmt, ...)
-
 /* ======================================================================== */
 /* [data] */
 
@@ -505,36 +502,47 @@ void knh_Token_join(Ctx *ctx, Token *o)
 {
 	Array *a = (Array*)DP(o)->data;
 	if(!IS_Array(a)) return;
-
 	int i, size = knh_Array_size(a) - 1;
 	for(i = 0; i < size ; i++) {
-		Token *tk = (Token*)knh_Array_n(a, i);
+		Token *tk =  (Token*)knh_Array_n(a, i);
+		Token *tkn = (Token*)knh_Array_n(a, i+1);
+		//DBG2_P("i=%d,%d tk=%s, tkn=%s", i, size, knh_token_tochar(tk->tt), knh_token_tochar(tkn->tt));
 		if(SP(tk)->tt == TT_TYPEN) {
-			Token *tkn = (Token*)knh_Array_n(a, i+1);
 			if(SP(tkn)->tt == TT_LT) {  /* T<T> */
 				knh_Token_addTypeParam(ctx, tk, a, i+1);
+				i--; size = knh_Array_size(a) - 1;
+				continue;
 			}
-			if(SP(tkn)->tt == TT_PARENTHESIS) { /* T(void) */
+			else if(SP(tkn)->tt == TT_PARENTHESIS) { /* T(void) */
 				if(knh_Token_toClosureType(ctx, tk, tkn)) {
 					knh_Array_remove(ctx, a, i+1);
+					i--; size = knh_Array_size(a) - 1;
+					continue;
 				}
 			}
-			if(SP(tkn)->tt == TT_BRANCET && IS_NULL(DP(tkn)->data)) {
+			else if(SP(tkn)->tt == TT_BRANCET && IS_NULL(DP(tkn)->data)) {
+				/* T[] */
 				knh_Token_setArrayType(tk, 1);
 				DP(tk)->tt_next = DP(tkn)->tt_next;
-				if(DP(tkn)->tt_next == TT_NOT) {
-					knh_Token_setNotNullType(tk, 1);
-					DP(tk)->tt_next = DP((Token*)knh_Array_n(a, i+2))->tt_next;
-					knh_Array_remove(ctx, a, i+1);
-					knh_Array_remove(ctx, a, i+1);
-				}
-				else {
-					knh_Array_remove(ctx, a, i+1);
-				}
+				knh_Array_remove(ctx, a, i+1);
+				i--; size = knh_Array_size(a) - 1;
+				DBG2_P("T[]");
+				continue;
+			}
+			else if(SP(tkn)->tt == TT_NOT) {  /* T! */
+				knh_Token_setNotNullType(tk, 1);
+				DP(tk)->tt_next = DP(tkn)->tt_next;
+				knh_Array_remove(ctx, a, i+1);
+				i--; size = knh_Array_size(a) - 1;
+			}
+			else if(SP(tkn)->tt == TT_QUESTION) {  /* T? */
+				knh_Token_setNullableType(tk, 1);
+				DP(tk)->tt_next = DP(tkn)->tt_next;
+				knh_Array_remove(ctx, a, i+1);
+				i--; size = knh_Array_size(a) - 1;
 			}
 		}
-		if(SP(tk)->tt == TT_NAME && ISB(knh_Token_tobytes(ctx, tk), "byte")) {
-			Token *tkn = (Token*)knh_Array_n(a, i+1);
+		else if(SP(tk)->tt == TT_NAME && ISB(knh_Token_tobytes(ctx, tk), "byte")) {
 			if(SP(tkn)->tt == TT_BRANCET && IS_NULL(DP(tkn)->data)) {
 				SP(tk)->tt = TT_TYPEN;
 				KNH_SETv(ctx, DP(tk)->data, ctx->share->ClassTable[CLASS_Bytes].sname);
@@ -543,23 +551,15 @@ void knh_Token_join(Ctx *ctx, Token *o)
 					DP(tkp)->tt_next = TT_TYPEN;
 				}
 				DP(tk)->tt_next = DP(tkn)->tt_next;
-				if(DP(tkn)->tt_next == TT_NOT) {
-					knh_Token_setNotNullType(tk, 1);
-					DP(tk)->tt_next = DP((Token*)knh_Array_n(a, i+2))->tt_next;
-					knh_Array_remove(ctx, a, i+1);
-					knh_Array_remove(ctx, a, i+1);
-				}
-				else {
-					knh_Array_remove(ctx, a, i+1);
-				}
+				knh_Array_remove(ctx, a, i+1);
+				i--; size = knh_Array_size(a) - 1;
+				continue;
 			}
 		}
-
-		if(SP(tk)->tt == TT_STR || SP(tk)->tt == TT_TSTR || SP(tk)->tt == TT_TSTR) {
+		else if(SP(tk)->tt == TT_STR || SP(tk)->tt == TT_TSTR || SP(tk)->tt == TT_TSTR) {
 			size_t next = i + 1;
-			Token *tkn = (Token*)knh_Array_n(a, next);
 			if(SP(tkn)->tt != TT_STR && SP(tkn)->tt != TT_TSTR && SP(tk)->tt != TT_ESTR) {
-				return;
+				continue;
 			}
 			knh_cwb_t cwb = new_cwb(ctx);
 			Token *tkp = tk;
@@ -580,7 +580,7 @@ void knh_Token_join(Ctx *ctx, Token *o)
 			size = knh_Array_size(a) - 1;
 		} /* "a" "b" "c" */
 	}
-
+	//DBG2_DUMP(ctx, o, KNH_NULL, "joined");
 }
 
 /* ------------------------------------------------------------------------ */
