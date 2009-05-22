@@ -202,7 +202,7 @@ void knh_iodrv_close__SOCKET(Ctx *ctx, knh_io_t sd)
 
 static knh_iodrv_t IO__SOCKET = {
 	KNH_DRVAPI_TYPE__IO, "socket",
-	1024,
+	4096,
 	knh_iodrv_open__SOCKET,
 	knh_iodrv_init__SOCKET,
 	knh_iodrv_read__SOCKET,

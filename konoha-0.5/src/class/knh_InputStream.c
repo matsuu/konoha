@@ -45,6 +45,7 @@ KNHAPI(InputStream*) new_InputStream__io(Ctx *ctx, String *urn, knh_io_t fd, knh
 	DP(o)->fd = fd;
 	if(fd != -1) {
 		DP(o)->driver = drv;
+		DP(o)->bufsiz = drv->bufsiz;
 		if(DP(o)->bufsiz > 0) {
 			KNH_SETv(ctx, DP(o)->ba, new_Bytes(ctx, DP(o)->bufsiz));
 			DP(o)->buf = (char*)(DP(o)->ba)->buf;
