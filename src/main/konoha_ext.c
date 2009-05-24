@@ -68,16 +68,6 @@ void knh_srand(knh_uint_t seed)
 }
 
 /* ------------------------------------------------------------------------ */
-/* void System.setRandomSeed(Int seed) */
-
-METHOD knh__System_setRandomSeed(Ctx *ctx, knh_sfp_t *sfp)
-{
-	knh_uint_t seed = IS_NULL(sfp[1].o) ? 0 : p_uinteger(sfp[1]);
-	knh_srand(seed);
-	KNH_RETURN_void(ctx, sfp);
-}
-
-/* ------------------------------------------------------------------------ */
 
 knh_uint_t knh_rand()
 {

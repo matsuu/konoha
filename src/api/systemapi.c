@@ -113,6 +113,16 @@ static METHOD knh__System_setErr(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
+/* @method[STATIC] void System.setRandomSeed(Int seed) */
+
+METHOD knh__System_setRandomSeed(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_uint_t seed = IS_NULL(sfp[1].o) ? 0 : p_uinteger(sfp[1]);
+	knh_srand(seed);
+	KNH_RETURN_void(ctx, sfp);
+}
+
+/* ------------------------------------------------------------------------ */
 /* @method[STATIC] void System.exit(Int status) */
 
 static METHOD knh__System_exit(Ctx *ctx, knh_sfp_t *sfp)
