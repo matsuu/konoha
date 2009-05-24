@@ -44,13 +44,13 @@ extern "C" {
 
 static
 knh_IntConstData_t IntConstData[] = {
-	{"SIG_HUP", SIGHUP},   // hang up (1)
-	{"SIG_INT", SIGINT},   // interrupt (2)
-	{"SIG_QUIT", SIGQUIT}, // quit (3)
-	{"SIG_ABRT", SIGABRT}, // abort (9)
-	{"SIG_KILL", SIGKILL}, // kill 9
-	{"SIG_ALRM", SIGALRM}, // alarm clock (14)
-	{"SIG_TERM", SIGTERM}, // software termination signal 15
+	{"Posix.SIG_HUP", SIGHUP},   // hang up (1)
+	{"Posix.SIG_INT", SIGINT},   // interrupt (2)
+	{"Posix.SIG_QUIT", SIGQUIT}, // quit (3)
+	{"Posix.SIG_ABRT", SIGABRT}, // abort (9)
+	{"Posix.SIG_KILL", SIGKILL}, // kill 9
+	{"Posix.SIG_ALRM", SIGALRM}, // alarm clock (14)
+	{"Posix.SIG_TERM", SIGTERM}, // software termination signal 15
 	{NULL}  // end of const data
 };
 

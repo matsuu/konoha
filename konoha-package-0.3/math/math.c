@@ -43,6 +43,16 @@ METHOD Math_ceil(Ctx *ctx, knh_sfp_t *sfp)
     KNH_RETURN_Float(ctx, sfp, ceil(p_double(sfp[1])));
 }
 
+METHOD Math_round(Ctx *ctx, knh_sfp_t *sfp)
+{
+    KNH_RETURN_Float(ctx, sfp, round(p_double(sfp[1])));
+}
+
+METHOD Math_nearbyint(Ctx *ctx, knh_sfp_t *sfp)
+{
+    KNH_RETURN_Float(ctx, sfp, nearbyint(p_double(sfp[1])));
+}
+
 METHOD Math_floor(Ctx *ctx, knh_sfp_t *sfp)
 {
     KNH_RETURN_Float(ctx, sfp, floor(p_double(sfp[1])));
@@ -110,7 +120,7 @@ METHOD Math_sinh(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD Math_cosh(Ctx *ctx, knh_sfp_t *sfp)
 {
-    KNH_RETURN_Float(ctx, sfp, cos(p_double(sfp[1])));
+    KNH_RETURN_Float(ctx, sfp, cosh(p_double(sfp[1])));
 }
 
 METHOD Math_tanh(Ctx *ctx, knh_sfp_t *sfp)
@@ -118,10 +128,33 @@ METHOD Math_tanh(Ctx *ctx, knh_sfp_t *sfp)
     KNH_RETURN_Float(ctx, sfp, tanh(p_double(sfp[1])));
 }
 
+METHOD Math_asinh(Ctx *ctx, knh_sfp_t *sfp)
+{
+    KNH_RETURN_Float(ctx, sfp, asinh(p_double(sfp[1])));
+}
+
+METHOD Math_acosh(Ctx *ctx, knh_sfp_t *sfp)
+{
+    KNH_RETURN_Float(ctx, sfp, acosh(p_double(sfp[1])));
+}
+
+METHOD Math_atanh(Ctx *ctx, knh_sfp_t *sfp)
+{
+    KNH_RETURN_Float(ctx, sfp, atanh(p_double(sfp[1])));
+}
+
+
 static
 knh_FloatConstData_t FloatConstData[] = {
-    {"Math.PI", M_PI},
     {"Math.E", M_E},
+    {"Math.LOG2E",M_LOG2E},
+    {"Math.LOG10E",M_LOG10E},
+    {"Math.LN2",M_LN2},
+    {"Math.LN10",M_LN10},
+    {"Math.PI", M_PI},
+    {"Math.PI_2",M_PI_2},
+    {"Math.PI_4",M_PI_4},
+    {"Math.SQRT2",M_SQRT2},
     {NULL}
 };
 

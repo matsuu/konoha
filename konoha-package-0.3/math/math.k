@@ -1,7 +1,5 @@
-@Singleton class Math {
+@Singleton class Math {}
 
-}
-// http://www005.upp.so-net.ne.jp/h-masuda/cl/CLib/clib04.html
 float Math.abs(float x);
 float Math.fabs(float x);
 float Math.pow(float x,float y);
@@ -10,6 +8,8 @@ float Math.modf(float x,double y);
 float Math.frexp(float x,int y);
 float Math.fmod(float x,float d);
 float Math.ceil(float x);
+float Math.round(float x);
+float Math.nearbyint(float x);
 float Math.floor(float x);
 float Math.sqrt(float x);
 
@@ -28,4 +28,7 @@ float Math.atan2(float x,float y);
 float Math.sinh(float x);
 float Math.cosh(float x);
 float Math.tanh(float x);
+float Math.asinh(float x);
+float Math.acosh(float x);
+float Math.atanh(float x);
 
