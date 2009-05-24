@@ -75,6 +75,7 @@ void knh_OutputStream_setEncoding(Ctx *ctx, OutputStream *o, String *enc);
 size_t bconv__toLower(Ctx *ctx, BytesConv *o, knh_bytes_t t, knh_Bytes_t *ba);
 size_t bconv__toUpper(Ctx *ctx, BytesConv *o, knh_bytes_t t, knh_Bytes_t *ba);
 /* ../src/api/systemapi.c */
+METHOD knh__System_setRandomSeed(Ctx *ctx, knh_sfp_t *sfp);
 Object* knh_Context_getProperty(Ctx *ctx, Context *b, knh_bytes_t key);
 void knh_Context_setProperty(Ctx *ctx, Context *b, String *key, Any *value);
 void knh_System__k(Ctx *ctx, System *o, OutputStream *w, String *m);
@@ -522,6 +523,8 @@ void knh_Token_setCONST(Ctx *ctx, Token *o, Any *data);
 Token* knh_Token_toCONST(Token *o);
 Token* new_TokenNULL(Ctx *ctx, Any *fln, knh_type_t type);
 knh_index_t knh_Asm_indexOfVariable(Asm *abr, knh_fieldn_t fnq);
+int knh_ismtchar(int c);
+int knh_bytes_findMT(Ctx *ctx, knh_bytes_t text, knh_bytes_t *mt, knh_bytes_t *expr, knh_bytes_t *next);
 int TERMs_isCONST(Stmt *stmt, size_t n);
 int TERMs_isTRUE(Stmt *stmt, size_t n);
 int TERMs_isFALSE(Stmt *stmt, size_t n);
@@ -608,7 +611,6 @@ METHOD knh__Script_readLine(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_addHistory(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/main/konoha_ext.c */
 void knh_srand(knh_uint_t seed);
-METHOD knh__System_setRandomSeed(Ctx *ctx, knh_sfp_t *sfp);
 knh_uint_t knh_rand();
 knh_float_t knh_float_rand();
 /* ../src/main/logging.c */
