@@ -199,8 +199,6 @@ static METHOD knh__String_getSize(Ctx *ctx, knh_sfp_t *sfp)
 	}
 }
 
-
-
 /* ------------------------------------------------------------------------ */
 /* @method[CONST|NULLBASE] String! String.opAdd(Any v) */
 
@@ -762,12 +760,106 @@ void knh_String__k(Ctx *ctx, String *o, OutputStream *w, String *m)
 /* ------------------------------------------------------------------------ */
 
 /* ------------------------------------------------------------------------ */
+/* @method[CONST] Regex Regex.new(String! pattern, String option) */
+
+static
+METHOD knh__Regex_new(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_Regex_t *o = (Regex*)sfp[0].o;
+	knh_bytes_t p = knh_String_tobytes(sfp[1].s);
+	knh_index_t loc = knh_bytes_index(p, ':');
+	KNH_SETv(ctx, o->pattern, sfp[1].s);
+	if(loc == -1) {
+		o->df = knh_System_getRegexDriver(ctx, STEXT("re"));
+	}
+	else {
+		o->df = knh_System_getRegexDriver(ctx, knh_bytes_first(p, loc));
+	}
+	o->reg = o->df->regmalloc(ctx);
+	{
+		char *ptn = (char*)(knh_bytes_last(p, loc+1).buf);
+		char *opt = IS_NULL(sfp[2].o) ? "" : knh_String_tochar(sfp[2].s);
+		o->df->regcomp(ctx, o->reg, ptn, opt);
+	}
+	KNH_RETURN(ctx, sfp, sfp[0].o);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+int knh_String_opMatch(Ctx *ctx, String *o, Regex *re)
+{
+	char *str = knh_String_tochar(o);
+	knh_regmatch_t pmatch[KNH_REGEX_NMATCH_SIZE];
+	int res = re->df->regexec(ctx, re->reg, str, KNH_REGEX_NMATCH_SIZE, pmatch, 0);
+	return (res == 0);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Boolean! String.opMatch(Regex! re) */
+
+static
+METHOD knh__String_opMatch(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN_Boolean(ctx, sfp, knh_String_opMatch(ctx, sfp[0].s, (Regex*)sfp[1].o));
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Boolean! Regex.opMatch(String! s) */
+
+static
+METHOD knh__Regex_opMatch(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN_Boolean(ctx, sfp, knh_String_opMatch(ctx, sfp[1].s, (Regex*)sfp[0].o));
+}
+
+/* ------------------------------------------------------------------------ */
+
+Array *knh_Regex_split(Ctx *ctx, Regex *o, String *s)
+{
+	char *str = knh_String_tochar(s);
+	knh_regmatch_t pmatch[KNH_REGEX_NMATCH_SIZE];
+	int res = o->df->regexec(ctx, o->reg, str, KNH_REGEX_NMATCH_SIZE, pmatch, 0);
+	if(res == 0) {
+		Array *a = new_Array(ctx, CLASS_String, KNH_REGEX_NMATCH_SIZE);
+		knh_bytes_t sub = knh_String_tobytes(s);
+		int i;
+		for(i = 1; i < KNH_REGEX_NMATCH_SIZE; i++) {
+			if(pmatch[i].rm_so == -1) break;
+			//DBG_P("[%d], rm_so=%d, rm_eo=%d", i, pmatch[i].rm_so, pmatch[i].rm_eo);
+			sub.buf = (knh_uchar_t*)str + pmatch[i].rm_so;
+			sub.len = pmatch[i].rm_eo - pmatch[i].rm_so;
+			knh_Array_add(ctx, a, UP(new_String(ctx, sub, s)));
+		}
+		return a;
+	}
+	else {
+		return (Array*)konoha_getClassDefaultValue(ctx, ACLASS_String);
+		//return (Array*)KNH_NULL;
+	}
+}
+
+/* ------------------------------------------------------------------------ */
 /* @method[CONST] String[] String.match(Regex pattern) */
 
 static METHOD knh__String_match(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN(ctx, sfp, knh_Regex_split(ctx, (Regex*)sfp[1].o, sfp[0].s));
 }
+
+/* ======================================================================== */
+/* [movabletext] */
+
+/* @method void Regex.%s(OutputStream w, String m) */
+
+void knh_Regex__s(Ctx *ctx, Regex *o, OutputStream *w, String *m)
+{
+	knh_putc(ctx, w, '\'');
+	knh_write(ctx, w, knh_String_tobytes(o->pattern));
+	knh_putc(ctx, w, '\'');
+}
+
+/* ------------------------------------------------------------------------ */
 
 #endif/*KNH_CC_METHODAPI*/
 

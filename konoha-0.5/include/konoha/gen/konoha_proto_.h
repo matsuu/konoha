@@ -74,6 +74,8 @@ void knh_OutputStream_setEncoding(Ctx *ctx, OutputStream *o, String *enc);
 /* ../src/api/stringapi.c */
 size_t bconv__toLower(Ctx *ctx, BytesConv *o, knh_bytes_t t, knh_Bytes_t *ba);
 size_t bconv__toUpper(Ctx *ctx, BytesConv *o, knh_bytes_t t, knh_Bytes_t *ba);
+Array *knh_Regex_split(Ctx *ctx, Regex *o, String *s);
+void knh_Regex__s(Ctx *ctx, Regex *o, OutputStream *w, String *m);
 /* ../src/api/systemapi.c */
 METHOD knh__System_setRandomSeed(Ctx *ctx, knh_sfp_t *sfp);
 Object* knh_Context_getProperty(Ctx *ctx, Context *b, knh_bytes_t key);
@@ -367,13 +369,6 @@ void konoha_setverbose(int v);
 METHOD knh_fmethod_movableText(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/class/knh_Range.c */
 Range *new_Range(Ctx *ctx, Object *start, Object *end);
-/* ../src/class/knh_Regex.c */
-Regex *new_Regex(Ctx *ctx, String *pattern);
-int knh_String_opMatch(Ctx *ctx, String *o, Regex *re);
-METHOD knh__String_opMatch(Ctx *ctx, knh_sfp_t *sfp);
-METHOD knh__Regex_opMatch(Ctx *ctx, knh_sfp_t *sfp);
-Array *knh_Regex_split(Ctx *ctx, Regex *o, String *s);
-void knh_Regex__s(Ctx *ctx, Regex *o, OutputStream *w, String *m);
 /* ../src/class/knh_ResultSet.c */
 ResultSet* new_ResultSet(Ctx *ctx);
 knh_boolean_t knh_ResultSet_next(Ctx *ctx, ResultSet *o);

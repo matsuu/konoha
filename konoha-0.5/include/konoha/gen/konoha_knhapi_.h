@@ -243,6 +243,7 @@ KNHAPI(knh_bytes_t) knh_StringNULL_tobytes(String *o, knh_bytes_t def);
 KNHAPI(void) konoha_addParserDriver(Ctx *ctx, char *alias, knh_parser_drvapi_t *d);
 KNHAPI(ClassSpec*) new_Vocabulary(Ctx *ctx, char *lang, char *defval, ...);
 KNHAPI(void) konoha_addVocabularyMapper(Ctx *ctx, knh_class_t scid, char *text);
+KNHAPI(void) konoha_setSystemPropertyText(Ctx *ctx, char *key, char *value);
 KNHAPI(void) konoha_addAliasURN(Ctx *ctx, char *alias, char *urn);
 KNHAPI(FILE*) knh_fopen(Ctx *ctx, char *filename, char *mode);
 KNHAPI(size_t) knh_fgetc(Ctx *ctx, FILE *fp);

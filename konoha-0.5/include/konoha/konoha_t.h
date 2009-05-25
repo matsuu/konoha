@@ -857,7 +857,7 @@ typedef struct {
 } knh_regmatch_t;
 
 typedef knh_regex_t* (*knh_fregmalloc)(Ctx *);
-typedef int (*knh_fregcomp)(Ctx *, knh_regex_t *, char *pattern, int flags);
+typedef int (*knh_fregcomp)(Ctx *, knh_regex_t *, char *pattern, char *option);
 typedef int (*knh_fregexec)(Ctx *, knh_regex_t *, char *str, size_t nmatch, knh_regmatch_t p[], int flags);
 typedef void (*knh_fregfree)(Ctx *, knh_regex_t *);
 
