@@ -822,7 +822,7 @@ int knh_TokenNUM_typing(Ctx *ctx, Token *o, NameSpace *ns, knh_class_t reqc)
 	}
 	else { /* if(req_bcid == CLASS_Int) */
 		knh_int_t n = 0;
-		if(!knh_bytes_parseinteger(t, &n)) {
+		if(!knh_bytes_parseint(t, &n)) {
 			knh_Token_perror(ctx, o, KMSG_WNUMOVERFLOW);
 			knh_perrata(ctx, SP(o)->fileid, SP(o)->line, (char*)t.buf, "0");
 		}

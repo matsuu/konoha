@@ -627,7 +627,7 @@ static MAPPER knh_String_Boolean(Ctx *ctx, knh_sfp_t *sfp)
 static MAPPER knh_String_Int(Ctx *ctx, knh_sfp_t *sfp)
 {
 	knh_int_t v = 0;
-	if(knh_bytes_parseinteger(knh_String_tobytes(sfp[0].s), &v)) {
+	if(knh_bytes_parseint(knh_String_tobytes(sfp[0].s), &v)) {
 		KNH_MAPPED_Int(ctx, sfp, v);
 	}
 	KNH_MAPPED(ctx, sfp, KNH_NULL);

@@ -103,8 +103,8 @@ void knh_Bytes_unputc(Bytes *o);
 size_t knh_size(size_t s);
 knh_bytes_t knh_bytes_subset(knh_bytes_t t, size_t s, size_t e);
 knh_bytes_t knh_bytes_offlen(knh_bytes_t t, size_t off, size_t len);
-knh_bytes_t knh_bytes_trim(knh_bytes_t t, knh_intptr_t ch);
-int knh_bytes_parseinteger(knh_bytes_t t, knh_int_t *value);
+knh_bytes_t knh_bytes_trim(knh_bytes_t t /*, knh_intptr_t ch*/);
+int knh_bytes_parseint(knh_bytes_t t, knh_int_t *value);
 int knh_bytes_parsefloat(knh_bytes_t t, knh_float_t *value);
 /* ../src/class/knh_BytesConv.c */
 size_t knh_BytesConv_conv(Ctx *ctx, BytesConv *o, knh_bytes_t t, knh_Bytes_t *ba);

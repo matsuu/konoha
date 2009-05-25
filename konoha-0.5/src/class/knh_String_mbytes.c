@@ -171,24 +171,6 @@ knh_bytes_t knh_bytes_mofflen(knh_bytes_t m, size_t moff, size_t mlen)
 	return knh_bytes_offlen(m, moff, mlen); /* if KONOHA_ENCODING is not set */
 }
 
-  /*
-static void show_binary(unsigned int n)
-{
-  int buf[32];
-  int i=0, j=0;
-  while (n > 0) {
-	buf[i] = n % 2;
-	n = (unsigned int)(n / 2);
-	i++;
-  }
-  for(j=0; j < i; j++){
-	printf("%d", buf[j]);
-  }
-  printf("\n");
-
-}
-  */
-
 /* ------------------------------------------------------------------------ */
 
 /* utf8 -> ucs4 */
