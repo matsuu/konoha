@@ -1570,7 +1570,6 @@ void knh_Regex_init(Ctx *ctx, Regex *o, int init)
 static
 void knh_Regex_traverse(Ctx *ctx, Regex *o, knh_ftraverse ftr)
 {
-
 	ftr(ctx, UP(o->pattern));
 	if(IS_SWEEP(ftr)) {
 		if(o->reg != NULL) {

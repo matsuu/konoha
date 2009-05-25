@@ -51,7 +51,7 @@ knh_regex_t* knh_regex_malloc__NOP(Ctx *ctx)
 /* ------------------------------------------------------------------------ */
 
 static
-int knh_regex_regcomp__NOP(Ctx *ctx, knh_regex_t *reg, char *pattern, int flags)
+int knh_regex_regcomp__NOP(Ctx *ctx, knh_regex_t *reg, char *pattern, char *option)
 {
 	return 0;
 }
@@ -101,9 +101,13 @@ knh_regex_t* knh_regex_malloc(Ctx *ctx)
 /* ------------------------------------------------------------------------ */
 
 static
-int knh_regex_regcomp(Ctx *ctx, knh_regex_t *reg, char *pattern, int flags)
+int knh_regex_regcomp(Ctx *ctx, knh_regex_t *reg, char *pattern, char *option)
 {
-	int res = regcomp((regex_t*)reg, pattern, REG_EXTENDED);
+	int flag = REG_EXTENDED;
+	if(knh_bytes_index(B(option), 'i') >= 0) {
+		flag |= REG_ICASE;
+	}
+	int res = regcomp((regex_t*)reg, pattern, flag);
 	if(res != 0) {
 		char buf[FILENAME_BUFSIZ * 4];
 		regerror(res, (regex_t*)reg, buf, sizeof(buf));
@@ -148,7 +152,8 @@ void knh_regex_regfree(Ctx *ctx, knh_regex_t *reg)
 /* @data */
 
 static knh_regex_drvapi_t RE__NOP = {
-	KNH_DRVAPI_TYPE__REGEX, "NOP",
+	KNH_DRVAPI_TYPE__REGEX,
+	"NOP",
 	knh_regex_malloc__NOP,
 	knh_regex_regcomp__NOP,
 	knh_regex_regexec__NOP,
@@ -158,7 +163,8 @@ static knh_regex_drvapi_t RE__NOP = {
 #ifdef KNH_USING_REGEX
 
 static knh_regex_drvapi_t RE__regex = {
-	KNH_DRVAPI_TYPE__REGEX, "regex",
+	KNH_DRVAPI_TYPE__REGEX,
+	"regex",
 	knh_regex_malloc,
 	knh_regex_regcomp,
 	knh_regex_regexec,
@@ -172,15 +178,38 @@ static knh_regex_drvapi_t RE__regex = {
 /* [string parser] */
 
 static
+Regex *new_Regex(Ctx *ctx, String *pattern, String *option)
+{
+	knh_Regex_t *o = (knh_Regex_t*)new_hObject(ctx, FLAG_Regex, CLASS_Regex, CLASS_Regex);
+	knh_bytes_t p = knh_String_tobytes(pattern);
+	knh_index_t loc = knh_bytes_index(p, ':');
+	KNH_INITv(o->pattern, pattern);
+	if(loc == -1) {
+		o->df = knh_System_getRegexDriver(ctx, STEXT("re"));
+	}
+	else {
+		o->df = knh_System_getRegexDriver(ctx, knh_bytes_first(p, loc));
+	}
+	o->reg = o->df->regmalloc(ctx);
+	{
+		char *ptn = (char*)(knh_bytes_last(p, loc+1).buf);
+		char *opt = IS_NULL(option) ? "" : knh_String_tochar(option);
+		o->df->regcomp(ctx, o->reg, ptn, opt);
+	}
+	return o;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
 Object* new_Regex_parseOf(Ctx *ctx, String *pattern)
 {
-	return (Object*)new_Regex(ctx, pattern);
+	return (Object*)new_Regex(ctx, pattern, (String*)KNH_NULL);
 }
 
 static knh_parser_drvapi_t PARSER__Regex = {
-	KNH_DRVAPI_TYPE__PARSER, "regex",
-	NNTYPE_Regex,
-	new_Regex_parseOf
+	KNH_DRVAPI_TYPE__PARSER,
+	"regex", NNTYPE_Regex, new_Regex_parseOf
 };
 
 /* ======================================================================== */
@@ -188,17 +217,12 @@ static knh_parser_drvapi_t PARSER__Regex = {
 
 knh_regex_drvapi_t *knh_System_getRegexDriver(Ctx *ctx, knh_bytes_t name)
 {
-	if(ctx == NULL) {
-		return &RE__NOP;
+	knh_regex_drvapi_t *p = (knh_regex_drvapi_t *)konoha_getDriverAPI(ctx, KNH_DRVAPI_TYPE__REGEX, name);
+	if(p == NULL) {
+		KNH_WARNING(ctx, "Regex: unsupported scheme '%s'", name);
+		p = &RE__NOP;
 	}
-	else {
-		knh_regex_drvapi_t *p = (knh_regex_drvapi_t *)konoha_getDriverAPI(ctx, KNH_DRVAPI_TYPE__REGEX, name);
-		if(p == NULL) {
-			KNH_WARNING(ctx, "Regex: unsupported scheme '%s'", name);
-			p = &RE__NOP;
-		}
-		return p;
-	}
+	return p;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -223,7 +247,7 @@ void KNHINIT init_Regex(Ctx *ctx)
 #ifdef KNH_USING_REGEX
 	konoha_addRegexDriver(ctx, NULL, &RE__regex);
 	konoha_addRegexDriver(ctx, "re", &RE__regex);
-	konoha_addRegexDriver(ctx, "//", &RE__regex);
+	konoha_setSystemPropertyText(ctx, "konoha.regex", "regex/POSIX.2");
 #endif
 }
 
