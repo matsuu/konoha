@@ -48,9 +48,9 @@ static METHOD knh__String_equals(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[CONST] Boolean! String.equalsIgnoreCase(String! s) */
+/* @method[CONST] Boolean! String.equals:IgnoreCase(String! s) */
 
-static METHOD knh__String_equalsIgnoreCase(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__String_equals__IgnoreCase(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp,
 		((sfp[0].s)->size == (sfp[1].s)->size &&
@@ -74,22 +74,6 @@ static METHOD knh__String_endsWith(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[CONST] Int! String.indexOf(String! s) */
-
-static METHOD knh__String_indexOf(Ctx *ctx, knh_sfp_t *sfp)
-{
-	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
-	knh_bytes_t delim = knh_String_tobytes(sfp[1].s);
-	int loc = knh_bytes_indexOf(base, delim);
-	if (knh_String_isASCII(sfp[0].s) || loc == -1) {
-		KNH_RETURN_Int(ctx, sfp, loc);
-	} else {
-		base.len = (size_t)loc;
-		KNH_RETURN_Int(ctx, sfp, knh_bytes_mlen(base));
-	}
-}
-
-/* ------------------------------------------------------------------------ */
 /* @method[CONST|NULLBASE] Int! String.getSize() */
 
 static METHOD knh__String_getSize(Ctx *ctx, knh_sfp_t *sfp)
@@ -105,6 +89,22 @@ static METHOD knh__String_getSize(Ctx *ctx, knh_sfp_t *sfp)
 		else {
 			KNH_RETURN_Int(ctx, sfp, knh_bytes_mlen(knh_String_tobytes(s)));
 		}
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] Int! String.indexOf(String! s) */
+
+static METHOD knh__String_indexOf(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
+	knh_bytes_t delim = knh_String_tobytes(sfp[1].s);
+	int loc = knh_bytes_indexOf(base, delim);
+	if (knh_String_isASCII(sfp[0].s) || loc == -1) {
+		KNH_RETURN_Int(ctx, sfp, loc);
+	} else {
+		base.len = (size_t)loc;
+		KNH_RETURN_Int(ctx, sfp, knh_bytes_mlen(base));
 	}
 }
 
@@ -133,26 +133,6 @@ static METHOD knh__String_opAdd(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN(ctx, sfp, new_String__cwb(ctx, cwb));
 }
 
-/* ------------------------------------------------------------------------ */
-/* @method[VARARGS|STATIC|NULLBASE] String! String.concat(Any v) */
-
-static METHOD knh__String_concat(Ctx *ctx, knh_sfp_t *sfp)
-{
-	int i, ac = knh_sfp_argc(ctx, sfp);
-	knh_cwb_t cwb = new_cwb(ctx);
-	knh_sfp_t *esp = KNH_LOCAL(ctx);
-	for(i = 0; i < ac; i++) {
-		if(IS_bString(sfp[i].o)) {
-			knh_Bytes_write(ctx, cwb.ba, knh_String_tobytes(sfp[i].s));
-		}
-		else {
-			KNH_ASSERT(esp == ctx->esp);
-			KNH_SETv(ctx, esp[1].o, sfp[i].o); esp[1].data = sfp[i].data;
-			knh_esp1_format(ctx, METHODN__s, cwb.w, KNH_NULL);
-		}
-	}
-	KNH_RETURN(ctx, sfp, new_String__cwb(ctx, cwb));
-}
 
 /* ------------------------------------------------------------------------ */
 /* @method[CONST] String! String.opSub(String! t) */
@@ -187,50 +167,6 @@ static METHOD knh__String_opSub(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-
-static
-int knh_bytes_equals_(knh_bytes_t base, size_t s, knh_bytes_t target)
-{
-	size_t i;
-	for(i = 1; i < target.len; i++) {
-		if(base.buf[s+i] != target.buf[i]) return 0;
-	}
-	return 1;
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method[CONST] String! String.replace(String! o, String! n)      .....  */
-/* @author nakata */
-
-static METHOD knh__String_replace(Ctx *ctx, knh_sfp_t *sfp)
-{
-	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
-	knh_bytes_t target = knh_String_tobytes(sfp[1].s);
-	knh_bytes_t alt = knh_String_tobytes(sfp[2].s);
-	knh_cwb_t cwb = new_cwb(ctx);
-	int search_flag= 0, ch = target.buf[0], i;
-
-	if (base.len == 0 || target.len == 0) KNH_RETURN(ctx, sfp, sfp[0].o);
-	for(i = 0; i < base.len - target.len+1; i++) {
-		if(base.buf[i] == ch && knh_bytes_equals_(base, i, target)) {
-		    knh_Bytes_write(ctx, cwb.ba, alt);
-			i += target.len - 1;
-			search_flag = 1;
-		}else {
-			knh_Bytes_putc(ctx, cwb.ba, base.buf[i]);
-		}
-	}
-	if(search_flag == 0) {
-		KNH_RETURN(ctx, sfp, sfp[0].o);
-	}
-	else {
-		knh_bytes_t leftover = {base.buf + i, base.len - i};
-		knh_Bytes_write(ctx, cwb.ba, leftover);
-		KNH_RETURN(ctx, sfp, new_String__cwb(ctx, cwb));
-	}
-}
-
-/* ------------------------------------------------------------------------ */
 /* @method[CONST] String! String.opMul(Int! n) */
 
 static METHOD knh__String_opMul(Ctx *ctx, knh_sfp_t *sfp)
@@ -253,75 +189,24 @@ static METHOD knh__String_opMul(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[VARARGS] String! String.opFmt(Any v) */
+/* @method[VARARGS|STATIC|NULLBASE] String! String.concat(Any v) */
 
-static METHOD knh__String_opFmt(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__String_concat(Ctx *ctx, knh_sfp_t *sfp)
 {
+	int i, ac = knh_sfp_argc(ctx, sfp);
 	knh_cwb_t cwb = new_cwb(ctx);
-	knh_sfp_t *v = sfp + 1;
-	int ac = knh_sfp_argc(ctx, v);
-	knh_bytes_t fmt = knh_String_tobytes(sfp[0].s);
-
-	while(1) {
-		knh_index_t loc = knh_bytes_index(fmt, '%');
-		if(loc == -1) break;
-		if(loc > 0) {
-			knh_Bytes_write(ctx, cwb.ba, knh_bytes_first(fmt, loc));
-		}
-		if(fmt.buf[loc+1]=='%') {
-			knh_Bytes_putc(ctx, cwb.ba, '%');
-			fmt = knh_bytes_last(fmt, loc+2);
-			continue;
-		}
-		fmt = knh_bytes_last(fmt, loc); /* a%s.. ==> s.. */
-		loc = knh_bytes_index(fmt, '{');
-		if(loc == -1) {
-			KNH_WARNING(ctx, "formatting: there is no {} for %%%s", (char*)fmt.buf);
-			goto L_ERROR;
-		}
-		knh_bytes_t mtn = knh_bytes_first(fmt, loc);
-		knh_methodn_t mt =
-			(mtn.len > 1) ? konoha_getMethodName(ctx, mtn, METHODN__empty) : METHODN__empty;
-		int idx = -1;
-		if(fmt.buf[loc+2] == '}') { /* %s{1} */
-			idx = fmt.buf[loc+1] - '0';
-			if(idx < 0 || idx > 9) {
-				idx = -1;
-			}
-			fmt = knh_bytes_last(fmt, loc+3);
-		}
-		else if(fmt.buf[loc+3] == '}') { /* %s{11} */
-			idx = (fmt.buf[loc+1] - '0') * 10 + (fmt.buf[loc+2] - '0');
-			if(idx < 0 || idx > 99) {
-				idx = -1;
-			}
-			fmt = knh_bytes_last(fmt, loc+3);
-		}
-		//DBG2_P("idx=%d", idx);
-		if(idx == -1) {
-			int quote = knh_Object_cid(sfp[0].o) == CLASS_String ? '"' : '\'';
-			knh_bytes_t fmt = knh_String_tobytes(sfp[0].s);
-			KNH_WARNING(ctx, "formatting: illegal string format: %c%s%c", quote, (char*)fmt.buf, quote);
-			goto L_ERROR;
-		}
-		if(0 <= idx && (size_t) idx < ac) {
-			knh_sfp_t *esp = KNH_LOCAL(ctx);
-			KNH_SETv(ctx, esp[1].o, v[idx].o); esp[1].data = v[idx].data;
-			mtn = knh_bytes_last(mtn, 1);
-			Object *m = (mtn.len > 0 && knh_bytes_isOptionalMT(mtn)) ?
-					UP(new_String(ctx, mtn, NULL)) : KNH_NULL;
-			knh_esp1_format(ctx, mt, cwb.w, m);
+	knh_sfp_t *esp = KNH_LOCAL(ctx);
+	for(i = 0; i < ac; i++) {
+		if(IS_bString(sfp[i].o)) {
+			knh_Bytes_write(ctx, cwb.ba, knh_String_tobytes(sfp[i].s));
 		}
 		else {
-			KNH_WARNING(ctx, "formatting: out of index %d < %d", (int)idx, (int)ac);
-			knh_write(ctx, cwb.w, STEXT("(null)"));
+			KNH_ASSERT(esp == ctx->esp);
+			KNH_SETv(ctx, esp[1].o, sfp[i].o); esp[1].data = sfp[i].data;
+			knh_esp1_format(ctx, METHODN__s, cwb.w, KNH_NULL);
 		}
 	}
-	if(fmt.len > 0) {
-		knh_Bytes_write(ctx, cwb.ba, fmt);
-	}
-	L_ERROR:;
-	KNH_RETURN(ctx, sfp, new_StringX__cwb(ctx, knh_Object_cid(sfp[0].o), cwb));
+	KNH_RETURN(ctx, sfp, new_String__cwb(ctx, cwb));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -373,6 +258,105 @@ static METHOD knh__String_opMod(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
+/* @method[VARARGS] String! String.format(Any v) */
+
+static METHOD knh__String_format(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_bytes_t fmt = knh_String_tobytes(sfp[0].s);
+	knh_sfp_t *param = sfp + 1;
+	int ac = knh_sfp_argc(ctx, param);
+	knh_bytes_t mt, expr, next;
+
+	if(!knh_bytes_findMT(ctx, fmt, &mt, &expr, &next)) {
+		KNH_RETURN(ctx, sfp, sfp[0].s);
+	}
+
+	knh_cwb_t cwb = new_cwb(ctx);
+	int count;
+	for(count = 0; ; count++) {
+		if(mt.buf > fmt.buf + 1) {
+			fmt.len = (mt.buf - fmt.buf) - 1;
+			knh_Bytes_write(ctx, cwb.ba, fmt);
+		}
+		int index = count;
+		if(expr.len > 0) {
+			knh_int_t num;
+			if(knh_bytes_parseint(expr, &num)) {
+				index = (int)num;
+			}
+		}
+		if(0 <= index && index < ac) {
+			knh_sfp_t *esp = KNH_LOCAL(ctx);
+			mt.buf = mt.buf - 1; mt.len++;   /* 's' == > '%s' */
+			KNH_SETv(ctx, esp[1].o, param[index].o); esp[1].data = param[index].data;
+			Object *m = KNH_NULL;
+			if(knh_bytes_isOptionalMT(mt)) m = UP(new_String(ctx, mt, NULL));
+			knh_methodn_t mn = konoha_getMethodName(ctx, mt, METHODN__empty);
+			knh_esp1_format(ctx, mn, cwb.w, m);
+		}
+		else {
+			if(knh_Context_isDebug(ctx)) {
+				KNH_THROW_OUTOFINDEX(ctx, index, ac);
+			}
+		}
+		fmt.buf = next.buf; fmt.len = next.len;
+		if(!knh_bytes_findMT(ctx, fmt, &mt, &expr, &next)) {
+			break;
+		}
+	}
+	if(fmt.len > 0) {
+		knh_Bytes_write(ctx, cwb.ba, fmt);
+	}
+	KNH_RETURN(ctx, sfp, new_StringX__cwb(ctx, knh_Object_cid(sfp[0].o), cwb));
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+int knh_bytes_equals_(knh_bytes_t base, size_t s, knh_bytes_t target)
+{
+	size_t i;
+	for(i = 1; i < target.len; i++) {
+		if(base.buf[s+i] != target.buf[i]) return 0;
+	}
+	return 1;
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] String! String.replace(String! o, String! n)      .....  */
+/* @author nakata */
+
+static METHOD knh__String_replace(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
+	knh_bytes_t target = knh_String_tobytes(sfp[1].s);
+	knh_bytes_t alt = knh_String_tobytes(sfp[2].s);
+	knh_cwb_t cwb = new_cwb(ctx);
+	int search_flag= 0, ch = target.buf[0], i;
+
+	if (base.len == 0 || target.len == 0) KNH_RETURN(ctx, sfp, sfp[0].o);
+	for(i = 0; i < base.len - target.len+1; i++) {
+		if(base.buf[i] == ch && knh_bytes_equals_(base, i, target)) {
+		    knh_Bytes_write(ctx, cwb.ba, alt);
+			i += target.len - 1;
+			search_flag = 1;
+		}else {
+			knh_Bytes_putc(ctx, cwb.ba, base.buf[i]);
+		}
+	}
+	if(search_flag == 0) {
+		KNH_RETURN(ctx, sfp, sfp[0].o);
+	}
+	else {
+		knh_bytes_t leftover = {base.buf + i, base.len - i};
+		knh_Bytes_write(ctx, cwb.ba, leftover);
+		KNH_RETURN(ctx, sfp, new_String__cwb(ctx, cwb));
+	}
+}
+
+/* ======================================================================== */
+
+/* ------------------------------------------------------------------------ */
 /* @method[CONST] Boolean! String.opHas(String! s) */
 
 static METHOD knh__String_opHas(Ctx *ctx, knh_sfp_t *sfp)
@@ -380,7 +364,7 @@ static METHOD knh__String_opHas(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_Boolean(ctx, sfp, knh_bytes_indexOf(knh_String_tobytes(sfp[0].s), knh_String_tobytes(sfp[1].s)) != -1);
 }
 
-/* ======================================================================== */
+/* ------------------------------------------------------------------------ */
 /* @method[CONST] String! String.get(Int! n) */
 
 static METHOD knh__String_get(Ctx *ctx, knh_sfp_t *sfp)
@@ -400,20 +384,56 @@ static METHOD knh__String_get(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[CONST] Int! String.getChar(Int! n) */
+/* @method[CONST] Int! String.getChar(Int n) */
 
 static METHOD knh__String_getChar(Ctx *ctx, knh_sfp_t *sfp)
 {
 	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
+	knh_intptr_t index = IS_NULL(sfp[1].o) ? 0 : (knh_intptr_t)sfp[1].ivalue;
 	if(knh_String_isASCII(sfp[0].s)) {
-		size_t n = knh_array_index(ctx, p_int(sfp[1]), knh_String_strlen(sfp[0].s));
+		size_t n = knh_array_index(ctx, index, knh_String_strlen(sfp[0].s));
 		KNH_RETURN_Int(ctx, sfp, knh_uchar_toucs4(&base.buf[n]));
 	}
 	else {
-		size_t off = knh_array_index(ctx, p_int(sfp[1]), knh_bytes_mlen(base));
+		size_t off = knh_array_index(ctx, index, knh_bytes_mlen(base));
 		knh_bytes_t sub = knh_bytes_mofflen(base, off, 1);
 		KNH_RETURN_Int(ctx, sfp, knh_uchar_toucs4(&sub.buf[0]));
 	}
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] String! String.substring(Int offset, Int len) */
+
+static METHOD knh__String_substring(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
+	knh_bytes_t sub;
+	if(knh_String_isASCII(sfp[0].s)) {
+		size_t offset = IS_NULL(sfp[1].o) ? 0 : knh_array_index(ctx, sfp[1].ivalue, base.len);
+		sub = knh_bytes_last(base, offset);
+		if(IS_NOTNULL(sfp[2].o)) {
+			size_t len = (size_t)sfp[2].ivalue;
+			if(len < sub.len) sub = knh_bytes_first(sub, len);
+		}
+	}
+	else { // multibytes
+		size_t mlen = knh_bytes_mlen(base);
+		size_t offset = IS_NULL(sfp[1].o) ? 0 : knh_array_index(ctx, sfp[1].ivalue, mlen);
+		size_t length = IS_NULL(sfp[1].o) ? (mlen - offset) : (size_t)sfp[2].ivalue;
+		sub = knh_bytes_mofflen(base, offset, length);
+	}
+
+	String *s;
+	if(sub.len == 0) {
+		s = TS_EMPTY;
+	}
+	else if(sub.len == base.len) {
+		s = sfp[0].s;
+	}
+	else {
+		s = new_String(ctx, sub, sfp[0].s);
+	}
+	KNH_RETURN(ctx, sfp, s);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -421,29 +441,31 @@ static METHOD knh__String_getChar(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__String_opOffset(Ctx *ctx, knh_sfp_t *sfp)
 {
-	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
-	if(knh_String_isASCII(sfp[0].s)) {
-		size_t offset = IS_NULL(sfp[1].o) ? 0 : knh_array_index(ctx, p_int(sfp[1]), base.len);
-		if(IS_NULL(sfp[2].o)) {
-			KNH_RETURN(ctx, sfp, new_String(ctx, knh_bytes_last(base, offset), sfp[0].s));
-		}
-		else {
-			knh_bytes_t sub = knh_bytes_offlen(base, offset, knh_array_index(ctx, p_int(sfp[2]), base.len - offset + 1 ));
-			KNH_RETURN(ctx, sfp, new_String(ctx, sub, sfp[0].s));
-		}
+	knh__String_substring(ctx, sfp);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] String! String.opSubset(Int s, Int e) */
+
+static METHOD knh__String_opSubset(Ctx *ctx, knh_sfp_t *sfp)
+{
+	if(IS_NOTNULL(sfp[2].o)) {
+		size_t offset = IS_NULL(sfp[1].o) ? 0 : (size_t)sfp[1].ivalue;
+		sfp[2].ivalue = sfp[2].ivalue - offset;
 	}
-	else {
-		// multibytes
-		size_t mlen = knh_bytes_mlen(base);
-		size_t offset = IS_NULL(sfp[1].o) ? 0 : knh_array_index(ctx, p_int(sfp[1]), mlen);
-		if(IS_NULL(sfp[2].o)) {
-			KNH_RETURN(ctx, sfp, new_String(ctx, knh_bytes_last(base, offset), sfp[0].s));
-		}
-		else {
-			knh_bytes_t sub = knh_bytes_mofflen(base, offset, p_int(sfp[2]));
-			KNH_RETURN(ctx, sfp, new_String(ctx, sub, sfp[0].s));
-		}
+	knh__String_substring(ctx, sfp);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] String! String.opSubsete(Int s, Int e) */
+
+static METHOD knh__String_opSubsete(Ctx *ctx, knh_sfp_t *sfp)
+{
+	if(IS_NOTNULL(sfp[2].o)) {
+		size_t offset = IS_NULL(sfp[1].o) ? 0 : (size_t)sfp[1].ivalue;
+		sfp[2].ivalue = sfp[2].ivalue - offset + 1;
 	}
+	knh__String_substring(ctx, sfp);
 }
 
 /* ======================================================================== */
@@ -504,121 +526,80 @@ static METHOD knh__String_toUpper(Ctx *ctx, knh_sfp_t *sfp)
 static METHOD knh__String_trim(Ctx *ctx, knh_sfp_t *sfp)
 {
 	knh_bytes_t t = knh_String_tobytes(sfp[0].s);
-	size_t i, s = 0;
-	for(i = 0; i < t.len; i++) {
-		if(!isspace(t.buf[i])) break;
+	knh_bytes_t t2 = knh_bytes_trim(t);
+	String *s = sfp[0].s;
+	if(t.len > t2.len) {
+		s = new_String(ctx, t2, s);
 	}
-	s = i;
-	for(i = t.len - 1; s < i; i--) {
-		if(!isspace(t.buf[i])) break;
-	}
-	if(i - s + 1 == t.len) {
-		KNH_RETURN(ctx, sfp, sfp[0].o)
-	}
-	t.buf = t.buf + s;
-	t.len = i - s + 1;
-	KNH_RETURN(ctx, sfp, new_String(ctx, t, NULL));
+	KNH_RETURN(ctx, sfp, s);
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[CONST] String[] String.split(Any delim) */
+
+static Array *knh_String_toCharArray(Ctx *ctx, String *bs, int istrim)
+{
+	knh_bytes_t base = knh_String_tobytes(bs);
+	if(knh_String_isASCII(bs)) {
+		size_t i, n = base.len;
+		Array *a = new_Array(ctx, CLASS_String, n);
+		for(i = 0; i < n; i++) {
+			if(istrim && isspace(base.buf[i])) continue;
+			knh_bytes_t sub = { base.buf + i, 1};
+			knh_Array_add(ctx, a, UP(new_String(ctx, sub, bs)));
+		}
+		return a;
+	}
+	else {
+		size_t i, n = knh_bytes_mlen(base);
+		Array *a = new_Array(ctx, CLASS_String, n);
+		for(i = 0; i < n; i++) {
+			if(istrim && isspace(base.buf[i])) continue;
+			knh_bytes_t sub = knh_bytes_mofflen(base, n, 1);
+			knh_Array_add(ctx, a, UP(new_String(ctx, sub, bs)));
+		}
+		return a;
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] String[] String.split(String delim, Int istrim) */
 
 static METHOD knh__String_split(Ctx *ctx, knh_sfp_t *sfp)
 {
-	if(IS_Regex(sfp[1].o)) {
-		KNH_RETURN(ctx, sfp, knh_Regex_split(ctx, (Regex*)sfp[1].o, sfp[0].s));
+	Array *a = NULL;
+	int istrim = IS_NULL(sfp[2].o) ? 0 : (int)sfp[2].ivalue;
+	if(IS_NULL(sfp[1].o)) {
+		a = knh_String_toCharArray(ctx, sfp[0].s, istrim);
 	}
-	else if(IS_String(sfp[1].o)) {
-		int trim = 0;
-		knh_bytes_t base = knh_String_tobytes(sfp[0].s);
+	else {
 		knh_bytes_t delim = knh_String_tobytes(sfp[1].s);
-		if(delim.len > 1 && delim.buf[delim.len-1] == ' ') {
-			trim = 1;
-			delim.len -=1;
-		}
 		if(delim.len == 0) {
-			if(knh_String_isASCII(sfp[0].s)) {
-				size_t i, n = base.len;
-				Array *a = new_Array(ctx, CLASS_String, n);
-				knh_bytes_t sub = knh_String_tobytes(sfp[0].s);
-				for(i = 0; i < n; i++) {
-					sub.buf = base.buf + i;
-					sub.len = 1;
-					knh_Array_add(ctx, a, UP(new_String(ctx, sub, sfp[0].s)));
-				}
-				KNH_RETURN(ctx, sfp, a);
-			}
-			else {
-				size_t i, n = knh_bytes_mlen(base);
-				Array *a = new_Array(ctx, CLASS_String, n);
-				for(i = 0; i < n; i++) {
-					knh_bytes_t sub = knh_bytes_mofflen(base, n, 1);
-					knh_Array_add(ctx, a, UP(new_String(ctx, sub, sfp[0].s)));
-				}
-				KNH_RETURN(ctx, sfp, a);
-			}
-		}else {
-			Array *a = new_Array(ctx, CLASS_String, 8);
+			a = knh_String_toCharArray(ctx, sfp[0].s, istrim);
+		}
+		else {
+			knh_bytes_t base = knh_String_tobytes(sfp[0].s);
+			a = new_Array(ctx, CLASS_String, 8);
 			while(1) {
 				knh_index_t loc = knh_bytes_indexOf(base, delim);
 				if(loc == -1) {
-					if(knh_bytes_equals(base, knh_String_tobytes(sfp[0].s))) {
-						knh_Array_add(ctx, a, UP(sfp[0].s));
-					}
-					else {
-						knh_Array_add(ctx, a, UP(new_String(ctx, base, sfp[0].s)));
-					}
-					break;
+					if(istrim) base = knh_bytes_trim(base);
+					knh_Array_add(ctx, a, UP(new_String(ctx, base, sfp[0].s)));
 				}
-				if(loc == 0) {
+				else if(loc == 0) {
 					knh_Array_add(ctx, a, UP(TS_EMPTY));
 				}
 				else {
-					knh_Array_add(ctx, a, UP(new_String(ctx, knh_bytes_first(base, loc), sfp[0].s)));
+					knh_bytes_t t = knh_bytes_first(base, loc);
+					if(istrim) t = knh_bytes_trim(t);
+					knh_Array_add(ctx, a, UP(new_String(ctx, t, sfp[0].s)));
 				}
 				base.buf = base.buf + loc + delim.len;
 				base.len = base.len - loc - delim.len;
-				if(trim) {
-					while(isspace(base.buf[0])) {
-						base.buf = base.buf + 1;
-						base.len = base.len - 1;
-					}
-				}
 			}
-			KNH_RETURN(ctx, sfp, a);
 		}
 	}
-	else {  /* sfp[1].o == null */
-		knh_bytes_t base = knh_String_tobytes(sfp[0].s);
-		Array *a = new_Array(ctx, CLASS_String, 8);
-		size_t loc;
-		while(1) {
-			while(isspace(base.buf[0])) {
-				base.buf = base.buf + 1;
-				base.len = base.len - 1;
-			}
-			if(base.buf[0] == 0) break;
-			for(loc = 0; loc < base.len; loc++) {
-				int ch = base.buf[loc];
-				if(isspace(ch)) break;
-			}
-			if(loc == base.len) {
-				if(knh_bytes_equals(base, knh_String_tobytes(sfp[0].s))) {
-					knh_Array_add(ctx, a, UP(sfp[0].s));
-				}
-				else {
-					knh_Array_add(ctx, a, UP(new_String(ctx, base, sfp[0].s)));
-				}
-				break;
-			} else {
-				knh_Array_add(ctx, a, UP(new_String(ctx, knh_bytes_first(base, loc), NULL /*sfp[0].s*/)));
-			}
-			base.buf = base.buf + loc;
-			base.len = base.len - loc;
-		}
-
-		KNH_RETURN(ctx, sfp, a);
-	}
+	KNH_ASSERT(a != NULL);
+	KNH_RETURN(ctx, sfp, a);
 }
 
 /* ======================================================================== */
@@ -681,6 +662,18 @@ void knh_String__k(Ctx *ctx, String *o, OutputStream *w, String *m)
 		knh_print(ctx, w, sub);
 	}
 	knh_putc(ctx, w, quote);
+}
+
+/* ------------------------------------------------------------------------ */
+/* [Regex] */
+/* ------------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] String[] String.match(Regex pattern) */
+
+static METHOD knh__String_match(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN(ctx, sfp, knh_Regex_split(ctx, (Regex*)sfp[1].o, sfp[0].s));
 }
 
 #endif/*KNH_CC_METHODAPI*/

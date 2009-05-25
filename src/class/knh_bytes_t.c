@@ -262,15 +262,14 @@ knh_bytes_t knh_bytes_offlen(knh_bytes_t t, size_t off, size_t len)
 
 /* ------------------------------------------------------------------------ */
 
-
-knh_bytes_t knh_bytes_trim(knh_bytes_t t, knh_intptr_t ch)
+knh_bytes_t knh_bytes_trim(knh_bytes_t t /*, knh_intptr_t ch*/)
 {
-	while(t.buf[0] == ch) {
+	while(isspace(t.buf[0])) {
 		t.buf++;
 		t.len--;
 	}
 	if(t.len == 0) return t;
-	while(t.buf[t.len-1] == ch) {
+	while(isspace(t.buf[t.len-1])) {
 		t.len--;
 		if(t.len == 0) return t;
 	}
@@ -279,7 +278,7 @@ knh_bytes_t knh_bytes_trim(knh_bytes_t t, knh_intptr_t ch)
 
 /* ------------------------------------------------------------------------ */
 
-int knh_bytes_parseinteger(knh_bytes_t t, knh_int_t *value)
+int knh_bytes_parseint(knh_bytes_t t, knh_int_t *value)
 {
 	knh_uint_t n = 0, prev = 0, base = 10;
 	size_t i = 0;
@@ -333,7 +332,7 @@ int knh_bytes_parsefloat(knh_bytes_t t, knh_float_t *value)
 {
 	if(t.buf[0] == '0' && (t.buf[1] == 'x' || t.buf[1] == 'b')) {
 		knh_int_t n = 0;
-		int res = knh_bytes_parseinteger(t, &n);
+		int res = knh_bytes_parseint(t, &n);
 		*value = (knh_float_t)n;
 		return res;
 	}
