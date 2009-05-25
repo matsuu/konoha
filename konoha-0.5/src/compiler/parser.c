@@ -1231,21 +1231,16 @@ Stmt *new_StmtOP(Ctx *ctx, knh_tokens_t *tc, Token *op)
 
 		while(tc->c < tc->e) {
 			knh_tokens_t op_tc = knh_tokens_splitEXPR(ctx, tc, SP(op)->tt);
-			if(SP(op)->tt != TT_FMT) {
+			if(SP(op_tc.ts[tc->c])->tt == TT_PARENTHESIS) {
+				knh_tokens_t ptc;
+				knh_Token_tc(op_tc.ts[tc->c], &ptc);
 				knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &op_tc, KNH_RVALUE));
+				knh_Stmt_add_EXPRs(ctx, stmt, &ptc);
+				tc->c += 1;
+				return stmt;
 			}
 			else {
-				if(SP(op_tc.ts[tc->c])->tt == TT_PARENTHESIS) {
-					knh_tokens_t ptc;
-					knh_Token_tc(op_tc.ts[tc->c], &ptc);
-					knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &op_tc, KNH_RVALUE));
-					knh_Stmt_add_EXPRs(ctx, stmt, &ptc);
-					tc->c += 1;
-					return stmt;
-				}
-				else {
-					knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &op_tc, KNH_RVALUE));
-				}
+				knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &op_tc, KNH_RVALUE));
 			}
 		}
 		return stmt;
@@ -3149,7 +3144,6 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 	case TT_GT:
 	case TT_GTE:
 	case TT_MATCH:
-	case TT_FMT:
 	case TT_LSHIFT:
 	case TT_RSHIFT:
 	case TT_DIV:  /* Div */
