@@ -848,7 +848,7 @@ void knh_TokenTSTR_typing(Ctx *ctx, Token *o, NameSpace *ns, knh_class_t reqt)
 		knh_Token_toCONST(o);
 	}
 	else {
-		if(DP(o)->tt_next == TT_ADD || DP(o)->tt_next == TT_FMT) {
+		if(DP(o)->tt_next == TT_ADD) {
 			TODO();
 		}
 		knh_Token_setCONST(ctx, o, new_Object_parseOf(ctx, (String*)DP(o)->data));
@@ -1953,6 +1953,13 @@ Term *knh_StmtCALLBASE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh
 		}
 		knh_Stmt_setType(ctx, stmt, DP(abr)->rtype);
 		return TM(stmt);
+	}
+	else if(mn == METHODN_likely || mn == METHODN_unlikely) { /* likely() */
+		if(DP(stmt)->size != 3) goto L_ERROR;
+		if(TERMs_typing(ctx, stmt, 2, abr, ns, TYPE_Boolean, TCHECK_)) {
+			return DP(stmt)->terms[2];
+		}
+		return NULL;
 	}
 	else {
 		char bufmn[CLASSNAME_BUFSIZ];

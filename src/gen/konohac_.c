@@ -84,11 +84,11 @@ static char* knh_token_array_tochar[] = {
     ">>=",  /* rshifte */ 
     "+=",  /* adde */ 
     "-=",  /* sube */ 
-    "*=",  /* mule */ 
     "/=",  /* dive */ 
     "%=",  /* mode */ 
-    "|=",  /* bitore */ 
+    "*=",  /* mule */ 
     "&=",  /* bitande */ 
+    "|=",  /* bitore */ 
     "?\?=",  /* ALTLET */ 
     "?",  /* QUESTION */ 
     "..",  /* Itr */ 
@@ -118,7 +118,6 @@ static char* knh_token_array_tochar[] = {
     "-",  /* Sub */ 
     "/",  /* Div */ 
     "%",  /* Mod */ 
-    "%%",  /* Fmt */ 
     "*",  /* Mul */ 
     "&",  /* Land */ 
     "|",  /* Lor */ 
@@ -214,11 +213,11 @@ static knh_methodn_t knh_token_array_tomethodn[] = {
     METHODN_NONAME,  /* rshifte */ 
     METHODN_NONAME,  /* adde */ 
     METHODN_NONAME,  /* sube */ 
-    METHODN_NONAME,  /* mule */ 
     METHODN_NONAME,  /* dive */ 
     METHODN_NONAME,  /* mode */ 
-    METHODN_NONAME,  /* bitore */ 
+    METHODN_NONAME,  /* mule */ 
     METHODN_NONAME,  /* bitande */ 
+    METHODN_NONAME,  /* bitore */ 
     METHODN_NONAME,  /* ALTLET */ 
     METHODN_NONAME,  /* QUESTION */ 
     METHODN_opItr,  /* Itr */ 
@@ -248,7 +247,6 @@ static knh_methodn_t knh_token_array_tomethodn[] = {
     METHODN_opSub,  /* Sub */ 
     METHODN_opDiv,  /* Div */ 
     METHODN_opMod,  /* Mod */ 
-    METHODN_opFmt,  /* Fmt */ 
     METHODN_opMul,  /* Mul */ 
     METHODN_opLand,  /* Land */ 
     METHODN_opLor,  /* Lor */ 
@@ -344,11 +342,11 @@ static int knh_token_array_getOpPriority[] = {
     0,  /* rshifte */ 
     0,  /* adde */ 
     0,  /* sube */ 
-    0,  /* mule */ 
     0,  /* dive */ 
     0,  /* mode */ 
-    0,  /* bitore */ 
+    0,  /* mule */ 
     0,  /* bitande */ 
+    0,  /* bitore */ 
     0,  /* ALTLET */ 
     2,  /* QUESTION */ 
     2,  /* Itr */ 
@@ -378,7 +376,6 @@ static int knh_token_array_getOpPriority[] = {
     20,  /* Sub */ 
     24,  /* Div */ 
     24,  /* Mod */ 
-    24,  /* Fmt */ 
     24,  /* Mul */ 
     27,  /* Land */ 
     27,  /* Lor */ 
@@ -474,11 +471,11 @@ static int knh_token_array_getOpSize[] = {
     0,  /* rshifte */ 
     0,  /* adde */ 
     0,  /* sube */ 
-    0,  /* mule */ 
     0,  /* dive */ 
     0,  /* mode */ 
-    0,  /* bitore */ 
+    0,  /* mule */ 
     0,  /* bitande */ 
+    0,  /* bitore */ 
     0,  /* ALTLET */ 
     0,  /* QUESTION */ 
     1,  /* Itr */ 
@@ -508,7 +505,6 @@ static int knh_token_array_getOpSize[] = {
     2,  /* Sub */ 
     2,  /* Div */ 
     2,  /* Mod */ 
-    0,  /* Fmt */ 
     2,  /* Mul */ 
     0,  /* Land */ 
     0,  /* Lor */ 
@@ -604,11 +600,11 @@ static knh_bool_t knh_token_array_isEndOfStmt[] = {
     0,  /* rshifte */ 
     0,  /* adde */ 
     0,  /* sube */ 
-    0,  /* mule */ 
     0,  /* dive */ 
     0,  /* mode */ 
-    0,  /* bitore */ 
+    0,  /* mule */ 
     0,  /* bitande */ 
+    0,  /* bitore */ 
     0,  /* ALTLET */ 
     0,  /* QUESTION */ 
     0,  /* Itr */ 
@@ -638,7 +634,6 @@ static knh_bool_t knh_token_array_isEndOfStmt[] = {
     0,  /* Sub */ 
     0,  /* Div */ 
     0,  /* Mod */ 
-    0,  /* Fmt */ 
     0,  /* Mul */ 
     0,  /* Land */ 
     0,  /* Lor */ 
@@ -727,7 +722,6 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
     case '%':
         if(ISB(t, "%=")) { tt = TT_MODE; break; }
         if(ISB(t, "%")) { tt = TT_MOD; break; }
-        if(ISB(t, "%%")) { tt = TT_FMT; break; }
     break;
     case '&':
         if(ISB(t, "&=")) { tt = TT_BITANDE; break; }
@@ -947,9 +941,6 @@ int knh_bytes_istoken(knh_bytes_t t, int ch)
 {
     switch(ch) {
 
-    case '%':
-        if(ISB(t, "%")) { return 1; }
-        return 0; 
     case '&':
         if(ISB(t, "&")) { return 1; }
         return 0; 
@@ -974,11 +965,11 @@ int knh_bytes_istoken(knh_bytes_t t, int ch)
         if(ISB(t, ">>")) { return 1; }
         if(ISB(t, "+")) { return 1; }
         if(ISB(t, "-")) { return 1; }
-        if(ISB(t, "*")) { return 1; }
         if(ISB(t, "/")) { return 1; }
         if(ISB(t, "%")) { return 1; }
-        if(ISB(t, "|")) { return 1; }
+        if(ISB(t, "*")) { return 1; }
         if(ISB(t, "&")) { return 1; }
+        if(ISB(t, "|")) { return 1; }
         if(ISB(t, "??")) { return 1; }
         if(ISB(t, "==")) { return 1; }
         if(ISB(t, "=")) { return 1; }
