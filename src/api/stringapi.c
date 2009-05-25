@@ -66,11 +66,118 @@ static METHOD knh__String_startsWith(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
+/* @method[CONST] Boolean! String.startsWith:IgnoreCase(String! s) */
+
+static METHOD knh__String_startsWith__IgnoreCase(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
+	knh_bytes_t expr = knh_String_tobytes(sfp[1].s);
+	int res = 0;
+	if(expr.len < base.len) {
+		base = knh_bytes_first(base, expr.len);
+		res = (knh_bytes_strcasecmp(base, expr) == 0);
+	}
+	KNH_RETURN_Boolean(ctx, sfp, res);
+}
+
+/* ------------------------------------------------------------------------ */
 /* @method[CONST] Boolean! String.endsWith(String! s) */
 
 static METHOD knh__String_endsWith(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_bytes_endsWith(knh_String_tobytes(sfp[0].s), knh_String_tobytes(sfp[1].s)));
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] Boolean! String.endsWith:IgnoreCase(String! s) */
+
+static METHOD knh__String_endsWith__IgnoreCase(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
+	knh_bytes_t expr = knh_String_tobytes(sfp[1].s);
+	int res = 0;
+	if(expr.len < base.len) {
+		base = knh_bytes_last(base, base.len - expr.len);
+		res = (knh_bytes_strcasecmp(base, expr) == 0);
+	}
+	KNH_RETURN_Boolean(ctx, sfp, res);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] Int! String.indexOf(String! s) */
+
+static METHOD knh__String_indexOf(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
+	knh_bytes_t delim = knh_String_tobytes(sfp[1].s);
+	int loc = knh_bytes_indexOf(base, delim);
+	if (knh_String_isASCII(sfp[0].s) || loc == -1) {
+		KNH_RETURN_Int(ctx, sfp, loc);
+	} else {
+		base.len = (size_t)loc;
+		KNH_RETURN_Int(ctx, sfp, knh_bytes_mlen(base));
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] Int! String.indexOf:IgnoreCase(String! s) */
+
+static METHOD knh__String_indexOf__IgnoreCase(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
+	knh_bytes_t delim = knh_String_tobytes(sfp[1].s);
+	knh_intptr_t loc = base.len - delim.len;
+	for(loc = 0; loc < base.len - delim.len; loc++) {
+		if(base.buf[loc] != delim.buf[loc]) continue;
+		knh_bytes_t sub = knh_bytes_offlen(base, loc, delim.len);
+		if(knh_bytes_strcasecmp(sub, delim) == 0) break;
+	}
+	if(loc == base.len - delim.len) loc = -1;
+	if (loc >= 0 && !knh_String_isASCII(sfp[0].s)) {
+		base.len = (size_t)loc;
+		loc = knh_bytes_mlen(base);
+	}
+	KNH_RETURN_Int(ctx, sfp, loc);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] Int! String.lastIndexOf(String! s) */
+
+static METHOD knh__String_lastIndexOf(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
+	knh_bytes_t delim = knh_String_tobytes(sfp[1].s);
+	knh_intptr_t loc = base.len - delim.len;
+	for(; loc >= 0; loc--) {
+		if(base.buf[loc] != delim.buf[loc]) continue;
+		knh_bytes_t sub = knh_bytes_offlen(base, loc, delim.len);
+		if(knh_bytes_strcmp(sub, delim) == 0) break;
+	}
+	if (loc >= 0 && !knh_String_isASCII(sfp[0].s)) {
+		base.len = (size_t)loc;
+		loc = knh_bytes_mlen(base);
+	}
+	KNH_RETURN_Int(ctx, sfp, loc);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] Int! String.lastIndexOf:IgnoreCase(String! s) */
+
+static METHOD knh__String_lastIndexOf__IgnoreCase(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
+	knh_bytes_t delim = knh_String_tobytes(sfp[1].s);
+	knh_intptr_t loc = base.len - delim.len;
+	for(; loc >= 0; loc--) {
+		if(base.buf[loc] != delim.buf[loc]) continue;
+		knh_bytes_t sub = knh_bytes_offlen(base, loc, delim.len);
+		if(knh_bytes_strcasecmp(sub, delim) == 0) break;
+	}
+	if (loc >= 0 && !knh_String_isASCII(sfp[0].s)) {
+		base.len = (size_t)loc;
+		loc = knh_bytes_mlen(base);
+	}
+	KNH_RETURN_Int(ctx, sfp, loc);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -92,21 +199,7 @@ static METHOD knh__String_getSize(Ctx *ctx, knh_sfp_t *sfp)
 	}
 }
 
-/* ------------------------------------------------------------------------ */
-/* @method[CONST] Int! String.indexOf(String! s) */
 
-static METHOD knh__String_indexOf(Ctx *ctx, knh_sfp_t *sfp)
-{
-	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
-	knh_bytes_t delim = knh_String_tobytes(sfp[1].s);
-	int loc = knh_bytes_indexOf(base, delim);
-	if (knh_String_isASCII(sfp[0].s) || loc == -1) {
-		KNH_RETURN_Int(ctx, sfp, loc);
-	} else {
-		base.len = (size_t)loc;
-		KNH_RETURN_Int(ctx, sfp, knh_bytes_mlen(base));
-	}
-}
 
 /* ------------------------------------------------------------------------ */
 /* @method[CONST|NULLBASE] String! String.opAdd(Any v) */
