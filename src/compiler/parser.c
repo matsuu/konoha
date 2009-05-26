@@ -1260,14 +1260,18 @@ static Token *knh_Token_findCASTNULL(Ctx *ctx, Token *tk, Token *ntk)
 		knh_tokens_t tc;
 		knh_Token_tc(tk, &tc);
 		if(tc.e == 0) return NULL;
-
+		if((tc.e > 2 && (tc.ts[1])->tt != TT_WITH)  || tc.e == 2) {
+			knh_Token_perror(ctx, tc.ts[1], KMSG_ESYNTAX);
+			SP(tk)->tt = TT_ERR;
+			return NULL;
+		}
 		if(SP(tc.ts[0])->tt == TT_MUL) {
 			SP(tc.ts[0])->tt = TT_CID;
 			DP(tc.ts[0])->cid = CLASS_Any;
-			return tc.ts[0];
+			return tk; //tc.ts[0];
 		}
 		if(knh_Token_isTYPEN(tc.ts[0])) {
-			return tc.ts[0];
+			return tk; //tc.ts[0];
 		}
 	}
 	return NULL;
@@ -1276,11 +1280,19 @@ static Token *knh_Token_findCASTNULL(Ctx *ctx, Token *tk, Token *ntk)
 /* ------------------------------------------------------------------------ */
 
 static
-Stmt *new_StmtCAST(Ctx *ctx, Token *tk_cast, knh_tokens_t *tc)
+Stmt *new_StmtCAST(Ctx *ctx, Token *tk, knh_tokens_t *tc)
 {
 	Stmt *stmt = new_Stmt(ctx, 0, STT_MAPCAST);
-	knh_Stmt_add(ctx, stmt, TM(tk_cast));
+	KNH_ASSERT(SP(tk)->tt == TT_PARENTHESIS);
+	knh_tokens_t ctc;
+	knh_Token_tc(tk, &ctc);
+	knh_Stmt_add(ctx, stmt, TM(ctc.ts[0]));
 	knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, tc, KNH_RVALUE));
+	if(ctc.e > 2) {
+		KNH_ASSERT((ctc.ts[1])->tt == TT_WITH);
+		ctc.c = 2;
+		knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &ctc, KNH_RVALUE));
+	}
 	return stmt;
 }
 
@@ -1330,7 +1342,6 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 	}
 
 	pc = 0;
-
 	{
 		knh_token_t tt0 = SP(ts[oc])->tt, tt1 = DP(ts[oc])->tt_next;
 		/* @TEST a.f "text" + 1 */
@@ -1508,6 +1519,18 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 				stmt = new_StmtNAME1(ctx, ts[oc], KNH_RVALUE);
 				fc = oc + 1;
 				goto L_FUNC;
+			}
+			else {
+				tc->c = oc + 1;
+				knh_tokens_ignore(ctx, tc);
+				return new_TermVALUE(ctx, ts[oc], lr);
+			}
+		}
+		else if(tt0 == TT_CMETHODN) {
+			if(tt1 == TT_PARENTHESIS) {   /* @TEST func(a) */
+				stmt = new_StmtNAME2(ctx, ts[oc], lr);
+				pc = oc + 1;
+				goto L_PARAM;
 			}
 			else {
 				tc->c = oc + 1;
