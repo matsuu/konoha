@@ -730,42 +730,11 @@ Stmt *new_StmtARRAY(Ctx *ctx, Token *tk)
 {
 	knh_tokens_t tc;
 	knh_Token_tc(tk, &tc);
-//	Token *tkidx;
-//	if((tkidx = knh_tokens_findIDXNULL(&tc)) == NULL) {
-		Stmt *stmt = new_Stmt(ctx, 0, STT_NEW);
-		knh_Stmt_add(ctx, stmt, TM(new_TokenMN(ctx, FL(tk), METHODN_new__init)));
-		knh_Stmt_add(ctx, stmt, TM(new_TokenCID(ctx, FL(tk), CLASS_Array)));
-		knh_Stmt_add_EXPRs(ctx, stmt, &tc);
-		return stmt;
-//	}
-//
-//	else {
-//		Stmt *stmt = new_Stmt(ctx, 0, STT_NEW);
-//		knh_tokens_t first_tc = knh_tokens_splitEXPR(ctx, &tc, SP(tkidx)->tt);
-//		if(SP(tkidx)->tt == TT_SUBSETE) {
-//			knh_Stmt_add(ctx, stmt, TM(new_TokenMN(ctx, FL(tk), METHODN_new)));
-//		}
-//		else if(SP(tkidx)->tt == TT_OFFSET) {
-//			knh_Stmt_add(ctx, stmt, TM(new_TokenMN(ctx, FL(tk), METHODN_new__offset)));
-//		}
-//		else {
-//			knh_Stmt_add(ctx, stmt, TM(new_TokenMN(ctx, FL(tk), METHODN_new__slice)));
-//		}
-//		knh_Stmt_add(ctx, stmt, TM(new_TokenCID(ctx, FL(tk), CLASS_Range)));
-//		if(first_tc.c == first_tc.e) {
-//			knh_Stmt_add(ctx, stmt, TM(new_TokenCONST(ctx, FL(tkidx), KNH_NULL)));
-//		}
-//		else {
-//			knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &first_tc, KNH_RVALUE));
-//		}
-//		if(tc.c == tc.e) {
-//			knh_Stmt_add(ctx, stmt, TM(new_TokenCONST(ctx, FL(tkidx), KNH_NULL)));
-//		}
-//		else {
-//			knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &tc, KNH_RVALUE));
-//		}
-//		return stmt;
-//	}
+	Stmt *stmt = new_Stmt(ctx, 0, STT_NEW);
+	knh_Stmt_add(ctx, stmt, TM(new_TokenMN(ctx, FL(tk), METHODN_new__init)));
+	knh_Stmt_add(ctx, stmt, TM(new_TokenCID(ctx, FL(tk), CLASS_Array)));
+	knh_Stmt_add_EXPRs(ctx, stmt, &tc);
+	return stmt;
 }
 
 /* ======================================================================== */
@@ -784,12 +753,7 @@ void knh_Stmt_add_IDX(Ctx *ctx, Stmt *stmt, Token *tkb, int lr)
 		return ;
 	}
 	if((tkidx = knh_tokens_findIDXNULL(&tc)) == NULL) {
-//		if(lr == KNH_LVALUE) {
-//			knh_Stmt_add(ctx, stmt, TM(new_TokenMN(ctx, FL(tkb), METHODN_set)));
-//		}
-//		else{
 		knh_Stmt_add(ctx, stmt, TM(new_TokenMN(ctx, FL(tkb), METHODN_get)));
-//		}
 		knh_Stmt_swap01(stmt);
 		knh_Stmt_add_EXPRs(ctx, stmt, &tc);
 #ifdef METHODN_set2D
@@ -894,8 +858,6 @@ void knh_Stmt_add_PAIR(Ctx *ctx, Stmt *stmt, knh_tokens_t *tc)
 		knh_Stmt_perror(ctx, stmt, KMSG_WEMPTY, NULL);
 		return;
 	}
-
-	//fprintf(stderr, "NAME s=%d, e=%d\n", s, tc->e);
 
 	if(SP(ts[s])->tt == TT_LABEL) {
 		knh_Stmt_add(ctx, stmt, TM(knh_Token_toCONST(ts[s])));
@@ -1163,11 +1125,10 @@ void knh_Stmt_add_PEXPR(Ctx *ctx, Stmt *stmt, knh_tokens_t *tc)
 /* ======================================================================== */
 /* [OP] */
 
-static int knh_tokens_findOPRindex(Ctx *ctx, knh_tokens_t *tc)
+static int knh_tokens_findOPR(Ctx *ctx, knh_tokens_t *tc)
 {
 	int i, oppri = 98, idx = -1;
 	Token **ts = tc->ts;
-
 	for(i = tc->c; i < tc->e; i++) {
 		int p = knh_token_getOpPriority(SP(ts[i])->tt);
 		if(p == 0) {
@@ -1204,49 +1165,10 @@ Stmt *new_StmtNEXT(Ctx *ctx, Token *op, knh_tokens_t *tc)
 /* ------------------------------------------------------------------------ */
 
 static
-Stmt *new_StmtOP(Ctx *ctx, knh_tokens_t *tc, Token *op)
+Stmt *new_StmtOPR(Ctx *ctx, knh_tokens_t *tc, Token *op)
 {
-	knh_stmt_t stt = STT_OP;
-	switch(SP(op)->tt) {
-		case TT_AND: stt = STT_AND; break;
-		case TT_OR:  stt = STT_OR; break;
-		case TT_ALT: stt = STT_ALT; break;
-		case TT_QUESTION: goto L_TRI;
-		case TT_NEXT: case TT_PREV: goto L_NEXT;
-	}
-
-	{
-		Stmt *stmt;
-		if(SP(tc->ts[tc->c])->tt == SP(op)->tt) {
-			stmt = new_Stmt(ctx, KNH_FLAG_STMTF_ADPOSITION, stt);
-			tc->c += 1;
-		}
-		else{
-			stmt = new_Stmt(ctx, 0, stt);
-		}
-
-		if(stt == STT_OP) {
-			knh_Stmt_add(ctx, stmt, TM(op));
-		}
-
-		while(tc->c < tc->e) {
-			knh_tokens_t op_tc = knh_tokens_splitEXPR(ctx, tc, SP(op)->tt);
-			if(SP(op_tc.ts[tc->c])->tt == TT_PARENTHESIS) {
-				knh_tokens_t ptc;
-				knh_Token_tc(op_tc.ts[tc->c], &ptc);
-				knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &op_tc, KNH_RVALUE));
-				knh_Stmt_add_EXPRs(ctx, stmt, &ptc);
-				tc->c += 1;
-				return stmt;
-			}
-			else {
-				knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &op_tc, KNH_RVALUE));
-			}
-		}
-		return stmt;
-	}
-
-	L_TRI:; {
+	/* $expr ? $expr : $expr */
+	if(SP(op)->tt == TT_QUESTION) {
 		Stmt *stmt = new_Stmt(ctx, 0, STT_TRI);
 		knh_tokens_t expr_tc = knh_tokens_splitEXPR(ctx, tc, SP(op)->tt);
 		knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &expr_tc, KNH_RVALUE));
@@ -1260,7 +1182,7 @@ Stmt *new_StmtOP(Ctx *ctx, knh_tokens_t *tc, Token *op)
 		}
 		return stmt;
 	}
-	L_NEXT:; {
+	else if(SP(op)->tt == TT_NEXT || SP(op)->tt == TT_PREV) {
 		if(tc->ts[tc->c] == op) {
 			knh_Token_perror(ctx, op, KMSG_CPREOP);
 			tc->c += 1;
@@ -1291,6 +1213,41 @@ Stmt *new_StmtOP(Ctx *ctx, knh_tokens_t *tc, Token *op)
 				return stmt;
 			}
 		}
+	}
+	else {
+		knh_stmt_t stt = STT_OP;
+		switch(SP(op)->tt) {
+			case TT_AND: stt = STT_AND; break;
+			case TT_OR:  stt = STT_OR; break;
+			case TT_ALT: stt = STT_ALT; break;
+		}
+		Stmt *stmt;
+		if(SP(tc->ts[tc->c])->tt == SP(op)->tt) {
+			stmt = new_Stmt(ctx, KNH_FLAG_STMTF_ADPOSITION, stt);
+			tc->c += 1;
+		}
+		else{
+			stmt = new_Stmt(ctx, 0, stt);
+		}
+
+		if(stt == STT_OP) {
+			knh_Stmt_add(ctx, stmt, TM(op));
+		}
+		while(tc->c < tc->e) {
+			knh_tokens_t op_tc = knh_tokens_splitEXPR(ctx, tc, SP(op)->tt);
+//			if(SP(op_tc.ts[tc->c])->tt == TT_PARENTHESIS) {
+//				knh_tokens_t ptc;
+//				knh_Token_tc(op_tc.ts[tc->c], &ptc);
+//				knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &op_tc, KNH_RVALUE));
+//				knh_Stmt_add_EXPRs(ctx, stmt, &ptc);
+//				tc->c += 1;
+//				return stmt;
+//			}
+//			else {
+			knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &op_tc, KNH_RVALUE));
+//			}
+		}
+		return stmt;
 	}
 }
 
@@ -1345,8 +1302,9 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 	Token **ts = tc->ts;
 	int oc = tc->c, e = tc->e;
 	int fc = 0, pc = 0;
-
 	Stmt *stmt = NULL;
+	DBG2_P("tt='%s'[%d] .. tt='%s'[%d]",
+			knh_token_tochar(ts[oc]->tt), oc, knh_token_tochar(ts[e-1]->tt), e-1);
 	if(!(oc < e)) {
 		DBG2_P("tc->c=%d, tc->e=%d", (int)oc, (int)e);
 		KNH_ASSERT(e > 0);
@@ -1405,52 +1363,55 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 	}
 
 	/* OPERATOR */ {
-		int idx = knh_tokens_findOPRindex(ctx, tc);
+		int idx = knh_tokens_findOPR(ctx, tc);
 		if(idx != -1) {
-			if(knh_token_getOpSize(SP(ts[idx])->tt) == 2) {
-				if(tc->c < idx && idx+1 < tc->e) {
-					Stmt *stmt = new_Stmt(ctx, 0, STT_OP);
-					knh_Stmt_add(ctx, stmt, TM(ts[idx]));
-					knh_tokens_t expr_tc = *tc;
-					expr_tc.e = idx;
-					knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &expr_tc, KNH_RVALUE));
-					expr_tc = *tc;
-					expr_tc.c = idx+1;
-					knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &expr_tc, KNH_RVALUE));
-					return TM(stmt);
-				}
-				else {
-					knh_Token_perror(ctx, ts[idx], KMSG_UOP2);
-					SP(ts[idx])->tt = TT_ERR; return TM(ts[idx]);
-				}
-			}
-			else if(knh_token_getOpSize(SP(ts[idx])->tt) == 1) {
-				if(SP(ts[idx])->tt == TT_NEXT || SP(ts[idx])->tt == TT_PREV) {
-					return TM(new_StmtOP(ctx, tc, ts[idx]));
-				}
-				else if(tc->c == idx) {
-					Stmt *stmt = new_Stmt(ctx, KNH_FLAG_STMTF_ADPOSITION, STT_OP);
-					knh_Stmt_add(ctx, stmt, TM(ts[idx]));
-					tc->c = idx + 1;
-					knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, tc, KNH_RVALUE));
-					return TM(stmt);
-				}
-				else if(idx == tc->e - 1) {
-					Stmt *stmt = new_Stmt(ctx, 0, STT_OP);
-					knh_Stmt_add(ctx, stmt, TM(ts[idx]));
-					tc->e = idx;
-					knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, tc, KNH_RVALUE));
-					return TM(stmt);
-				}
-				else {
-					knh_Token_perror(ctx, ts[idx], KMSG_UOP1);
-					SP(ts[idx])->tt = TT_ERR; return TM(ts[idx]);
-				}
-			}
-			else {
-				return TM(new_StmtOP(ctx, tc, ts[idx]));
-			}
+			return TM(new_StmtOPR(ctx, tc, ts[idx]));
 		}
+//		if(idx != -1) {
+//			if(knh_token_getOpSize(SP(ts[idx])->tt) == 2) {
+//				if(tc->c < idx && idx+1 < tc->e) {
+//					Stmt *stmt = new_Stmt(ctx, 0, STT_OP);
+//					knh_Stmt_add(ctx, stmt, TM(ts[idx]));
+//					knh_tokens_t expr_tc = *tc;
+//					expr_tc.e = idx;
+//					knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &expr_tc, KNH_RVALUE));
+//					expr_tc = *tc;
+//					expr_tc.c = idx+1;
+//					knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &expr_tc, KNH_RVALUE));
+//					return TM(stmt);
+//				}
+//				else {
+//					knh_Token_perror(ctx, ts[idx], KMSG_UOP2);
+//					SP(ts[idx])->tt = TT_ERR; return TM(ts[idx]);
+//				}
+//			}
+//			else if(knh_token_getOpSize(SP(ts[idx])->tt) == 1) {
+//				if(SP(ts[idx])->tt == TT_NEXT || SP(ts[idx])->tt == TT_PREV) {
+//					return TM(new_StmtOPR(ctx, tc, ts[idx]));
+//				}
+//				else if(tc->c == idx) {
+//					Stmt *stmt = new_Stmt(ctx, KNH_FLAG_STMTF_ADPOSITION, STT_OP);
+//					knh_Stmt_add(ctx, stmt, TM(ts[idx]));
+//					tc->c = idx + 1;
+//					knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, tc, KNH_RVALUE));
+//					return TM(stmt);
+//				}
+//				else if(idx == tc->e - 1) {
+//					Stmt *stmt = new_Stmt(ctx, 0, STT_OP);
+//					knh_Stmt_add(ctx, stmt, TM(ts[idx]));
+//					tc->e = idx;
+//					knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, tc, KNH_RVALUE));
+//					return TM(stmt);
+//				}
+//				else {
+//					knh_Token_perror(ctx, ts[idx], KMSG_UOP1);
+//					SP(ts[idx])->tt = TT_ERR; return TM(ts[idx]);
+//				}
+//			}
+//			else {
+//				return TM(new_StmtOPR(ctx, tc, ts[idx]));
+//			}
+//		}
 	}
 
 	/* cast operator (C)a */ {
@@ -1513,6 +1474,21 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 		}
 	}
 
+	/* Closure Class (a, b) { ... } */
+	if(knh_Token_isTYPEN(ts[oc])) {
+		if(DP(ts[oc])->tt_next == TT_PARENTHESIS) {
+			if(DP(ts[fc])->tt_next == TT_BRACE) {  /* @TEST Class (a,b) { ... } */
+				tc->c = oc;
+				stmt = new_Stmt(ctx, 0, STT_FUNCTION);
+				knh_Stmt_add_TYPEN(ctx, stmt, tc);
+				knh_Stmt_add_PARAMs(ctx, stmt, tc);
+				knh_Stmt_add_STMT1(ctx, stmt, tc);
+				fc = tc->c;
+				goto L_NEXTFUNC;
+			}
+		}
+	}
+
 	/** first **/
 	KNH_ASSERT(fc < e);
 	{
@@ -1521,6 +1497,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 			SP(ts[oc])->tt = TT_NAME;
 			tt0 = TT_NAME;
 		}
+		/* NAME */
 		if(tt0 == TT_NAME) {
 			if(tt1 == TT_PARENTHESIS) {   /* @TEST func(a) */
 				stmt = new_StmtNAME2(ctx, ts[oc], lr);
@@ -1538,7 +1515,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 				return new_TermVALUE(ctx, ts[oc], lr);
 			}
 		}/* TT_NAME */
-		if(tt0 == TT_MT) {  /* @TEST %s(a) */
+		else if(tt0 == TT_MT) {  /* @TEST %s(a) */
 			if(tt1 != TT_PARENTHESIS) {
 				tc->c = oc + 1;
 				knh_Token_perror(ctx, ts[oc], KMSG_ESYNTAX);
@@ -1549,19 +1526,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 			pc = oc + 1;
 			goto L_PARAM;
 		} /* DP(ts[oc])->TT == TT_MT */
-
-		if(knh_Token_isTYPEN(ts[oc])) {
-			if(DP(ts[oc])->tt_next == TT_PARENTHESIS) {
-				if(DP(ts[fc])->tt_next == TT_BRACE) {  /* @TEST Class (a,b) { ... } */
-					tc->c = oc;
-					stmt = new_Stmt(ctx, 0, STT_FUNCTION);
-					knh_Stmt_add_TYPEN(ctx, stmt, tc);
-					knh_Stmt_add_PARAMs(ctx, stmt, tc);
-					knh_Stmt_add_STMT1(ctx, stmt, tc);
-					fc = tc->c;
-					goto L_NEXTFUNC;
-				}
-			}
+		else if(knh_Token_isTYPEN(ts[oc])) {
 			if(DP(ts[oc])->tt_next == TT_BRACE) {  /* @TEST Class {..} */
 				stmt = new_StmtDICTMAP(ctx, ts[oc], ts[oc+1]);
 				tc->c = oc + 2;
@@ -1572,17 +1537,17 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 			knh_tokens_ignore(ctx, tc);
 			return TM(ts[oc]);
 		}
-	}
-
-	KNH_ASSERT(stmt == NULL);
-	{
-		Term *tm = new_TermVALUE(ctx, ts[oc], lr);
-		if(IS_Token(tm) && SP((Token*)tm)->tt == TT_ERR) {
-			return tm;
+		else {
+			KNH_ASSERT(stmt == NULL);
+			DBG2_P("**** FIRST TOKEN=%s", knh_token_tochar(tt0));
+			Term *tm = new_TermVALUE(ctx, ts[oc], lr);
+			if(SP((Token*)tm)->tt == TT_ERR) {
+				return tm;
+			}
+			stmt = new_Stmt(ctx, 0, STT_CALL);
+			knh_Stmt_add(ctx, stmt, tm);
+			fc = oc + 1;
 		}
-		stmt = new_Stmt(ctx, 0, STT_CALL);
-		knh_Stmt_add(ctx, stmt, tm);
-		fc = oc + 1;
 	}
 
 	L_FUNC:; /* function name */
