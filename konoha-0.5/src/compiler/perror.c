@@ -42,13 +42,19 @@ extern "C" {
 /* ======================================================================== */
 /* [perrata] */
 
-void
-knh_perrata(Ctx *ctx, knh_fileid_t fileid, int line, char *oldt, char *newt)
+void knh_vperror(Ctx *ctx, knh_fileid_t file, int line, int level, const char *fmt, va_list *ap)
+{
+	knh_sfp_t list[16] = {};
+
+}
+
+/* ======================================================================== */
+/* [perrata] */
+
+void knh_perrata(Ctx *ctx, knh_fileid_t fileid, int line, char *oldt, char *newt)
 {
 	if(knh_Context_isCompiling(ctx)) {
 		OutputStream *w = KNH_STDERR;
-//		knh_snprintf(buf, sizeof(buf), "\t%s:%d (ERRATA): ", FILEIDN(fileid), line);
-//		knh_print(ctx, w, B(buf));
 		knh_write__s(ctx, w, "\t (ERRATA): ");
 		knh_write__s(ctx, w, oldt);
 		knh_write__s(ctx, w, " ==> ");

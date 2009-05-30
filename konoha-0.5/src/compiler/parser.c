@@ -1315,8 +1315,8 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 	int oc = tc->c, e = tc->e;
 	int fc = 0, pc = 0;
 	Stmt *stmt = NULL;
-	DBG2_P("tt='%s'[%d] .. tt='%s'[%d]",
-			knh_token_tochar(ts[oc]->tt), oc, knh_token_tochar(ts[e-1]->tt), e-1);
+//	DBG2_P("tt='%s'[%d] .. tt='%s'[%d]",
+//			knh_token_tochar(ts[oc]->tt), oc, knh_token_tochar(ts[e-1]->tt), e-1);
 	if(!(oc < e)) {
 		DBG2_P("tc->c=%d, tc->e=%d", (int)oc, (int)e);
 		KNH_ASSERT(e > 0);
@@ -2308,9 +2308,17 @@ static Stmt *new_StmtCLASS(Ctx *ctx, knh_tokens_t *tc)
 
 static Stmt *new_StmtFORMAT(Ctx *ctx, knh_tokens_t *tc)
 {
-	knh_Token_perror(ctx, tc->ts[tc->c-1], KMSG_EFUTURE);
-	knh_tokens_nextStmt(tc);
-	return new_Stmt(ctx, 0, STT_DONE);
+	Token **ts = tc->ts;
+	if(tc->c < tc->e && SP(ts[tc->c])->tt == TT_PARENTHESIS) {
+		/* format("%s", a) */
+		tc->c =-1;
+		return new_StmtLETEXPR(ctx, tc);
+	}
+	else {
+		knh_Token_perror(ctx, tc->ts[tc->c-1], KMSG_EFUTURE);
+		knh_tokens_nextStmt(tc);
+		return new_Stmt(ctx, 0, STT_DONE);
+	}
 //	Stmt *o = new_StmtMETA(ctx, tc, STT_FORMAT);
 //	knh_Stmt_add_MT(ctx, o, tc); /* MT */
 //	knh_Stmt_add_PARAMs(ctx, o, tc); /* PARAM* */

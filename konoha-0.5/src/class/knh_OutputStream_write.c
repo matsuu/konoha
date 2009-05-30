@@ -275,16 +275,151 @@ KNHAPI(void) knh_format(Ctx *ctx, OutputStream *w, knh_methodn_t mn, Object *o, 
 /* ======================================================================== */
 /* [printf] */
 
-KNHAPI(void) knh_printf(Ctx *ctx, OutputStream *w, char *fmt, ...)
+static char* knh_vprintf_parseindex(char *p, int *index)
 {
-	va_list args;
+	p++;
+	if(p[0] == '{' && isdigit(p[1]) && p[2] == '}') {
+		*index = p[1] - '0';
+		p += 3;
+	}
+	return p;
+}
+
+/* ------------------------------------------------------------------------ */
+/* @data */
+
+#define VA_NOP                0
+#define VA_INT                1
+#define VA_FLOAT              2
+#define VA_CHAR               3
+#define VA_POINTER            4
+#define VA_OBJECT             5
+#define VA_FIELDN             6
+#define VA_CLASS              7
+#define VA_TYPE               8
+#define VA_METHODN            9
+#define VA_BYTES             10
+
+typedef struct {
+	int atype;
+	union {
+		knh_intptr_t  ivalue;
+		knh_uintptr_t uvalue;
+		knh_float_t   fvalue;
+		knh_float_t   evalue;
+		void         *pvalue;
+		char         *svalue;
+		Object       *ovalue;
+		knh_bytes_t   bvalue;
+		knh_class_t     cid;
+		knh_type_t      type;
+		knh_fieldn_t    fn;
+		knh_methodn_t   mn;
+	};
+} knh_valist_t;
+
+/* ------------------------------------------------------------------------ */
+
+void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
+{
+	knh_valist_t args[10];
 	int ch; char *c = fmt;
-	va_start(args , fmt);
+	int i, bindex = 0, bindex_max = 10;
+	for(i = 0; i < bindex_max; i++) args[i].atype = 0;
+
 	while((ch = *c) != '\0') {
 		c++;
-		switch(ch) {
-		case '\\':
-			ch = *c++;
+		if(ch == '%') {
+			ch = *c;
+			int index = bindex++;
+			c = knh_vprintf_parseindex(c++, &index);
+			//DBG2_P("bindex=%d, index=%d", bindex, index);
+			switch(ch) {
+				case 'd': case 'u':
+					args[index].atype = VA_INT;
+					break;
+				case 'f': case 'e':
+					args[index].atype = VA_FLOAT;
+					break;
+				case 's':
+					args[index].atype = VA_CHAR;
+					break;
+				case 'p':
+					args[index].atype = VA_POINTER;
+					break;
+				case 'O': case 'o':
+					args[index].atype = VA_OBJECT;
+					break;
+				case 'N': case 'F':
+					args[index].atype = VA_FIELDN;
+					break;
+				case 'M':
+					args[index].atype = VA_METHODN;
+					break;
+				case 'C':
+					args[index].atype = VA_CLASS;
+					break;
+				case 'T':
+					args[index].atype = VA_TYPE;
+					break;
+				case 'B':
+					args[index].atype = VA_BYTES;
+					break;
+				default:
+					bindex--;
+			}
+			if(bindex == 10) {
+				DBG2_ASSERT(bindex < 10);
+				break;
+			}
+		}
+	}
+
+	for(i = 0; i < 10; i++) {
+		switch(args[i].atype) {
+		case VA_INT:
+			args[i].ivalue = (knh_intptr_t)va_arg(ap, knh_intptr_t);
+			break;
+		case VA_FLOAT:
+			args[i].fvalue = (knh_float_t)va_arg(ap, double);
+			break;
+		case VA_CHAR:
+			args[i].svalue = (char*)va_arg(ap, char*);
+			break;
+		case VA_POINTER:
+			args[i].pvalue = (void*)va_arg(ap, void*);
+			break;
+		case VA_OBJECT:
+			args[i].ovalue = (Object*)va_arg(ap, Object*);
+			break;
+		case VA_FIELDN:
+			args[i].fn = (knh_fieldn_t)va_arg(ap, int/*knh_fieldn_t*/);
+			break;
+		case VA_METHODN:
+			args[i].mn = (knh_methodn_t)va_arg(ap, int/*knh_methodn_t*/);
+			break;
+		case VA_CLASS:
+			args[i].cid = (knh_class_t)va_arg(ap, int/*knh_class_t*/);
+			break;
+		case VA_TYPE:
+			args[i].type = (knh_type_t)va_arg(ap, int/*knh_type_t*/);
+			break;
+		case VA_BYTES:
+			args[i].bvalue = (knh_bytes_t)va_arg(ap, knh_bytes_t);
+			break;
+		default:
+			bindex_max = i;
+			goto L_FORMAT;
+		}
+	}
+
+	L_FORMAT:;
+	c = fmt;
+	bindex = 0;
+	while((ch = *c) != '\0') {
+		c++;
+		if(ch == '\\') {
+			ch = *c;
 			switch(ch) {
 				case '\0' : return ;
 				case 'n': knh_println(ctx, w, STEXT("")); break;
@@ -293,77 +428,85 @@ KNHAPI(void) knh_printf(Ctx *ctx, OutputStream *w, char *fmt, ...)
 					knh_putc(ctx, w, '\\');
 					knh_putc(ctx, w, ch);
 			}
-			break;
-		case '%':
-			ch = *c++;
+		}
+		else if(ch == '%') {
+			ch = *c;
+			int index = bindex++;
+			c = knh_vprintf_parseindex(c++, &index);
 			switch(ch) {
 				case '\0' : return ;
 				case 'd':
-					knh_write__i(ctx, w, (knh_intptr_t)va_arg(args, knh_intptr_t));
+					KNH_ASSERT(args[index].atype == VA_INT);
+					knh_write__i(ctx, w, args[index].ivalue);
 					break;
-
 				case 'u':
-					knh_write__u(ctx, w, (knh_uintptr_t)va_arg(args, knh_uintptr_t));
+					KNH_ASSERT(args[index].atype == VA_INT);
+					knh_write__u(ctx, w, args[index].uvalue);
 					break;
-
-//				case 'x':
-//					knh_write__x(ctx, w, (knh_uintptr_t)va_arg(args, knh_uintptr_t));
-//					break;
-
 				case 'f':
-					knh_write__f(ctx, w, (knh_float_t)va_arg(args, double));
+					KNH_ASSERT(args[index].atype == VA_FLOAT);
+					knh_write__f(ctx, w, args[index].fvalue);
 					break;
-
 				case 'e':
-					knh_write__e(ctx, w, (knh_float_t)va_arg(args, double));
+					KNH_ASSERT(args[index].atype == VA_FLOAT);
+					knh_write__e(ctx, w, args[index].fvalue);
 					break;
-
 				case 's':
-					knh_write__s(ctx, w, (char*)va_arg(args, char*));
+					KNH_ASSERT(args[index].atype == VA_CHAR);
+					knh_write__s(ctx, w, args[index].svalue);
 					break;
-
 				case 'p':
-					knh_write__p(ctx, w, (void*)va_arg(args, void*));
+					KNH_ASSERT(args[index].atype == VA_POINTER);
+					knh_write__p(ctx, w, args[index].pvalue);
 					break;
-
-				case 'F':
-					knh_write__flag(ctx, w, (knh_flag_t)va_arg(args, int));
+				case 'O': case 'o':
+					KNH_ASSERT(args[index].atype == VA_OBJECT);
+					knh_write__O(ctx, w, args[index].ovalue);
 					break;
-
-				case 'N':
-					knh_write__s(ctx, w, FIELDN((knh_fieldn_t)va_arg(args, int)));
+				case 'N': case 'F':
+					KNH_ASSERT(args[index].atype == VA_FIELDN);
+					knh_write__s(ctx, w, FIELDN(args[index].fn));
 					break;
-
 				case 'M':
-					knh_write_mn(ctx, w, (knh_methodn_t)va_arg(args, int));
+					KNH_ASSERT(args[index].atype == VA_METHODN);
+					knh_write_mn(ctx, w, args[index].mn);
 					break;
-
 				case 'C':
-					knh_write_cid(ctx, w, (knh_class_t)va_arg(args, int));
+					KNH_ASSERT(args[index].atype == VA_CLASS);
+					knh_write_cid(ctx, w, args[index].cid);
 					break;
-
 				case 'T':
-					knh_write_type(ctx, w, (knh_methodn_t)va_arg(args, int));
+					KNH_ASSERT(args[index].atype == VA_TYPE);
+					knh_write_type(ctx, w, args[index].type);
 					break;
-
 				case 'B':
-					knh_write(ctx, w, (knh_bytes_t)va_arg(args, knh_bytes_t));
+					KNH_ASSERT(args[index].atype == VA_BYTES);
+					knh_write(ctx,w, args[index].bvalue);
 					break;
-
-				case 'O':
-					knh_write__O(ctx, w, (Object*)va_arg(args, Object*));
-					break;
-
 				default:
-					knh_putc(ctx, w, '%');
+					//knh_putc(ctx, w, '%');
 					knh_putc(ctx, w, ch);
 			}
-			break;
-		default:
+			if(!(bindex <= bindex_max)) {
+				DBG2_ASSERT(bindex <= bindex_max);
+				break;
+			}
+		}
+		else {
 			knh_putc(ctx, w, ch);
 		}
-	} /* while */
-	va_end(args);
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+
+KNHAPI(void) knh_printf(Ctx *ctx, OutputStream *w, char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap , fmt);
+	knh_vprintf(ctx, w, fmt, ap);
+	va_end(ap);
 }
 
 /* ======================================================================== */
@@ -386,15 +529,15 @@ void konoha_setverbose(int v)
 
 KNHAPI(void) konoha_says(Ctx *ctx, int type, char *fmt, ...)
 {
-	int ch;
-	char *c = fmt;
-	va_list args;
 	if(type == KONOHA_NOTICE && !knh_Context_isVerbose(ctx)) {
 		return;
 	}
 	if(ctx->err == NULL) {
+		int ch;
+		char *c = fmt;
 		FILE *fp = stderr;
 		fprintf(fp, "[KONOHA] ");
+		va_list args;
 		va_start(args , fmt);
 		while((ch = *c) != '\0') {
 			c++;
@@ -436,7 +579,6 @@ KNHAPI(void) konoha_says(Ctx *ctx, int type, char *fmt, ...)
 				case 'p':
 					fprintf(fp, "%p", (void*)va_arg(args, void*));
 						break;
-
 				default:
 					fputc('%', fp);
 					fputc(ch, fp);
@@ -450,69 +592,18 @@ KNHAPI(void) konoha_says(Ctx *ctx, int type, char *fmt, ...)
 			}
 		} /* while */
 		fprintf(fp, KONOHA_OS_LINEFEED);
+		va_end(args);
+
 	}
 	else {
+		va_list args;
 		OutputStream *w = KNH_STDERR;
 		knh_write(ctx, w, STEXT("[konoha] "));
-		va_start(args , fmt);
-		while((ch = *c) != '\0') {
-			c++;
-			if(ch == '\\') {
-				ch = *c++;
-				switch(ch) {
-				case '\0' : return ;
-				case 'n':
-					knh_write_EOL(ctx, w); break;
-				case 't':
-					knh_write_TAB(ctx, w); break;
-				default:
-					knh_putc(ctx, w, '\\');
-					knh_putc(ctx, w, ch);
-				}
-			}
-			else if(ch == '%') {
-				ch = *c++;
-				switch(ch) {
-					case '\0' : return ;
-					case 'd':
-						knh_write__i(ctx, w, (knh_int_t)va_arg(args, knh_int_t));
-						break;
-
-					case 'u':
-						knh_write__u(ctx, w, (knh_uint_t)va_arg(args, knh_uint_t));
-						break;
-
-					case 'f':
-						knh_write__f(ctx, w, (knh_float_t)va_arg(args, double));
-						break;
-
-					case 's':
-						knh_write__s(ctx, w, (char*)va_arg(args, char*));
-						break;
-
-					case 'p':
-						knh_write__p(ctx, w, (void*)va_arg(args, void*));
-						break;
-
-					case 'O':
-						knh_write__O(ctx, w, (Object*)va_arg(args, Object*));
-						break;
-
-					default:
-						knh_putc(ctx, w, '%');
-						knh_putc(ctx, w, ch);
-				}
-			}
-			else if(ch == 0) {
-				return;
-			}
-			else {
-				knh_putc(ctx, w, ch);
-			}
-		} /* while */
+		va_start(fmt, args);
+		knh_vprintf(ctx, w, fmt, args);
+		va_end(args);
 		knh_write_EOL(ctx, w);
 	}
-	va_end(args);
 }
 
 /* ------------------------------------------------------------------------ */
