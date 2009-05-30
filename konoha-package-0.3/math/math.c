@@ -1,5 +1,18 @@
 #include <konoha.h>
+#ifdef KONOHA_OS__WINDOWS
+#define _USE_MATH_DEFINES
+#undef METHOD
+#define METHOD void __declspec(dllexport) 
+#undef KNHAPI
+#define KNHAPI(T) T __declspec(dllexport) 
+#endif
+
 #include <math.h>
+
+#ifdef __cplusplus 
+extern "C" {
+#endif
+
 
 METHOD Math_fabs(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -43,6 +56,7 @@ METHOD Math_ceil(Ctx *ctx, knh_sfp_t *sfp)
     KNH_RETURN_Float(ctx, sfp, ceil(p_double(sfp[1])));
 }
 
+#if KONOHA_OS__WINDOWS
 METHOD Math_round(Ctx *ctx, knh_sfp_t *sfp)
 {
     KNH_RETURN_Float(ctx, sfp, round(p_double(sfp[1])));
@@ -52,6 +66,7 @@ METHOD Math_nearbyint(Ctx *ctx, knh_sfp_t *sfp)
 {
     KNH_RETURN_Float(ctx, sfp, nearbyint(p_double(sfp[1])));
 }
+#endif
 
 METHOD Math_floor(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -128,6 +143,7 @@ METHOD Math_tanh(Ctx *ctx, knh_sfp_t *sfp)
     KNH_RETURN_Float(ctx, sfp, tanh(p_double(sfp[1])));
 }
 
+#if KONOHA_OS__WINDOWS
 METHOD Math_asinh(Ctx *ctx, knh_sfp_t *sfp)
 {
     KNH_RETURN_Float(ctx, sfp, asinh(p_double(sfp[1])));
@@ -142,7 +158,7 @@ METHOD Math_atanh(Ctx *ctx, knh_sfp_t *sfp)
 {
     KNH_RETURN_Float(ctx, sfp, atanh(p_double(sfp[1])));
 }
-
+#endif
 
 static
 knh_FloatConstData_t FloatConstData[] = {
@@ -165,5 +181,7 @@ KNHAPI(int) init(Ctx *ctx)
     return 1;
 }
 
-
+#ifdef __cplusplus
+}
+#endif
 
