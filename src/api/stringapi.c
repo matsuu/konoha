@@ -44,7 +44,7 @@ static METHOD knh__String_equals(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp,
 		((sfp[0].s)->size == (sfp[1].s)->size &&
-		knh_bytes_strcmp(knh_String_tobytes(sfp[0].s), knh_String_tobytes(sfp[1].s))));
+		knh_bytes_strcmp(knh_String_tobytes(sfp[0].s), knh_String_tobytes(sfp[1].s)) == 0));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -54,7 +54,7 @@ static METHOD knh__String_equals__IgnoreCase(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp,
 		((sfp[0].s)->size == (sfp[1].s)->size &&
-		knh_bytes_strcasecmp(knh_String_tobytes(sfp[0].s), knh_String_tobytes(sfp[1].s))));
+		knh_bytes_strcasecmp(knh_String_tobytes(sfp[0].s), knh_String_tobytes(sfp[1].s))== 0));
 }
 
 /* ------------------------------------------------------------------------ */
