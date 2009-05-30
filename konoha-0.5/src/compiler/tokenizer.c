@@ -679,6 +679,19 @@ void knh_InputStream_skipBLOCK(Ctx *ctx, InputStream *in, int prev, Token *tk)
 }
 
 /* ======================================================================== */
+
+static knh_token_t knh_Token_lastTT(Token *tk)
+{
+	if(IS_Array(DP(tk)->list)) {
+		return SP((Token*)knh_Array_last(DP(tk)->list))->tt;
+	}
+	else if(IS_Token(DP(tk)->data)) {
+		return SP((Token*)DP(tk)->data)->tt;
+	}
+	return TT_EOT;
+}
+
+/* ======================================================================== */
 /* [parse] */
 
 void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
@@ -845,7 +858,10 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 
 		case '%':
 			knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
-			DBG2_P("IS EXTENDED QUOTE: %s", (equote) ? "yes" : "no");
+			//DBG2_P("IS EXTENDED QUOTE: %s", (equote) ? "yes" : "no");
+			if(equote == 0 && knh_Token_lastTT(tks[tkl]) < TT_NUM) {
+				equote = 1;
+			}
 
 			ch = knh_InputStream_getc(ctx, in);
 			prev = '%';
@@ -853,6 +869,12 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 				knh_Bytes_putc(ctx, tbuf.ba, '%');
 				equote = 1;
 				goto OP_PART_INLOOP;
+			}
+			else if(ch == '(') {  /* %(..) => format(..) */
+				knh_Bytes_write(ctx, tbuf.ba, STEXT("format"));
+				knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);
+				equote = 0;
+				goto MAIN_PART_INLOOP;
 			}
 			else {
 				equote = 0;
@@ -872,7 +894,10 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 				goto MAIN_PART;
 			}
 
-			DBG2_P("IS EXTENDED QUOTE: %s", (equote) ? "yes" : "no");
+			//DBG2_P("IS EXTENDED QUOTE: %s", (equote) ? "yes" : "no");
+			if(equote == 0 && knh_Token_lastTT(tks[tkl]) < TT_NUM) {
+				equote = 1;
+			}
 
 			if(equote == 1) {
 				equote = 2; /*very dirty orz */
@@ -1322,7 +1347,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 				nest--;
 				if(nest == 0) goto MAIN_PART;
 			}else if(prev == '/' && ch == '*') {
-				DBG2_P("nesting /* ")
+				DBG2_P("nesting /* ");
 				nest++;
 			}
 			prev = ch;
