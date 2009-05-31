@@ -454,8 +454,8 @@ extern "C" {
 
 /* ======================================================================== */
 /* [function] */
-#define StmtFUNCTION_rtype(stmt)        DP(stmt)->tokens[0]
-#define FUNCTION_rtype                  0
+#define StmtFUNCTION_name(stmt)         DP(stmt)->tokens[0]
+#define FUNCTION_name                   0
 #define StmtFUNCTION_params(stmt)       DP(stmt)->stmts[1]
 #define FUNCTION_params                 1
 #define StmtFUNCTION_instmt(stmt)       DP(stmt)->stmts[2]

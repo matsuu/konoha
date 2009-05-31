@@ -581,7 +581,8 @@ void knh_ClassMap__man(Ctx *ctx, ClassMap *o, OutputStream *w, knh_class_t cid)
 	knh_ClassMap_sort(ctx, o);
 	for(i = 0; i < DP(o)->size; i++) {
 		if(hasCaption == 0) {
-			knh_printf(ctx, w, "%s\n", knh_message_text(KMSG_MAPPING));
+			knh_write__s(ctx, w, _("Mapper"));
+			knh_write_EOL(ctx, w);
 			hasCaption = 1;
 		}
 		if(from == 0) {

@@ -39,14 +39,13 @@ extern "C" {
 /* [tokens] */
 
 static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc);
-static void knh_Stmt_tokens_perror(Ctx *ctx, Stmt *o, knh_tokens_t *tc, int pe);
 static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr);
 static Stmt *new_StmtMETA(Ctx *ctx,  knh_tokens_t *tc, knh_stmt_t stt);
 static void knh_Stmt_addMETA(Ctx *ctx, Stmt *o, knh_tokens_t *tc);
 static void knh_Stmt_add_STMT1(Ctx *ctx, Stmt *o, knh_tokens_t *tc);
 static void knh_Stmt_add_SEMICOLON(Ctx *ctx, Stmt *o, knh_tokens_t *tc);
 static int knh_Token_isLVALUE(Ctx *ctx, Token *tk);
-static void knh_Stmt_toLVALUE(Ctx *ctx, Stmt *stmt, int pe);
+static void knh_Stmt_toLVALUE(Ctx *ctx, Stmt *stmt, int pe, char *fmt);
 
 /* ------------------------------------------------------------------------ */
 
@@ -97,7 +96,7 @@ knh_tokens_t knh_tokens_splitSTMT(Ctx *ctx, knh_tokens_t *tc)
 	for(i = tc->c + 1; i < tc->e; i++) {
 		if(knh_Token_isBOL(sub.ts[i])) {
 			if(SP(sub.ts[i])->tt != TT_SEMICOLON) {
-				knh_perror(ctx, SP(sub.ts[i-1])->fileid, SP(sub.ts[i-1])->line, KMSG_WSEMICOLON, NULL);
+				knh_Token_perror(ctx, sub.ts[i-1], KERR_INFO, "needs ;");
 			}
 			sub.e = i;
 			tc->c = i;
@@ -134,7 +133,38 @@ knh_tokens_t knh_tokens_splitEXPR(Ctx *ctx, knh_tokens_t *tc, knh_token_t tt)
 static
 void knh_tokens_ignore(Ctx *ctx, knh_tokens_t *tc)
 {
+	if(tc->c < tc->e) {
+		Token *tk = tc->ts[tc->c];
+		knh_Token_perror(ctx, tk, KERR_DWARN, "ignored %s ..", sToken(tk));
+		tc->c = tc->e;
+	}
+}
 
+/* ------------------------------------------------------------------------ */
+
+static Token* knh_tokens_curToken(knh_tokens_t *tc)
+{
+	int c = tc->c;
+	while(!(c < tc->e)) {
+		if(c == 0) break;
+		c--;
+	}
+	tc->c = c + 1;
+	return tc->ts[c];
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_Stmt_tokens_perror(Ctx *ctx, Stmt *o, knh_tokens_t *tc, char *fmt)
+{
+	Token *tk = knh_tokens_curToken(tc);
+	knh_Token_perror(ctx, tk, KERR_ERROR, fmt, sToken(tk));
+	knh_Stmt_add(ctx, o, TM(tk));
+	if(SP(tk)->tt == TT_ERR) {
+		knh_tokens_nextStmt(tc);
+		KNH_ASSERT(SP(o)->stt == STT_ERR);
+	}
 }
 
 /* ======================================================================== */
@@ -172,7 +202,7 @@ static void knh_Stmt_add_NSCLASSN(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		tc->c += 1;
 	}
 	else {
-		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_TCLASSN);
+		knh_Stmt_tokens_perror(ctx, o, tc, _("syntax error: %s"));
 	}
 }
 
@@ -186,7 +216,7 @@ static void knh_Stmt_add_TYPEN(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		tc->c += 1;
 	}
 	else {
-		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_TTYPEN);
+		knh_Stmt_tokens_perror(ctx, o, tc, _("syntax error: %s"));
 	}
 }
 
@@ -217,7 +247,7 @@ static void knh_Stmt_add_CLASSN(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		tc->c += 1;
 	}
 	else {
-		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_TCLASSN);
+		knh_Stmt_tokens_perror(ctx, o, tc, _("syntax error: %s"));
 	}
 }
 
@@ -242,7 +272,7 @@ static void knh_Stmt_add_CLASSTN(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		tc->c += 1;
 	}
 	else {
-		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_TCLASSN);
+		knh_Stmt_tokens_perror(ctx, o, tc, _("syntax error: %s"));
 	}
 }
 
@@ -264,7 +294,7 @@ static void knh_Stmt_add_PATH(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		tc->c += 1;
 	}
 	else {
-		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_TPATH);
+		knh_Stmt_tokens_perror(ctx, o, tc, _("syntax error: %s"));
 	}
 }
 
@@ -293,7 +323,7 @@ static void knh_Stmt_add_VARN(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		tc->c += 1;
 	}
 	else {
-		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_TVARN);
+		knh_Stmt_tokens_perror(ctx, o, tc, _("syntax error: %s"));
 	}
 }
 
@@ -337,7 +367,7 @@ void knh_Stmt_add_TYPEVARN(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 			return;
 		}
 	}
-	knh_Stmt_tokens_perror(ctx, o, tc, KMSG_TTYPEN);
+	knh_Stmt_tokens_perror(ctx, o, tc, _("syntax error: %s"));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -347,7 +377,7 @@ void knh_Stmt_add_PARAMs(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 {
 	if(SP(o)->stt == STT_ERR) return;
 	if(tc->c < tc->e && SP(tc->ts[tc->c])->tt != TT_PARENTHESIS) {
-		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_ESYNTAX);
+		knh_Stmt_tokens_perror(ctx, o, tc, _("syntax error: %s"));
 	}
 	knh_tokens_t param_tc;
 	knh_Token_tc(tc->ts[tc->c], &param_tc); tc->c += 1;
@@ -389,7 +419,10 @@ void knh_Stmt_add_EXPR(Ctx *ctx, Stmt *stmt, knh_tokens_t *tc)
 		knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &expr_tc, KNH_RVALUE));
 	}
 	else {
-		knh_Stmt_perror(ctx, stmt, KMSG_ESYNTAX, NULL);
+		KNH_ASSERT(expr_tc.e > 0);
+		Token *tk = tc->ts[expr_tc.e-1];
+		knh_Token_perror(ctx, tk, KERR_ERROR, _("no expression"));
+		SP(stmt)->stt = STT_ERR;
 	}
 }
 
@@ -409,29 +442,6 @@ void knh_Stmt_add_EXPRs(Ctx *ctx, Stmt *stmt_b, knh_tokens_t *tc)
 
 /* ======================================================================== */
 /* [VALUE] */
-
-static Token* knh_tokens_curToken(knh_tokens_t *tc)
-{
-	int c = tc->c;
-	while(!(c < tc->e)) {
-		if(c == 0) break;
-		c--;
-	}
-	tc->c = c + 1;
-	return tc->ts[c];
-}
-
-/* ------------------------------------------------------------------------ */
-
-static void knh_Stmt_tokens_perror(Ctx *ctx, Stmt *o, knh_tokens_t *tc, int pe)
-{
-	Token *tk = knh_tokens_curToken(tc);
-	knh_Token_perror(ctx, tk, pe);
-	SP(tk)->tt = TT_ERR;
-	knh_Stmt_add(ctx, o, TM(tk));
-	knh_tokens_nextStmt(tc);
-	KNH_ASSERT(SP(o)->stt == STT_ERR);
-}
 
 /* ------------------------------------------------------------------------ */
 
@@ -855,7 +865,7 @@ void knh_Stmt_add_PAIR(Ctx *ctx, Stmt *stmt, knh_tokens_t *tc)
 	}
 
 	if(!(tc->c < tc->e)) {
-		knh_Stmt_perror(ctx, stmt, KMSG_WEMPTY, NULL);
+		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, KERR_DWARN, _("empty"));
 		return;
 	}
 
@@ -869,13 +879,13 @@ void knh_Stmt_add_PAIR(Ctx *ctx, Stmt *stmt, knh_tokens_t *tc)
 	}
 	else {
 		//fprintf(stderr, "tt='%s'\n", knh_token_tochar(SP(ts[s])->tt));
-		knh_Stmt_perror(ctx, stmt, KMSG_WEMPTY, ts[s]);
+		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, KERR_DWARN, _("empty"));
 		return;
 	}
 
 	//fprintf(stderr, "VALUE s=%d, e=%d\n", s, tc->e);
 	if(s == tc->e) {
-		knh_Stmt_perror(ctx, stmt, KMSG_WEMPTY, ts[s-1]);
+		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, KERR_ERRATA, _("empty: ==> null"));
 		knh_Stmt_add(ctx, stmt, TM(new_TokenCONST(ctx, UP(ts[s]), KNH_NULL)));
 		return;
 	}
@@ -1037,9 +1047,8 @@ Term *new_TermVALUE(Ctx *ctx, Token *tk, int lr)
 		case TT_ERR:
 			return TM(tk);
 	}
-	DBG2_P("unexpected value: (tt=%s) %s", knh_token_tochar(SP(tk)->tt), sToken(tk));
-	knh_Token_perror(ctx, tk, KMSG_UTOKEN);
-	SP(tk)->tt = TT_ERR;
+	//DBG2_P("unexpected value: (tt=%s) %s", knh_token_tochar(SP(tk)->tt), sToken(tk));
+	knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown token"), sToken(tk));
 	return TM(tk);
 }
 
@@ -1093,8 +1102,7 @@ Term *new_TermPEXPR(Ctx *ctx, Token *tk)
 		knh_tokens_t p_tc;
 		knh_Token_tc(tk, &p_tc);
 		if(p_tc.e == 0) {
-			knh_perror(ctx, SP(tk)->fileid, SP(tk)->line, KMSG_WEMPTY, "()");
-			knh_perrata(ctx, SP(tk)->fileid, SP(tk)->line, "()", "(false)");
+			knh_Token_perror(ctx, tk, KERR_ERRATA, _("empty: () ==> false"));
 			return TM(new_TokenCONST(ctx, FL(tk), KNH_FALSE));
 		}
 		return new_TermEXPR(ctx, &p_tc, KNH_RVALUE);
@@ -1119,7 +1127,7 @@ void knh_Stmt_add_PEXPR(Ctx *ctx, Stmt *stmt, knh_tokens_t *tc)
 			return ;
 		}
 	}
-	knh_Stmt_tokens_perror(ctx, stmt, tc, KMSG_ESYNTAX);
+	knh_Stmt_tokens_perror(ctx, stmt, tc, _("syntax error"));
 }
 
 /* ======================================================================== */
@@ -1133,7 +1141,7 @@ static int knh_tokens_findOPR(Ctx *ctx, knh_tokens_t *tc)
 		int p = knh_token_getOpPriority(SP(ts[i])->tt);
 		if(p == 0) {
 			if(SP(ts[i])->tt != TT_DOTS) {
-				knh_Token_perror(ctx, ts[i], KMSG_ESYNTAX);
+				knh_Token_perror(ctx, ts[i], KERR_ERROR, _("syntax error"));
 			}
 			tc->e = i;
 			break;
@@ -1178,13 +1186,13 @@ Stmt *new_StmtOPR(Ctx *ctx, knh_tokens_t *tc, Token *op)
 			knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, tc, KNH_RVALUE));
 		}
 		else {
-			knh_Stmt_tokens_perror(ctx, stmt, &expr_tc, KMSG_ESYNTAX);
+			knh_Stmt_tokens_perror(ctx, stmt, &expr_tc, _("syntax error"));
 		}
 		return stmt;
 	}
 	else if(SP(op)->tt == TT_NEXT || SP(op)->tt == TT_PREV) {
 		if(tc->ts[tc->c] == op) {
-			knh_Token_perror(ctx, op, KMSG_CPREOP);
+			knh_Token_perror(ctx, op, KERR_DWARN, _("unsupported C/C++ grammer fully"), sToken(op));
 			tc->c += 1;
 		}
 		knh_tokens_t ltc = knh_tokens_splitEXPR(ctx, tc, SP(op)->tt);
@@ -1199,14 +1207,14 @@ Stmt *new_StmtOPR(Ctx *ctx, knh_tokens_t *tc, Token *op)
 					return stmt;
 				}
 				else {
-					knh_Token_perror(ctx, op, KMSG_ENEXTPREV);
+					knh_Token_perror(ctx, op, KERR_ERROR, _("cannot use %s for this expression"), sToken(op));
 					return new_StmtERR(ctx, &ltc);
 				}
 			}
 			else {
 				Stmt *stmt = (Stmt*)lval;
 				KNH_ASSERT(IS_Stmt(stmt));
-				knh_Stmt_toLVALUE(ctx, stmt, KMSG_ENEXTPREV);
+				knh_Stmt_toLVALUE(ctx, stmt, KERR_ERROR, _("cannot use %s for this expression"));
 				if(SP(stmt)->stt != STT_ERR) {
 					knh_Stmt_add(ctx, stmt, TM(new_StmtNEXT(ctx, op, &rtc)));
 				}
@@ -1261,7 +1269,7 @@ static Token *knh_Token_findCASTNULL(Ctx *ctx, Token *tk, Token *ntk)
 		knh_Token_tc(tk, &tc);
 		if(tc.e == 0) return NULL;
 		if((tc.e > 2 && (tc.ts[1])->tt != TT_WITH)  || tc.e == 2) {
-			knh_Token_perror(ctx, tc.ts[1], KMSG_ESYNTAX);
+			knh_Token_perror(ctx, tc.ts[1], KERR_ERROR, _("syntax error"));
 			SP(tk)->tt = TT_ERR;
 			return NULL;
 		}
@@ -1321,7 +1329,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 		DBG2_P("tc->c=%d, tc->e=%d", (int)oc, (int)e);
 		KNH_ASSERT(e > 0);
 		Token *tke = new_Token(ctx, 0, SP(tc->ts[e-1])->fileid, SP(tc->ts[e-1])->line, TT_ERR);
-		knh_perror(ctx, SP(tc->ts[e-1])->fileid, SP(tc->ts[e-1])->line, KMSG_ESYNTAX, NULL);
+		knh_perror(ctx, SP(tc->ts[e-1])->fileid, SP(tc->ts[e-1])->line, KERR_ERROR, _("syntax error"));
 		return TM(tke);
 	}
 
@@ -1392,7 +1400,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 //					return TM(stmt);
 //				}
 //				else {
-//					knh_Token_perror(ctx, ts[idx], KMSG_UOP2);
+//					knh_Token_perror(ctx, ts[idx], KERR_ERROR, _("unknown")OP2);
 //					SP(ts[idx])->tt = TT_ERR; return TM(ts[idx]);
 //				}
 //			}
@@ -1415,7 +1423,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 //					return TM(stmt);
 //				}
 //				else {
-//					knh_Token_perror(ctx, ts[idx], KMSG_UOP1);
+//					knh_Token_perror(ctx, ts[idx], KERR_ERROR, _("unknown")OP1);
 //					SP(ts[idx])->tt = TT_ERR; return TM(ts[idx]);
 //				}
 //			}
@@ -1464,7 +1472,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 			}
 			else {
 				Token *tke = ts[oc];
-				knh_Token_perror(ctx, tke, KMSG_ESYNTAX);
+				knh_Token_perror(ctx, tke, KERR_ERROR, _("syntax error"));
 				SP(tke)->tt = TT_ERR;
 				tc->c = oc + 2; knh_tokens_nextStmt(tc);
 				return TM(tke);
@@ -1480,7 +1488,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 			goto L_PARAM;
 		}
 		else {
-			knh_Token_perror(ctx, ts[oc+1], KMSG_TCLASSN);
+			knh_Token_perror(ctx, ts[oc+1], KERR_ERROR, _("syntax error"));
 			return TM(new_StmtERR(ctx, tc));
 		}
 	}
@@ -1541,7 +1549,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 		else if(tt0 == TT_MT) {  /* @TEST %s(a) */
 			if(tt1 != TT_PARENTHESIS) {
 				tc->c = oc + 1;
-				knh_Token_perror(ctx, ts[oc], KMSG_ESYNTAX);
+				knh_Token_perror(ctx, ts[oc], KERR_ERROR, _("syntax error"));
 				return TM(new_StmtERR(ctx, tc));
 			}
 			stmt = new_Stmt(ctx, 0, STT_MT);
@@ -1600,7 +1608,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 	}
 	else {
 		DBG2_P("** Unexpected funcname %s **", knh_token_tochar(SP(ts[fc])->tt));
-		knh_Token_perror(ctx, ts[fc], KMSG_ESYNTAX);
+		knh_Token_perror(ctx, ts[fc], KERR_ERROR, _("syntax error"));
 		knh_Stmt_add(ctx, stmt, TM(ts[fc]));
 		tc->c = tc->e;
 	}
@@ -1619,8 +1627,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 		knh_Stmt_add_EXPRs(ctx, stmt, &ptc);
 	}
 	if(DP(stmt)->size == 1) {
-		knh_perror(ctx, SP(ts[pc])->fileid, SP(ts[pc])->line, KMSG_WEMPTY, "()");
-		knh_perrata(ctx, SP(ts[pc])->fileid, SP(ts[pc])->line, "()", "(null)");
+		knh_perror(ctx, SP(ts[pc])->fileid, SP(ts[pc])->line, KERR_DWARN, _("empty: () == > (null)"));
 		knh_Stmt_add(ctx, stmt, TM(new_TokenCONST(ctx, FL(ts[oc]), KNH_NULL)));
 	}
 	fc = pc + 1; pc = 0;
@@ -1660,7 +1667,7 @@ static int knh_Token_isLVALUE(Ctx *ctx, Token *tk)
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_Stmt_toLVALUE(Ctx *ctx, Stmt *stmt, int pe)
+void knh_Stmt_toLVALUE(Ctx *ctx, Stmt *stmt, int pe, char *fmt)
 {
 	if(SP(stmt)->stt == STT_CALL) {
 		Token *tk = (Token*)DP(stmt)->tokens[0];
@@ -1689,10 +1696,9 @@ void knh_Stmt_toLVALUE(Ctx *ctx, Stmt *stmt, int pe)
 			TODO();
 		}
 	}
-	DBG2_P("stt=%s", knh_stmt_tochar(SP(stmt)->stt));
 	SP(stmt)->stt = STT_ERR;
-	knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, pe, NULL);
-
+	knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, pe, fmt);
+	DBG2_P("stt=%s", knh_stmt_tochar(SP(stmt)->stt));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1709,14 +1715,14 @@ Stmt *new_StmtLET(Ctx *ctx, knh_tokens_t *lvalue_tc, knh_tokens_t *rvalue_tc)
 			return stmt;
 		}
 		else {
-			knh_Token_perror(ctx, (Token*)lval, KMSG_ELVALUE);
+			knh_Token_perror(ctx, (Token*)lval, KERR_ERROR, _("unavailable l-value"));
 			return new_StmtERR(ctx, lvalue_tc);
 		}
 	}
 	else {
 		Stmt *stmt = (Stmt*)lval;
 		KNH_ASSERT(IS_Stmt(stmt));
-		knh_Stmt_toLVALUE(ctx, stmt, KMSG_ELVALUE);
+		knh_Stmt_toLVALUE(ctx, stmt, KERR_ERROR, _("unavailable l-value"));
 		if(SP(stmt)->stt != STT_ERR) {
 			knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, rvalue_tc, KNH_RVALUE));
 		}
@@ -1989,7 +1995,7 @@ static void knh_Stmt_add_SEMICOLON(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		tc->c += 1;
 	}
 	else {
-		knh_perror(ctx, SP(o)->fileid, SP(o)->line, KMSG_WSEMICOLON, NULL);
+		knh_perror(ctx, SP(o)->fileid, SP(o)->line, KERR_DWARN, _("needs ;"));
 	}
 }
 
@@ -2025,7 +2031,7 @@ static void knh_Stmt_add_NSNAME(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		tc->c += 1;
 	}
 	else {
-		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_TNAME/*KMSG_TNSNAME*/);
+		knh_Stmt_tokens_perror(ctx, o, tc, _("namespace name is needed"));
 	}
 }
 
@@ -2069,7 +2075,7 @@ static void knh_Stmt_add_FURN(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		tc->c += 1;
 	}
 	else {
-		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_TPATH/*KMSG_TFURN*/);
+		knh_Stmt_tokens_perror(ctx, o, tc, _("file or URN is needed"));
 	}
 }
 
@@ -2163,7 +2169,7 @@ void knh_Stmt_add_CFUNCN(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		tc->c += 1;
 	}
 	else {
-		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_TNAME/*KMSG_TCMETHODN*/);
+		knh_Stmt_tokens_perror(ctx, o, tc, _("class function name is needed"));
 	}
 }
 
@@ -2244,14 +2250,12 @@ Stmt *new_StmtUSING(Ctx *ctx, knh_tokens_t *tc)
 				return new_StmtUVOCAB(ctx, tc);
 			}
 		}
+		knh_Token_perror(ctx, tc->ts[tc->c-1], KERR_EWARN, _("unknown using options: %s"), sToken(tk));
 	}
-	knh_Token_perror(ctx, tc->ts[tc->c-1], KMSG_UUSING);
 	knh_tokens_nextStmt(tc);
 	return new_Stmt(ctx, 0, STT_DONE);
 }
 
-
-/* ------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------ */
 /* [class] */
 /* ------------------------------------------------------------------------ */
@@ -2315,7 +2319,7 @@ static Stmt *new_StmtFORMAT(Ctx *ctx, knh_tokens_t *tc)
 		return new_StmtLETEXPR(ctx, tc);
 	}
 	else {
-		knh_Token_perror(ctx, tc->ts[tc->c-1], KMSG_EFUTURE);
+		knh_Token_perror(ctx, tc->ts[tc->c-1], KERR_EWARN, _("format will be supported soon or later"));
 		knh_tokens_nextStmt(tc);
 		return new_Stmt(ctx, 0, STT_DONE);
 	}
@@ -2369,7 +2373,7 @@ static Stmt *new_StmtMAPMAP(Ctx *ctx, knh_tokens_t *tc)
 
 static Stmt *new_StmtWEAVE(Ctx *ctx, knh_tokens_t *tc)
 {
-	knh_Token_perror(ctx, tc->ts[tc->c-1], KMSG_EFUTURE);
+	knh_Token_perror(ctx, tc->ts[tc->c-1], KERR_EWARN, _("weave will be supported soon or later"));
 	knh_tokens_nextStmt(tc);
 	return new_Stmt(ctx, 0, STT_DONE);
 //	Stmt *o = new_StmtMETA(ctx, tc, STT_WEAVE);
@@ -2383,7 +2387,7 @@ static Stmt *new_StmtWEAVE(Ctx *ctx, knh_tokens_t *tc)
 
 static Stmt *new_StmtASPECT(Ctx *ctx, knh_tokens_t *tc)
 {
-	knh_Token_perror(ctx, tc->ts[tc->c-1], KMSG_EFUTURE);
+	knh_Token_perror(ctx, tc->ts[tc->c-1], KERR_EWARN, _("aspect will be supported soon or later"));
 	knh_tokens_nextStmt(tc);
 	return new_Stmt(ctx, 0, STT_DONE);
 //	Stmt *o = new_StmtMETA(ctx, tc, STT_ASPECT);
@@ -2434,7 +2438,7 @@ static Stmt *new_StmtIF(Ctx *ctx, knh_tokens_t *tc)
 
 static Stmt *new_StmtSWITCH(Ctx *ctx, knh_tokens_t *tc)
 {
-	knh_Token_perror(ctx, tc->ts[tc->c-1], KMSG_EFUTURE);
+	knh_Token_perror(ctx, tc->ts[tc->c-1], KERR_EWARN, _("switch will be supported soon or later"));
 	knh_tokens_nextStmt(tc);
 	return new_Stmt(ctx, 0, STT_DONE);
 //	Stmt *o = new_StmtMETA(ctx, tc, STT_SWITCH);
@@ -2503,7 +2507,7 @@ knh_Stmt_add_PEACH(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 	Token *tk = tc->ts[tc->c];
 	if(SP(o)->stt == STT_ERR) return;
 	if(tc->c < tc->e && SP(tk)->tt != TT_PARENTHESIS) {
-		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_ESYNTAX);
+		knh_Stmt_tokens_perror(ctx, o, tc, _("syntax error: needs ()"));
 		return;
 	}
 
@@ -2524,7 +2528,7 @@ knh_Stmt_add_PEACH(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 			goto L_FROM;
 		}
 	}
-	knh_Stmt_tokens_perror(ctx, o, tc, KMSG_ESYNTAX);
+	knh_Stmt_tokens_perror(ctx, o, tc, _("syntax error: needs from"));
 	return;
 
 	L_FROM:;
@@ -2544,7 +2548,7 @@ knh_Stmt_add_PEACH(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 
 	if(!(from_tc.c < from_tc.e)) {
 		DBG2_P("NO FROM!! c=%d, e=%d", from_tc.c, from_tc.e);
-		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_ESYNTAX);
+		knh_Stmt_tokens_perror(ctx, o, tc, _("syntax error: needs from"));
 		return;
 	}
 
@@ -2574,7 +2578,7 @@ void knh_Stmt_add_PSTMT3(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 	Token *tk = tc->ts[tc->c];
 	if(SP(o)->stt == STT_ERR) return;
 	if(tc->c < tc->e && SP(tk)->tt != TT_PARENTHESIS) {
-		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_ESYNTAX);
+		knh_Stmt_tokens_perror(ctx, o, tc, _("syntax error: needs ()"));
 	}
 
 	knh_tokens_t ptc;
@@ -2589,7 +2593,7 @@ void knh_Stmt_add_PSTMT3(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 
 	int c = knh_tokens_count(&ptc, TT_SEMICOLON);
 	if(c != 2) {
-		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_ESYNTAX);
+		knh_Stmt_tokens_perror(ctx, o, tc, _("syntax error: needs ;"));
 		return ;
 	}
 
@@ -2692,7 +2696,7 @@ static Stmt *new_StmtCATCH(Ctx *ctx, knh_tokens_t *tc)
 		tc->c += 1;
 	}
 	else {
-		knh_Stmt_tokens_perror(ctx, o, tc, KMSG_ESYNTAX);
+		knh_Stmt_tokens_perror(ctx, o, tc, _("syntax error: needs ()"));
 		return o;
 	}
 	knh_Stmt_add_STMT1(ctx, o, tc);
@@ -2834,7 +2838,7 @@ void knh_Stmt_add_CMETHOD(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 			goto L_PARAMS;
 		}
 	}
-	knh_Stmt_tokens_perror(ctx, o, tc, KMSG_TNAME/*KMSG_TMETHODN*/);
+	knh_Stmt_tokens_perror(ctx, o, tc, _("method/function name is needed"));
 	return;
 
 	L_PARAMS:;
@@ -2882,7 +2886,8 @@ Stmt *new_StmtDECL(Ctx *ctx, Token *tk_TYPEN, knh_tokens_t *tc)
 		knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &expr_tc, KNH_RVALUE));
 	}
 	else { /* Syntax Error */
-		knh_Stmt_perror(ctx, stmt, KMSG_ESYNTAX, expr_tc.ts[expr_tc.c]);
+		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, KERR_ERROR, _("initialization needs ="));
+		SP(stmt)->stt = STT_ERR;
 		return stmt;
 	}
 
@@ -3167,7 +3172,7 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 
 	tc->c -= 1;
 	Token *tk = tc->ts[tc->c];
-	knh_Token_perror(ctx, tk, KMSG_NOTHERE);
+	knh_Token_perror(ctx, tk, KERR_ERROR, "syntax error: don't use '%s' HERE", sToken(tk));
 	return new_StmtERR(ctx, tc);
 }
 

@@ -840,7 +840,7 @@ typedef struct knh_System {
 
 typedef knh_ushort_t   knh_token_t;
 typedef knh_ushort_t   knh_stmt_t;
-#define knh_perror_t   int
+#define knh_perror0_t   int
 
 /* ------------------------------------------------------------------------ */
 /* @class Token Object knh_Token_struct */
@@ -1071,9 +1071,9 @@ typedef struct knh_KLRCode {
 	if(fmt != NULL){ \
 		char buf_[KNH_PERROR_BUFSIZ]; \
 		knh_snprintf(buf_, sizeof(buf_), ": " fmt, ## __VA_ARGS__); \
-		knh_perror(ctx, fid, line, pe, buf_); \
+		knh_perror0(ctx, fid, line, pe, buf_); \
 	}else { \
-		knh_perror(ctx, fid, line, pe, NULL); \
+		knh_perror0(ctx, fid, line, pe, NULL); \
 	} \
 
 #define KNH_TOKEN_PERROR(ctx, tk, pe, fmt, ...) \

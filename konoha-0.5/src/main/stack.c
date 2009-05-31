@@ -110,8 +110,6 @@ METHOD knh__System_stackdump(Ctx *ctx, knh_sfp_t *sfp)
 /* ======================================================================== */
 /* [call] */
 
-char * knh_format_mtdparam(Ctx *ctx, char *buf, size_t bufsiz, Method *mtd, int n);
-
 void knh_sfp_typecheck(Ctx *ctx, knh_sfp_t *sfp, Method *mtd, knh_code_t *pc)
 {
 	DBG2_ASSERT(IS_Method(sfp[-1].mtd));
@@ -122,13 +120,13 @@ void knh_sfp_typecheck(Ctx *ctx, knh_sfp_t *sfp, Method *mtd, knh_code_t *pc)
 		knh_type_t type = knh_Method_ptype(ctx, mtd, this_cid, i);
 		if(IS_NULL(sfp[i].o)) {
 			if(IS_NNTYPE(type)) {
-				emsg = "Null!!: "; goto L_THROWERR;
+				emsg = "Null!!: the parameter %d of %M"; goto L_THROWERR;
 			}
 		}
 		else {
 			knh_class_t reqc = CLASS_type(type);
 			if(!knh_class_instanceof(ctx, knh_Object_cid(sfp[i].o), reqc)) {
-				emsg = "Type!!: "; goto L_THROWERR;
+				emsg = "Null!!: the parameter %d of %M"; goto L_THROWERR;
 			}
 		}
 	}
@@ -136,10 +134,10 @@ void knh_sfp_typecheck(Ctx *ctx, knh_sfp_t *sfp, Method *mtd, knh_code_t *pc)
 
 	L_THROWERR:
 	{
-		char buf[CLASSNAME_BUFSIZ];
-		knh_snprintf(buf, sizeof(buf), emsg);
-		knh_format_mtdparam(ctx, buf+9, sizeof(buf)-9, mtd, i);
-		knh_throw__s(ctx, buf, knh_Method_file(ctx, sfp[-1].mtd), knh_Method_pctoline(sfp[-1].mtd, pc));
+		knh_cwb_t cwb = new_cwb(ctx);
+		knh_printf(ctx, cwb.w, emsg, i, DP(mtd)->mn);
+		String *s = new_String__cwb(ctx, cwb);
+		knh_throw(ctx, (Object*)s, knh_Method_file(ctx, sfp[-1].mtd), knh_Method_pctoline(sfp[-1].mtd, pc));
 	}
 }
 

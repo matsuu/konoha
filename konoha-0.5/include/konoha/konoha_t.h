@@ -385,6 +385,11 @@ typedef struct {
 	knh_sline_t  line;
 } knh_FileLine_t ;
 
+typedef struct {
+	const char *file;
+	int   line;
+} knh_fline_t;
+
 #define knh_Object_data(o)       (((Int*)(o))->n.data)
 
 /* ------------------------------------------------------------------------ */

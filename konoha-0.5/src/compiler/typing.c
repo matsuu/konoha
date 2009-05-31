@@ -124,39 +124,38 @@ int knh_Token_isNullable(Ctx *ctx, Token *o)
 /* ------------------------------------------------------------------------ */
 
 static
-knh_type_t knh_Token_gettype(Ctx *ctx, Token *o, NameSpace *ns, knh_class_t defc)
+knh_type_t knh_Token_gettype(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t defc)
 {
-	KNH_ASSERT(IS_Token(o));
-	if(SP(o)->tt == TT_ASIS) {
+	KNH_ASSERT(IS_Token(tk));
+	if(SP(tk)->tt == TT_ASIS) {
 		DBG2_ABORT();
 		return TYPE_var;
 	}
-	if(SP(o)->tt == TT_CID) {
-		return NNTYPE_cid(DP(o)->cid);
+	if(SP(tk)->tt == TT_CID) {
+		return NNTYPE_cid(DP(tk)->cid);
 	}
-	if(knh_Token_isExceptionType(o)) {
-		if(!knh_Token_isNullable(ctx, o)) return NNTYPE_Exception;
+	if(knh_Token_isExceptionType(tk)) {
+		if(!knh_Token_isNullable(ctx, tk)) return NNTYPE_Exception;
 		return CLASS_Exception;
 	}
 
-	knh_bytes_t name = knh_Token_tobytes(ctx, o);
-	knh_type_t type = knh_NameSpace_gettype(ctx, ns, name, knh_Token_isNullable(ctx, o));
+	knh_bytes_t name = knh_Token_tobytes(ctx, tk);
+	knh_type_t type = knh_NameSpace_gettype(ctx, ns, name, knh_Token_isNullable(ctx, tk));
 	if(type == CLASS_unknown) {
 		type = defc;
 		if(defc != CLASS_Any) {
-			if(!knh_Token_isNullable(ctx, o)) type = NNTYPE_cid(defc);
+			if(!knh_Token_isNullable(ctx, tk)) type = NNTYPE_cid(defc);
 		}
-		knh_Token_perror(ctx, o, KMSG_UCLASSN);
-		knh_Token_perrata(ctx, o, CLASSN(defc));
+		knh_Token_perror(ctx, tk, KERR_ERRATA, _("unknown class: %s ==> %C"), sToken(tk), defc);
 	}
 
-	if(knh_Token_isIteratorType(o)) {
+	if(knh_Token_isIteratorType(tk)) {
 		knh_class_t cid = knh_class_Generics(ctx, CLASS_Iterator, CLASS_type(type), CLASS_Any);
 		return NNTYPE_cid(cid);
 	}
-	else if(knh_Token_isArrayType(o)) {
+	else if(knh_Token_isArrayType(tk)) {
 		knh_class_t cid = knh_class_Generics(ctx, CLASS_Array, CLASS_type(type), CLASS_Any);
-		if(!knh_Token_isNullableType(o)) return NNTYPE_cid(cid);
+		if(!knh_Token_isNullableType(tk)) return NNTYPE_cid(cid);
 		return cid;
 	}
 	return type;
@@ -177,8 +176,7 @@ knh_class_t knh_Token_getcid(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t def
 	if(cid == CLASS_unknown) {
 		if(defc == CLASS_unknown) return cid;
 		cid = defc;
-		knh_Token_perror(ctx, tk, KMSG_UCLASSN);
-		knh_Token_perrata(ctx, tk, CLASSN(cid));
+		knh_Token_perror(ctx, tk, KERR_ERRATA, _("unknown class: %s ==> %C"), sToken(tk), defc);
 	}
 	if(knh_Token_isIteratorType(tk)) {
 		cid = knh_class_Generics(ctx, CLASS_Iterator, cid, CLASS_Nue);
@@ -187,24 +185,6 @@ knh_class_t knh_Token_getcid(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t def
 		cid = knh_class_Generics(ctx, CLASS_Array, cid, CLASS_Nue);
 	}
 	return cid;
-}
-
-/* ------------------------------------------------------------------------ */
-
-void knh_Asm_perrorMTD(Ctx *ctx, Asm *abr, int pe, knh_class_t cid, knh_methodn_t mn)
-{
-	char bufcm[CLASSNAME_BUFSIZ];
-	knh_format_cmethodn(ctx, bufcm, sizeof(bufcm), cid, mn);
-	knh_Asm_perror(ctx, abr, pe, bufcm);
-}
-
-/* ------------------------------------------------------------------------ */
-
-void knh_Asm_perrorMPR(Ctx *ctx, Asm *abr, int pe, knh_class_t scid, knh_class_t tcid)
-{
-	char bufcm[CLASSNAME_BUFSIZ*2];
-	knh_snprintf(bufcm, sizeof(bufcm), "%s --> %s", CTXCLASSN(scid), CTXCLASSN(tcid));
-	knh_Asm_perror(ctx, abr, pe, bufcm);
 }
 
 /* ======================================================================== */
@@ -396,20 +376,14 @@ knh_index_t knh_Asm_addVariableTable(Ctx *ctx, Asm *abr,
 		}
 		if(cf[idx].fn == fn && fn != FIELDN_register) {
 			if(cf[idx].type != type) {
-				char buf[CLASSNAME_BUFSIZ];
-				knh_snprintf(buf, sizeof(buf), "%s%s %s: %s%s", TYPEQN(cf->type), FIELDN(fn), TYPEQN(type));
-				knh_Asm_perror(ctx, abr, KMSG_DIFFDECL, buf);
+				knh_Asm_perror(ctx, abr, KERR_ERROR, _("variable declared differently: %T %N"), cf->type, fn);
 				return -1;
 			}
 			return idx;
 		}
 	}
-	{
-		char buf[CLASSNAME_BUFSIZ];
-		knh_snprintf(buf, sizeof(buf), "%s%s %s", TYPEQN(type), FIELDN(fn));
-		knh_Asm_perror(ctx, abr, KMSG_TOOMANYVARS, buf);
-		return -1;
-	}
+	knh_Asm_perror(ctx, abr, KERR_ERROR, _("too many declared variables: must be %d < %d"), max, max);
+	return -1;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -607,7 +581,7 @@ static int knh_TokenNAME_typing(Ctx *ctx, Token *tk, Asm *abr)
 	}
 
 	L_ERROR:;
-	knh_Token_perror(ctx, tk, KMSG_UVARN);
+	knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown variable: %s"), sToken(tk));
 	return 0;
 }
 
@@ -626,7 +600,7 @@ int knh_TokenCONSTN_typing(Ctx *ctx, Token *tk, Asm *abr, NameSpace *ns)
 			return 1;
 		}
 	}
-	knh_Token_perror(ctx, tk, KMSG_UCONSTN);
+	knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown constant variable: %s"), sToken(tk));
 	return 0;
 }
 
@@ -656,49 +630,49 @@ void knh_Token_toCLASSID(Ctx *ctx, Token *o, knh_class_t cid)
 /* ------------------------------------------------------------------------ */
 
 static
-int knh_TokenTYEPN_typing(Ctx *ctx, Token *o, Asm *abr, NameSpace *ns)
+int knh_TokenTYEPN_typing(Ctx *ctx, Token *tk, Asm *abr, NameSpace *ns)
 {
-	knh_class_t cid = knh_Token_getcid(ctx, o, ns, CLASS_unknown);
+	knh_class_t cid = knh_Token_getcid(ctx, tk, ns, CLASS_unknown);
 	if(cid == CLASS_unknown) {
-		if(knh_Token_toSYSVAL(ctx, o, abr)) {
+		if(knh_Token_toSYSVAL(ctx, tk, abr)) {
 			return 1;
 		}
-		knh_bytes_t t = knh_Token_tobytes(ctx, o);
+		knh_bytes_t t = knh_Token_tobytes(ctx, tk);
 		Object *value = knh_NameSpace_getConstNULL(ctx, ns, t);
 		if(value != NULL) {
-			knh_Token_setCONST(ctx, o, value);
+			knh_Token_setCONST(ctx, tk, value);
 			return 1;
 		}
-		knh_Token_perror(ctx, o, KMSG_UCLASSN);
+		knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown class: %s"), sToken(tk));
 		return 0;
 	}
-	knh_Token_toCLASSID(ctx, o, cid);
+	knh_Token_toCLASSID(ctx, tk, cid);
 	return 1;
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-int knh_TokenCMETHODN_typing(Ctx *ctx, Token *o, NameSpace *ns)
+int knh_TokenCMETHODN_typing(Ctx *ctx, Token *tk, NameSpace *ns)
 {
-	knh_bytes_t t = knh_Token_tobytes(ctx, o);
+	knh_bytes_t t = knh_Token_tobytes(ctx, tk);
 	knh_index_t idx = knh_bytes_index(t, '.');
 	if(idx == -1) return 0;
 
 	knh_bytes_t cname = knh_bytes_first(t, idx);
 	knh_class_t cid = knh_NameSpace_getcid(ctx, ns, cname);
 	if(cid == CLASS_unknown) {
-		knh_Token_perror(ctx, o, KMSG_UCLASSN);
+		knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown class: %s"), sToken(tk));
 		return 0;
 	}
 	t = knh_bytes_last(t, idx+1);
 	knh_methodn_t mn = konoha_getMethodName(ctx, t, METHODN_NONAME);
 	Method *mtd = knh_Class_getMethod(ctx, cid, mn);
 	if(IS_NULL(mtd)) {
-		knh_Token_perror(ctx, o, KMSG_UMETHODN);
+		knh_Token_perror(ctx, tk, KERR_ERROR, _("undefined method: %s"), sToken(tk));
 		return 0;
 	}
-	knh_Token_setCONST(ctx, o, UP(mtd));
+	knh_Token_setCONST(ctx, tk, UP(mtd));
 	return 1;
 }
 
@@ -706,9 +680,9 @@ int knh_TokenCMETHODN_typing(Ctx *ctx, Token *o, NameSpace *ns)
 /* [NUM] */
 
 static
-knh_class_t knh_Token_tagcNUM(Ctx *ctx, Token *o, knh_class_t reqc, NameSpace *ns)
+knh_class_t knh_Token_tagcNUM(Ctx *ctx, Token *tk, knh_class_t reqc, NameSpace *ns)
 {
-	knh_bytes_t t = knh_Token_tobytes(ctx, o), tag = STEXT("");
+	knh_bytes_t t = knh_Token_tobytes(ctx, tk), tag = STEXT("");
 	size_t i = 1;
 	int ishex = 0;
 	if(t.buf[0] == '0' && (t.buf[1] == 'x' || t.buf[1] == 'b')) {
@@ -750,7 +724,7 @@ knh_class_t knh_Token_tagcNUM(Ctx *ctx, Token *o, knh_class_t reqc, NameSpace *n
 	else {
 		knh_class_t tagc = knh_NameSpace_tagcid(ctx, ns, reqc, tag);
 		if(tagc == CLASS_unknown) {
-			knh_Token_perror(ctx, o, KMSG_UTAG);
+			knh_Token_perror(ctx, tk, KERR_DWARN, _("unknown class tag: %s"), sToken(tk));
 			return reqc;
 		}
 		return tagc;
@@ -783,20 +757,19 @@ knh_class_t knh_bytes_guessNUMcid(Ctx *ctx, knh_bytes_t t)
 /* ------------------------------------------------------------------------ */
 
 static
-int knh_TokenNUM_typing(Ctx *ctx, Token *o, NameSpace *ns, knh_class_t reqc)
+int knh_TokenNUM_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqc)
 {
 	KNH_ASSERT_cid(reqc);
-	knh_bytes_t t = knh_Token_tobytes(ctx, o);
+	knh_bytes_t t = knh_Token_tobytes(ctx, tk);
 
 	if(reqc == CLASS_Boolean) {
-		knh_perror(ctx, SP(o)->fileid, SP(o)->line, KMSG_WTRUEFALSE, NULL);
 		if(t.buf[0] == '0') {
-			knh_perrata(ctx, SP(o)->fileid, SP(o)->line, "0", "false");
-			knh_Token_setCONST(ctx, o, KNH_FALSE);
+			knh_Token_perror(ctx, tk, KERR_ERRATA, _("false is much better than: %B"), t);
+			knh_Token_setCONST(ctx, tk, KNH_FALSE);
 		}
 		else {
-			knh_perrata(ctx, SP(o)->fileid, SP(o)->line, (char*)t.buf, "true");
-			knh_Token_setCONST(ctx, o, KNH_TRUE);
+			knh_Token_perror(ctx, tk, KERR_ERRATA, _("true is much better than: %B"), t);
+			knh_Token_setCONST(ctx, tk, KNH_TRUE);
 		}
 		return 1;
 	}
@@ -810,27 +783,25 @@ int knh_TokenNUM_typing(Ctx *ctx, Token *o, NameSpace *ns, knh_class_t reqc)
 	if(req_bcid == CLASS_Float) {
 		knh_float_t n = 0.0;
 		if(!knh_bytes_parsefloat(t, &n)) {
-			knh_Token_perror(ctx, o, KMSG_WNUMOVERFLOW);
-			knh_perrata(ctx, SP(o)->fileid, SP(o)->line, (char*)t.buf, "0.0");
+			knh_Token_perror(ctx, tk, KERR_EWARN, _("float overflow: %B"), t);
 		}
-		knh_class_t tagc = knh_Token_tagcNUM(ctx, o, req_bcid, ns);
+		knh_class_t tagc = knh_Token_tagcNUM(ctx, tk, req_bcid, ns);
 		if(tagc == reqc) {
-			knh_Token_setCONST(ctx, o, UP(new_FloatX(ctx, reqc, n)));
+			knh_Token_setCONST(ctx, tk, UP(new_FloatX(ctx, reqc, n)));
 		}else{
-			knh_Token_setCONST(ctx, o, UP(new_FloatX(ctx, tagc, n)));
+			knh_Token_setCONST(ctx, tk, UP(new_FloatX(ctx, tagc, n)));
 		}
 	}
 	else { /* if(req_bcid == CLASS_Int) */
 		knh_int_t n = 0;
 		if(!knh_bytes_parseint(t, &n)) {
-			knh_Token_perror(ctx, o, KMSG_WNUMOVERFLOW);
-			knh_perrata(ctx, SP(o)->fileid, SP(o)->line, (char*)t.buf, "0");
+			knh_Token_perror(ctx, tk, KERR_EWARN, _("int overflow: %B"), t);
 		}
-		knh_class_t tagc = knh_Token_tagcNUM(ctx, o, req_bcid, ns);
+		knh_class_t tagc = knh_Token_tagcNUM(ctx, tk, req_bcid, ns);
 		if(tagc == reqc) {
-			knh_Token_setCONST(ctx, o, UP(new_IntX(ctx, reqc, n)));
+			knh_Token_setCONST(ctx, tk, UP(new_IntX(ctx, reqc, n)));
 		}else{
-			knh_Token_setCONST(ctx, o, UP(new_IntX(ctx, tagc, n)));
+			knh_Token_setCONST(ctx, tk, UP(new_IntX(ctx, tagc, n)));
 		}
 	}
 	return 1;
@@ -907,8 +878,7 @@ int knh_Token_typing(Ctx *ctx, Token *tk, Asm *abr, NameSpace *ns, knh_type_t re
 	default:
 		DBG2_P("unknown tt=%s", knh_token_tochar(SP(tk)->tt));
 	}
-
-	knh_Token_perror(ctx, tk, KMSG_ESYNTAX);
+	knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown term: %s"), sToken(tk));
 	return 0;
 }
 
@@ -1013,7 +983,7 @@ Term *knh_TokenESTR_toTerm(Ctx *ctx, Token *tk, Asm *abr)
 				knh_Stmt_add(ctx, stmt_mt, TM(stmt_expr));
 			}
 			else {
-				knh_Asm_perror(ctx, abr, KMSG_NOTHERE, (char*)expr.buf);
+				knh_Asm_perror(ctx, abr, KERR_ERROR, _("some expression is needed: {%B}"), expr);
 			}
 			text = next;
 			res = knh_bytes_findMT(ctx, text, &mt, &expr, &next);
@@ -1126,95 +1096,40 @@ knh_type_t TERMs_gettype(Stmt *stmt, size_t n)
 
 /* ------------------------------------------------------------------------ */
 
-char * knh_format_mtdparam(Ctx *ctx, char *buf, size_t bufsiz, Method *mtd, int n)
-{
-	char bufa[20];
-	knh_snprintf(bufa, sizeof(bufa), knh_message_text(KMSG_FMTARGS), n);
-	knh_methodn_t mn = DP(mtd)->mn;
-	if(METHODN_IS_MOVTEXT(mn)) {
-		knh_snprintf(buf, bufsiz, "%%%s(%s)", FIELDN(METHODN_TOFIELDN(mn)), bufa);
-		return buf;
-	}
-	if(METHODN_IS_GETTER(mn)) {
-		knh_snprintf(buf, bufsiz, "get%s(%s)", FIELDN(METHODN_TOFIELDN(mn)), bufa);
-		if(islower(buf[3])) buf[3] = toupper(buf[3]);
-		return buf;
-	}
-	if(METHODN_IS_SETTER(mn)) {
-		knh_snprintf(buf, bufsiz, "set%s(%s)", FIELDN(METHODN_TOFIELDN(mn)), bufa);
-		if(islower(buf[3])) buf[3] = toupper(buf[3]);
-		return buf;
-	}
-	if(knh_methodn_isNew(ctx, mn)) {
-		knh_snprintf(buf, bufsiz, "%s %s(%s)", FIELDN(mn), CTXCLASSN(DP(mtd)->cid), bufa);
-	}
-	else {
-		knh_snprintf(buf, bufsiz, "%s(%s)", FIELDN(mn), bufa);
-	}
-	return buf;
-}
-
-/* ------------------------------------------------------------------------ */
-
 static
-char * knh_format_op(Ctx *ctx, char *buf, size_t bufsiz, knh_methodn_t mn, int n)
+void TERMs_perrorTYPE(Ctx *ctx, Stmt *stmt, size_t n, knh_type_t reqt)
 {
-	char *op;
-	switch(mn) {
-	case METHODN_opAdd: op = "+"; break;
-	case METHODN_opSub: op = "-"; break;
-	case METHODN_opMul: op = "*"; break;
-	case METHODN_opDiv: op = "/"; break;
-	case METHODN_opMod: op = "mod"; break;
-	default:
-		DBG2_P("mn=%s", FIELDN(METHODN_TOFIELDN(mn)));
-		op = "?set_knh_format_op?";
-	}
-	knh_snprintf(buf, bufsiz, "%s %s", knh_message_text(KMSG_OPERATOR), op);
-	return buf;
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-void TERMs_perrorTYPE(Ctx *ctx, Stmt *stmt, size_t n, int pe, knh_type_t reqt)
-{
-	char buf[CLASSNAME_BUFSIZ];
-	char *at = buf;
+	knh_type_t type = TERMs_gettype(stmt, n);
+	DBG_P("TYPEERROR: type=%s%s reqt=%s%s", TYPEQN(type), TYPEQN(reqt));
 	switch(SP(stmt)->stt) {
 	case STT_CALL:
 	case STT_NEW:
-		{
-			Method *mtd = DP(DP(stmt)->tokens[0])->mtd;
-			DBG2_ASSERT(IS_Method(mtd));
-			knh_format_mtdparam(ctx, buf, sizeof(buf), mtd, n - 1);
-		}
-		break;
 	case STT_OP:
 		{
 			Method *mtd = DP(DP(stmt)->tokens[0])->mtd;
 			DBG2_ASSERT(IS_Method(mtd));
-			knh_format_op(ctx, buf, sizeof(buf), DP(mtd)->mn, n - 1);
+			knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line,
+				KERR_ERROR, _("type error: %T must be %T at the parameter %d of %M"), type, reqt, n - 1, DP(mtd)->mn);
 		}
+		break;
 	case STT_LET:
-		at = knh_message_text(KMSG_ASSIGNMENT);
+		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line,
+			KERR_ERROR, _("type error: %T must be %T at the assignment"), type, reqt);
 		break;
-	case STT_FOREACH:
-		at = "foreach";
-		if(n == 2) {
-			if(knh_Stmt_isMAPNEXT(stmt)) at = "from ..";
-			else at = "in ..";
-		}
-		else if(n == 3) {
-			at = "where ..";
-		}
-		break;
+//	case STT_FOREACH:
+//		at = "foreach";
+//		if(n == 2) {
+//			if(knh_Stmt_isMAPNEXT(stmt)) at = "from ..";
+//			else at = "in ..";
+//		}
+//		else if(n == 3) {
+//			at = "where ..";
+//		}
+//		break;
 	default :
-		at = knh_stmt_tochar(SP(stmt)->stt);
-		DBG2_P("%s n=%d type=%s%s", at, (int)n, TYPEQN(reqt));
+		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line,
+			KERR_ERROR, _("type error: %T must be %T at %s(%d)"), type, reqt, knh_stmt_tochar(SP(stmt)->stt), n);
 	}
-	DBG2_P("reqt=%s%s", TYPEQN(reqt));
-	knh_perror__s(ctx, SP(stmt)->fileid, SP(stmt)->line, pe, at);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1224,7 +1139,7 @@ knh_type_t knh_Asm_typeinfer(Ctx *ctx, Asm *abr, knh_type_t type, char *varname)
 {
 	if(type == CLASS_Nue) type = CLASS_Any;
 	if(type == CLASS_Any || type == NNTYPE_Any) {
-//		knh_Asm_perror(ctx, abr, KMSG_WTYPEINF, varname);
+//		knh_Asm_perror(ctx, abr, KERR_ERROR, _("error")WTYPEINF, varname);
 	}
 	return type;
 }
@@ -1326,7 +1241,7 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		}
 		Object *value = TERMs_value(ctx, stmt, 2, type);
 		if(!TERMs_isCONST(stmt, 2) && !TERMs_isASIS(stmt, 2)) {
-			knh_Asm_perror(ctx, abr, KMSG_IGFIELDVALUE, FIELDN(fn));
+			knh_Asm_perror(ctx, abr, KERR_EWARN, _("ignored initialization of field variable: %N"), fn);
 		}
 		knh_Asm_declareFieldVariable(ctx, abr, flag, type, fn, value);
 		knh_Stmt_done(ctx, stmt);
@@ -1352,10 +1267,10 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		return TM(stmt);
 	}
 	else {
-		if(FIELDN_IS_U2(fnq) || FIELDN_IS_U1(fnq)) {
-			knh_Asm_perror(ctx, abr, KMSG_IGQNAME, sToken(StmtDECL_name(stmt)));
-		}
 		Object *value = knh_StmtDECL_value(ctx, type);
+		if(FIELDN_IS_U2(fnq) || FIELDN_IS_U1(fnq)) {
+			knh_Asm_perror(ctx, abr, KERR_EWARN, _("ignored scope of script/field variable: %N"), fn);
+		}
 		knh_Asm_declareLocalVariable(ctx, abr, flag, type, fn, value);
 	}
 
@@ -1404,10 +1319,9 @@ Term *knh_StmtLET_declConst(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int l
 {
 	Token *tk = DP(stmt)->tokens[0];
 	knh_bytes_t cn = knh_Token_tobytes(ctx, tk);
-	int pe = KMSG_ESYNTAX;
 
 	if(level > 1) {
-		pe = KMSG_NOTHERE; goto L_PERROR;
+		goto L_NOTHERE;
 	}
 
 	if(!TERMs_typing(ctx, stmt, 1, abr, ns, TYPE_Any, TWARN_)) {
@@ -1415,7 +1329,8 @@ Term *knh_StmtLET_declConst(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int l
 	}
 
 	if(!TERMs_isCONST(stmt, 1)) {
-		pe = KMSG_NNCONST; goto L_PERROR;
+		knh_Token_perror(ctx, tk, KERR_ERROR, _("syntax error: r-value is not const: %s"), sToken(tk));
+		return NULL;
 	}
 
 	{
@@ -1425,7 +1340,7 @@ Term *knh_StmtLET_declConst(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int l
 		if(level == 0) {
 			if(dotidx == -1) {
 				if(knh_NameSpace_getConstNULL(ctx, ns, cn)) {
-					pe = KMSG_DUPCONST; goto L_PERROR;
+					goto L_DUPCONST;
 				}
 				KNH_ASSERT(IS_String(DP(tk)->text));
 				knh_NameSpace_addConst(ctx, ns, DP(tk)->text, value);
@@ -1434,28 +1349,33 @@ Term *knh_StmtLET_declConst(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int l
 				knh_bytes_t fn = knh_bytes_first(cn, dotidx);
 				knh_class_t cid = knh_NameSpace_getcid(ctx, ns, fn);
 				if(cid == CLASS_unknown) {
-					pe = KMSG_UCLASSN; goto L_PERROR;
+					knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown class: %B"), fn);
+					return NULL;
 				}
 				if(!konoha_addClassConst(ctx, cid, new_String(ctx, knh_bytes_last(cn, dotidx+1), NULL), value)) {
-					pe = KMSG_DUPCONST; goto L_PERROR;
+					goto L_DUPCONST;
 				}
 			}
 		}
 		else if(level == 1) {
 			knh_class_t cid = DP(abr)->this_cid;
 			if(dotidx != -1) {
-				pe = KMSG_NOTHERE; goto L_PERROR;
+				goto L_NOTHERE;
 			}
 			if(!konoha_addClassConst(ctx, cid, new_String(ctx, knh_bytes_last(cn, dotidx+1), NULL), value)) {
-				pe = KMSG_DUPCONST; goto L_PERROR;
+				goto L_DUPCONST;
 			}
 		}
 		knh_Stmt_done(ctx, stmt);
 		return TM(stmt);
 	}
 
-	L_PERROR:
-	knh_Token_perror(ctx, tk, pe);
+	L_NOTHERE:
+	knh_Token_perror(ctx, tk, KERR_ERROR, _("syntax error: don't declare const HERE: %s"), sToken(tk));
+	return NULL;
+
+	L_DUPCONST:
+	knh_Token_perror(ctx, tk, KERR_ERROR, _("cannot override the existing const: %s"), sToken(tk));
 	return NULL;
 }
 
@@ -1474,10 +1394,11 @@ Term *knh_StmtLET_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type
 		return TM(stmt);
 	}
 
-	knh_fieldn_t fnq = knh_Token_getfnq(ctx, DP(stmt)->tokens[0]);
+	Token *tk0 = DP(stmt)->tokens[0];
+	knh_fieldn_t fnq = knh_Token_getfnq(ctx, tk0);
 	knh_fieldn_t fn = FIELDN_UNMASK(fnq);
 	if(fn == FIELDN_NONAME) {
-		knh_Asm_perror(ctx, abr, KMSG_ELVALUE, FIELDN(fn));
+		knh_Token_perror(ctx, tk0, KERR_ERROR, _("unavailable l-value: %s"), sToken(tk0));
 		return NULL;
 	}
 
@@ -1493,7 +1414,7 @@ Term *knh_StmtLET_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type
 			existsName = 1;
 		}
 		else if(FIELDN_IS_U1(fnq) || FIELDN_IS_U2(fnq)) {
-			knh_Token_perror(ctx, DP(stmt)->tokens[0], KMSG_UVARN);
+			knh_Token_perror(ctx, tk0, KERR_ERRATA, _("undefined variable: %s"), sToken(tk0));
 			return NULL;
 		}
 	}
@@ -1518,7 +1439,7 @@ Term *knh_StmtLET_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type
 		}
 		else if(level == 1) {  /* CLASS FIELD LEVEL */
 			if(!TERMs_isCONST(stmt, 1)) {
-				knh_Asm_perror(ctx, abr, KMSG_IGFIELDVALUE, FIELDN(fn));
+				knh_Asm_perror(ctx, abr, KERR_ERROR, _("ignored value of field variable: %s"), sToken(tk0));
 			}
 			// flag |= KNH_FLAG_CFF_GETTER | KNH_FLAG_CFF_SETTER;
 			knh_Asm_declareFieldVariable(ctx, abr, flag, type, fn, value);
@@ -1534,13 +1455,11 @@ Term *knh_StmtLET_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type
 		knh_Stmt_setType(ctx, stmt, type);
 	}
 	else {
-		Token *tk = DP(stmt)->tokens[0];
 		if(!TERMs_typing(ctx, stmt, 0, abr, ns, TYPE_Any, TCHECK_)) {
 			return NULL;
 		}
-		tk = DP(stmt)->tokens[0];
-		if(SP(tk)->tt != TT_STACK && SP(tk)->tt == TT_GLOBAL && SP(tk)->tt == TT_FIELD) {
-			knh_Asm_perror(ctx, abr, KMSG_ELVALUE, FIELDN(fn));
+		if(SP(tk0)->tt != TT_STACK && SP(tk0)->tt != TT_GLOBAL && SP(tk0)->tt != TT_FIELD) {
+			knh_Asm_perror(ctx, abr, KERR_ERROR, _("unavailable l-value: %s"), sToken(tk0));
 			return NULL;
 		}
 		knh_type_t type = TERMs_gettype(stmt, 0);
@@ -1671,7 +1590,7 @@ Term *knh_StmtPARAMS_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_c
 		}
 		else {
 			if(IS_NNTYPE(reqt)) {
-				knh_Asm_perrorMTD(ctx, abr, KMSG_ETOOFEWPARAMS, mtd_cid, DP(mtd)->mn);
+				knh_Asm_perror(ctx, abr, KERR_ERROR, _("too few parameters: %C.%M"), mtd_cid, DP(mtd)->mn);
 				return NULL;
 			}
 			else if(!knh_Method_isVarArgs(mtd)) {
@@ -1691,7 +1610,7 @@ Term *knh_StmtPARAMS_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_c
 	}
 	else if(i + 2 != size) {
 		//DBG2_P("i+2=%d, size=%d", i+2, size);
-		knh_Asm_perrorMTD(ctx, abr, KMSG_WTOOMANYPARAMS, mtd_cid, DP(mtd)->mn);
+		knh_Asm_perror(ctx, abr, KERR_DWARN, _("too many parameters: %C.%M"), mtd_cid, DP(mtd)->mn);
 		DP(stmt)->size = i + 2;
 	}
 	return knh_StmtCALL_toCONST(ctx, stmt, mtd);
@@ -1848,7 +1767,7 @@ Term *knh_StmtCALLBASE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh
 
 	/* (func _ ...) */
 	/* built-in function */
-	int pe = KMSG_EBUILTINFUNC;
+	char *emsg = _("wrong parameters: built-in function %s()");
 	if(mn == METHODN_typeof) {
 		if(DP(stmt)->size != 3) goto L_ERROR;
 		if(TERMs_typing(ctx, stmt, 2, abr, ns, TYPE_Any, TWARN_)) {
@@ -1907,7 +1826,7 @@ Term *knh_StmtCALLBASE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh
 			}
 			cid = TERMs_getcid(stmt, 2);
 			Method *mtd = knh_Class_getMethod(ctx, cid, mn);
-			if(IS_NULL(mtd)) { pe = KMSG_UMETHODN; goto L_ERROR; }
+			if(IS_NULL(mtd)) { emsg = _("undefined method: %s"); goto L_ERROR; }
 			knh_Token_setCONST(ctx, DP(stmt)->tokens[3], UP(mtd));
 			cid = knh_class_MethodClosure(ctx, cid, mtd);
 		}
@@ -1921,7 +1840,7 @@ Term *knh_StmtCALLBASE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh
 				Script *scr = knh_Asm_getScript(ctx, abr);
 				cid = knh_Object_cid(scr);
 				mtd = knh_Class_getMethod(ctx, cid, mn);
-				if(IS_NULL(mtd)) { pe = KMSG_UMETHODN; goto L_ERROR; }
+				if(IS_NULL(mtd)) { emsg = _("undefined method: %s"); goto L_ERROR; }
 				knh_Token_setCONST(ctx, DP(stmt)->tokens[2], UP(scr));
 			}
 			else {
@@ -1996,11 +1915,11 @@ Term *knh_StmtCALLBASE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh
 			knh_Token_setCONST(ctx, tk, UP(scr));
 			return TM(stmt);
 		}
-		pe = KMSG_UMETHODN;
+		emsg = _("undefined method: %s");
 	}
 
 	L_ERROR:;
-	knh_Asm_perror(ctx, abr, pe, sToken(DP(stmt)->tokens[0]));
+	knh_Asm_perror(ctx, abr, KERR_ERROR, emsg, sToken(DP(stmt)->tokens[0]));
 	return NULL;
 }
 
@@ -2023,7 +1942,7 @@ Term *knh_StmtCALL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_cla
 	knh_class_t   mtd_cid = CLASS_type(btype);
 	Method *mtd = knh_Class_getMethod(ctx, mtd_cid, mn);
 	if(mtd_cid != CLASS_Any && IS_NULL(mtd)) {
-		knh_Asm_perrorMTD(ctx, abr, KMSG_UMETHODN, mtd_cid, mn);
+		knh_Asm_perror(ctx, abr, KERR_ERROR, _("undefined method: %C.%M"), mtd_cid, mn);
 		return NULL;
 	}
 
@@ -2083,10 +2002,12 @@ Term *knh_StmtNEW_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_clas
 	}
 
 	if(mtd_cid == CLASS_unknown) {
-		knh_Token_perror(ctx, DP(stmt)->tokens[1], KMSG_UCLASSN);
 		if(!IS_NNTYPE(reqt)) {
-			knh_Token_perrata(ctx, DP(stmt)->tokens[0], "null");
+			knh_Token_perror(ctx, DP(stmt)->tokens[1], KERR_ERRATA, _("unknown class: %s ==> null"), sToken(DP(stmt)->tokens[1]));
 			return TM(new_TokenNULL(ctx, FL(DP(stmt)->tokens[1]), reqt));
+		}
+		else {
+			knh_Token_perror(ctx, DP(stmt)->tokens[1], KERR_ERROR, _("unknown class: %s"), sToken(DP(stmt)->tokens[1]));
 		}
 		return NULL;
 	}
@@ -2123,10 +2044,8 @@ Term *knh_StmtNEW_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_clas
 
 	KNH_ASSERT_cid(mtd_cid);
 	Method *mtd = knh_Class_getMethod(ctx, mtd_cid, mn);
-	if(IS_NULL(mtd) || knh_class_isPrivate(mtd_cid)) {
-		char bufnw[CLASSNAME_BUFSIZ];
-		knh_snprintf(bufnw, sizeof(bufnw), "%s %s(...)", sToken(DP(stmt)->tokens[0]), CLASSN(mtd_cid));
-		knh_Asm_perror(ctx, abr, KMSG_UNEW, bufnw);
+	if(IS_NULL(mtd) || knh_class_isPrivate(mtd_cid) || knh_Method_isPrivate(mtd)) {
+		knh_Asm_perror(ctx, abr, KERR_ERROR, _("unknown constructor: %s %C(...)"), sToken(DP(stmt)->tokens[0]), mtd_cid);
 		return NULL;
 	}
 	DP(DP(stmt)->tokens[1])->cid = mtd_cid;
@@ -2217,7 +2136,7 @@ static
 int knh_Stmt_checkOPSIZE(Ctx *ctx,Stmt *stmt, size_t n)
 {
 	if(n < 2) {
-		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, KMSG_UOP2, NULL);
+		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, KERR_ERROR, _("not uniary operator"));
 		return 0;
 	}
 	return 1;
@@ -2306,8 +2225,7 @@ Term *knh_StmtOP_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_
 		}
 		mtd_cid = knh_StmtOPEQ_basecid(ctx, stmt);
 		if(mtd_cid == CLASS_unknown) {
-			knh_Asm_perror(ctx, abr, KMSG_EOPCMP, NULL);
-			knh_Token_perrata(ctx, optk, "false");
+			knh_Asm_perror(ctx, abr, KERR_DWARN, _("comparison of different type: %T %T"), TERMs_gettype(stmt, 1), TERMs_gettype(stmt, 2));
 			return new_TermCONST(ctx, FL(optk), KNH_FALSE); /* CONST */
 		}
 		break;
@@ -2346,8 +2264,7 @@ Term *knh_StmtOP_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_
 		}
 		mtd_cid = knh_StmtOPEQ_basecid(ctx, stmt);
 		if(mtd_cid == CLASS_unknown) {
-			knh_Asm_perror(ctx, abr, KMSG_EOPCMP, NULL);
-			knh_Token_perrata(ctx, optk, "true");
+			knh_Asm_perror(ctx, abr, KERR_DWARN, _("comparison of different type: %T %T"), TERMs_gettype(stmt, 1), TERMs_gettype(stmt, 2));
 			return new_TermCONST(ctx, FL(optk), KNH_TRUE); /* CONST */
 		}
 		break;
@@ -2361,7 +2278,7 @@ Term *knh_StmtOP_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_
 		}
 		mtd_cid = knh_StmtOPEQ_basecid(ctx, stmt);
 		if(mtd_cid == CLASS_unknown) {
-			knh_Asm_perror(ctx, abr, KMSG_EOPCMP, NULL);
+			knh_Asm_perror(ctx, abr, KERR_EWARN, _("comparison of different type: %T %T"), TERMs_gettype(stmt, 1), TERMs_gettype(stmt, 2));
 			return NULL;
 		}
 		break;
@@ -2411,7 +2328,7 @@ Term *knh_StmtOP_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_
 	KNH_ASM_ASSERT(ctx, abr, mtd_cid != CLASS_unknown);
 	Method *mtd = knh_Class_getMethod(ctx, mtd_cid, mn);
 	if(IS_NULL(mtd)) {
-		knh_Asm_perror(ctx, abr, KMSG_UOP, knh_token_tochar(SP(optk)->tt));
+		knh_Asm_perror(ctx, abr, KERR_ERROR, _("unsupported operator in %C"), mtd_cid);
 		return NULL;
 	}
 	knh_Token_toMTD(ctx, DP(stmt)->tokens[0], mn, mtd);
@@ -2443,7 +2360,7 @@ Term *knh_StmtMAPCAST_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_
 		return NULL;
 	}
 	if(!TERMs_isCLASSID(stmt, 0)) {
-		knh_Token_perror(ctx, DP(stmt)->tokens[0], KMSG_UCLASSN);
+		knh_Token_perror(ctx, DP(stmt)->tokens[0], KERR_ERROR, _("unknown class: %s"), sToken(DP(stmt)->tokens[0]));
 		return NULL;
 	}
 
@@ -2487,7 +2404,7 @@ Term *knh_StmtMAPCAST_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_
 
 	Mapper *mpr = knh_Class_getMapper(ctx, exprc, mprcid);
 	if(IS_NULL(mpr)) {
-		knh_Asm_perrorMPR(ctx, abr, KMSG_UMAP, exprc, mprcid);
+		knh_Asm_perror(ctx, abr, KERR_ERROR, _("undefined mapper %C ==> %C"), exprc, mprcid);
 		return NULL;
 	}
 
@@ -2694,20 +2611,20 @@ int TERMs_typecheck(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_type_t reqt, i
 	if(TERMs_isNULL(stmt, n)) {
 		//DBG2_P("reqc=%s varc=%s", CTXCLASSN(reqc), CTXCLASSN(varc));
 		if(IS_NNTYPE(reqt) && varc != reqc) {
-			TERMs_perrorTYPE(ctx, stmt, n, KMSG_ENULLFMT, reqt);
+			TERMs_perrorTYPE(ctx, stmt, n, reqt);
 			return 0;
 		}
 		return 1;
 	}
 
 	if(vart == TYPE_void) {
-		TERMs_perrorTYPE(ctx, stmt, n, KMSG_ETYPEFMT, reqt);
+		TERMs_perrorTYPE(ctx, stmt, n, reqt);
 		return 0;
 	}
 
 	if(reqt == NNTYPE_Boolean && vart != NNTYPE_Boolean) {
 		DBG2_P("stt=%s, vart=%s%s", knh_stmt_tochar(SP(stmt)->stt), TYPEQN(vart));
-		TERMs_perrorTYPE(ctx, stmt, n, KMSG_ETYPEFMT, reqt);
+		TERMs_perrorTYPE(ctx, stmt, n, reqt);
 		return 0;
 	}
 
@@ -2730,7 +2647,7 @@ int TERMs_typecheck(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_type_t reqt, i
 		if(mode == TITERCONV_) return 0;
 	}
 	DBG_P("stt=%s reqt=%s%s, vart=%s%s", knh_stmt_tochar(SP(stmt)->stt), TYPEQN(reqt), TYPEQN(vart));
-	TERMs_perrorTYPE(ctx, stmt, n, KMSG_ETYPEFMT, reqt);
+	TERMs_perrorTYPE(ctx, stmt, n, reqt);
 	return 0;
 }
 
@@ -2825,7 +2742,6 @@ Term *knh_StmtIF_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 static
 Term *knh_StmtSWITCH_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 {
-	knh_Asm_perror(ctx, abr, KMSG_EFUTURE, "switch");
 	knh_Stmt_done(ctx, stmt);
 	return TM(stmt);
 }
@@ -2999,8 +2915,9 @@ Term *knh_StmtTRY_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		while(SP(instmt)->stt == STT_CATCH) {
 			knh_fieldn_t fn = knh_Token_getfnq(ctx, DP(instmt)->tokens[1]);
 			if(fn == FIELDN_NONAME) {
-				knh_Asm_perror(ctx, abr, KMSG_ESYNTAX, sToken(DP(instmt)->tokens[1]));
-				return NULL;
+				KNH_ASSERT(fn != FIELDN_NONAME);
+//				knh_Asm_perror(ctx, abr, KERR_ERROR, _("error")ESYNTAX, sToken(DP(instmt)->tokens[1]));
+//				return NULL;
 			}
 			knh_Asm_declareLocalVariable(ctx, abr, 0, TYPE_Exception, fn, KNH_NULL);
 			if(TERMs_typing(ctx, instmt, 1, abr, ns, TYPE_Exception, TCHECK_)) {
@@ -3051,13 +2968,13 @@ Term *knh_StmtRETURN_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	//DBG2_P("this_cid=%s, rtype=%s%s", CTXCLASSN(DP(abr)->this_cid), TYPEQN(rtype));
 	if(rtype == TYPE_void) {
 		if(DP(stmt)->size > 0) {
-			knh_Asm_perror(ctx, abr, KMSG_IGRETURN, NULL);
+			knh_Asm_perror(ctx, abr, KERR_EWARN, _("ignored return value"));
 			DP(stmt)->size = 0;
 		}
 	}
 	else if(knh_Method_isConstructor(ctx, DP(abr)->mtd)) {
 		if(DP(stmt)->size > 0) {
-			knh_Asm_perror(ctx, abr, KMSG_IGRETURN, NULL);
+			knh_Asm_perror(ctx, abr, KERR_EWARN, _("ignored return value"));
 			DP(stmt)->size = 1;
 		}
 		else {
@@ -3067,7 +2984,7 @@ Term *knh_StmtRETURN_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		knh_Token_toSTACK(ctx, DP(stmt)->tokens[0], 0, rtype);
 	}
 	else if(DP(stmt)->size == 0) {
-		knh_Asm_perror(ctx, abr, KMSG_NORETURNVALUE, NULL);
+		knh_Asm_perror(ctx, abr, KERR_ERRATA, _("added return value"));
 		knh_StmtRETURN_addValue(ctx, stmt, rtype);
 	}
 	else if(!TERMs_typing(ctx, stmt, 0, abr, ns, rtype, TCHECK_)){
@@ -3269,11 +3186,6 @@ Term *knh_Asm_lookupRegisteredStmt(Ctx *ctx, Asm *abr, Stmt *stmt)
 	}
 	return TM(stmt);
 }
-
-/* ------------------------------------------------------------------------ */
-/* ------------------------------------------------------------------------ */
-/* ------------------------------------------------------------------------ */
-
 /* ------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------ */
 /* [METHOD] */
@@ -3310,14 +3222,14 @@ knh_class_t knh_StmtMETHOD_class(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, 
 
 		knh_class_t cid = knh_NameSpace_getcid(ctx, ns, name);
 		if(cid == CLASS_unknown) {
-			knh_Asm_perror(ctx, abr, KMSG_UCLASSN, (char*)name.buf);
 			cid = DP(abr)->this_cid;
+			knh_Asm_perror(ctx, abr, KERR_ERRATA, _("unknown class: %B ==> %s"), name, cid);
 		}
 		else if(level > 0 && cid != DP(abr)->this_cid) {
-			knh_Asm_perror(ctx, abr, KMSG_DIFFCLASSN, (char*)name.buf);
-			knh_Token_perrata(ctx, tk, CLASSN(cid));
 			cid = DP(abr)->this_cid;
+			knh_Asm_perror(ctx, abr, KERR_ERRATA, _("different class: %B ==> %s"), name, cid);
 		}
+		KNH_ASSERT(cid != CLASS_unknown);
 		return cid;
 	}
 }
@@ -3455,7 +3367,7 @@ int knh_Stmt_checkLastReturn(Ctx *ctx, Stmt *stmt, Method *mtd)
 
 	}
 	else { /* return default value */
-		knh_perror(ctx, SP(last_stmt)->fileid, SP(last_stmt)->line, KMSG_NORETURNVALUE, NULL);
+		knh_perror(ctx, SP(last_stmt)->fileid, SP(last_stmt)->line, KERR_ERRATA, _("added return value"));
 		knh_StmtRETURN_addValue(ctx, rstmt, knh_Method_rtype(ctx, mtd, DP(mtd)->cid));
 	}
 	KNH_ASSERT(last_stmt != NULL);
@@ -3512,14 +3424,9 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	int level = DP(abr)->level;
 	knh_flag_t flag   = knh_StmtMETHOD_flag(ctx, stmt);
 	knh_type_t rztype = knh_StmtMETHOD_rtype(ctx, stmt, ns);
+
 	knh_class_t mtd_cid = knh_StmtMETHOD_class(ctx, stmt, abr, ns, level);
 	knh_methodn_t mn = knh_StmtMETHOD_name(ctx, stmt, abr, level);
-	int pe = KMSG_ESYNTAX;
-
-	if(mtd_cid == CLASS_unknown) {
-		knh_Token_perror(ctx, DP(stmt)->tokens[METHOD_class], KMSG_UCLASSN);
-		return NULL;
-	}
 
 	if(!knh_Stmt_initParams(ctx, StmtMETHOD_params(stmt), abr, ns, KNH_OUTERPARAMS)) {
 		return NULL;
@@ -3530,8 +3437,7 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	/* Check the type of Constructor */
 	if(knh_methodn_isNew(ctx, mn) &&
 			(mtd_cid != CLASS_type(rztype) && mtd_cid != CLASS_This)) {
-		knh_Asm_perror(ctx, abr, KMSG_DIFFNEWTYPE, NULL);
-		knh_Token_perrata(ctx, StmtMETHOD_rtype(stmt), CLASSN(mtd_cid));
+		knh_Asm_perror(ctx, abr, KERR_ERRATA, _("different constructor class: %C == %C"), CLASS_type(rztype), mtd_cid);
 		rztype = mtd_cid;
 	}
 
@@ -3562,7 +3468,7 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		//DBG2_P("(mtd)->cid=%s, mtd_cid=%s", CLASSN(DP(mtd)->cid), CLASSN(mtd_cid));
 		if(DP(mtd)->cid != mtd_cid) { /* Overriding */
 			if(knh_Method_isFinal(mtd)) { /* CHECK @Final */
-				knh_Asm_perrorMTD(ctx, abr, KMSG_EOVERRIDE, DP(mtd)->cid, mn);
+				knh_Asm_perror(ctx, abr, KERR_ERROR, _("%C.%M is final"), DP(mtd)->cid, mn);
 				return NULL;
 			}
 			mtd = new_Method(ctx, flag, mtd_cid, mn, NULL);
@@ -3574,17 +3480,18 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 				!knh_Method_isAbstract(mtd) && DP(mtd)->mn != METHODN_main) {
 			/* Konoha: To override, you need @Override */
 			if(!knh_Context_isInteractive(ctx)) {
-				knh_Asm_perrorMTD(ctx, abr, KMSG_AOVERRIDE, mtd_cid, mn);
+				knh_Asm_perror(ctx, abr, KERR_DWARN, _("%C.%M is overriden"), mtd_cid, mn);
 			}
-			//return NULL;
 		}
 
 		if(mfsize != mf->psize+1) {
-			pe = KMSG_DIFFPSIZE; goto L_PERROR;
+			knh_Asm_perror(ctx, abr, KERR_DWARN, _("differnt parameter size: must be %C.%M(%d)"), mtd_cid, mn, mf->psize+1);
+			return NULL;
 		}
 
 		if(mf->rtype != rztype) {
-			pe = KMSG_DIFFRTYPE; goto L_PERROR;
+			knh_Asm_perror(ctx, abr, KERR_DWARN, _("differnt return type: must be %T %C.%M"), mf->rtype, mtd_cid, mn);
+			return NULL;
 		}
 
 		for(i = 1; i < mfsize; i++) {
@@ -3594,7 +3501,8 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 				vtype = CLASS_type(vtype);
 			}
 			if(ptype != vtype) {
-				pe = KMSG_DIFFPTYPE; goto L_PERROR;
+				knh_Asm_perror(ctx, abr, KERR_DWARN, _("differnt type: parameter %d of %C.%M"), i, mtd_cid, mn);
+				return NULL;
 			}
 		}
 	}
@@ -3611,15 +3519,15 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 			knh_Method_syncfunc(mtd, func);
 			knh_Stmt_done(ctx, stmt);
 		}
-		return TM(stmt);
 	}
+	return TM(stmt);
 
-	L_PERROR:;
-	knh_cwb_t cwb = new_cwb(ctx);
-	knh_Method__k(ctx, mtd, cwb.w, (String*)KNH_NULL);
-	knh_Asm_perror(ctx, abr, pe, knh_cwb_tochar(cwb));
-	knh_cwb_clear(cwb);
-	return NULL;
+//	L_PERROR:;
+//	knh_cwb_t cwb = new_cwb(ctx);
+//	knh_Method__k(ctx, mtd, cwb.w, (String*)KNH_NULL);
+//	knh_Asm_perror(ctx, abr, pe, knh_cwb_tochar(cwb));
+//	knh_cwb_clear(cwb);
+//	return NULL;
 }
 
 
@@ -3727,7 +3635,7 @@ Term *knh_StmtCLASS_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 			;; /* NO perror */
 		}
 		else {
-			knh_Asm_perror(ctx, abr, KMSG_NOTHERE, knh_stmt_tochar(SP(instmt)->stt));
+			knh_Asm_perror(ctx, abr, KERR_DWARN, _("don't use %s HERE"), knh_stmt_tochar(SP(instmt)->stt));
 		}
 		instmt = DP(instmt)->next;
 	}
@@ -3788,9 +3696,9 @@ Term *knh_Stmt_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_t 
 		}
 	}
 	if(!knh_stmt_isExpr(SP(stmt)->stt)) {
-		DBG2_P("stt=%s", knh_stmt_tochar(SP(stmt)->stt));
-		knh_Asm_perror(ctx, abr, KMSG_NOTHERE, knh_stmt_tochar(SP(stmt)->stt));
-		return NULL;
+		knh_Asm_perror(ctx, abr, KERR_EWARN, _("don't use %s HERE"), knh_stmt_tochar(SP(stmt)->stt));
+		knh_Stmt_done(ctx, stmt);
+		return TM(stmt);
 	}
 	{
 		Stmt *rstmt = (Stmt*)knh_StmtEXPR_typing(ctx, stmt, abr, ns, reqt);
