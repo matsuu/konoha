@@ -229,7 +229,7 @@ void knh_Asm_finish(Ctx *ctx, Asm *abr)
 
 	if(knh_Asm_isCancelled(abr)) {
 		if(DP(mtd)->mn != METHODN_lambda) {
-			knh_Asm_perrorMTD(ctx, abr, KMSG_TOABSTRACT, DP(mtd)->cid, DP(mtd)->mn);
+			knh_Asm_perror(ctx, abr, KERR_DWARN, "defined %C.%M as an abstract method", DP(mtd)->cid, DP(mtd)->mn);
 		}
 		knh_Method_toAbstract(ctx, mtd);
 	}
@@ -1364,7 +1364,7 @@ int knh_StmtOP_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 				case METHODN_opDiv:
 					if(b == 0) {
 						b = 1;
-						knh_Asm_perror(ctx, abr, KMSG_EZERODIV, NULL);
+						knh_Asm_perror(ctx, abr, KERR_ERRATA, _("divided by zero: /0 ==> /1"));
 					}
 					KNH_ASM_iDIVn_(ctx, abr, sfi_(sfpidx), sfi_(a), b);
 					return 1;
@@ -1372,7 +1372,7 @@ int knh_StmtOP_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 				case METHODN_opMod:
 					if(b == 0) {
 						b = 1;
-						knh_Asm_perror(ctx, abr, KMSG_EZERODIV, NULL);
+						knh_Asm_perror(ctx, abr, KERR_ERRATA, _("divided by zero: %0 ==> %1"));
 					}
 					KNH_ASM_iMODn_(ctx, abr, sfi_(sfpidx), sfi_(a), b);
 					return 1;
@@ -1472,7 +1472,7 @@ int knh_StmtOP_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 				case METHODN_opDiv:
 					if(b == 0.0) {
 						b = 1.0;
-						knh_Asm_perror(ctx, abr, KMSG_EZERODIV, NULL);
+						knh_Asm_perror(ctx, abr, KERR_ERRATA, _("divided by zero: 0.0 ==> 1.0"));
 					}
 					KNH_ASM_fDIVn_(ctx, abr, sfi_(sfpidx), sfi_(a), b);
 					return 1;
@@ -1996,9 +1996,9 @@ knh_labelid_t knh_Asm_stackLabelId(Ctx *ctx, Asm *abr, Stmt *stmt)
 	size_t s = knh_Array_size(DP(abr)->lstacks);
 	if(s == 0) {
 		if(SP(stmt)->stt == STT_CONTINUE)
-			knh_Asm_perror(ctx, abr, KMSG_EABORT, "continue");
+			knh_Asm_perror(ctx, abr, KERR_ERROR, _("continue"));
 		else
-			knh_Asm_perror(ctx, abr, KMSG_EABORT, "break");
+			knh_Asm_perror(ctx, abr, KERR_ERROR, _("break"));
 		return -1;
 	}
 	Token *tk = NULL;
@@ -2014,7 +2014,7 @@ knh_labelid_t knh_Asm_stackLabelId(Ctx *ctx, Asm *abr, Stmt *stmt)
 				tk = tk2;
 			}
 		}
-		knh_Asm_perror(ctx, abr, KMSG_ULABEL, sToken(tk));
+		knh_Asm_perror(ctx, abr, KERR_ERROR, _("unknown label: %s"), sToken(tk));
 		tk = NULL;
 	}
 	if(tk == NULL) {
@@ -2176,7 +2176,7 @@ void knh_Asm_setFinallyStmt(Ctx *ctx, Asm *abr, Stmt *stmt)
 {
 	if(IS_NOTNULL(stmt)) {
 		if(IS_NOTNULL(DP(abr)->finallyStmt)) {
-			knh_Asm_perror(ctx, abr, KMSG_ETRY, NULL);
+			knh_Asm_perror(ctx, abr, KERR_ERROR, _("cannot use nested try statements"));
 			return;
 		}
 		KNH_SETv(ctx, DP(abr)->finallyStmt, stmt);

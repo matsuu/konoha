@@ -64,9 +64,12 @@ extern "C" {
 /* [util] */
 
 static
-void knh_InputStream_perror(Ctx *ctx, InputStream *in, int pe, char *msg)
+void knh_InputStream_perror(Ctx *ctx, InputStream *in, int pe, char *fmt, ...)
 {
-	knh_perror(ctx, DP(in)->fileid, DP(in)->line, pe, msg);
+	va_list ap;
+	va_start(ap, fmt);
+	knh_vperror(ctx, DP(in)->fileid, DP(in)->line, pe, fmt, ap);
+	va_end(ap);
 }
 
 /* ======================================================================== */
@@ -114,7 +117,7 @@ Token *new_Token__NAME(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t
 		goto NAME_PART;
 	}
 	else {
-		knh_InputStream_perror(ctx, in, KMSG_UTOKEN, (char*)t.buf);
+		knh_InputStream_perror(ctx, in, KERR_ERROR, _("unknown token: %B"), t);
 		return new_Token(ctx, flag, DP(in)->fileid, DP(in)->line, TT_ERR);
 	}
 
@@ -150,8 +153,7 @@ Token *new_Token__NAME(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t
 				goto TOKEN_PART;
 			}
 			if(!isalnum(t.buf[i]) && t.buf[i] != ':') {
-				char cb[2] = {t.buf[i], 0};
-				knh_InputStream_perror(ctx, in, KMSG_WCHAR, cb);
+				knh_InputStream_perror(ctx, in, KERR_EWARN, _("used strange character: %B"), t);
 				goto TOKEN_PART;
 			}
 			if(islower(t.buf[i])) has_lower = 1;
@@ -175,8 +177,7 @@ Token *new_Token__NAME(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t
 				goto NAME_PART;
 			}
 			else {
-				char cb[2] = {t.buf[i], 0};
-				knh_InputStream_perror(ctx, in, KMSG_WCHAR, cb);
+				knh_InputStream_perror(ctx, in, KERR_EWARN, _("used strange character: %B"), t);
 				goto TOKEN_PART;
 			}
 		}
@@ -211,8 +212,7 @@ Token *new_Token__NAME(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t
 					continue;
 				}
 				else {
-					char cb[2] = {t.buf[i], 0};
-					knh_InputStream_perror(ctx, in, KMSG_WCHAR, cb);
+					knh_InputStream_perror(ctx, in, KERR_EWARN, _("used strange character: %B"), t);
 					goto TOKEN_PART;
 				}
 			}
@@ -235,8 +235,7 @@ Token *new_Token__NAME(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t
 
 	WLENGTH_PART: {
 		*p = 0;
-		knh_InputStream_perror(ctx, in, KMSG_WLENGTH, (char*)t.buf);
-		knh_perrata(ctx, DP(in)->fileid, DP(in)->line, (char*)t.buf, name);
+		knh_InputStream_perror(ctx, in, KERR_ERRATA, "too long name: '%B' => '%s'", t, name);
 	}
 
 	TOKEN_PART: {
@@ -649,9 +648,7 @@ void knh_InputStream_skipBLOCK(Ctx *ctx, InputStream *in, int prev, Token *tk)
 	MAIN_PART:
 	while((ch = knh_InputStream_getc(ctx, in)) != EOF) {
 		if(prev == '\n' && ch == endch) {
-			char buf[40];
-			knh_snprintf(buf, sizeof(buf), "lines: %d..%d", (int)SP(tk)->line, (int)DP(in)->line);
-			knh_InputStream_perror(ctx, in, KMSG_IGBLOCK, buf);
+			knh_InputStream_perror(ctx, in, KERR_DWARN, _("ignored this block from %d to %d lines"), (int)SP(tk)->line, (int)DP(in)->line);
 			return ;
 		}
 		if(prev == '/' && ch == '*') {
@@ -755,7 +752,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 				}
 			}
 			else {
-				knh_InputStream_perror(ctx, in, KMSG_ESYNTAX, "TOO MANY NESTED");
+				knh_InputStream_perror(ctx, in, KERR_ERROR, _("too many of tested blocks"));
 				knh_InputStream_skipBLOCK(ctx, in, prev, blocktk);
 				blocktk = NULL;
 			}
@@ -769,7 +766,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 				tkl--;
 			}
 			else {
-				knh_InputStream_perror(ctx, in, KMSG_EMISMATCH, " ...}");
+				knh_InputStream_perror(ctx, in, KERR_ERROR, _("mismatched ...}"));
 				knh_InputStream_skipBLOCK(ctx, in, prev, blocktk);
 				while(tkl > 0) {
 					tks[tkl]->tt = TT_ERR;
@@ -788,7 +785,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 				tkl--;
 			}
 			else {
-				knh_InputStream_perror(ctx, in, KMSG_EMISMATCH, " ...)");
+				knh_InputStream_perror(ctx, in, KERR_ERROR, _("mismatched ...)"));
 				knh_InputStream_skipBLOCK(ctx, in, prev, blocktk);
 				while(tkl > 0) {
 					tks[tkl]->tt = TT_ERR;
@@ -807,7 +804,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 				tkl--;
 			}
 			else {
-				knh_InputStream_perror(ctx, in, KMSG_EMISMATCH, " ...]");
+				knh_InputStream_perror(ctx, in, KERR_ERROR, _("mismatched ...]"));
 				knh_InputStream_skipBLOCK(ctx, in, prev, blocktk);
 				while(tkl > 0) {
 					tks[tkl]->tt = TT_ERR;
@@ -1022,7 +1019,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 		default:
 			equote = 0;
 			if(ch > 127) {
-				knh_InputStream_perror(ctx, in, KMSG_WASCII, NULL);
+				knh_InputStream_perror(ctx, in, KERR_DWARN, _("unexpected multi-byte character"));
 				ch = ' ';
 			}
 			knh_Bytes_putc(ctx, tbuf.ba, ch);
@@ -1096,7 +1093,6 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 			}
 		}
 		knh_Token_padd(ctx, tks[tkl], &BOL, new_Token__buffer(ctx, TT_NUM, tbuf, in));
-		//knh_InputStream_perror(ctx, in, KMSG_WEOF, NULL);
 	}
 	goto MAIN_PART_INLOOP; /* EOF */
 
@@ -1185,7 +1181,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 				continue;
 			}
 			if(ch == '\n' || ch == '\r' || ch == EOF) {
-				knh_InputStream_perror(ctx, in, KMSG_WCHAR, "\\n");
+				knh_InputStream_perror(ctx, in, KERR_EWARN, _("suddenly ending?"));
 				knh_Token_padd(ctx, tks[tkl], &BOL, new_Token__buffer(ctx, knh_char_totoken(prev), tbuf, in));
 				goto MAIN_PART_INLOOP;
 			}
@@ -1254,7 +1250,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 				continue;
 			}
 			if(ch == '\n' || ch == '\r' || ch == EOF) {
-				knh_InputStream_perror(ctx, in, KMSG_WCHAR, "\\n");
+				knh_InputStream_perror(ctx, in, KERR_EWARN, _("suddenly ending?"));
 				knh_Token_padd(ctx, tks[tkl], &BOL, new_Token__buffer(ctx, knh_char_totoken(prev), tbuf, in));
 				goto MAIN_PART_INLOOP;
 			}
@@ -1356,7 +1352,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 	goto L_EOF; /* EOF */
 
 	L_EOF:;
-	knh_InputStream_perror(ctx, in, KMSG_WEOF, NULL);
+	knh_InputStream_perror(ctx, in, KERR_EWARN, _("suddenly comes to end of file"));
 
 	L_JOIN:
 	knh_Token_add_space(ctx, tks[tkl], &BOL, tbuf, in);

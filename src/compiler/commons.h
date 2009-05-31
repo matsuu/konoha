@@ -8,6 +8,8 @@
 extern "C" {
 #endif
 
+/* ------------------------------------------------------------------------ */
+
 #undef IS_Token
 #define IS_Token(o)      (((Token*)o)->h.cid == CLASS_Token)
 #define TOKENNo(o)        knh_token_tochar(SP(o)->tt)
@@ -20,6 +22,14 @@ extern "C" {
 
 #define FL(o)            ((Object*)o)
 #define TM(o)            ((Term*)o)
+
+#define KERR_ERROR     0
+#define KERR_EWARN     1
+#define KERR_DWARN     2
+#define KERR_ERRATA    3
+#define KERR_INFO      4
+
+#define _(s)           s
 
 /* ------------------------------------------------------------------------ */
 

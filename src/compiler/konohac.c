@@ -155,7 +155,7 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		KNH_ASSERT(ctx->share->ClassTable[cid].class_cid == NULL);
 	}
 	else {
-		knh_Asm_perror(ctx, abr, KMSG_EOVERRIDE, CLASSN(cid));
+		knh_Asm_perror(ctx, abr, KERR_ERROR, _("cannot redefine %C"), cid);
 		knh_Stmt_done(ctx, stmt);
 		return 0;
 	}
@@ -167,12 +167,11 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	else {
 		supcid = knh_NameSpace_getcid(ctx, ns, knh_Token_tobytes(ctx, StmtCLASS_superclass(stmt)));
 		if(supcid == CLASS_unknown) {
-			knh_Asm_perror(ctx, abr, KMSG_UCLASSN, NULL);
 			supcid = CLASS_Object;
-			knh_Token_perrata(ctx, StmtCLASS_superclass(stmt), CLASSN(supcid));
+			knh_Asm_perror(ctx, abr, KERR_ERRATA, _("unknown class: %s ==> %C"), sToken(StmtCLASS_superclass(stmt)), supcid);
 		}
 		else if(knh_class_isFinal(supcid)) {
-			knh_Asm_perror(ctx, abr, KMSG_EEXTENDS, CLASSN(supcid));
+			knh_Asm_perror(ctx, abr, KERR_ERROR, _("cannot extends %C: this class is final"), supcid);
 			knh_Stmt_done(ctx, stmt);
 			return 0;
 		}
@@ -210,11 +209,11 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 			Token *tk = DP(stmt)->tokens[i];
 			knh_class_t icid = knh_NameSpace_getcid(ctx, ns, knh_Token_tobytes(ctx, tk));
 			if(icid == CLASS_unknown) {
-				knh_Token_perror(ctx, tk, KMSG_UCLASSN);
+				knh_Token_perror(ctx, tk, KERR_EWARN, _("unknown class: %s"), sToken(tk));
 				continue;
 			}
 			if(!knh_class_isInterface(icid)) {
-				knh_Token_perror(ctx, tk, KMSG_EIMPLEMENTS);
+				knh_Token_perror(ctx, tk, KERR_EWARN, _("cannot implements %C: this class is not @Interfac"), icid);
 				continue;
 			}
 			knh_class_addInterface(ctx, cid, icid);
@@ -288,12 +287,12 @@ int knh_StmtUIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		if(knh_System_loadPackage(ctx, knh_bytes_first(name, loc))) {
 			knh_class_t newcid = konoha_getcid(ctx, name);
 			if(newcid == CLASS_unknown) {
-				knh_Token_perror(ctx, tk, KMSG_UCLASSN);
+				knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown class: %s"), sToken(tk));
 				return 0;
 			}
 			knh_class_t oldcid = knh_NameSpace_getcid(ctx, ns, knh_bytes_last(name, loc+1));
 			if(oldcid != CLASS_unknown && newcid != oldcid) {
-				KNH_WARNING(ctx, "ovrriding.. %s => %s", CLASSN(oldcid), CLASSN(newcid));
+				KNH_WARNING(ctx, _("ovrriding.. %s => %s"), CLASSN(oldcid), CLASSN(newcid));
 			}
 			knh_NameSpace_setLocalName(ctx, ns, newcid);
 			return 1;
@@ -306,7 +305,7 @@ int knh_StmtUIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 			return 1;
 		}
 	}
-	knh_Token_perror(ctx, tk, KMSG_UPACKAGE);
+	knh_Token_perror(ctx, tk, KERR_ERROR, _("package not found: %s"), sToken(tk));
 	return 0;
 }
 
@@ -360,13 +359,13 @@ int knh_StmtXCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_class
 	knh_format_classurn(ctx, bufcu, sizeof(bufcu), bcid, knh_Token_tobytes(ctx, tkurn));
 	knh_class_t cid = konoha_findcid(ctx, B(bufcu));
 	if(cid == bcid || cid == CLASS_unknown) {
-		knh_Token_perror(ctx, tkurn, KMSG_UPATH);
+		knh_Token_perror(ctx, tkurn, KERR_EWARN, _("resource not found: %s"), sToken(tkurn));
 		cid = bcid;
 	}
 
 	knh_class_t oldcid = knh_NameSpace_getcid(ctx, ns, knh_Token_tobytes(ctx, tkclassn));
 	if(oldcid != CLASS_unknown && cid != oldcid) {
-		KNH_WARNING(ctx, "Overriding %s", knh_Token_tobytes(ctx, tkclassn));
+		KNH_WARNING(ctx, _("overriding %s"), knh_Token_tobytes(ctx, tkclassn));
 	}
 
 	KNH_ASSERT(IS_String(DP(tkclassn)->data));
@@ -409,12 +408,12 @@ int knh_StmtUFUNC_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		knh_index_t loc = knh_bytes_rindex(name, '.');
 		knh_class_t cid = knh_NameSpace_getcid(ctx, ns, knh_bytes_first(name, loc));
 		if(cid == CLASS_unknown) {
-			knh_Token_perror(ctx, tk, KMSG_UCLASSN);
+			knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown class: %s"), sToken(tk));
 			return 0;
 		}
 		knh_methodn_t mn = konoha_getMethodName(ctx, knh_bytes_last(name, loc+1), METHODN_NONAME);
 		if(mn == METHODN_NONAME) {
-			knh_Token_perror(ctx, tk, KMSG_UMETHODN);
+			knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown method: %C.%s"), cid, sToken(tk));
 			return 0;
 		}
 		knh_NameSpace_setFuncClass(ctx, ns, mn, cid);
@@ -422,7 +421,7 @@ int knh_StmtUFUNC_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	else {
 		knh_class_t cid = knh_NameSpace_getcid(ctx, ns, name);
 		if(cid == CLASS_unknown) {
-			knh_Token_perror(ctx, tk, KMSG_UCLASSN);
+			knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown class: %s"), sToken(tk));
 			return 0;
 		}
 		else {
@@ -435,9 +434,7 @@ int knh_StmtUFUNC_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 				if(!knh_Method_isStatic(mtd)) continue;
 				knh_NameSpace_setFuncClass(ctx, ns, DP(mtd)->mn, cid);
 				if(knh_Context_isVerbose(ctx)) {
-					char bufcm[CLASSNAME_BUFSIZ];
-					knh_format_cmethodn(ctx, bufcm, sizeof(bufcm), cid, DP(mtd)->mn);
-					KNH_NOTICE(ctx, "using %s", bufcm);
+					KNH_NOTICE(ctx, _("using %C.%M"), cid, DP(mtd)->mn);
 				}
 			}
 		}

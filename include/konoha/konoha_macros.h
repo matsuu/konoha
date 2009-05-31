@@ -13,6 +13,8 @@
 #define KONOHA_WARNING 2
 #define KONOHA_NOTICE  3
 
+#define _(s)          s
+
 #define KNH_NOTICE(ctx, fmt, ...) \
 	konoha_says(ctx, KONOHA_NOTICE, fmt, ## __VA_ARGS__) \
 

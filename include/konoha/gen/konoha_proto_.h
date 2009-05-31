@@ -365,6 +365,7 @@ void knh_write_mn(Ctx *ctx, OutputStream *w, knh_methodn_t mn);
 void knh_write_cidmn(Ctx *ctx, OutputStream *w, knh_class_t cid, knh_methodn_t mn);
 void knh_write_type(Ctx *ctx, OutputStream *w, knh_type_t type);
 void knh_write_fline(Ctx *ctx, OutputStream *w, char *file, int line);
+void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap);
 void konoha_setverbose(int v);
 METHOD knh_fmethod_movableText(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/class/knh_Range.c */
@@ -467,14 +468,15 @@ void konoha_compile(Ctx *ctx, String *nsname, knh_bytes_t fpath);
 Stmt *new_StmtINSTMT(Ctx *ctx, Token *tk);
 void knh_Stmt_add_PEACH(Ctx *ctx, Stmt *o, knh_tokens_t *tc);
 /* ../src/compiler/perror.c */
-void knh_perrata(Ctx *ctx, knh_fileid_t fileid, int line, char *oldt, char *newt);
-void knh_Token_perrata(Ctx *ctx, Token *o, char *newtoken);
-void knh_perror(Ctx *ctx, knh_fileid_t fileid, int line, int pe, char *msg);
-void knh_perror__s(Ctx *ctx, knh_fileid_t fileid, int line, int pe, char *msg);
-void knh_Token_perror(Ctx *ctx, Token *o, int pe);
-void knh_Stmt_perror(Ctx *ctx, Stmt *o, int pe, Token *tk);
-void knh_Asm_perror(Ctx *ctx, Asm *abr, int pe, char *msg);
-void knh_Asm_assert(Ctx *ctx, Asm *abr, int c);
+void knh_vperror(Ctx *ctx, knh_fileid_t fileid, int line, int pe, char *fmt, va_list ap);
+void knh_perror(Ctx *ctx, knh_fileid_t fileid, int line, int pe, char *fmt, ...);
+void knh_Token_perror(Ctx *ctx, Token *tk, int pe, char *fmt, ...);
+void knh_Asm_perror(Ctx *ctx, Asm *abr, int pe, char *fmt, ...);
+void knh_perrata(Ctx *ctx /*knh_fileid_t fileid, int line, char *oldt, char *newt*/);
+void knh_Token_perrata(Ctx *ctx /*Token *o, char *newtoken*/);
+void knh_perror0(Ctx *ctx/*, knh_fileid_t fileid, int line, int pe, char *msg*/);
+void knh_perror0__s(Ctx *ctx/*, knh_fileid_t fileid, int line, int pe, char *msg*/);
+void knh_Stmt_perror(Ctx *ctx /*Stmt *o, int pe, Token *tk*/);
 /* ../src/compiler/stmt.c */
 Stmt* new_Stmt(Ctx *ctx, knh_flag_t flag, knh_stmt_t stt);
 void knh_Stmt_toERR(Ctx *ctx, Stmt *stmt, Term *tm);
@@ -511,8 +513,6 @@ Token *new_Token__NAME(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t
 knh_token_t knh_char_totoken(int ch);
 void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in);
 /* ../src/compiler/typing.c */
-void knh_Asm_perrorMTD(Ctx *ctx, Asm *abr, int pe, knh_class_t cid, knh_methodn_t mn);
-void knh_Asm_perrorMPR(Ctx *ctx, Asm *abr, int pe, knh_class_t scid, knh_class_t tcid);
 Token* new_TokenCONST(Ctx *ctx, Any *fln, Any *data);
 void knh_Token_setCONST(Ctx *ctx, Token *o, Any *data);
 Token* knh_Token_toCONST(Token *o);
@@ -524,7 +524,6 @@ int TERMs_isCONST(Stmt *stmt, size_t n);
 int TERMs_isTRUE(Stmt *stmt, size_t n);
 int TERMs_isFALSE(Stmt *stmt, size_t n);
 knh_type_t TERMs_gettype(Stmt *stmt, size_t n);
-char * knh_format_mtdparam(Ctx *ctx, char *buf, size_t bufsiz, Method *mtd, int n);
 void knh_Stmt_setType(Ctx *ctx, Stmt *stmt, knh_type_t type);
 Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns);
 Term *knh_StmtLET_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_t reqt);

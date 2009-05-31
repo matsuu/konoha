@@ -484,7 +484,7 @@ char *knh_methodop_tochar(knh_methodn_t mn)
 static
 void knh_Class_NAME__man(Ctx *ctx, knh_class_t cid, OutputStream *w)
 {
-	knh_write__s(ctx, w, knh_message_text(KMSG_CLASS));
+	knh_write__s(ctx, w, _("Class"));
 	knh_write_EOL(ctx, w);
 
 	knh_write_TAB(ctx, w);
@@ -594,7 +594,7 @@ void knh_Class__man(Ctx *ctx, Class *o, OutputStream *w, String *m)
 			knh_DictMap_removeAt(ctx, dm, i);
 			if(DP(mtd)->cid == CLASS_Object && cid != CLASS_Object) continue;
 			if(hasCaption == 0) {
-				knh_write__s(ctx, w, knh_message_text(KMSG_OPERATOR));
+				knh_write__s(ctx, w, _("Operator"));
 				knh_write_EOL(ctx, w);
 				hasCaption = 1;
 			}
@@ -626,7 +626,7 @@ void knh_Class__man(Ctx *ctx, Class *o, OutputStream *w, String *m)
 			if(DP(mtd)->cid == CLASS_Object && cid != CLASS_Object) continue;
 //			if(DP(mtd)->cid != ctx->share->ClassTable[cid].bcid) continue;
 			if(hasCaption == 0) {
-				knh_write__s(ctx, w, knh_message_text(KMSG_METHOD));
+				knh_write__s(ctx, w, _("Method"));
 				knh_write_EOL(ctx, w);
 				hasCaption = 1;
 			}
@@ -645,7 +645,7 @@ void knh_Class__man(Ctx *ctx, Class *o, OutputStream *w, String *m)
 			if(!METHODN_IS_MOVTEXT(DP(mtd)->mn)) continue;
 			if(DP(mtd)->cid == CLASS_Object && cid != CLASS_Object) continue;
 			if(hasCaption == 0) {
-				knh_write__s(ctx, w, knh_message_text(KMSG_FORMATTER));
+				knh_write__s(ctx, w, _("Formatter"));
 				knh_write_EOL(ctx, w);
 				knh_write_TAB(ctx, w);
 				hasCaption = 1;

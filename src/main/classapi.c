@@ -2119,7 +2119,7 @@ void knh_System_init(Ctx *ctx, System *o, int init)
 	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.home"), UP(sys->homeDir));
 	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.lang"),
 			UP(new_String(ctx, B(knh_format_lang(buf, sizeof(buf))), NULL)));
-	knh_Asm_setLang(buf);
+	//knh_Asm_setLang(buf);
 
 	KNH_INITv(sys->UsingResources, new_Array0(ctx, 0));
 	//KNH_INITv(sys->sysnsDictMap_UNUSED, new_DictMap0(ctx, 16));

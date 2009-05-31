@@ -35,32 +35,85 @@
 extern "C" {
 #endif
 
-#ifndef KONOHAC_ERROR_BUFSIZ
-#define KONOHAC_ERROR_BUFSIZ 512
-#endif
-
 /* ======================================================================== */
-/* [perrata] */
+/* [perror] */
 
-void knh_vperror(Ctx *ctx, knh_fileid_t file, int line, int level, const char *fmt, va_list *ap)
+
+/* ------------------------------------------------------------------------ */
+/* @data */
+
+static const char *KERR_MSG[] = {
+	"(error)", "(warning)", "(warning)", "(errata)", "(info)"
+};
+
+/* ------------------------------------------------------------------------ */
+
+void knh_vperror(Ctx *ctx, knh_fileid_t fileid, int line, int pe, char *fmt, va_list ap)
 {
-	knh_sfp_t list[16] = {};
+	KNH_ASSERT(pe <= KERR_INFO);
+	if(knh_Context_isInteractive(ctx))
+	if(pe > KERR_EWARN && !knh_Context_isCompiling(ctx)) {
+		if(knh_Context_isInteractive(ctx) && pe != KERR_INFO) {
+			;;
+		}
+		return;
+	}
+	{
+		OutputStream *w = KNH_STDERR;
+		knh_printf(ctx, w, " - [%s:%d]:%s ", FILEIDN(fileid), line, KERR_MSG[pe]);
+		knh_vprintf(ctx, w, fmt, ap);
+		knh_write_EOL(ctx, w);
+	}
+}
 
+/* ------------------------------------------------------------------------ */
+
+void knh_perror(Ctx *ctx, knh_fileid_t fileid, int line, int pe, char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	knh_vperror(ctx, fileid, line, pe, fmt, ap);
+	va_end(ap);
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_Token_perror(Ctx *ctx, Token *tk, int pe, char *fmt, ...)
+{
+	if(SP(tk)->tt != TT_ERR) {
+		va_list ap;
+		va_start(ap, fmt);
+		knh_vperror(ctx, SP(tk)->fileid, SP(tk)->line, pe, fmt, ap);
+		va_end(ap);
+		if(pe < KERR_EWARN) {
+			SP(tk)->tt = TT_ERR;
+		}
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_Asm_perror(Ctx *ctx, Asm *abr, int pe, char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	knh_vperror(ctx, DP(abr)->fileid, (int)DP(abr)->line, pe, fmt, ap);
+	va_end(ap);
 }
 
 /* ======================================================================== */
 /* [perrata] */
 
-void knh_perrata(Ctx *ctx, knh_fileid_t fileid, int line, char *oldt, char *newt)
+void knh_perrata(Ctx *ctx /*knh_fileid_t fileid, int line, char *oldt, char *newt*/)
 {
-	if(knh_Context_isCompiling(ctx)) {
-		OutputStream *w = KNH_STDERR;
-		knh_write__s(ctx, w, "\t (ERRATA): ");
-		knh_write__s(ctx, w, oldt);
-		knh_write__s(ctx, w, " ==> ");
-		knh_write__s(ctx, w, newt);
-		knh_write_EOL(ctx, w);
-	}
+//	if(knh_Context_isCompiling(ctx)) {
+//		OutputStream *w = KNH_STDERR;
+//		knh_write__s(ctx, w, "\t (ERRATA): ");
+//		knh_write__s(ctx, w, oldt);
+//		knh_write__s(ctx, w, " ==> ");
+//		knh_write__s(ctx, w, newt);
+//		knh_write_EOL(ctx, w);
+//	}
 }
 
 #define _KNH_PERRATA_(ctx, f, l, msgo, msgn)    knh_perrata(ctx, f, l, msgo, msgn)
@@ -69,125 +122,108 @@ void knh_perrata(Ctx *ctx, knh_fileid_t fileid, int line, char *oldt, char *newt
 /* ------------------------------------------------------------------------ */
 
 void
-knh_Token_perrata(Ctx *ctx, Token *o, char *newtoken)
+knh_Token_perrata(Ctx *ctx /*Token *o, char *newtoken*/)
 {
-	knh_perrata(ctx, SP(o)->fileid, SP(o)->line, sToken(o), newtoken);
+//	knh_perrata(ctx, SP(o)->fileid, SP(o)->line, sToken(o), newtoken);
 }
 
 /* ======================================================================== */
 /* [perror] */
 
 void
-knh_perror(Ctx *ctx, knh_fileid_t fileid, int line, int pe, char *msg)
+knh_perror0(Ctx *ctx/*, knh_fileid_t fileid, int line, int pe, char *msg*/)
 {
-	KNH_ASSERT(pe != KMSG_EABORT);
-	char buf[512];
-	OutputStream *w = KNH_STDERR;
-#ifdef KNH_DBGMODE
-	knh_snprintf(buf, sizeof(buf), " - [%s:%d]:%s(%d) ", FILEIDN(fileid), line, knh_message_tochar(pe), knh_message_type(pe));
-#else
-	switch(knh_message_type(pe)) {
-	case 1:
-		knh_snprintf(buf, sizeof(buf), " - [%s:%d]:(error) ", FILEIDN(fileid), line);
-		break;
-	case 3:
-		if(!knh_Context_isCompiling(ctx)) return;
-		knh_snprintf(buf, sizeof(buf), " - [%s:%d]:(info) ", FILEIDN(fileid), line);
-		break;
-	default:
-		if(!knh_Context_isCompiling(ctx)) return;
-		knh_snprintf(buf, sizeof(buf), " - [%s:%d]:(warning) ", FILEIDN(fileid), line);
-		break;
-	}
-#endif
-	knh_write__s(ctx, w, buf);
-	if(msg == NULL || msg[0] == 0) {
-		knh_println(ctx, w, B(knh_message_text(pe)));
-	}
-	else {
-		knh_print(ctx, w, B(knh_message_text(pe)));
-		knh_write__s(ctx, w, ": ");
-		knh_println(ctx, w, B(msg));
-	}
+//	KNH_ASSERT(pe != KMSG_EABORT);
+//	char buf[512];
+//	OutputStream *w = KNH_STDERR;
+//#ifdef KNH_DBGMODE
+//	knh_snprintf(buf, sizeof(buf), " - [%s:%d]:%s(%d) ", FILEIDN(fileid), line, knh_message_tochar(pe), knh_message_type(pe));
+//#else
+//	switch(knh_message_type(pe)) {
+//	case 1:
+//		knh_snprintf(buf, sizeof(buf), " - [%s:%d]:(error) ", FILEIDN(fileid), line);
+//		break;
+//	case 3:
+//		if(!knh_Context_isCompiling(ctx)) return;
+//		knh_snprintf(buf, sizeof(buf), " - [%s:%d]:(info) ", FILEIDN(fileid), line);
+//		break;
+//	default:
+//		if(!knh_Context_isCompiling(ctx)) return;
+//		knh_snprintf(buf, sizeof(buf), " - [%s:%d]:(warning) ", FILEIDN(fileid), line);
+//		break;
+//	}
+//#endif
+//	knh_write__s(ctx, w, buf);
+//	if(msg == NULL || msg[0] == 0) {
+//		knh_println(ctx, w, B(knh_message_text(pe)));
+//	}
+//	else {
+//		knh_print(ctx, w, B(knh_message_text(pe)));
+//		knh_write__s(ctx, w, ": ");
+//		knh_println(ctx, w, B(msg));
+//	}
 }
 
 /* ------------------------------------------------------------------------ */
 
-void knh_perror__s(Ctx *ctx, knh_fileid_t fileid, int line, int pe, char *msg)
+void knh_perror0__s(Ctx *ctx/*, knh_fileid_t fileid, int line, int pe, char *msg*/)
 {
-	char buf[512];
-	OutputStream *w = KNH_STDERR;
-#ifdef KNH_DBGMODE
-	knh_snprintf(buf, sizeof(buf), " - [%s:%d]:%s(%d) ", FILEIDN(fileid), line, knh_message_tochar(pe), knh_message_type(pe));
-#else
-	switch(knh_message_type(pe)) {
-	case 1:
-		knh_snprintf(buf, sizeof(buf), " - [%s:%d]:(error) ", FILEIDN(fileid), line);
-		break;
-	case 3:
-		if(!knh_Context_isCompiling(ctx)) return;
-		knh_snprintf(buf, sizeof(buf), " - [%s:%d]:(info) ", FILEIDN(fileid), line);
-		break;
-	default:
-		if(!knh_Context_isCompiling(ctx)) return;
-		knh_snprintf(buf, sizeof(buf), " - [%s:%d]:(warning) ", FILEIDN(fileid), line);
-		break;
-	}
-#endif
-	knh_write__s(ctx, w, buf);
-	if(msg == NULL) msg = "NULL";
-	knh_snprintf(buf, sizeof(buf), knh_message_text(pe), msg);
-	knh_println(ctx, w, B(buf));
+//	char buf[512];
+//	OutputStream *w = KNH_STDERR;
+//#ifdef KNH_DBGMODE
+//	knh_snprintf(buf, sizeof(buf), " - [%s:%d]:%s(%d) ", FILEIDN(fileid), line, knh_message_tochar(pe), knh_message_type(pe));
+//#else
+//	switch(knh_message_type(pe)) {
+//	case 1:
+//		knh_snprintf(buf, sizeof(buf), " - [%s:%d]:(error) ", FILEIDN(fileid), line);
+//		break;
+//	case 3:
+//		if(!knh_Context_isCompiling(ctx)) return;
+//		knh_snprintf(buf, sizeof(buf), " - [%s:%d]:(info) ", FILEIDN(fileid), line);
+//		break;
+//	default:
+//		if(!knh_Context_isCompiling(ctx)) return;
+//		knh_snprintf(buf, sizeof(buf), " - [%s:%d]:(warning) ", FILEIDN(fileid), line);
+//		break;
+//	}
+//#endif
+//	knh_write__s(ctx, w, buf);
+//	if(msg == NULL) msg = "NULL";
+//	knh_snprintf(buf, sizeof(buf), knh_message_text(pe), msg);
+//	knh_println(ctx, w, B(buf));
 }
 
 /* ------------------------------------------------------------------------ */
 
-void knh_Token_perror(Ctx *ctx, Token *o, int pe)
+void knh_Stmt_perror(Ctx *ctx /*Stmt *o, int pe, Token *tk*/)
 {
-	if(SP(o)->tt == TT_ERR) return;
-	knh_perror(ctx, SP(o)->fileid, (int)SP(o)->line, pe, sToken(o));
-	if(knh_message_type(pe) == 1) {
-		SP(o)->tt = TT_ERR;
-	}
+//	if(tk == NULL || !IS_Token(tk)) {
+//		knh_perror0(ctx, SP(o)->fileid, (int)SP(o)->line, pe, NULL);
+//		if(knh_message_type(pe) == 1) {
+//			SP(o)->stt = STT_ERR;
+//		}
+//	}
+//	else {
+//		knh_Token_perror(ctx, tk, pe);
+//		SP(tk)->tt = TT_ERR;
+//		knh_Stmt_add(ctx, o, TM(tk));
+//	}
 }
-
-
-/* ------------------------------------------------------------------------ */
-
-void knh_Stmt_perror(Ctx *ctx, Stmt *o, int pe, Token *tk)
-{
-	if(tk == NULL || !IS_Token(tk)) {
-		knh_perror(ctx, SP(o)->fileid, (int)SP(o)->line, pe, NULL);
-		if(knh_message_type(pe) == 1) {
-			SP(o)->stt = STT_ERR;
-		}
-	}
-	else {
-		knh_Token_perror(ctx, tk, pe);
-		SP(tk)->tt = TT_ERR;
-		knh_Stmt_add(ctx, o, TM(tk));
-	}
-}
-
-/* ======================================================================== */
-/* [Asm] */
-
-void
-knh_Asm_perror(Ctx *ctx, Asm *abr, int pe, char *msg)
-{
-	knh_perror(ctx, DP(abr)->fileid, (int)DP(abr)->line, pe, msg);
-}
-
-/* ------------------------------------------------------------------------ */
-
-void
-knh_Asm_assert(Ctx *ctx, Asm *abr, int c)
-{
-	knh_perror(ctx, DP(abr)->fileid, (int)DP(abr)->line, KMSG_EABORT, NULL);
-	knh_Asm_setCancelled(abr, 1);
-}
-
-/* ------------------------------------------------------------------------ */
+//
+///* ======================================================================== */
+///* [Asm] */
+//
+//
+///* ------------------------------------------------------------------------ */
+//
+//void
+//knh_Asm_assert(Ctx *ctx, Asm *abr, int c)
+//{
+//	knh_perror0(ctx, DP(abr)->fileid, (int)DP(abr)->line, KMSG_EABORT, NULL);
+//	knh_Asm_setCancelled(abr, 1);
+//}
+//
+///* ------------------------------------------------------------------------ */
 
 #ifdef __cplusplus
 }
