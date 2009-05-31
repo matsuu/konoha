@@ -581,7 +581,7 @@ static int knh_TokenNAME_typing(Ctx *ctx, Token *tk, Asm *abr)
 	}
 
 	L_ERROR:;
-	knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown variable: %s"), sToken(tk));
+	knh_Token_perror(ctx, tk, KERR_ERROR, _("undefined variable: %s"), sToken(tk));
 	return 0;
 }
 

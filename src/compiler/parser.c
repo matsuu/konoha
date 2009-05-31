@@ -1995,7 +1995,7 @@ static void knh_Stmt_add_SEMICOLON(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		tc->c += 1;
 	}
 	else {
-		knh_perror(ctx, SP(o)->fileid, SP(o)->line, KERR_DWARN, _("needs ;"));
+		knh_perror(ctx, SP(o)->fileid, SP(o)->line, KERR_INFO, _("needs ;"));
 	}
 }
 
