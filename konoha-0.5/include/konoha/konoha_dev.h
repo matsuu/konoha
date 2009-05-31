@@ -58,7 +58,6 @@
 #ifndef LIBKONOHA
 	#include"gen/konoha_proto_.h"
 	#include"gen/konohac_stmt_.h"
-	#include"gen/konoha_message_.h"
 #endif
 
 #include"konoha_vm.h"

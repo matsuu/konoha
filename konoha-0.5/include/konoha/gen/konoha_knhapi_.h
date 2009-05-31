@@ -130,8 +130,6 @@ extern "C" {
 #define NSN_main           0
 #define FILEN_unknown      0
 #define KNH_ASM_JMP(ctx, abr, l)  KNH_ASM_JMP_(ctx, abr, l);
-#define KNH_PERRATA_(ctx, f, l, msgo, msgn)    knh_perrata(ctx, f, l, msgo, msgn)
-#define KNH_PERRATA(ctx, tk, msg)  knh_perrata(ctx, (tk)->fileid, (tk)->line, sToken(tk), msg)
 #define sToken(o)  knh_Token_tochar(ctx, o)
 #define new_TermCONST(ctx, fln, d)   TM(new_TokenCONST(ctx, fln, d))
 #define TERMs_getcid(stmt, n)    CLASS_type(TERMs_gettype(stmt, n))

@@ -472,11 +472,6 @@ void knh_vperror(Ctx *ctx, knh_fileid_t fileid, int line, int pe, char *fmt, va_
 void knh_perror(Ctx *ctx, knh_fileid_t fileid, int line, int pe, char *fmt, ...);
 void knh_Token_perror(Ctx *ctx, Token *tk, int pe, char *fmt, ...);
 void knh_Asm_perror(Ctx *ctx, Asm *abr, int pe, char *fmt, ...);
-void knh_perrata(Ctx *ctx /*knh_fileid_t fileid, int line, char *oldt, char *newt*/);
-void knh_Token_perrata(Ctx *ctx /*Token *o, char *newtoken*/);
-void knh_perror0(Ctx *ctx/*, knh_fileid_t fileid, int line, int pe, char *msg*/);
-void knh_perror0__s(Ctx *ctx/*, knh_fileid_t fileid, int line, int pe, char *msg*/);
-void knh_Stmt_perror(Ctx *ctx /*Stmt *o, int pe, Token *tk*/);
 /* ../src/compiler/stmt.c */
 Stmt* new_Stmt(Ctx *ctx, knh_flag_t flag, knh_stmt_t stt);
 void knh_Stmt_toERR(Ctx *ctx, Stmt *stmt, Term *tm);
@@ -632,7 +627,7 @@ knh_ftraverse konoha_getDefaultSweepFunc();
 /* ../src/main/stack.c */
 int knh_sfp_argc(Ctx *ctx, knh_sfp_t *v);
 METHOD knh__System_stackdump(Ctx *ctx, knh_sfp_t *sfp);
-char * knh_format_mtdparam(Ctx *ctx, char *buf, size_t bufsiz, Method *mtd, int n); void knh_sfp_typecheck(Ctx *ctx, knh_sfp_t *sfp, Method *mtd, knh_code_t *pc);
+void knh_sfp_typecheck(Ctx *ctx, knh_sfp_t *sfp, Method *mtd, knh_code_t *pc);
 /* ../src/main/system.c */
 int konoha_addClassConst(Ctx *ctx, knh_class_t cid, String* name, Object *value);
 Object *konoha_getClassConstNULL(Ctx *ctx, knh_class_t cid, knh_bytes_t name);
