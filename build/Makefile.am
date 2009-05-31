@@ -2,7 +2,7 @@
 # shinpei@ynu(c)2008
 
 # make target for libtool.
-AM_CFLAGS = -g3 -O3 -pipe
+CFLAGS = -g3 -O3 -pipe
 lib_LTLIBRARIES = libkonoha.la
 
 libkonoha_la_LDFLAGS = -no-undefined -release 0 -version-info 5:0:0
@@ -86,7 +86,6 @@ libkonoha_la_SOURCES += ../src/ext/mt19937ar.c
 libkonoha_la_SOURCES += ../src/gen/codetemplate.c
 libkonoha_la_SOURCES += ../src/gen/fibo.c
 libkonoha_la_SOURCES += ../src/gen/konoha_klr_.c
-libkonoha_la_SOURCES += ../src/gen/konoha_message_.c
 libkonoha_la_SOURCES += ../src/gen/konohac_.c
 libkonoha_la_SOURCES += ../src/gen/method_.c
 libkonoha_la_SOURCES += ../src/labs/b4.c
@@ -124,7 +123,6 @@ libkonoha_la_includegendir = $(includedir)/../include/konoha/gen
 libkonoha_la_includegen_HEADERS = 
 libkonoha_la_includegen_HEADERS += ../include/konoha/gen/konoha_class_.h
 libkonoha_la_includegen_HEADERS += ../include/konoha/gen/konoha_knhapi_.h
-libkonoha_la_includegen_HEADERS += ../include/konoha/gen/konoha_message_.h
 libkonoha_la_includegen_HEADERS += ../include/konoha/gen/konoha_proto_.h
 libkonoha_la_includegen_HEADERS += ../include/konoha/gen/konohac_klr_.h
 libkonoha_la_includegen_HEADERS += ../include/konoha/gen/konohac_stmt_.h
