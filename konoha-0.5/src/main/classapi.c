@@ -1592,9 +1592,15 @@ void knh_Regex_traverse(Ctx *ctx, Regex *o, knh_ftraverse ftr)
 #define knh_BytesConv_newClass NULL
 #define knh_BytesConv_getkey NULL
 
-size_t f_bconv__NOP(Ctx *ctx, BytesConv *bc, knh_bytes_t t, knh_Bytes_t *ba)
+size_t knh_fbyteconv_nop(Ctx *ctx, BytesConv *bc, knh_bytes_t t, knh_Bytes_t *ba)
 {
 	return 0;
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_fbyteconvfree_nop(Ctx *ctx, BytesConv *bc)
+{
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1602,11 +1608,9 @@ size_t f_bconv__NOP(Ctx *ctx, BytesConv *bc, knh_bytes_t t, knh_Bytes_t *ba)
 static
 void knh_BytesConv_init(Ctx *ctx, BytesConv *bc, int init)
 {
-	KNH_INITv(DP(bc)->name, TS_EMPTY);
-	DP(bc)->fbconv = f_bconv__NOP;
-#ifdef KNH_USING_ICONV
-	DP(bc)->iconv_d = ((iconv_t)-1);
-#endif
+	bc->fbconv  = knh_fbyteconv_nop;
+	bc->fbconvfree = knh_fbyteconvfree_nop;
+	bc->convp = NULL;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1614,14 +1618,10 @@ void knh_BytesConv_init(Ctx *ctx, BytesConv *bc, int init)
 static
 void knh_BytesConv_traverse(Ctx *ctx, BytesConv *bc, knh_ftraverse ftr)
 {
-	ftr(ctx, UP(DP(bc)->name));
 	if(IS_SWEEP(ftr)) {
-#ifdef KNH_USING_ICONV
-		if(DP(bc)->iconv_d != ((iconv_t)-1)) {
-			iconv_close(DP(bc)->iconv_d);
-			DP(bc)->fbconv = f_bconv__NOP;
-		}
-#endif
+		bc->fbconvfree(ctx, bc);
+		bc->fbconv = knh_fbyteconv_nop;
+		bc->fbconvfree = knh_fbyteconvfree_nop;
 	}
 }
 

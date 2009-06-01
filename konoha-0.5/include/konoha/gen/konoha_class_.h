@@ -3388,11 +3388,6 @@ typedef struct knh_FloatUnit_t {
 	knh_FloatUnit_struct *b;
 } knh_FloatUnit_t; 
 
-typedef struct knh_BytesConv_t {
-	knh_hObject_t h;
-	knh_BytesConv_struct *b;
-} knh_BytesConv_t; 
-
 typedef struct knh_StringUnit_t {
 	knh_hObject_t h;
 	knh_StringUnit_struct *b;

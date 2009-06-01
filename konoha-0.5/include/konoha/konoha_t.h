@@ -803,13 +803,14 @@ typedef struct {
 /* KNH_DRVAPI_TYPE__BYTECONV */
 
 struct knh_BytesConv_t;
-typedef size_t (*knh_fbcnv)(Ctx *ctx, struct knh_BytesConv_t *o, knh_bytes_t t, struct knh_Bytes_t *ba);
+typedef size_t (*knh_fbyteconv)(Ctx *ctx, struct knh_BytesConv_t *o, knh_bytes_t t, struct knh_Bytes_t *ba);
+typedef void   (*knh_fbyteconvfree)(Ctx *ctx, struct knh_BytesConv_t *);
 
 typedef struct {
 	int  type;
 	char *name;
-	knh_fbcnv  fbconv;
-	knh_fbcnv  fbconv_inverse;
+	knh_fbyteconv  fbconv;
+	knh_fbyteconv  fbconv_inverse;
 } knh_bconv_driapi_t;
 
 /* ------------------------------------------------------------------------ */

@@ -110,14 +110,14 @@ int knh_bytes_parseint(knh_bytes_t t, knh_int_t *value);
 int knh_bytes_parsefloat(knh_bytes_t t, knh_float_t *value);
 /* ../src/class/knh_BytesConv.c */
 size_t knh_BytesConv_conv(Ctx *ctx, BytesConv *o, knh_bytes_t t, knh_Bytes_t *ba);
-BytesConv* new_BytesConv(Ctx *ctx, String *name, knh_fbcnv fbconv);
+iconv_t knh_iconv_open(Ctx *ctx, char *to, char *from);
+void knh_iconv_close(Ctx *ctx, iconv_t cd);
 BytesConv* new_BytesConv__iconv(Ctx *ctx, char *from, char *to);
 BytesConv* new_BytesConv__in(Ctx *ctx, char *from);
 BytesConv* new_BytesConv__out(Ctx *ctx, char *to);
 String *new_String__bconv(Ctx *ctx, knh_bytes_t t, BytesConv *bc);
 String *new_String__cwbconv(Ctx *ctx, knh_cwb_t cwb, BytesConv *bc);
 void knh_OutputStream_write__bconv(Ctx *ctx, OutputStream *w, knh_bytes_t t);
-void knh_BytesConv__k(Ctx *ctx, BytesConv *o, OutputStream *w, String *m);
 /* ../src/class/knh_Class.c */
 knh_struct_t knh_StructTable_newId(Ctx *ctx);
 knh_class_t knh_ClassTable_newId(Ctx *ctx);
@@ -578,7 +578,8 @@ METHOD knh__Script_changeChannel(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_hook(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/main/classapi.c */
 knh_hcode_t knh_MethodField_hachCode(Ctx *ctx, MethodField *o);
-size_t f_bconv__NOP(Ctx *ctx, BytesConv *bc, knh_bytes_t t, knh_Bytes_t *ba);
+size_t knh_fbyteconv_nop(Ctx *ctx, BytesConv *bc, knh_bytes_t t, knh_Bytes_t *ba);
+void knh_fbyteconvfree_nop(Ctx *ctx, BytesConv *bc);
 void knh_OutputStream_init(Ctx *ctx, OutputStream *out, int init);
 void knh_ExceptionHandler_traverse(Ctx *ctx, ExceptionHandler *hdr, knh_ftraverse gc);
 void knh_Context_init(Ctx *ctx, knh_Context_t *o, int init);

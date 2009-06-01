@@ -193,7 +193,7 @@ KNHAPI(char*) knh_format_bytes(char *buf, size_t bufsiz, knh_bytes_t t);
 KNHAPI(knh_intptr_t) knh_bytes_toint(knh_bytes_t t);
 KNHAPI(knh_float_t) knh_bytes_tofloat(knh_bytes_t t);
 KNHAPI(knh_int64_t) knh_bytes_toint64(knh_bytes_t t);
-KNHAPI(String*) new_String__fbcnv(Ctx *ctx, String *s, knh_fbcnv fbcnv, BytesConv *bc);
+KNHAPI(String*) new_String__fbcnv(Ctx *ctx, String *s, knh_fbyteconv fbcnv, BytesConv *bc);
 KNHAPI(void) knh_putsfp(Ctx *ctx, knh_sfp_t *lsfp, int n, Object *obj);
 KNHAPI(void) knh_Closure_invokesfp(Ctx *ctx, Closure *c, knh_sfp_t *lsfp, int argc);
 KNHAPI(knh_sfp_t*) knh_Closure_invokef(Ctx *ctx, Closure *c, const char *fmt, ...);
