@@ -61,7 +61,7 @@ KNHAPI(Int*) new_IntX__fast(Ctx *ctx, knh_class_t cid, knh_int_t value)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(Int *)new_IntX(Ctx *ctx, knh_class_t cid, knh_int_t value)
+KNHAPI(Int*) new_IntX(Ctx *ctx, knh_class_t cid, knh_int_t value)
 {
 	IntUnit *u = (IntUnit*)ctx->share->ClassTable[cid].cspec;
 	KNH_ASSERT(IS_IntUnit(u));

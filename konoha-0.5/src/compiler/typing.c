@@ -1553,7 +1553,7 @@ static Term *knh_StmtCALL_toCONST(Ctx *ctx, Stmt *stmt, Method *mtd)
 		KNH_UNBOX(ctx, &lsfp[i]);
 	}
 	DBG2_P("STMT TO CONST ..");
-	KNH_SCALL(ctx, lsfp, 0, mtd, DP(stmt)->size);
+	KNH_SCALL(ctx, lsfp, 0, mtd, (DP(stmt)->size - 2));
 	KNH_BOX(ctx, &lsfp[0], knh_Method_rztype(mtd));
 	knh_Token_setCONST(ctx, DP(stmt)->tokens[0], lsfp[0].o);
 	return DP(stmt)->terms[0];

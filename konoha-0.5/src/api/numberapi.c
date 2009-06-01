@@ -149,12 +149,11 @@ static METHOD knh__Int_opGte(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Int_opLand(Ctx *ctx, knh_sfp_t *sfp)
 {
-	int ac = knh_sfp_argc(ctx, sfp + 1);
-	knh_sfp_t *v = sfp + 1;
+	int ac = knh_sfp_argc(ctx, sfp);
 	knh_int_t n = p_integer(sfp[0]);
 	size_t i;
-	for(i = 0; i < ac; i++) {
-		n = n & p_integer(v[i]);
+	for(i = 1; i < ac; i++) {
+		n = n & p_integer(sfp[i]);
 	}
 	KNH_RETURN_Int(ctx, sfp, n);
 }
@@ -164,12 +163,11 @@ static METHOD knh__Int_opLand(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Int_opLor(Ctx *ctx, knh_sfp_t *sfp)
 {
-	int ac = knh_sfp_argc(ctx, sfp + 1);
-	knh_sfp_t *v = sfp + 1;
+	int ac = knh_sfp_argc(ctx, sfp);
 	knh_int_t n = p_integer(sfp[0]);
 	size_t i;
-	for(i = 0; i < ac; i++) {
-		n = n | p_integer(v[i]);
+	for(i = 1; i < ac; i++) {
+		n = n | p_integer(sfp[i]);
 	}
 	KNH_RETURN_Int(ctx, sfp, n);
 }
