@@ -268,7 +268,12 @@ Mapper *knh_tMapper_find_(Ctx *ctx, knh_class_t scid, knh_class_t tcid, int isge
 	KNH_ASSERT_cid(scid);
 	KNH_ASSERT_cid(tcid);
 	DBG2_P("finding.. %s ==> %s",CLASSN(scid), CLASSN(tcid));
-	KNH_ASSERT(scid != CLASS_Any); KNH_ASSERT(tcid != CLASS_Nue);
+	if(scid == CLASS_Any) {
+		if(isgen == 0) return (Mapper*)KNH_NULL;
+		KNH_ASSERT(scid != CLASS_Any);
+	}
+	KNH_ASSERT(scid != CLASS_Any);
+	KNH_ASSERT(tcid != CLASS_Nue);
 	//KNH_ABORT();
 
 	Mapper *mpr = knh_tmapper_getcache(ctx, scid, tcid);
