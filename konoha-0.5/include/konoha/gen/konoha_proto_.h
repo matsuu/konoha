@@ -272,11 +272,11 @@ Iterator* new_Iterator(Ctx *ctx, knh_class_t p1, Any *source, knh_fitrnext fnext
 Mapper* new_Mapper(Ctx *ctx, knh_flag_t flag, knh_class_t scid, knh_class_t tcid, knh_fmapper fmap, Object *mapdata);
 Mapper* new_MapMap(Ctx *ctx, Mapper *m1, Mapper *m2);
 void knh_Mapper__k(Ctx *ctx, Mapper *o, OutputStream *w, String *m);
-void konoha_addMapper(Ctx *ctx, knh_flag_t flag, knh_type_t stype, knh_type_t ttype, knh_fmapper fmap, Object *mapdata);
-MAPPER knh_Mapper_fInterface(Ctx *ctx, knh_sfp_t *sfp);
+void konoha_addMapperFunc(Ctx *ctx, knh_flag_t flag, knh_type_t stype, knh_type_t ttype, knh_fmapper fmap, Object *mapdata);
+MAPPER knh_Mapper_fasis(Ctx *ctx, knh_sfp_t *sfp);
 MAPPER knh_fmapper_null(Ctx *ctx, knh_sfp_t *sfp);
 knh_bool_t knh_Mapper_isNoSuchMapping(Mapper *mpr);
-Mapper *knh_tMapper_find_(Ctx *ctx, knh_class_t scid, knh_class_t tcid, int isgen);
+Mapper *konoha_findMapper_(Ctx *ctx, knh_class_t scid, knh_class_t tcid, int isgen);
 /* ../src/class/knh_Method.c */
 MethodField* new_MethodField(Ctx *ctx, knh_type_t rtype, size_t psize);
 knh_hcode_t knh_mparam_hcode(knh_hcode_t h, knh_type_t type, knh_fieldn_t fn);

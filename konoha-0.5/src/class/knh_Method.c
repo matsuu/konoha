@@ -758,7 +758,7 @@ Method *konoha_lookupMethod(Ctx *ctx, knh_class_t cid, knh_methodn_t mn)
 
 Method *konoha_lookupFormatter(Ctx *ctx, knh_class_t cid, knh_methodn_t mn)
 {
-	KNH_ASSERT(METHODN_IS_MOVTEXT(mn));
+	DBG2_ASSERT(METHODN_IS_MOVTEXT(mn));
 	knh_hcode_t h = ((((knh_hcode_t)cid) << (sizeof(knh_class_t) * 8)) + mn) % ctx->cachesize;
 	Method *mtd = ctx->fmtCache[h];
 	if(mtd != NULL) {

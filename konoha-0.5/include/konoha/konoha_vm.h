@@ -585,13 +585,13 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 	} \
 
 #define KLR_MAP(ctx, n, tcid)  { \
-		KLR_MOV(ctx, sfp[n+1].o, knh_tMapper_find(ctx, knh_Object_cid(sfp[n].o), tcid)); \
+		KLR_MOV(ctx, sfp[n+1].o, konoha_findMapper(ctx, knh_Object_cid(sfp[n].o), tcid)); \
 		(sfp[n+1].mpr)->fmap_1(ctx, sfp + n); \
 	} \
 
 #define KLR_MAPnc(ctx, n, tcid)  { \
 		if(likely(IS_NOTNULL(sfp[n].o))) {\
-			KLR_MOV(ctx, sfp[n+1].o, knh_tMapper_find(ctx, knh_Object_cid(sfp[n].o), tcid)); \
+			KLR_MOV(ctx, sfp[n+1].o, konoha_findMapper(ctx, knh_Object_cid(sfp[n].o), tcid)); \
 			(sfp[n+1].mpr)->fmap_1(ctx, sfp + n); \
 		}\
 	}\
@@ -599,7 +599,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 #define KLR_AMAP(ctx, n, tcid)  { \
 		knh_class_t scid = knh_Object_cid(sfp[n].o);\
 		if(scid != ((knh_class_t)tcid) && !knh_class_instanceof(ctx, scid, tcid) && scid != CLASS_Nue) { \
-			KLR_MOV(ctx, sfp[n+1].o, knh_tMapper_find(ctx, scid, tcid)); \
+			KLR_MOV(ctx, sfp[n+1].o, konoha_findMapper(ctx, scid, tcid)); \
 			(sfp[n+1].mpr)->fmap_1(ctx, sfp + n); \
 		} \
 	} \
@@ -701,7 +701,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 			} \
 			ncid_ = knh_Object_cid(sfp[sc].o);\
 			if(ncid_ == reqc || knh_class_instanceof(ctx, reqc, ncid_)) break;\
-			KLR_MOV(ctx, sfp[sc+1].o, knh_tMapper_find(ctx, ncid_, reqc));\
+			KLR_MOV(ctx, sfp[sc+1].o, konoha_findMapper(ctx, ncid_, reqc));\
 			(sfp[sc+1].mpr)->fmap_1(ctx, sfp + sc); \
 		}while(IS_NOTNULL(sfp[sc].o));\
 		KLR_MOV(ctx, sfp[na].o, sfp[sc].o); sfp[na].data = sfp[sc].data;\
@@ -752,7 +752,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 			} \
 			ncid_ = knh_Object_cid(sfp[sc].o);\
 			if(ncid_ == ((knh_class_t)reqc) || knh_class_instanceof(ctx, reqc, ncid_)) break;\
-			KLR_MOV(ctx, sfp[sc+1].o, knh_tMapper_find(ctx, ncid_, reqc));\
+			KLR_MOV(ctx, sfp[sc+1].o, konoha_findMapper(ctx, ncid_, reqc));\
 			(sfp[sc+1].mpr)->fmap_1(ctx, sfp + sc); \
 		}while(IS_NOTNULL(sfp[sc].o));\
 		KLR_MOV(ctx, sfp[na].o, sfp[sc].o); sfp[na].data = sfp[sc].data;\
