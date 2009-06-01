@@ -649,7 +649,7 @@ static METHOD knh__Array_reverse(Ctx *ctx, knh_sfp_t *sfp)
 	Array *o = (Array*)sfp[0].o;
 	size_t i;
 	for(i = 0; i < o->size / 2; i++) {
-		size_t n = o->size - i;
+		size_t n = o->size - i - 1;
 		Object *temp = o->list[i];
 		o->list[i] = o->list[n];
 		o->list[n] = temp;
@@ -726,7 +726,7 @@ static METHOD knh__IArray_reverse(Ctx *ctx, knh_sfp_t *sfp)
 	IArray *o = (IArray*)sfp[0].o;
 	size_t i;
 	for(i = 0; i < o->size / 2; i++) {
-		size_t n = o->size - i;
+		size_t n = o->size - i - 1;
 		knh_int_t temp = o->ilist[i];
 		o->ilist[i] = o->ilist[n];
 		o->ilist[n] = temp;
@@ -804,7 +804,7 @@ static METHOD knh__FArray_reverse(Ctx *ctx, knh_sfp_t *sfp)
 	FArray *o = (FArray*)sfp[0].o;
 	size_t i;
 	for(i = 0; i < o->size / 2; i++) {
-		size_t n = o->size - i;
+		size_t n = o->size - i - 1;
 		knh_float_t temp = o->flist[i];
 		o->flist[i] = o->flist[n];
 		o->flist[n] = temp;
