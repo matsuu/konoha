@@ -240,7 +240,7 @@ knh_fieldn_t knh_tfieldn_common(Ctx *ctx, knh_bytes_t n, knh_fieldn_t def)
 
 int knh_bytes_isOptionalMT(knh_bytes_t t)
 {
-	KNH_ASSERT(t.buf[0] != '%');
+	DBG2_ASSERT(t.buf[0] != '%');
 	return (isdigit(t.buf[0]) || knh_bytes_index(t, '%') > 0);
 }
 

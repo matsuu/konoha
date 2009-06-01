@@ -1776,6 +1776,17 @@ Term *knh_StmtCALLBASE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh
 		}
 		return NULL;
 	}
+	else if(mn == METHODN_format) {
+		int i;
+		for(i = 1; i < DP(stmt)->size-1; i++) {
+			KNH_SETv(ctx, DP(stmt)->terms[i], DP(stmt)->terms[i+1]);
+		}
+		DP(stmt)->size -= 1;
+		if(!TERMs_typing(ctx, stmt, 1, abr, ns, CLASS_String, TCHECK_)) {
+			return NULL;
+		}
+		return TM(stmt);
+	}
 	else if(mn == METHODN_default) {
 		if(DP(stmt)->size != 3) goto L_ERROR;
 		if(TERMs_typing(ctx, stmt, 2, abr, ns, CLASS_Any, TWARN_)) {
