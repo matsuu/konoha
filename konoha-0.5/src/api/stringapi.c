@@ -675,6 +675,7 @@ static METHOD knh__String_split(Ctx *ctx, knh_sfp_t *sfp)
 				if(loc == -1) {
 					if(istrim) base = knh_bytes_trim(base);
 					knh_Array_add(ctx, a, UP(new_String(ctx, base, sfp[0].s)));
+					break;
 				}
 				else if(loc == 0) {
 					knh_Array_add(ctx, a, UP(TS_EMPTY));
