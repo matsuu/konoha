@@ -589,19 +589,23 @@ typedef struct {
 } knh_Regex_t;
 
 /* ------------------------------------------------------------------------ */
-/* @class BytesConv Object knh_BytesConv_struct @Private */
+/* @class BytesConv Object knh_BytesConv_t @Private */
 
 #ifdef KNH_USING_ICONV
 	#include<iconv.h>
+#else
+typedef knh_intptr_t iconv_t;
 #endif
 
-typedef struct knh_BytesConv {
-	struct knh_String_t *name;
-	knh_fbcnv fbconv;
-#ifdef KNH_USING_ICONV
-	iconv_t iconv_d;
-#endif
-} knh_BytesConv_struct;
+typedef struct knh_BytesConv_t {
+	knh_hObject_t h;
+	knh_fbyteconv      fbconv;
+	knh_fbyteconvfree  fbconvfree;
+	union {
+		iconv_t iconv_d;
+		void *convp;
+	};
+} knh_BytesConv_t;
 
 /* ------------------------------------------------------------------------ */
 /* @class StringUnit Object knh_StringUnit_struct @Private */
@@ -614,7 +618,7 @@ typedef struct knh_StringUnit {
 	knh_hClassSpec_struct spec;
 	knh_fvcabnew fnew;
 	knh_fvcabcmp fcmp;
-	knh_fbcnv     fbconv;
+	knh_fbyteconv     fbconv;
 	struct knh_BytesConv_t *bconv;
 	knh_ushort_t bytelen;
 	knh_ushort_t charlen;

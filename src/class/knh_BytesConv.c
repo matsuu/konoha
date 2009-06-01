@@ -44,30 +44,58 @@ extern "C" {
 
 size_t knh_BytesConv_conv(Ctx *ctx, BytesConv *o, knh_bytes_t t, knh_Bytes_t *ba)
 {
-	return DP(o)->fbconv(ctx, o, t, ba);
+	return o->fbconv(ctx, o, t, ba);
 }
 
 
+///* ------------------------------------------------------------------------ */
+//
+//BytesConv* new_BytesConv(Ctx *ctx, knh_fbyteconv fbconv)
+//{
+//	knh_BytesConv_t *o = (BytesConv*)new_Object_bcid(ctx, CLASS_BytesConv, 0);
+//	DP(o)->fbconv = (fbconv == NULL) ? knh_fbyteconv_nop : fbconv;
+//	return o;
+//}
+
 /* ------------------------------------------------------------------------ */
 
-BytesConv* new_BytesConv(Ctx *ctx, String *name, knh_fbcnv fbconv)
+static
+size_t knh_fbyteconv_noconv(Ctx *ctx, BytesConv *bc, knh_bytes_t t, knh_Bytes_t *ba)
 {
-	knh_BytesConv_t *o = (BytesConv*)new_Object_bcid(ctx, CLASS_BytesConv, 0);
-	KNH_SETv(ctx, DP(o)->name, name);
-	DP(o)->fbconv = (fbconv == NULL) ? f_bconv__NOP : fbconv;
-	return o;
+	knh_Bytes_write(ctx, ba, t);
+	return t.len;
 }
 
 /* ------------------------------------------------------------------------ */
 /* [iconv] */
 
+iconv_t knh_iconv_open(Ctx *ctx, char *to, char *from)
+{
+#if defined(KNH_USING_ICONV)
+	return iconv_open(to, from);
+#else
+	return ((iconv_t)-1);
+#endif
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_iconv_close(Ctx *ctx, iconv_t cd)
+{
+#if defined(KNH_USING_ICONV)
+	iconv_close(cd);
+#endif
+}
+
+/* ------------------------------------------------------------------------ */
+
 static
-size_t f_bconv__iconv(Ctx *ctx, BytesConv *o, knh_bytes_t t, knh_Bytes_t *ba)
+size_t knh_fbyteconv_iconv(Ctx *ctx, BytesConv *bc, knh_bytes_t t, knh_Bytes_t *ba)
 {
 #if defined(KNH_USING_ICONV)
 	char buffer[4096], *ibuf = (char*)t.buf;
 	size_t ilen = t.len, rsize = 0, ilen_prev = ilen;
-	iconv_t cd = DP(o)->iconv_d;
+	iconv_t cd = bc->iconv_d;
 	KNH_ASSERT(cd != (iconv_t)-1);
 
 	while(ilen > 0) {
@@ -95,33 +123,40 @@ size_t f_bconv__iconv(Ctx *ctx, BytesConv *o, knh_bytes_t t, knh_Bytes_t *ba)
 	}
 	return rsize;
 #else
-	return 0;
+	knh_Bytes_write(ctx, ba, t);
+	return t.len;
 #endif
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_fbyteconvfree_iconv(Ctx *ctx, BytesConv *bc)
+{
+	if(bc->iconv_d != (iconv_t)-1) {
+		knh_iconv_close(ctx, bc->iconv_d);
+	}
 }
 
 /* ------------------------------------------------------------------------ */
 
 BytesConv* new_BytesConv__iconv(Ctx *ctx, char *from, char *to)
 {
-#ifdef KNH_USING_ICONV
-	iconv_t cd = iconv_open(to, from);
+	iconv_t cd = knh_iconv_open(ctx, to, from);
 	if(cd == (iconv_t)-1) {
+		KNH_WARNING(ctx, _("unsupported iconv(from=%s, to=%s)"), from, to);
+	}
 
-		return (BytesConv*)KNH_NULL;
+	BytesConv* o = (BytesConv*)new_Object_bcid(ctx, CLASS_BytesConv, 0);
+	if(cd != (iconv_t)-1) {
+		o->iconv_d = cd;
+		o->fbconv = knh_fbyteconv_iconv;
+		o->fbconvfree = knh_fbyteconvfree_iconv;
 	}
 	else {
-		BytesConv* o = (BytesConv*)new_Object_bcid(ctx, CLASS_BytesConv, 0);
-		char buf[FILENAME_BUFSIZ];
-		knh_snprintf(buf, sizeof(buf), "iconv:%s=>%s", from, to);
-		KNH_SETv(ctx, DP(o)->name, new_String(ctx, B(buf), NULL));
-		DP(o)->iconv_d = cd;
-		DP(o)->fbconv = f_bconv__iconv;
-		return o;
+		o->fbconv = knh_fbyteconv_noconv;
 	}
-#else
-	DBG2_P("uninstalled iconv!!");
-	return (knh_BytesConv_t*)KNH_NULL;
-#endif
+	return o;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -167,7 +202,7 @@ String *new_String__bconv(Ctx *ctx, knh_bytes_t t, BytesConv *bc)
 	if(t.len == 0) return TS_EMPTY;
 	Bytes *ba = knh_Context_openBConvBuf(ctx);
 	String *s;
-	DP(bc)->fbconv(ctx, bc, t, ba);
+	bc->fbconv(ctx, bc, t, ba);
 	s = new_String(ctx, knh_Bytes_tobytes(ba), NULL);
 	knh_Context_closeBConvBuf(ctx, ba);
 	return s;
@@ -186,7 +221,7 @@ String *new_String__cwbconv(Ctx *ctx, knh_cwb_t cwb, BytesConv *bc)
 		return s;
 	}else {
 		Bytes *ba = knh_Context_openBConvBuf(ctx);
-		DP(bc)->fbconv(ctx, bc, knh_cwb_tobytes(cwb), ba);
+		bc->fbconv(ctx, bc, knh_cwb_tobytes(cwb), ba);
 		String *s = new_String(ctx, knh_Bytes_tobytes(ba), NULL);
 		knh_Context_closeBConvBuf(ctx, ba);
 		knh_cwb_clear(cwb);
@@ -196,7 +231,7 @@ String *new_String__cwbconv(Ctx *ctx, knh_cwb_t cwb, BytesConv *bc)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(String*) new_String__fbcnv(Ctx *ctx, String *s, knh_fbcnv fbcnv, BytesConv *bc)
+KNHAPI(String*) new_String__fbcnv(Ctx *ctx, String *s, knh_fbyteconv fbcnv, BytesConv *bc)
 {
 	knh_bytes_t base = knh_String_tobytes(s);
 	Bytes *ba = knh_Context_openBConvBuf(ctx);
@@ -217,16 +252,6 @@ void knh_OutputStream_write__bconv(Ctx *ctx, OutputStream *w, knh_bytes_t t)
 	knh_BytesConv_conv(ctx, DP(w)->bconv, t, ba);
 	knh_OutputStream_write(ctx, w, knh_Bytes_tobytes(ba));
 	knh_Context_closeBConvBuf(ctx, ba);
-}
-
-/* ======================================================================== */
-/* [movabletext] */
-
-/* @method void BytesConv.%k(OutputStream w, String m) */
-
-void knh_BytesConv__k(Ctx *ctx, BytesConv *o, OutputStream *w, String *m)
-{
-	knh_write(ctx, w, knh_String_tobytes(DP(o)->name));
 }
 
 /* ------------------------------------------------------------------------ */

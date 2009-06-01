@@ -69,7 +69,7 @@ static METHOD knh__String_getBytes(Ctx *ctx, knh_sfp_t *sfp)
 		BytesConv *bc = new_BytesConv__out(ctx, knh_String_tochar(sfp[1].s));
 		KNH_SETv(ctx, sfp[2].o, bc);
 		ba = new_Bytes(ctx, t.len);
-		DP(bc)->fbconv(ctx, bc, t, ba);
+		bc->fbconv(ctx, bc, t, ba);
 	}
 	KNH_RETURN(ctx, sfp, ba);
 }

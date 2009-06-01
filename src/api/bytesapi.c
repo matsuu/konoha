@@ -161,7 +161,7 @@ static METHOD knh__Bytes_opFill(Ctx *ctx, knh_sfp_t *sfp)
 /* @method void Bytes.%k(OutputStream w, String m) */
 
 static
-void knh_Bytes__dump(Ctx *ctx, Bytes *o, OutputStream *w, String *m)
+void knh_Bytes__k(Ctx *ctx, Bytes *o, OutputStream *w, String *m)
 {
 	knh_printf(ctx, w, "byte[%d]", (o)->size);
 }
