@@ -471,7 +471,7 @@ void knh_cfield_dump(Ctx *ctx, knh_cfield_t *f, size_t offset, size_t fsize, Out
 			continue;
 		}
 		if(f[idx].fn == FIELDN_register || f[idx].type == CLASS_unknown) continue;
-		knh_printf(ctx, w, "[%d] %F %T %N = %O\n", (offset+idx), f[idx].flag, f[idx].type, f[idx].fn, f[idx].value);
+		knh_printf(ctx, w, "[%d] %T %N = %O\n", (offset+idx), f[idx].type, f[idx].fn, f[idx].value);
 	}
 }
 
