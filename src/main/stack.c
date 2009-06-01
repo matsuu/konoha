@@ -198,42 +198,6 @@ void knh_Exception_addStackTrace(Ctx *ctx, Exception *o, String *msg)
 	}
 }
 
-///* ------------------------------------------------------------------------ */
-///* @method void Context.%s(OutputStream w, String m) */
-//
-//void knh_Context__s(Ctx *ctx, Context *o, OutputStream *w, String *m)
-//{
-//	char *fn = NULL;
-//	int  line = 0;
-//	knh_sfp_t *mtd_sfp = NULL, *prev_sfp = o->esp;
-//	while(o->stack <= prev_sfp) {
-//		if(IS_Method(prev_sfp[0].o) && prev_sfp[0].op != 0) {
-//			if(mtd_sfp != NULL) {
-//				fn = knh_Method_file(ctx, prev_sfp[0].mtd);
-//				line = knh_Method_pctoline(prev_sfp[0].mtd, (knh_code_t*)mtd_sfp[-1].op);
-//				break;
-//			}
-//			mtd_sfp = prev_sfp;
-//		}
-//		prev_sfp--;
-//	}
-//	knh_putc(ctx, w, '[');
-//	if(o->doing == NULL) {
-//		knh_write__s(ctx, w, KONOHA_NAME);
-//	}
-//	else {
-//		knh_write__s(ctx, w, o->doing);
-//	}
-//	knh_putc(ctx, w, ']');
-//	if(fn != NULL) {
-//		knh_putc(ctx, w, '(');
-//		knh_write__s(ctx, w, KNH_SAFEFILE(fn));
-//		knh_putc(ctx, w, ':');
-//		knh_write__i(ctx, w, (knh_int_t)line);
-//		knh_putc(ctx, w, ')');
-//	}
-//}
-
 /* ------------------------------------------------------------------------ */
 
 static
@@ -249,7 +213,9 @@ String *knh_stackf_getStackTraceMsg(Ctx *ctx, knh_sfp_t *sfp)
 		line = knh_Method_pctoline(mtd, pc);
 	}
 	knh_cwb_t cwb = new_cwb(ctx);
-	knh_write_cidmn(ctx, cwb.w, DP(mtd)->cid, DP(mtd)->mn);
+	knh_write_cid(ctx, cwb.w, DP(mtd)->cid);
+	knh_putc(ctx, cwb.w, '.');
+	knh_write_mn(ctx, cwb.w, DP(mtd)->mn);
 	knh_putc(ctx, cwb.w, ':');
 	knh_write_fline(ctx, cwb.w, fn, line);
 	return new_String__cwb(ctx, cwb);

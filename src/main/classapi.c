@@ -2915,7 +2915,7 @@ static
 void konoha_loadMapperData(Ctx *ctx, knh_MapperData_t *data)
 {
 	while(data->func != NULL) {
-		konoha_addMapper(ctx, data->flag, data->scid, data->tcid, data->func, KNH_NULL);
+		konoha_addMapperFunc(ctx, data->flag, data->scid, data->tcid, data->func, KNH_NULL);
 		data++;
 	}
 }

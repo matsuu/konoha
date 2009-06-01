@@ -210,14 +210,14 @@ void knh_write_mn(Ctx *ctx, OutputStream *w, knh_methodn_t mn)
 	knh_write__s(ctx, w, name);
 }
 
-/* ------------------------------------------------------------------------ */
-
-void knh_write_cidmn(Ctx *ctx, OutputStream *w, knh_class_t cid, knh_methodn_t mn)
-{
-	knh_write_cid(ctx, w, cid);
-	knh_putc(ctx, w, '.');
-	knh_write_mn(ctx, w, mn);
-}
+///* ------------------------------------------------------------------------ */
+//
+//void knh_write_cidmn(Ctx *ctx, OutputStream *w, knh_class_t cid, knh_methodn_t mn)
+//{
+//	knh_write_cid(ctx, w, cid);
+//	knh_putc(ctx, w, '.');
+//	knh_write_mn(ctx, w, mn);
+//}
 
 /* ------------------------------------------------------------------------ */
 
@@ -237,11 +237,10 @@ void knh_write_type(Ctx *ctx, OutputStream *w, knh_type_t type)
 		return;
 	}
 	knh_write__s(ctx, w, cname);
-	if(IS_NNTYPE(type)) {
-		knh_putc(ctx, w, '!');
+	if(!IS_NNTYPE(type)) {
+		knh_putc(ctx, w, '?');
 	}
 }
-
 
 /* ------------------------------------------------------------------------ */
 

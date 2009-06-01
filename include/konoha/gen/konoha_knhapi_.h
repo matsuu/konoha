@@ -90,8 +90,8 @@ extern "C" {
 
 #define knh_Float_value(o)    (o)->value
 #define knh_Int_value(o)      (o)->value
-#define knh_tMapper_find(ctx, scid, tcid) knh_tMapper_find_(ctx, scid, tcid, 1)
-#define knh_Class_getMapper(ctx, scid, tcid)  knh_tMapper_find_(ctx, scid, tcid, 0)
+#define konoha_findMapper(ctx, scid, tcid) konoha_findMapper_(ctx, scid, tcid, 1)
+#define knh_Class_getMapper(ctx, scid, tcid)  konoha_findMapper_(ctx, scid, tcid, 0)
 #define knh_Method_mn(mtd)    DP(mtd)->mn
 #define knh_Method_mf(mtd)    DP(mtd)->mf
 #define knh_MethodField_rztype(mf)   ((mf)->rtype)
