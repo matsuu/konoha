@@ -272,6 +272,7 @@ Iterator* new_Iterator(Ctx *ctx, knh_class_t p1, Any *source, knh_fitrnext fnext
 Mapper* new_Mapper(Ctx *ctx, knh_flag_t flag, knh_class_t scid, knh_class_t tcid, knh_fmapper fmap, Object *mapdata);
 Mapper* new_MapMap(Ctx *ctx, Mapper *m1, Mapper *m2);
 void knh_Mapper__k(Ctx *ctx, Mapper *o, OutputStream *w, String *m);
+void konoha_addMapper(Ctx *ctx, Mapper *mpr);
 void konoha_addMapperFunc(Ctx *ctx, knh_flag_t flag, knh_type_t stype, knh_type_t ttype, knh_fmapper fmap, Object *mapdata);
 MAPPER knh_Mapper_fasis(Ctx *ctx, knh_sfp_t *sfp);
 MAPPER knh_fmapper_null(Ctx *ctx, knh_sfp_t *sfp);
@@ -362,7 +363,6 @@ void knh_write_integerfmt(Ctx *ctx, OutputStream *w, char *fmt, knh_int_t n);
 void knh_write__flag(Ctx *ctx, OutputStream *w, knh_flag_t flag);
 void knh_write_cid(Ctx *ctx, OutputStream *w, knh_class_t cid);
 void knh_write_mn(Ctx *ctx, OutputStream *w, knh_methodn_t mn);
-void knh_write_cidmn(Ctx *ctx, OutputStream *w, knh_class_t cid, knh_methodn_t mn);
 void knh_write_type(Ctx *ctx, OutputStream *w, knh_type_t type);
 void knh_write_fline(Ctx *ctx, OutputStream *w, char *file, int line);
 void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap);

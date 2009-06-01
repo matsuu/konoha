@@ -40,12 +40,6 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-/* [macros] */
-
-static
-size_t f_bconv__iconv(Ctx *ctx, BytesConv *o, knh_bytes_t t, knh_Bytes_t *ba);
-
-/* ======================================================================== */
 /* [fbconv] */
 
 size_t knh_BytesConv_conv(Ctx *ctx, BytesConv *o, knh_bytes_t t, knh_Bytes_t *ba)
@@ -85,7 +79,7 @@ size_t f_bconv__iconv(Ctx *ctx, BytesConv *o, knh_bytes_t t, knh_Bytes_t *ba)
 #else
 		size_t rc = iconv(cd, &ibuf, &ilen, &obuf, &olen);
 #endif
-		//		DBG2_P("E in=%p,%d out=%p,%d", ibuf, ilen, obuf, olen);
+//		DBG2_P("E in=%p,%d out=%p,%d", ibuf, ilen, obuf, olen);
 		olen = sizeof(buffer) - olen;
 //		DBG2_P("E2 in=%p,%d out=%p,%d", ibuf, ilen, obuf, olen);
 		if(rc == (size_t)-1) {
@@ -112,6 +106,7 @@ BytesConv* new_BytesConv__iconv(Ctx *ctx, char *from, char *to)
 #ifdef KNH_USING_ICONV
 	iconv_t cd = iconv_open(to, from);
 	if(cd == (iconv_t)-1) {
+
 		return (BytesConv*)KNH_NULL;
 	}
 	else {
@@ -125,7 +120,7 @@ BytesConv* new_BytesConv__iconv(Ctx *ctx, char *from, char *to)
 	}
 #else
 	DBG2_P("uninstalled iconv!!");
-	return (BytesConv*)KNH_NULL;
+	return (knh_BytesConv_t*)KNH_NULL;
 #endif
 }
 
@@ -133,22 +128,14 @@ BytesConv* new_BytesConv__iconv(Ctx *ctx, char *from, char *to)
 
 BytesConv* new_BytesConv__in(Ctx *ctx, char *from)
 {
-#ifdef KNH_USING_ICONV
 	return new_BytesConv__iconv(ctx, from, KONOHA_ENCODING);
-#else
-	return (BytesConv*)KNH_NULL;
-#endif
 }
 
 /* ------------------------------------------------------------------------ */
 
 BytesConv* new_BytesConv__out(Ctx *ctx, char *to)
 {
-#ifdef KNH_USING_ICONV
 	return new_BytesConv__iconv(ctx, KONOHA_ENCODING, to);
-#else
-	return (BytesConv*)KNH_NULL;
-#endif
 }
 
 
