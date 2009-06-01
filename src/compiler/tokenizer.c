@@ -44,25 +44,6 @@ extern "C" {
 /* ======================================================================== */
 /* [util] */
 
-#ifndef KMSG_EINDENT
-#define KMSG_EINDENT KMSG_ESYNTAX
-#endif
-
-#ifndef KMSG_UTOKEN
-#define KMSG_UTOKEN KMSG_ESYNTAX
-#endif
-
-#ifndef KMSG_WCHAR
-#define KMSG_WCHAR KMSG_ESYNTAX
-#endif
-
-#ifndef KMSG_IGBLOCK
-#define KMSG_IGBLOCK KMSG_ESYNTAX
-#endif
-
-/* ======================================================================== */
-/* [util] */
-
 static
 void knh_InputStream_perror(Ctx *ctx, InputStream *in, int pe, char *fmt, ...)
 {
@@ -578,6 +559,10 @@ void knh_Token_join(Ctx *ctx, Token *o)
 			KNH_SETv(ctx, DP(tk)->data, new_String__cwb(ctx, cwb));
 			size = knh_Array_size(a) - 1;
 		} /* "a" "b" "c" */
+		else if(SP(tk)->tt == TT_FORMAT && DP(tk)->tt_next == TT_PARENTHESIS) {
+			SP(tk)->tt = TT_NAME;
+			KNH_SETv(ctx, DP(tk)->data, new_String__NAME(ctx, STEXT("format")));
+		}
 	}
 	//DBG2_DUMP(ctx, o, KNH_NULL, "joined");
 }

@@ -378,10 +378,10 @@ static METHOD knh__String_format(Ctx *ctx, knh_sfp_t *sfp)
 		}
 		if(0 <= index && index < ac) {
 			knh_sfp_t *esp = KNH_LOCAL(ctx);
-			mt.buf = mt.buf - 1; mt.len++;   /* 's' == > '%s' */
 			KNH_SETv(ctx, esp[1].o, param[index].o); esp[1].data = param[index].data;
 			Object *m = KNH_NULL;
 			if(knh_bytes_isOptionalMT(mt)) m = UP(new_String(ctx, mt, NULL));
+			mt.buf = mt.buf - 1; mt.len++;   /* 's' == > '%s' */
 			knh_methodn_t mn = konoha_getMethodName(ctx, mt, METHODN__empty);
 			knh_esp1_format(ctx, mn, cwb.w, m);
 		}
