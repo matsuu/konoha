@@ -157,24 +157,25 @@ void knh_ClassStruct_initField(Ctx *ctx, ClassStruct *cs, knh_class_t self_cid, 
 	knh_cfield_t *cf = cs->fields;
 	for(i = 0; i < cs->fsize; i++) {
 #ifdef KNH_USING_UNBOXFIELD
-		if(cf[i].type == NNTYPE_Int) {
+		if(cf[i].type == TYPE_void) {
+			continue;
+		}
+		else if(cf[i].type == NNTYPE_Int) {
 			knh_int_t *data = (knh_int_t*)(v + i);
 			data[0] = IS_NULL(cf[i].value) ? 0 : ((Int*)cf[i].value)->n.ivalue;
 			continue;
 		}
-		if(cf[i].type == NNTYPE_Float) {
+		else if(cf[i].type == NNTYPE_Float) {
 			knh_float_t *data = (knh_float_t*)(v + i);
 			data[0] = IS_NULL(cf[i].value) ? 0.0 : ((Int*)cf[i].value)->n.fvalue;
 			continue;
 		}
-		if(cf[i].type == NNTYPE_Boolean) {
+		else if(cf[i].type == NNTYPE_Boolean) {
 			knh_bool_t *data = (knh_bool_t*)(v + i);
 			data[0] = IS_NULL(cf[i].value) ? 0 : ((Int*)cf[i].value)->n.bvalue;
 			continue;
 		}
-		if(cf[i].type == CLASS_unknown) {
-			continue;
-		}
+		else
 #endif/*KNH_USING_UNBOXFIELD*/
 		if(IS_NULL(cf[i].value) && IS_NNTYPE(cf[i].type)) {
 			knh_class_t cid = knh_pmztype_toclass(ctx, cf[i].type, self_cid);

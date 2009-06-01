@@ -29,13 +29,3 @@ print c;
 OUT << "c.s is ''?" << (c.s == "") << EOL;
 
 
-OUT << "hashmap" << EOL;
-h1=new HashMap()
-print h1
-print h1[2]
-h2 = new HashMap<Int,Int>();
-print h2
-h2[1]
-h3 = new HashMap<Int,Float>()
-print h3[2];
-print h3[3]
