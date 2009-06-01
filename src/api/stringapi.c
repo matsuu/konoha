@@ -38,6 +38,43 @@ extern "C" {
 #ifdef KNH_CC_METHODAPI
 
 /* ------------------------------------------------------------------------ */
+/* @method[CONST] String! String.new(Bytes! byte, String enc) */
+
+static METHOD knh__String_new(Ctx *ctx, knh_sfp_t *sfp)
+{
+	String *s;
+	if(IS_NULL(sfp[2].o)) {
+		s = new_String(ctx, knh_Bytes_tobytes(sfp[1].ba), NULL);
+	}
+	else {
+		BytesConv *bc = new_BytesConv__in(ctx, knh_String_tochar(sfp[2].s));
+		KNH_SETv(ctx, sfp[3].o, bc);
+		s = new_String__bconv(ctx, knh_Bytes_tobytes(sfp[1].ba), bc);
+	}
+	KNH_RETURN(ctx, sfp, s);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] Bytes! String.getBytes(String enc) */
+
+static METHOD knh__String_getBytes(Ctx *ctx, knh_sfp_t *sfp)
+{
+	Bytes *ba;
+	if(IS_NULL(sfp[1].o)) {
+		ba = new_Bytes(ctx, (sfp[0].s)->size + 1);
+		knh_Bytes_write(ctx, ba, knh_String_tobytes(sfp[0].s));
+	}
+	else {
+		knh_bytes_t t = knh_String_tobytes(sfp[0].s);
+		BytesConv *bc = new_BytesConv__out(ctx, knh_String_tochar(sfp[1].s));
+		KNH_SETv(ctx, sfp[2].o, bc);
+		ba = new_Bytes(ctx, t.len);
+		DP(bc)->fbconv(ctx, bc, t, ba);
+	}
+	KNH_RETURN(ctx, sfp, ba);
+}
+
+/* ------------------------------------------------------------------------ */
 /* @method[CONST] Boolean! String.equals(String! s) */
 
 static METHOD knh__String_equals(Ctx *ctx, knh_sfp_t *sfp)

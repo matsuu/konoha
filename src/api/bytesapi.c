@@ -157,6 +157,16 @@ static METHOD knh__Bytes_opFill(Ctx *ctx, knh_sfp_t *sfp)
 /* ======================================================================== */
 /* [movabletext] */
 
+/* ------------------------------------------------------------------------ */
+/* @method void Bytes.%k(OutputStream w, String m) */
+
+static
+void knh_Bytes__dump(Ctx *ctx, Bytes *o, OutputStream *w, String *m)
+{
+	knh_printf(ctx, w, "byte[%d]", (o)->size);
+}
+
+/* ------------------------------------------------------------------------ */
 /* @method void Bytes.%dump(OutputStream w, String m) */
 
 static
@@ -177,9 +187,7 @@ void knh_Bytes__dump(Ctx *ctx, Bytes *o, OutputStream *w, String *m)
 				knh_write(ctx, w, STEXT("   "));
 			}
 		}
-
 		knh_write(ctx, w, STEXT("    "));
-
 		for(i = 0; i < 16; i++) {
 			n = j * 16 + i;
 			if(n < o->size && isprint(o->buf[n])) {
