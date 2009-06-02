@@ -979,7 +979,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 #define KLR_iDIVn(ctx, c, a, n)  SFi(c) = (SFi(a) / n)
 #define KLR_iMOD(ctx, c, a, b)  { \
 		KNH_THROW_iZERODIV(SFi(b)); \
-		SFi(c) = (SFi(a) / SFi(b)); \
+		SFi(c) = (SFi(a) % SFi(b)); \
 	} \
 
 #define KLR_iMODn(ctx, c, a, n)  SFi(c) = (SFi(a) % n)
