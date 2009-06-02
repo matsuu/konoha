@@ -276,10 +276,12 @@ KNHAPI(void) knh_format(Ctx *ctx, OutputStream *w, knh_methodn_t mn, Object *o, 
 
 static char* knh_vprintf_parseindex(char *p, int *index)
 {
-	p++;
-	if(p[0] == '{' && isdigit(p[1]) && p[2] == '}') {
-		*index = p[1] - '0';
-		p += 3;
+    char *ptr = p+1;
+	
+	if(ptr[0] == '{' && isdigit(ptr[1]) && ptr[2] == '}') {
+		*index = ptr[1] - '0';
+		ptr += 3;
+		return ptr;
 	}
 	return p;
 }
@@ -438,11 +440,12 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 			}
 			else if(ch == '%') {
 				if(b.len > 0) {
-					knh_print(ctx, w, b);
+				  knh_print(ctx, w, b);
 				}
 				ch = *c;
 				int index = bindex++;
-				c = knh_vprintf_parseindex(c++, &index);
+				c = knh_vprintf_parseindex(++c, &index);
+
 				switch(ch) {
 					case '\0' : return ;
 					case 'd':
@@ -509,7 +512,7 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 			}
 		}
 		if(b.len > 0) {
-			knh_print(ctx, w, b);
+		  knh_print(ctx, w, b);
 		}
 	}
 }
