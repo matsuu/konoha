@@ -49,7 +49,7 @@
 #else
 #define KONOHA_NAME     "konoha"
 #define KONOHA_MAJOR_VERSION "0.5"
-#define KONOHA_VERSION  "0.5.0"
+#define KONOHA_VERSION  "0.5b"
 #endif
 
 #define KONOHA_XCODE    "Toguro"
