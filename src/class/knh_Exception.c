@@ -308,8 +308,32 @@ KNHAPI(void) knh_throw_OutOfIndex(Ctx *ctx, knh_int_t n, size_t max, char *file,
 		knh_throw_OutOfIndex(ctx, n, max, __FILE__, __LINE__); \
 	}\
 
+/* ======================================================================== */
+/* [ExceptionHandler] */
+
+ExceptionHandler* new_ExceptionHandler(Ctx *ctx)
+{
+	return (ExceptionHandler*)new_Object_bcid(ctx, CLASS_ExceptionHandler, 0);
+}
+
 /* ------------------------------------------------------------------------ */
 
+void knh_ExceptionHandler_longjmp(Ctx *ctx, ExceptionHandler *o, Exception *e)
+{
+	KNH_ASSERT(IS_Exception(e));
+	KNH_SETv(ctx, DP(o)->caught, e);
+	longjmp(DP(o)->jmpbuf, DP(e)->eid);
+}
+
+/* ------------------------------------------------------------------------ */
+
+Exception* knh_ExceptionHandler_getCaughtException(ExceptionHandler *o)
+{
+	KNH_ASSERT(IS_Exception(DP(o)->caught));
+	return DP(o)->caught;
+}
+
+/* ------------------------------------------------------------------------ */
 
 #ifdef __cplusplus
 }
