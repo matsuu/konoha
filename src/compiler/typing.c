@@ -2358,7 +2358,12 @@ void knh_Token_toMPR(Ctx *ctx, Token *tk, knh_class_t cid, Mapper *mpr)
 	SP(tk)->tt = TT_MPR;
 	DP(tk)->cid = cid;
 	KNH_SETv(ctx, DP(tk)->data, mpr);
-	DP(tk)->type = knh_Mapper_isTotal(mpr) ? NNTYPE_cid(DP(mpr)->tcid) : DP(mpr)->tcid;
+	if(IS_NULL(mpr)) {
+		DP(tk)->type = cid;
+	}
+	else {
+		DP(tk)->type = knh_Mapper_isTotal(mpr) ? NNTYPE_cid(DP(mpr)->tcid) : DP(mpr)->tcid;
+	}
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2584,8 +2589,17 @@ static
 Term *new_TermINCAST(Ctx *ctx, knh_class_t reqc, Stmt *stmt, size_t n)
 {
 	knh_class_t varc = TERMs_getcid(stmt, n);
+	if(varc == CLASS_Any) {
+		Token *tk = new_TokenNULL(ctx, FL(stmt), CLASS_Any);
+		knh_Token_toMPR(ctx, tk, reqc, (Mapper*)KNH_NULL);
+		Stmt *cstmt = new_Stmt(ctx, 0, STT_MAPCAST);
+		knh_Stmt_add(ctx, cstmt, TM(tk));
+		knh_Stmt_add(ctx, cstmt, DP(stmt)->terms[n]);
+		knh_Stmt_setType(ctx, cstmt, reqc);
+		return TM(cstmt);
+	}
 	Mapper *mpr = knh_Class_getMapper(ctx, varc, reqc);
-	if(IS_NULL(mpr) && varc != TYPE_Any) {
+	if(IS_NULL(mpr)) {
 		DBG2_P("cannot convert");
 		return NULL;
 	}

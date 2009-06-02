@@ -145,15 +145,6 @@ void knh_ClassMap_sort(Ctx *ctx, ClassMap *o);
 void knh_ClassMap_add(Ctx *ctx, ClassMap *o, Mapper *map);
 void knh_ClassMap__dump(Ctx *ctx, ClassMap *o, OutputStream *w, String *m);
 void knh_ClassMap__man(Ctx *ctx, ClassMap *o, OutputStream *w, knh_class_t cid);
-/* ../src/class/knh_Class_type_t.c */
-knh_class_t knh_pmztype_toclass(Ctx *ctx, knh_type_t t, knh_class_t this_cid);
-knh_type_t knh_pmztype_totype(Ctx *ctx, knh_type_t t, knh_class_t this_cid);
-knh_class_t knh_class_Array(Ctx *ctx, knh_class_t p1);
-knh_class_t knh_class_Iterator(Ctx *ctx, knh_class_t p1);
-knh_class_t knh_class_Generics(Ctx *ctx, knh_class_t bcid, knh_class_t p1, knh_class_t p2);
-char* knh_format_type(Ctx *ctx, char *buf, size_t bufsiz, knh_type_t type);
-char *TYPEQ(knh_type_t type);
-char *knh_TYPEN(Ctx *ctx, knh_type_t type);
 /* ../src/class/knh_Closure.c */
 METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Closure_invoke(Ctx *ctx, knh_sfp_t *sfp);
@@ -229,7 +220,6 @@ knh_expt_t konoha_addException(Ctx *ctx, knh_flag_t flag, knh_class_t eid, Strin
 Exception* knh_Exception_new__init(Ctx *ctx, Exception *o, String *e, String *msg, Object *bag);
 int knh_Exception_isa(Ctx *ctx, Exception *o, String *msg);
 Exception* new_Exception__Nue(Ctx *ctx, Object *o);
-/* ../src/class/knh_ExceptionHandler.c */
 ExceptionHandler* new_ExceptionHandler(Ctx *ctx);
 void knh_ExceptionHandler_longjmp(Ctx *ctx, ExceptionHandler *o, Exception *e);
 Exception* knh_ExceptionHandler_getCaughtException(ExceptionHandler *o);
@@ -368,8 +358,6 @@ void knh_write_fline(Ctx *ctx, OutputStream *w, char *file, int line);
 void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap);
 void konoha_setverbose(int v);
 METHOD knh_fmethod_movableText(Ctx *ctx, knh_sfp_t *sfp);
-/* ../src/class/knh_Range.c */
-Range *new_Range(Ctx *ctx, Object *start, Object *end);
 /* ../src/class/knh_ResultSet.c */
 ResultSet* new_ResultSet(Ctx *ctx);
 knh_boolean_t knh_ResultSet_next(Ctx *ctx, ResultSet *o);
@@ -416,8 +404,15 @@ void knh_System_setProperty(Ctx *ctx, System *o, String *key, Any *value);
 knh_bool_t konoha_initcheck(void);
 knh_bytes_t knh_Runtime_aliasURN(Ctx *ctx, knh_bytes_t aurn);
 void knh_Runtime_setAliasURN(Ctx *ctx, String *alias, String *urn);
-/* ../src/class/knh_Tuple2.c */
-Tuple2 *new_Tuple2(Ctx *ctx, Object *first, Object *second);
+/* ../src/class/knh_type_t.c */
+knh_class_t knh_pmztype_toclass(Ctx *ctx, knh_type_t t, knh_class_t this_cid);
+knh_type_t knh_pmztype_totype(Ctx *ctx, knh_type_t t, knh_class_t this_cid);
+knh_class_t knh_class_Array(Ctx *ctx, knh_class_t p1);
+knh_class_t knh_class_Iterator(Ctx *ctx, knh_class_t p1);
+knh_class_t knh_class_Generics(Ctx *ctx, knh_class_t bcid, knh_class_t p1, knh_class_t p2);
+char* knh_format_type(Ctx *ctx, char *buf, size_t bufsiz, knh_type_t type);
+char *TYPEQ(knh_type_t type);
+char *knh_TYPEN(Ctx *ctx, knh_type_t type);
 /* ../src/compiler/asm.c */
 Asm* knh_Context_getAsm(Ctx *ctx);
 NameSpace *knh_Context_getNameSpace(Ctx *ctx);

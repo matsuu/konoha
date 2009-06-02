@@ -68,7 +68,6 @@ extern "C" {
 #define CLASSNo(o)    knh_ClassTable_CLASSN(ctx, knh_Object_cid(o))
 #define KNH_DEF(ctx, cid)  konoha_getClassDefaultValue(ctx, cid)
 #define KNH_DEF(ctx, cid)  konoha_getClassDefaultValue(ctx, cid)
-#define TYPEN(type)  knh_TYPEN(ctx,type)
 #define KNH_STDIN          (((Context*)ctx)->in)
 #define KNH_STDOUT         (((Context*)ctx)->out)
 #define KNH_STDERR         (((Context*)ctx)->err)
@@ -129,6 +128,7 @@ extern "C" {
 #define new_String__T(ctx, text)    new_StringX__T(ctx, CLASS_String, text)
 #define NSN_main           0
 #define FILEN_unknown      0
+#define TYPEN(type)  knh_TYPEN(ctx,type)
 #define KNH_ASM_JMP(ctx, abr, l)  KNH_ASM_JMP_(ctx, abr, l);
 #define sToken(o)  knh_Token_tochar(ctx, o)
 #define new_TermCONST(ctx, fln, d)   TM(new_TokenCONST(ctx, fln, d))
