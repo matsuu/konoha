@@ -12,7 +12,7 @@ library = "$(pkgname)_$(target).so"
 .PHONY: all
 all: $(library)
 
-objs = $(pkgname).o sdl_event.o sdl_keyboard.o
+objs = $(pkgname).o sdl_event.o sdl_keyboard.o sdl_color.o
 
 "$(pkgname).o": $(pkgname).c
 	$(CC) $(CFLAGS) -o $@ -c $^
@@ -21,6 +21,9 @@ sdl_event.o: sdl_event.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 sdl_keyboard.o: sdl_keyboard.c
+	$(CC) $(CFLAGS) -o $@ -c $^
+
+sdl_color.o: sdl_color.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 $(library): $(objs)
