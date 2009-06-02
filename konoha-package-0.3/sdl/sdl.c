@@ -3,17 +3,36 @@
 #include <SDL.h>
 #else
 #include<SDL/SDL.h>
+#include"knh_sdl.h"
+//#include<SDL/SDL_opengl.h>
 #endif
 //#include<SDL/SDL_image.h>
 
 /* General */
 
+
+METHOD SDL_testColor(Ctx* ctx, knh_sfp_t* sfp)
+{
+  knh_Glue_t *g = sfp[1].glue;
+  knh_sdl_color_t *c = (knh_sdl_color_t*)(g->ptr);
+  printf("%lld %lld %lld\n", c->r, c->g, c->b);
+
+}
+
+
+METHOD SDL_testRect(Ctx* ctx, knh_sfp_t* sfp)
+{
+  knh_Glue_t *g = sfp[1].glue;
+  knh_sdl_rect_t *r = (knh_sdl_rect_t*)(g->ptr);
+  printf("%lld %lld %lld %lld\n", r->x, r->y, r->w, r->h);
+}
+
 /* void SDL.init(int flags) */
 
 METHOD SDL_init(Ctx* ctx,knh_sfp_t* sfp)
 {
-  int i1 = p_int(sfp[1]);
-  if(SDL_Init((Uint32)i1) == -1){
+  int flags = p_int(sfp[1]);
+  if(SDL_Init((Uint32)flags) == -1){
     fprintf(stderr,"initialize error %s\n",SDL_GetError());
   }
 
@@ -24,8 +43,8 @@ METHOD SDL_init(Ctx* ctx,knh_sfp_t* sfp)
 
 METHOD SDL_initSubSystem(Ctx* ctx,knh_sfp_t* sfp)
 {
-  int i1 = p_int(sfp[1]);
-  if(SDL_InitSubSystem(i1)==-1){
+  int flags = p_int(sfp[1]);
+  if(SDL_InitSubSystem(flags)==-1){
     fprintf(stderr,"%s\n",SDL_GetError());
   }
 
@@ -45,8 +64,8 @@ METHOD SDL_quit(Ctx* ctx,knh_sfp_t *sfp)
 
 METHOD SDL_quitSubSystem(Ctx* ctx,knh_sfp_t* sfp)
 {
-  int i1 = p_int(sfp[1]);
-  SDL_QuitSubSystem((Uint32)i1);
+  int flags = p_int(sfp[1]);
+  SDL_QuitSubSystem((Uint32)flags);
 
   KNH_RETURN_void(ctx,sfp);
 }
@@ -55,8 +74,8 @@ METHOD SDL_quitSubSystem(Ctx* ctx,knh_sfp_t* sfp)
 
 METHOD SDL_wasInit(Ctx* ctx,knh_sfp_t* sfp)
 {
-  int i1 = p_int(sfp[1]);
-  if(SDL_WasInit(i1)!=0){
+  int flags = p_int(sfp[1]);
+  if(SDL_WasInit(flags)!=0){
     printf("It is initialized\n");
   } else {
     printf("It is not initialized\n");
@@ -66,13 +85,13 @@ METHOD SDL_wasInit(Ctx* ctx,knh_sfp_t* sfp)
 }
 
 /* void SDL.getError */
+
 METHOD SDL_getError(Ctx* ctx,knh_sfp_t* sfp)
 {
   printf("%s\n",SDL_GetError());
 
   KNH_RETURN_void(ctx,sfp);
 }
-
 
 /* Video */
 
@@ -83,64 +102,72 @@ METHOD SDL_getVideoSurface(Ctx* ctx,knh_sfp_t *sfp)
   SDL_Surface* ret;
   ret = SDL_GetVideoSurface();
 
-  KNH_RETURN(ctx,sfp,ret);
+  KNH_RETURN(ctx,sfp,new_Glue(ctx,"sdl.Surface",ret,NULL));
 }
 
-
-
 /* VideoInfo SDL.getVideoInfo() */
-// TODO
-/*METHOD SDL_getVideoInfo(Ctx* ctx,knh_sfp_t *sfp)
+
+METHOD SDL_getVideoInfo(Ctx* ctx,knh_sfp_t *sfp)
 {
   SDL_VideoInfo* ret;
   ret = SDL_GetVideoInfo();
 
-  KNH_RETURN(ctx,sfp,ret);
+  KNH_RETURN(ctx,sfp,new_Glue(ctx,"sdl.VideoInfo",ret,NULL));
 }
-*/
+
 
 /* void SDL.videoDriveName(String namebuf, int maxlen) */
 
-METHOD SDL_videoDrivername(Ctx* ctx,knh_sfp_t *sfp)
+METHOD SDL_videoDriverName(Ctx* ctx,knh_sfp_t *sfp)
 {
   char* ret;
-  char* s1 = p_char(sfp[1]);
-  int i1 = p_int(sfp[2]);
-  ret = SDL_VideoDriverName(s1,i1);
+  char* namebuf = p_char(sfp[1]);
+  int maxlen = p_int(sfp[2]);
+  ret = SDL_VideoDriverName(namebuf, maxlen);
   if(ret == NULL){
     printf("Video is initialized\n");
+    KNH_RETURN_void(ctx,sfp);
   }
 
-  KNH_RETURN_void(ctx,sfp);
+  KNH_RETURN(ctx,sfp,ret);
 }
 
+/* void SDL.listModes(PixelFormat fmt, int flags) */
+//todo
 /*
 METHOD SDL_listModes(Ctx* ctx,knh_sfp_t *sfp)
 {
   SDL_PixelFormat* fmt = ((sfp[1].glue)->ptr);
-  int i1 = p_int(sfp[2]);
-  SDL_Rect** ret = SDL_ListModes(fmt,i1);
+  int flags = p_int(sfp[2]);
+  int i;
+  SDL_Rect** ret = SDL_ListModes(NULL,flags);
   if(ret == (SDL_Rect**)0){
-      fprintf(stderr,"%s\n", SDL_GetError());
-    }
-
-    KNH_RETURN(ctx,sfp,ret);
+    fprintf(stderr,"%s\n", SDL_GetError());
+  } else if((SDL_Rect**)-1){
+    printf("Enable All\n");
+  } else {
+    printf("Enable Mode\n");
+    for(i = 0; ret[i]; ++i){
+      printf("%d x %d\n", ret[i]->w, ret[i]->h);
+    } 
+  }
+   
+  KNH_RETURN_void(ctx,sfp);
 }
 */
-
 /* void SDL.videoModeOK(int width, int height, int bpp, int flags) */
 
 METHOD SDL_videoModeOK(Ctx* ctx,knh_sfp_t *sfp)
 {
-  int i1 = p_int(sfp[1]);
-  int i2 = p_int(sfp[2]);
-  int i3 = p_int(sfp[3]);
-  int i4 = p_int(sfp[4]);
-  int bpp = SDL_VideoModeOK(i1,i2,i3,i4);
-  if(bpp == 0){
+  int width = p_int(sfp[1]);
+  int height = p_int(sfp[2]);
+  int bpp = p_int(sfp[3]);
+  int flags = p_int(sfp[4]);
+  int chk = SDL_VideoModeOK(width, height, bpp, flags);
+  if(chk == 0){
     printf("Unusable mode\n");
   } else {
-    printf("Reccommend %dbpp\n",bpp);
+    printf("Reccommend %dbpp\n",chk);
   }
 
   KNH_RETURN_void(ctx,sfp);
@@ -151,44 +178,44 @@ METHOD SDL_videoModeOK(Ctx* ctx,knh_sfp_t *sfp)
 METHOD SDL_setVideoMode(Ctx* ctx, knh_sfp_t *sfp)
 {
   SDL_Surface *ret;
-  knh_Glue_t *glue = sfp[0].glue;
-  int i1 = p_int(sfp[1]);
-  int i2 = p_int(sfp[2]);
-  int i3 = p_int(sfp[3]);
-  int i4 = p_int(sfp[4]);
-  ret = SDL_SetVideoMode(i1,i2,i3,i4);  
+  int width = p_int(sfp[1]);
+  int height = p_int(sfp[2]);
+  int bpp = p_int(sfp[3]);
+  int flags = p_int(sfp[4]);
+  ret = SDL_SetVideoMode(width, height, bpp, flags);  
   if(ret == NULL){
     fprintf(stderr,"create screen error %s\n",SDL_GetError());
     SDL_Quit();
   }
 
-  glue->ptr = (void*)ret;
-  KNH_RETURN(ctx, sfp, sfp[0].o);
+  KNH_RETURN(ctx, sfp, new_Glue(ctx, "sdl.Surface", ret, NULL));
 }
 
-/* void Surface.updateRect(self, int x, int y, int w, int h) */
+/* void Surface.updateRect(self, int x, int y, int width, int height) */
 
 METHOD Surface_updateRect(Ctx* ctx, knh_sfp_t *sfp)
 {
   SDL_Surface *self = ((sfp[0].glue)->ptr);
-  int i1 = p_int(sfp[1]);
-  int i2 = p_int(sfp[2]);
-  int i3 = p_int(sfp[3]);
-  int i4 = p_int(sfp[4]);
-  SDL_UpdateRect(self,i1,i2,i3,i4);
+  int x = p_int(sfp[1]);
+  int y = p_int(sfp[2]);
+  int width = p_int(sfp[3]);
+  int height = p_int(sfp[4]);
+  SDL_UpdateRect(self, x, y, width, height);
 
   KNH_RETURN_void(ctx,sfp);
 }
 
+/* void SDL.updateRects(Surface screen, int numrects, Rect rects) */
 /*
 METHOD SDL_updateRects(Ctx* ctx, knh_sfp_t *sfp)
 {
   SDL_UpdateRects((sfp[1].glue)->ptr,sfp[2].ivalue,(sfp[3].glue)->ptr);
+
   KNH_RETURN_void(ctx,sfp);
 }
 */
       
- /* void Surface.flip(self) */ 
+/* void Surface.flip(self) */ 
  
 METHOD Surface_flip(Ctx* ctx, knh_sfp_t *sfp)
 {
@@ -200,6 +227,7 @@ METHOD Surface_flip(Ctx* ctx, knh_sfp_t *sfp)
   KNH_RETURN_void(ctx,sfp);
 }
 
+/* void SDL.setColors(Surface screen, Color color, int firstcolor, int ncolors) */
 /*
 METHOD SDL_setColos(Ctx* ctx,knh_sfp_t *sfp)
 {
@@ -209,6 +237,8 @@ METHOD SDL_setColos(Ctx* ctx,knh_sfp_t *sfp)
   KNH_RETURN_void(ctx,sfp);
 }
 */
+
+/* void SDL.setPalette(Surface screen, int flags, Color color, int firstcolor, int ncolors) */
  /*
 METHOD SDL_setPalette(Ctx* ctx,knh_sfp_t *sfp)
 {
@@ -218,6 +248,8 @@ METHOD SDL_setPalette(Ctx* ctx,knh_sfp_t *sfp)
   KNH_RETURN_void(ctx,sfp);
 }
  */
+
+/* void SDL.setGamma(float redgamma, float greengamma, float bluegamma) */
 /*
 METHOD SDL_setGamma(Ctx* ctx, knh_sfp_t *sfp)
 {
@@ -226,73 +258,148 @@ METHOD SDL_setGamma(Ctx* ctx, knh_sfp_t *sfp)
   }
   KNH_RETURN_void(ctx,sfp);
 }
+*/
 
-METHOD SDL_getGammaramp(Ctx* ctx, knh_sfp_t *sfp)
+/* void SDL.getGammaRamp(int redtable, int greentable, int bluetable) */
+/*
+METHOD SDL_getGammaRamp(Ctx* ctx, knh_sfp_t *sfp)
 {
-  if(SDL_GetGammaRamp(sfp[1].ivalue,sfp[2].ivalue,sfp[3].ivalue)==-1){
+  int redtable = p_int(sfp[1]);
+  int greentable = p_int(sfp[2]);
+  int bluetable = p_int(sfp[3]);
+  if(SDL_GetGammaRamp(&redtable. &greentable. &bluetable)==-1){
     fprintf(stderr,"%s\n",SDL_GetError());
   }
+
   KNH_RETURN_void(ctx,sfp);
 }
+*/
 
+/* void SDL.setGammaRamp(int redtable, int greentable, int bluetable) */
+ /* 
 METHOD SDL_setGammaramp(Ctx* ctx, knh_sfp_t *sfp)
 {
-  if(SDL_SetGammaRamp(sfp[1].ivalue,sfp[2].ivalue,sfp[3].ivalue==-1)){
+  int redtable = p_int(sfp[1]);
+  int greentable = p_int(sfp[2]);
+  int bluetable = p_int(sfp[3]);
+  if(SDL_SetGammaRamp(&redtable, &greentable, &bluetable)==-1)){
       fprintf(stderr,"%s\n",SDL_GetError());
     }
+
     KNH_RETURN_void(ctx,sfp);
 }
 */
-/*
-METHOD SDL_mapRGB(Ctx* ctx, knh_sfp_t *sfp)
+
+/* int Surface.mapRGB(self, int red, int green, int blue) */
+
+METHOD Surface_mapRGB(Ctx* ctx, knh_sfp_t *sfp)
 {
-  int pixel;
-  pixel = SDL_MapRGB((sfp[1].glue)->ptr,sfp[2].ivalue,sfp[3].ivalue,sfp[4].ivalue);
-  KNH_RETURN_Int(ctx,sfp,pixel);
+  SDL_Surface* self = ((sfp[0].glue)->ptr);
+  Uint8 red = p_int(sfp[1]);
+  Uint8 green = p_int(sfp[2]);
+  Uint8 blue = p_int(sfp[3]);
+  int ret;
+  ret = SDL_MapRGB(self->format, red, green, blue);
+
+  KNH_RETURN_Int(ctx, sfp, ret);
 }
-*/
+
+/* int SDL.mapRGBA(PexelFormat fmt, int red, int green, int blue, int alpha) */
  /*
 METHOD SDL_mapRGBA(Ctx* ctx, knh_sfp_t *sfp)
 {
-  int pixel;
-  pixel = SDL_MapRGBA((sfp[1].glue)->ptr,sfp[2].ivalue,sfp[3].ivalue,sfp[4].ivalue,sfp[5].ivalue);
-  KNH_RETURN_Int(ctx,sfp,pixel);
+  int ret;
+  SDL_pixelFormat* fmt = ((sfp[1].glue)->ptr);
+  int red = p_int(sfp[2]);
+  int green = p_int(sfp[3]);
+  int blue = p_int(sfp[4]);
+  int alpha = p_int(sfp[5]);
+  pixel = SDL_MapRGBA(fmt, red, green, blue, alpha);
+
+  KNH_RETURN_Int(ctx,sfp,ret);
 }
  */
+
+/* void SDL.getRGB(int pixel, PixelFormat fmt, int red, int green, int blue) */
 /*
 METHOD SDL_getRGB(Ctx* ctx, knh_sfp_t *sfp)
 {
-  SDL_GetRGB(sfp[1].ivalue,(sfp[2].glue)->ptr,sfp[3].ivalue,sfp[4].ivalue,sfp[5].ivalue);
+  int pixel = p_int(sfp[1]);
+  SDL_PixelFormat* fmt = ((sfp[2].glue)->glue);
+  int red = p_int(sfp[3]);
+  int green = p_int(sfp[4]);
+  int blue = p_int(sfp[5]);
+  SDL_GetRGB(pixel, fmt, red, green, blue);
+
   KNH_RETURN_void(ctx,sfp);
 }
 */
+
+/* void SDL.getRGBA(int pixel, PixelFormat fmt, int red, int green, int blue, int alpha) */
  /*
 METHOD SDL_getRGBA(Ctx* ctx, knh_sfp_t *sfp)
 {
-  SDL_GetRGBA(sfp[1].ivalue,(sfp[2].glue)->ptr,sfp[3].ivalue,sfp[4].ivalue,sfp[5].ivalue,sfp[6].ivalue);
+  int pixel = p_int(sfp[1]);
+  SDL_PixelFormat* fmt = ((sfp[2].glue)->ptr);
+  int red = p_int(sfp[3]);
+  int green = p_int(sfp[4]);
+  int blue = p_int(sfp[5]);
+  int alpha = p_int(sfp[6]);
+  SDL_GetRGBA(pixel, fmt, red, green, blue, alpha);
+
   KNH_RETURN_void(ctx,sfp);
 }
  */
-  /*
-METHOD SDL_createRGBsurface(Ctx* ctx, knh_sfp_t *sfp)
-{
-  SDL_Surface* surface;
-  surface = SDL_CreateRGBSurface(sfp[1].ivalue,sfp[2].ivalue,sfp[3].ivalue,sfp[4].ivalue,sfp[5].ivalue,sfp[6].ivalue,sfp[7].ivalue,sfp[8].ivalue);
-  if(surface == NULL){
-    fprintf(stderr,"%s\n",SDL_GetError);
-  }
-  KNH_RETURN(ctx, sfp, new_Glue(ctx, "sdl.Surface", surface, NULL));
-}
-  */
-// METHOD SDL_createRGBsurfacefrom(Ctx* ctx, knh_sfp_t *sfp)
 
+/* Surface SDL.createRGBSurface(int flags, int w, int h, int d, int rmask, int gmask, int bmask, int amask) */
+
+METHOD SDL_createRGBSurface(Ctx* ctx, knh_sfp_t *sfp)
+{
+  SDL_Surface* ret;
+  Uint32 flags = p_int(sfp[1]);
+  int width = p_int(sfp[2]);
+  int height = p_int(sfp[3]);
+  int depth = p_int(sfp[4]);
+  Uint32 rmask = p_int(sfp[5]);
+  Uint32 gmask = p_int(sfp[6]);
+  Uint32 bmask = p_int(sfp[7]);
+  Uint32 amask = p_int(sfp[8]);
+  ret = SDL_CreateRGBSurface(flags, width, height, depth, rmask, gmask, bmask, amask);
+  if(ret == NULL){
+    fprintf(stderr,"%s\n",SDL_GetError());
+  }
+
+  KNH_RETURN(ctx, sfp, new_Glue(ctx, "sdl.Surface", ret, NULL));
+}
+
+/* Surface SDL.createRGBsurfaceFrom(void[] pixels, int width, int height, int depth, int pitch, int rmask, int gmask, int bmask, int amask) */
+//TODO
+METHOD SDL_createRGBsurfaceFrom(Ctx* ctx, knh_sfp_t *sfp)
+{
+  SDL_Surface* ret;
+  void* pixels = ((sfp[1].glue)->ptr);
+  int width = p_int(sfp[2]);
+  int height = p_int(sfp[3]);
+  int depth = p_int(sfp[4]);
+  int pitch = p_int(sfp[5]);
+  int rmask = p_int(sfp[6]);
+  int gmask = p_int(sfp[7]);
+  int bmask = p_int(sfp[8]);
+  int amask = p_int(sfp[9]);
+  ret = SDL_CreateRGBSurfaceFrom(pixels, width, height, depth, pitch, rmask, gmask, bmask, amask);
+  if(ret == NULL){
+    fprintf(stderr,"%s\n",SDL_GetError());
+  }
+  KNH_RETURN(ctx, sfp, new_Glue(ctx, "sdl.Surface", ret, NULL));
+}
  
-   /* void Surface.freeSurface(self) */
+/* void Surface.freeSurface(self) */
 
 METHOD Surface_freeSurface(Ctx* ctx,knh_sfp_t *sfp)
 {
   SDL_Surface* self = ((sfp[0].glue)->ptr);
   SDL_FreeSurface(self);
+
   KNH_RETURN_void(ctx,sfp);
 }
 
@@ -318,13 +425,12 @@ METHOD Surface_unLockSurface(Ctx* ctx, knh_sfp_t *sfp)
   KNH_RETURN_void(ctx,sfp);
 }
 
-
 /* Surface SDL.loadBMP(String file) */ 
 
 METHOD SDL_loadBMP(Ctx* ctx, knh_sfp_t *sfp)
 {
-  char* s1 = p_char(sfp[1]);
-  SDL_Surface *image = SDL_LoadBMP(s1);
+  char* file = p_char(sfp[1]);
+  SDL_Surface *image = SDL_LoadBMP(file);
   if(image == NULL){
     fprintf(stderr,"%s\n",SDL_GetError());
     SDL_Quit();
@@ -333,87 +439,112 @@ METHOD SDL_loadBMP(Ctx* ctx, knh_sfp_t *sfp)
   KNH_RETURN(ctx,sfp,new_Glue(ctx, "sdl.Surface",image,NULL));
 }
 
-
 /* void Suface.saveBMP(self, String file) */
 
 METHOD Surface_saveBMP(Ctx* ctx, knh_sfp_t *sfp)
 {
   SDL_Surface* self = ((sfp[0].glue)->ptr);
-  char* s1 = p_char(sfp[1]);
-  if(SDL_SaveBMP(self,s1)==-1){
+  char* file = p_char(sfp[1]);
+  if(SDL_SaveBMP(self, file) == -1){
     fprintf(stderr,"%s\n",SDL_GetError());
   }
 
   KNH_RETURN_void(ctx,sfp);
 }
-
 
 /* void Surface.setColorKey(self, int flag, int key) */
-/*
-METHOD SDL_setColorKey(Ctx* ctx, knh_sfp_t *sfp)
+
+METHOD Surface_setColorKey(Ctx* ctx, knh_sfp_t *sfp)
 {
   SDL_Surface* self = ((sfp[0].glue)->ptr);
-  int i1 = p_int(sfp[1]);
-  int i2 = p_int(sfp[2]);
-  if(SDL_SetColorKey(self,i1,i2)==-1){
+  int flag = p_int(sfp[1]);
+  if(SDL_SetColorKey(self, flag, (*(Uint8*)self->pixels) ) == -1){
     fprintf(stderr,"%s\n",SDL_GetError());
   }
 
   KNH_RETURN_void(ctx,sfp);
 }
-*/
 
- /* void Surface.setAlpha(self, int flag, int alpha) */
+/* void Surface.setAlpha(self, int flag, int alpha) */
 
 METHOD Surface_setAlpha(Ctx* ctx,knh_sfp_t *sfp)
 {
   SDL_Surface* self = ((sfp[0].glue)->ptr);
-  int i1 = p_int(sfp[1]);
-  int i2 = p_int(sfp[2]);
-  if(SDL_SetAlpha(self, i1, i2)==-1){
+  Uint32 flag = p_int(sfp[1]);
+  Uint8 alpha = p_int(sfp[2]);
+  if(SDL_SetAlpha(self, flag, alpha) == -1){
     fprintf(stderr,"%s\n",SDL_GetError());
   }
+
   KNH_RETURN_void(ctx,sfp);
 }
 
+/* void SDL.setClipRect(Surface screen, Rect rect) */
 /*
-METHOD SDL_setCliprect(Ctx* ctx, knh_sfp_t *sfp)
+METHOD SDL_setClipRect(Ctx* ctx, knh_sfp_t *sfp)
 {
-  SDL_SetClipRect((sfp[1].glue)->ptr,(sfp[2].glue)->ptr);
+  SDL_Surface* screen = ((sfrp[1].glue)->ptr);
+  SDL_Rect* rect = ((sfp[2].glue)->ptr);
+  SDL_SetClipRect(screen, rect);
+
   KNH_RETURN_void(ctx,sfp);
 }
 */
+
+/* void SDL.getClipRect(Surface screen, Rect rect) */
  /*
-METHOD SDL_getCliprect(Ctx* ctx, knh_sfp_t *sfp)
+METHOD SDL_getClipRect(Ctx* ctx, knh_sfp_t *sfp)
 {
-  SDL_GetClipRect((sfp[1].glue)->ptr,(sfp[2].glue)->ptr);
+  SDL_Surface* screen = ((sfp[1].glue)->ptr);
+  SDL_Rect* rect = ((sfp[2].glue)->ptr);
+  SDL_GetClipRect(screen, rect);
+
   KNH_RETURN_void(ctx,sfp);
 }
  */
+
+/* Surface SDL.convertSurface(Surface screen, PixelFormat fmt, int flags) */
   /*
 METHOD SDL_convertSurface(Ctx* ctx, knh_sfp_t *sfp)
 {
-  SDL_Surface *surface = SDL_ConvertSurface((sfp[1].glue)->ptr,(sfp[2].glue)->ptr,sfp[3].ivalue);
-  if(surface == NULL){
+  SDL_Surface* screen = ((sfp[1].glue)->ptr);
+  SDL_PixelFormat* fmt = ((sfp[2].glue)->ptr);
+  int flags = p_int(sfp[3]);
+  SDL_Surface* ret = SDL_ConvertSurface(screen, fmt, flags);
+  if(ret == NULL){
     fprintf(stderr,"%s\n",SDL_GetError());
   }
-  KNH_RETURN(ctx,sfp,new_Glue(ctx,"sdl.Surface",surface,NULL));
+  KNH_RETURN(ctx,sfp,new_Glue(ctx,"sdl.Surface",ret,NULL));
 }
   */
   
-   /* void Surface.blitSurface(self, Surface image) */
+/* void Surface.blitSurface(self, Surface screen) */
  
 METHOD Surface_blitSurface(Ctx* ctx,knh_sfp_t *sfp)
 {
 
-  SDL_Surface *s = (SDL_Surface*)((sfp[1].glue)->ptr);
-  SDL_Surface *i = (SDL_Surface*)((sfp[0].glue)->ptr);
-  if(SDL_BlitSurface(i,NULL,s,NULL) != 0){
+  SDL_Surface *self = (SDL_Surface*)((sfp[0].glue)->ptr);
+  knh_sdl_rect_t* rect1 = (knh_sdl_rect_t*)((sfp[1].glue)->ptr);
+  SDL_Surface *screen = (SDL_Surface*)((sfp[2].glue)->ptr);
+  knh_sdl_rect_t* rect2 = (knh_sdl_rect_t*)((sfp[3].glue)->ptr);
+  SDL_Rect srcrect;
+  SDL_Rect dstrect;
+  srcrect.x = (Sint16)rect1->x;
+  srcrect.y = (Sint16)rect1->y;
+  srcrect.w = (Uint16)rect1->w;
+  srcrect.h = (Uint16)rect1->h;
+  dstrect.x = (Sint16)rect2->x;
+  dstrect.y = (Sint16)rect2->y;
+  dstrect.w = (Uint16)rect2->w;
+  dstrect.h = (Uint16)rect2->h;
+  if(SDL_BlitSurface(self, &srcrect, screen, &dstrect) != 0){
     fprintf(stderr,"%s\n",SDL_GetError());
   }
 
   KNH_RETURN_void(ctx,sfp);
 }
+
+/* void Surface.fillRect(self, Rect dstrect, int color) */
 /*
 METHOD Surface_fillRect(Ctx* ctx, knh_sfp_t *sfp)
 {
@@ -428,185 +559,273 @@ METHOD Surface_fillRect(Ctx* ctx, knh_sfp_t *sfp)
 }
 */
 
- /* void Surface.displayFormat(self) 
- // TODO
+/* Surface Surface.displayFormat(self) */
+
 METHOD Surface_displayFormat(Ctx* ctx, knh_sfp_t *sfp)
 {
   SDL_Surface *self = ((sfp[0].glue)->ptr);
-  SDL_Surface *ret = SDL_DisplayFormat(self);
-  if(ret == NULL){
+  if((SDL_DisplayFormat(self)) == NULL ){
     fprintf(stderr,"%s\n",SDL_GetError());
   }
-  KNH_RETURN_void(ctx,sfp);
-}
- */
-/*
-METHOD SDL_displayFormatalpha(Ctx* ctx, knh_sfp_t *sfp)
-{
-  SDL_Surface *surface = SDL_DisplayFormatAlpha((sfp[1].glue)->ptr);
-  if(surface == NULL){
-    fprintf(stderr,"%s\n",SDL_GetError());
-  }
-  KNH_RETURN(ctx,sfp,new_Glue(ctx,"sdl.Surface",surface,NULL));
-}
-*/
 
- /* void SDL.warpMouse(int x, int y) */
+  KNH_RETURN(ctx,sfp, new_Glue(ctx,"sdl.Surface",self,NULL));
+}
+
+/* Surface Surface.displayFormatAlpha(self) */
+
+METHOD Surface_displayFormatAlpha(Ctx* ctx, knh_sfp_t *sfp)
+{
+  SDL_Surface *self = SDL_DisplayFormatAlpha((sfp[0].glue)->ptr);
+  if(self == NULL){
+    fprintf(stderr,"%s\n",SDL_GetError());
+  }
+
+  KNH_RETURN(ctx,sfp, new_Glue(ctx,"sdl.Surface",self,NULL));
+}
+
+
+/* void SDL.warpMouse(int x, int y) */
 
 METHOD SDL_warpMouse(Ctx* ctx, knh_sfp_t *sfp)
 {
-  int i1 = p_int(sfp[1]);
-  int i2 = p_int(sfp[2]);
-  SDL_WarpMouse(i1,i2)
-;
+  int x = p_int(sfp[1]);
+  int y = p_int(sfp[2]);
+  SDL_WarpMouse(x, y);
+
   KNH_RETURN_void(ctx,sfp);
 }
 
-/*
+/* Cursor SDL.createCursor(int[] data, int[] mask, int width, int height, int hot_x, int hot_y) */
+//TODO
 METHOD SDL_createCursor(Ctx* ctx, knh_sfp_t *sfp)
 {
- int i1 = p_int(sfp[1]);
- int i2 = p_int(sfp[2]);
- int i3 = p_int(sfp[3]);
- int i4 = p_int(sfp[4]);
+  SDL_Cursor* ret;
+  Uint8 data = p_int(sfp[1]);
+  Uint8 mask = p_int(sfp[2]);
+  int width = p_int(sfp[3]);
+  int height = p_int(sfp[4]);
+  int hot_x = p_int(sfp[5]);
+  int hot_y = p_int(sfp[6]);
+  ret = SDL_CreateCursor(&data, &mask, width, height, hot_x, hot_y);
 
-
- SDL_Cursor* ret = SDL_CreateCursor( , , i1, i2, i3, i4);
-
- KNH_RETURN(ctx,sfp,ret);
+  KNH_RETURN(ctx,sfp, new_Glue(ctx,"sdl.Cursor", ret, NULL));
 }
-*/
- /*
-METHOD SDL_freeCursor(Ctx* ctx, knh_sfp_t *sfp)
+
+/* void Cursor.freeCursor(self) */
+
+METHOD Cursor_freeCursor(Ctx* ctx, knh_sfp_t *sfp)
 {
-  SDL_FreeCursor((sfp[1].glue)->ptr);
+  SDL_Cursor* self = ((sfp[0].glue)->ptr);
+  SDL_FreeCursor(self);
+
   KNH_RETURN_void(ctx,sfp);
 }
- */
-// METHOD SDL_setCursor(Ctx* ctx, knh_sfp_t *sfp)
-  
-  /* Cursor SDL.getCursor(void) */
-  /*METHOD SDL_getCursor(Ctx* ctx, knh_sfp_t *sfp)
+
+/* void Cursor.setCursor(self) */
+METHOD Cursor_setCursor(Ctx* ctx, knh_sfp_t *sfp)
+ {  
+   SDL_Cursor* self = ((sfp[0].glue)->ptr);
+   SDL_SetCursor(self);
+
+   KNH_RETURN_void(ctx,sfp);
+ }
+
+/* Cursor SDL.getCursor(void) */
+
+METHOD SDL_getCursor(Ctx* ctx, knh_sfp_t *sfp)
 {
   SDL_Cursor* ret = SDL_GetCursor();
 
-  KNH_RETURN(ctx,sfp,ret);
-  }*/
+  KNH_RETURN(ctx,sfp, new_Glue(ctx,"sdl.Cursor", ret, NULL));
+}
   
-
-   /* int SDL.showCursor(int toggle) */   
+/* int SDL.showCursor(int toggle) */   
 
 METHOD SDL_showCursor(Ctx* ctx, knh_sfp_t *sfp)
 {
-  int i1 = p_int(sfp[1]);
-  int ret = SDL_ShowCursor(i1);
+  int toggle = p_int(sfp[1]);
+  int ret = SDL_ShowCursor(toggle);
 
   KNH_RETURN_Int(ctx,sfp,ret);
 }
    
 /* void SDL.glLoadLibrary(String path) */
 
-METHOD SDL_glLoadLibrary(Ctx* ctx, knh_sfp_t *sfp)
+/*METHOD SDL_glLoadLibrary(Ctx* ctx, knh_sfp_t *sfp)
 {
-  char* s1 = p_char(sfp[1]);
-  if(SDL_GL_LoadLibrary(s1)==-1){
+  char* path = p_char(sfp[1]);
+  if(SDL_GL_LoadLibrary(path) == -1){
     fprintf(stderr,"%s\n",SDL_GetError());
   }
 
   KNH_RETURN_void(ctx,sfp);
 }
+*/
 
-// METHOD SDL_glGetprocaddress(Ctx* ctx, knh_sfp_t *sfp)
-// METHOD SDL_glGetattribute(Ctx* ctx, knh_sfp_t *sfp)
+/* void[] SDL.glGetProcAddress(String proc) */
+
+/*METHOD SDL_glGetprocaddress(Ctx* ctx, knh_sfp_t *sfp)
+{
+  char* proc = p_char(sfp[1]);
+  void* ret = SDL_GL_GetProcAddress(proc);
+
+
+  }*/
+
+/* void SDL.glGetAttribute(int attr) */
+
+ /*METHOD SDL_glGetAttribute(Ctx* ctx, knh_sfp_t *sfp)
+{
+  int attr = p_int(sfp[1]);
+  int* ret = NULL;
+  if(SDL_GL_GetAttribute(attr, ret) == -1){
+    fprintf(stderr,"%s\n",SDL_GetError());
+  }
+
+  KNH_RETURN_void(ctx,sfp);
+}
+ */
 
 /* void SDL.glSetAttribute(int attr, int value) */
 
-/*METHOD SDL_glSetAttribute(Ctx* ctx, knh_sfp_t *sfp)
+  /*METHOD SDL_glSetAttribute(Ctx* ctx, knh_sfp_t *sfp)
 {
   int i1 = p_int(sfp[1]);
   int i2 = p_int(sfp[2]);
   if(SDL_GL_SetAttribute(i1, i2)==-1){
     fprintf(stderr,"%s\n",SDL_GetError());
   }
+
   KNH_RETURN_void(ctx,sfp);
 }
-*/
+  */
+
+/* void SDL.glSwapBuffers(void) */
  /*
-METHOD SDL_glSwapbuffers(Ctx* ctx, knh_sfp_t *sfp)
+METHOD SDL_glSwapBuffers(Ctx* ctx, knh_sfp_t *sfp)
 {
   SDL_GL_SwapBuffers();
+
   KNH_RETURN_void(ctx,sfp);
 }
  */
+
+/* Overlay SDL.createYUVoverlay(int width, int height, int fmt, Surface display) */
   /*
 METHOD SDL_createYUVoverlay(Ctx* ctx, knh_sfp_t *sfp)
 {
-  SDL_Overlay* overlay = SDL_CreateYUVOverlay(sfp[1].ivalue,sfp[2].ivalue,sfp[3].ivalue,(sfp[4].glue)->ptr);
-  KNH_RETURN(ctx,sfp,new_Glue(ctx,"sdl.Overlay",overlay,NULL));
+  int width = p_int(sfp[1]);
+  int height = p_int(sfp[2]);
+  int fmt = p_int(sfp[3]);
+  SDL_Surface* display = ((sfp[4].glue)->ptr);
+  SDL_Overlay* ret = SDL_CreateYUVOverlay(width, height, fmt, display);
+
+  KNH_RETURN(ctx,sfp,new_Glue(ctx,"sdl.Overlay",ret,NULL));
 }
   */
+
+/* void SDL.lockYUVoverlay(Overlay ol) */
    /*
 METHOD SDL_lockYUVoverlay(Ctx* ctx, knh_sfp_t *sfp)
 {
-  if(SDL_LockYUVOverlay((sfp[1].glue)->ptr)==-1){
+  SDL_Overlay* ol = ((sfp[1].glue)->ptr);
+  if(SDL_LockYUVOverlay(ol) == -1){
     fprintf(stderr,"%s\n",SDL_GetError());
   }
+
   KNH_RETURN_void(ctx,sfp);
 }
    */
+
+/* SDL.unLockYUVoverlay(Overlay ol) */
     /*
-METHOD SDL_unlockYUVoverlay(Ctx* ctx, knh_sfp_t *sfp)
+METHOD SDL_unLockYUVoverlay(Ctx* ctx, knh_sfp_t *sfp)
 {
-  SDL_UnlockYUVOverlay((sfp[1].glue)->ptr);
+  SDL_Overlay* ol = ((sfp[1].glue)->ptr);
+  SDL_UnlockYUVOverlay(ol);
+
   KNH_RETURN_void(ctx,sfp);
 }
     */
+
+     /* void SDL.displayYUVoverlay(Overlay ol, Rect dstrect) */
      /*
 METHOD SDL_displayYUVoverlay(Ctx* ctx, knh_sfp_t *sfp)
 {
-  if(SDL_DisplayYUVOverlay((sfp[1].glue)->ptr,(sfp[2].glue)->ptr)!=0){
+  SDL_Overlay* ol = ((sfp[1].glue)->glue);
+  SDL_Rect* dstrect = ((sfp[2].glue)->glue);
+  if(SDL_DisplayYUVOverlay(ol, dstrect)!=0){
     fprintf(stderr,"%s\n",SDL_GetError());
   }
+
   KNH_RETURN_void(ctx,sfp);
 }
 */
+
+/* void SDL.freeYUVoverlay(Overlay ol) */ 
       /*
 METHOD SDL_freeYUVoverlay(Ctx* ctx, knh_sfp_t *sfp)
 {
-  SDL_FreeYUVOverlay((sfp[1].glue)->ptr);
+  SDL_Overlay* ol = ((sfp[1].glue)->ptr);
+  SDL_FreeYUVOverlay(ol);
+
   KNH_RETURN_void(ctx,sfp);
 }
 */
 
 /* Window Management */
 
-       /* void SDL.wmSetCaption(String title) */       
+/* String SDL.wmSetCaption(String title) */       
 
 METHOD SDL_wmSetCaption(Ctx* ctx, knh_sfp_t *sfp)
 {
-  char* s1 = p_char(sfp[1]);
-  SDL_WM_SetCaption(s1, s1);
+  char* title = p_char(sfp[1]);
+  SDL_WM_SetCaption(title, title);
   
+  KNH_RETURN(ctx, sfp, new_String(ctx, B(title), NULL));
+}
+
+/* void String.wmGetCaption(String title) */
+
+METHOD String_wmGetCaption(Ctx* ctx, knh_sfp_t *sfp)
+{
+  char* title = p_char(sfp[0]);
+  SDL_WM_GetCaption(&title,&title);
+  if(title){
+    printf("Title was set to: %s\n",title);
+  } else {
+    printf("No window title was set !\n");
+  }
+
+  KNH_RETURN_void(ctx, sfp);
+}
+
+/* void SDL.wmSetIcon(Surface icon, int mask) */
+
+METHOD SDL_wmSetIcon(Ctx* ctx, knh_sfp_t *sfp)
+{
+  SDL_Surface* icon = ((sfp[1].glue)->ptr);
+  Uint8 mask = p_int(sfp[2]);
+  SDL_WM_SetIcon(icon, &mask);
+
   KNH_RETURN_void(ctx,sfp);
 }
 
-// METHOD SDL_wmGetcaption(Ctx* ctx, knh_sfp_t *sfp)
-// METHOD SDL_wmSeticon(Ctx* ctx, knh_sfp_t *sfp)
-
-/* void SDL.wmIconifyWindow(void) */
+/* int SDL.wmIconifyWindow(void) */
 
 METHOD SDL_wmIconifyWindow(Ctx* ctx, knh_sfp_t *sfp)
 {
-  if(SDL_WM_IconifyWindow()==0){
+  int ret = SDL_WM_IconifyWindow();
+  if(ret == 0){
     fprintf(stderr,"%s\n",SDL_GetError());
   }
 
-  KNH_RETURN_void(ctx,sfp);
+  KNH_RETURN_Int(ctx, sfp, ret);
 }
 
 
- /* void Surface.wmToggleFullScreen(self) */ 
-
+/* void Surface.wmToggleFullScreen(self) */ 
+//todo
 METHOD Surface_wmToggleFullScreen(Ctx* ctx, knh_sfp_t *sfp)
 {
   SDL_Surface* self = ((sfp[0].glue)->ptr);
@@ -618,23 +837,28 @@ METHOD Surface_wmToggleFullScreen(Ctx* ctx, knh_sfp_t *sfp)
 }
 
 /* Grubmode SDL.wmGrabInput(Grubmod grabmode) */
+
 METHOD SDL_wmGrabInput(Ctx* ctx, knh_sfp_t *sfp)
 {
-  int i1 = p_int(sfp[1]);
-  int grabmode = SDL_WM_GrabInput(i1);
+  int grabmode = p_int(sfp[1]);
+  int ret = SDL_WM_GrabInput(grabmode);
 
-  KNH_RETURN_Int(ctx,sfp,grabmode);
+  KNH_RETURN_Int(ctx, sfp, ret);
 }
 
 
 /* Event */
-   /*
+
+/* void SDL.pumpEvents(void) */
+
 METHOD SDL_pumpEvents(Ctx* ctx, knh_sfp_t *sfp)
 {
   SDL_PumpEvents();
+
   KNH_RETURN_void(ctx,sfp);
 }
 
+/*
 METHOD SDL_peepEvents(Ctx* ctx, knh_sfp_t *sfp)
 {
   if(SDL_PeepEvents((sfp[1].glue)->ptr, sfp[2].ivalue, sfp[3].ivalue, sfp[4].ivalue)==-1){
@@ -643,28 +867,41 @@ METHOD SDL_peepEvents(Ctx* ctx, knh_sfp_t *sfp)
   KNH_RETURN_void(ctx,sfp);
 }
    */
-/*
+
+ /* void SDL.pollEvent(Event evt) */
 METHOD SDL_pollEvent(Ctx* ctx,knh_sfp_t *sfp)
 {
-  if(SDL_PollEvent((sfp[1].glue)->ptr)==0){
+  SDL_Event *event = ((sfp[1].glue)->ptr);
+  if(SDL_PollEvent(event)==0){
     printf("Nothing Event\n");
   }
+
   KNH_RETURN_void(ctx,sfp);
 }
 
+/* int SDL.waitEvent(Event evt) */
 METHOD SDL_waitEvent(Ctx* ctx, knh_sfp_t *sfp)
 {
-  if(SDL_WaitEvent((sfp[1].glue)->ptr)==0){
-    fprintf(stderr,"%s\n",SDL_GetError());
+  int ret;
+  SDL_Event *event = ((sfp[1].glue)->ptr);
+  if((ret = SDL_WaitEvent(event)) == 0){
+    fprintf(stderr,"error:%s\n",SDL_GetError());
   }
-  KNH_RETURN_void(ctx,sfp);
+  
+
+  printf("ret %d\nevent.type %d\n",ret,event->type);
+  //KNH_RETURN(ctx,sfp,new_Glue(ctx,"sdl.Event",event,NULL));
+
+  KNH_RETURN_Int(ctx, sfp, ret);
 }
-*/
- /*
+
+
+/* void SDL.pushEvent(Event evt) */
 METHOD SDL_pushEvent(Ctx* ctx, knh_sfp_t *sfp)
 {
-  if(SDL_PushEvent((sfp[1].glue)->ptr)==-1){
-    fprintf(stderr,"%s\n",SDL_GetError());
+  SDL_Event *event = ((sfp[1].glue)->ptr);
+  if(SDL_PushEvent(event)==-1){
+    fprintf(stderr,"error:%s\n",SDL_GetError());
   }
   KNH_RETURN_void(ctx,sfp);
 }
@@ -672,12 +909,19 @@ METHOD SDL_pushEvent(Ctx* ctx, knh_sfp_t *sfp)
 // METHOD SDL_setEventfilter(Ctx* ctx, knh_sfp_t *sfp)
 // METHOD SDL_getEventfilter(Ctx* ctx, knh_sfp_t *sfp)
 
+
+/* int SDL.eventState(int type, int state) */
+
 METHOD SDL_eventState(Ctx* ctx, knh_sfp_t *sfp)
 {
-  int state = SDL_EventState(sfp[1].ivalue, sfp[2].ivalue);
-  KNH_RETURN_Int(ctx,sfp,state);
+  Uint8 type = p_int(sfp[1]);
+  int state = p_int(sfp[2]);
+  int ret = SDL_EventState(type, state);
+
+  KNH_RETURN_Int(ctx,sfp,ret);
 }
-*/
+
+
  /*
 METHOD SDL_getKeyState(Ctx* ctx,knh_sfp_t *sfp)
 {
@@ -685,59 +929,83 @@ METHOD SDL_getKeyState(Ctx* ctx,knh_sfp_t *sfp)
   KNH_RETURN_void(ctx,sfp);
 }
  */
- /*
+
+/* int SDL.getModState(void) */
+
 METHOD SDL_getModstate(Ctx* ctx, knh_sfp_t *sfp)
 {
-  KNH_RETURN_Int(ctx,sfp,SDL_GetModState());
+  int ret = SDL_GetModState();
+
+  KNH_RETURN_Int(ctx,sfp,ret);
 }
+
+/* void SDL.setModState(int modstate) */
 
 METHOD SDL_setModstate(Ctx* ctx, knh_sfp_t *sfp)
 {
-  SDL_SetModState(sfp[1].ivalue);
+  int modstate = p_int(sfp[1]);
+  SDL_SetModState(modstate);
+
   KNH_RETURN_void(ctx,sfp);
 }
+
+/* String SDL.getKeyName(int key) */
 
 METHOD SDL_getKeyname(Ctx* ctx, knh_sfp_t *sfp)
 {
-  printf("%s\n",SDL_GetKeyName(sfp[1].ivalue));
-  KNH_RETURN_void(ctx,sfp);
+  int key = p_int(sfp[1]);
+  char* ret = SDL_GetKeyName(key);
+
+  KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
 }
+
+
+/* int SDL.enableUNICODE(int enable) */
 
 METHOD SDL_enableUNICODE(Ctx* ctx, knh_sfp_t *sfp)
 {
-  SDL_EnableUNICODE(sfp[1].ivalue);
-  KNH_RETURN_void(ctx,sfp);
+  int enable = p_int(sfp[1]);
+  int ret = SDL_EnableUNICODE(enable);
+
+  KNH_RETURN_Int(ctx,sfp,ret);
 }
 
-METHOD SDL_enableKeyrepeat(Ctx* ctx, knh_sfp_t *sfp)
+/* void SDL.enableKeyRepeat(int delay, int interval) */
+
+METHOD SDL_enableKeyRepeat(Ctx* ctx, knh_sfp_t *sfp)
 {
-  if(SDL_EnableKeyRepeat(sfp[1].ivalue,sfp[2].ivalue)==-1){
+  int delay = p_int(sfp[1]);
+  int interval = p_int(sfp[2]);
+  if(SDL_EnableKeyRepeat(delay, interval)==-1){
     fprintf(stderr,"%s\n",SDL_GetError());
   }
-  KNH_RETURN_void(ctx,sfp);
-}
- */
-//METHOD SDL_getMousestate(Ctx* ctx, knh_sfp_t *sfp)
-//METHOD SDL_getRelativemousestate(Ctx* ctx, knh_sfp_t *sfp)
-/*
-METHOD SDL_getAppstate(Ctx* ctx, knh_sfp_t *sfp)
-{
-  KNH_RETURN_Int(ctx,sfp,SDL_GetAppState());
-}
-*/
- /*
-METHOD SDL_joystickEventstate(Ctx* ctx, knh_sfp_t *sfp)
-{
-  int state = SDL_JoystickEventState(sfp[1].ivalue);
-  if(state == SDL_QUERY){
-    printf("keep state\n");
-  } else {
-    printf("change state\n");
-  }
+
   KNH_RETURN_void(ctx,sfp);
 }
 
-*/
+//METHOD SDL_getMousestate(Ctx* ctx, knh_sfp_t *sfp)
+//METHOD SDL_getRelativemousestate(Ctx* ctx, knh_sfp_t *sfp)
+
+/* int SDL.getAppState(void) */
+
+METHOD SDL_getAppstate(Ctx* ctx, knh_sfp_t *sfp)
+{
+  int ret = SDL_GetAppState();
+
+  KNH_RETURN_Int(ctx,sfp,ret);
+}
+
+/* int SDL.joystickEventState(int state) */
+
+METHOD SDL_joystickEventstate(Ctx* ctx, knh_sfp_t *sfp)
+{
+  int state = p_int(sfp[1]);
+  int ret = SDL_JoystickEventState(state);
+
+  KNH_RETURN_Int(ctx,sfp,ret);
+}
+
+
 /* Joystick */
   /*
 METHOD SDL_numJoysticks(Ctx* ctx, knh_sfp_t *sfp)
@@ -945,8 +1213,8 @@ METHOD SDL_cdPlayTracks(Ctx* ctx, knh_sfp_t *sfp)
 
 METHOD SDL_delay(Ctx* ctx, knh_sfp_t *sfp)
 {
-  int i1 = p_int(sfp[1]);
-  SDL_Delay(i1);
+  int ms = p_int(sfp[1]);
+  SDL_Delay(ms);
 
   KNH_RETURN_void(ctx,sfp);
 }
@@ -960,11 +1228,6 @@ METHOD SDL_getTicks(Ctx* ctx, knh_sfp_t *sfp)
    KNH_RETURN_Float(ctx,sfp,SDL_GetTicks());
 }
 
-METHOD SDL_sample(Ctx* ctx, knh_sfp_t *sfp)
-{
-  //  SDL_Flip(s);
-  KNH_RETURN_void(ctx,sfp);
-}
 
 /*
 METHOD SDL_imgLoad(Ctx* ctx, knh_sfp_t *sfp)
@@ -988,76 +1251,66 @@ METHOD SDL_imgLoadRW(Ctx* ctx, knh_sfp_t *sfp)
   KNH_RETURN(ctx,sfp,new_Glue(ctx,"sdl.Surface",image,NULL));
 }
 */
-/*METHOD SDL_setIColor(Ctx *ctx, knh_sfp_t *sfp)
-{
-  int i=0;
-  SDL_Color palette[0];
-  SDL_Surface *screen=(sfp[1].glue)->ptr;
-  //    for(i=0;i<256;i++){
-    palette[i].r=(sfp[2].ivalue);
-    palette[i].g=(sfp[3].ivalue);
-    palette[i].b=(sfp[4].ivalue);
-    //     }
-  SDL_SetColors(screen,palette,0,21);
-  KNH_RETURN_void(ctx,sfp);
-  }
-*/
 
+METHOD SDL_sample(Ctx* ctx, knh_sfp_t *sfp)
+{
+  KNH_RETURN_void(ctx,sfp);
+}
 
 /* ConstData */
  
 static
 knh_IntConstData_t IntConstData[] = {
   // init
-  {"SDL.SDL_INIT_TIMER", SDL_INIT_TIMER},
-  {"SDL.SDL_INIT_AUDIO", SDL_INIT_AUDIO},
-  {"SDL.SDL_INIT_VIDEO", SDL_INIT_VIDEO},
-  {"SDL.SDL_INIT_CDROM", SDL_INIT_CDROM},
-  {"SDL.SDL_INIT_JOYSTICK", SDL_INIT_JOYSTICK},
-  {"SDL.SDL_INIT_EVERYTHING", SDL_INIT_EVERYTHING},
-  {"SDL.SDL_INIT_NOPARACHUTE", SDL_INIT_NOPARACHUTE},
-  {"SDL.SDL_INIT_EVENTTHREAD", SDL_INIT_EVENTTHREAD}, 
+  {"SDL.INIT_TIMER", SDL_INIT_TIMER},
+  {"SDL.INIT_AUDIO", SDL_INIT_AUDIO},
+  {"SDL.INIT_VIDEO", SDL_INIT_VIDEO},
+  {"SDL.INIT_CDROM", SDL_INIT_CDROM},
+  {"SDL.INIT_JOYSTICK", SDL_INIT_JOYSTICK},
+  {"SDL.INIT_EVERYTHING", SDL_INIT_EVERYTHING},
+  {"SDL.INIT_NOPARACHUTE", SDL_INIT_NOPARACHUTE},
+  {"SDL.INIT_EVENTTHREAD", SDL_INIT_EVENTTHREAD}, 
   // 
-  {"SDL.SDL_SWSURFACE", SDL_SWSURFACE},
-  {"SDL.SDL_HWSURFACE", SDL_HWSURFACE},
-  {"SDL.SDL_ASYNCBLIT", SDL_ASYNCBLIT},
-  {"SDL.SDL_ANYFORMAT", SDL_ANYFORMAT},
-  {"SDL.SDL_HWPALETTE", SDL_HWPALETTE},     
-  {"SDL.SDL_DOUBLEBUF", SDL_DOUBLEBUF},     
-  {"SDL.SDL_FULLSCREEN", SDL_FULLSCREEN},   
-  {"SDL.SDL_OPENGL", SDL_OPENGL},           
-  {"SDL.SDL_OPENGLBLIT", SDL_OPENGLBLIT},   
-  {"SDL.SDL_RESIZABLE",SDL_RESIZABLE},      
-  {"SDL.SDL_HWACCEL",SDL_HWACCEL},          
-  {"SDL.SDL_SRCCOLORKEY", SDL_SRCCOLORKEY}, 
-  {"SDL.SDL_RLEACCEL", SDL_RLEACCEL},       
-  {"SDL.SDL_SRCALPHA", SDL_SRCALPHA},       
-  {"SDL.SDL_PREALLOC", SDL_PREALLOC},       
+  {"SDL.SWSURFACE", SDL_SWSURFACE},
+  {"SDL.HWSURFACE", SDL_HWSURFACE},
+  {"SDL.ASYNCBLIT", SDL_ASYNCBLIT},
+  {"SDL.ANYFORMAT", SDL_ANYFORMAT},
+  {"SDL.HWPALETTE", SDL_HWPALETTE},     
+  {"SDL.DOUBLEBUF", SDL_DOUBLEBUF},     
+  {"SDL.FULLSCREEN", SDL_FULLSCREEN},   
+  {"SDL.OPENGL", SDL_OPENGL},           
+  {"SDL.OPENGLBLIT", SDL_OPENGLBLIT},   
+  {"SDL.RESIZABLE",SDL_RESIZABLE},      
+  {"SDL.HWACCEL",SDL_HWACCEL},          
+  {"SDL.SRCCOLORKEY", SDL_SRCCOLORKEY}, 
+  {"SDL.RLEACCEL", SDL_RLEACCEL},       
+  {"SDL.SRCALPHA", SDL_SRCALPHA},       
+  {"SDL.PREALLOC", SDL_PREALLOC},       
   //
-  {"SDL.SDL_ACTIVEEVENT", SDL_ACTIVEEVENT},       
-  {"SDL.SDL_KEYDOWN", SDL_KEYDOWN},               
-  {"SDL.SDL_KEYUP", SDL_KEYUP},                   
-  {"SDL.SDL_MOUSEMOTION", SDL_MOUSEMOTION},       
-  {"SDL.SDL_MOUBUTTONDOWN", SDL_MOUSEBUTTONDOWN}, 
-  {"SDL.SDL_MOUBUTTONUP", SDL_MOUSEBUTTONUP},     
-  {"SDL.SDL_JOYAXISMOTION", SDL_JOYAXISMOTION},   
-  {"SDL.SDL_JOYBALLMOTION", SDL_JOYBALLMOTION},   
-  {"SDL.SDL_JOYHATMOTION", SDL_JOYHATMOTION},     
-  {"SDL.SDL_JOYBUTTONDOWN", SDL_JOYBUTTONDOWN},   
-  {"SDL.SDL_JOYBUTTONUP", SDL_JOYBUTTONUP},       
-  {"SDL.SDL_QUIT", SDL_QUIT},                     
-  {"SDL.SDL_SYSWMEVENT", SDL_SYSWMEVENT},         
-  {"SDL.SDL_VIDEORESIZE", SDL_VIDEORESIZE},       
-  {"SDL.SDL_VIDEOEXPOSE", SDL_VIDEOEXPOSE},       
-  {"SDL.SDL_USEREVENT",  SDL_USEREVENT},          
+  {"SDL.ACTIVEEVENT", SDL_ACTIVEEVENT},       
+  {"SDL.KEYDOWN", SDL_KEYDOWN},               
+  {"SDL.KEYUP", SDL_KEYUP},                   
+  {"SDL.MOUSEMOTION", SDL_MOUSEMOTION},       
+  {"SDL.MOUSEBUTTONDOWN", SDL_MOUSEBUTTONDOWN}, 
+  {"SDL.MOUSEBUTTONUP", SDL_MOUSEBUTTONUP},     
+  {"SDL.JOYAXISMOTION", SDL_JOYAXISMOTION},   
+  {"SDL.JOYBALLMOTION", SDL_JOYBALLMOTION},   
+  {"SDL.JOYHATMOTION", SDL_JOYHATMOTION},     
+  {"SDL.JOYBUTTONDOWN", SDL_JOYBUTTONDOWN},   
+  {"SDL.JOYBUTTONUP", SDL_JOYBUTTONUP},       
+  {"SDL.QUIT", SDL_QUIT},                     
+  {"SDL.SYSWMEVENT", SDL_SYSWMEVENT},         
+  {"SDL.VIDEORESIZE", SDL_VIDEORESIZE},       
+  {"SDL.VIDEOEXPOSE", SDL_VIDEOEXPOSE},       
+  {"SDL.USEREVENT",  SDL_USEREVENT},          
   //
-  {"SDL.SDL_ENABLE", SDL_ENABLE},   
-  {"SDL.SDL_DISABLE", SDL_DISABLE}, 
-  {"SDL.SDL_QUERY", SDL_QUERY},     
+  {"SDL.ENABLE", SDL_ENABLE},   
+  {"SDL.DISABLE", SDL_DISABLE}, 
+  {"SDL.QUERY", SDL_QUERY},     
   //
-  {"SDL.SDL_GRAB_QUERY", SDL_GRAB_QUERY},
-  {"SDL.SDL_GRAB_OFF", SDL_GRAB_OFF},
-  {"SDL.SDL_GRAB_ON", SDL_GRAB_ON},
+  {"SDL.GRAB_QUERY", SDL_GRAB_QUERY},
+  {"SDL.GRAB_OFF", SDL_GRAB_OFF},
+  {"SDL.GRAB_ON", SDL_GRAB_ON},
   //
   {"SDL.SDLK_BACKSPACE", SDLK_BACKSPACE},
   {"SDL.SDLK_TAB", SDLK_TAB},
@@ -1206,15 +1459,15 @@ knh_IntConstData_t IntConstData[] = {
   {"SDL.KMOD_SHIFT", KMOD_SHIFT},
   {"SDL.KMOD_ALT", KMOD_ALT},
   //
-  {"SDL.SDL_HAT_CENTERED", SDL_HAT_CENTERED},
-  {"SDL.SDL_HAT_UP", SDL_HAT_UP},
-  {"SDL.SDL_HAT_RIGHT", SDL_HAT_RIGHT},
-  {"SDL.SDL_HAT_DOWN", SDL_HAT_DOWN},
-  {"SDL.SDL_HAT_LEFT", SDL_HAT_LEFT},
-  {"SDL.SDL_HAT_RIGHTUP", SDL_HAT_RIGHTUP},
-  {"SDL.SDL_HAT_RIGHTDOWN", SDL_HAT_RIGHTDOWN},
-  {"SDL.SDL_HAT_LEFTUP", SDL_HAT_LEFTUP},
-  {"SDL.SDL_HAT_LEFTDOWN", SDL_HAT_LEFTDOWN},
+  {"SDL.HAT_CENTERED", SDL_HAT_CENTERED},
+  {"SDL.HAT_UP", SDL_HAT_UP},
+  {"SDL.HAT_RIGHT", SDL_HAT_RIGHT},
+  {"SDL.HAT_DOWN", SDL_HAT_DOWN},
+  {"SDL.HAT_LEFT", SDL_HAT_LEFT},
+  {"SDL.HAT_RIGHTUP", SDL_HAT_RIGHTUP},
+  {"SDL.HAT_RIGHTDOWN", SDL_HAT_RIGHTDOWN},
+  {"SDL.HAT_LEFTUP", SDL_HAT_LEFTUP},
+  {"SDL.HAT_LEFTDOWN", SDL_HAT_LEFTDOWN},
   //
   {"SDL.AUDIO_U8", AUDIO_U8},
   {"SDL.AUDIO_S8", AUDIO_S8},
@@ -1230,9 +1483,9 @@ knh_IntConstData_t IntConstData[] = {
   {"SDL.AUDIO_S16LSB", AUDIO_S16LSB},
   {"SDL.AUDIO_S16MSB", AUDIO_S16MSB},
   //
-  {"SDL.SDL_AUDIO_STOPPED", SDL_AUDIO_STOPPED},
-  {"SDL.SDL_AUDIO_PAUSED", SDL_AUDIO_PAUSED},
-  {"SDL.SDL_AUDIO_PLAYING", SDL_AUDIO_PLAYING},
+  {"SDL.AUDIO_STOPPED", SDL_AUDIO_STOPPED},
+  {"SDL.AUDIO_PAUSED", SDL_AUDIO_PAUSED},
+  {"SDL.AUDIO_PLAYING", SDL_AUDIO_PLAYING},
   //
   {"SDL.CD_TRAYEMPTY", CD_TRAYEMPTY},
   {"SDL.CD_STOPPED", CD_STOPPED},
@@ -1240,18 +1493,18 @@ knh_IntConstData_t IntConstData[] = {
   {"SDL.CD_PAUSED", CD_PAUSED},
   {"SDL.CD_ERROR", CD_ERROR},
   //
-  {"SDL.SDL_GL_RED_SIZE", SDL_GL_RED_SIZE},
-  {"SDL.SDL_GL_GREEN_SIZE", SDL_GL_GREEN_SIZE},
-  {"SDL.SDL_GL_BLUE_SIZE", SDL_GL_BLUE_SIZE},
-  {"SDL.SDL_GL_ALPHA_SIZE", SDL_GL_ALPHA_SIZE},
-  {"SDL.SDL_GL_DOUBLEBUFFER", SDL_GL_DOUBLEBUFFER},
-  {"SDL.SDL_GL_BUFFER_SIZE", SDL_GL_BUFFER_SIZE},
-  {"SDL.SDL_GL_DEPTH_SIZE", SDL_GL_DEPTH_SIZE},
-  {"SDL.SDL_GL_STENCIL_SIZE", SDL_GL_STENCIL_SIZE},
-  {"SDL.SDL_GL_ACCUM_RED_SIZE", SDL_GL_ACCUM_RED_SIZE},
-  {"SDL.SDL_GL_ACCUM_GREEN_SIZE", SDL_GL_ACCUM_GREEN_SIZE},
-  {"SDL.SDL_GL_ACCUM_BLUE_SIZE", SDL_GL_ACCUM_BLUE_SIZE},
-  {"SDL.SDL_GL_ACCUM_ALPHA_SIZE",SDL_GL_ACCUM_ALPHA_SIZE},
+  {"SDL.GL_RED_SIZE", SDL_GL_RED_SIZE},
+  {"SDL.GL_GREEN_SIZE", SDL_GL_GREEN_SIZE},
+  {"SDL.GL_BLUE_SIZE", SDL_GL_BLUE_SIZE},
+  {"SDL.GL_ALPHA_SIZE", SDL_GL_ALPHA_SIZE},
+  {"SDL.GL_DOUBLEBUFFER", SDL_GL_DOUBLEBUFFER},
+  {"SDL.GL_BUFFER_SIZE", SDL_GL_BUFFER_SIZE},
+  {"SDL.GL_DEPTH_SIZE", SDL_GL_DEPTH_SIZE},
+  {"SDL.GL_STENCIL_SIZE", SDL_GL_STENCIL_SIZE},
+  {"SDL.GL_ACCUM_RED_SIZE", SDL_GL_ACCUM_RED_SIZE},
+  {"SDL.GL_ACCUM_GREEN_SIZE", SDL_GL_ACCUM_GREEN_SIZE},
+  {"SDL.GL_ACCUM_BLUE_SIZE", SDL_GL_ACCUM_BLUE_SIZE},
+  {"SDL.GL_ACCUM_ALPHA_SIZE",SDL_GL_ACCUM_ALPHA_SIZE},
   {NULL}  // end of const data
 };
  
