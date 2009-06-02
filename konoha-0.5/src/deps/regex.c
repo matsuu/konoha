@@ -30,7 +30,11 @@
 #include"commons.h"
 
 #ifdef KNH_USING_REGEX
+#ifdef KONOHA_OS__WINDOWS
+#include "onigposix.h"
+#else
 #include<regex.h>
+#endif
 #endif
 
 /* ************************************************************************ */
@@ -122,7 +126,7 @@ static
 int knh_regex_regexec(Ctx *ctx, knh_regex_t *reg, char *str, size_t nmatch, knh_regmatch_t p[], int flags)
 {
 	regmatch_t pmatch[KNH_REGEX_NMATCH_SIZE];
-	int res = regexec((const regex_t*)reg, str, KNH_REGEX_NMATCH_SIZE, pmatch, 0);
+	int res = regexec((regex_t*)reg, str, KNH_REGEX_NMATCH_SIZE, pmatch, 0);
 	if(res == 0) {
 		size_t i;
 		for(i = 0; i < KNH_REGEX_NMATCH_SIZE; i++) {
