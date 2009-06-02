@@ -190,7 +190,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-EXTRA_SUBDIRS = src .pygen include windows
+EXTRA_SUBDIRS = src include dist
 EXTRA_FILES = bootstrap
 # dirs which include Makefile.in
 SUBDIRS = build 

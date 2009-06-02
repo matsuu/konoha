@@ -2,7 +2,7 @@
 # define extra dirs
 # these dirs only included for distribution archive.
 
-EXTRA_SUBDIRS = src .pygen include windows
+EXTRA_SUBDIRS = src include dist
 EXTRA_FILES = bootstrap
 # dirs which include Makefile.in
 SUBDIRS = build 

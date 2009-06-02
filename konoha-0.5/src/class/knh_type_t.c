@@ -38,10 +38,6 @@ extern "C" {
 /* ======================================================================== */
 /* [macros] */
 
-/* NN = NONNULL*/
-
-
-
 /* ------------------------------------------------------------------------ */
 
 knh_class_t knh_pmztype_toclass(Ctx *ctx, knh_type_t t, knh_class_t this_cid)
@@ -210,7 +206,7 @@ char* knh_format_type(Ctx *ctx, char *buf, size_t bufsiz, knh_type_t type)
 		return buf;
 	}
 	if(IS_NNTYPE(type)) {
-		knh_snprintf(buf, bufsiz, "%s!", cname);
+		knh_snprintf(buf, bufsiz, "%s", cname);
 		return buf;
 	}
 	knh_snprintf(buf, bufsiz, "%s?", cname);
@@ -223,7 +219,7 @@ char* knh_format_type(Ctx *ctx, char *buf, size_t bufsiz, knh_type_t type)
 char *TYPEQ(knh_type_t type)
 {
 	if(IS_NNTYPE(type)) {
-		return "!";
+		return "";
 	}
 	return "?";
 }
