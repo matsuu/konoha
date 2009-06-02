@@ -1,0 +1,3 @@
+2009-06-02 Masahiro Ide <imasahiro@users.sourceforge.jp>
+    * libxml2.{c,k}     make libxml2 package.
+
