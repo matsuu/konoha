@@ -372,7 +372,7 @@ static METHOD knh__Float_random(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Float_floatToIntBits(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Int(ctx, sfp, sfp[1].ivalue);
+	KNH_RETURN_Int(ctx, sfp, sfp[1].fvalue);
 }
 
 /* ------------------------------------------------------------------------ */
