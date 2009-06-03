@@ -561,6 +561,7 @@ void knh_Token_join(Ctx *ctx, Token *o)
 		} /* "a" "b" "c" */
 		else if(SP(tk)->tt == TT_FORMAT && DP(tk)->tt_next == TT_PARENTHESIS) {
 			SP(tk)->tt = TT_NAME;
+			knh_Token_setBOL(tk, 0);
 			KNH_SETv(ctx, DP(tk)->data, new_String__NAME(ctx, STEXT("format")));
 		}
 	}

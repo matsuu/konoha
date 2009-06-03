@@ -1327,7 +1327,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 //			knh_token_tochar(ts[oc]->tt), oc, knh_token_tochar(ts[e-1]->tt), e-1);
 	if(!(oc < e)) {
 		DBG2_P("tc->c=%d, tc->e=%d", (int)oc, (int)e);
-		KNH_ASSERT(e > 0);
+		DBG2_ASSERT(oc < e);
 		Token *tke = new_Token(ctx, 0, SP(tc->ts[e-1])->fileid, SP(tc->ts[e-1])->line, TT_ERR);
 		knh_perror(ctx, SP(tc->ts[e-1])->fileid, SP(tc->ts[e-1])->line, KERR_ERROR, _("syntax error"));
 		return TM(tke);
