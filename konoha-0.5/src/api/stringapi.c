@@ -547,7 +547,7 @@ static METHOD knh__String_substring(Ctx *ctx, knh_sfp_t *sfp)
 	else { // multibytes
 		size_t mlen = knh_bytes_mlen(base);
 		size_t offset = IS_NULL(sfp[1].o) ? 0 : knh_array_index(ctx, sfp[1].ivalue, mlen);
-		size_t length = IS_NULL(sfp[1].o) ? (mlen - offset) : (size_t)sfp[2].ivalue;
+		size_t length = IS_NULL(sfp[2].o) ? (mlen - offset) : (size_t)sfp[2].ivalue;
 		sub = knh_bytes_mofflen(base, offset, length);
 	}
 

@@ -145,6 +145,13 @@ knh_bytes_t knh_bytes_mofflen(knh_bytes_t m, size_t moff, size_t mlen)
 #ifdef KONOHA_ENCODING__UTF8
 	size_t i, s = m.len, len = 0, ulen = 0;
 	size_t bytes = 0;
+	knh_uchar_t ch;
+	
+	// boundary check
+	if(knh_bytes_mlen(m) < mlen){
+		mlen = knh_bytes_mlen(m) - moff;
+	}
+	
 	for (i = 0; i < m.len; i++) {
 		if (knh_bytes_checkUTF8_isLead(m.buf[i])) ulen++;
 		else if (knh_bytes_checkUTF8_isSingleton(m.buf[i])) len++;
@@ -158,13 +165,16 @@ knh_bytes_t knh_bytes_mofflen(knh_bytes_t m, size_t moff, size_t mlen)
 		m.len = 0;
 		return m;
 	}
-	knh_uchar_t ch = m.buf[s];
-	if (knh_bytes_checkUTF8_isSingleton(ch)) {
-		bytes = 1;
-	} else {
-		bytes = knh_bytes_checkUTF8_getBytes(ch);
-	}
+	
 	m.buf = m.buf + s;
+	for(i = 0; i < mlen; i++) {
+		ch = m.buf[bytes];
+		if (knh_bytes_checkUTF8_isSingleton(ch)) {
+			bytes += 1;
+		} else {
+			bytes += knh_bytes_checkUTF8_getBytes(ch);
+		}
+	}
 	m.len = bytes;
 	return m;
 #endif
