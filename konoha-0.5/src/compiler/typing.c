@@ -2146,11 +2146,17 @@ knh_class_t knh_StmtOPEQ_basecid(Ctx *ctx, Stmt *stmt)
 static
 int knh_Stmt_checkOPSIZE(Ctx *ctx,Stmt *stmt, size_t n)
 {
-	if(n < 2) {
-		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, KERR_ERROR, _("not uniary operator"));
-		return 0;
+	if(DP(stmt)->size + 1 == n) return 1;
+	if(n == 1) {
+		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, KERR_ERROR, _("must be uniary operator"));
 	}
-	return 1;
+	else if(n == 2) {
+		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, KERR_ERROR, _("must be binary operator"));
+	}
+	else {
+		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, KERR_ERROR, _("syntax error"));
+	}
+	return 0;
 }
 
 /* ------------------------------------------------------------------------ */
