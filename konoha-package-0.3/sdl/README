@@ -1,5 +1,33 @@
-start
-second
-test
-class cleate
-event class (portion) 
+-------------------------------------------
++ SDL bindings for Konoha
++ version 0.1
++ kigarashi (c) 2009
++ kigarashi@users.sourceforge.net
+-------------------------------------------
+
+1. What is this?
+  Simple bindings for SDL API.
+
+2. How to install
+  > make -f linux32_.mk
+
+  dig .konoha/sdl directory at your launcing directory.
+if you checkout svn repository, its easy to make symlink
+from your $(homedir),
+
+  > ln -s $(svn-package-checkoutdir) ~/.konoha
+
+3. How to Use?
+  For detailed build and API reference, see the project
+web site:
+    
+          http://konoha.sourceforge.jp/wiki
+
+  For quickly use, check out sample files.
+
+  > konoha sample/sample2.k
+
+4. Bugs
+  report is always welcome.
+
+  kigarashi@users.sourceforge.jp

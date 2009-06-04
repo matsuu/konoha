@@ -1,6 +1,12 @@
 class SDL;
 class Surface;
 class VideoInfo;
+class KeySym;
+class KeyBoard;
+class MouseMotion;
+class MouseButton;
+class Event;
+class Cursor;
 
 class Rect
 {
@@ -9,7 +15,10 @@ class Rect
 	int w;
 	int h;
 	Rect(int x, int y, int w, int h){
-		 _x = x; _y = y; _w = w; _h = h;
+		 _x = x;
+		 _y = y;
+		 _w = w;
+		 _h = h;
 	}
 };
 
@@ -19,332 +28,225 @@ class Color
 	int g;
 	int b;
 	Color(int r, int g, int b){
-		  _r = r; _g = g; _b = b;
+		  _r = r;
+		  _g = g;
+		  _b = b;
 	}
 };
 
-class Active
-{
-	int type;
-	int gain;
-	int state;
-//	Active(int type, int gain, int state){
-//		   _type = type; _gain = gain; _state = state;
-//	}
 
-};
-
-//class KeySym
-//{
-//	int scancode;
-//	int sym;
-//	int mode;
-//	int unicode;
-//	KeySym(int scancode, int sym, int mode, int unicode){
-//		   _scancode = scancode; _sym = sym; _mode = mode; _unicode = unicode;
-//	}
-//};
-
-class KeySym;
-
-//class KeyBoard
-//{
-//	int type;
-//	int state;
-//	KeySym keysym;
-//	KeyBoard(int type, int state, KeySym keysym){
-//		     _type = type; _state = state; _keysym = keysym;
-//	}
-//}
-
-class KeyBoard;
-
-class MouseMotion
-{
-	int type;
-	int state;
-	int x;
-	int y;
-	int xrel;
-	int yrel;
-	MouseMotion(int type, int state, int x, int y, int xrel, int yrel){
-			_type = type; _state = state; _x = x; _y = y; _xrel = xrel; _yrel = yrel;
-	}
-};
-
-class MouseButton
-{
-	int type;
-	int button;
-	int state;
-	int x;
-	int y;
-//	MouseButton(int type, int button, int state, int x, int y){
-//			_type = type; _button = button; _state = state; _x = x; _y = y;
-//	}
-
-};
-
-class Resize
-{
-	int type;
-	int w;
-	int h;
-	Resize(int type, int w, int h){
-		   _type = type; _w = w; _h = h;
-	}
-};
-
-class Expose
-{
-	int type;
-	Expose(int type){
-		   _type = type;
-	}
-};
-
-class Quit
-{
-	int type;
-	Quit(int type){
-		 _type = type;
-	}
-};
-
-/*
-class Event
-{
-	int type;
-	Active active;
-	KeyBoard key;
-	MouseMotion motion;
-	MouseButton button;
-	Resize resize;
-	Expose expose;
-	Quit quit;
-	Event(int type, Active active, KeyBoard key, MouseMotion motion, MouseButton button, Resize resize, Expose expose, Quit quit){
-		  _type = type; _active = active; _key = key; _motion = motion; _button = button; _resize = resize; _expose = expose; _quit = quit;
-	}
-
-}
-
-*/
-class Event;
-
-class PixelFormat;
-
-class Cursor;
-class Overlay;
-class Joystick;
-class AudioSpec;
-class AudioCVT;
-class CD;
+//    class PixelFormat;
+//    class Overlay;
+//    class Joystick;
+//    class AudioSpec;
+//    class AudioCVT;
+//    class CD;
 
 
 
-void SDL.sample()
 
-
-//  for Test
-void SDL.testColor(Color c);
-void SDL.testRect(Rect r);
-
-
-//	General
+//---------------General------------------------------------
 void SDL.init(int flags);
 void SDL.initSubSystem(int flags);
-void SDL.quit();							
+void SDL.quit();	
 void SDL.quitSubSystem(int flags);
 void SDL.wasInit(int flags);
 void SDL.getError();
 
 
-//	Video
-Surface SDL.getVideoSurface();
-VideoInfo SDL.getVideoInfo();
-String SDL.videoDriverName(String namebuf, int maxlen);
-// TODO
-//void SDL.listModes(PixelFormat fmt, int flags);
 
-void SDL.videoModeOK(int width, int height, int bpp, int flags);
-Surface SDL.setVideoMode(int width, int height, int bpp, int flags);
-void Surface.updateRect(int x, int y, int width, int height);
-
-//void SDL.updateRects(Surface screen, int numrects, Rect rects);
-void Surface.flip();
-
-//void SDL.setColors(Surface screen, Color color, int firstcolor, int ncolors);
-//void SDL.setPalette(Surface screen, int flags, Color color, int firstcolor, int ncolors);
-
-//void SDL.setGamma(float redgamma, float greengamma, float bluegamma);	
-//void SDL.getGammaRamp(int redtable, int greentable, int bluetable);
-//void SDL.setGammaRamp(int redtable, int greentable, int bluetable);
-
+//----------------Video-------------------------------------
 int Surface.mapRGB(int red, int green, int blue);
-//int SDL.mapRGBA(PixelFormat fmt, int red, int green, int blue, int alpha);
-//void SDL.getRGB(int pixel, PixelFormat fmt, int red, int green, int blue);
-//void SDL.getRGBA(int pixel, PixelFormat fmt, int red, int green, int blue, int alpha);
-
-Surface SDL.createRGBSurface(int flags, int width, int height, int depth, int rmask, int gmask, int bmask, int amask);
-//todo
-Surface SDL.createRGBSurfaceFrom(void[] pixels, int width, int height, int depth, int pitch, int rmask, int gmask, int bmask, int amask);
-
+int Surface.mapRGBA(int red, int green, int blue, int alpha);
+void SDL.videoModeOK(int width, int height, int bpp, int flags);
+void SDL.setGamma(float redgamma, float greengamma, float bluegamma);
+void Surface.updateRect(int x, int y, int width, int height);
+void Surface.updateRects(int numrects, Rect rects);
+void Surface.getClipRect(Rect rect);
+void Surface.setClipRect(Rect rect);
+void Surface.flip();
 void Surface.freeSurface();
 void Surface.lockSurface();
 void Surface.unLockSurface();
-Surface SDL.loadBMP(String file);
 void Surface.saveBMP(String file);
 void Surface.setColorKey(int flag);
 void Surface.setAlpha(int flag, int alpha);
-
-//void SDL.setClipRect(Surface screen, Rect rect);
-//void SDL.getClipRect(Surface screen, Rect rect);
-//Surface SDL.convertSurface(Surface screen, PixelFormat fmt, int flags);
-
 void Surface.blitSurface(Rect srcrect, Surface screen, Rect dstrect);
-
-//void Surface.fillRect(Rect dstrect, int color);
-
+void Surface.fillRect(Rect dstrect, int color);
+void SDL.warpMouse(int x,int y);
+void Color.setColors(Surface screen, int firstcolor, int ncolors);
+void Color.setPalette(Surface screen, int flags, int firstcolor, int ncolors);
+String SDL.videoDriverName(String namebuf, int maxlen);
+Surface SDL.getVideoSurface();
+Surface SDL.setVideoMode(int width, int height, int bpp, int flags);
+Surface SDL.createRGBSurface(int flags, int width, int height, int depth, int rmask, int gmask, int bmask, int amask);
+Surface SDL.loadBMP(String file);
 Surface Surface.displayFormat();
 Surface Surface.displayFormatAlpha();
-void SDL.warpMouse(int x,int y);
+VideoInfo SDL.getVideoInfo();
 
-//todo
-//Cursor SDL.createCursor(int data, int mask, int width, int height, int hot_x, int hot_y);
-//void Cursor.freeCursor();
-//void Cursor.setCursor();
+//   void SDL.getGammaRamp(int redtable, int greentable, int bluetable);
+//   void SDL.setGammaRamp(int redtable, int greentable, int bluetable);
+//   void SDL.getRGB(int pixel, PixelFormat fmt, int red, int green, int blue);
+//   void SDL.getRGBA(int pixel, PixelFormat fmt, int red, int green, int blue, int alpha);
+//   Surface SDL.createRGBSurfaceFrom(void[] pixels, int width, int height, int depth, int pitch, int rmask, int gmask, int bmask, int amask);
+//   Surface SDL.convertSurface(Surface screen, PixelFormat fmt, int flags);
 
-Cursor SDL.getCursor();
 
-int SDL.showCursor(int toggle);
 
-//void SDL.glLoadLibrary(String path);
-//void[] SDL.glGetProcAddress(String proc);
-//void SDL.glGetAttribute(int attr);
-//void SDL.glSetAttribute(int attr, int value);
-//void SDL.glSwapBuffers();
+//------------------Cursor-----------------------------------
+int Cursor.showCursor(int toggle);
+void Cursor.freeCursor();
+void Cursor.setCursor();
+Cursor Cursor.getCursor();
+Cursor Cursor.createCursor(int data, int mask, int width, int height, int hot_x, int hot_y);
 
-//Overlay SDL.createYUVoverlay(int width, int height, int fmt, Surface display);
-//void SDL.lockYUVoverlay(Overlay ol);
-//void SDL.unlockYUVoverlay(Overlay ol);
-//void SDL.displayYUVoverlay(Overlay ol, Rect dstrect);
-//void SDL.freeYUVoverlay(Overlay ol);
 
-//   	Window Management
-String SDL.wmSetCaption(String title);
-void String.wmGetCaption(String title); 
-void SDL.wmSetIcon(Surface icon, int mask);
+//------------------SDL_GL-----------------------------------
+//   void SDL.glLoadLibrary(String path);
+//   void[] SDL.glGetProcAddress(String proc);
+//   void SDL.glGetAttribute(int attr);
+//   void SDL.glSetAttribute(int attr, int value);
+//   void SDL.glSwapBuffers();
+
+
+//------------------OverLay----------------------------------
+//   void SDL.lockYUVoverlay(Overlay ol);
+//   void SDL.unlockYUVoverlay(Overlay ol);
+//   void SDL.displayYUVoverlay(Overlay ol, Rect dstrect);
+//   void SDL.freeYUVoverlay(Overlay ol);
+//   Overlay SDL.createYUVoverlay(int width, int height, int fmt, Surface display);
+
+
+
+
+//-------------Window Management-----------------------------
 int SDL.wmIconifyWindow();
 int SDL.wmGrabInput(int grabmode);
+void String.wmGetCaption(String title); 
+void SDL.wmSetIcon(Surface icon, int mask);
+void SDL.wmToggleFullScreen(Surface screen);
+String SDL.wmSetCaption(String title);
 
-//todo
-void Surface.wmToggleFullScreen();
 
 
-//   	Event 
 
+//------------------Time-------------------------------------
+void SDL.delay(int ms);
+float SDL.getTicks();
+
+
+
+
+
+//-----------------Event-------------------------------------
 int Event.getType();
+int Event.waitEvent(Event evt);
+int Event.eventState(int type, int state);
+int Event.getModState();
+int Event.getAppState();
+int Event.joystickEventState(int state);
+int Event.enableUNICODE(int enable);
+void Event.pumpEvents();
+void Event.pollEvent(Event evt);
+void Event.pushEvent(Event evt);
+void Event.setModState(int modstate);
+void Event.enableKeyRepeat(int delay, int interval);
 Event Event.new();
+String Event.getKeyName(int key);
 KeyBoard Event.getKeyBoard();
+MouseMotion Event.getMouseMotion();
+MouseButton Event.getMouseButton();
+
+//   void Event.peepEvents(Event evt, int num, int action, int mask);
+//   void Event.setEventFilter(EventFilter filter);
+//   EventFilter Event.getEventFilter();
+//   int[] Event.getKeyState(int[] numkeys);
+//   int Event.getMouseState(int[] x, int[] y);
+//   int Event.getRelativemouseState(int[] x, int[] y);
 
 
-//	 KeyBoard
+
+
+//-----------------Key---------------------------------------
+int KeySym.getScanCode();
+int KeySym.getSym();
+int KeySym.getMod();
+int KeySym.getUniCode();
+int KeyBoard.getType();
+int KeyBoard.getState();
 KeySym KeyBoard.getKeySym();
 
-//     KeySym
-int KeySym.getSym();
-
-void SDL.pumpEvents();
-//void SDL.peepEvents(Event evt, int num, int action, int mask);
-void SDL.pollEvent(Event evt);
-int SDL.waitEvent(Event evt);
-void SDL.pushEvent(Event evt);
-//void SDL.setEventfilter(EventFilter filter);
-//EventFilter SDL.getEventfilter();
-
-int SDL.eventState(int type, int state);
-
-//int* SDL.getKeyState(int* numkeys);
-
-int SDL.getModState();
-void SDL.setModState(int modstate);
-String SDL.getKeyName(int key);
-int SDL.enableUNICODE(int enable);
-void SDL.enableKeyRepeat(int delay, int interval);
-
-//int SDL.getMousestate(int[] x, int[] y);
-//int SDL.getRelativemousestate(int[] x, int[] y);
-
-int SDL.getAppState();
-int SDL.joystickEventstate(int state);
-
-//   	Joystick
-//int SDL.numJoysticks();
-//String SDL.joystickName(int index);
-//Joystick SDL.joystickOpen(int index);
-//int SDL.joystickOpened(int index); 
-//int SDL.joystickIndex(Joystick js);
-//int SDL.joystickNumaxes(Joystick js);
-//int SDL.joystickNumballs(Joystick js);
-//int SDL.joystickNumhats(Joystick js);
-//int SDL.joystickNumbuttons(Joystick js);
-//void SDL.joystickUpdate();
-//int SDL.joystickGetaxis(Joystick js, int axis);
-//int SDL.joystickGethat(Joystick js, int hat);
-//int SDL.joystickGetbutton(Joystick js, int button);
-//void SDL.joystickGetball(Joystick js, int ball, int[] dx, int[] dy);
-//void SDL.joystickClose(Joystick js);
-
-//	Audio
-//void SDL.openAudio(AudioSpec desired, AudioSpec obtained);
-//void SDL.pauseAudio(int pause_on);
-//int SDL.getAudiostatus();
-//AudioSpec SDL.loadWAV(String file, AudioSpec spec, int[][] audio_buf, int[] audio_len);
-//void SDL.freeWAV(int[] audio_buf);
-//void SDL.buildAudioCVT(AudioCVT cvt, int src_fmt, int src_channels, int src_rate, int dst_fmt, int dst_channels, int dst_rate);
-//void SDL.convertAudio(AudioCVT cvt);
-//void SDL.mixAudio(int[] dst, int[] src, int len, int volume);
-//void SDL.lockAudio();
-//void SDL.unLockAudio();
-//void SDL.closeAudio();
-
-//	CD-ROM
-//int SDL.cdNumDrives();
-//String SDL.cdName(int drive);
-//CD SDL.cdOpen(int drive);
-//int SDL.cdStatus(CD cdrom);
-//void SDL.cdPlay(CD cdrom, int start, int length);
-//void SDL.cdPlayTracks(CD cdrom, int start_track, int start_frame, int ntracks, int nframes);
 
 
-//	Multi-threaded Programming
+
+//----------------Mouse------------------------------------
+int MouseMotion.getType();
+int MouseMotion.getState();
+int MouseMotion.getX();
+int MouseMotion.getY();
+int MouseMotion.getXrel();
+int MouseMotion.getYrel();
+int MouseButton.getType();
+int MouseButton.getButton();
+int MouseButton.getState();
+int MouseButton.getX();
+int MouseButton.getY();
+
+
+
+//---------------Joystick-----------------------------------
+//	int SDL.numJoysticks();
+//	int SDL.joystickOpened(int index); 
+//	int SDL.joystickIndex(Joystick js);
+//	int SDL.joystickNumaxes(Joystick js);
+//	int SDL.joystickNumballs(Joystick js);
+//	int SDL.joystickNumhats(Joystick js);
+//	int SDL.joystickNumbuttons(Joystick js);
+//	int SDL.joystickGetaxis(Joystick js, int axis);
+//	int SDL.joystickGethat(Joystick js, int hat);
+//	int SDL.joystickGetbutton(Joystick js, int button);
+//	void SDL.joystickGetball(Joystick js, int ball, int[] dx, int[] dy);
+//	void SDL.joystickClose(Joystick js);
+//	void SDL.joystickUpdate();
+//	String SDL.joystickName(int index);
+//	Joystick SDL.joystickOpen(int index);
+
+
+
+//------------------Audio----------------------------------
+//	int SDL.getAudiostatus();
+//	void SDL.openAudio(AudioSpec desired, AudioSpec obtained);
+//	void SDL.pauseAudio(int pause_on);
+//	void SDL.freeWAV(int[] audio_buf);
+//	void SDL.buildAudioCVT(AudioCVT cvt, int src_fmt, int src_channels, int src_rate, int dst_fmt, int dst_channels, int dst_rate);
+//	void SDL.convertAudio(AudioCVT cvt);
+//	void SDL.mixAudio(int[] dst, int[] src, int len, int volume);
+//	void SDL.lockAudio();
+//	void SDL.unLockAudio();
+//	void SDL.closeAudio();
+//	AudioSpec SDL.loadWAV(String file, AudioSpec spec, int[][] audio_buf, int[] audio_len);
+
+
+
+//-----------------CD-ROM------------------------------------
+//	CD SDL.cdOpen(int drive);
+//	int SDL.cdNumDrives();
+//	int SDL.cdStatus(CD cdrom);
+//	void SDL.cdPlay(CD cdrom, int start, int length);
+//	void SDL.cdPlayTracks(CD cdrom, int start_track, int start_frame, int ntracks, int nframes);
+//	String SDL.cdName(int drive);
 
 
 
 
-
-//	Time
-float SDL.getTicks();
-void SDL.delay(int ms);
+//-----------Multi-threaded Programming---------------------
 
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-//    	SDL_image
-
-//Surface SDL.imgLoad();
-//Surface SDL.imgLoadRW();
+//-----------------SDL_image--------------------------------
+//	Surface SDL.imgLoad();
+//	Surface SDL.imgLoadRW();
