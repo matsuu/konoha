@@ -1,10 +1,10 @@
 #include<konoha.h>
 #ifdef KONOHA_OS__MACOSX
-#include <SDL.h>
+#include <SDL/SDL.h>
 #else
 #include<SDL/SDL.h>
-#include"knh_sdl.h"
 #endif
+#include"knh_sdl.h"
 
 /* void SDL.init(int flags) */
 METHOD SDL_init(Ctx* ctx,knh_sfp_t* sfp)
