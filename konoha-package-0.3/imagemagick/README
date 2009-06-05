@@ -11,16 +11,18 @@
 2. How to install?
  Compile imagemagick with makefile.
 
-  > make
+  > make -f linux_32.mk
 
  Suppose there are installed ImageMagick and 
 MagickWand API. Compilation needs -lWand, -lMagick 
 options. Thus, Magick-config program is needed. 
-After compilation, type;
+After compilation, konoha will search imagemagick lib
+from below directories
 
-  > make konoha_install
+  ~/.konoha/imagemagick
+  ./.konoha/imagemagick
 
- This would install package under your enviroment.
+ Please place imagemagick_linux_32.so at there.
 
 3. How to Use?
  just type;
@@ -29,7 +31,7 @@ After compilation, type;
 
  and goes on like this... 
 
-   >>> MagickWand mw = new MagickWand()
+   >>> ImageMagick mw = new ImageMagick()
    >>> mw.readImage("xxx.png")
    >>> mw.flipImage()
    >>> mw.writeImage("ooo.png")
