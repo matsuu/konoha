@@ -1,5 +1,4 @@
-#include<konoha.h>
-#include<SDL/SDL.h>
+#include"knh_sdl.h">
 
 /* Overlay SDL.createYUVoverlay(int width, int height, int fmt, Surface display) */
   /*

@@ -1,5 +1,4 @@
-#include<konoha.h>
-#include<SDL/SDL.h>
+#include"knh_sdl.h"
 
 /* void SDL.glLoadLibrary(String path) */
 

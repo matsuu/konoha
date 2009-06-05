@@ -1,5 +1,4 @@
-#include<konoha.h>
-#include<SDL/SDL.h>
+#include"knh_sdl.h"
 
 /* void Color.setColors(Surface screen, int firstcolor, int ncolors) */
 METHOD Color_setColors(Ctx* ctx, knh_sfp_t *sfp)

@@ -1,5 +1,3 @@
-#include<konoha.h>
-#include<SDL/SDL.h>
 #include"knh_sdl.h"
 
 

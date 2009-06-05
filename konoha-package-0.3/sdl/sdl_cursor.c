@@ -1,5 +1,4 @@
-#include<konoha.h>
-#include<SDL/SDL.h>
+#include"knh_sdl.h"
 
 /* Cursor Cursor.createCursor(int[] data, int[] mask, int width, int height, int hot_x, int hot_y) */
 METHOD Cursor_createCursor(Ctx* ctx, knh_sfp_t *sfp)

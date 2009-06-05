@@ -10,28 +10,28 @@ class Cursor;
 
 class Rect
 {
-	int x;
-	int y;
-	int w;
-	int h;
-	Rect(int x, int y, int w, int h){
-		 _x = x;
-		 _y = y;
-		 _w = w;
-		 _h = h;
-	}
+    int x;
+    int y;
+    int w;
+    int h;
+    Rect(int x, int y, int w, int h){
+        _x = x;
+        _y = y;
+        _w = w;
+        _h = h;
+    }
 };
 
 class Color
 {
-	int r;
-	int g;
-	int b;
-	Color(int r, int g, int b){
-		  _r = r;
-		  _g = g;
-		  _b = b;
-	}
+    int r;
+    int g;
+    int b;
+    Color(int r, int g, int b){
+        _r = r;
+        _g = g;
+        _b = b;
+    }
 };
 
 
@@ -250,3 +250,4 @@ int MouseButton.getY();
 //-----------------SDL_image--------------------------------
 //	Surface SDL.imgLoad();
 //	Surface SDL.imgLoadRW();
+

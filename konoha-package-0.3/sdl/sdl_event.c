@@ -1,5 +1,4 @@
-#include <konoha.h>
-#include <SDL/SDL.h>
+#include"knh_sdl.h"
 
 /* Event Event.new(void) */
 METHOD Event_new(Ctx *ctx, knh_sfp_t *sfp)
