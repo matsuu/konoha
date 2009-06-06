@@ -83,8 +83,6 @@ void knh_Context_setProperty(Ctx *ctx, Context *b, String *key, Any *value);
 void knh_System__k(Ctx *ctx, System *o, OutputStream *w, String *m);
 void knh_System__dump(Ctx *ctx, System *o, OutputStream *w, String *m);
 void knh_Context_setEncoding(Ctx *ctx, knh_Context_t *o, String *enc);
-/* ../src/class/knh_AffineConv.c */
-AffineConv *new_AffineConv(Ctx *ctx, knh_float_t fa, knh_float_t fb);
 /* ../src/class/knh_Array.c */
 size_t knh_array_newsize(size_t newsize, size_t usize);
 size_t knh_array_index0(Ctx *ctx, knh_intptr_t n, size_t size);
@@ -145,8 +143,7 @@ void knh_ClassMap_add(Ctx *ctx, ClassMap *o, Mapper *map);
 void knh_ClassMap__dump(Ctx *ctx, ClassMap *o, OutputStream *w, String *m);
 void knh_ClassMap__man(Ctx *ctx, ClassMap *o, OutputStream *w, knh_class_t cid);
 /* ../src/class/knh_ClassSpec.c */
-void knh_ClassSpec_initIntRange(Ctx *ctx, ClassSpec *u, knh_int_t min, knh_int_t max);
-void knh_ClassSpec_initFloatRange(Ctx *ctx, ClassSpec *u, knh_float_t min, knh_float_t max, knh_float_t step);
+void knh_write_intx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_int_t v);
 void knh_write_floatx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_float_t v);
 void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid);
 knh_bytes_t konoha_getAliasURN(Ctx *ctx, knh_bytes_t aurn);
@@ -229,10 +226,6 @@ Exception* new_Exception__Nue(Ctx *ctx, Object *o);
 ExceptionHandler* new_ExceptionHandler(Ctx *ctx);
 void knh_ExceptionHandler_longjmp(Ctx *ctx, ExceptionHandler *o, Exception *e);
 Exception* knh_ExceptionHandler_getCaughtException(ExceptionHandler *o);
-/* ../src/class/knh_Float.c */
-Float* new_Float(Ctx *ctx, knh_float_t value);
-Float* new_FloatX__fast(Ctx *ctx, knh_class_t cid, knh_float_t value);
-Float* new_FloatX(Ctx *ctx, knh_class_t cid, knh_float_t value);
 /* ../src/class/knh_Hash.c */
 knh_hashentry_t *new_hashentry(Ctx *ctx, knh_Hash_t *o);
 void knh_hashentry_collect(Ctx *ctx, knh_Hash_t *o, knh_hashentry_t *e);
@@ -253,8 +246,6 @@ String* knh_InputStream_readLine(Ctx *ctx, InputStream *o);
 void knh_InputStream_close(Ctx *ctx, InputStream *o);
 int knh_InputStream_isClosed(InputStream *o);
 MAPPER knh_Bytes_InputStream(Ctx *ctx, knh_sfp_t *sfp);
-/* ../src/class/knh_Int.c */
-knh_int_t knh_IntNULL_toint(Int *v);
 /* ../src/class/knh_Iterator.c */
 void knh_Iterator_close(Ctx *ctx, Iterator *it);
 Iterator* new_Iterator(Ctx *ctx, knh_class_t p1, Any *source, knh_fitrnext fnext);
@@ -321,6 +312,7 @@ knh_type_t knh_NameSpace_tagcid(Ctx *ctx, NameSpace *o, knh_class_t bcid, knh_by
 /* ../src/class/knh_Number.c */
 knh_int_t knh_Number_tointeger(Any *o);
 knh_float_t knh_Number_tofloat(Any *o);
+knh_int_t knh_IntNULL_toint(Int *v);
 /* ../src/class/knh_Object.c */
 Object *new_Nue(Ctx *ctx, String *msg);
 METHOD knh__Object_new(Ctx *ctx, knh_sfp_t *sfp);
@@ -344,20 +336,6 @@ void knh_OutputStream_indent_inc(Ctx *ctx, OutputStream *o);
 void knh_OutputStream_indent_dec(Ctx *ctx, OutputStream *o);
 void knh_OutputStream_write_indent(Ctx *ctx, OutputStream *o);
 void knh_OutputStream_print_(Ctx *ctx, OutputStream *o, knh_bytes_t str, knh_bool_t isnl);
-/* ../src/class/knh_OutputStream_write.c */
-void knh_write__s(Ctx *ctx, OutputStream *w, char *s);
-void knh_write__p(Ctx *ctx, OutputStream *w, void *ptr);
-void knh_write__ifmt(Ctx *ctx, OutputStream *w, char *fmt, knh_intptr_t n);
-void knh_write__ffmt(Ctx *ctx, OutputStream *w, char *fmt, knh_float_t n);
-void knh_write_integerfmt(Ctx *ctx, OutputStream *w, char *fmt, knh_int_t n);
-void knh_write__flag(Ctx *ctx, OutputStream *w, knh_flag_t flag);
-void knh_write_cid(Ctx *ctx, OutputStream *w, knh_class_t cid);
-void knh_write_mn(Ctx *ctx, OutputStream *w, knh_methodn_t mn);
-void knh_write_type(Ctx *ctx, OutputStream *w, knh_type_t type);
-void knh_write_fline(Ctx *ctx, OutputStream *w, char *file, int line);
-void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap);
-void konoha_setverbose(int v);
-METHOD knh_fmethod_movableText(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/class/knh_ResultSet.c */
 ResultSet* new_ResultSet(Ctx *ctx);
 knh_boolean_t knh_ResultSet_next(Ctx *ctx, ResultSet *o);
@@ -408,6 +386,20 @@ knh_class_t knh_class_Generics(Ctx *ctx, knh_class_t bcid, knh_class_t p1, knh_c
 char* knh_format_type(Ctx *ctx, char *buf, size_t bufsiz, knh_type_t type);
 char *TYPEQ(knh_type_t type);
 char *knh_TYPEN(Ctx *ctx, knh_type_t type);
+/* ../src/class/knh_write.c */
+void knh_write__s(Ctx *ctx, OutputStream *w, char *s);
+void knh_write__p(Ctx *ctx, OutputStream *w, void *ptr);
+void knh_write__ifmt(Ctx *ctx, OutputStream *w, char *fmt, knh_intptr_t n);
+void knh_write__ffmt(Ctx *ctx, OutputStream *w, char *fmt, knh_float_t n);
+void knh_write_integerfmt(Ctx *ctx, OutputStream *w, char *fmt, knh_int_t n);
+void knh_write__flag(Ctx *ctx, OutputStream *w, knh_flag_t flag);
+void knh_write_cid(Ctx *ctx, OutputStream *w, knh_class_t cid);
+void knh_write_mn(Ctx *ctx, OutputStream *w, knh_methodn_t mn);
+void knh_write_type(Ctx *ctx, OutputStream *w, knh_type_t type);
+void knh_write_fline(Ctx *ctx, OutputStream *w, char *file, int line);
+void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap);
+void konoha_setverbose(int v);
+METHOD knh_fmethod_movableText(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/compiler/asm.c */
 Asm* knh_Context_getAsm(Ctx *ctx);
 NameSpace *knh_Context_getNameSpace(Ctx *ctx);
