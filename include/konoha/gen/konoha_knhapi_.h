@@ -1,20 +1,20 @@
 /****************************************************************************
- * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER  
- * 
+ * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
+ *
  * Copyright (c) 2005-2009, Kimio Kuramitsu <kimio at ynu.ac.jp>
- *           (c) 2008-      Konoha Software Foundation  
+ *           (c) 2008-      Konoha Software Foundation
  * All rights reserved.
- * 
- * You may choose one of the following two licenses when you use konoha. 
+ *
+ * You may choose one of the following two licenses when you use konoha.
  * See www.konohaware.org/license.html for further information.
- * 
+ *
  * (1) GNU General Public License 2.0      (with    KONOHA_UNDER_GPL2)
  * (2) Konoha Software Foundation License 1.0
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
  * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *  
+ *
  ****************************************************************************/
 
 #ifndef KONOHA_KNHAPI__H
@@ -31,7 +31,7 @@
 #include<konoha/gen/konoha_class_.h>
 
 
-#ifdef __cplusplus 
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -63,9 +63,6 @@ extern "C" {
 #define STRUCT_FIELDSIZE(sid)      (sid & (~KNH_FLAG_SF_FIELD))
 #define STRUCT_UNMASK(sid)         (sid & (~KNH_FLAG_SF_FIELD))
 #define KNH_ASSERT_sid(sid)   KNH_ASSERT(((knh_struct_t)sid) < ctx->share->StructTableSize)
-#define KNH_ASSERT_cid(cid)    KNH_ASSERT(cid < KNH_TCLASS_SIZE)
-#define CLASSN(cid)   knh_ClassTable_CLASSN(ctx, cid)
-#define CLASSNo(o)    knh_ClassTable_CLASSN(ctx, knh_Object_cid(o))
 #define KNH_DEF(ctx, cid)  konoha_getClassDefaultValue(ctx, cid)
 #define KNH_DEF(ctx, cid)  konoha_getClassDefaultValue(ctx, cid)
 #define KNH_STDIN          (((Context*)ctx)->in)

@@ -395,6 +395,15 @@ typedef struct knh_Class_t {
 #define KNH_FLAG_CF_PARAM2 0
 #define KNH_FLAG_CF_PARAM4 0
 
+
+/* class */
+
+#define knh_Class_cid(c)     (knh_class_t)(c)->cid
+#define KNH_FLAG_CF2OF(f)        (f)
+#define knh_Class_isGenerics(cid)    (ctx->share->ClassTable[cid].p1 != CLASS_Nue)
+
+
+
 /* ------------------------------------------------------------------------ */
 /* @class ClassStruct Object knh_ClassStruct_t @Private */
 /* @flag ClassStruct.Hidden CFF ((ClassStruct)%s)->fields[n].flag 'is:set:*:*' */

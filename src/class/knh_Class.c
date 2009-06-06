@@ -36,28 +36,6 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-/* [macros] */
-
-#define _CLASS_newid          ((knh_class_t)-1)
-#define _CLASS_unknown        ((knh_class_t)-2)
-
-#define _knh_Class_cid(c)     (knh_class_t)(c)->cid
-#define _KNH_FLAG_CF2OF(f)        (f)
-#define _knh_Class_isGenerics(cid)    (ctx->share->ClassTable[cid].p1 != CLASS_Nue)
-
-/* ------------------------------------------------------------------------ */
-
-#define _KNH_FLAG_SF_FIELD          KNH_FLAG_T1
-
-#define _STRUCT_ISFIELD(sid)        ((sid & KNH_FLAG_SF_FIELD) == KNH_FLAG_SF_FIELD)
-#define _BSIZE_TOSID(bsize)         (((knh_struct_t)bsize)|KNH_FLAG_SF_FIELD)
-#define _STRUCT_FIELD(bsize)        (((knh_struct_t)bsize)|KNH_FLAG_SF_FIELD)
-#define _STRUCT_FIELDSIZE(sid)      (sid & (~KNH_FLAG_SF_FIELD))
-#define _STRUCT_UNMASK(sid)         (sid & (~KNH_FLAG_SF_FIELD))
-
-#define _KNH_ASSERT_sid(sid)   KNH_ASSERT(((knh_struct_t)sid) < ctx->share->StructTableSize)
-
-/* ======================================================================== */
 /* [ClassTable] */
 
 knh_struct_t knh_StructTable_newId(Ctx *ctx)
@@ -93,8 +71,6 @@ knh_class_t knh_ClassTable_newId(Ctx *ctx)
 	KNH_EXIT("Enlarge KNH_TCLASS_SIZE %d", KNH_TCLASS_SIZE);
 	return CLASS_unknown;
 }
-
-#define _KNH_ASSERT_cid(cid)    KNH_ASSERT(cid < KNH_TCLASS_SIZE)
 
 /* ------------------------------------------------------------------------ */
 
@@ -148,9 +124,6 @@ void konoha_setClassName(Ctx *ctx, knh_class_t cid, String *lname)
 
 /* ------------------------------------------------------------------------ */
 /* [name] */
-
-#define _CLASSN(cid)   knh_ClassTable_CLASSN(ctx, cid)
-#define _CLASSNo(o)    knh_ClassTable_CLASSN(ctx, knh_Object_cid(o))
 
 char *knh_ClassTable_CLASSN(Ctx *ctx, knh_class_t cid)
 {
@@ -365,9 +338,6 @@ KNH_XCLASS(Ctx *ctx, knh_class_t cid, knh_class_t bcid, ClassSpec *cs)
 	ctx->share->ClassTable[cid].fdefault = knh_ClassTable_fdefault__CSPEC;
 	return cid;
 }
-
-
-/* ------------------------------------------------------------------------ */
 
 /* ======================================================================== */
 /* [ClassStruct] */
@@ -613,6 +583,7 @@ void knh_ClassMap__man(Ctx *ctx, ClassMap *o, OutputStream *w, knh_class_t cid)
 	}
 }
 
+/* ------------------------------------------------------------------------ */
 
 #ifdef __cplusplus
 }
