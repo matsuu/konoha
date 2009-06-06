@@ -289,12 +289,6 @@ METHOD knh__Mapper_isDerived(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 static 
-METHOD knh__IntUnit_isUnsigned(Ctx *ctx, knh_sfp_t *sfp)
-{
-	KNH_RETURN_Boolean(ctx, sfp, knh_IntUnit_isUnsigned((knh_IntUnit_t*)sfp[0].o));
-}
-
-static 
 METHOD knh__OutputStream_isAutoFlush(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_OutputStream_isAutoFlush((knh_OutputStream_t*)sfp[0].o));

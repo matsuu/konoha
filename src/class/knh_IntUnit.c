@@ -36,186 +36,366 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-/* [default_func] */
-
-static knh_bool_t knh_fenumchk__nop(IntUnit *b, knh_int_t v);
-static int knh_fenumcmp__unsigned(IntUnit *b, knh_int_t v1, knh_int_t v2);
-static void knh_fenumfmt__unsigned(IntUnit *b, char *buf, size_t bufsiz, knh_int_t v);
-static knh_bool_t knh_fenumchk__signed_min(IntUnit *b, knh_int_t v);
-static knh_bool_t knh_fenumchk__signed_max(IntUnit *b, knh_int_t v);
-static knh_bool_t knh_fenumchk__signed(IntUnit *b, knh_int_t v);
-static knh_bool_t knh_fenumchk__unsigned_min(IntUnit *b, knh_int_t v);
-static knh_bool_t knh_fenumchk__unsigned_max(IntUnit *b, knh_int_t v);
-static knh_bool_t knh_fenumchk__unsigned(IntUnit *b, knh_int_t v);
-
-/* ------------------------------------------------------------------------ */
+/* [Int] */
 
 static
-knh_bool_t knh_fenumchk__nop(IntUnit *b, knh_int_t v)
+int knh_fichk__range(ClassSpec *u, knh_int_t v)
 {
-	return 1;
+	return (DP(u)->imin <= v && v <= DP(u)->imax);
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-int knh_fenumcmp__unsigned(IntUnit *b, knh_int_t v1, knh_int_t v2)
+int knh_fichk__umax(ClassSpec *u, knh_uint_t v)
+{
+	return (v <= DP(u)->umax);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+int knh_fichk__urange(ClassSpec *u, knh_uint_t v)
+{
+	return (DP(u)->umin <= v && v <= DP(u)->umax);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+int knh_ficmp__unsigned(ClassSpec *u, knh_uint_t v1, knh_uint_t v2)
 {
 	if(v1 == v2) return 0;
-	return ((knh_uintptr_t)v1) > ((knh_uintptr_t)v2) ? 1 : 0;
+	return (v1 > v2) ? 1 : -1;
+}
+
+/* ------------------------------------------------------------------------ */
+/* [Float] */
+
+static
+int knh_ffchk__range(ClassSpec *u, knh_float_t v)
+{
+	return (DP(u)->fmin <= v && v <= DP(u)->fmax);
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_fenumfmt__unsigned(IntUnit *b, char *buf, size_t bufsiz, knh_int_t v)
+int knh_ffcmp__step(ClassSpec *u, knh_float_t v1, knh_float_t v2)
 {
-	knh_snprintf(buf, bufsiz, KNH_UINT_FMT, (knh_uint_t)v);
-}
-
-/* ======================================================================== */
-/* [range] */
-
-static
-knh_bool_t knh_fenumchk__signed_min(IntUnit *b, knh_int_t v)
-{
-	return (DP(b)->min <= v);
+	knh_float_t v = v1 - v2;
+	if(v >= DP(u)->fstep) return 1;
+	if(v <= -(DP(u)->fstep)) return -1;
+	return 0;
 }
 
 /* ------------------------------------------------------------------------ */
 
-static
-knh_bool_t knh_fenumchk__signed_max(IntUnit *b, knh_int_t v)
+void knh_ClassSpec_initIntRange(Ctx *ctx, ClassSpec *u, knh_int_t min, knh_int_t max)
 {
-	return (v <= DP(b)->max);
-}
+	DP(u)->imin = min;
+	DP(u)->fmin = (knh_float_t)min;
+	DP(u)->imax = max;
+	DP(u)->fmax = (knh_float_t)max;
+	DP(u)->fstep = 1.0;
 
-/* ------------------------------------------------------------------------ */
-
-static
-knh_bool_t knh_fenumchk__signed(IntUnit *b, knh_int_t v)
-{
-	return (DP(b)->min <= v && v <= DP(b)->max);
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-knh_bool_t knh_fenumchk__unsigned_min(IntUnit *b, knh_int_t v)
-{
-	return ((knh_uint_t)DP(b)->min) <= ((knh_uint_t)v);
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-knh_bool_t knh_fenumchk__unsigned_max(IntUnit *b, knh_int_t v)
-{
-	return ((knh_uint_t)v) <= ((knh_uint_t)DP(b)->max);
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-knh_bool_t knh_fenumchk__unsigned(IntUnit *b, knh_int_t v)
-{
-	return (((knh_uint_t)DP(b)->min) <= ((knh_uint_t)v) && ((knh_uint_t)v) <= ((knh_uint_t)DP(b)->max));
-}
-
-/* ======================================================================== */
-/* [set] */
-
-/* ------------------------------------------------------------------------ */
-
-void knh_IntUnit_initMinMax(Ctx *ctx, IntUnit *b, knh_int_t min, knh_int_t max)
-{
-	DP(b)->min = min;
-	DP(b)->max = max;
-	if(knh_IntUnit_isUnsigned(b)) {
-		DP(b)->fcmp = knh_fenumcmp__unsigned;
-		DP(b)->ffmt = knh_fenumfmt__unsigned;
-		if(DP(b)->min == KNH_UINT_MIN) {
-			if(DP(b)->max == KNH_UINT_MAX) {
-				//KNH_ASSERT(DP(b)->fchk == knh_fenumchk__nop);
-			}
-			else {
-				DP(b)->fchk = knh_fenumchk__unsigned_max;
-			}
+	if(min >= 0) {
+		DP(u)->ficmp = (knh_ficmp)knh_ficmp__unsigned;
+		if(min == 0) {
+			DP(u)->fichk = (knh_fichk)knh_fichk__umax;
 		}
 		else {
-			if(DP(b)->max == KNH_UINT_MAX) {
-				DP(b)->fchk = knh_fenumchk__unsigned_min;
-			}
-			else {
-				DP(b)->fchk = knh_fenumchk__unsigned;
-			}
+			DP(u)->fichk = (knh_fichk)knh_fichk__urange;
+		}
+		DP(u)->ffchk = knh_ffchk__range;
+	}
+	else {
+		if(min != KNH_INT_MIN || max != KNH_INT_MAX) {
+			DP(u)->fichk = knh_fichk__range;
+			DP(u)->ffchk = knh_ffchk__range;
+		}
+	}
+	DP(u)->ffcmp = knh_ffcmp__step;
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_ClassSpec_initFloatRange(Ctx *ctx, ClassSpec *u, knh_float_t min, knh_float_t max, knh_float_t step)
+{
+	DP(u)->fmin = min;
+	DP(u)->fmax = max;
+	DP(u)->fstep = step;
+	DP(u)->imax = (knh_int_t)max;
+	DP(u)->imin = (knh_int_t)min;
+
+	if(min >= 0.0) {
+		DP(u)->ficmp = (knh_ficmp)knh_ficmp__unsigned;
+		if(min == 0) {
+			DP(u)->fichk = (knh_fichk)knh_fichk__umax;
+		}
+		else {
+			DP(u)->fichk = (knh_fichk)knh_fichk__urange;
+		}
+		DP(u)->ffchk = knh_ffchk__range;
+	}
+	else {
+		if(min != KNH_FLOAT_MIN || max != KNH_FLOAT_MAX) {
+			DP(u)->fichk = knh_fichk__range;
+			DP(u)->ffchk = knh_ffchk__range;
+		}
+	}
+	if(step != 0.0) {
+		DP(u)->ffcmp = knh_ffcmp__step;
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_write_floatx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_float_t v)
+{
+	char *FMT = KNH_FLOAT_FMT;
+	knh_float_t step = DP(u)->fstep;
+	if(0.1 <= step && step < 1.0) {
+		FMT = KNH_FLOAT_FMT1;
+	}
+	else if(0.01 <= step && step < 0.1) {
+		FMT = KNH_FLOAT_FMT2;
+	}
+	else if(0.001 <= step && step < 0.01) {
+		FMT = KNH_FLOAT_FMT3;
+	}
+	else if(0.0001 <= step && step < 0.001) {
+		FMT = KNH_FLOAT_FMT4;
+	}
+	knh_write__ffmt(ctx, w, FMT, v);
+	knh_bytes_t tag = knh_String_tobytes(DP(u)->tag);
+	if(tag.len > 0) {
+		knh_putc(ctx, w, '[');
+		knh_write(ctx, w, tag);
+		knh_putc(ctx, w, ']');
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid)
+{
+	knh_class_t bcid = ctx->share->ClassTable[cid].bcid;
+	if(bcid == CLASS_Int) {
+		knh_int_t v = 0;
+		if(!DP(u)->fichk(u, v)) {
+			v = DP(u)->imin;
+		}
+		KNH_ASSERT(DP(u)->ivalue == NULL);
+		KNH_INITv(DP(u)->ivalue, new_IntX__fast(ctx, cid, v));
+		if(DP(u)->fvalue != NULL) {
+
+		}
+		if(DP(u)->svalue != NULL) {
+
+		}
+	}
+	else if(bcid == CLASS_Float) {
+		knh_float_t v = 0;
+		if(!DP(u)->ffchk(u, v)) {
+			v = DP(u)->fmin;
+		}
+		KNH_ASSERT(DP(u)->fvalue == NULL);
+		KNH_INITv(DP(u)->fvalue, new_FloatX__fast(ctx, cid, v));
+		if(DP(u)->ivalue != NULL) {
+
+		}
+		if(DP(u)->svalue != NULL) {
+
 		}
 	}
 	else {
-		if(DP(b)->min == KNH_INT_MIN) {
-			if(DP(b)->max == KNH_INT_MAX) {
-				//KNH_ASSERT(DP(b)->fchk == knh_fenumchk__nop);
-			}
-			else {
-				DP(b)->fchk = knh_fenumchk__signed_max;
-			}
+		KNH_ASSERT(bcid == CLASS_String);
+		if(DP(u)->ivalue != NULL) {
+
 		}
-		else {
-			if(DP(b)->max == KNH_INT_MAX) {
-				DP(b)->fchk = knh_fenumchk__signed_min;
-			}
-			else {
-				DP(b)->fchk = knh_fenumchk__signed;
-			}
+		if(DP(u)->svalue != NULL) {
+
 		}
 	}
 }
 
 /* ------------------------------------------------------------------------ */
 
-void knh_IntUnit_initDefaultValue(Ctx *ctx, IntUnit *b, knh_int_t v)
+KNHAPI(ClassSpec*) new_Enum(Ctx *ctx, char *tag, knh_int_t min, knh_int_t max)
 {
-	if(!DP(b)->fchk(b, v)) {
-		v = DP(b)->min;
+	knh_class_t cid = knh_ClassTable_newId(ctx);
+	ClassSpec* u = (ClassSpec*)new_Object_bcid(ctx, CLASS_ClassSpec, (int)cid);
+	if(tag != NULL || tag[0] != 0) {
+		KNH_SETv(ctx, DP(u)->urn, new_String__T(ctx, tag));
 	}
-	KNH_SETv(ctx, DP(b)->spec.defvalue, new_IntX__fast(ctx, DP(b)->spec.cid, v));
+	knh_ClassSpec_initIntRange(ctx, u, min, max);
+	return u;
 }
 
 /* ------------------------------------------------------------------------ */
 
-IntUnit *new_IntUnit(Ctx *ctx, knh_flag_t flag, knh_class_t cid, String *urn, String *tag, knh_int_t min, knh_int_t max, knh_int_t defvalue)
+KNHAPI(ClassSpec*) new_Unit(Ctx *ctx, char *tag, knh_float_t min, knh_float_t max, knh_float_t step)
 {
-	IntUnit* o = (IntUnit*)new_Object_bcid(ctx, CLASS_IntUnit, 0);
+	knh_class_t cid = knh_ClassTable_newId(ctx);
+	ClassSpec* u = (ClassSpec*)new_Object_bcid(ctx, CLASS_ClassSpec, (int)cid);
+	if(tag != NULL || tag[0] != 0) {
+		KNH_SETv(ctx, DP(u)->urn, new_String__T(ctx, tag));
+	}
+	knh_ClassSpec_initFloatRange(ctx, u, min, max, step);
+	return u;
+}
 
-	DP(o)->spec.flag = flag;
-	DP(o)->spec.cid  = cid;
-	KNH_SETv(ctx, DP(o)->spec.urn,  urn);
-	KNH_SETv(ctx, DP(o)->spec.tag,  tag);
-	knh_IntUnit_initMinMax(ctx, o, min, max);
-	knh_IntUnit_initDefaultValue(ctx, o, defvalue);
+/* ======================================================================== */
+/* [String] */
+
+static
+String *new_StringX__FormatException(Ctx *ctx, knh_class_t cid, knh_bytes_t t, String *orign)
+{
+	TODO();
+//	Bytes *ba = knh_Context_openBConvBuf(ctx);
+//	knh_Bytes_write(ctx, ba, STEXT("Format!!: "));
+//	knh_Bytes_write(ctx, ba, B(CLASSN(cid)));
+//	knh_Bytes_write(ctx, ba, STEXT("('"));
+//	knh_Bytes_write(ctx, ba, t);
+//	knh_Bytes_write(ctx, ba, STEXT(")'"));
+//	{
+//		String *s = (String*)new_Nue__b(ctx, knh_Bytes_tobytes(ba));
+//		knh_Bytes_clear(ba, 0);
+//		return s;
+//	}
+	return TS_EMPTY;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+String *knh_fsnew__dict(Ctx *ctx, knh_class_t cid, knh_bytes_t t, String *orign)
+{
+	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
+	KNH_ASSERT(IS_ClassSpec(u));
+	knh_index_t n = knh_DictIdx_index(ctx, DP(u)->vocabDictIdx, t);
+	if(n == -1) return new_StringX__FormatException(ctx, cid, t, orign);
+	return knh_DictIdx_get__fast(DP(u)->vocabDictIdx, n);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+int knh_fscmp__dict(ClassSpec *o, knh_bytes_t v1, knh_bytes_t v2)
+{
+	return knh_DictIdx_index(NULL, DP(o)->vocabDictIdx, v1) - knh_DictIdx_index(NULL, DP(o)->vocabDictIdx, v2);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+DictIdx* new_DictIdx__Array(Ctx *ctx, Array *a)
+{
+	knh_DictIdx_t *o = (knh_DictIdx_t*)new_hObject(ctx, FLAG_DictIdx, CLASS_DictIdx, CLASS_DictIdx);
+	KNH_INITv(o->terms, a);
+	KNH_INITv(o->termsDictSet, new_DictSet(ctx, knh_Array_size(a)));
+	o->offset = 0;
+	{
+		knh_uintptr_t i = 0;
+		for(i = 0; i < knh_Array_size(a); i++) {
+			String *s = (String*)knh_Array_n(a, i);
+			knh_DictSet_append(ctx, o->termsDictSet, s, i);
+		}
+	}
+	knh_DictSet_toIgnoreCase(o->termsDictSet);
 	return o;
 }
 
 /* ------------------------------------------------------------------------ */
 
-void knh_IntUnit_initId(Ctx *ctx, IntUnit *b, knh_flag_t flag, knh_class_t cid, String *urn, String *tag)
+KNHAPI(ClassSpec*) new_Vocabulary(Ctx *ctx, char *tag, int base, char *terms, ...)
 {
-	KNH_ASSERT(IS_NOTNULL(urn));
-	KNH_ASSERT(IS_NOTNULL(tag));
-
-	DP(b)->spec.flag = flag;
-	DP(b)->spec.cid  = cid;
-	KNH_SETv(ctx, DP(b)->spec.urn, urn);
-	KNH_SETv(ctx, DP(b)->spec.tag, tag);
-
-	if(knh_IntUnit_isUnsigned(b)) {
-		DP(b)->max  = KNH_UINT_MAX;
-		DP(b)->min  = KNH_UINT_MIN;
-		DP(b)->fchk = knh_fenumchk__nop;
-		DP(b)->fcmp = knh_fenumcmp__unsigned;
-		DP(b)->ffmt = knh_fenumfmt__unsigned;
+	knh_class_t cid = knh_ClassTable_newId(ctx);
+	ClassSpec* u = (ClassSpec*)new_Object_bcid(ctx, CLASS_ClassSpec, (int)cid);
+	if(tag != NULL || tag[0] != 0) {
+		KNH_SETv(ctx, DP(u)->urn, new_String__T(ctx, tag));
 	}
+
+	DP(u)->fsnew = knh_fsnew__dict;
+	DP(u)->fscmp = knh_fscmp__dict;
+	{
+		va_list args;
+		va_start(args , terms);
+		Array *a = new_Array0(ctx, 0);
+		char *vocab = NULL;
+		while((vocab = va_arg(args, char*)) != NULL) {
+			String *s = new_String__T(ctx, vocab);
+			knh_Array_add(ctx, a, UP(s));
+			s->h.cid = cid;
+		}
+		va_end(args);
+		KNH_SETv(ctx, DP(u)->vocabDictIdx, new_DictIdx__Array(ctx, a));
+		knh_ClassSpec_initIntRange(ctx, u, base, base + knh_Array_size(a) - 1);
+		KNH_ASSERT(knh_Array_size(a) > 0);
+		KNH_INITv(DP(u)->svalue, knh_Array_n(a, 0));
+	}
+	return u;
 }
+
+///* ------------------------------------------------------------------------ */
+//
+//static
+//MAPPER knh_Mapper__fdict(Ctx *ctx, knh_sfp_t *sfp)
+//{
+//	String *s = sfp[0].s;
+//	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[knh_Object_cid(sfp[0].o)].cspec;
+//	KNH_ASSERT(IS_ClassSpec(u));
+//	KNH_ASSERT(IS_DictIdx(DP(u)->vocabDictIdx));
+//
+//	ClassSpec *u2 = (ClassSpec*)ctx->share->ClassTable[DP(sfp[1].mpr)->tcid].cspec;
+//	KNH_ASSERT(IS_ClassSpec(u2));
+//	KNH_ASSERT(IS_DictIdx(DP(u2)->vocabDictIdx));
+//
+//	size_t n = (size_t)knh_DictIdx_index(ctx, DP(u)->vocabDictIdx, knh_String_tobytes(s));
+//	KNH_ASSERT(n < knh_DictIdx_size(DP(u2)->vocabDictIdx));
+//	KNH_MAPPED(ctx, sfp, knh_DictIdx_get__fast(DP(u2)->vocabDictIdx, n));
+//}
+//
+///* ------------------------------------------------------------------------ */
+//
+//KNHAPI(void) konoha_addVocabularyMapper(Ctx *ctx, knh_class_t scid, char *text)
+//{
+//	KNH_ASSERT_cid(scid);
+//	knh_class_t tcid = konoha_findcid(ctx, B(text));
+//
+//	if(tcid != CLASS_unknown || ctx->share->ClassTable[tcid].bcid != tcid) {
+////		ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[scid].cspec;
+////		if(!IS_ClassSpec(u) || !IS_DictIdx(DP(u)->vocabDictIdx)) {
+////			TODO();
+////			return;
+////		}
+//		ClassSpec *u2 = (ClassSpec*)ctx->share->ClassTable[tcid].cspec;
+//		if(!IS_ClassSpec(u2) || !IS_DictIdx(DP(u2)->vocabDictIdx)) {
+//			TODO();
+//			return;
+//		}
+////		if(knh_DictIdx_size(DP(u)->vocabDictIdx) != knh_DictIdx_size(DP(u2)->vocabDictIdx)) {
+////			TODO();
+////			return;
+////		}
+//		Mapper *mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, scid, tcid,
+//				knh_Mapper_fvocab, (Object*)KNH_NULL);
+//		if(ctx->share->ClassTable[scid].cmap == NULL) {
+//			knh_ClassTable_t *TC = (knh_ClassTable_t*)(&ctx->share->ClassTable[scid]);
+//			KNH_INITv(TC->cmap, new_ClassMap0(ctx, 4));
+//		}
+//		knh_ClassMap_add(ctx, ctx->share->ClassTable[scid].cmap, mpr);
+//
+//		mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, tcid, scid,
+//				knh_Mapper_fvocab, (Object*)KNH_NULL);
+//		if(ctx->share->ClassTable[tcid].cmap == NULL) {
+//			knh_ClassTable_t *TC = (knh_ClassTable_t*)(&ctx->share->ClassTable[tcid]);
+//			KNH_INITv(TC->cmap, new_ClassMap0(ctx, 4));
+//		}
+//		knh_ClassMap_add(ctx, ctx->share->ClassTable[tcid].cmap, mpr);
+//	}
+//}
 
 /* ------------------------------------------------------------------------ */
 

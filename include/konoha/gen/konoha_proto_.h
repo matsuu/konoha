@@ -224,7 +224,6 @@ ExceptionHandler* new_ExceptionHandler(Ctx *ctx);
 void knh_ExceptionHandler_longjmp(Ctx *ctx, ExceptionHandler *o, Exception *e);
 Exception* knh_ExceptionHandler_getCaughtException(ExceptionHandler *o);
 /* ../src/class/knh_Float.c */
-FloatUnit *new_FloatUnit(Ctx *ctx, knh_flag_t flag, knh_class_t cid, String *tag, knh_float_t min, knh_float_t max, knh_float_t defvalue, knh_float_t step);
 Float* new_Float(Ctx *ctx, knh_float_t value);
 Float* new_FloatX__fast(Ctx *ctx, knh_class_t cid, knh_float_t value);
 Float* new_FloatX(Ctx *ctx, knh_class_t cid, knh_float_t value);
@@ -251,10 +250,10 @@ MAPPER knh_Bytes_InputStream(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/class/knh_Int.c */
 knh_int_t knh_IntNULL_toint(Int *v);
 /* ../src/class/knh_IntUnit.c */
-void knh_IntUnit_initMinMax(Ctx *ctx, IntUnit *b, knh_int_t min, knh_int_t max);
-void knh_IntUnit_initDefaultValue(Ctx *ctx, IntUnit *b, knh_int_t v);
-IntUnit *new_IntUnit(Ctx *ctx, knh_flag_t flag, knh_class_t cid, String *urn, String *tag, knh_int_t min, knh_int_t max, knh_int_t defvalue);
-void knh_IntUnit_initId(Ctx *ctx, IntUnit *b, knh_flag_t flag, knh_class_t cid, String *urn, String *tag);
+void knh_ClassSpec_initIntRange(Ctx *ctx, ClassSpec *u, knh_int_t min, knh_int_t max);
+void knh_ClassSpec_initFloatRange(Ctx *ctx, ClassSpec *u, knh_float_t min, knh_float_t max, knh_float_t step);
+void knh_write_floatx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_float_t v);
+void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid);
 /* ../src/class/knh_Iterator.c */
 void knh_Iterator_close(Ctx *ctx, Iterator *it);
 Iterator* new_Iterator(Ctx *ctx, knh_class_t p1, Any *source, knh_fitrnext fnext);
@@ -394,16 +393,13 @@ size_t knh_bytes_mlen(knh_bytes_t s);
 knh_bytes_t knh_bytes_mofflen(knh_bytes_t m, size_t moff, size_t mlen);
 knh_int_t knh_uchar_toucs4(knh_uchar_t *utf8);
 char *knh_format_utf8(char *buf, size_t bufsiz, knh_int_t ucs4);
-/* ../src/class/knh_StringUnit.c */
-StringUnit *new_StringUnit(Ctx *ctx, knh_flag_t flag, knh_class_t cid, String *tag);
-String *new_StringX__FormatException(Ctx *ctx, knh_class_t cid, knh_bytes_t t, String *orign);
 /* ../src/class/knh_System.c */
 char * knh_bytes_nzenvkey(knh_bytes_t t, char *buf, size_t bufsiz);
 Any* knh_System_getProperty(Ctx *ctx, System *o, knh_bytes_t key);
 void knh_System_setProperty(Ctx *ctx, System *o, String *key, Any *value);
 knh_bool_t konoha_initcheck(void);
-knh_bytes_t knh_Runtime_aliasURN(Ctx *ctx, knh_bytes_t aurn);
-void knh_Runtime_setAliasURN(Ctx *ctx, String *alias, String *urn);
+knh_bytes_t konoha_getAliasURN(Ctx *ctx, knh_bytes_t aurn);
+void konoha_setAliasURN(Ctx *ctx, String *alias, String *urn);
 /* ../src/class/knh_type_t.c */
 knh_class_t knh_pmztype_toclass(Ctx *ctx, knh_type_t t, knh_class_t this_cid);
 knh_type_t knh_pmztype_totype(Ctx *ctx, knh_type_t t, knh_class_t this_cid);

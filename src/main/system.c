@@ -678,13 +678,13 @@ KNHAPI(void) konoha_addClassSpecFunc(Ctx *ctx, char *urn, knh_fspec func)
 
 ClassSpec *konoha_getClassSpec(Ctx *ctx, knh_class_t bcid, knh_bytes_t urn)
 {
-	urn = knh_Runtime_aliasURN(ctx, urn);
+	urn = konoha_getAliasURN(ctx, urn);
 	DBG2_P("finding.. '%s'", urn.buf);
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 	knh_fspec func = (knh_fspec)knh_DictSet_get__b(DP(ctx->sys)->SpecFuncDictSet, urn);
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
 	if(func != NULL) {
-		return func(ctx, bcid, NULL);
+		return func(ctx, bcid, urn);
 	}
 	return (ClassSpec*)(KNH_NULL);
 }

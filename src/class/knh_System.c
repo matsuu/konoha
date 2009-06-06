@@ -119,7 +119,7 @@ knh_bool_t konoha_initcheck(void)
 /* ======================================================================== */
 /* [urnalias] */
 
-knh_bytes_t knh_Runtime_aliasURN(Ctx *ctx, knh_bytes_t aurn)
+knh_bytes_t konoha_getAliasURN(Ctx *ctx, knh_bytes_t aurn)
 {
 	String *s = (String*)knh_DictMap_get__b(ctx,  DP(ctx->sys)->URNAliasDictMap, aurn);
 	if(IS_NOTNULL(s)) {
@@ -130,7 +130,7 @@ knh_bytes_t knh_Runtime_aliasURN(Ctx *ctx, knh_bytes_t aurn)
 
 /* ------------------------------------------------------------------------ */
 
-void knh_Runtime_setAliasURN(Ctx *ctx, String *alias, String *urn)
+void konoha_setAliasURN(Ctx *ctx, String *alias, String *urn)
 {
 	if(knh_Context_isVerbose(ctx)) {
 		String *s =(String*)knh_DictMap_get__b(ctx,  DP(ctx->sys)->URNAliasDictMap, knh_String_tobytes(urn));
@@ -145,10 +145,10 @@ void knh_Runtime_setAliasURN(Ctx *ctx, String *alias, String *urn)
 
 KNHAPI(void) konoha_addAliasURN(Ctx *ctx, char *alias, char *urn)
 {
-	knh_Runtime_setAliasURN(ctx, new_String__T(ctx, alias), new_String__T(ctx, urn));
+	konoha_setAliasURN(ctx, new_String__T(ctx, alias), new_String__T(ctx, urn));
 }
 
-
+/* ------------------------------------------------------------------------ */
 
 #ifdef __cplusplus
 }
