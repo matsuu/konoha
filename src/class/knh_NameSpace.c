@@ -381,51 +381,27 @@ knh_NameSpace_getFuncClass(Ctx *ctx, NameSpace *o, knh_bytes_t funcname)
 /* ======================================================================== */
 /* [tag] */
 
-knh_class_t knh_tclass_classURN(Ctx *ctx, knh_class_t bcid, knh_bytes_t urn)
+knh_type_t knh_NameSpace_tagcid(Ctx *ctx, NameSpace *o, knh_class_t cid, knh_bytes_t tag)
 {
-	char buf[CLASSNAME_BUFSIZ];
-	knh_snprintf(buf, sizeof(buf), KNH_CLASSSPEC_FMT, CLASSN(bcid), urn.buf);
-	knh_class_t cid = konoha_getcid(ctx, B(buf));
-	if(cid == CLASS_unknown) {
-		cid = knh_tclass_loadURN(ctx, bcid, urn);
-	}
-	return cid;
-}
-
-/* ------------------------------------------------------------------------ */
-
-knh_class_t knh_tclass_loadURN(Ctx *ctx, knh_class_t bcid, knh_bytes_t urn)
-{
-//	switch(bcid) {
-//	case CLASS_Int:
-//		return knh_system_loadEnum(ctx, urn);
-//	case CLASS_Float:
-//		return knh_system_loadUnit(ctx, urn);
-//	case CLASS_String:
-//		return knh_system_loadVocabulary(ctx, urn);
-//	}
-	TODO();
-	DBG2_P("unknown bcid=%d,'%s'", bcid, CLASSN(bcid));
-	return bcid;
-}
-
-/* ------------------------------------------------------------------------ */
-
-knh_type_t knh_NameSpace_tagcid(Ctx *ctx, NameSpace *o, knh_class_t bcid, knh_bytes_t tag)
-{
-	TODO();
-//	char buf[CLASSNAME_BUFSIZ];
-//	DBG2_P("%s:'%s'", CLASSN(bcid), tag.buf);
-//	knh_snprintf(buf, sizeof(buf), "%s:%s", CLASSN(bcid), tag.buf);
-//	knh_class_t cid = knh_NameSpace_getClass(ctx, o, B(buf));
+	knh_cwb_t cwb = new_cwb(ctx);
+	knh_class_t bcid = ctx->share->ClassTable[cid].bcid;
+	//DBG2_P("%s:'%s'", CLASSN(bcid), tag.buf);
+	knh_printf(ctx, cwb.w, "%C:%B", bcid, tag);
+	cid = knh_NameSpace_getcid(ctx, o, knh_cwb_tobytes(cwb));
+	knh_cwb_clear(cwb);
 //	if(cid == CLASS_unknown) {
 //		if(bcid == CLASS_Int) {
-//			knh_snprintf(buf, sizeof(buf), "Float:%s", tag.buf);
-//			cid = knh_NameSpace_getClass(ctx, o, B(buf));
+//			knh_printf(ctx, cwb.w, "Float:%B", tag);
+//			cid = knh_NameSpace_getcid(ctx, o, knh_cwb_tobytes(cwb));
+//			knh_cwb_clear(cwb);
+//		}
+//		else if(bcid == CLASS_Float) {
+//			knh_printf(ctx, cwb.w, "Int:%B", tag);
+//			cid = knh_NameSpace_getcid(ctx, o, knh_cwb_tobytes(cwb));
+//			knh_cwb_clear(cwb);
 //		}
 //	}
-//	return cid;
-	return CLASS_unknown;
+	return cid;
 }
 
 
