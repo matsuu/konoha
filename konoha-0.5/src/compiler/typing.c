@@ -718,6 +718,7 @@ knh_class_t knh_Token_tagcNUM(Ctx *ctx, Token *tk, knh_class_t reqc, NameSpace *
 			break;
 		}
 	}
+	DBG2_P("TAG %s, %d", tag.buf, tag.len);
 	if(tag.len == 0 || ishex) {
 		return reqc;
 	}
@@ -761,8 +762,10 @@ int knh_TokenNUM_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqc)
 {
 	KNH_ASSERT_cid(reqc);
 	knh_bytes_t t = knh_Token_tobytes(ctx, tk);
+	knh_class_t breqc = ctx->share->ClassTable[reqc].bcid;
+	//DBG2_P("reqc=%s", CLASSN(breqc));
 
-	if(reqc == CLASS_Boolean) {
+	if(breqc == CLASS_Boolean) {
 		if(t.buf[0] == '0') {
 			knh_Token_perror(ctx, tk, KERR_ERRATA, _("false is much better than: %B"), t);
 			knh_Token_setCONST(ctx, tk, KNH_FALSE);
@@ -774,21 +777,31 @@ int knh_TokenNUM_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqc)
 		return 1;
 	}
 
-	knh_class_t req_bcid = ctx->share->ClassTable[reqc].bcid;
-	if(req_bcid != CLASS_Int && req_bcid != CLASS_Float) {
-		req_bcid = knh_bytes_guessNUMcid(ctx, t);
-		reqc = req_bcid;
+	if(breqc == CLASS_Int || breqc == CLASS_Float) {
+
+	}
+	else if(breqc == CLASS_Any || breqc == CLASS_Object || breqc == CLASS_Number) {
+		breqc = knh_bytes_guessNUMcid(ctx, t);
+		reqc = breqc;
+	}
+	else {
+		knh_Token_perror(ctx, tk, KERR_ERROR, _("type error: %C is not numeric"), reqc);
+		return 0;
 	}
 
-	if(req_bcid == CLASS_Float) {
+	if(breqc == CLASS_Float) {
 		knh_float_t n = 0.0;
 		if(!knh_bytes_parsefloat(t, &n)) {
 			knh_Token_perror(ctx, tk, KERR_EWARN, _("float overflow: %B"), t);
 		}
-		knh_class_t tagc = knh_Token_tagcNUM(ctx, tk, req_bcid, ns);
-		if(tagc == reqc) {
-			knh_Token_setCONST(ctx, tk, UP(new_FloatX(ctx, reqc, n)));
-		}else{
+		knh_class_t tagc = knh_Token_tagcNUM(ctx, tk, reqc, ns);
+		ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[tagc].cspec;
+		KNH_ASSERT(IS_ClassSpec(u));
+		if(!DP(u)->ffchk(u, n)) {
+			knh_Token_perror(ctx, tk, KERR_ERRATA, _("%C: out of range: %B ==> %O"), tagc, t, DP(u)->fvalue);
+			knh_Token_setCONST(ctx, tk, UP(DP(u)->fvalue));
+		}
+		else {
 			knh_Token_setCONST(ctx, tk, UP(new_FloatX(ctx, tagc, n)));
 		}
 	}
@@ -797,10 +810,14 @@ int knh_TokenNUM_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqc)
 		if(!knh_bytes_parseint(t, &n)) {
 			knh_Token_perror(ctx, tk, KERR_EWARN, _("int overflow: %B"), t);
 		}
-		knh_class_t tagc = knh_Token_tagcNUM(ctx, tk, req_bcid, ns);
-		if(tagc == reqc) {
-			knh_Token_setCONST(ctx, tk, UP(new_IntX(ctx, reqc, n)));
-		}else{
+		knh_class_t tagc = knh_Token_tagcNUM(ctx, tk, reqc, ns);
+		ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[tagc].cspec;
+		KNH_ASSERT(IS_ClassSpec(u));
+		if(!DP(u)->fichk(u, n)) {
+			knh_Token_perror(ctx, tk, KERR_ERRATA, _("%C: out of range: %B ==> %O"), tagc, t, DP(u)->ivalue);
+			knh_Token_setCONST(ctx, tk, UP(DP(u)->ivalue));
+		}
+		else {
 			knh_Token_setCONST(ctx, tk, UP(new_IntX(ctx, tagc, n)));
 		}
 	}
@@ -1112,6 +1129,7 @@ void TERMs_perrorTYPE(Ctx *ctx, Stmt *stmt, size_t n, knh_type_t reqt)
 				KERR_ERROR, _("type error: %T must be %T at the parameter %d of %M"), type, reqt, n - 1, DP(mtd)->mn);
 		}
 		break;
+	case STT_DECL:
 	case STT_LET:
 		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line,
 			KERR_ERROR, _("type error: %T must be %T at the assignment"), type, reqt);

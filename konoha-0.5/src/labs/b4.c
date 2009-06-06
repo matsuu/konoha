@@ -87,6 +87,92 @@ METHOD knh__Script_hook(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
+/* [pacage test] */
+
+static
+ClassSpec *unit_Temperature(Ctx *ctx, knh_bytes_t urn)
+{
+	knh_bytes_t t = knh_bytes_rmod(urn, '/');
+	DBG2_P("finding ..%s", t.buf);
+	if(ISB(t, "Celsius")) {
+		return new_Unit(ctx, "C", urn, -273.15, KNH_FLOAT_MAX, 0.01);
+	}
+	else if(ISB(t, "Fahrenheit")) {
+		ClassSpec *u = new_Unit(ctx, "F", urn, -459.67, KNH_FLOAT_MAX, 0.01);
+		konoha_addAffineMapper(ctx, DP(u)->ucid, "Float{http://konoha/Temperature/Celsius}", 5.0/9.0, -32.0*5.0/9.0);
+		return u;
+	}
+	return NULL;
+}
+
+///* ------------------------------------------------------------------------ */
+//
+//static
+//ClassSpec *makespec_ItalianCity__en(Ctx *ctx, knh_class_t bcid, char *extra)
+//{
+//	if(bcid == CLASS_String) {
+//		return new_Vocabulary(ctx, "en", "Rome", "Milan", "Rome", NULL);
+//	}
+//	return (ClassSpec*)KNH_NULL;
+//}
+//
+///* ------------------------------------------------------------------------ */
+//
+//static
+//ClassSpec *makespec_ItalianCity__ja(Ctx *ctx, knh_class_t bcid, char *extra)
+//{
+//	if(bcid == CLASS_String) {
+//		ClassSpec *cs = new_Vocabulary(ctx, "ja", "ローマ", "ミラノ", "ローマ", NULL);
+//		konoha_addVocabularyMapper(ctx, DP(cs)->cid, "konoha.String{http://konoha/ItalianCity.en}");
+//		return cs;
+//	}
+//	return (ClassSpec*)KNH_NULL;
+//}
+//
+///* ------------------------------------------------------------------------ */
+//
+//static
+//ClassSpec *makespec_ItalianCity__it(Ctx *ctx, knh_class_t bcid, char *extra)
+//{
+//	if(bcid == CLASS_String) {
+//		ClassSpec *cs = new_Vocabulary(ctx, "it", "Roma", "Milano", "Roma", NULL);
+//		konoha_addVocabularyMapper(ctx, DP(cs)->cid, "konoha.String{http://konoha/ItalianCity.en}");
+//		return cs;
+//	}
+//	return (ClassSpec*)KNH_NULL;
+//}
+
+/* ======================================================================== */
+/* @data */
+
+static
+knh_StringConstData_t URNAliasData[] = {
+		{":摂氏", "http://konoha/Temperature/Celsius"},
+		{":華氏", "http://konoha/Temperature/Fahrenheit"},
+		{":C", "http://konoha/Temperature/Celsius"},
+		{":F", "http://konoha/Temperature/Fahrenheit"},
+		{NULL}
+};
+
+static
+knh_NamedPointerData_t ClassSpecFuncData[] = {
+		{"http://konoha/Temperature", unit_Temperature},
+		{NULL}
+};
+
+/* ------------------------------------------------------------------------ */
+
+int package_init(Ctx *ctx)
+{
+	KNH_NOTICE(ctx, "loading SCOPE2009..");
+	konoha_loadURNAliasData(ctx, URNAliasData);
+	konoha_loadClassSpecFuncData(ctx, ClassSpecFuncData);
+	return 1;
+}
+
+/* ------------------------------------------------------------------------ */
+
+
 
 #ifdef __cplusplus
 }
