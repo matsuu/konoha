@@ -146,7 +146,7 @@ void knh_ClassMap__man(Ctx *ctx, ClassMap *o, OutputStream *w, knh_class_t cid);
 void knh_write_intx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_int_t v);
 void knh_write_floatx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_float_t v);
 void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid);
-knh_bytes_t konoha_getAliasURN(Ctx *ctx, knh_bytes_t aurn);
+knh_bytes_t konoha_getURNAlias(Ctx *ctx, knh_bytes_t aurn);
 knh_class_t konoha_findcidx(Ctx *ctx, knh_bytes_t lname);
 /* ../src/class/knh_Closure.c */
 METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp);
@@ -558,6 +558,7 @@ int main(int argc, char **argv);
 /* ../src/labs/b4.c */
 METHOD knh__Script_changeChannel(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_hook(Ctx *ctx, knh_sfp_t *sfp);
+int package_init(Ctx *ctx);
 /* ../src/main/classapi.c */
 knh_hcode_t knh_MethodField_hachCode(Ctx *ctx, MethodField *o);
 size_t knh_fbyteconv_nop(Ctx *ctx, BytesConv *bc, knh_bytes_t t, knh_Bytes_t *ba);

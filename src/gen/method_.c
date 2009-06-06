@@ -241,6 +241,12 @@ METHOD knh__Mapper_isFinal(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 static 
+METHOD knh__Mapper_isImplicit(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN_Boolean(ctx, sfp, knh_Mapper_isImplicit((knh_Mapper_t*)sfp[0].o));
+}
+
+static 
 METHOD knh__Mapper_isSynonym(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Mapper_isSynonym((knh_Mapper_t*)sfp[0].o));

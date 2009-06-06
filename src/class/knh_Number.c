@@ -232,10 +232,10 @@ knh_fmapper knh_fmapper_affine(knh_class_t scid, knh_class_t tcid)
 		KNH_ASSERT(tcid == CLASS_Float);
 		return knh_AffineConv_fmap__i2f;
 	}
-	KNH_ASSERT(scid == CLASS_Float);
+	//KNH_ASSERT(scid == CLASS_Float);
 	{
 		if(tcid == CLASS_Int) return knh_AffineConv_fmap__f2i;
-		KNH_ASSERT(tcid == CLASS_Float);
+		//KNH_ASSERT(tcid == CLASS_Float);
 		return knh_AffineConv_fmap__f2f;
 	}
 }

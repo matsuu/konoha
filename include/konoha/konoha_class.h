@@ -476,6 +476,7 @@ typedef struct knh_Method {
 /* @flag Mapper.Interface MMF DP((Mapper*)%s)->flag     'is:set:is:*' */
 /* @flag Mapper.Significant MMF DP((Mapper*)%s)->flag   'is:set:is:*' */
 /* @flag Mapper.Final MMF DP((Mapper*)%s)->flag         'is:*:is:*' */
+/* @flag Mapper.Implicit MMF DP((Mapper*)%s)->flag      'is:*:is:*' */
 /* @flag Mapper.Synonym MMF DP((Mapper*)%s)->flag       'is:set:is:*' */
 /* @flag Mapper.LossLess MMF DP((Mapper*)%s)->flag      'is:set:is:*' */
 /* @flag Mapper.Total!Partial MMF DP((Mapper*)%s)->flag 'is:set:is:*' */
@@ -579,6 +580,7 @@ typedef int (*knh_fscmp)(struct knh_ClassSpec_t *, knh_bytes_t, knh_bytes_t);
 typedef struct {
 	knh_flag_t  flag;
 	knh_class_t ucid;
+	knh_class_t ubcid;
 	knh_String_t* urn;
 	knh_String_t* tag;
 	struct knh_Int_t    *ivalue;

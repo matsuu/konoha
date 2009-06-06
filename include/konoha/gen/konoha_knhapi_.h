@@ -71,7 +71,6 @@ extern "C" {
 	}\
 
 
-#define knh_Float_value(o)    (o)->value
 #define konoha_findMapper(ctx, scid, tcid) konoha_findMapper_(ctx, scid, tcid, 1)
 #define knh_Class_getMapper(ctx, scid, tcid)  konoha_findMapper_(ctx, scid, tcid, 0)
 #define knh_Method_mn(mtd)    DP(mtd)->mn
@@ -169,6 +168,7 @@ KNHAPI(knh_bool_t) knh_bytes_startsWith(knh_bytes_t v1, knh_bytes_t v2);
 KNHAPI(knh_bool_t) knh_bytes_endsWith(knh_bytes_t v1, knh_bytes_t v2);
 KNHAPI(knh_index_t) knh_bytes_index(knh_bytes_t v, knh_intptr_t ch);
 KNHAPI(knh_index_t) knh_bytes_rindex(knh_bytes_t v, knh_intptr_t ch);
+KNHAPI(knh_bytes_t) knh_bytes_rmod(knh_bytes_t t, int ch);
 KNHAPI(knh_bytes_t) knh_bytes_first(knh_bytes_t t, knh_intptr_t loc);
 KNHAPI(knh_bytes_t) knh_bytes_last(knh_bytes_t t, knh_intptr_t loc);
 KNHAPI(knh_bytes_t) knh_bytes_skipscheme(knh_bytes_t t);
@@ -177,11 +177,11 @@ KNHAPI(knh_intptr_t) knh_bytes_toint(knh_bytes_t t);
 KNHAPI(knh_float_t) knh_bytes_tofloat(knh_bytes_t t);
 KNHAPI(knh_int64_t) knh_bytes_toint64(knh_bytes_t t);
 KNHAPI(String*) new_String__fbcnv(Ctx *ctx, String *s, knh_fbyteconv fbcnv, BytesConv *bc);
-KNHAPI(ClassSpec*) new_Enum(Ctx *ctx, char *tag, knh_int_t min, knh_int_t max);
-KNHAPI(ClassSpec*) new_Unit(Ctx *ctx, char *tag, knh_float_t min, knh_float_t max, knh_float_t step);
-KNHAPI(ClassSpec*) new_Vocabulary(Ctx *ctx, char *tag, int base, char *terms, ...);
-KNHAPI(void) konoha_loadURNAlias(Ctx *ctx, knh_StringConstData_t *data);
-KNHAPI(void) konoha_loadClassSpecFunc(Ctx *ctx, knh_NamedPointerData_t *data);
+KNHAPI(ClassSpec*) new_Enum(Ctx *ctx, char *tag, knh_bytes_t urn, knh_int_t min, knh_int_t max);
+KNHAPI(ClassSpec*) new_Unit(Ctx *ctx, char *tag, knh_bytes_t urn, knh_float_t min, knh_float_t max, knh_float_t step);
+KNHAPI(ClassSpec*) new_Vocabulary(Ctx *ctx, char *tag, knh_bytes_t urn, int base, char *terms, ...);
+KNHAPI(void) konoha_loadURNAliasData(Ctx *ctx, knh_StringConstData_t *data);
+KNHAPI(void) konoha_loadClassSpecFuncData(Ctx *ctx, knh_NamedPointerData_t *data);
 KNHAPI(void) knh_putsfp(Ctx *ctx, knh_sfp_t *lsfp, int n, Object *obj);
 KNHAPI(void) knh_Closure_invokesfp(Ctx *ctx, Closure *c, knh_sfp_t *lsfp, int argc);
 KNHAPI(knh_sfp_t*) knh_Closure_invokef(Ctx *ctx, Closure *c, const char *fmt, ...);
