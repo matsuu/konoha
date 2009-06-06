@@ -183,7 +183,7 @@ AffineConv *new_AffineConv(Ctx *ctx, knh_float_t fa, knh_float_t fb)
 static
 MAPPER knh_AffineConv_fmap__i2i(Ctx *ctx, knh_sfp_t *sfp)
 {
-	AffineConv *af = (AffineConv*)sfp[1].o;
+	AffineConv *af = (AffineConv*)DP(sfp[1].mpr)->mapdata;
 	KNH_ASSERT(IS_AffineConv(af));
 	knh_float_t y = (sfp[0].ivalue * af->scale) + af->shift;
 	KNH_MAPPED_Int(ctx, sfp, (knh_int_t)y);
@@ -194,7 +194,7 @@ MAPPER knh_AffineConv_fmap__i2i(Ctx *ctx, knh_sfp_t *sfp)
 static
 MAPPER knh_AffineConv_fmap__i2f(Ctx *ctx, knh_sfp_t *sfp)
 {
-	AffineConv *af = (AffineConv*)sfp[1].o;
+	AffineConv *af = (AffineConv*)DP(sfp[1].mpr)->mapdata;
 	KNH_ASSERT(IS_AffineConv(af));
 	knh_float_t y = (sfp[0].ivalue * af->scale) + af->shift;
 	KNH_MAPPED_Float(ctx, sfp, y);
@@ -205,7 +205,7 @@ MAPPER knh_AffineConv_fmap__i2f(Ctx *ctx, knh_sfp_t *sfp)
 static
 MAPPER knh_AffineConv_fmap__f2i(Ctx *ctx, knh_sfp_t *sfp)
 {
-	AffineConv *af = (AffineConv*)sfp[1].o;
+	AffineConv *af = (AffineConv*)DP(sfp[1].mpr)->mapdata;
 	KNH_ASSERT(IS_AffineConv(af));
 	knh_float_t y = (sfp[0].fvalue * af->scale) + af->shift;
 	KNH_MAPPED_Int(ctx, sfp, (knh_int_t)y);
@@ -216,7 +216,7 @@ MAPPER knh_AffineConv_fmap__f2i(Ctx *ctx, knh_sfp_t *sfp)
 static
 MAPPER knh_AffineConv_fmap__f2f(Ctx *ctx, knh_sfp_t *sfp)
 {
-	AffineConv *af = (AffineConv*)sfp[1].o;
+	AffineConv *af = (AffineConv*)DP(sfp[1].mpr)->mapdata;
 	KNH_ASSERT(IS_AffineConv(af));
 	knh_float_t y = (sfp[0].fvalue * af->scale) + af->shift;
 	KNH_MAPPED_Float(ctx, sfp, y);

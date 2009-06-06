@@ -635,7 +635,11 @@ knh_class_t konoha_addSpecializedType(Ctx *ctx, knh_class_t cid, knh_class_t bci
 	char bufcn[CLASSNAME_BUFSIZ];
 	knh_snprintf(bufcn, sizeof(bufcn), KNH_CLASSSPEC_FMT, CLASSN(bcid), knh_String_tochar(DP(u)->urn));
 	konoha_setClassName(ctx, cid, new_String(ctx, B(bufcn), NULL));
-	DBG2_P("added '%s'", knh_String_tochar(ctx->share->ClassTable[cid].lname));
+	if((DP(u)->tag)->size > 0) {
+		knh_snprintf(bufcn, sizeof(bufcn), "%s:%s", CLASSN(bcid), knh_String_tochar(DP(u)->tag));
+		KNH_SETv(ctx, ctx->share->ClassTable[cid].sname, new_String(ctx, B(bufcn), NULL));
+	}
+	DBG2_P("added %d, '%s'", cid, knh_String_tochar(ctx->share->ClassTable[cid].lname));
 
 	ctx->share->ClassTable[cid].bcid   = bcid;
 	ctx->share->ClassTable[cid].supcid = bcid;
@@ -644,7 +648,7 @@ knh_class_t konoha_addSpecializedType(Ctx *ctx, knh_class_t cid, knh_class_t bci
 //	else if(bcid == CLASS_Float) bcid = CLASS_FloatX;
 //	else if(bcid == CLASS_String) bcid = CLASS_StringX;
 
-	DBG2_P("%s\n\tcopying from %s", bufcn, CLASSN(bcid));
+	//DBG2_P("%s\n\tcopying from %s", bufcn, CLASSN(bcid));
 	ctx->share->ClassTable[cid].cflag  = ctx->share->ClassTable[bcid].cflag;
 	ctx->share->ClassTable[cid].oflag  = ctx->share->ClassTable[bcid].oflag;
 	ctx->share->ClassTable[cid].offset = ctx->share->ClassTable[bcid].offset;

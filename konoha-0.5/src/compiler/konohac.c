@@ -336,15 +336,14 @@ void knh_NameSpace_setTagName(Ctx *ctx, NameSpace *o, String *name, knh_class_t 
 	KNH_ASSERT(IS_NameSpace(o));
 	KNH_ASSERT_cid(cid);
 	knh_DictSet_set(ctx, DP(o)->name2cidDictSet, name, (knh_uintptr_t)(cid+1));
-	knh_bytes_t n = knh_String_tobytes(name);
-	knh_index_t loc = knh_bytes_index(n, ':');
-	if(loc != -1) {
-		n = knh_bytes_last(n, loc+1);
-		if(isupper(n.buf[0])) {
-			TODO();
-			knh_DictSet_set(ctx, DP(o)->name2cidDictSet, new_String(ctx, n, name), (knh_uintptr_t)(cid+1));
-		}
-	}
+//	knh_bytes_t n = knh_String_tobytes(name);
+//	knh_index_t loc = knh_bytes_index(n, ':');
+//	if(loc != -1) {
+//		n = knh_bytes_last(n, loc+1);
+//		if(isupper(n.buf[0])) {
+//			knh_DictSet_set(ctx, DP(o)->name2cidDictSet, new_String(ctx, n, name), (knh_uintptr_t)(cid+1));
+//		}
+//	}
 }
 
 /* ------------------------------------------------------------------------ */
@@ -370,7 +369,7 @@ int knh_StmtXCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_class
 	}
 
 	KNH_ASSERT(IS_String(DP(tkclassn)->data));
-	knh_NameSpace_setTagName(ctx, ns, (String*)DP(tkclassn)->data, cid);
+	knh_NameSpace_setTagName(ctx, ns, DP(tkclassn)->text, cid);
 	return 1;
 }
 

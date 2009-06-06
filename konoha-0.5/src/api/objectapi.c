@@ -400,7 +400,7 @@ void knh_Class__s(Ctx *ctx, Class *o, OutputStream *w, String *m)
 static
 void knh_Class__k(Ctx *ctx, Class *o, OutputStream *w, String *m)
 {
-	knh_write_cid(ctx, w, o->type);
+	knh_write_cid(ctx, w, o->cid);
 }
 
 /* ------------------------------------------------------------------------ */

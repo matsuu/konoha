@@ -87,7 +87,7 @@ static knh_Class_t *new_Class(Ctx *ctx, knh_class_t cid)
 void konoha_setClassName(Ctx *ctx, knh_class_t cid, String *lname)
 {
 	KNH_ASSERT_cid(cid);
-	//KNH_NOTICE(ctx, "added new class: %s", knh_String_tochar(lname));
+	//KNH_NOTICE(ctx, _("added new class: %s"), knh_String_tochar(lname));
 	KNH_ASSERT(ctx->share->ClassTable[cid].class_cid == NULL);
 	KNH_INITv(ctx->share->ClassTable[cid].class_cid, new_Class(ctx, cid));
 	KNH_INITv(ctx->share->ClassTable[cid].lname, lname);
@@ -96,7 +96,7 @@ void konoha_setClassName(Ctx *ctx, knh_class_t cid, String *lname)
 		knh_index_t idx = knh_bytes_index(n, '{');
 		if(idx != -1) {
 			KNH_INITv(ctx->share->ClassTable[cid].sname, lname);
-			return;
+			goto L_ADDDICT;
 		}
 		if(knh_bytes_endsWith(n, STEXT(".."))) {
 			n.len -= 2;
@@ -113,6 +113,7 @@ void konoha_setClassName(Ctx *ctx, knh_class_t cid, String *lname)
 			KNH_INITv(ctx->share->ClassTable[cid].sname, new_String(ctx, knh_bytes_last(n, idx + 1), lname));
 		}
 	}
+	L_ADDDICT:
 	//DBG2_P("NEW CLASS: %s, %s", knh_String_tochar(lname), knh_String_tochar(ctx->share->ClassTable[cid].sname));
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 	knh_DictSet_append(ctx, DP(ctx->sys)->ClassNameDictSet, lname, cid+1);
