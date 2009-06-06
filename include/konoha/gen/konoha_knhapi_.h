@@ -39,7 +39,6 @@ extern "C" {
 
 /* ======================================================================== */
 /* [MACROS] */
-#define KNH_FLAG_MMF_AFFINE (KNH_FLAG_MMF_SIGNIFICANT|KNH_FLAG_MMF_SYNONYM|KNH_FLAG_MMF_TOTAL|KNH_FLAG_MMF_CONST)
 #define knh_Array_n(a,n)      (a)->list[(n)]
 #define knh_Array_size(a)     (a)->size
 #define knh_Bytes_size(o)      (o)->size
@@ -73,7 +72,6 @@ extern "C" {
 
 
 #define knh_Float_value(o)    (o)->value
-#define knh_Int_value(o)      (o)->value
 #define konoha_findMapper(ctx, scid, tcid) konoha_findMapper_(ctx, scid, tcid, 1)
 #define knh_Class_getMapper(ctx, scid, tcid)  konoha_findMapper_(ctx, scid, tcid, 0)
 #define knh_Method_mn(mtd)    DP(mtd)->mn
@@ -87,6 +85,7 @@ extern "C" {
 #define knh_Class_findMethod(ctx, c, mn)   knh_Class_getMethod__(ctx, c, mn, 1)
 #define CTXCLASSN(cid)     knh_Context_CLASSN(ctx,cid)
 #define CTXTYPEQN(cid)     knh_Context_CLASSN(ctx,CLASS_type(cid)), TYPEQ(cid)
+#define KNH_FLAG_MMF_AFFINE (KNH_FLAG_MMF_SIGNIFICANT|KNH_FLAG_MMF_SYNONYM|KNH_FLAG_MMF_TOTAL|KNH_FLAG_MMF_CONST)
 #define knh_Object_cid(o)           (o)->h.cid
 #define knh_Object_bcid(o)          (o)->h.bcid
 #define IS_NULL(o)          (((Object*)o)->h.cid == CLASS_Nue)
@@ -98,6 +97,13 @@ extern "C" {
 #define BOOL_ISFALSE(o)        (o == KNH_FALSE)
 #define new_Nue__b(ctx, txt)   new_Nue(ctx, new_String(ctx, txt, NULL));
 #define new_Nue__s(ctx, txt)   new_Nue(ctx, new_String(ctx, B(txt), NULL));
+#define knh_String_value(o)   ((o)->str)
+#define knh_String_tochar(o)  (char*)((o)->str)
+#define knh_String_strlen(o)  (o)->size
+#define new_String__T(ctx, text)    new_StringX__T(ctx, CLASS_String, text)
+#define NSN_main           0
+#define FILEN_unknown      0
+#define TYPEN(type)  knh_TYPEN(ctx,type)
 #define knh_write_delim(ctx, w)    knh_write(ctx, w, STEXT(", "))
 #define knh_write_dots(ctx, w)     knh_write(ctx, w, STEXT("..."))
 #define knh_write__i(ctx, w, n)   knh_write__ifmt(ctx, w, KNH_INTPTR_FMT, n)
@@ -107,13 +113,6 @@ extern "C" {
 #define knh_write__e(ctx, w, f)  knh_write__ffmt(ctx, w, KNH_FLOAT_FMTE, f)
 #define knh_write_fn(ctx, w, fn)   knh_write__s(ctx, w, FIELDN(fn))
 #define knh_write__O(ctx, w, o)    knh_format(ctx, w, METHODN__k, o, KNH_NULL)
-#define knh_String_value(o)   ((o)->str)
-#define knh_String_tochar(o)  (char*)((o)->str)
-#define knh_String_strlen(o)  (o)->size
-#define new_String__T(ctx, text)    new_StringX__T(ctx, CLASS_String, text)
-#define NSN_main           0
-#define FILEN_unknown      0
-#define TYPEN(type)  knh_TYPEN(ctx,type)
 #define KNH_ASM_JMP(ctx, abr, l)  KNH_ASM_JMP_(ctx, abr, l);
 #define sToken(o)  knh_Token_tochar(ctx, o)
 #define new_TermCONST(ctx, fln, d)   TM(new_TokenCONST(ctx, fln, d))
@@ -151,7 +150,6 @@ extern "C" {
 
 /* ======================================================================== */
 /* [PROTOTYPE] */
-KNHAPI(void) konoha_addAffineMapper(Ctx *ctx, knh_class_t scid, char *text, knh_float_t scale, knh_float_t shift);
 KNHAPI(knh_Array_t*) new_Array(Ctx *ctx, knh_class_t p1, size_t capacity);
 KNHAPI(void) knh_Array_add(Ctx *ctx, Array *o, Any *value);
 KNHAPI(Bytes*) new_Bytes(Ctx *ctx, size_t capacity);
@@ -199,23 +197,16 @@ KNHAPI(InputStream*) new_StringInputStream(Ctx *ctx, String *str, size_t s, size
 KNHAPI(Int*) new_Int(Ctx *ctx, knh_int_t value);
 KNHAPI(Int*) new_IntX__fast(Ctx *ctx, knh_class_t cid, knh_int_t value);
 KNHAPI(Int*) new_IntX(Ctx *ctx, knh_class_t cid, knh_int_t value);
+KNHAPI(Float*) new_Float(Ctx *ctx, knh_float_t value);
+KNHAPI(Float*) new_FloatX__fast(Ctx *ctx, knh_class_t cid, knh_float_t value);
+KNHAPI(Float*) new_FloatX(Ctx *ctx, knh_class_t cid, knh_float_t value);
+KNHAPI(void) konoha_addAffineMapper(Ctx *ctx, knh_class_t scid, char *text, knh_float_t scale, knh_float_t shift);
 KNHAPI(void) knh_Glue_init(Ctx *ctx, knh_Glue_t *g, void *ptr, knh_fgfree gfree);
 KNHAPI(Object*) new_Glue(Ctx *ctx, char *lname, void *ptr, knh_fgfree gfree);
 KNHAPI(OutputStream*) new_OutputStream__io(Ctx *ctx, String *urn, knh_io_t fd, knh_iodrv_t *drv);
 KNHAPI(OutputStream*) new_OutputStream__FILE(Ctx *ctx, String *urn, FILE *fp, knh_iodrv_t *drv);
 KNHAPI(OutputStream*) new_FileOutputStream(Ctx *ctx, knh_bytes_t file, char *mode);
 KNHAPI(OutputStream*) new_BytesOutputStream(Ctx *ctx, Bytes *ba);
-KNHAPI(void) knh_putc(Ctx *ctx, OutputStream *w, int ch);
-KNHAPI(void) knh_write(Ctx *ctx, OutputStream *w, knh_bytes_t s);
-KNHAPI(void) knh_flush(Ctx *ctx, OutputStream *w);
-KNHAPI(void) knh_print(Ctx *ctx, OutputStream *w, knh_bytes_t s);
-KNHAPI(void) knh_println(Ctx *ctx, OutputStream *w, knh_bytes_t s);
-KNHAPI(void) knh_write_EOL(Ctx *ctx, OutputStream *w);
-KNHAPI(void) knh_write_TAB(Ctx *ctx, OutputStream *w);
-KNHAPI(void) knh_write_BOL(Ctx *ctx, OutputStream *w);
-KNHAPI(void) knh_format(Ctx *ctx, OutputStream *w, knh_methodn_t mn, Object *o, Any *m);
-KNHAPI(void) knh_printf(Ctx *ctx, OutputStream *w, char *fmt, ...);
-KNHAPI(void) konoha_says(Ctx *ctx, int type, char *fmt, ...);
 KNHAPI(void) knh_ResultSet_initColumn(Ctx *ctx, ResultSet *o, size_t column_size);
 KNHAPI(void) knh_ResultSet_setName(Ctx *ctx, ResultSet *o, size_t n, String *name);
 KNHAPI(void) knh_ResultSet_initData(Ctx *ctx, ResultSet *o);
@@ -229,6 +220,17 @@ KNHAPI(knh_bytes_t) knh_String_tobytes(String *o);
 KNHAPI(knh_bytes_t) knh_StringNULL_tobytes(String *o, knh_bytes_t def);
 KNHAPI(void) konoha_addParserDriver(Ctx *ctx, char *alias, knh_parser_drvapi_t *d);
 KNHAPI(void) konoha_setSystemPropertyText(Ctx *ctx, char *key, char *value);
+KNHAPI(void) knh_putc(Ctx *ctx, OutputStream *w, int ch);
+KNHAPI(void) knh_write(Ctx *ctx, OutputStream *w, knh_bytes_t s);
+KNHAPI(void) knh_flush(Ctx *ctx, OutputStream *w);
+KNHAPI(void) knh_print(Ctx *ctx, OutputStream *w, knh_bytes_t s);
+KNHAPI(void) knh_println(Ctx *ctx, OutputStream *w, knh_bytes_t s);
+KNHAPI(void) knh_write_EOL(Ctx *ctx, OutputStream *w);
+KNHAPI(void) knh_write_TAB(Ctx *ctx, OutputStream *w);
+KNHAPI(void) knh_write_BOL(Ctx *ctx, OutputStream *w);
+KNHAPI(void) knh_format(Ctx *ctx, OutputStream *w, knh_methodn_t mn, Object *o, Any *m);
+KNHAPI(void) knh_printf(Ctx *ctx, OutputStream *w, char *fmt, ...);
+KNHAPI(void) konoha_says(Ctx *ctx, int type, char *fmt, ...);
 KNHAPI(FILE*) knh_fopen(Ctx *ctx, char *filename, char *mode);
 KNHAPI(size_t) knh_fgetc(Ctx *ctx, FILE *fp);
 KNHAPI(size_t) knh_fread(Ctx *ctx, void *ptr, size_t size, FILE *fp);
