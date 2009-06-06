@@ -295,9 +295,12 @@ typedef knh_uint16_t       knh_expt_t;    /* knh_expt_t */
 #define NNTYPE_cid(c)                 (c|KNH_FLAG_TF_NN)
 #define TYPE_TONNTYPE(t)              (t|KNH_FLAG_TF_NN)
 
-#define IS_ubxint(t)                  (IS_NNTYPE(t) && ctx->share->tClass[CLASS_type(t)].bcid == CLASS_Int)
-#define IS_ubxfloat(t)                (IS_NNTYPE(t) && ctx->share->tClass[CLASS_type(t)].bcid == CLASS_Float)
+#define IS_ubxint(t)                  (IS_NNTYPE(t) && ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Int)
+#define IS_ubxfloat(t)                (IS_NNTYPE(t) && ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Float)
 #define IS_ubxboolean(t)              (NNTYPE_Boolean == t)
+#define IS_ubxtype(t)                 (IS_NNTYPE(t) && (ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Int || ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Float || t == NNTYPE_Boolean) )
+#define IS_bxint(t)                   (!IS_NNTYPE(t) && ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Int)
+#define IS_bxfloat(t)                 (!IS_NNTYPE(t) && ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Float)
 
 // @NOUSE
 #define TYPEQN(t)                     TYPEN(t), TYPEQ(t)
@@ -307,9 +310,6 @@ typedef knh_uint16_t       knh_expt_t;    /* knh_expt_t */
 #define NNTYPE_void                   NNTYPE_cid(CLASS_Nue)
 #define TYPE_any                      CLASS_Any
 #define NNTYPE_any                    CLASS_any
-
-//OLD
-//typedef knh_ushort_t          knh_nsid_t;
 
 /* ------------------------------------------------------------------------ */
 

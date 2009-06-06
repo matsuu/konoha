@@ -286,17 +286,17 @@ void knh_Object__k(Ctx *ctx, Object *o, OutputStream *w, String *m)
 				}
 				knh_printf(ctx, w, "%s: ", FIELDN(cf->fn));
 #ifdef KNH_USING_UNBOXFIELD
-				if(cf->type == NNTYPE_Int) {
+				if(IS_ubxint(cf->type)) {
 					knh_int_t *data = (knh_int_t*)(v + i);
 					knh_write__i(ctx, w, data[0]);
 					continue;
 				}
-				else if(cf->type == NNTYPE_Float) {
+				else if(IS_ubxfloat(cf->type)) {
 					knh_float_t *data = (knh_float_t*)(v + i);
 					knh_write__f(ctx, w, data[0]);
 					continue;
 				}
-				else if(cf->type == NNTYPE_Boolean) {
+				else if(IS_ubxboolean(cf->type)) {
 					knh_boolean_t *data = (knh_boolean_t*)(v + i);
 					if(data[0]) knh_write(ctx, w, STEXT("true"));
 					else knh_write(ctx, w, STEXT("false"));

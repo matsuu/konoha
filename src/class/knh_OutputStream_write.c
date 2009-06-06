@@ -231,7 +231,7 @@ void knh_write_type(Ctx *ctx, OutputStream *w, knh_type_t type)
 	knh_class_t cid = CLASS_type(type);
 	KNH_ASSERT_cid(cid);
 	char *cname = CTXCLASSN(cid);
-	if(type == NNTYPE_Int || type == NNTYPE_Float || type == NNTYPE_Boolean) {
+	if(IS_ubxtype(type)) {
 		knh_putc(ctx, w, tolower(cname[0]));
 		knh_write__s(ctx, w, cname + 1);
 		return;
@@ -277,7 +277,7 @@ KNHAPI(void) knh_format(Ctx *ctx, OutputStream *w, knh_methodn_t mn, Object *o, 
 static char* knh_vprintf_parseindex(char *p, int *index)
 {
     char *ptr = p+1;
-	
+
 	if(ptr[0] == '{' && isdigit(ptr[1]) && ptr[2] == '}') {
 		*index = ptr[1] - '0';
 		ptr += 3;

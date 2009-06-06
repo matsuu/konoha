@@ -398,7 +398,7 @@ int knh_Asm_declareScriptVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_
 	knh_index_t idx = knh_Asm_addVariableTable(ctx, abr, cf, KNH_SCRIPT_FIELDSIZE, flag, type, fn, value);
 	if(idx != -1) {
 #ifdef KNH_USING_UNBOXFIELD
-		if(type == NNTYPE_Int) {
+		if(IS_ubxint(type)) {
 			if(sizeof(knh_int_t) > sizeof(void*)) {
 				if(knh_Asm_addVariableTable(ctx, abr, cf, KNH_SCRIPT_FIELDSIZE, 0, TYPE_void, FIELDN_register, value) == -1) {
 					return 0;
@@ -407,7 +407,7 @@ int knh_Asm_declareScriptVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_
 			knh_int_t *v = (knh_int_t*)(scr->fields + idx);
 			v[0] = (IS_NULL(value)) ? 0 : ((Int*)value)->n.ivalue;
 		}
-		else if(type == NNTYPE_Float) {
+		else if(IS_ubxfloat(type)) {
 			if(sizeof(knh_float_t) > sizeof(void*)) {
 				if(knh_Asm_addVariableTable(ctx, abr, cf, KNH_SCRIPT_FIELDSIZE, 0, TYPE_void, FIELDN_register, value) == -1) {
 					return 0;
@@ -416,7 +416,7 @@ int knh_Asm_declareScriptVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_
 			knh_float_t *v = (knh_float_t*)(scr->fields + idx);
 			v[0] = (IS_NULL(value)) ? 0.0 : ((Float*)value)->n.fvalue;
 		}
-		else if(type == NNTYPE_Boolean) {
+		else if(IS_ubxboolean(type)) {
 			knh_boolean_t *v = (knh_boolean_t*)(scr->fields + idx);
 			v[0] = (IS_NULL(value)) ? 0 : ((Int*)value)->n.bvalue;
 		}
@@ -440,7 +440,7 @@ int knh_Asm_declareFieldVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_t
 		knh_Asm_addVariableTable(ctx, abr, (knh_cfield_t*)DP(abr)->vars, KONOHA_LOCALSIZE, flag, type, fn, value);
 	if(idx != -1) {
 #ifdef KNH_USING_UNBOXFIELD
-		if(type == NNTYPE_Int) {
+		if(IS_ubxint(type)) {
 			if(sizeof(knh_int_t) > sizeof(void*)) {
 				if(knh_Asm_addVariableTable(ctx, abr,
 						(knh_cfield_t*)DP(abr)->vars, KONOHA_LOCALSIZE, 0, TYPE_void, FIELDN_register, value) == -1) {
@@ -452,7 +452,7 @@ int knh_Asm_declareFieldVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_t
 				return idx;
 			}
 		}
-		else if(type == NNTYPE_Float) {
+		else if(IS_ubxfloat(type)) {
 			if(sizeof(knh_float_t) > sizeof(void*)) {
 				if(knh_Asm_addVariableTable(ctx, abr,
 						(knh_cfield_t*)DP(abr)->vars, KONOHA_LOCALSIZE, 0, TYPE_void, FIELDN_register, value) == -1) {
