@@ -229,6 +229,11 @@ typedef struct {
 	char *value;
 } knh_StringConstData_t;
 
+typedef struct {
+	char *name;
+	void *ptr;
+} knh_NamedPointerData_t;
+
 /* ------------------------------------------------------------------------ */
 /* knh_flag_t */
 /* ------------------------------------------------------------------------ */

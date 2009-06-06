@@ -662,32 +662,6 @@ NameSpace *knh_System_getNameSpace(Ctx *ctx, knh_bytes_t name)
 	}
 }
 
-/* ======================================================================== */
-/* [makesepc] */
-
-KNHAPI(void) konoha_addClassSpecFunc(Ctx *ctx, char *urn, knh_fspec func)
-{
-	if(func != (knh_fspec)NULL) {
-		DBG2_P("adding.. '%s'", urn);
-		KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-		knh_DictSet_set(ctx, DP(ctx->sys)->SpecFuncDictSet, new_String__T(ctx, urn), (knh_uintptr_t)func);
-		KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-	}
-}
-/* ------------------------------------------------------------------------ */
-
-ClassSpec *konoha_getClassSpec(Ctx *ctx, knh_class_t bcid, knh_bytes_t urn)
-{
-	urn = konoha_getAliasURN(ctx, urn);
-	DBG2_P("finding.. '%s'", urn.buf);
-	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-	knh_fspec func = (knh_fspec)knh_DictSet_get__b(DP(ctx->sys)->SpecFuncDictSet, urn);
-	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-	if(func != NULL) {
-		return func(ctx, bcid, urn);
-	}
-	return (ClassSpec*)(KNH_NULL);
-}
 
 /* ------------------------------------------------------------------------ */
 

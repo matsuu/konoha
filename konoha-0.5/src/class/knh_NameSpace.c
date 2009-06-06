@@ -123,18 +123,7 @@ knh_class_t konoha_findcid(Ctx *ctx, knh_bytes_t lname)
 		return knh_class_Iterator(ctx, cid);
 	}
 	if(lname.buf[lname.len-1] == '}') {
-		knh_index_t loc = knh_bytes_index(lname, '{');
-		if(loc != -1) {
-			knh_bytes_t urn = knh_bytes_last(lname, loc+1); urn.len -= 1;
-			urn = konoha_getAliasURN(ctx, urn);
-			knh_class_t bcid = konoha_getcid(ctx, knh_bytes_first(lname, loc));
-			DBG2_P("cid=%d,%s", bcid, CLASSN(bcid));
-			ClassSpec *cs = (ClassSpec*)konoha_getClassSpec(ctx, bcid, urn);
-			if(IS_NOTNULL(cs)) {
-				return KNH_XCLASS(ctx, DP(cs)->bcid, bcid, cs);
-			}
-			return bcid;
-		}
+		return konoha_findcidx(ctx, lname);
 	}
 	return cid;
 }

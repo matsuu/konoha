@@ -1545,7 +1545,7 @@ void knh_ClassSpec_init(Ctx *ctx, ClassSpec *u, int init)
 	knh_ClassSpec_struct *b = DP(u);
 	// common
 	b->flag = 0;
-	b->bcid  = (knh_class_t)init;
+	b->ucid  = (knh_class_t)init;
 	KNH_INITv(b->urn, TS_EMPTY);
 	KNH_INITv(b->tag,  TS_EMPTY);
 	b->ivalue = NULL;
