@@ -398,9 +398,9 @@ int knh_Int_compareTo(Int *o, Int *o2)
 	}
 	else {
 		Ctx *ctx = konoha_getCurrentContext();
-		IntUnit *u = (IntUnit*)ctx->share->ClassTable[o->h.cid].cspec;
-		KNH_ASSERT(IS_IntUnit(u));
-		return DP(u)->fcmp(u, o->n.ivalue, o2->n.ivalue);
+		ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[o->h.cid].cspec;
+		KNH_ASSERT(IS_ClassSpec(u));
+		return DP(u)->ficmp(u, o->n.ivalue, o2->n.ivalue);
 	}
 }
 
@@ -456,9 +456,9 @@ int knh_Float_compareTo(Float *o, Float *o2)
 	}
 	else {
 		Ctx *ctx = konoha_getCurrentContext();
-		FloatUnit *fu = (FloatUnit*)ctx->share->ClassTable[o->h.cid].cspec;
-		KNH_ASSERT(IS_FloatUnit(fu));
-		return DP(fu)->fcmp(fu, o->n.fvalue, o2->n.fvalue);
+		ClassSpec *fu = (ClassSpec*)ctx->share->ClassTable[o->h.cid].cspec;
+		KNH_ASSERT(IS_ClassSpec(fu));
+		return DP(fu)->ffcmp(fu, o->n.fvalue, o2->n.fvalue);
 	}
 }
 
@@ -538,9 +538,9 @@ int knh_String_compareTo(String *o, String *o2)
 	else {
 		if(o->h.cid == o2->h.cid) {
 			Ctx *ctx = konoha_getCurrentContext();
-			StringUnit *u = (StringUnit*)ctx->share->ClassTable[o->h.cid].cspec;
-			KNH_ASSERT(IS_StringUnit(u));
-			return DP(u)->fcmp(u, knh_String_tobytes(o), knh_String_tobytes(o2));
+			ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[o->h.cid].cspec;
+			KNH_ASSERT(IS_ClassSpec(u));
+			return DP(u)->fscmp(u, knh_String_tobytes(o), knh_String_tobytes(o2));
 		}
 		return (int)(o - o2);
 	}
@@ -1397,155 +1397,6 @@ void knh_AffineConv_init(Ctx *ctx, AffineConv *o, int init)
 }
 
 /* ======================================================================== */
-/* IntUnit */
-
-#define knh_IntUnit_init_ NULL
-#define knh_IntUnit_copy NULL
-#define knh_IntUnit_traverse_ NULL
-#define knh_IntUnit_compareTo NULL
-#define knh_IntUnit_hashCode NULL
-#define knh_IntUnit_newClass NULL
-
-/* ------------------------------------------------------------------------ */
-
-static
-knh_bool_t knh_fenumchk__nop(IntUnit *b, knh_int_t v)
-{
-	return 1;
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-int knh_fenumcmp__signed(IntUnit *b, knh_int_t v1, knh_int_t v2)
-{
-	return (int)(v1 - v2);
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-void knh_fenumfmt__signed(IntUnit *b, char *buf, size_t bufsiz, knh_int_t v)
-{
-	knh_snprintf(buf, bufsiz, KNH_INT_FMT, v);
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-void knh_IntUnit_init(Ctx *ctx, IntUnit *u, int init)
-{
-	knh_IntUnit_struct *b = DP(u);
-	b->spec.flag = 0;
-	b->spec.cid  = CLASS_Int;
-	KNH_INITv(b->spec.urn,  TS_EMPTY);
-	KNH_INITv(b->spec.tag,  TS_EMPTY);
-	KNH_INITv(b->spec.defvalue, ctx->share->tInt[0-(KNH_TINT_MIN)]);
-	//
-	b->step = 1;
-	b->max  = KNH_INT_MAX;
-	b->min  = KNH_INT_MIN;
-	b->fchk = knh_fenumchk__nop;
-	b->fcmp = knh_fenumcmp__signed;
-	b->ffmt = knh_fenumfmt__signed;
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-void knh_IntUnit_traverse(Ctx *ctx, IntUnit *u, knh_ftraverse ftr)
-{
-	knh_IntUnit_struct *b = DP(u);
-	ftr(ctx, UP(b->spec.urn));
-	ftr(ctx, UP(b->spec.tag));
-	ftr(ctx, b->spec.defvalue);
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-String* knh_IntUnit_getkey(Ctx *ctx, knh_sfp_t *lsfp)
-{
-	return DP((IntUnit*)lsfp[0].o)->spec.urn;
-}
-
-/* ======================================================================== */
-/* FloatUnit */
-
-#define knh_FloatUnit_init_ NULL
-#define knh_FloatUnit_copy NULL
-#define knh_FloatUnit_traverse_ NULL
-#define knh_FloatUnit_compareTo NULL
-#define knh_FloatUnit_hashCode NULL
-#define knh_FloatUnit_newClass NULL
-
-/* ------------------------------------------------------------------------ */
-
-static
-knh_bool_t knh_funitchk__default(FloatUnit *b, knh_float_t v)
-{
-	return 1;
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-int knh_funitcmp__default(FloatUnit *b, knh_float_t v1, knh_float_t v2)
-{
-	knh_float_t delta = v1 - v2;
-	if(delta == 0.0) return 0;
-	return delta < 0 ? -1 : 1;
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-void knh_funitfmt__default(FloatUnit *b, char *buf, size_t bufsiz, knh_float_t v)
-{
-	knh_snprintf(buf, bufsiz, KNH_FLOAT_FMT, v);
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-void knh_FloatUnit_init(Ctx *ctx, FloatUnit *u, int init)
-{
-	knh_FloatUnit_struct *b = DP(u);
-	b->spec.flag = 0;
-	b->spec.cid  = CLASS_Float;
-	KNH_INITv(b->spec.urn,  TS_EMPTY);
-	KNH_INITv(b->spec.tag,  TS_EMPTY);
-	KNH_INITv(b->spec.defvalue, KNH_FLOAT0);
-	//
-	b->step = 0.0;
-	b->max  = KNH_FLOAT_MAX;
-	b->min  = KNH_FLOAT_MIN;
-	b->fchk = knh_funitchk__default;
-	b->fcmp = knh_funitcmp__default;
-	b->ffmt = knh_funitfmt__default;
-	b->FMT  = KNH_FLOAT_FMT;
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-void knh_FloatUnit_traverse(Ctx *ctx, FloatUnit *u, knh_ftraverse gc)
-{
-	knh_FloatUnit_struct *b = DP(u);
-	gc(ctx, UP(b->spec.urn));
-	gc(ctx, UP(b->spec.tag));
-	gc(ctx, b->spec.defvalue);
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-String* knh_FloatUnit_getkey(Ctx *ctx, knh_sfp_t *lsfp)
-{
-	return DP((FloatUnit*)lsfp[0].o)->spec.urn;
-}
-
-/* ======================================================================== */
 /* Regex */
 
 #define knh_Regex_init_ NULL
@@ -1626,19 +1477,62 @@ void knh_BytesConv_traverse(Ctx *ctx, BytesConv *bc, knh_ftraverse ftr)
 }
 
 /* ======================================================================== */
-/* StringUnit */
+/* ClassSpec */
 
-#define knh_StringUnit_init_ NULL
-#define knh_StringUnit_copy NULL
-#define knh_StringUnit_traverse_ NULL
-#define knh_StringUnit_compareTo NULL
-#define knh_StringUnit_hashCode NULL
-#define knh_StringUnit_newClass NULL
+#define knh_ClassSpec_init_ NULL
+#define knh_ClassSpec_copy NULL
+#define knh_ClassSpec_traverse_ NULL
+#define knh_ClassSpec_compareTo NULL
+#define knh_ClassSpec_hashCode NULL
+#define knh_ClassSpec_newClass NULL
 
 /* ------------------------------------------------------------------------ */
 
 static
-int knh_fvcabcmp__default(StringUnit *o, knh_bytes_t v1, knh_bytes_t v2)
+int knh_fichk__nop(ClassSpec *u, knh_int_t v)
+{
+	return 1;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+int knh_ficmp__signed(ClassSpec *u, knh_int_t v1, knh_int_t v2)
+{
+	return (int)(v1 - v2);
+}
+
+///* ------------------------------------------------------------------------ */
+//
+//static
+//void knh_fenumfmt__signed(ClassSpec *b, char *buf, size_t bufsiz, knh_int_t v)
+//{
+//	knh_snprintf(buf, bufsiz, KNH_INT_FMT, v);
+//}
+
+/* ------------------------------------------------------------------------ */
+
+static
+int knh_ffchk__default(ClassSpec *u, knh_float_t v)
+{
+	return 1;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+int knh_ffcmp__default(ClassSpec *u, knh_float_t v1, knh_float_t v2)
+{
+	knh_float_t delta = v1 - v2;
+	if(delta == 0.0) return 0;
+	return delta < 0 ? -1 : 1;
+}
+
+
+/* ------------------------------------------------------------------------ */
+
+static
+int knh_fscmp__default(ClassSpec *u, knh_bytes_t v1, knh_bytes_t v2)
 {
 	return knh_bytes_strcmp(v1, v2);
 }
@@ -1646,19 +1540,37 @@ int knh_fvcabcmp__default(StringUnit *o, knh_bytes_t v1, knh_bytes_t v2)
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_StringUnit_init(Ctx *ctx, StringUnit *u, int init)
+void knh_ClassSpec_init(Ctx *ctx, ClassSpec *u, int init)
 {
-	knh_StringUnit_struct *b = DP(u);
+	knh_ClassSpec_struct *b = DP(u);
+	// common
+	b->flag = 0;
+	b->bcid  = (knh_class_t)init;
+	KNH_INITv(b->urn, TS_EMPTY);
+	KNH_INITv(b->tag,  TS_EMPTY);
+	b->ivalue = NULL;
+	b->fvalue = NULL;
+	b->svalue = NULL;
 
-	b->spec.flag = 0;
-	b->spec.cid  = CLASS_newid;
-	KNH_INITv(b->spec.urn, TS_EMPTY);
-	KNH_INITv(b->spec.tag,  TS_EMPTY);
-	KNH_INITv(b->spec.defvalue, TS_EMPTY);
-	//
-	b->fnew = new_StringX__fast;
-	b->fcmp = knh_fvcabcmp__default;
-	b->fbconv = NULL;
+	// int
+	b->imax  = KNH_INT_MAX;
+	b->imin  = KNH_INT_MIN;
+	b->fichk = knh_fichk__nop;
+	b->ficmp = knh_ficmp__signed;
+
+	// float
+	b->fstep = 0.001;
+	b->fmax  = KNH_FLOAT_MAX;
+	b->fmin  = KNH_FLOAT_MIN;
+	b->ffchk = knh_ffchk__default;
+	b->ffcmp = knh_ffcmp__default;
+//	b->ffmt = knh_funitfmt__default;
+//	b->FMT  = KNH_FLOAT_FMT;
+
+	// String
+	b->fsnew = new_StringX__fast;
+	b->fscmp = knh_fscmp__default;
+	//b->fsconv = NULL;
 	KNH_INITv(b->bconv, KNH_NULL);
 	b->charlen = 0;
 	b->bytelen = 0;
@@ -1669,24 +1581,27 @@ void knh_StringUnit_init(Ctx *ctx, StringUnit *u, int init)
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_StringUnit_traverse(Ctx *ctx, StringUnit *u, knh_ftraverse gc)
+void knh_ClassSpec_traverse(Ctx *ctx, ClassSpec *u, knh_ftraverse ftr)
 {
-	knh_StringUnit_struct *b = DP(u);
-	gc(ctx, UP(b->spec.urn));
-	gc(ctx, UP(b->spec.tag));
-	gc(ctx, b->spec.defvalue);
+	knh_ClassSpec_struct *b = DP(u);
+	ftr(ctx, UP(b->urn));
+	ftr(ctx, UP(b->tag));
 
-	gc(ctx, UP(b->bconv));
-	gc(ctx, UP(b->pattern));
-	gc(ctx, UP(b->vocabDictIdx));
+	if(b->ivalue != NULL) ftr(ctx, UP(b->ivalue));
+	if(b->fvalue != NULL) ftr(ctx, UP(b->fvalue));
+	if(b->svalue != NULL) ftr(ctx, UP(b->svalue));
+
+	ftr(ctx, UP(b->bconv));
+	ftr(ctx, UP(b->pattern));
+	ftr(ctx, UP(b->vocabDictIdx));
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-String* knh_StringUnit_getkey(Ctx *ctx, knh_sfp_t *lsfp)
+String* knh_ClassSpec_getkey(Ctx *ctx, knh_sfp_t *lsfp)
 {
-	return DP((StringUnit*)lsfp[0].o)->spec.urn;
+	return DP((ClassSpec*)lsfp[0].o)->urn;
 }
 
 /* ======================================================================== */
@@ -2458,11 +2373,11 @@ void knh_KLRCode_traverse(Ctx *ctx, KLRCode *o, knh_ftraverse ftr)
 #define knh_ClassMap_fdefault NULL
 #define knh_Closure_fdefault NULL
 #define knh_AffineConv_fdefault NULL
-#define knh_IntUnit_fdefault NULL
-#define knh_FloatUnit_fdefault NULL
+#define knh_ClassSpec_fdefault NULL
+#define knh_ClassSpec_fdefault NULL
 #define knh_Regex_fdefault NULL
 #define knh_BytesConv_fdefault NULL
-#define knh_StringUnit_fdefault NULL
+#define knh_ClassSpec_fdefault NULL
 #define knh_InputStream_fdefault NULL
 #define knh_OutputStream_fdefault NULL
 #define knh_Socket_fdefault NULL
@@ -2525,9 +2440,9 @@ Object *knh_Float_fdefault(Ctx *ctx, knh_class_t cid)
 static
 Object *knh_FloatX_fdefault(Ctx *ctx, knh_class_t cid)
 {
-	FloatUnit *o = (FloatUnit*)ctx->share->ClassTable[cid].cspec;
-	KNH_ASSERT(IS_FloatUnit(o));
-	return DP(o)->spec.defvalue;
+	ClassSpec *o = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
+	KNH_ASSERT(IS_ClassSpec(o));
+	return UP(DP(o)->fvalue);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2543,9 +2458,9 @@ Object *knh_Int_fdefault(Ctx *ctx, knh_class_t cid)
 static
 Object *knh_IntX_fdefault(Ctx *ctx, knh_class_t cid)
 {
-	IntUnit *o = (IntUnit*)ctx->share->ClassTable[cid].cspec;
-	KNH_ASSERT(IS_IntUnit(o));
-	return DP(o)->spec.defvalue;
+	ClassSpec *o = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
+	KNH_ASSERT(IS_ClassSpec(o));
+	return UP(DP(o)->ivalue);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2561,9 +2476,9 @@ Object *knh_String_fdefault(Ctx *ctx, knh_class_t cid)
 static
 Object *knh_StringX_fdefault(Ctx *ctx, knh_class_t cid)
 {
-	StringUnit *u = (StringUnit*)ctx->share->ClassTable[cid].cspec;
-	KNH_ASSERT(IS_StringUnit(u));
-	return DP(u)->spec.defvalue;
+	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
+	KNH_ASSERT(IS_ClassSpec(u));
+	return UP(DP(u)->svalue);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2963,12 +2878,13 @@ static knh_StringConstData_t StringPropertyData[] = {
 
 static void konoha_loadClassProperties(Ctx *ctx)
 {
-	KNH_SETv(ctx, ctx->share->ClassTable[CLASS_Int].cspec,
-		new_IntUnit(ctx, 0, CLASS_Int, TS_EMPTY, TS_EMPTY, KNH_INT_MIN, KNH_INT_MAX, 0));
-	KNH_SETv(ctx, ctx->share->ClassTable[CLASS_Float].cspec,
-			new_FloatUnit(ctx, 0, CLASS_Float, TS_EMPTY, KNH_FLOAT_MIN, KNH_FLOAT_MAX, 0.0, 0.0));
-	KNH_SETv(ctx, ctx->share->ClassTable[CLASS_String].cspec,
-			new_StringUnit(ctx, 0, CLASS_String, TS_EMPTY));
+	ClassSpec *u = (ClassSpec*)new_Object_bcid(ctx, CLASS_ClassSpec, 0);
+	KNH_INITv(DP(u)->ivalue, KNH_INT0);
+	KNH_INITv(DP(u)->fvalue, KNH_FLOAT0);
+	KNH_INITv(DP(u)->svalue, TS_EMPTY);
+	KNH_SETv(ctx, ctx->share->ClassTable[CLASS_Int].cspec, u);
+	KNH_SETv(ctx, ctx->share->ClassTable[CLASS_Float].cspec, u);
+	KNH_SETv(ctx, ctx->share->ClassTable[CLASS_String].cspec, u);
 
 	konoha_setClassParam(ctx, CLASS_Array, CLASS_Any, CLASS_Nue);
 	konoha_setClassParam(ctx, CLASS_Iterator, CLASS_Any, CLASS_Nue);

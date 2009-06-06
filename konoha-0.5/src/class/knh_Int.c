@@ -63,24 +63,15 @@ KNHAPI(Int*) new_IntX__fast(Ctx *ctx, knh_class_t cid, knh_int_t value)
 
 KNHAPI(Int*) new_IntX(Ctx *ctx, knh_class_t cid, knh_int_t value)
 {
-	IntUnit *u = (IntUnit*)ctx->share->ClassTable[cid].cspec;
-	KNH_ASSERT(IS_IntUnit(u));
-
-	if(DP(u)->fchk(u, value)) {
+	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
+	KNH_ASSERT(IS_ClassSpec(u));
+	if(DP(u)->fichk(u, value)) {
 		Int *n = (knh_Int_t*)new_hObject(ctx, FLAG_Int, CLASS_Int, cid);
 		n->n.ivalue = value;
 		return n;
 	}
 	else {
-		DBG2_ABORT();
-		char buf[CLASSNAME_BUFSIZ];
-		if(knh_IntUnit_isUnsigned(u)) {
-			knh_snprintf(buf, sizeof(buf), "Format!!: %s(" KNH_UINT_FMT ")", CLASSN(cid), value);
-		}else {
-			knh_snprintf(buf, sizeof(buf), "Format!!: %s(" KNH_INT_FMT ")", CLASSN(cid), value);
-		}
-		DBG2_P("%s", buf);
-		return (Int*)new_Nue__s(ctx, buf);
+		return DP(u)->ivalue;
 	}
 }
 

@@ -285,10 +285,11 @@ void KNH_ICLASS(Ctx *ctx, knh_class_t cid, knh_class_t p1)
 /* [SPEC] */
 
 static
-Object *knh_ClassTable_fdefault__CSPEC(Ctx *ctx, knh_class_t cid)
+Object *knh_ClassTable_fdefault__ISPEC(Ctx *ctx, knh_class_t cid)
 {
-	ClassSpec *cs = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
-	return UP(DP(cs)->defvalue);
+	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
+	KNH_ASSERT(IS_ClassSpec(u));
+	return UP(DP(u)->ivalue);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -306,14 +307,13 @@ KNH_XCLASS(Ctx *ctx, knh_class_t cid, knh_class_t bcid, ClassSpec *cs)
 	char bufcn[CLASSNAME_BUFSIZ];
 	knh_snprintf(bufcn, sizeof(bufcn), KNH_CLASSSPEC_FMT, CLASSN(bcid), knh_String_tochar(DP(cs)->urn));
 	konoha_setClassName(ctx, cid, new_String(ctx, B(bufcn), NULL));
-	DP(cs)->cid = cid;
 
 	ctx->share->ClassTable[cid].bcid   = bcid;
 	ctx->share->ClassTable[cid].supcid = bcid;
 
-	if(bcid == CLASS_Int) bcid = CLASS_IntX;
-	else if(bcid == CLASS_Float) bcid = CLASS_FloatX;
-	else if(bcid == CLASS_String) bcid = CLASS_StringX;
+//	if(bcid == CLASS_Int) bcid = CLASS_IntX;
+//	else if(bcid == CLASS_Float) bcid = CLASS_FloatX;
+//	else if(bcid == CLASS_String) bcid = CLASS_StringX;
 
 	DBG2_P("%s\n\tcopying from %s", bufcn, CLASSN(bcid));
 	ctx->share->ClassTable[cid].cflag  = ctx->share->ClassTable[bcid].cflag;
@@ -335,7 +335,8 @@ KNH_XCLASS(Ctx *ctx, knh_class_t cid, knh_class_t bcid, ClassSpec *cs)
 	}
 	KNH_ASSERT(ctx->share->ClassTable[cid].cspec == NULL);
 	KNH_INITv(ctx->share->ClassTable[cid].cspec, cs);
-	ctx->share->ClassTable[cid].fdefault = knh_ClassTable_fdefault__CSPEC;
+	TODO();
+	ctx->share->ClassTable[cid].fdefault = knh_ClassTable_fdefault__ISPEC;
 	return cid;
 }
 

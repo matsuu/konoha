@@ -157,8 +157,8 @@ String *new_StringX(Ctx *ctx, knh_class_t cid, knh_bytes_t t, String *orign)
 		TODO();
 		return new_String(ctx, t, orign);
 	}
-//	StringUnit *u = (StringUnit*)ctx->share->ClassTable[cid].cspec;
-//	KNH_ASSERT(IS_StringUnit(u));
+//	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
+//	KNH_ASSERT(IS_ClassSpec(u));
 //		if(DP(u)->fbconv != NULL) {
 //		return new_String__fcnv(ctx, DP(u)->)
 //		Bytes *ba = knh_Context_openBConvBuf(ctx);

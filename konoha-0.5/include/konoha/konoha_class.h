@@ -131,7 +131,7 @@ typedef struct knh_Number_t {
 
 /* ------------------------------------------------------------------------ */
 /* @class Int Number  knh_Int_t @Immutable */
-/* @class IntX Number knh_Int_t @Immutable */
+/* @ class IntX Number knh_Int_t @Immutable */
 
 typedef struct knh_Int_t {
 	knh_hObject_t h;
@@ -142,7 +142,7 @@ typedef knh_Int_t knh_IntX_t;
 
 /* ------------------------------------------------------------------------ */
 /* @class Float Number knh_Float_t @Immutable */
-/* @class FloatX Number knh_Float_t @Immutable */
+/* @ class FloatX Number knh_Float_t @Immutable */
 
 typedef struct knh_Float_t {
 	knh_hObject_t h;
@@ -153,7 +153,7 @@ typedef knh_Float_t knh_FloatX_t;
 
 /* ------------------------------------------------------------------------ */
 /* @class String Object knh_String_t @Immutable */
-/* @class StringX String knh_String_t @Immutable */
+/* @ class StringX String knh_String_t @Immutable */
 /* @flag String.TextSgm STRING:1 (%s)->h.flag 'is:set:*:*' */
 /* @flag String.ASCII STRING:2 (%s)->h.flag 'is:set:*:*' */
 
@@ -529,65 +529,6 @@ typedef struct knh_AffineConv_t {
 } knh_AffineConv_t;
 
 /* ------------------------------------------------------------------------ */
-/* IntSpec, FloatSpec, StringSpec */
-
-#define KNH_CLASSSPEC_FMT    "%s{%s}"
-
-typedef struct {
-	knh_flag_t  flag;
-	knh_class_t cid;
-	knh_String_t* urn;
-	knh_String_t* tag;
-	Object* defvalue;
-} knh_hClassSpec_struct;
-
-typedef struct knh_ClassSpec_t {
-	knh_hObject_t h;
-	knh_hClassSpec_struct *b;
-} knh_ClassSpec_t ;
-
-#define ClassSpec        knh_ClassSpec_t
-typedef knh_ClassSpec_t* (*knh_fspec)(Ctx *ctx, knh_class_t bcid, char *extra);
-
-/* ------------------------------------------------------------------------ */
-/* @class IntUnit Object knh_IntUnit_struct @Private */
-/* @flag IntUnit.Unsigned UF DP((IntUnit*)%s)->spec.flag 'is:*:is:*' */
-
-struct  knh_IntUnit_t;
-typedef knh_bool_t (*knh_fenumchk)(struct knh_IntUnit_t *, knh_int_t v);
-typedef int (*knh_fenumcmp)(struct knh_IntUnit_t *, knh_int_t v1, knh_int_t v2);
-typedef void (*knh_fenumfmt)(struct knh_IntUnit_t *, char *buf, size_t bufsiz, knh_int_t v);
-
-typedef struct knh_IntUnit {
-	knh_hClassSpec_struct spec;
-	knh_fenumchk fchk;
-	knh_fenumcmp fcmp;
-	knh_fenumfmt ffmt;
-	knh_int_t min;
-	knh_int_t max;
-	knh_int_t step;
-} knh_IntUnit_struct;
-
-/* ------------------------------------------------------------------------ */
-/* @class FloatUnit Object knh_FloatUnit_struct @Private */
-
-struct knh_FloatUnit_t;
-typedef knh_bool_t (*knh_funitchk)(struct knh_FloatUnit_t *, knh_float_t v);
-typedef int (*knh_funitcmp)(struct knh_FloatUnit_t *, knh_float_t v1, knh_float_t v2);
-typedef void (*knh_funitfmt)(struct knh_FloatUnit_t *, char *buf, size_t bufsiz, knh_float_t v);
-
-typedef struct knh_FloatUnit {
-	knh_hClassSpec_struct spec;
-	knh_funitchk fchk;
-	knh_funitcmp fcmp;
-	knh_funitfmt ffmt;
-	knh_float_t min;
-	knh_float_t max;
-	knh_float_t step;
-	char* FMT;
-} knh_FloatUnit_struct;
-
-/* ------------------------------------------------------------------------ */
 /* @class Regex Object knh_Regex_t @Immutable */
 
 typedef struct {
@@ -599,6 +540,10 @@ typedef struct {
 
 /* ------------------------------------------------------------------------ */
 /* @class BytesConv Object knh_BytesConv_t @Private */
+
+//struct knh_BytesConv_t;
+//typedef size_t (*knh_fbyteconv)(Ctx *ctx, struct knh_BytesConv_t *o, knh_bytes_t t, struct knh_Bytes_t *ba);
+//typedef void   (*knh_fbyteconvfree)(Ctx *ctx, struct knh_BytesConv_t *);
 
 #ifdef KNH_USING_ICONV
 	#include<iconv.h>
@@ -617,23 +562,59 @@ typedef struct knh_BytesConv_t {
 } knh_BytesConv_t;
 
 /* ------------------------------------------------------------------------ */
-/* @class StringUnit Object knh_StringUnit_struct @Private */
+/* @class ClassSpec Object knh_ClassSpec_struct @Private */
 
-struct knh_StringUnit_t;
-typedef knh_String_t *(*knh_fvcabnew)(Ctx *, knh_class_t cid, knh_bytes_t, struct knh_String_t *);
-typedef int (*knh_fvcabcmp)(struct knh_StringUnit_t *, knh_bytes_t, knh_bytes_t);
+#define KNH_CLASSSPEC_FMT    "%s{%s}"
+struct  knh_ClassSpec_t;
 
-typedef struct knh_StringUnit {
-	knh_hClassSpec_struct spec;
-	knh_fvcabnew fnew;
-	knh_fvcabcmp fcmp;
-	knh_fbyteconv     fbconv;
-	struct knh_BytesConv_t *bconv;
-	knh_ushort_t bytelen;
-	knh_ushort_t charlen;
+typedef int (*knh_fichk)(struct knh_ClassSpec_t *, knh_int_t v);
+typedef int (*knh_ficmp)(struct knh_ClassSpec_t *, knh_int_t v1, knh_int_t v2);
+
+typedef int (*knh_ffchk)(struct knh_ClassSpec_t *, knh_float_t v);
+typedef int (*knh_ffcmp)(struct knh_ClassSpec_t *, knh_float_t v1, knh_float_t v2);
+
+typedef knh_String_t *(*knh_fsnew)(Ctx *, knh_class_t cid, knh_bytes_t, struct knh_String_t *);
+typedef int (*knh_fscmp)(struct knh_ClassSpec_t *, knh_bytes_t, knh_bytes_t);
+
+typedef struct {
+	knh_flag_t  flag;
+	knh_class_t bcid;
+	knh_String_t* urn;
+	knh_String_t* tag;
+	struct knh_Int_t    *ivalue;
+	struct knh_Float_t  *fvalue;
+	struct knh_String_t *svalue;
+
+	// int
+	union {
+		knh_int_t imin;
+		knh_uint_t umin;
+	};
+	union {
+		knh_int_t imax;
+		knh_uint_t umax;
+	};
+	knh_fichk fichk;
+	knh_ficmp ficmp;
+
+	// float
+	knh_float_t fmin;
+	knh_float_t fmax;
+	knh_float_t fstep;
+	knh_ffchk   ffchk;
+	knh_ffcmp   ffcmp;
+
+	// String
+	size_t bytelen;
+	size_t charlen;
 	Object* pattern;
 	struct knh_DictIdx_t* vocabDictIdx;
-} knh_StringUnit_struct;
+	struct knh_BytesConv_t *bconv;
+	knh_fsnew    fsnew;
+	knh_fscmp    fscmp;
+} knh_ClassSpec_struct;
+
+typedef struct knh_ClassSpec_t* (*knh_fspec)(Ctx *ctx, knh_class_t bcid, knh_bytes_t urn);
 
 /* ------------------------------------------------------------------------ */
 /* InputStream, OutputStream */

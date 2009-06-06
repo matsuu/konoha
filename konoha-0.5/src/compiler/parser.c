@@ -2240,10 +2240,10 @@ Stmt *new_StmtUSING(Ctx *ctx, knh_tokens_t *tc)
 
 		/* using Int:ns */
 		if(knh_Token_isCLASSTN(ctx, tk)) {
-			if(knh_bytes_startsWith(op, STEXT("Int:"))) {
+			if(knh_bytes_startsWith(op, STEXT("Int:"))||knh_bytes_startsWith(op, STEXT("int:"))) {
 				return new_StmtUENUM(ctx, tc);
 			}
-			if(knh_bytes_startsWith(op, STEXT("Float:"))) {
+			if(knh_bytes_startsWith(op, STEXT("Float:"))||knh_bytes_startsWith(op, STEXT("float:"))) {
 				return new_StmtUUNIT(ctx, tc);
 			}
 			if(knh_bytes_startsWith(op, STEXT("String:"))) {

@@ -585,15 +585,9 @@ static METHOD knh__Float__bits(Ctx *ctx, knh_sfp_t *sfp)
 static METHOD knh__Float__k(Ctx *ctx, knh_sfp_t *sfp)
 {
 	Float *o = sfp[0].f;
-	FloatUnit *u = (FloatUnit*)ctx->share->ClassTable[o->h.cid].cspec;
-	KNH_ASSERT(IS_FloatUnit(u));
-	knh_write__ffmt(ctx, sfp[1].w, DP(u)->FMT, p_float(sfp[0]));
-	knh_bytes_t tag = knh_String_tobytes(DP(u)->spec.tag);
-	if(tag.len > 0) {
-		knh_putc(ctx, sfp[1].w, '[');
-		knh_write(ctx, sfp[1].w, tag);
-		knh_putc(ctx, sfp[1].w, ']');
-	}
+	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[o->h.cid].cspec;
+	KNH_ASSERT(IS_ClassSpec(u));
+	knh_write_floatx(ctx, sfp[1].w, u, p_float(sfp[0]));
 }
 
 /* ======================================================================== */
