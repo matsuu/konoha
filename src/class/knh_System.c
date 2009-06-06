@@ -116,37 +116,7 @@ knh_bool_t konoha_initcheck(void)
  	return 1;
  }
 
-/* ======================================================================== */
-/* [urnalias] */
 
-knh_bytes_t konoha_getAliasURN(Ctx *ctx, knh_bytes_t aurn)
-{
-	String *s = (String*)knh_DictMap_get__b(ctx,  DP(ctx->sys)->URNAliasDictMap, aurn);
-	if(IS_NOTNULL(s)) {
-		return knh_String_tobytes(s);
-	}
-	return aurn;
-}
-
-/* ------------------------------------------------------------------------ */
-
-void konoha_setAliasURN(Ctx *ctx, String *alias, String *urn)
-{
-	if(knh_Context_isVerbose(ctx)) {
-		String *s =(String*)knh_DictMap_get__b(ctx,  DP(ctx->sys)->URNAliasDictMap, knh_String_tobytes(urn));
-		if(IS_NOTNULL(s)) {
-			KNH_WARNING(ctx, "Overriding %s %s", knh_String_tochar(alias), knh_String_tochar(s));
-		}
-	}
-	knh_DictMap_set(ctx, DP(ctx->sys)->URNAliasDictMap, alias, UP(urn));
-}
-
-/* ------------------------------------------------------------------------ */
-
-KNHAPI(void) konoha_addAliasURN(Ctx *ctx, char *alias, char *urn)
-{
-	konoha_setAliasURN(ctx, new_String__T(ctx, alias), new_String__T(ctx, urn));
-}
 
 /* ------------------------------------------------------------------------ */
 

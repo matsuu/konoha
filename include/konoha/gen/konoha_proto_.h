@@ -130,7 +130,6 @@ void konoha_setClassParam(Ctx *ctx, knh_class_t cid, knh_class_t p1, knh_class_t
 knh_class_t konoha_addGenericsClass(Ctx *ctx, knh_class_t cid, String *name, knh_class_t bcid, knh_class_t p1, knh_class_t p2);
 void KNH_ACLASS(Ctx *ctx, knh_class_t cid, knh_class_t p1);
 void KNH_ICLASS(Ctx *ctx, knh_class_t cid, knh_class_t p1);
-knh_class_t KNH_XCLASS(Ctx *ctx, knh_class_t cid, knh_class_t bcid, ClassSpec *cs);
 ClassStruct* new_ClassStruct0(Ctx *ctx, int field_size, int method_size);
 knh_index_t knh_Class_indexOfField(Ctx *ctx, knh_class_t cid, knh_fieldn_t fn);
 knh_index_t knh_Class_queryField(Ctx *ctx, knh_class_t cid, knh_fieldn_t fnq);
@@ -145,6 +144,13 @@ void knh_ClassMap_sort(Ctx *ctx, ClassMap *o);
 void knh_ClassMap_add(Ctx *ctx, ClassMap *o, Mapper *map);
 void knh_ClassMap__dump(Ctx *ctx, ClassMap *o, OutputStream *w, String *m);
 void knh_ClassMap__man(Ctx *ctx, ClassMap *o, OutputStream *w, knh_class_t cid);
+/* ../src/class/knh_ClassSpec.c */
+void knh_ClassSpec_initIntRange(Ctx *ctx, ClassSpec *u, knh_int_t min, knh_int_t max);
+void knh_ClassSpec_initFloatRange(Ctx *ctx, ClassSpec *u, knh_float_t min, knh_float_t max, knh_float_t step);
+void knh_write_floatx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_float_t v);
+void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid);
+knh_bytes_t konoha_getAliasURN(Ctx *ctx, knh_bytes_t aurn);
+knh_class_t konoha_findcidx(Ctx *ctx, knh_bytes_t lname);
 /* ../src/class/knh_Closure.c */
 METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Closure_invoke(Ctx *ctx, knh_sfp_t *sfp);
@@ -249,11 +255,6 @@ int knh_InputStream_isClosed(InputStream *o);
 MAPPER knh_Bytes_InputStream(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/class/knh_Int.c */
 knh_int_t knh_IntNULL_toint(Int *v);
-/* ../src/class/knh_IntUnit.c */
-void knh_ClassSpec_initIntRange(Ctx *ctx, ClassSpec *u, knh_int_t min, knh_int_t max);
-void knh_ClassSpec_initFloatRange(Ctx *ctx, ClassSpec *u, knh_float_t min, knh_float_t max, knh_float_t step);
-void knh_write_floatx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_float_t v);
-void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid);
 /* ../src/class/knh_Iterator.c */
 void knh_Iterator_close(Ctx *ctx, Iterator *it);
 Iterator* new_Iterator(Ctx *ctx, knh_class_t p1, Any *source, knh_fitrnext fnext);
@@ -398,8 +399,6 @@ char * knh_bytes_nzenvkey(knh_bytes_t t, char *buf, size_t bufsiz);
 Any* knh_System_getProperty(Ctx *ctx, System *o, knh_bytes_t key);
 void knh_System_setProperty(Ctx *ctx, System *o, String *key, Any *value);
 knh_bool_t konoha_initcheck(void);
-knh_bytes_t konoha_getAliasURN(Ctx *ctx, knh_bytes_t aurn);
-void konoha_setAliasURN(Ctx *ctx, String *alias, String *urn);
 /* ../src/class/knh_type_t.c */
 knh_class_t knh_pmztype_toclass(Ctx *ctx, knh_type_t t, knh_class_t this_cid);
 knh_type_t knh_pmztype_totype(Ctx *ctx, knh_type_t t, knh_class_t this_cid);
@@ -640,7 +639,6 @@ void konoha_addDriverAPI(Ctx *ctx, char *alias, knh_drvapi_t* p);
 knh_drvapi_t *konoha_getDriverAPI(Ctx *ctx, int type, knh_bytes_t name);
 NameSpace *knh_System_loadPackage(Ctx *ctx, knh_bytes_t pkgname);
 NameSpace *knh_System_getNameSpace(Ctx *ctx, knh_bytes_t name);
-ClassSpec *konoha_getClassSpec(Ctx *ctx, knh_class_t bcid, knh_bytes_t urn);
 /* ../src/main/systemtable.c */
 Ctx *new_Context(Ctx *parent);
 void knh_Context_traverse(Ctx *ctx, knh_Context_t *o, knh_ftraverse ftr);

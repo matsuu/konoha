@@ -578,7 +578,7 @@ typedef int (*knh_fscmp)(struct knh_ClassSpec_t *, knh_bytes_t, knh_bytes_t);
 
 typedef struct {
 	knh_flag_t  flag;
-	knh_class_t bcid;
+	knh_class_t ucid;
 	knh_String_t* urn;
 	knh_String_t* tag;
 	struct knh_Int_t    *ivalue;
@@ -614,7 +614,7 @@ typedef struct {
 	knh_fscmp    fscmp;
 } knh_ClassSpec_struct;
 
-typedef struct knh_ClassSpec_t* (*knh_fspec)(Ctx *ctx, knh_class_t bcid, knh_bytes_t urn);
+typedef struct knh_ClassSpec_t* (*knh_fspec)(Ctx *ctx, knh_bytes_t urn);
 
 /* ------------------------------------------------------------------------ */
 /* InputStream, OutputStream */

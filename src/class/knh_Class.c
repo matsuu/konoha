@@ -281,64 +281,6 @@ void KNH_ICLASS(Ctx *ctx, knh_class_t cid, knh_class_t p1)
 	konoha_addGenericsClass(ctx, cid, new_String(ctx, B(buf), NULL), CLASS_Iterator, p1, CLASS_Nue);
 }
 
-/* ======================================================================== */
-/* [SPEC] */
-
-static
-Object *knh_ClassTable_fdefault__ISPEC(Ctx *ctx, knh_class_t cid)
-{
-	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
-	KNH_ASSERT(IS_ClassSpec(u));
-	return UP(DP(u)->ivalue);
-}
-
-/* ------------------------------------------------------------------------ */
-
-knh_class_t
-KNH_XCLASS(Ctx *ctx, knh_class_t cid, knh_class_t bcid, ClassSpec *cs)
-{
-	if(cid == CLASS_newid) {
-		cid = knh_ClassTable_newId(ctx);
-	}else {
-		KNH_ASSERT(cid + 1 == ctx->share->ClassTableSize);
-		ctx->share->ClassTableSize = cid;
-	}
-
-	char bufcn[CLASSNAME_BUFSIZ];
-	knh_snprintf(bufcn, sizeof(bufcn), KNH_CLASSSPEC_FMT, CLASSN(bcid), knh_String_tochar(DP(cs)->urn));
-	konoha_setClassName(ctx, cid, new_String(ctx, B(bufcn), NULL));
-
-	ctx->share->ClassTable[cid].bcid   = bcid;
-	ctx->share->ClassTable[cid].supcid = bcid;
-
-//	if(bcid == CLASS_Int) bcid = CLASS_IntX;
-//	else if(bcid == CLASS_Float) bcid = CLASS_FloatX;
-//	else if(bcid == CLASS_String) bcid = CLASS_StringX;
-
-	DBG2_P("%s\n\tcopying from %s", bufcn, CLASSN(bcid));
-	ctx->share->ClassTable[cid].cflag  = ctx->share->ClassTable[bcid].cflag;
-	ctx->share->ClassTable[cid].oflag  = ctx->share->ClassTable[bcid].oflag;
-	ctx->share->ClassTable[cid].offset = ctx->share->ClassTable[bcid].offset;
-
-	ctx->share->ClassTable[cid].sid  = ctx->share->ClassTable[bcid].sid;
-	ctx->share->ClassTable[cid].size = ctx->share->ClassTable[bcid].size;
-	ctx->share->ClassTable[cid].bsize  = ctx->share->ClassTable[bcid].bsize;
-
-	KNH_ASSERT(ctx->share->ClassTable[cid].cstruct == NULL);
-	KNH_INITv(ctx->share->ClassTable[cid].cstruct, ctx->share->ClassTable[bcid].cstruct);
-
-	if(ctx->share->ClassTable[cid].cmap == NULL) {
-		KNH_INITv(ctx->share->ClassTable[cid].cmap, new_ClassMap0(ctx, 4));
-	}
-	else {
-		KNH_ASSERT(IS_ClassMap(ctx->share->ClassTable[cid].cmap));
-	}
-	KNH_ASSERT(ctx->share->ClassTable[cid].cspec == NULL);
-	KNH_INITv(ctx->share->ClassTable[cid].cspec, cs);
-	TODO();
-	ctx->share->ClassTable[cid].fdefault = knh_ClassTable_fdefault__ISPEC;
-	return cid;
-}
 
 /* ======================================================================== */
 /* [ClassStruct] */

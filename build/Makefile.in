@@ -66,22 +66,22 @@ libkonoha_la_LIBADD =
 am_libkonoha_la_OBJECTS = anyapi.lo arrayapi.lo bytesapi.lo dbapi.lo \
 	dictapi.lo hashapi.lo numberapi.lo objectapi.lo streamapi.lo \
 	stringapi.lo systemapi.lo knh_AffineConv.lo knh_Array.lo \
-	knh_Bytes.lo knh_BytesConv.lo knh_Class.lo knh_Closure.lo \
-	knh_Connection.lo knh_Context.lo knh_DictIdx.lo \
+	knh_Bytes.lo knh_BytesConv.lo knh_Class.lo knh_ClassSpec.lo \
+	knh_Closure.lo knh_Connection.lo knh_Context.lo knh_DictIdx.lo \
 	knh_DictMapSet.lo knh_Exception.lo knh_Float.lo knh_Hash.lo \
-	knh_InputStream.lo knh_Int.lo knh_IntUnit.lo knh_Iterator.lo \
-	knh_Mapper.lo knh_Method.lo knh_NameSpace.lo knh_Number.lo \
-	knh_Object.lo knh_OutputStream.lo knh_OutputStream_write.lo \
-	knh_ResultSet.lo knh_Script.lo knh_String.lo knh_StringUnit.lo \
-	knh_String_mbytes.lo knh_System.lo knh_bytes_t.lo knh_cwb_t.lo \
-	knh_type_t.lo asm.lo kcode.lo konohac.lo parser.lo perror.lo \
-	stmt.lo token.lo tokenizer.lo typing.lo dlopen.lo fileio.lo \
-	filesystem.lo konoha_locale.lo regex.lo socket.lo sqlite3.lo \
-	thread.lo time.lo mt19937-64.lo mt19937ar.lo codetemplate.lo \
-	fibo.lo konoha_klr_.lo konohac_.lo method_.lo b4.lo \
-	konohaget.lo classapi.lo exports.lo fileutils.lo glue.lo \
-	konoha_api.lo konoha_ext.lo logging.lo memory.lo metadata.lo \
-	objectdbms.lo stack.lo system.lo systemtable.lo typesystem.lo
+	knh_InputStream.lo knh_Int.lo knh_Iterator.lo knh_Mapper.lo \
+	knh_Method.lo knh_NameSpace.lo knh_Number.lo knh_Object.lo \
+	knh_OutputStream.lo knh_OutputStream_write.lo knh_ResultSet.lo \
+	knh_Script.lo knh_String.lo knh_String_mbytes.lo knh_System.lo \
+	knh_bytes_t.lo knh_cwb_t.lo knh_type_t.lo asm.lo kcode.lo \
+	konohac.lo parser.lo perror.lo stmt.lo token.lo tokenizer.lo \
+	typing.lo dlopen.lo fileio.lo filesystem.lo konoha_locale.lo \
+	regex.lo socket.lo sqlite3.lo thread.lo time.lo mt19937-64.lo \
+	mt19937ar.lo codetemplate.lo fibo.lo konoha_klr_.lo \
+	konohac_.lo method_.lo b4.lo konohaget.lo classapi.lo \
+	exports.lo fileutils.lo glue.lo konoha_api.lo konoha_ext.lo \
+	logging.lo memory.lo metadata.lo objectdbms.lo stack.lo \
+	system.lo systemtable.lo typesystem.lo
 libkonoha_la_OBJECTS = $(am_libkonoha_la_OBJECTS)
 libkonoha_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -249,29 +249,29 @@ libkonoha_la_SOURCES = ../src/api/anyapi.c ../src/api/arrayapi.c \
 	../src/api/stringapi.c ../src/api/systemapi.c \
 	../src/class/knh_AffineConv.c ../src/class/knh_Array.c \
 	../src/class/knh_Bytes.c ../src/class/knh_BytesConv.c \
-	../src/class/knh_Class.c ../src/class/knh_Closure.c \
-	../src/class/knh_Connection.c ../src/class/knh_Context.c \
-	../src/class/knh_DictIdx.c ../src/class/knh_DictMapSet.c \
-	../src/class/knh_Exception.c ../src/class/knh_Float.c \
-	../src/class/knh_Hash.c ../src/class/knh_InputStream.c \
-	../src/class/knh_Int.c ../src/class/knh_IntUnit.c \
+	../src/class/knh_Class.c ../src/class/knh_ClassSpec.c \
+	../src/class/knh_Closure.c ../src/class/knh_Connection.c \
+	../src/class/knh_Context.c ../src/class/knh_DictIdx.c \
+	../src/class/knh_DictMapSet.c ../src/class/knh_Exception.c \
+	../src/class/knh_Float.c ../src/class/knh_Hash.c \
+	../src/class/knh_InputStream.c ../src/class/knh_Int.c \
 	../src/class/knh_Iterator.c ../src/class/knh_Mapper.c \
 	../src/class/knh_Method.c ../src/class/knh_NameSpace.c \
 	../src/class/knh_Number.c ../src/class/knh_Object.c \
 	../src/class/knh_OutputStream.c \
 	../src/class/knh_OutputStream_write.c \
 	../src/class/knh_ResultSet.c ../src/class/knh_Script.c \
-	../src/class/knh_String.c ../src/class/knh_StringUnit.c \
-	../src/class/knh_String_mbytes.c ../src/class/knh_System.c \
-	../src/class/knh_bytes_t.c ../src/class/knh_cwb_t.c \
-	../src/class/knh_type_t.c ../src/compiler/asm.c \
-	../src/compiler/kcode.c ../src/compiler/konohac.c \
-	../src/compiler/parser.c ../src/compiler/perror.c \
-	../src/compiler/stmt.c ../src/compiler/token.c \
-	../src/compiler/tokenizer.c ../src/compiler/typing.c \
-	../src/deps/dlopen.c ../src/deps/fileio.c \
-	../src/deps/filesystem.c ../src/deps/konoha_locale.c \
-	../src/deps/regex.c ../src/deps/socket.c ../src/deps/sqlite3.c \
+	../src/class/knh_String.c ../src/class/knh_String_mbytes.c \
+	../src/class/knh_System.c ../src/class/knh_bytes_t.c \
+	../src/class/knh_cwb_t.c ../src/class/knh_type_t.c \
+	../src/compiler/asm.c ../src/compiler/kcode.c \
+	../src/compiler/konohac.c ../src/compiler/parser.c \
+	../src/compiler/perror.c ../src/compiler/stmt.c \
+	../src/compiler/token.c ../src/compiler/tokenizer.c \
+	../src/compiler/typing.c ../src/deps/dlopen.c \
+	../src/deps/fileio.c ../src/deps/filesystem.c \
+	../src/deps/konoha_locale.c ../src/deps/regex.c \
+	../src/deps/socket.c ../src/deps/sqlite3.c \
 	../src/deps/thread.c ../src/deps/time.c \
 	../src/ext/mt19937-64.c ../src/ext/mt19937ar.c \
 	../src/gen/codetemplate.c ../src/gen/fibo.c \
@@ -428,6 +428,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Bytes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_BytesConv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Class.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_ClassSpec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Closure.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Connection.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Context.Plo@am__quote@
@@ -438,7 +439,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Hash.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_InputStream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Int.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_IntUnit.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Iterator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Mapper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Method.Plo@am__quote@
@@ -450,7 +450,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_ResultSet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Script.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_String.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_StringUnit.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_String_mbytes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_System.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_bytes_t.Plo@am__quote@
@@ -625,6 +624,13 @@ knh_Class.lo: ../src/class/knh_Class.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Class.lo `test -f '../src/class/knh_Class.c' || echo '$(srcdir)/'`../src/class/knh_Class.c
 
+knh_ClassSpec.lo: ../src/class/knh_ClassSpec.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_ClassSpec.lo -MD -MP -MF $(DEPDIR)/knh_ClassSpec.Tpo -c -o knh_ClassSpec.lo `test -f '../src/class/knh_ClassSpec.c' || echo '$(srcdir)/'`../src/class/knh_ClassSpec.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/knh_ClassSpec.Tpo $(DEPDIR)/knh_ClassSpec.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_ClassSpec.c' object='knh_ClassSpec.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_ClassSpec.lo `test -f '../src/class/knh_ClassSpec.c' || echo '$(srcdir)/'`../src/class/knh_ClassSpec.c
+
 knh_Closure.lo: ../src/class/knh_Closure.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Closure.lo -MD -MP -MF $(DEPDIR)/knh_Closure.Tpo -c -o knh_Closure.lo `test -f '../src/class/knh_Closure.c' || echo '$(srcdir)/'`../src/class/knh_Closure.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/knh_Closure.Tpo $(DEPDIR)/knh_Closure.Plo
@@ -694,13 +700,6 @@ knh_Int.lo: ../src/class/knh_Int.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Int.c' object='knh_Int.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Int.lo `test -f '../src/class/knh_Int.c' || echo '$(srcdir)/'`../src/class/knh_Int.c
-
-knh_IntUnit.lo: ../src/class/knh_IntUnit.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_IntUnit.lo -MD -MP -MF $(DEPDIR)/knh_IntUnit.Tpo -c -o knh_IntUnit.lo `test -f '../src/class/knh_IntUnit.c' || echo '$(srcdir)/'`../src/class/knh_IntUnit.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/knh_IntUnit.Tpo $(DEPDIR)/knh_IntUnit.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_IntUnit.c' object='knh_IntUnit.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_IntUnit.lo `test -f '../src/class/knh_IntUnit.c' || echo '$(srcdir)/'`../src/class/knh_IntUnit.c
 
 knh_Iterator.lo: ../src/class/knh_Iterator.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Iterator.lo -MD -MP -MF $(DEPDIR)/knh_Iterator.Tpo -c -o knh_Iterator.lo `test -f '../src/class/knh_Iterator.c' || echo '$(srcdir)/'`../src/class/knh_Iterator.c
@@ -778,13 +777,6 @@ knh_String.lo: ../src/class/knh_String.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_String.c' object='knh_String.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_String.lo `test -f '../src/class/knh_String.c' || echo '$(srcdir)/'`../src/class/knh_String.c
-
-knh_StringUnit.lo: ../src/class/knh_StringUnit.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_StringUnit.lo -MD -MP -MF $(DEPDIR)/knh_StringUnit.Tpo -c -o knh_StringUnit.lo `test -f '../src/class/knh_StringUnit.c' || echo '$(srcdir)/'`../src/class/knh_StringUnit.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/knh_StringUnit.Tpo $(DEPDIR)/knh_StringUnit.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_StringUnit.c' object='knh_StringUnit.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_StringUnit.lo `test -f '../src/class/knh_StringUnit.c' || echo '$(srcdir)/'`../src/class/knh_StringUnit.c
 
 knh_String_mbytes.lo: ../src/class/knh_String_mbytes.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_String_mbytes.lo -MD -MP -MF $(DEPDIR)/knh_String_mbytes.Tpo -c -o knh_String_mbytes.lo `test -f '../src/class/knh_String_mbytes.c' || echo '$(srcdir)/'`../src/class/knh_String_mbytes.c
