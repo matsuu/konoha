@@ -91,6 +91,7 @@ int knh_ffcmp__step(ClassSpec *u, knh_float_t v1, knh_float_t v2)
 
 /* ------------------------------------------------------------------------ */
 
+static
 void knh_ClassSpec_initIntRange(Ctx *ctx, ClassSpec *u, knh_int_t min, knh_int_t max)
 {
 	DP(u)->imin = min;
@@ -120,6 +121,24 @@ void knh_ClassSpec_initIntRange(Ctx *ctx, ClassSpec *u, knh_int_t min, knh_int_t
 
 /* ------------------------------------------------------------------------ */
 
+void knh_write_intx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_int_t v)
+{
+	char *FMT = KNH_INT_FMT;
+	if(DP(u)->imin >= 0) {
+		FMT = KNH_UINT_FMT;
+	}
+	knh_write__ffmt(ctx, w, FMT, v);
+	knh_bytes_t tag = knh_String_tobytes(DP(u)->tag);
+	if(tag.len > 0) {
+		knh_putc(ctx, w, '[');
+		knh_write(ctx, w, tag);
+		knh_putc(ctx, w, ']');
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
 void knh_ClassSpec_initFloatRange(Ctx *ctx, ClassSpec *u, knh_float_t min, knh_float_t max, knh_float_t step)
 {
 	DP(u)->fmin = min;
@@ -178,6 +197,64 @@ void knh_write_floatx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_float_t v)
 
 /* ------------------------------------------------------------------------ */
 
+static MAPPER knh_IntX_FloatX(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_float_t v = (knh_float_t)sfp[0].ivalue;
+	KNH_MAPPED_Float(ctx, sfp, v);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static MAPPER knh_FloatX_IntX(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_int_t v = (knh_int_t)sfp[0].fvalue;
+	KNH_MAPPED_Int(ctx, sfp, v);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+int knh_ClassSpec_isVocab(ClassSpec *u)
+{
+	return IS_DictIdx(DP(u)->vocabDictIdx);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+String *knh_ClassSpec_getVocabAt(Ctx *ctx, ClassSpec *u, size_t n)
+{
+	return knh_DictIdx_get__fast(DP(u)->vocabDictIdx, n - DP(u)->imin);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+knh_int_t knh_ClassSpec_getVocabIdx(Ctx *ctx, ClassSpec *u, String *s)
+{
+	return knh_DictIdx_index(ctx, DP(u)->vocabDictIdx, knh_String_tobytes(s)) + DP(u)->imin;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static MAPPER knh_IntX_Vocab(Ctx *ctx, knh_sfp_t *sfp)
+{
+	ClassSpec *u = (ClassSpec*)sfp[1].o;
+	KNH_ASSERT(IS_ClassSpec(u));
+	KNH_MAPPED(ctx, sfp, knh_ClassSpec_getVocabAt(ctx, u, sfp[0].ivalue));
+}
+
+/* ------------------------------------------------------------------------ */
+
+static MAPPER knh_Vocab_IntX(Ctx *ctx, knh_sfp_t *sfp)
+{
+	ClassSpec *u = (ClassSpec*)sfp[1].o;
+	KNH_ASSERT(IS_ClassSpec(u));
+	KNH_MAPPED_Int(ctx, sfp, knh_ClassSpec_getVocabIdx(ctx, u, sfp[0].s));
+}
+
+/* ------------------------------------------------------------------------ */
+
 void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid)
 {
 	knh_class_t bcid = ctx->share->ClassTable[cid].bcid;
@@ -189,10 +266,18 @@ void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid)
 		KNH_ASSERT(DP(u)->ivalue == NULL);
 		KNH_INITv(DP(u)->ivalue, new_IntX__fast(ctx, cid, v));
 		if(DP(u)->fvalue != NULL) {
-
+			Mapper *mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, DP(u)->ucid, cid, knh_FloatX_IntX, (Object*)u);
+			konoha_addMapper(ctx, mpr);
+			mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, cid, DP(u)->ucid, knh_IntX_FloatX, (Object*)u);
+			konoha_addMapper(ctx, mpr);
 		}
 		if(DP(u)->svalue != NULL) {
-
+			if(knh_ClassSpec_isVocab(u)) {
+				Mapper *mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, cid, DP(u)->ucid, knh_IntX_Vocab, (Object*)u);
+				konoha_addMapper(ctx, mpr);
+				mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, DP(u)->ucid, cid, knh_Vocab_IntX, (Object*)u);
+				konoha_addMapper(ctx, mpr);
+			}
 		}
 	}
 	else if(bcid == CLASS_Float) {
@@ -203,20 +288,15 @@ void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid)
 		KNH_ASSERT(DP(u)->fvalue == NULL);
 		KNH_INITv(DP(u)->fvalue, new_FloatX__fast(ctx, cid, v));
 		if(DP(u)->ivalue != NULL) {
-
-		}
-		if(DP(u)->svalue != NULL) {
-
+			Mapper *mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, cid, DP(u)->ucid, knh_FloatX_IntX, (Object*)u);
+			konoha_addMapper(ctx, mpr);
+			mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, DP(u)->ucid, cid, knh_IntX_FloatX, (Object*)u);
+			konoha_addMapper(ctx, mpr);
 		}
 	}
 	else {
 		KNH_ASSERT(bcid == CLASS_String);
-		if(DP(u)->ivalue != NULL) {
 
-		}
-		if(DP(u)->svalue != NULL) {
-
-		}
 	}
 }
 

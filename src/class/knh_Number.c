@@ -36,7 +36,7 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-/* [conv] */
+/* [Number] */
 
 /* ------------------------------------------------------------------------ */
 
@@ -76,40 +76,197 @@ knh_float_t knh_Number_tofloat(Any *o)
 	return (knh_float_t)0.0;
 }
 
-///* ======================================================================== */
-///* [Int] */
-//
-//knh_int_t knh_Int_toint(Int *o)
-//{
-//	KNH_ASSERT(IS_bInt(o));
-//	return (knh_int_t)o->value;
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//knh_float_t knh_Int_tofloat(Int *o)
-//{
-//	KNH_ASSERT(IS_bInt(o));
-//	return (knh_float_t)(o->value);
-//}
+/* ======================================================================== */
+/* [Int] */
 
-///* ======================================================================== */
-///* [Float] */
-//
-//knh_int_t knh_Float_toint(Float *o)
-//{
-//	KNH_ASSERT(IS_bFloat(o));
-//	return (knh_int_t)(o->value);
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//knh_float_t knh_Float_tofloat(Float *o)
-//{
-//	KNH_ASSERT(IS_bFloat(o));
-//	return (knh_float_t)(o->value);
-//}
-//
+KNHAPI(Int*) new_Int(Ctx *ctx, knh_int_t value)
+{
+	knh_Int_t *b = (knh_Int_t*)new_hObject(ctx, FLAG_Int, CLASS_Int, CLASS_Int);
+	b->n.ivalue = value;
+	return b;
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(Int*) new_IntX__fast(Ctx *ctx, knh_class_t cid, knh_int_t value)
+{
+	knh_Int_t *b = (knh_Int_t*)new_hObject(ctx, FLAG_Int, CLASS_Int, cid);
+	b->n.ivalue = value;
+	return b;
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(Int*) new_IntX(Ctx *ctx, knh_class_t cid, knh_int_t value)
+{
+	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
+	KNH_ASSERT(IS_ClassSpec(u));
+	if(DP(u)->fichk(u, value)) {
+		Int *n = (knh_Int_t*)new_hObject(ctx, FLAG_Int, CLASS_Int, cid);
+		n->n.ivalue = value;
+		return n;
+	}
+	else {
+		if(DP(u)->imin >= 0) {
+			KNH_WARNING(ctx, _("out of range: %u of %s"), value, CLASSN(cid));
+		}
+		else {
+			KNH_WARNING(ctx, _("out of range: %d of %s"), value, CLASSN(cid));
+		}
+		return DP(u)->ivalue;
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+knh_int_t knh_IntNULL_toint(Int *v)
+{
+	if(IS_NULL(v)) {
+		return 0;
+	}else {
+		return v->n.ivalue;
+	}
+}
+
+/* ======================================================================== */
+/* [Float] */
+
+KNHAPI(Float*) new_Float(Ctx *ctx, knh_float_t value)
+{
+	Float *b = (Float*)new_hObject(ctx, FLAG_Float, CLASS_Float, CLASS_Float);
+	b->n.fvalue = value;
+	return b;
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(Float*) new_FloatX__fast(Ctx *ctx, knh_class_t cid, knh_float_t value)
+{
+	Float *b = (Float*)new_hObject(ctx, FLAG_Float, CLASS_Float, cid);
+	b->n.fvalue = value;
+	return b;
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(Float*) new_FloatX(Ctx *ctx, knh_class_t cid, knh_float_t value)
+{
+	KNH_ASSERT_cid(cid);
+	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
+	KNH_ASSERT(IS_ClassSpec(u));
+	if(DP(u)->ffchk(u, value)) {
+		Float *f = (Float*)new_hObject(ctx, FLAG_Float, CLASS_Float, cid);
+		f->n.fvalue = value;
+		return f;
+	}
+	else {
+		KNH_WARNING(ctx, _("out of range: %f of %s"), value, CLASSN(cid));
+		return DP(u)->fvalue;
+	}
+}
+
+/* ======================================================================== */
+/* [Affine] */
+
+static
+AffineConv *new_AffineConv(Ctx *ctx, knh_float_t fa, knh_float_t fb)
+{
+	knh_AffineConv_t *af = (AffineConv*)new_Object_bcid(ctx, CLASS_AffineConv, 0);
+	af->scale = (knh_affinefloat_t)fa;
+	af->shift = (knh_affinefloat_t)fb;
+	return af;
+}
+
+/* ------------------------------------------------------------------------ */
+/* [mapper] */
+
+static
+MAPPER knh_AffineConv_fmap__i2i(Ctx *ctx, knh_sfp_t *sfp)
+{
+	AffineConv *af = (AffineConv*)sfp[1].o;
+	KNH_ASSERT(IS_AffineConv(af));
+	knh_float_t y = (sfp[0].ivalue * af->scale) + af->shift;
+	KNH_MAPPED_Int(ctx, sfp, (knh_int_t)y);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+MAPPER knh_AffineConv_fmap__i2f(Ctx *ctx, knh_sfp_t *sfp)
+{
+	AffineConv *af = (AffineConv*)sfp[1].o;
+	KNH_ASSERT(IS_AffineConv(af));
+	knh_float_t y = (sfp[0].ivalue * af->scale) + af->shift;
+	KNH_MAPPED_Float(ctx, sfp, y);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+MAPPER knh_AffineConv_fmap__f2i(Ctx *ctx, knh_sfp_t *sfp)
+{
+	AffineConv *af = (AffineConv*)sfp[1].o;
+	KNH_ASSERT(IS_AffineConv(af));
+	knh_float_t y = (sfp[0].fvalue * af->scale) + af->shift;
+	KNH_MAPPED_Int(ctx, sfp, (knh_int_t)y);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+MAPPER knh_AffineConv_fmap__f2f(Ctx *ctx, knh_sfp_t *sfp)
+{
+	AffineConv *af = (AffineConv*)sfp[1].o;
+	KNH_ASSERT(IS_AffineConv(af));
+	knh_float_t y = (sfp[0].fvalue * af->scale) + af->shift;
+	KNH_MAPPED_Float(ctx, sfp, y);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+knh_fmapper knh_fmapper_affine(knh_class_t scid, knh_class_t tcid)
+{
+	if(scid == CLASS_Int) {
+		if(tcid == CLASS_Int) return knh_AffineConv_fmap__i2i;
+		KNH_ASSERT(tcid == CLASS_Float);
+		return knh_AffineConv_fmap__i2f;
+	}
+	KNH_ASSERT(scid == CLASS_Float);
+	{
+		if(tcid == CLASS_Int) return knh_AffineConv_fmap__f2i;
+		KNH_ASSERT(tcid == CLASS_Float);
+		return knh_AffineConv_fmap__f2f;
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+/* [TAFFINE] */
+
+#define _KNH_FLAG_MMF_AFFINE (KNH_FLAG_MMF_SIGNIFICANT|KNH_FLAG_MMF_SYNONYM|KNH_FLAG_MMF_TOTAL|KNH_FLAG_MMF_CONST)
+
+static
+void KNH_TAFFINE(Ctx *ctx, knh_class_t scid, knh_class_t tcid, knh_float_t scale, knh_float_t shift)
+{
+	Mapper *mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, scid, tcid,
+			knh_fmapper_affine(ctx->share->ClassTable[scid].bcid, ctx->share->ClassTable[tcid].bcid),
+			(Object*)new_AffineConv(ctx, scale, shift));
+	knh_ClassMap_add(ctx, ctx->share->ClassTable[scid].cmap, mpr);
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(void) konoha_addAffineMapper(Ctx *ctx, knh_class_t scid, char *text, knh_float_t scale, knh_float_t shift)
+{
+	//KNH_ASSERT_cid(scid);
+	knh_class_t tcid = konoha_findcid(ctx, B(text));
+	if(tcid != CLASS_unknown && ctx->share->ClassTable[tcid].bcid != tcid) {
+		KNH_TAFFINE(ctx, scid, tcid, scale, shift);
+		if(scale != 0.0) {
+			KNH_TAFFINE(ctx, tcid, scid, 1.0 / scale, -(shift/scale));
+		}
+	}
+}
 
 /* ------------------------------------------------------------------------ */
 
