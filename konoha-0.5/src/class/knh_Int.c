@@ -35,56 +35,6 @@
 extern "C" {
 #endif
 
-/* ======================================================================== */
-/* [macros] */
-
-#define _knh_Int_value(o)      (o)->value
-
-/* ======================================================================== */
-/* [constructors] */
-
-KNHAPI(Int*) new_Int(Ctx *ctx, knh_int_t value)
-{
-	knh_Int_t *b = (knh_Int_t*)new_hObject(ctx, FLAG_Int, CLASS_Int, CLASS_Int);
-	b->n.ivalue = value;
-	return b;
-}
-
-/* ------------------------------------------------------------------------ */
-
-KNHAPI(Int*) new_IntX__fast(Ctx *ctx, knh_class_t cid, knh_int_t value)
-{
-	knh_Int_t *b = (knh_Int_t*)new_hObject(ctx, FLAG_Int, CLASS_Int, cid);
-	b->n.ivalue = value;
-	return b;
-}
-
-/* ------------------------------------------------------------------------ */
-
-KNHAPI(Int*) new_IntX(Ctx *ctx, knh_class_t cid, knh_int_t value)
-{
-	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
-	KNH_ASSERT(IS_ClassSpec(u));
-	if(DP(u)->fichk(u, value)) {
-		Int *n = (knh_Int_t*)new_hObject(ctx, FLAG_Int, CLASS_Int, cid);
-		n->n.ivalue = value;
-		return n;
-	}
-	else {
-		return DP(u)->ivalue;
-	}
-}
-
-/* ======================================================================== */
-
-knh_int_t knh_IntNULL_toint(Int *v)
-{
-	if(IS_NULL(v)) {
-		return 0;
-	}else {
-		return v->n.ivalue;
-	}
-}
 
 /* ------------------------------------------------------------------------ */
 
