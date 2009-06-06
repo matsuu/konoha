@@ -267,13 +267,37 @@ typedef knh_uint16_t       knh_class_t;   /* class id */
 typedef knh_uint16_t       knh_type_t;    /* extended knh_type_t */
 typedef knh_uint16_t       knh_expt_t;    /* knh_expt_t */
 
+/* knh_struct_t */
+#define KNH_FLAG_SF_FIELD          KNH_FLAG_T1
+
+#define STRUCT_ISFIELD(sid)        ((sid & KNH_FLAG_SF_FIELD) == KNH_FLAG_SF_FIELD)
+#define BSIZE_TOSID(bsize)         (((knh_struct_t)bsize)|KNH_FLAG_SF_FIELD)
+#define STRUCT_FIELD(bsize)        (((knh_struct_t)bsize)|KNH_FLAG_SF_FIELD)
+#define STRUCT_FIELDSIZE(sid)      (sid & (~KNH_FLAG_SF_FIELD))
+#define STRUCT_UNMASK(sid)         (sid & (~KNH_FLAG_SF_FIELD))
+#define KNH_ASSERT_sid(sid)        KNH_ASSERT(((knh_struct_t)sid) < ctx->share->StructTableSize)
+
+/* knh_class_t */
+
+#define CLASS_newid                ((knh_class_t)-1)
+#define CLASS_unknown              ((knh_class_t)-2)
+#define CLASS_type(t)              (t&(~KNH_FLAG_TF_NN))
+
+#define KNH_ASSERT_cid(cid)        KNH_ASSERT(cid < KNH_TCLASS_SIZE)
+#define CLASSN(cid)                knh_ClassTable_CLASSN(ctx, cid)
+#define CLASSNo(o)                 knh_ClassTable_CLASSN(ctx, knh_Object_cid(o))
+
+/* knh_type_t */
+
 #define KNH_FLAG_TF_NN                KNH_FLAG_T0
 #define TYPE_ISNULLABLE(t)            ((t & KNH_FLAG_TF_NN)==0)
 #define IS_NNTYPE(t)                  ((t & KNH_FLAG_TF_NN)==KNH_FLAG_TF_NN)
 #define NNTYPE_cid(c)                 (c|KNH_FLAG_TF_NN)
 #define TYPE_TONNTYPE(t)              (t|KNH_FLAG_TF_NN)
 
-#define CLASS_type(t)                (t&(~KNH_FLAG_TF_NN))
+#define IS_ubxint(t)                  (IS_NNTYPE(t) && ctx->share->tClass[CLASS_type(t)].bcid == CLASS_Int)
+#define IS_ubxfloat(t)                (IS_NNTYPE(t) && ctx->share->tClass[CLASS_type(t)].bcid == CLASS_Float)
+#define IS_ubxboolean(t)              (NNTYPE_Boolean == t)
 
 // @NOUSE
 #define TYPEQN(t)                     TYPEN(t), TYPEQ(t)
