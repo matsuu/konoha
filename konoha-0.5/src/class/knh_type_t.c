@@ -200,16 +200,17 @@ char* knh_format_type(Ctx *ctx, char *buf, size_t bufsiz, knh_type_t type)
 	}
 	KNH_ASSERT_cid(cid);
 	char *cname = knh_ClassTable_CLASSN(ctx, cid);
-	if(type == NNTYPE_Int || type == NNTYPE_Float || type == NNTYPE_Boolean) {
+	if(IS_ubxtype(type)) {
 		knh_snprintf(buf, bufsiz, "%s", cname);
 		buf[0] = tolower(buf[0]);
 		return buf;
 	}
 	if(IS_NNTYPE(type)) {
 		knh_snprintf(buf, bufsiz, "%s", cname);
-		return buf;
 	}
-	knh_snprintf(buf, bufsiz, "%s?", cname);
+	else {
+		knh_snprintf(buf, bufsiz, "%s?", cname);
+	}
 	return buf;
 }
 

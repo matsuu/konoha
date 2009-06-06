@@ -597,13 +597,13 @@ static
 Method *new_Method_getter(Ctx *ctx, knh_class_t cid, knh_methodn_t mn, knh_type_t type, int idx)
 {
 	knh_fmethod f = knh_fmethod_getter;
-	if(type == NNTYPE_Int) {
+	if(IS_ubxint(type)) {
 		f = knh_fmethod_igetter;
 	}
-	else if(type == NNTYPE_Float) {
+	else if(IS_ubxfloat(type)) {
 		f = knh_fmethod_fgetter;
 	}
-	else if(type == NNTYPE_Boolean) {
+	else if(IS_ubxboolean(type)) {
 		f = knh_fmethod_bgetter;
 	}
 	Method *mtd = new_Method(ctx, KNH_FLAG_MF_GENERATED, cid, mn, f);
@@ -618,19 +618,19 @@ static
 Method *new_Method_setter(Ctx *ctx, knh_class_t cid, knh_methodn_t mn, knh_type_t type, int idx)
 {
 	knh_fmethod f = knh_fmethod_setter;
-	if(type == NNTYPE_Int) {
+	if(IS_ubxint(type)) {
 		f = knh_fmethod_isetter;
 	}
-	else if(type == TYPE_Int) {
+	else if(IS_bxint(type)) {
 		f = knh_fmethod_insetter;
 	}
-	else if(type == NNTYPE_Float) {
+	else if(IS_ubxfloat(type)) {
 		f = knh_fmethod_fsetter;
 	}
-	else if(type == TYPE_Float) {
+	else if(IS_bxfloat(type)) {
 		f = knh_fmethod_fnsetter;
 	}
-	else if(type == NNTYPE_Boolean) {
+	else if(IS_ubxboolean(type)) {
 		f = knh_fmethod_bsetter;
 	}
 	Method *mtd = new_Method(ctx, KNH_FLAG_MF_GENERATED, cid, mn, f);
