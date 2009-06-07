@@ -513,7 +513,7 @@ int knh_Stmt_eval(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int isEval)
 			KNH_MOV(ctx, lsfp[3].o, scr);
 			KNH_SCALL(ctx, lsfp, 2, mtd, 0/*args*/);
 			if(isExpr && !isVOID) {
-				//DBG_P("returning %s %lld", CLASSN(knh_Object_cid(lsfp[2].o)), lsfp[2].ivalue);
+				//DBG2_P("returning %s %lld", CLASSNo(lsfp[2].o), lsfp[2].ivalue);
 				((Context*)ctx)->esp = lsfp+1;
 				knh_esp1_format(ctx, mt, KNH_STDOUT, KNH_NULL);
 				knh_write_EOL(ctx, KNH_STDOUT);
