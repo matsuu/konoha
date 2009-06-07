@@ -604,6 +604,13 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		} \
 	} \
 
+#define KLR_DCAST(ctx, n, tcid)  { \
+		knh_class_t scid = knh_Object_cid(sfp[n].o);\
+		if(scid != ((knh_class_t)tcid) && !knh_class_instanceof(ctx, scid, tcid) && scid != CLASS_Nue) { \
+			KNH_THROWs(ctx, "ClassCast!!"); \
+		} \
+	} \
+
 #define KLR_NNMAP(ctx, a, tcid)  { \
 		if(unlikely(IS_NULL(sfp[a].o))) {\
 			Int *v_ = (Int*)KNH_DEF(ctx, tcid);\

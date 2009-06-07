@@ -1956,6 +1956,33 @@ METHOD jc2_AMAP(Ctx *ctx, knh_sfp_t *sfp)
 
 
 static
+METHOD jc0_DCAST(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_DCAST(ctx, (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_DCAST(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_DCAST(ctx, (1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_DCAST(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_DCAST(ctx, (-1), (2));
+	__asm__ __volatile__("int3");
+}
+
+
+static
 METHOD jc0_NNMAP(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
@@ -4664,7 +4691,7 @@ METHOD jc3_FASETN(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 
-static knh_fmethod codeTempList[140][6] = {
+static knh_fmethod codeTempList[141][6] = {
 	{jc0_HALT},
 	{jc0_MOVA,jc1_MOVA,jc2_MOVA},
 	{jc0_MOVN,jc1_MOVN,jc2_MOVN},
@@ -4724,6 +4751,7 @@ static knh_fmethod codeTempList[140][6] = {
 	{jc0_MAP,jc1_MAP,jc2_MAP},
 	{jc0_MAPNC,jc1_MAPNC,jc2_MAPNC},
 	{jc0_AMAP,jc1_AMAP,jc2_AMAP},
+	{jc0_DCAST,jc1_DCAST,jc2_DCAST},
 	{jc0_NNMAP,jc1_NNMAP,jc2_NNMAP},
 	{jc0_JMP,jc1_JMP},
 	{jc0_SKIP,jc1_SKIP},
