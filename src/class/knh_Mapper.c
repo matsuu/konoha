@@ -64,7 +64,13 @@ Mapper* new_Mapper(Ctx *ctx, knh_flag_t flag, knh_class_t scid, knh_class_t tcid
 {
 	knh_Mapper_t* o = (Mapper*)new_Object_bcid(ctx, CLASS_Mapper, 0);
 	DP(o)->size = 0;
-	DP(o)->flag = flag;
+	if(knh_class_isFinal(scid)) {
+		DBG2_P("*** final mapper ****");
+		DP(o)->flag = flag | KNH_FLAG_MMF_FINAL;
+	}
+	else {
+		DP(o)->flag = flag;
+	}
 	DP(o)->scid = scid;
 	DP(o)->tcid = tcid;
 	if(fmap == NULL) {

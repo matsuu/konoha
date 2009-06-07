@@ -856,12 +856,15 @@ void KNH_ASM_NEW(Ctx *ctx, Asm *abr, knh_type_t reqt, int sfpidx, Token *tkb,
 /* ------------------------------------------------------------------------ */
 
 static
-void KNH_ASM_MAP(Ctx *ctx, Asm *abr, knh_type_t reqt, int sfpidx, Token *tkb, knh_type_t srct)
+void KNH_ASM_MAP(Ctx *ctx, Asm *abr, knh_type_t reqt, int sfpidx, Token *tkb, knh_type_t srct, int isNonNullCast)
 {
 	KNH_ASSERT(IS_Token(tkb));
 	KNH_ASSERT(sfpidx >= DP(abr)->stack);
 	Mapper *mpr = (Mapper*)DP(tkb)->data;
+
 	if(IS_Mapper(mpr)) {
+		DBG2_P("reqt=%s%s tcid=%s srct=%s%s isNonNullCast=%d",
+				TYPEQN(reqt), CLASSN(DP(mpr)->tcid), TYPEQN(srct), isNonNullCast);
 		if(knh_Mapper_isFinal(mpr)) {
 			if(IS_NNTYPE(srct)) {
 				if(DP(mpr)->scid == CLASS_Int && DP(mpr)->tcid == CLASS_Float) {
@@ -890,7 +893,9 @@ void KNH_ASM_MAP(Ctx *ctx, Asm *abr, knh_type_t reqt, int sfpidx, Token *tkb, kn
 		else {
 			if(IS_NNTYPE(srct)) {
 				KNH_ASM_MAP_(ctx, abr, sfpidx, DP(mpr)->tcid);
-				if(!knh_Mapper_isTotal(mpr)) srct = CLASS_type(srct);
+				if(!knh_Mapper_isTotal(mpr)) {
+					srct = CLASS_type(srct);
+				}
 			}
 			else {
 				KNH_ASM_MAPnc_(ctx, abr, sfpidx, DP(mpr)->tcid);
@@ -899,11 +904,13 @@ void KNH_ASM_MAP(Ctx *ctx, Asm *abr, knh_type_t reqt, int sfpidx, Token *tkb, kn
 	}
 	else {
 		KNH_ASSERT(SP(tkb)->tt == TT_MPR);
-		KNH_ASM_AMAP_(ctx, abr, sfpidx, DP(tkb)->cid);
-		srct = CLASS_type(srct);
+		DBG2_P("reqt=%s%s srct=%s%s isNonNullCast=%d", TYPEQN(reqt), TYPEQN(srct), isNonNullCast);
+		if(CLASS_type(srct) == CLASS_Any) {
+			KNH_ASM_AMAP_(ctx, abr, sfpidx, DP(tkb)->cid);
+			srct = CLASS_type(srct);
+		}
 	}
-
-	if(!IS_NNTYPE(srct) && knh_Token_isNotNullType(tkb)) {
+	if(!IS_NNTYPE(srct) && isNonNullCast) {
 		KNH_ASM_NNMAP_(ctx, abr, sfpidx, DP(tkb)->cid);
 	}
 	else if(IS_NNTYPE(reqt)) {
@@ -1640,12 +1647,12 @@ void knh_StmtMAPCAST_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sf
 	int local = ASML(abr, sfpidx);
 	knh_type_t srct = TERMs_gettype(stmt, 1);
 	TERMs_asm(ctx, stmt, 1, abr, TYPE_Any, local);
-	if(knh_Stmt_isNNCAST(stmt)) {
-		KNH_ASM_NNMAP_(ctx, abr, local, DP(DP(stmt)->tokens[0])->cid);
-	}
-	else {
-		KNH_ASM_MAP(ctx, abr, reqt, local, DP(stmt)->tokens[0], srct);
-	}
+//	if(knh_Stmt_isNNCAST(stmt)) {
+//		KNH_ASM_NNMAP_(ctx, abr, local, DP(DP(stmt)->tokens[0])->cid);
+//	}
+//	else {
+		KNH_ASM_MAP(ctx, abr, reqt, local, DP(stmt)->tokens[0], srct, knh_Stmt_isNNCAST(stmt));
+//	}
 	MOVL(ctx, abr, local, sfpidx);
 }
 

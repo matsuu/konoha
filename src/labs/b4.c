@@ -103,7 +103,7 @@ ClassSpec *unit_Temperature(Ctx *ctx, knh_bytes_t urn)
 	}
 	else if(ISB(t, "Kelvin")) {
 		ClassSpec *u = new_Unit(ctx, "K", urn, 0.0, KNH_FLOAT_MAX, 0.001);
-		konoha_addAffineMapper(ctx, DP(u)->ucid, "Float{http://konoha/Temperature/Celsius}", 1.0, 273.15);
+		konoha_addAffineMapper(ctx, DP(u)->ucid, "Float{http://konoha/Temperature/Celsius}", 1.0, -273.15);
 		return u;
 	}
 	return NULL;

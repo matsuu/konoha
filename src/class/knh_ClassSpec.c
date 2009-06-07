@@ -35,6 +35,7 @@
 extern "C" {
 #endif
 
+
 static
 knh_class_t konoha_addSpecializedType(Ctx *ctx, knh_class_t cid, knh_class_t bcid, ClassSpec *u);
 
@@ -126,11 +127,13 @@ void knh_ClassSpec_initIntRange(Ctx *ctx, ClassSpec *u, knh_int_t min, knh_int_t
 
 void knh_write_intx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_int_t v)
 {
-	char *FMT = KNH_INT_FMT;
+	char buf[KNH_INT_FMTSIZ];
+	char *fmt = KNH_INT_FMT;
 	if(DP(u)->imin >= 0) {
-		FMT = KNH_UINT_FMT;
+		fmt = KNH_UINT_FMT;
 	}
-	knh_write__ffmt(ctx, w, FMT, v);
+	knh_snprintf(buf, sizeof(buf), fmt, v);
+	knh_write(ctx, w, B(buf));
 	knh_bytes_t tag = knh_String_tobytes(DP(u)->tag);
 	if(tag.len > 0) {
 		knh_putc(ctx, w, '[');
@@ -299,6 +302,7 @@ void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid)
 	}
 	else {
 		KNH_ASSERT(bcid == CLASS_String);
+		TODO();
 
 	}
 }
@@ -403,7 +407,7 @@ MAPPER knh_fmapper_vocabidx(Ctx *ctx, knh_sfp_t *sfp)
 {
 	ClassSpec *u = konoha_getClassSpec(ctx, knh_Object_cid(sfp[0].o));
 	knh_int_t n = knh_ClassSpec_getVocabIdx(ctx, u, sfp[0].s);
-	//DBG2_P("n = %lld", n);
+	DBG2_P("n = %lld", n);
 	KNH_MAPPED_Int(ctx, sfp, n);
 }
 
@@ -417,7 +421,9 @@ MAPPER knh_fmapper_vocab(Ctx *ctx, knh_sfp_t *sfp)
 	DBG2_P("n = %ld", n);
 	Array *a = (DP(u)->vocabDictIdx)->terms;
 	Object *s = KNH_NULL;
-	if(n < knh_Array_size(a)) s = knh_Array_n(a, n);
+	if(n < knh_Array_size(a)) {
+		s = knh_Array_n(a, n);
+	}
 	KNH_MAPPED(ctx, sfp, s);
 }
 
@@ -449,9 +455,9 @@ KNHAPI(ClassSpec*) new_Vocab(Ctx *ctx, char *tag, knh_bytes_t urn, int base, cha
 	}
 	konoha_addSpecializedType(ctx, cid, CLASS_String, u);
 	{
-		Mapper *mpr = new_Mapper(ctx, KNH_FLAG_MMF_TOTAL|KNH_FLAG_MMF_CONST, cid, CLASS_Int, knh_fmapper_vocabidx, (Object*)u);
+		Mapper *mpr = new_Mapper(ctx, KNH_FLAG_MMF_TOTAL|KNH_FLAG_MMF_CONST|KNH_FLAG_MMF_FINAL, cid, CLASS_Int, knh_fmapper_vocabidx, (Object*)u);
 		konoha_addMapper(ctx, mpr);
-		mpr = new_Mapper(ctx, KNH_FLAG_MMF_CONST, CLASS_Int, cid, knh_fmapper_vocab, (Object*)u);
+		mpr = new_Mapper(ctx, KNH_FLAG_MMF_CONST|KNH_FLAG_MMF_FINAL, CLASS_Int, cid, knh_fmapper_vocab, (Object*)u);
 		konoha_addMapper(ctx, mpr);
 	}
 	return u;
@@ -669,7 +675,7 @@ knh_class_t konoha_addSpecializedType(Ctx *ctx, knh_class_t cid, knh_class_t bci
 //	else if(bcid == CLASS_String) bcid = CLASS_StringX;
 
 	//DBG2_P("%s\n\tcopying from %s", bufcn, CLASSN(bcid));
-	ctx->share->ClassTable[cid].cflag  = ctx->share->ClassTable[bcid].cflag;
+	ctx->share->ClassTable[cid].cflag  = ctx->share->ClassTable[bcid].cflag | KNH_FLAG_CF_FINAL;
 	ctx->share->ClassTable[cid].oflag  = ctx->share->ClassTable[bcid].oflag;
 	ctx->share->ClassTable[cid].offset = ctx->share->ClassTable[bcid].offset;
 
