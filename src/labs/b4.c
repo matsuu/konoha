@@ -93,7 +93,6 @@ static
 ClassSpec *unit_Temperature(Ctx *ctx, knh_bytes_t urn)
 {
 	knh_bytes_t t = knh_bytes_rmod(urn, '/');
-	DBG2_P("finding ..%s", t.buf);
 	if(ISB(t, "Celsius")) {
 		return new_Unit(ctx, "C", urn, -273.15, KNH_FLOAT_MAX, 0.01);
 	}
@@ -101,6 +100,38 @@ ClassSpec *unit_Temperature(Ctx *ctx, knh_bytes_t urn)
 		ClassSpec *u = new_Unit(ctx, "F", urn, -459.67, KNH_FLOAT_MAX, 0.01);
 		konoha_addAffineMapper(ctx, DP(u)->ucid, "Float{http://konoha/Temperature/Celsius}", 5.0/9.0, -32.0*5.0/9.0);
 		return u;
+	}
+	else if(ISB(t, "Kelvin")) {
+		ClassSpec *u = new_Unit(ctx, "K", urn, 0.0, KNH_FLOAT_MAX, 0.001);
+		konoha_addAffineMapper(ctx, DP(u)->ucid, "Float{http://konoha/Temperature/Celsius}", 1.0, 273.15);
+		return u;
+	}
+	return NULL;
+}
+
+/* ------------------------------------------------------------------------ */
+/* @data */
+
+static char* MonthData[] = {
+	"January", "February", "March", "April", "May", "June",
+	"July", "August", "September", "October", "November", "December",
+	NULL
+};
+
+static char* WeekData[] = {
+	"Monday", "Tuesday", "Wednesday", "Tursday", "Friday", "Saturday", "Sunday",
+	NULL
+};
+
+static
+ClassSpec *unit_Date(Ctx *ctx, knh_bytes_t urn)
+{
+	knh_bytes_t t = knh_bytes_rmod(urn, '/');
+	if(ISB(t, "Month")) {
+		return new_Vocab(ctx, "", urn, 1, MonthData);
+	}
+	else if(ISB(t, "Week")) {
+		return new_Vocab(ctx, "", urn, 1, WeekData);
 	}
 	return NULL;
 }
@@ -147,17 +178,21 @@ ClassSpec *unit_Temperature(Ctx *ctx, knh_bytes_t urn)
 
 static
 knh_StringConstData_t URNAliasData[] = {
-		{":摂氏", "http://konoha/Temperature/Celsius"},
-		{":華氏", "http://konoha/Temperature/Fahrenheit"},
-		{":C", "http://konoha/Temperature/Celsius"},
-		{":F", "http://konoha/Temperature/Fahrenheit"},
-		{NULL}
+	{":摂氏", "http://konoha/Temperature/Celsius"},
+	{":華氏", "http://konoha/Temperature/Fahrenheit"},
+	{":C", "http://konoha/Temperature/Celsius"},
+	{":F", "http://konoha/Temperature/Fahrenheit"},
+	{":K", "http://konoha/Temperature/Kelvin"},
+	{":M", "http://konoha/English/Date/Month"},
+	{":W", "http://konoha/English/Date/Week"},
+	{NULL}
 };
 
 static
 knh_NamedPointerData_t ClassSpecFuncData[] = {
-		{"http://konoha/Temperature", unit_Temperature},
-		{NULL}
+	{"http://konoha/Temperature", unit_Temperature},
+	{"http://konoha/English/Date", unit_Date},
+	{NULL}
 };
 
 /* ------------------------------------------------------------------------ */

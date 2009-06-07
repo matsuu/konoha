@@ -398,8 +398,7 @@ int knh_Int_compareTo(Int *o, Int *o2)
 	}
 	else {
 		Ctx *ctx = konoha_getCurrentContext();
-		ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[o->h.cid].cspec;
-		KNH_ASSERT(IS_ClassSpec(u));
+		ClassSpec *u = konoha_getClassSpec(ctx, o->h.cid);
 		return DP(u)->ficmp(u, o->n.ivalue, o2->n.ivalue);
 	}
 }
@@ -456,8 +455,7 @@ int knh_Float_compareTo(Float *o, Float *o2)
 	}
 	else {
 		Ctx *ctx = konoha_getCurrentContext();
-		ClassSpec *fu = (ClassSpec*)ctx->share->ClassTable[o->h.cid].cspec;
-		KNH_ASSERT(IS_ClassSpec(fu));
+		ClassSpec *fu = konoha_getClassSpec(ctx, o->h.cid);
 		return DP(fu)->ffcmp(fu, o->n.fvalue, o2->n.fvalue);
 	}
 }
@@ -538,8 +536,7 @@ int knh_String_compareTo(String *o, String *o2)
 	else {
 		if(o->h.cid == o2->h.cid) {
 			Ctx *ctx = konoha_getCurrentContext();
-			ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[o->h.cid].cspec;
-			KNH_ASSERT(IS_ClassSpec(u));
+			ClassSpec *u = konoha_getClassSpec(ctx, o->h.cid);
 			return DP(u)->fscmp(u, knh_String_tobytes(o), knh_String_tobytes(o2));
 		}
 		return (int)(o - o2);
@@ -1502,14 +1499,6 @@ int knh_ficmp__signed(ClassSpec *u, knh_int_t v1, knh_int_t v2)
 	return (int)(v1 - v2);
 }
 
-///* ------------------------------------------------------------------------ */
-//
-//static
-//void knh_fenumfmt__signed(ClassSpec *b, char *buf, size_t bufsiz, knh_int_t v)
-//{
-//	knh_snprintf(buf, bufsiz, KNH_INT_FMT, v);
-//}
-
 /* ------------------------------------------------------------------------ */
 
 static
@@ -1528,6 +1517,14 @@ int knh_ffcmp__default(ClassSpec *u, knh_float_t v1, knh_float_t v2)
 	return delta < 0 ? -1 : 1;
 }
 
+
+/* ------------------------------------------------------------------------ */
+
+static
+String *knh_fsnew__default(Ctx *ctx, knh_class_t cid, knh_bytes_t t, String *orig, int *foundError)
+{
+	return new_StringX__fast(ctx, cid, t, orig);
+}
 
 /* ------------------------------------------------------------------------ */
 
@@ -1568,7 +1565,7 @@ void knh_ClassSpec_init(Ctx *ctx, ClassSpec *u, int init)
 //	b->FMT  = KNH_FLOAT_FMT;
 
 	// String
-	b->fsnew = new_StringX__fast;
+	b->fsnew = knh_fsnew__default;
 	b->fscmp = knh_fscmp__default;
 	//b->fsconv = NULL;
 	KNH_INITv(b->bconv, KNH_NULL);
@@ -2435,15 +2432,15 @@ Object *knh_Float_fdefault(Ctx *ctx, knh_class_t cid)
 	return (Object*)KNH_FLOAT0;
 }
 
-/* ------------------------------------------------------------------------ */
-
-static
-Object *knh_FloatX_fdefault(Ctx *ctx, knh_class_t cid)
-{
-	ClassSpec *o = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
-	KNH_ASSERT(IS_ClassSpec(o));
-	return UP(DP(o)->fvalue);
-}
+///* ------------------------------------------------------------------------ */
+//
+//static
+//Object *knh_FloatX_fdefault(Ctx *ctx, knh_class_t cid)
+//{
+//	ClassSpec *o = konoha_getClassSpec(ctx, cid].cspec;
+//	KNH_ASSERT(IS_ClassSpec(o));
+//	return UP(DP(o)->fvalue);
+//}
 
 /* ------------------------------------------------------------------------ */
 
@@ -2453,15 +2450,15 @@ Object *knh_Int_fdefault(Ctx *ctx, knh_class_t cid)
 	return (Object*)KNH_INT0;
 }
 
-/* ------------------------------------------------------------------------ */
-
-static
-Object *knh_IntX_fdefault(Ctx *ctx, knh_class_t cid)
-{
-	ClassSpec *o = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
-	KNH_ASSERT(IS_ClassSpec(o));
-	return UP(DP(o)->ivalue);
-}
+///* ------------------------------------------------------------------------ */
+//
+//static
+//Object *knh_IntX_fdefault(Ctx *ctx, knh_class_t cid)
+//{
+//	ClassSpec *o = konoha_getClassSpec(ctx, cid].cspec;
+//	KNH_ASSERT(IS_ClassSpec(o));
+//	return UP(DP(o)->ivalue);
+//}
 
 /* ------------------------------------------------------------------------ */
 
@@ -2471,15 +2468,15 @@ Object *knh_String_fdefault(Ctx *ctx, knh_class_t cid)
 	return (Object*)TS_EMPTY;
 }
 
-/* ------------------------------------------------------------------------ */
-
-static
-Object *knh_StringX_fdefault(Ctx *ctx, knh_class_t cid)
-{
-	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
-	KNH_ASSERT(IS_ClassSpec(u));
-	return UP(DP(u)->svalue);
-}
+///* ------------------------------------------------------------------------ */
+//
+//static
+//Object *knh_StringX_fdefault(Ctx *ctx, knh_class_t cid)
+//{
+//	ClassSpec *u = konoha_getClassSpec(ctx, cid].cspec;
+//	KNH_ASSERT(IS_ClassSpec(u));
+//	return UP(DP(u)->svalue);
+//}
 
 /* ------------------------------------------------------------------------ */
 

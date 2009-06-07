@@ -99,8 +99,7 @@ KNHAPI(Int*) new_IntX__fast(Ctx *ctx, knh_class_t cid, knh_int_t value)
 
 KNHAPI(Int*) new_IntX(Ctx *ctx, knh_class_t cid, knh_int_t value)
 {
-	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
-	KNH_ASSERT(IS_ClassSpec(u));
+	ClassSpec *u = konoha_getClassSpec(ctx, cid);
 	if(DP(u)->fichk(u, value)) {
 		Int *n = (knh_Int_t*)new_hObject(ctx, FLAG_Int, CLASS_Int, cid);
 		n->n.ivalue = value;
@@ -152,8 +151,7 @@ KNHAPI(Float*) new_FloatX__fast(Ctx *ctx, knh_class_t cid, knh_float_t value)
 KNHAPI(Float*) new_FloatX(Ctx *ctx, knh_class_t cid, knh_float_t value)
 {
 	KNH_ASSERT_cid(cid);
-	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
-	KNH_ASSERT(IS_ClassSpec(u));
+	ClassSpec *u = konoha_getClassSpec(ctx, cid);
 	if(DP(u)->ffchk(u, value)) {
 		Float *f = (Float*)new_hObject(ctx, FLAG_Float, CLASS_Float, cid);
 		f->n.fvalue = value;

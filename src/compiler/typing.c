@@ -718,7 +718,7 @@ knh_class_t knh_Token_tagcNUM(Ctx *ctx, Token *tk, knh_class_t reqc, NameSpace *
 			break;
 		}
 	}
-	DBG2_P("TAG %s, %d", tag.buf, tag.len);
+	//DBG2_P("TAG %s, %d", tag.buf, tag.len);
 	if(tag.len == 0 || ishex) {
 		return reqc;
 	}
@@ -795,8 +795,7 @@ int knh_TokenNUM_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqc)
 			knh_Token_perror(ctx, tk, KERR_EWARN, _("float overflow: %B"), t);
 		}
 		knh_class_t tagc = knh_Token_tagcNUM(ctx, tk, reqc, ns);
-		ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[tagc].cspec;
-		KNH_ASSERT(IS_ClassSpec(u));
+		ClassSpec *u = konoha_getClassSpec(ctx, tagc);
 		if(!DP(u)->ffchk(u, n)) {
 			knh_Token_perror(ctx, tk, KERR_ERRATA, _("%C: out of range: %B ==> %O"), tagc, t, DP(u)->fvalue);
 			knh_Token_setCONST(ctx, tk, UP(DP(u)->fvalue));
@@ -811,8 +810,7 @@ int knh_TokenNUM_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqc)
 			knh_Token_perror(ctx, tk, KERR_EWARN, _("int overflow: %B"), t);
 		}
 		knh_class_t tagc = knh_Token_tagcNUM(ctx, tk, reqc, ns);
-		ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[tagc].cspec;
-		KNH_ASSERT(IS_ClassSpec(u));
+		ClassSpec *u = konoha_getClassSpec(ctx, tagc);
 		if(!DP(u)->fichk(u, n)) {
 			knh_Token_perror(ctx, tk, KERR_ERRATA, _("%C: out of range: %B ==> %O"), tagc, t, DP(u)->ivalue);
 			knh_Token_setCONST(ctx, tk, UP(DP(u)->ivalue));
@@ -824,22 +822,67 @@ int knh_TokenNUM_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqc)
 	return 1;
 }
 
+
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_TokenTSTR_typing(Ctx *ctx, Token *o, NameSpace *ns, knh_class_t reqt)
+int knh_TokenSTR_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqt)
 {
-	knh_bytes_t t = knh_Token_tobytes(ctx, o);
-	knh_index_t loc = knh_bytes_index(t, ':');
-	if(loc <= -1) {
-		KNH_ASSERT(IS_String(DP(o)->data));
-		knh_Token_toCONST(o);
+	knh_class_t reqc = CLASS_type(reqt);
+	if(reqc == CLASS_String || reqc == CLASS_Object || reqc == CLASS_Any) {
+		KNH_ASSERT(IS_String(DP(tk)->data));
+		knh_Token_toCONST(tk);
+		return 1;
+	}
+	else if(reqc == CLASS_Exception) {
+		knh_Token_setCONST(ctx, tk, UP(new_Exception(ctx, DP(tk)->text)));
+		return 1;
 	}
 	else {
-		if(DP(o)->tt_next == TT_ADD) {
-			TODO();
+		knh_class_t breqc = ctx->share->ClassTable[reqc].bcid;
+		if(breqc == CLASS_String) {
+			knh_bytes_t t = knh_Token_tobytes(ctx, tk);
+			ClassSpec *u = konoha_getClassSpec(ctx, reqc);
+			int foundError = 0;
+			String *s = DP(u)->fsnew(ctx, reqc, t, NULL, &foundError);
+			knh_Token_setCONST(ctx, tk, UP(s));
+			if(foundError) {
+				knh_Token_perror(ctx, tk, KERR_ERRATA, _("%C: invalid string: '%B' ==> %O"), reqc, t, s);
+			}
+			return 1;
 		}
-		knh_Token_setCONST(ctx, o, new_Object_parseOf(ctx, (String*)DP(o)->data));
+	}
+	knh_Token_perror(ctx, tk, KERR_ERROR, _("type error: %C is not string"), reqc);
+	return 0;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_TokenTSTR_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqt)
+{
+	knh_bytes_t t = knh_Token_tobytes(ctx, tk), tag;
+	if(!knh_bytes_splitTag(t, &tag, &t)) {
+		KNH_ASSERT(IS_String(DP(tk)->data));
+		knh_Token_toCONST(tk);
+	}
+	else if(knh_bytes_endsWith(tag, STEXT("!!"))) {
+		knh_Token_setCONST(ctx, tk, UP(new_Exception(ctx, DP(tk)->text)));
+	}
+	else {
+		knh_class_t tagcid = knh_NameSpace_tagcid(ctx, ctx->ns, CLASS_String, tag);
+		if(tagcid != CLASS_unknown) {
+			ClassSpec *u = konoha_getClassSpec(ctx, tagcid);
+			int foundError = 0;
+			String *s = DP(u)->fsnew(ctx, tagcid, t, NULL, &foundError);
+			knh_Token_setCONST(ctx, tk, UP(s));
+			if(foundError) {
+				knh_Token_perror(ctx, tk, KERR_ERRATA, _("%C: invalid string: '%B:%B' ==> %O"), tagcid, tag, t, s);
+			}
+		}
+		else {
+			knh_Token_setCONST(ctx, tk, new_Object_parseOf(ctx, (String*)DP(tk)->data));
+		}
 	}
 }
 
@@ -875,12 +918,7 @@ int knh_Token_typing(Ctx *ctx, Token *tk, Asm *abr, NameSpace *ns, knh_type_t re
 	case TT_ESTR:
 		TODO();
 	case TT_STR:
-		KNH_ASSERT(IS_String(DP(tk)->data));
-		knh_Token_toCONST(tk);
-		if(ctx->share->ClassTable[reqc].bcid == CLASS_String && reqc != CLASS_String) {
-			TODO();
-		}
-		return 1;
+		return knh_TokenSTR_typing(ctx, tk, ns, reqt);
 
 	case TT_TSTR:
 		knh_TokenTSTR_typing(ctx, tk, ns, reqt);
@@ -895,7 +933,7 @@ int knh_Token_typing(Ctx *ctx, Token *tk, Asm *abr, NameSpace *ns, knh_type_t re
 	default:
 		DBG2_P("unknown tt=%s", knh_token_tochar(SP(tk)->tt));
 	}
-	knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown term: %s"), sToken(tk));
+	knh_Token_perror(ctx, tk, KERR_ERROR, _("untyped token: %s"), sToken(tk));
 	return 0;
 }
 

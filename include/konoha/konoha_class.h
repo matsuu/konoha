@@ -574,7 +574,7 @@ typedef int (*knh_ficmp)(struct knh_ClassSpec_t *, knh_int_t v1, knh_int_t v2);
 typedef int (*knh_ffchk)(struct knh_ClassSpec_t *, knh_float_t v);
 typedef int (*knh_ffcmp)(struct knh_ClassSpec_t *, knh_float_t v1, knh_float_t v2);
 
-typedef knh_String_t *(*knh_fsnew)(Ctx *, knh_class_t cid, knh_bytes_t, struct knh_String_t *);
+typedef knh_String_t *(*knh_fsnew)(Ctx *, knh_class_t cid, knh_bytes_t, struct knh_String_t *, int *);
 typedef int (*knh_fscmp)(struct knh_ClassSpec_t *, knh_bytes_t, knh_bytes_t);
 
 typedef struct {
