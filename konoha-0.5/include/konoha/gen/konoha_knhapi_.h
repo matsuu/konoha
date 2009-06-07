@@ -179,7 +179,7 @@ KNHAPI(knh_int64_t) knh_bytes_toint64(knh_bytes_t t);
 KNHAPI(String*) new_String__fbcnv(Ctx *ctx, String *s, knh_fbyteconv fbcnv, BytesConv *bc);
 KNHAPI(ClassSpec*) new_Enum(Ctx *ctx, char *tag, knh_bytes_t urn, knh_int_t min, knh_int_t max);
 KNHAPI(ClassSpec*) new_Unit(Ctx *ctx, char *tag, knh_bytes_t urn, knh_float_t min, knh_float_t max, knh_float_t step);
-KNHAPI(ClassSpec*) new_Vocabulary(Ctx *ctx, char *tag, knh_bytes_t urn, int base, char *terms, ...);
+KNHAPI(ClassSpec*) new_Vocab(Ctx *ctx, char *tag, knh_bytes_t urn, int base, char **terms);
 KNHAPI(void) konoha_loadURNAliasData(Ctx *ctx, knh_StringConstData_t *data);
 KNHAPI(void) konoha_loadClassSpecFuncData(Ctx *ctx, knh_NamedPointerData_t *data);
 KNHAPI(void) knh_putsfp(Ctx *ctx, knh_sfp_t *lsfp, int n, Object *obj);

@@ -436,7 +436,8 @@ static METHOD knh__Int__s(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Int__k(Ctx *ctx, knh_sfp_t *sfp)
 {
-	knh_write_integerfmt(ctx, sfp[1].w, KNH_INT_FMT, sfp[0].ivalue);
+	ClassSpec *u = konoha_getClassSpec(ctx, knh_Object_cid(sfp[0].o));
+	knh_write_intx(ctx, sfp[1].w, u, sfp[0].ivalue);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -584,9 +585,7 @@ static METHOD knh__Float__bits(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Float__k(Ctx *ctx, knh_sfp_t *sfp)
 {
-	Float *o = sfp[0].f;
-	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[o->h.cid].cspec;
-	KNH_ASSERT(IS_ClassSpec(u));
+	ClassSpec *u = konoha_getClassSpec(ctx, knh_Object_cid(sfp[0].o));
 	knh_write_floatx(ctx, sfp[1].w, u, p_float(sfp[0]));
 }
 

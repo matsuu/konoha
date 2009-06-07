@@ -147,6 +147,7 @@ void knh_write_intx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_int_t v);
 void knh_write_floatx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_float_t v);
 void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid);
 knh_bytes_t konoha_getURNAlias(Ctx *ctx, knh_bytes_t aurn);
+ClassSpec *konoha_getClassSpec(Ctx *ctx, knh_class_t cid);
 knh_class_t konoha_findcidx(Ctx *ctx, knh_bytes_t lname);
 /* ../src/class/knh_Closure.c */
 METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp);
@@ -306,9 +307,7 @@ Object * knh_NameSpace_getConstNULL(Ctx *ctx, NameSpace *ns, knh_bytes_t name);
 void knh_NameSpace_addConst(Ctx *ctx, NameSpace *ns, String *name, Object *value);
 void knh_NameSpace_setFuncClass(Ctx *ctx, NameSpace *o, knh_methodn_t mn, knh_class_t c);
 knh_class_t knh_NameSpace_getFuncClass(Ctx *ctx, NameSpace *o, knh_bytes_t funcname);
-knh_class_t knh_tclass_classURN(Ctx *ctx, knh_class_t bcid, knh_bytes_t urn);
-knh_class_t knh_tclass_loadURN(Ctx *ctx, knh_class_t bcid, knh_bytes_t urn);
-knh_type_t knh_NameSpace_tagcid(Ctx *ctx, NameSpace *o, knh_class_t bcid, knh_bytes_t tag);
+knh_type_t knh_NameSpace_tagcid(Ctx *ctx, NameSpace *o, knh_class_t cid, knh_bytes_t tag);
 /* ../src/class/knh_Number.c */
 knh_int_t knh_Number_tointeger(Any *o);
 knh_float_t knh_Number_tofloat(Any *o);
@@ -365,6 +364,7 @@ knh_bool_t knh_String_equals(String *o, knh_bytes_t s);
 knh_bool_t knh_String_startsWith(String *b, knh_bytes_t s);
 knh_bool_t knh_String_endsWith(String *b, knh_bytes_t s);
 Object* new_String_parseOf(Ctx *ctx, String *p);
+int knh_bytes_splitTag(knh_bytes_t t, knh_bytes_t *tag, knh_bytes_t *body);
 Object *new_Object_parseOf(Ctx *ctx, String *s);
 /* ../src/class/knh_String_mbytes.c */
 knh_bool_t knh_bytes_checkENCODING(knh_bytes_t s);

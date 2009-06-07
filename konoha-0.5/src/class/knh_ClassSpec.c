@@ -371,21 +371,29 @@ String *new_StringX__FormatException(Ctx *ctx, knh_class_t cid, knh_bytes_t t, S
 /* ------------------------------------------------------------------------ */
 
 static
-String *knh_fsnew__dict(Ctx *ctx, knh_class_t cid, knh_bytes_t t, String *orign)
+String *knh_fsnew__dict(Ctx *ctx, knh_class_t cid, knh_bytes_t t, String *orign, int *foundError)
 {
-	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
-	KNH_ASSERT(IS_ClassSpec(u));
+	ClassSpec *u = konoha_getClassSpec(ctx, cid);
 	knh_index_t n = knh_DictIdx_index(ctx, DP(u)->vocabDictIdx, t);
-	if(n == -1) return new_StringX__FormatException(ctx, cid, t, orign);
+	if(n == -1) {
+		knh_bytes_t tag;
+		if(knh_bytes_splitTag(t, &tag, &t)) {
+			n = knh_DictIdx_index(ctx, DP(u)->vocabDictIdx, t);
+		}
+	}
+	if(n == -1) {
+		*foundError = 1;
+		return DP(u)->svalue;
+	}
 	return knh_DictIdx_get__fast(DP(u)->vocabDictIdx, n);
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-int knh_fscmp__dict(ClassSpec *o, knh_bytes_t v1, knh_bytes_t v2)
+int knh_fscmp__dict(ClassSpec *u, knh_bytes_t v1, knh_bytes_t v2)
 {
-	return knh_DictIdx_index(NULL, DP(o)->vocabDictIdx, v1) - knh_DictIdx_index(NULL, DP(o)->vocabDictIdx, v2);
+	return knh_DictIdx_index(NULL, DP(u)->vocabDictIdx, v1) - knh_DictIdx_index(NULL, DP(u)->vocabDictIdx, v2);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -410,30 +418,25 @@ DictIdx* new_DictIdx__Array(Ctx *ctx, Array *a)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(ClassSpec*) new_Vocabulary(Ctx *ctx, char *tag, knh_bytes_t urn, int base, char *terms, ...)
+KNHAPI(ClassSpec*) new_Vocab(Ctx *ctx, char *tag, knh_bytes_t urn, int base, char **terms)
 {
 	knh_class_t cid = knh_ClassTable_newId(ctx);
 	ClassSpec* u = (ClassSpec*)new_Object_bcid(ctx, CLASS_ClassSpec, (int)cid);
 	DP(u)->ubcid = CLASS_String;
 	KNH_SETv(ctx, DP(u)->urn, new_String(ctx, urn, NULL));
-
 	if(tag != NULL || tag[0] != 0) {
-		KNH_SETv(ctx, DP(u)->urn, new_String__T(ctx, tag));
+		KNH_SETv(ctx, DP(u)->tag, new_String__T(ctx, tag));
 	}
-
 	DP(u)->fsnew = knh_fsnew__dict;
 	DP(u)->fscmp = knh_fscmp__dict;
 	{
-		va_list args;
-		va_start(args , terms);
 		Array *a = new_Array0(ctx, 0);
-		char *vocab = NULL;
-		while((vocab = va_arg(args, char*)) != NULL) {
-			String *s = new_String__T(ctx, vocab);
+		while(*terms != NULL) {
+			String *s = new_String__T(ctx, *terms);
 			knh_Array_add(ctx, a, UP(s));
 			s->h.cid = cid;
+			terms++;
 		}
-		va_end(args);
 		KNH_SETv(ctx, DP(u)->vocabDictIdx, new_DictIdx__Array(ctx, a));
 		knh_ClassSpec_initIntRange(ctx, u, base, base + knh_Array_size(a) - 1);
 		KNH_ASSERT(knh_Array_size(a) > 0);
@@ -449,11 +452,11 @@ KNHAPI(ClassSpec*) new_Vocabulary(Ctx *ctx, char *tag, knh_bytes_t urn, int base
 //MAPPER knh_Mapper__fdict(Ctx *ctx, knh_sfp_t *sfp)
 //{
 //	String *s = sfp[0].s;
-//	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[knh_Object_cid(sfp[0].o)].cspec;
+//	ClassSpec *u = konoha_getClassSpec(ctx, knh_Object_cid(sfp[0].o)].cspec;
 //	KNH_ASSERT(IS_ClassSpec(u));
 //	KNH_ASSERT(IS_DictIdx(DP(u)->vocabDictIdx));
 //
-//	ClassSpec *u2 = (ClassSpec*)ctx->share->ClassTable[DP(sfp[1].mpr)->tcid].cspec;
+//	ClassSpec *u2 = konoha_getClassSpec(ctx, DP(sfp[1].mpr)->tcid].cspec;
 //	KNH_ASSERT(IS_ClassSpec(u2));
 //	KNH_ASSERT(IS_DictIdx(DP(u2)->vocabDictIdx));
 //
@@ -470,12 +473,12 @@ KNHAPI(ClassSpec*) new_Vocabulary(Ctx *ctx, char *tag, knh_bytes_t urn, int base
 //	knh_class_t tcid = konoha_findcid(ctx, B(text));
 //
 //	if(tcid != CLASS_unknown || ctx->share->ClassTable[tcid].bcid != tcid) {
-////		ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[scid].cspec;
+////		ClassSpec *u = konoha_getClassSpec(ctx, scid].cspec;
 ////		if(!IS_ClassSpec(u) || !IS_DictIdx(DP(u)->vocabDictIdx)) {
 ////			TODO();
 ////			return;
 ////		}
-//		ClassSpec *u2 = (ClassSpec*)ctx->share->ClassTable[tcid].cspec;
+//		ClassSpec *u2 = konoha_getClassSpec(ctx, tcid].cspec;
 //		if(!IS_ClassSpec(u2) || !IS_DictIdx(DP(u2)->vocabDictIdx)) {
 //			TODO();
 //			return;
@@ -593,11 +596,19 @@ ClassSpec *new_ClassSpecNULL(Ctx *ctx, knh_bytes_t urn)
 /* ======================================================================== */
 /* [SPEC] */
 
-static
-Object *knh_ClassTable_fdefault__ISPEC(Ctx *ctx, knh_class_t cid)
+ClassSpec *konoha_getClassSpec(Ctx *ctx, knh_class_t cid)
 {
 	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
 	KNH_ASSERT(IS_ClassSpec(u));
+	return u;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+Object *knh_ClassTable_fdefault__ISPEC(Ctx *ctx, knh_class_t cid)
+{
+	ClassSpec *u = konoha_getClassSpec(ctx, cid);
 	return UP(DP(u)->ivalue);
 }
 
@@ -606,8 +617,7 @@ Object *knh_ClassTable_fdefault__ISPEC(Ctx *ctx, knh_class_t cid)
 static
 Object *knh_ClassTable_fdefault__FSPEC(Ctx *ctx, knh_class_t cid)
 {
-	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
-	KNH_ASSERT(IS_ClassSpec(u));
+	ClassSpec *u = konoha_getClassSpec(ctx, cid);
 	return UP(DP(u)->fvalue);
 }
 
@@ -616,8 +626,7 @@ Object *knh_ClassTable_fdefault__FSPEC(Ctx *ctx, knh_class_t cid)
 static
 Object *knh_ClassTable_fdefault__SSPEC(Ctx *ctx, knh_class_t cid)
 {
-	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
-	KNH_ASSERT(IS_ClassSpec(u));
+	ClassSpec *u = konoha_getClassSpec(ctx, cid);
 	return UP(DP(u)->svalue);
 }
 
@@ -701,17 +710,17 @@ ClassSpec* konoha_findClassSpecNULL(Ctx *ctx, knh_bytes_t lname)
 		knh_snprintf(cname, sizeof(cname), "Int%s", postfix);
 		knh_class_t cid = konoha_getcid(ctx, B(cname));
 		if(cid != CLASS_unknown) {
-			return (ClassSpec*)ctx->share->ClassTable[cid].cspec;
+			return konoha_getClassSpec(ctx, cid);
 		}
 		knh_snprintf(cname, sizeof(cname), "Float%s", postfix);
 		cid = konoha_getcid(ctx, B(cname));
 		if(cid != CLASS_unknown) {
-			return (ClassSpec*)ctx->share->ClassTable[cid].cspec;
+			return konoha_getClassSpec(ctx, cid);
 		}
 		knh_snprintf(cname, sizeof(cname), "String%s", postfix);
 		cid = konoha_getcid(ctx, B(cname));
 		if(cid != CLASS_unknown) {
-			return (ClassSpec*)ctx->share->ClassTable[cid].cspec;
+			return konoha_getClassSpec(ctx, cid);
 		}
 	}
 	return NULL;

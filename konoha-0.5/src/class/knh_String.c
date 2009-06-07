@@ -157,7 +157,7 @@ String *new_StringX(Ctx *ctx, knh_class_t cid, knh_bytes_t t, String *orign)
 		TODO();
 		return new_String(ctx, t, orign);
 	}
-//	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
+//	ClassSpec *u = konoha_getClassSpec(ctx, cid].cspec;
 //	KNH_ASSERT(IS_ClassSpec(u));
 //		if(DP(u)->fbconv != NULL) {
 //		return new_String__fcnv(ctx, DP(u)->)
@@ -294,20 +294,22 @@ knh_parser_drvapi_t *knh_System_getParserDriver(Ctx *ctx, knh_bytes_t name)
 	return (knh_parser_drvapi_t*)d;
 }
 
-///* ------------------------------------------------------------------------ */
-//
-//knh_type_t	knh_ObjectParser_typing(Ctx *ctx, knh_bytes_t t)
-//{
-//	knh_index_t loc = knh_bytes_index(t, ':');
-//	if(loc <= 0) {
-//		return NNTYPE_String;
-//	}
-//	if(loc > 2 && t.buf[loc-2] == '!' && t.buf[loc-1] == '!') {
-//		return NNTYPE_Exception;
-//	}
-//	knh_parser_drvapi_t *d = knh_System_getParserDriver(ctx, knh_bytes_first(t, loc));
-//	return d->rtype;
-//}
+/* ------------------------------------------------------------------------ */
+
+int knh_bytes_splitTag(knh_bytes_t t, knh_bytes_t *tag, knh_bytes_t *body)
+{
+	size_t i;
+	for(i = 1; i < t.len; i++) {
+		if(t.buf[i] == ':' && t.buf[i-1] != '\\') {
+			tag->buf = t.buf;
+			tag->len = i;
+			body->buf = t.buf + i + 1;
+			body->len = t.len - (i+1);
+			return 1;
+		}
+	}
+	return 0;
+}
 
 /* ------------------------------------------------------------------------ */
 
@@ -320,6 +322,11 @@ Object *new_Object_parseOf(Ctx *ctx, String *s)
 	}
 	if(loc > 2 && t.buf[loc-2] == '!' && t.buf[loc-1] == '!') {
 		return UP(new_Exception(ctx, s));
+	}
+	knh_class_t tagcid = knh_NameSpace_tagcid(ctx, ctx->ns, CLASS_String, knh_bytes_first(t, loc));
+	if(tagcid != CLASS_unknown) {
+		DBG2_P("cid=%s", CLASSN(tagcid));
+
 	}
 	knh_parser_drvapi_t *d = knh_System_getParserDriver(ctx, knh_bytes_first(t, loc));
 	return d->parser(ctx, s);
