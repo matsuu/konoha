@@ -51,13 +51,13 @@ static const char *KERR_MSG[] = {
 void knh_vperror(Ctx *ctx, knh_fileid_t fileid, int line, int pe, char *fmt, va_list ap)
 {
 	KNH_ASSERT(pe <= KERR_INFO);
-	if(knh_Context_isInteractive(ctx))
+	if(knh_Context_isInteractive(ctx)) {
+		goto L_PRINT;
+	}
 	if(pe > KERR_EWARN && !knh_Context_isCompiling(ctx)) {
-		if(knh_Context_isInteractive(ctx) && pe != KERR_INFO) {
-			;;
-		}
 		return;
 	}
+	L_PRINT:;
 	{
 		OutputStream *w = KNH_STDERR;
 		knh_printf(ctx, w, " - [%s:%d]:%s ", FILEIDN(fileid), line, KERR_MSG[pe]);
