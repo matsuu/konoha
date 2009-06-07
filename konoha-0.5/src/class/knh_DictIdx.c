@@ -129,6 +129,7 @@ String* knh_DictIdx_get__fast(DictIdx *o, knh_intptr_t termid)
 {
 	size_t n = termid_toarrayn(termid);
 	KNH_ASSERT(/*0 <= n &&*/ n < knh_Array_size(o->terms));
+	DBG2_P("n=%d, %d", termid, n);
 	return (String*)knh_Array_n(o->terms, n);
 }
 

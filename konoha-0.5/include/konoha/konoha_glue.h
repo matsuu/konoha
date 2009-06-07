@@ -146,20 +146,20 @@ extern "C" {
 	}\
 
 #define KNH_MAPPED_Boolean(ctx, sfp, value) {\
+		KNH_MOV(ctx, sfp[0].o, KNH_FALSE);\
 		sfp[0].bvalue = value;\
-		KNH_MOV(ctx, sfp[0].o, KNH_TRUE);\
 		return; \
 	}\
 
 #define KNH_MAPPED_Int(ctx, sfp, value) {\
+		KNH_MOV(ctx, sfp[0].o, KNH_INT0); \
 		sfp[0].ivalue = value;\
-		KNH_MOV(ctx, sfp[0].o, KNH_INT0);\
 		return; \
 	}\
 
 #define KNH_MAPPED_Float(ctx, sfp, value) {\
-		sfp[0].fvalue = value;\
 		KNH_MOV(ctx, sfp[0].o, KNH_FLOAT0);\
+		sfp[0].fvalue = value;\
 		return;\
 	}\
 
