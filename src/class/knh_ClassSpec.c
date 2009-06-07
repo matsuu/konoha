@@ -351,26 +351,6 @@ KNHAPI(ClassSpec*) new_Unit(Ctx *ctx, char *tag, knh_bytes_t urn, knh_float_t mi
 /* [String] */
 
 static
-String *new_StringX__FormatException(Ctx *ctx, knh_class_t cid, knh_bytes_t t, String *orign)
-{
-	TODO();
-//	Bytes *ba = knh_Context_openBConvBuf(ctx);
-//	knh_Bytes_write(ctx, ba, STEXT("Format!!: "));
-//	knh_Bytes_write(ctx, ba, B(CLASSN(cid)));
-//	knh_Bytes_write(ctx, ba, STEXT("('"));
-//	knh_Bytes_write(ctx, ba, t);
-//	knh_Bytes_write(ctx, ba, STEXT(")'"));
-//	{
-//		String *s = (String*)new_Nue__b(ctx, knh_Bytes_tobytes(ba));
-//		knh_Bytes_clear(ba, 0);
-//		return s;
-//	}
-	return TS_EMPTY;
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
 String *knh_fsnew__dict(Ctx *ctx, knh_class_t cid, knh_bytes_t t, String *orign, int *foundError)
 {
 	ClassSpec *u = konoha_getClassSpec(ctx, cid);
@@ -409,11 +389,21 @@ DictIdx* new_DictIdx__Array(Ctx *ctx, Array *a)
 		knh_uintptr_t i = 0;
 		for(i = 0; i < knh_Array_size(a); i++) {
 			String *s = (String*)knh_Array_n(a, i);
-			knh_DictSet_append(ctx, o->termsDictSet, s, i);
+			knh_DictSet_append(ctx, o->termsDictSet, s, i+1);
 		}
 	}
-	knh_DictSet_toIgnoreCase(o->termsDictSet);
+	//knh_DictSet_toIgnoreCase(o->termsDictSet);
 	return o;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+MAPPER knh_fmapper_vocabidx(Ctx *ctx, knh_sfp_t *sfp)
+{
+	ClassSpec *u = konoha_getClassSpec(ctx, knh_Object_cid(sfp[0].o));
+	KNH_ASSERT(knh_ClassSpec_isVocab(u));
+	KNH_MAPPED_Int(ctx, sfp, knh_ClassSpec_getVocabIdx(ctx, u, sfp[0].s));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -438,11 +428,16 @@ KNHAPI(ClassSpec*) new_Vocab(Ctx *ctx, char *tag, knh_bytes_t urn, int base, cha
 			terms++;
 		}
 		KNH_SETv(ctx, DP(u)->vocabDictIdx, new_DictIdx__Array(ctx, a));
-		knh_ClassSpec_initIntRange(ctx, u, base, base + knh_Array_size(a) - 1);
+		knh_ClassSpec_initIntRange(ctx, u, (knh_int_t)base, (knh_int_t)(base + knh_Array_size(a) - 1));
 		KNH_ASSERT(knh_Array_size(a) > 0);
 		KNH_INITv(DP(u)->svalue, knh_Array_n(a, 0));
+		DBG2_P("BASE=%d, %lld", base, DP(u)->imin);
 	}
 	konoha_addSpecializedType(ctx, cid, CLASS_String, u);
+	{
+		Mapper *mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, cid, CLASS_Int, knh_fmapper_vocabidx, (Object*)u);
+		konoha_addMapper(ctx, mpr);
+	}
 	return u;
 }
 
