@@ -2433,72 +2433,90 @@ void knh_Token_toMPR(Ctx *ctx, Token *tk, knh_class_t cid, Mapper *mpr)
 static
 Term *knh_StmtMAPCAST_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_t reqt)
 {
+	Token *tk0 = DP(stmt)->tokens[0];
+
 	DBG2_ASSERT(DP(stmt)->size > 1);
 	if(!TERMs_typing(ctx, stmt, 0, abr, ns, TYPE_Any, TWARN_)) {
 		return NULL;
 	}
 	if(!TERMs_isCLASSID(stmt, 0)) {
-		knh_Token_perror(ctx, DP(stmt)->tokens[0], KERR_ERROR, _("unknown class: %s"), sToken(DP(stmt)->tokens[0]));
+		knh_Token_perror(ctx, tk0, KERR_ERROR, _("unknown class: %s"), sToken(tk0));
 		return NULL;
 	}
 
-	Token *tk = DP(stmt)->tokens[0];
-	knh_class_t mprcid = DP(tk)->cid;
-	if(mprcid == CLASS_Any) mprcid = CLASS_type(reqt);
-
-	if(!TERMs_typing(ctx, stmt, 1, abr, ns, mprcid, TWARN_)) {
+	if(!TERMs_typing(ctx, stmt, 1, abr, ns, TYPE_Any, TWARN_)) {
 		return NULL;
 	}
-	if(mprcid == CLASS_Any) return DP(stmt)->terms[1];
 
-	if(TERMs_isNULL(stmt, 1)) {
-		if(knh_Token_isNotNullType(tk)) {
-			knh_Token_setCONST(ctx, DP(stmt)->tokens[1], konoha_getClassDefaultValue(ctx, mprcid));
+	knh_class_t mprcid = DP(tk0)->cid;
+	knh_type_t  exprt = TERMs_gettype(stmt, 1);
+	knh_class_t exprc = CLASS_type(exprt);
+	int isNonNullCast = (knh_Token_isNotNullType(tk0) || (!knh_Token_isNullableType(tk0) && IS_NNTYPE(reqt)));
+	DBG2_P("MAPCAST %s => %s isNonNullCast=%d", CLASSN(exprc), CLASSN(mprcid), isNonNullCast);
+	knh_Stmt_setType(ctx, stmt, isNonNullCast ? NNTYPE_cid(mprcid) : mprcid);
+	if(isNonNullCast) {
+		knh_Stmt_setNNCAST(stmt, 1);
+	}
+
+	if(mprcid == CLASS_Any) {   /* (Any)expr */
+		mprcid = CLASS_type(reqt);
+		if(mprcid == CLASS_Any) {
+			return DP(stmt)->terms[1];
+		}
+	}
+
+	if(TERMs_isNULL(stmt, 1)) {  /* (T)null */
+		if(isNonNullCast) {
+			knh_Token_toDEFVAL(DP(stmt)->tokens[1], mprcid);
+		}
+		else {
+			knh_Asm_perror(ctx, abr, KERR_DWARN, _("casting null"));
 		}
 		return DP(stmt)->terms[1];
 	}
 
-	knh_type_t exprt = TERMs_gettype(stmt, 1);
-	knh_type_t exprc = CLASS_type(exprt);
-	knh_Stmt_setType(ctx, stmt, knh_Token_isNotNullType(tk) ? NNTYPE_cid(mprcid) : mprcid);
-
-	if(exprc == CLASS_Any && mprcid != CLASS_Any) {
-		knh_Token_toMPR(ctx, DP(stmt)->tokens[0], mprcid, (Mapper*)KNH_NULL);
+	if(exprc == CLASS_Any) {     /* (T)anyexpr */
+		knh_Token_toMPR(ctx, tk0, mprcid, (Mapper*)KNH_NULL);
 		return TM(stmt);
 	}
 
 	if(mprcid == exprc || knh_class_instanceof(ctx, mprcid, exprc)) {
-		if(knh_Token_isNotNullType(tk)) {
-			DBG2_P("Nonnull cast");
-			if(!IS_NNTYPE(exprt)) {
-				knh_Stmt_setNNCAST(stmt, 1);
-				knh_Token_toMPR(ctx, tk, mprcid, (Mapper*)KNH_NULL);
-				return TM(stmt);
-			}
+		/* upcast */
+		if(isNonNullCast && IS_NNTYPE(exprt)) {
+			knh_Token_toMPR(ctx, tk0, mprcid, (Mapper*)KNH_NULL);
+			return TM(stmt);
 		}
-		DBG2_P("UPCAST (%s)%s", CLASSN(mprcid), CLASSN(exprc));
+		if(!TERMs_isCONST(stmt, 1) && mprcid == exprc) {
+			knh_Asm_perror(ctx, abr, KERR_DWARN, _("upcast does not need (%C)"), mprcid);
+		}
 		return DP(stmt)->terms[1];
+	}
+
+	if(knh_class_instanceof(ctx, exprc, mprcid)) {  /* downcast */
+		knh_Token_toMPR(ctx, tk0, mprcid, (Mapper*)KNH_NULL);
+		return TM(stmt);
 	}
 
 	Mapper *mpr = knh_Class_getMapper(ctx, exprc, mprcid);
 	if(IS_NULL(mpr)) {
-		knh_Asm_perror(ctx, abr, KERR_ERROR, _("undefined mapper %C ==> %C"), exprc, mprcid);
+		knh_Asm_perror(ctx, abr, KERR_ERROR, _("undefined mapper: %C ==> %C"), exprc, mprcid);
 		return NULL;
 	}
-
 	if(knh_Mapper_isConst(mpr) && TERMs_isCONST(stmt, 1)) {
 		DBG2_P("MAPCAST TO CONST ..");
-		Token *tk2 = DP(stmt)->tokens[1];
+		Token *tk1 = DP(stmt)->tokens[1];
 		knh_sfp_t *lsfp = KNH_LOCAL(ctx);
-		KNH_MOV(ctx, lsfp[0].o, DP(tk2)->data);
+		KNH_MOV(ctx, lsfp[0].o, DP(tk1)->data);
 		KNH_UNBOX(ctx, &lsfp[0]);
 		KNH_SMAP(ctx, lsfp, 0, mpr);
 		KNH_BOX(ctx, &lsfp[0], DP(mpr)->tcid);
-		knh_Token_setCONST(ctx, tk2, lsfp[0].o);
-		return TM(tk2);
+		knh_Token_setCONST(ctx, tk1, lsfp[0].o);
+		return TM(tk1);
 	}
-	knh_Token_toMPR(ctx, tk, mprcid, mpr);
-	return TM(stmt);
+	else {
+		knh_Token_toMPR(ctx, tk0, mprcid, mpr);
+		return TM(stmt);
+	}
 }
 
 /* ======================================================================== */

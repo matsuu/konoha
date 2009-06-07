@@ -242,7 +242,7 @@ knh_int_t knh_ClassSpec_getVocabIdx(Ctx *ctx, ClassSpec *u, String *s)
 
 static MAPPER knh_IntX_Vocab(Ctx *ctx, knh_sfp_t *sfp)
 {
-	ClassSpec *u = (ClassSpec*)sfp[1].o;
+	ClassSpec *u = (ClassSpec*)DP(sfp[1].mpr)->mapdata;
 	KNH_ASSERT(IS_ClassSpec(u));
 	KNH_MAPPED(ctx, sfp, knh_ClassSpec_getVocabAt(ctx, u, sfp[0].ivalue));
 }
@@ -251,7 +251,7 @@ static MAPPER knh_IntX_Vocab(Ctx *ctx, knh_sfp_t *sfp)
 
 static MAPPER knh_Vocab_IntX(Ctx *ctx, knh_sfp_t *sfp)
 {
-	ClassSpec *u = (ClassSpec*)sfp[1].o;
+	ClassSpec *u = (ClassSpec*)DP(sfp[1].mpr)->mapdata;
 	KNH_ASSERT(IS_ClassSpec(u));
 	KNH_MAPPED_Int(ctx, sfp, knh_ClassSpec_getVocabIdx(ctx, u, sfp[0].s));
 }
@@ -402,8 +402,23 @@ static
 MAPPER knh_fmapper_vocabidx(Ctx *ctx, knh_sfp_t *sfp)
 {
 	ClassSpec *u = konoha_getClassSpec(ctx, knh_Object_cid(sfp[0].o));
-	KNH_ASSERT(knh_ClassSpec_isVocab(u));
-	KNH_MAPPED_Int(ctx, sfp, knh_ClassSpec_getVocabIdx(ctx, u, sfp[0].s));
+	knh_int_t n = knh_ClassSpec_getVocabIdx(ctx, u, sfp[0].s);
+	//DBG2_P("n = %lld", n);
+	KNH_MAPPED_Int(ctx, sfp, n);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+MAPPER knh_fmapper_vocab(Ctx *ctx, knh_sfp_t *sfp)
+{
+	ClassSpec *u = (ClassSpec*)DP(sfp[1].mpr)->mapdata;
+	size_t n = (size_t)(sfp[0].ivalue - DP(u)->imin);
+	DBG2_P("n = %ld", n);
+	Array *a = (DP(u)->vocabDictIdx)->terms;
+	Object *s = KNH_NULL;
+	if(n < knh_Array_size(a)) s = knh_Array_n(a, n);
+	KNH_MAPPED(ctx, sfp, s);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -431,11 +446,12 @@ KNHAPI(ClassSpec*) new_Vocab(Ctx *ctx, char *tag, knh_bytes_t urn, int base, cha
 		knh_ClassSpec_initIntRange(ctx, u, (knh_int_t)base, (knh_int_t)(base + knh_Array_size(a) - 1));
 		KNH_ASSERT(knh_Array_size(a) > 0);
 		KNH_INITv(DP(u)->svalue, knh_Array_n(a, 0));
-		DBG2_P("BASE=%d, %lld", base, DP(u)->imin);
 	}
 	konoha_addSpecializedType(ctx, cid, CLASS_String, u);
 	{
-		Mapper *mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, cid, CLASS_Int, knh_fmapper_vocabidx, (Object*)u);
+		Mapper *mpr = new_Mapper(ctx, KNH_FLAG_MMF_TOTAL|KNH_FLAG_MMF_CONST, cid, CLASS_Int, knh_fmapper_vocabidx, (Object*)u);
+		konoha_addMapper(ctx, mpr);
+		mpr = new_Mapper(ctx, KNH_FLAG_MMF_CONST, CLASS_Int, cid, knh_fmapper_vocab, (Object*)u);
 		konoha_addMapper(ctx, mpr);
 	}
 	return u;

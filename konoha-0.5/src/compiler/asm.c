@@ -376,16 +376,6 @@ void KNH_ASM_SETLINE(Ctx *ctx, Asm *abr, int line)
 
 #define sfi_(n)    ((knh_sfi_t)(n))
 
-//#define IS_BOOL(t)  (t == NNTYPE_Boolean)
-//
-//#define IS_INT(t)  (t == NNTYPE_Int || t == TYPE_Int)
-//#define IS_NNINT(t)  (t == NNTYPE_Int)
-//#define IS_NAINT(t)  (t == TYPE_Int)
-//
-//#define IS_FLOAT(t)  (t == NNTYPE_Float || t == TYPE_Float)
-//#define IS_NNFLOAT(t)  (t == NNTYPE_Float)
-//#define IS_NAFLOAT(t)  (t == TYPE_Float)
-
 #define IS_VAL(t) (IS_BOOL(t)||IS_INT(t)||IS_FLOAT(t))
 #define IS_ANY(t) (CLASS_type(t) == CLASS_Any || CLASS_type(t) == CLASS_Object)
 
