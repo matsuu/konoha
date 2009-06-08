@@ -440,7 +440,7 @@ void knh_Asm_genMethod(Ctx *ctx, Asm *abr, OutputStream *w);
 void knh_Asm_loadCompiledMethod(Ctx *ctx, Asm *abr);
 knh_fmethod knh_Asm_getCompiledMethod(Ctx *ctx, Asm *abr, knh_bytes_t cname, knh_bytes_t mname);
 /* ../src/compiler/konohac.c */
-int knh_Stmt_complie(Ctx *ctx, Stmt *stmt, String *nsname, int isEval);
+int knh_Stmt_compile(Ctx *ctx, Stmt *stmt, String *nsname, int isEval);
 Stmt *knh_bytes_parseStmt(Ctx *ctx, knh_bytes_t kscript, int fileid, int line);
 void konohac_eval(Ctx *ctx, String *nsname, InputStream *in);
 void knh_Asm_openlib(Ctx *ctx, Asm *abr, knh_bytes_t fpath);
