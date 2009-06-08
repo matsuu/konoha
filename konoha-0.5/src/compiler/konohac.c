@@ -532,7 +532,7 @@ int knh_Stmt_eval(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int isEval)
 
 /* ------------------------------------------------------------------------ */
 
-int knh_Stmt_complie(Ctx *ctx, Stmt *stmt, String *nsname, int isEval)
+int knh_Stmt_compile(Ctx *ctx, Stmt *stmt, String *nsname, int isEval)
 {
 	Asm *abr = knh_Context_getAsm(ctx);
 	NameSpace *ns = knh_Context_setNameSpace(ctx, nsname);
@@ -704,7 +704,7 @@ void konohac_eval(Ctx *ctx, String *nsname, InputStream *in)
 		Stmt *stmt = knh_InputStream_parseStmt(ctx, in);
 		KNH_LPUSH(ctx, stmt);
 		DBG_DUMP(ctx, stmt, KNH_NULL, "stmt");
-		knh_Stmt_complie(ctx, stmt, nsname, !knh_Context_isCompiling(ctx) /* isrun 1 */);
+		knh_Stmt_compile(ctx, stmt, nsname, !knh_Context_isCompiling(ctx) /* isrun 1 */);
 	}
 	KNH_LOCALBACK(ctx, lsfp);
 	return;
@@ -793,7 +793,7 @@ int knh_NameSpace_loadScript(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isE
 	if(isEval) {
 		knh_Asm_openlib(ctx, knh_Context_getAsm(ctx), fpath);
 	}
-	knh_Stmt_complie(ctx, stmt, DP(ns)->nsname, isEval);
+	knh_Stmt_compile(ctx, stmt, DP(ns)->nsname, isEval);
 	KNH_LOCALBACK(ctx, lsfp);
 	return 1;
 }
