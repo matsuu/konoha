@@ -2745,6 +2745,14 @@ int TERMs_typecheck(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_type_t reqt, i
 		mode = TCONV_;
 	}
 
+	if(mode != TCONV_) {
+		Mapper *mpr = knh_Class_getMapper(ctx, varc, reqc);
+		if(IS_Mapper(mpr) && knh_Mapper_isICast(mpr)) {
+			mode = TCONV_;
+			knh_Asm_perror(ctx, abr, KERR_INFO, _("implict casting: %C => %C"), varc, reqc);
+		}
+	}
+
 	if(mode == TCONV_ || mode == TITERCONV_) {
 		Term *mcast = new_TermINCAST(ctx, reqc, stmt, n);
 		if(mcast != NULL) {

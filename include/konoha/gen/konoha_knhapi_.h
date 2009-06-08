@@ -84,7 +84,7 @@ extern "C" {
 #define knh_Class_findMethod(ctx, c, mn)   knh_Class_getMethod__(ctx, c, mn, 1)
 #define CTXCLASSN(cid)     knh_Context_CLASSN(ctx,cid)
 #define CTXTYPEQN(cid)     knh_Context_CLASSN(ctx,CLASS_type(cid)), TYPEQ(cid)
-#define KNH_FLAG_MMF_AFFINE (KNH_FLAG_MMF_SIGNIFICANT|KNH_FLAG_MMF_SYNONYM|KNH_FLAG_MMF_TOTAL|KNH_FLAG_MMF_CONST)
+#define KNH_FLAG_MMF_AFFINE (KNH_FLAG_MMF_ICAST|KNH_FLAG_MMF_SYNONYM|KNH_FLAG_MMF_TOTAL|KNH_FLAG_MMF_CONST)
 #define knh_Object_cid(o)           (o)->h.cid
 #define knh_Object_bcid(o)          (o)->h.bcid
 #define IS_NULL(o)          (((Object*)o)->h.cid == CLASS_Nue)

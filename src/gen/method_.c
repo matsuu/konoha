@@ -229,6 +229,12 @@ METHOD knh__Mapper_isInterface(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 static 
+METHOD knh__Mapper_isICast(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN_Boolean(ctx, sfp, knh_Mapper_isICast((knh_Mapper_t*)sfp[0].o));
+}
+
+static 
 METHOD knh__Mapper_isSignificant(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Mapper_isSignificant((knh_Mapper_t*)sfp[0].o));
@@ -238,12 +244,6 @@ static
 METHOD knh__Mapper_isFinal(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Mapper_isFinal((knh_Mapper_t*)sfp[0].o));
-}
-
-static 
-METHOD knh__Mapper_isImplicit(Ctx *ctx, knh_sfp_t *sfp)
-{
-	KNH_RETURN_Boolean(ctx, sfp, knh_Mapper_isImplicit((knh_Mapper_t*)sfp[0].o));
 }
 
 static 

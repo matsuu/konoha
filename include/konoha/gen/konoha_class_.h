@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-#define KONOHA_BUILDID                  575
+#define KONOHA_BUILDID                  578
 
 /* ======================================================================== */
 
@@ -448,7 +448,11 @@ extern "C" {
 #define knh_Mapper_setInterface(o,b)  \
 	if(b) DP((Mapper*)o)->flag |= KNH_FLAG_MMF_INTERFACE; else DP((Mapper*)o)->flag &= ~(KNH_FLAG_MMF_INTERFACE);
 
-#define KNH_FLAG_MMF_SIGNIFICANT        KNH_FLAG_T1
+#define KNH_FLAG_MMF_ICAST              KNH_FLAG_T1
+
+#define knh_Mapper_isICast(o)  \
+	((DP((Mapper*)o)->flag & KNH_FLAG_MMF_ICAST) == KNH_FLAG_MMF_ICAST)
+#define KNH_FLAG_MMF_SIGNIFICANT        KNH_FLAG_T2
 
 #define knh_Mapper_isSignificant(o)  \
 	((DP((Mapper*)o)->flag & KNH_FLAG_MMF_SIGNIFICANT) == KNH_FLAG_MMF_SIGNIFICANT)
@@ -456,14 +460,10 @@ extern "C" {
 #define knh_Mapper_setSignificant(o,b)  \
 	if(b) DP((Mapper*)o)->flag |= KNH_FLAG_MMF_SIGNIFICANT; else DP((Mapper*)o)->flag &= ~(KNH_FLAG_MMF_SIGNIFICANT);
 
-#define KNH_FLAG_MMF_FINAL              KNH_FLAG_T2
+#define KNH_FLAG_MMF_FINAL              KNH_FLAG_T3
 
 #define knh_Mapper_isFinal(o)  \
 	((DP((Mapper*)o)->flag & KNH_FLAG_MMF_FINAL) == KNH_FLAG_MMF_FINAL)
-#define KNH_FLAG_MMF_IMPLICIT           KNH_FLAG_T3
-
-#define knh_Mapper_isImplicit(o)  \
-	((DP((Mapper*)o)->flag & KNH_FLAG_MMF_IMPLICIT) == KNH_FLAG_MMF_IMPLICIT)
 #define KNH_FLAG_MMF_SYNONYM            KNH_FLAG_T4
 
 #define knh_Mapper_isSynonym(o)  \
@@ -2230,21 +2230,21 @@ extern "C" {
 #define METHODN__isGenerated            ((knh_methodn_t)86|KNH_FLAG_MN_MOVTEXT)
 #define METHODN_getIsGenerated          ((knh_methodn_t)86|KNH_FLAG_MN_GETTER)
 #define METHODN_setIsGenerated          ((knh_methodn_t)86|KNH_FLAG_MN_SETTER)
-#define FIELDN_isIgnoreCase             ((knh_fieldn_t)87)
-#define METHODN_isIgnoreCase            ((knh_methodn_t)87)
-#define METHODN__isIgnoreCase           ((knh_methodn_t)87|KNH_FLAG_MN_MOVTEXT)
-#define METHODN_getIsIgnoreCase         ((knh_methodn_t)87|KNH_FLAG_MN_GETTER)
-#define METHODN_setIsIgnoreCase         ((knh_methodn_t)87|KNH_FLAG_MN_SETTER)
-#define FIELDN_isImmutable              ((knh_fieldn_t)88)
-#define METHODN_isImmutable             ((knh_methodn_t)88)
-#define METHODN__isImmutable            ((knh_methodn_t)88|KNH_FLAG_MN_MOVTEXT)
-#define METHODN_getIsImmutable          ((knh_methodn_t)88|KNH_FLAG_MN_GETTER)
-#define METHODN_setIsImmutable          ((knh_methodn_t)88|KNH_FLAG_MN_SETTER)
-#define FIELDN_isImplicit               ((knh_fieldn_t)89)
-#define METHODN_isImplicit              ((knh_methodn_t)89)
-#define METHODN__isImplicit             ((knh_methodn_t)89|KNH_FLAG_MN_MOVTEXT)
-#define METHODN_getIsImplicit           ((knh_methodn_t)89|KNH_FLAG_MN_GETTER)
-#define METHODN_setIsImplicit           ((knh_methodn_t)89|KNH_FLAG_MN_SETTER)
+#define FIELDN_isICast                  ((knh_fieldn_t)87)
+#define METHODN_isICast                 ((knh_methodn_t)87)
+#define METHODN__isICast                ((knh_methodn_t)87|KNH_FLAG_MN_MOVTEXT)
+#define METHODN_getIsICast              ((knh_methodn_t)87|KNH_FLAG_MN_GETTER)
+#define METHODN_setIsICast              ((knh_methodn_t)87|KNH_FLAG_MN_SETTER)
+#define FIELDN_isIgnoreCase             ((knh_fieldn_t)88)
+#define METHODN_isIgnoreCase            ((knh_methodn_t)88)
+#define METHODN__isIgnoreCase           ((knh_methodn_t)88|KNH_FLAG_MN_MOVTEXT)
+#define METHODN_getIsIgnoreCase         ((knh_methodn_t)88|KNH_FLAG_MN_GETTER)
+#define METHODN_setIsIgnoreCase         ((knh_methodn_t)88|KNH_FLAG_MN_SETTER)
+#define FIELDN_isImmutable              ((knh_fieldn_t)89)
+#define METHODN_isImmutable             ((knh_methodn_t)89)
+#define METHODN__isImmutable            ((knh_methodn_t)89|KNH_FLAG_MN_MOVTEXT)
+#define METHODN_getIsImmutable          ((knh_methodn_t)89|KNH_FLAG_MN_GETTER)
+#define METHODN_setIsImmutable          ((knh_methodn_t)89|KNH_FLAG_MN_SETTER)
 #define FIELDN_isInteractive            ((knh_fieldn_t)90)
 #define METHODN_isInteractive           ((knh_methodn_t)90)
 #define METHODN__isInteractive          ((knh_methodn_t)90|KNH_FLAG_MN_MOVTEXT)

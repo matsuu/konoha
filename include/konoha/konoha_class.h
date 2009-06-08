@@ -474,9 +474,9 @@ typedef struct knh_Method {
 /* ------------------------------------------------------------------------ */
 /* @class Mapper Object knh_Mapper_struct */
 /* @flag Mapper.Interface MMF DP((Mapper*)%s)->flag     'is:set:is:*' */
+/* @flag Mapper.ICast MMF DP((Mapper*)%s)->flag  'is:*:is:*' */
 /* @flag Mapper.Significant MMF DP((Mapper*)%s)->flag   'is:set:is:*' */
 /* @flag Mapper.Final MMF DP((Mapper*)%s)->flag         'is:*:is:*' */
-/* @flag Mapper.Implicit MMF DP((Mapper*)%s)->flag      'is:*:is:*' */
 /* @flag Mapper.Synonym MMF DP((Mapper*)%s)->flag       'is:set:is:*' */
 /* @flag Mapper.LossLess MMF DP((Mapper*)%s)->flag      'is:set:is:*' */
 /* @flag Mapper.Total!Partial MMF DP((Mapper*)%s)->flag 'is:set:is:*' */
