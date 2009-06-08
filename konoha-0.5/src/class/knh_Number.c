@@ -241,7 +241,7 @@ knh_fmapper knh_fmapper_affine(knh_class_t scid, knh_class_t tcid)
 /* ------------------------------------------------------------------------ */
 /* [TAFFINE] */
 
-#define _KNH_FLAG_MMF_AFFINE (KNH_FLAG_MMF_SIGNIFICANT|KNH_FLAG_MMF_SYNONYM|KNH_FLAG_MMF_TOTAL|KNH_FLAG_MMF_CONST)
+#define _KNH_FLAG_MMF_AFFINE (KNH_FLAG_MMF_ICAST|KNH_FLAG_MMF_SYNONYM|KNH_FLAG_MMF_TOTAL|KNH_FLAG_MMF_CONST)
 
 static
 void KNH_TAFFINE(Ctx *ctx, knh_class_t scid, knh_class_t tcid, knh_float_t scale, knh_float_t shift)
