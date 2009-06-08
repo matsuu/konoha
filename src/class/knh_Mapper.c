@@ -107,7 +107,7 @@ Mapper* new_MapMap(Ctx *ctx, Mapper *m1, Mapper *m2)
 {
 	knh_Mapper_t* mpr = (Mapper*)new_Object_bcid(ctx, CLASS_Mapper, 0);
 	mpr->h.flag = FLAG_Mapper|KNH_FLAG_MMF_MAPMAP;
-	DBG2_P("MAPMAP %p %s => %s => %s", mpr, CLASSN(DP(m1)->scid), CLASSN(DP(m1)->tcid), CLASSN(DP(m2)->tcid));
+	KNH_NOTICE(ctx, "generated mapper: %C => %C => %C", DP(m1)->scid, DP(m1)->tcid, DP(m2)->tcid);
 	DP(mpr)->size = 0;
 	DP(mpr)->flag = DP(m1)->flag | DP(m2)->flag;
 	DP(mpr)->scid = DP(m1)->scid;
@@ -232,7 +232,6 @@ Mapper *konoha_findMapper_(Ctx *ctx, knh_class_t scid, knh_class_t tcid, int isg
 {
 	KNH_ASSERT_cid(scid);
 	KNH_ASSERT_cid(tcid);
-	DBG2_P("finding.. %s ==> %s",CLASSN(scid), CLASSN(tcid));
 	if(scid == CLASS_Any) {
 		if(isgen == 0) return (Mapper*)KNH_NULL;
 		KNH_ASSERT(scid != CLASS_Any);
@@ -241,6 +240,7 @@ Mapper *konoha_findMapper_(Ctx *ctx, knh_class_t scid, knh_class_t tcid, int isg
 
 	Mapper *mpr = knh_Context_getMapperCache(ctx, scid, tcid);
 	if(mpr != NULL) { return mpr; }
+	DBG2_P("finding.. %s ==> %s",CLASSN(scid), CLASSN(tcid));
 
 	{
 		knh_class_t sbcid = scid;
