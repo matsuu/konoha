@@ -3,7 +3,7 @@ using gl.*;
 	void showpot()
 	{
 		GL.glClear(GL.GL_COLOR_BUFFER_BIT);
-		GL.glColor3d(0.0, 0.0, 1.0);
+		GL.glColor3d(0.0, 1.0, 1.0);
 		GL.glutWireTeapot(0.5);
 		GL.glutSwapBuffers();
 	}

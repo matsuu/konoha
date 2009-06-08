@@ -205,6 +205,9 @@ void GL.glInitNames();
 void GL.glLightModelf(Int i0, Float f1);
 void GL.glLightModeli(Int i0, Int i1);
 void GL.glLightf(Int i0, Int i1, Float f2);
+
+void GL.glLightfv(Int light, int pname, Float[] params);
+
 void GL.glLighti(Int i0, Int i1, Int i2);
 void GL.glLineWidth(Float f0);
 void GL.glListBase(Int i0);
@@ -216,10 +219,15 @@ void GL.glMapGrid1f(Int i0, Float f1, Float f2);
 void GL.glMapGrid2d(Int i0, Float f1, Float f2, Int i3, Float f4, Float f5);
 void GL.glMapGrid2f(Int i0, Float f1, Float f2, Int i3, Float f4, Float f5);
 void GL.glMaterialf(Int i0, Int i1, Float f2);
+void GL.glMaterialfv(Int i0, Int i1, Float[] fa2);
 void GL.glMateriali(Int i0, Int i1, Int i2);
 void GL.glMatrixMode(Int i0);
 void GL.glNewList(Int i0, Int i1);
 void GL.glNormal3d(Float f0, Float f1, Float f2);
+
+
+void GL.glNormal3dv(Float[] fa1);
+
 void GL.glNormal3f(Float f0, Float f1, Float f2);
 void GL.glNormal3i(Int i0, Int i1, Int i2);
 void GL.glNormal3s(Int i0, Int i1, Int i2);
@@ -297,6 +305,9 @@ void GL.glVertex2f(Float f0, Float f1);
 void GL.glVertex2i(Int i0, Int i1);
 void GL.glVertex2s(Int i0, Int i1);
 void GL.glVertex3d(Float f0, Float f1, Float f2);
+
+void GL.glVertex3dv(Float[] fa);
+
 void GL.glVertex3f(Float f0, Float f1, Float f2);
 void GL.glVertex3i(Int i0, Int i1, Int i2);
 void GL.glVertex3s(Int i0, Int i1, Int i2);
@@ -465,3 +476,6 @@ void GL.glutGameModeString(String s0);
 Int GL.glutEnterGameMode();
 void GL.glutLeaveGameMode();
 Int GL.glutGameModeGet(Int i0);
+
+void GL.glDepthMask(Int mode);
+

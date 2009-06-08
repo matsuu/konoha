@@ -12,9 +12,12 @@ library = "$(pkgname)_$(target).dylib"
 .PHONY: all
 all: $(library)
 
-objs = $(pkgname).o
+objs = $(pkgname).o gl_vectors.o
 
 "$(pkgname).o": $(pkgname).c
+	$(CC) $(CFLAGS) -o $@ -c $^
+
+"$gl_vectors.o": gl_vectors.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 $(library): $(objs)

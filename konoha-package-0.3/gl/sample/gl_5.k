@@ -8,6 +8,7 @@ Float[] light0pos = [0.0, 3.0, 5.0, 1.0];
 Float[] light1pos = [5.0, 3.0, 0.0, 1.0];
 Float[] green = [0.0, 1.0, 0.0, 1.0];
 Float[] red = [0.8, 0.2, 0.2, 1.0];
+Float[] blue = [ 0.2, 0.2, 0.8, 1.0 ];
 
 void make_vertex(int n, Float[] xyz)
 {
@@ -90,17 +91,17 @@ void go_display()
   GL.glClear(GL.GL_COLOR_BUFFER_BIT| GL.GL_DEPTH_BUFFER_BIT);
 
 
-  GL.glLightf(GL.GL_LIGHT0, GL.GL_POSITION, 1.0);
-  GL.glLightf(GL.GL_LIGHT1, GL.GL_POSITION, 6.0);
+  GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light0pos);
+  GL.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, light1pos);
 
   GL.glPushMatrix();
   GL.glRotatef(r, 0.0, 1.0, 0.0);
-  GL.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, 0.8);
+  GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, red);
   cube();
   GL.glPushMatrix();
   GL.glTranslated(1.0, 1.0, 1.0);
   GL.glRotatef(r*2, 0.0, 1.0, 0.0);
-  GL.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, -0.8);
+  GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, blue);
   cube();
   GL.glPopMatrix();
 
@@ -139,8 +140,8 @@ void init()
   GL.glEnable(GL.GL_LIGHTING);
   GL.glEnable(GL.GL_LIGHT0);
   GL.glEnable(GL.GL_LIGHT1);
-  GL.glLightf(GL.GL_LIGHT1, GL.GL_DIFFUSE, 2.0);
-  GL.glLightf(GL.GL_LIGHT1, GL.GL_SPECULAR, 2.0);
+  GL.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, green);
+  GL.glLightfv(GL.GL_LIGHT1, GL.GL_SPECULAR, green);
 }
 
 void stop_disp()

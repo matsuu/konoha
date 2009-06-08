@@ -1,8 +1,12 @@
 using gl.*
 
+int count=0;
 float spin = 0.0;	
+
 void display()
 {
+	count++;
+	print count; 
 	GL.glClear(GL.GL_COLOR_BUFFER_BIT);
 	GL.glPushMatrix();
 	GL.glRotatef(spin, 0.0, 0.0, 1.0);
@@ -10,7 +14,6 @@ void display()
 	GL.glRectf(-25.0, -25.0, 25.0, 25.0);
 	GL.glPopMatrix();
 	GL.glutSwapBuffers();
-
 }
 
 void init()

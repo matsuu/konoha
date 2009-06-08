@@ -6,19 +6,9 @@
  *
  *---------------------------------*/
 
-#include <konoha.h>
-
-#ifdef KONOHA_OS__MACOSX
-#include <OpenGL/gl.h>
-#include <GLUT/glut.h>
-#include <pthread.h>
+#include "knh_gl.h"
 
 pthread_mutex_t mytex = PTHREAD_MUTEX_INITIALIZER;
-#endif
-
-#ifdef KONOHA_OS__LINUX
-#include <GL/glut.h>
-#endif
 
 Closure *displayfunc;
 Closure *initfunc = NULL;
@@ -29,8 +19,6 @@ Closure *timerfunc;
 
 // for pthread
 Ctx gl_ctx;
-
-
 
 static
 knh_IntConstData_t IntConstData[] = {
@@ -64,6 +52,15 @@ knh_IntConstData_t IntConstData[] = {
   {"GL.GL_DIFFUSE", GL_DIFFUSE},
   {"GL.GL_SPECULAR", GL_SPECULAR},
   {"GL.GL_FRONT_AND_BACK", GL_FRONT_AND_BACK},
+  {"GL.GL_TEXTURE_2D", GL_TEXTURE_2D},
+  {"GL.GL_TEXTURE_GEN_S", GL_TEXTURE_GEN_S},
+  {"GL.GL_TEXTURE_GEN_T", GL_TEXTURE_GEN_T},
+  {"GL.GL_FALSE", GL_FALSE},
+  {"GL.GL_TRUE", GL_TRUE},
+  {"GL.GL_S", GL_S},
+  {"GL.GL_T", GL_T},
+  {"GL.GL_TEXTURE_GEN_MODE", GL_TEXTURE_GEN_MODE},
+  {"GL.GL_SPHERE_MAP", GL_SPHERE_MAP},
   {NULL} // end of const
 };
 
@@ -79,8 +76,6 @@ void knh_glut_display(void)
   knh_sfp_t *lsfp = KNH_LOCAL(lctx);
 
   knh_Closure_invokesfp(lctx, displayfunc, lsfp, 0);
-  //  KNH_SCALL(ctx, lsfp, -1, displayfunc, 0);
-  //  displayfunc->fcall_1(ctx, lsfp);
 }
 
 void init (void)
@@ -96,7 +91,6 @@ void init (void)
   Ctx *lctx = &gl_ctx;
 #endif
   knh_sfp_t *lsfp = KNH_LOCAL(lctx);
-
   knh_Closure_invokesfp(lctx, initfunc, lsfp, 0);
 }
 
