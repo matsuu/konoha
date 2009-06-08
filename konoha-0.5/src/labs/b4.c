@@ -89,6 +89,27 @@ METHOD knh__Script_hook(Ctx *ctx, knh_sfp_t *sfp)
 /* ------------------------------------------------------------------------ */
 /* [pacage test] */
 
+/* @data */
+
+static char* MyRoom[] = {
+	"寒い", "ビミョー", "暑い", NULL
+};
+
+/* ------------------------------------------------------------------------ */
+
+static
+MAPPER knh_fmapper_myroom(Ctx *ctx, knh_sfp_t *sfp)
+{
+	ClassSpec *u = (ClassSpec*)DP(sfp[1].mpr)->mapdata;
+	DBG2_P("t = %fC", sfp[0].fvalue);
+	int n = 1;
+	if(sfp[0].fvalue <= 12.0) n = 0;
+	if(sfp[0].fvalue >= 25.0) n = 2;
+	Array *a = (DP(u)->vocabDictIdx)->terms;
+	Object *s = knh_Array_n(a, n);
+	KNH_MAPPED(ctx, sfp, s);
+}
+
 static
 ClassSpec *unit_Temperature(Ctx *ctx, knh_bytes_t urn)
 {
@@ -104,6 +125,15 @@ ClassSpec *unit_Temperature(Ctx *ctx, knh_bytes_t urn)
 	else if(ISB(t, "Kelvin")) {
 		ClassSpec *u = new_Unit(ctx, "K", urn, 0.0, KNH_FLOAT_MAX, 0.001);
 		konoha_addAffineMapper(ctx, DP(u)->ucid, "Float{http://konoha/Temperature/Celsius}", 1.0, -273.15);
+		return u;
+	}
+	else if(ISB(t, "MyRoom")) {
+		ClassSpec *u = new_Vocab(ctx, "", urn, 0, MyRoom);
+		knh_class_t scid = konoha_findcid(ctx, STEXT("Float{http://konoha/Temperature/Celsius}"));
+		Mapper *mpr = new_Mapper(ctx,
+				KNH_FLAG_MMF_TOTAL|KNH_FLAG_MMF_CONST|KNH_FLAG_MMF_FINAL, scid, DP(u)->ucid,
+				knh_fmapper_myroom, (Object*)u);
+		konoha_addMapper(ctx, mpr);
 		return u;
 	}
 	return NULL;
@@ -183,6 +213,10 @@ knh_StringConstData_t URNAliasData[] = {
 	{":C", "http://konoha/Temperature/Celsius"},
 	{":F", "http://konoha/Temperature/Fahrenheit"},
 	{":K", "http://konoha/Temperature/Kelvin"},
+	{":Celsius", "http://konoha/Temperature/Celsius"},
+	{":Fahrenheit", "http://konoha/Temperature/Fahrenheit"},
+	{":Kelvin", "http://konoha/Temperature/Kelvin"},
+	{":MyRoom", "http://konoha/Temperature/MyRoom"},
 	{":M", "http://konoha/English/Date/Month"},
 	{":W", "http://konoha/English/Date/Week"},
 	{NULL}

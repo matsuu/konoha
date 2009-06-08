@@ -553,7 +553,7 @@ void konoha_setverbose(int v)
 
 KNHAPI(void) konoha_says(Ctx *ctx, int type, char *fmt, ...)
 {
-	if(type == KONOHA_NOTICE && !knh_Context_isVerbose(ctx)) {
+	if(type == KONOHA_NOTICE && (!knh_Context_isVerbose(ctx) || !knh_Context_isInteractive(ctx))) {
 		return;
 	}
 	if(ctx->err == NULL) {
