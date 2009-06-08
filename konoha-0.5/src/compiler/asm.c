@@ -921,7 +921,6 @@ void KNH_ASM_MAP(Ctx *ctx, Asm *abr, knh_type_t reqt, int sfpidx, Token *tkb, kn
 	}
 }
 
-
 /* ======================================================================== */
 /* [CONTROL] */
 
