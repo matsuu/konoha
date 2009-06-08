@@ -845,10 +845,11 @@ int knh_TokenSTR_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqt)
 			ClassSpec *u = konoha_getClassSpec(ctx, reqc);
 			int foundError = 0;
 			String *s = DP(u)->fsnew(ctx, reqc, t, NULL, &foundError);
-			knh_Token_setCONST(ctx, tk, UP(s));
 			if(foundError) {
-				knh_Token_perror(ctx, tk, KERR_ERRATA, _("%C: invalid string: '%B' ==> %O"), reqc, t, s);
+				knh_Token_perror(ctx, tk, KERR_ERROR, _("invalid string: %O of %C"), DP(tk)->data, reqc);
+				return 0;
 			}
+			knh_Token_setCONST(ctx, tk, UP(s));
 			return 1;
 		}
 	}
@@ -859,12 +860,12 @@ int knh_TokenSTR_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqt)
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_TokenTSTR_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqt)
+int knh_TokenTSTR_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqt)
 {
 	knh_bytes_t t = knh_Token_tobytes(ctx, tk), tag;
 	if(!knh_bytes_splitTag(t, &tag, &t)) {
 		KNH_ASSERT(IS_String(DP(tk)->data));
-		knh_Token_toCONST(tk);
+		return knh_TokenSTR_typing(ctx, tk, ns, reqt);
 	}
 	else if(knh_bytes_endsWith(tag, STEXT("!!"))) {
 		knh_Token_setCONST(ctx, tk, UP(new_Exception(ctx, DP(tk)->text)));
@@ -877,13 +878,15 @@ void knh_TokenTSTR_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqt)
 			String *s = DP(u)->fsnew(ctx, tagcid, t, NULL, &foundError);
 			knh_Token_setCONST(ctx, tk, UP(s));
 			if(foundError) {
-				knh_Token_perror(ctx, tk, KERR_ERRATA, _("%C: invalid string: '%B:%B' ==> %O"), tagcid, tag, t, s);
+				knh_Token_perror(ctx, tk, KERR_ERROR, _("invalid string: '%B:%B' of %C"), tag, t, tagcid);
+				return 0;
 			}
 		}
 		else {
 			knh_Token_setCONST(ctx, tk, new_Object_parseOf(ctx, (String*)DP(tk)->data));
 		}
 	}
+	return 1;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -921,8 +924,7 @@ int knh_Token_typing(Ctx *ctx, Token *tk, Asm *abr, NameSpace *ns, knh_type_t re
 		return knh_TokenSTR_typing(ctx, tk, ns, reqt);
 
 	case TT_TSTR:
-		knh_TokenTSTR_typing(ctx, tk, ns, reqt);
-		return 1;
+		return knh_TokenTSTR_typing(ctx, tk, ns, reqt);
 
 	case TT_ASIS:
 		/* This is used in DECL for default value */

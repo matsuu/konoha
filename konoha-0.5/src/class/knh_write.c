@@ -348,6 +348,7 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 				case 'p':
 					args[index].atype = VA_POINTER;
 					break;
+				case 'K': case 'k':
 				case 'O': case 'o':
 					args[index].atype = VA_OBJECT;
 					break;
@@ -473,6 +474,10 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 						knh_write__p(ctx, w, args[index].pvalue);
 						break;
 					case 'O': case 'o':
+						KNH_ASSERT(args[index].atype == VA_OBJECT);
+						knh_write__O(ctx, w, args[index].ovalue);
+						break;
+					case 'K': case 'k':
 						KNH_ASSERT(args[index].atype == VA_OBJECT);
 						knh_write__O(ctx, w, args[index].ovalue);
 						break;
