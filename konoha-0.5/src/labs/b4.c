@@ -92,7 +92,8 @@ METHOD knh__Script_hook(Ctx *ctx, knh_sfp_t *sfp)
 /* @data */
 
 static char* MyRoom[] = {
-	"寒い", "ビミョー", "暑い", NULL
+	"cold", "confortable", "hot", NULL
+//	"寒い", "ビミョー", "暑い", NULL
 };
 
 /* ------------------------------------------------------------------------ */
@@ -208,8 +209,8 @@ ClassSpec *unit_Date(Ctx *ctx, knh_bytes_t urn)
 
 static
 knh_StringConstData_t URNAliasData[] = {
-	{":摂氏", "http://konoha/Temperature/Celsius"},
-	{":華氏", "http://konoha/Temperature/Fahrenheit"},
+//	{":摂氏", "http://konoha/Temperature/Celsius"},
+//	{":華氏", "http://konoha/Temperature/Fahrenheit"},
 	{":C", "http://konoha/Temperature/Celsius"},
 	{":F", "http://konoha/Temperature/Fahrenheit"},
 	{":K", "http://konoha/Temperature/Kelvin"},

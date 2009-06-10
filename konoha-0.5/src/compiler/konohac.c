@@ -162,9 +162,6 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 
 	knh_class_t supcid = CLASS_Object;
 	if(SP(StmtCLASS_superclass(stmt))->tt != TT_ASIS) {
-		supcid = CLASS_Object;
-	}
-	else {
 		supcid = knh_NameSpace_getcid(ctx, ns, knh_Token_tobytes(ctx, StmtCLASS_superclass(stmt)));
 		if(supcid == CLASS_unknown) {
 			supcid = CLASS_Object;
@@ -192,7 +189,6 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	if(supcid == CLASS_Object) {
 		TC->offset = 0;
 	}else {
-		KNH_ASSERT(supcid < cid);
 		TC->offset = ctx->share->ClassTable[supcid].bsize;
 	}
 	KNH_ASSERT(TC->class_cid == NULL);
