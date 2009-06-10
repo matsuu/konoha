@@ -1,0 +1,34 @@
+\section{Induction}
+% kimio
+
+コンピュータサイエンス（少なくともプログラミング言語理論に関して）は、
+ほとんど全て帰納法で証明できる。
+最初の２つは、高校数学でもおなじみの数学的帰納法。
+
+\paragraph{2.4.1} 公理[自然数上の単純帰納法]
+$P$を自然上の述語とすると:
+
+\begin{quote}
+P(0) が成り立ち、\\
+かつ全ての$i$に対し$P(i)$のとき$P(i+1)$ならば、\\
+全ての$n$において$P(n)$が成り立つ 
+\end{quote} 
+
+\paragraph{2.4.2} 公理[自然数上の完全帰納法]
+$P$を自然上の述語とすると:
+
+\begin{quote}
+個々の$n$ に対し、$i < n$ となる全ての$i$において$P(i)$を与えると、
+P(n)がいえ、\\
+そして全ての$n$に対し$P(n)$が成り立つ 
+\end{quote} 
+
+\paragraph{2.4.3} 定義[Lexicographic order] は、自然数のペアの上で定義され、
+"$(m, n) \leq (m', n')$ は、"iff either $m < m'$ or else $m = m'$ and $n \leq n'$"のときのみいえる。
+
+\paragraph{2.4.4} 公理 [Lexicographic 帰納法]
+
+公理2.4.2を "lexicographic order" 上で言い直したもの。（公理なのか？？）
+
+Lexicographic order は、入れ子状の帰納法の基礎となる。
+ペア上の順序以外にも、トリプル上でもしばしば有用である。それ以上の組はほとんど登場しない。
