@@ -88,18 +88,6 @@ typedef knh_intptr_t              knh_index_t;
 
 #define KNH_INTPTR_FMT               "%"PRIdPTR
 
-//OLD
-//#define KNH_INTPTR_FMTX              "%"PRIxPTR
-//#define KNH_INT_BSIZE             (sizeof(knh_int_t))
-//#define KNH_UINT_FMT              "%lu"
-//typedef size_t                    knh_size_t;
-//typedef size_t                    bsize_t;
-//typedef knh_intptr_t                 int_byte_t;
-//#define KNH_INTPTR_MAX               LONG_MAX
-//#define KNH_INTPTR_MIN               LONG_MIN
-//#define KNH_UINTPTR_MAX              ULONG_MAX
-//#define KNH_UINTPTR_MIN              0
-
 /* ------------------------------------------------------------------------ */
 /* Integer, knh_int_t */
 /* ------------------------------------------------------------------------ */
@@ -147,14 +135,28 @@ typedef knh_uint64_t       knh_uint_t;
 
 #define KNH_INT_FMTSIZ            40
 
-//OLD
-//#define KNH_INT_BSIZE             (sizeof(knh_int_t))
-
 /* ------------------------------------------------------------------------ */
 /* Float, knh_float_t */
 /* ------------------------------------------------------------------------ */
 
-#ifdef KNH_USING_LONGDOUBLE
+#ifdef KNH_USING_NOFLOAT
+/* dummy */
+typedef int               knh_float_t;
+#define KNH_FLOAT_MAX             0
+#define KNH_FLOAT_MIN             0
+#define KNH_FLOAT_STEP            0
+#define KNH_FLOAT_FMT             "%d"
+#define KNH_FLOAT_FMT1            "%d"
+#define KNH_FLOAT_FMT2            "%d"
+#define KNH_FLOAT_FMT3            "%d"
+#define KNH_FLOAT_FMT4            "%d"
+#define KNH_FLOAT_FMTE            "%d"
+#define KNH_FLOAT_NAN             0
+#define KNH_FLOAT_NULL            KNH_FLOAT_NAN
+#define KNH_FLOAT_FMTSIZ          40
+#endif/*KNH_USING_NOFLOAT*/
+
+#if defined(KNH_USING_LONGDOUBLE) && !defined(KNH_FLOAT_FMT)
 typedef long double               knh_float_t;
 #define KNH_FLOAT_MAX             LDBL_MAX
 #define KNH_FLOAT_MIN             (-(LDBL_MAX))
@@ -165,9 +167,9 @@ typedef long double               knh_float_t;
 #define KNH_FLOAT_FMT3            "%.3Lf"
 #define KNH_FLOAT_FMT4            "%.4Lf"
 #define KNH_FLOAT_FMTE            "%Le"
-#else/*KNH_USING_LONGDOUBLE*/
+#endif
 
-#ifdef KNH_USING_FLOAT
+#if defined(KNH_USING_FLOAT) && !defined(KNH_FLOAT_FMT)
 typedef float                     knh_float_t;
 #define KNH_FLOAT_MAX             FLT_MAX
 #define KNH_FLOAT_MIN             (-(FLT_MAX))
@@ -178,8 +180,9 @@ typedef float                     knh_float_t;
 #define KNH_FLOAT_FMT3            "%.3f"
 #define KNH_FLOAT_FMT4            "%.4f"
 #define KNH_FLOAT_FMTE            "%e"
-#else/*KNH_USING_FLOAT*/
+#endif
 
+#ifndef KNH_FLOAT_FMT
 typedef double                    knh_float_t;
 #define KNH_FLOAT_MAX             DBL_MAX
 #define KNH_FLOAT_MIN             (-(DBL_MAX))
@@ -190,12 +193,13 @@ typedef double                    knh_float_t;
 #define KNH_FLOAT_FMT3            "%.3f"
 #define KNH_FLOAT_FMT4            "%.4f"
 #define KNH_FLOAT_FMTE            "%e"
-#endif/*KNH_USING_FLOAT*/
-#endif/*KNH_USING_LONGDOUBLE*/
+#endif
 
+#ifndef KNH_FLOAT_NAN
 #define KNH_FLOAT_NAN             (0.0/0.0)
 #define KNH_FLOAT_NULL            KNH_FLOAT_NAN
 #define KNH_FLOAT_FMTSIZ          80
+#endif/*KNH_FILAT_NAN*/
 
 /* ------------------------------------------------------------------------ */
 /* String, knh_uchar_t */
