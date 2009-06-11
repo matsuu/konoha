@@ -108,6 +108,19 @@
 #define KONOHA_OS "teaboard"
 #endif
 
+/* ------------------------------------------------------------------------ */
+
+#ifdef KONOHA_OS__LKM
+
+#define KNH_USING_INT32   1
+#define KNH_USING_NOFLOAT 1
+#define KNH_USING_NOFILE  1
+
+#define KNH_EXT_QSORT  1
+#define KNH_EXT_SETJMP 1
+/* please added other options */
+#endif
+
 /* ======================================================================== */
 /* [CC] */
 /* cpp -dM /dev/null */
@@ -144,7 +157,6 @@
 			#define KONOHA_OS__TB       1
 		#endif
 	#endif/*KONOHA_OS*/
-
 #endif/*__GNUC__*/
 
 #ifdef _MSC_VER
@@ -185,6 +197,7 @@
 #else
 #define KONOHA_PLATFORM KONOHA_OS "_32"
 #endif
+
 
 /* ======================================================================== */
 /* [OPTIONS_DEPS] */

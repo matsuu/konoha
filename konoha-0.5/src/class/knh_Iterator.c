@@ -38,12 +38,6 @@ extern "C" {
 /* ======================================================================== */
 /* [macros] */
 
-//#define _knh_Iterator_cid(it)           DP(it)->cid
-//#define _DP(it)->source        DP(it)->source
-//#define _DP(it)->pos           DP(it)->pos
-//#define _DP(it)->pos = , p)     DP(it)->pos = p
-//#define _knh_Iterator_ref(it)           DP(it)->ref
-
 /* ------------------------------------------------------------------------ */
 /* [private] */
 
