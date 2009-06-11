@@ -1,4 +1,52 @@
 \section{Ordered Sets}
 % nakata? 
 
-\paragraph{2.22.1} 
+
+\paragraph{2.2.1} 
+定義:
+$S$についての二項関係$R$の性質
+\begin{itemize}
+\item reflexive : $R$が$S$の要素すべてが自分自身との関係をもつ時
+\item symmetric: $s$ $R$ $t$ならば、$t$ $R$ $s$で、かつ$s$, $t$が$S$の要素であるとき
+\item transitive: $s$ $R$ $t$かつ、$t$ $R$ $u$ならば$s$ $R$ $u$であるとき
+\item antisymmetric:$s$ $R$ $s$かつ、$t$ $R$ $s$ならば$s = t$であるとき
+\end{itemize}
+
+\paragraph{2.2.2}
+定義:
+ReflexiveかつTransitiveな$S$についての二項関係$R$は$S$についての{\it preorder}
+と呼ぶ。　Preorderは$\leq$もしくは$\subseteq$と書かれる。$s<t$と書いた場合、これは
+$s \leq t\wedge s \neq t$である。
+
+$S$についてのPreorderで、かつantisymmetricなものは{\it partial order}と呼ばれる。
+Partial order $\leq$が $S$の要素である$s$, $t$が$s\leq t$または$t\leq s$であるとき
+{\it total order}と呼ぶ。
+
+
+\paragraph{2.2.3}
+定義:
+\begin{itemize}
+\item join: $s, t, j\in S, s \leq j \wedge t \leq j$
+\item meet: $s,t,m\in S, m \leq s \wedge m \leq t$
+\end{itemize}
+
+\paragraph{2.2.4}
+定義:reflexive + transitive + symmetric = {\it equivalenc}
+
+\paragraph{2.2.5}
+定義:
+$R$におけるreflexive Closure$R'$はRを含む、最も小さいReflexive Relationである。
+”最も小さい”とはおなじく$R$を含む$R''$があったとして、最も小さい$R'$と$R''$には
+$R' \subseteq R''$が成り立つ。Transitive Closureも同様である。
+\paragraph{2.2.6}
+(問題)
+\paragraph{2.2.7}
+(問題)
+
+\paragraph{2.2.8}
+\paragraph{2.2.9}
+定義:Sにおけるpreorder $\leq$が存在するとする。
+$s_1,s_2, s_3 \dots$においてすべての$i$について、$s_{i+1} < s_i$ならば、$\leq$中のdecreasing chainと呼ぶ。（有限、無限があり得る)
+\paragraph{2.2.10}
+定義:Sにおけるpreorder $\leq$が存在するとする。
+$\leq$が無限のdecreasing chainを含んでいないとき、この$\leq$を{\it well-defined}と呼ぶ。
