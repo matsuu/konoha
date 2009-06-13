@@ -39,6 +39,7 @@ extern "C" {
 /* [tokens] */
 
 static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc);
+static Stmt *new_StmtDECL(Ctx *ctx, Token *tkT, knh_tokens_t *tc);
 static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr);
 static Stmt *new_StmtMETA(Ctx *ctx,  knh_tokens_t *tc, knh_stmt_t stt);
 static void knh_Stmt_addMETA(Ctx *ctx, Stmt *o, knh_tokens_t *tc);
@@ -1571,6 +1572,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 		else {
 			KNH_ASSERT(stmt == NULL);
 			DBG2_P("**** FIRST TOKEN=%s", knh_token_tochar(tt0));
+			KNH_ABORT();
 			Term *tm = new_TermVALUE(ctx, ts[oc], lr);
 			if(SP((Token*)tm)->tt == TT_ERR) {
 				return tm;
@@ -2600,7 +2602,15 @@ void knh_Stmt_add_PSTMT3(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 	/* for(FIRST;second;third) */
 	knh_tokens_t stmt_tc = knh_tokens_splitEXPR(ctx, &ptc, TT_SEMICOLON);
 	if(stmt_tc.c < stmt_tc.e) {
-		knh_Stmt_add(ctx, o, TM(new_StmtLETEXPR(ctx, &stmt_tc)));
+		Token *tkT = stmt_tc.ts[stmt_tc.c];
+		if(SP(tkT)->tt == TT_TYPEN && DP(tkT)->tt_next == TT_NAME) {
+			stmt_tc.c  += 1;
+			stmt_tc.meta = -1;
+			knh_Stmt_add(ctx, o, TM(new_StmtDECL(ctx, tkT, &stmt_tc)));
+		}
+		else {
+			knh_Stmt_add(ctx, o, TM(new_StmtLETEXPR(ctx, &stmt_tc)));
+		}
 	}
 	else {
 		knh_Stmt_add(ctx, o, TM(new_Stmt(ctx, 0, STT_DONE)));
@@ -2867,12 +2877,12 @@ Stmt *new_StmtMETHOD(Ctx *ctx, knh_tokens_t *tc)
 /* [DECL] */
 
 static
-Stmt *new_StmtDECL(Ctx *ctx, Token *tk_TYPEN, knh_tokens_t *tc)
+Stmt *new_StmtDECL(Ctx *ctx, Token *tkT, knh_tokens_t *tc)
 {
 	Stmt *stmt = new_StmtMETA(ctx, tc, STT_DECL);
 
 	knh_tokens_t expr_tc = knh_tokens_splitEXPR(ctx, tc, TT_COMMA);
-	knh_Stmt_add(ctx, stmt, TM(tk_TYPEN));
+	knh_Stmt_add(ctx, stmt, TM(tkT));
 	knh_Stmt_add_VARN(ctx, stmt, &expr_tc);
 
 	if(expr_tc.c == expr_tc.e) {   /* Type name; */
@@ -2892,7 +2902,7 @@ Stmt *new_StmtDECL(Ctx *ctx, Token *tk_TYPEN, knh_tokens_t *tc)
 
 	L_NEXT:;
 	if(tc->c < tc->e) {
-		Stmt *newstmt = new_StmtDECL(ctx, tk_TYPEN, tc);
+		Stmt *newstmt = new_StmtDECL(ctx, tkT, tc);
 		KNH_SETv(ctx, DP(newstmt)->metaDictMap, DP(stmt)->metaDictMap);
 		KNH_SETv(ctx, DP(stmt)->next, newstmt);
 	}
