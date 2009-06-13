@@ -1073,11 +1073,11 @@ Stmt *new_StmtINSTMT(Ctx *ctx, Token *tk)
 		prev = tc.c;
 		if(first_stmt == NULL) {
 			first_stmt = new_StmtSTMT1(ctx, &tc);
-			last_stmt = first_stmt;
+			last_stmt = knh_Stmt_tail(first_stmt);
 		}
 		else {
 			KNH_SETv(ctx, DP(last_stmt)->next, new_StmtSTMT1(ctx, &tc));
-			last_stmt = DP(last_stmt)->next;
+			last_stmt = knh_Stmt_tail(DP(last_stmt)->next);
 		}
 		if(prev == tc.c) { /* infinate loop */
 			DBG_P("Infinate loop? prev = %d, c = %d, e = %d", prev, tc.c, tc.e);
@@ -2872,7 +2872,6 @@ Stmt *new_StmtDECL(Ctx *ctx, Token *tk_TYPEN, knh_tokens_t *tc)
 	Stmt *stmt = new_StmtMETA(ctx, tc, STT_DECL);
 
 	knh_tokens_t expr_tc = knh_tokens_splitEXPR(ctx, tc, TT_COMMA);
-
 	knh_Stmt_add(ctx, stmt, TM(tk_TYPEN));
 	knh_Stmt_add_VARN(ctx, stmt, &expr_tc);
 
@@ -2893,9 +2892,9 @@ Stmt *new_StmtDECL(Ctx *ctx, Token *tk_TYPEN, knh_tokens_t *tc)
 
 	L_NEXT:;
 	if(tc->c < tc->e) {
-		Stmt *stmt_n = new_StmtDECL(ctx, tk_TYPEN, tc);
-		KNH_SETv(ctx, DP(stmt_n)->metaDictMap, DP(stmt)->metaDictMap);
-		knh_StmtNULL_tail_append(ctx, stmt, stmt_n);
+		Stmt *newstmt = new_StmtDECL(ctx, tk_TYPEN, tc);
+		KNH_SETv(ctx, DP(newstmt)->metaDictMap, DP(stmt)->metaDictMap);
+		KNH_SETv(ctx, DP(stmt)->next, newstmt);
 	}
 	return stmt;
 }
