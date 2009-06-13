@@ -905,13 +905,8 @@ void KNH_ASM_MAP(Ctx *ctx, Asm *abr, knh_type_t reqt, int sfpidx, Token *tkb, kn
 	else {
 		KNH_ASSERT(SP(tkb)->tt == TT_MPR);
 		//DBG2_P("reqt=%s%s mprcid=%s srct=%s%s isNonNullCast=%d", TYPEQN(reqt), DP(tkb)->cid, TYPEQN(srct), isNonNullCast);
-		if(CLASS_type(srct) == CLASS_Any) {
-			KNH_ASM_AMAP_(ctx, abr, sfpidx, DP(tkb)->cid);
-			srct = CLASS_type(srct);
-		}
-		else if(knh_class_instanceof(ctx, DP(tkb)->cid, CLASS_type(srct))) {
-			KNH_ASM_DCAST_(ctx, abr, sfpidx, DP(tkb)->cid);
-		}
+		KNH_ASM_AMAP_(ctx, abr, sfpidx, DP(tkb)->cid);
+		srct = CLASS_type(srct);
 	}
 	if(!IS_NNTYPE(srct) && isNonNullCast) {
 		KNH_ASM_NNMAP_(ctx, abr, sfpidx, DP(tkb)->cid);

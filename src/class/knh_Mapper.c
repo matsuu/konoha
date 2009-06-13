@@ -204,7 +204,10 @@ Mapper* new_Mapper__asis(Ctx *ctx, knh_class_t scid, knh_class_t tcid)
 
 MAPPER knh_fmapper_null(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_MAPPED(ctx, sfp, KNH_NULL);
+	Mapper *mpr = sfp[1].mpr;
+	DBG2_P("mpr: %s ==> %s", DP(mpr)->scid, DP(mpr)->tcid);
+	KNH_THROWs(ctx, "ClassCast!!");
+	//KNH_MAPPED(ctx, sfp, KNH_NULL);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -247,7 +250,6 @@ Mapper *konoha_findMapper_(Ctx *ctx, knh_class_t scid, knh_class_t tcid, int isg
 		while(1) {
 			ClassMap *cmap = ctx->share->ClassTable[sbcid].cmap;
 			//DBG2_P("scid=%d,%s", sbcid, CLASSN(sbcid));
-			//DBG2_(knh_ClassMap__dump(ctx, cmap, KNH_STDOUT, (String*)KNH_NULL));
 			int i;
 			for(i = 0; i < DP(cmap)->size; i++) {
 				mpr = DP(cmap)->maplist[i];
@@ -263,19 +265,28 @@ Mapper *konoha_findMapper_(Ctx *ctx, knh_class_t scid, knh_class_t tcid, int isg
 			}
 			if(sbcid == CLASS_Object) break;
 			for(i = 0; i < DP(cmap)->size; i++) {
-				ClassMap *cmap2 = ctx->share->ClassTable[DP(DP(cmap)->maplist[i])->tcid].cmap;
+				knh_class_t mcid = DP(DP(cmap)->maplist[i])->tcid;
+				KNH_ASSERT_cid(mcid);
+				if(mcid <= CLASS_Class) {
+					DBG_P("forbid lowlevel transitivity %s", CLASSN(mcid));
+					continue;   /* Stop lowlevel inference */
+				}
+				ClassMap *cmap2 = ctx->share->ClassTable[mcid].cmap;
 				int j;
-				KNH_ASSERT_cid(DP(DP(cmap)->maplist[i])->tcid);
 				for(j = 0; j < DP(cmap2)->size; j++) {
 					mpr = DP(cmap2)->maplist[j];
 					if(DP(mpr)->tcid == tcid) {
-						return knh_Context_setMapperCache(ctx, scid, tcid, new_MapMap(ctx, DP(cmap)->maplist[i], mpr));
+						Mapper *mapmap = new_MapMap(ctx, DP(cmap)->maplist[i], mpr);
+						konoha_addMapper(ctx, mapmap);
+						return knh_Context_setMapperCache(ctx, scid, tcid, mapmap);
 					}
 				}
 				for(j = 0; j < DP(cmap2)->size; j++) {
 					mpr = DP(cmap2)->maplist[j];
 					if(knh_class_instanceof(ctx, DP(mpr)->tcid, tcid)) {
-						return knh_Context_setMapperCache(ctx, scid, tcid, new_MapMap(ctx, DP(cmap)->maplist[i], mpr));
+						Mapper *mapmap = new_MapMap(ctx, DP(cmap)->maplist[i], mpr);
+						konoha_addMapper(ctx, mapmap);
+						return knh_Context_setMapperCache(ctx, scid, tcid, mapmap);
 					}
 				}
 			}

@@ -2509,8 +2509,8 @@ Term *knh_StmtMAPCAST_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_
 		knh_Asm_perror(ctx, abr, KERR_ERROR, _("undefined mapper: %C ==> %C"), exprc, mprcid);
 		return NULL;
 	}
-	if(knh_Mapper_isConst(mpr) && TERMs_isCONST(stmt, 1)) {
-		DBG2_P("MAPCAST TO CONST ..");
+	else if(knh_Mapper_isConst(mpr) && TERMs_isCONST(stmt, 1)) {
+		DBG2_P("MAPCAST TO CONST .. %s ==> %s", CLASSN(DP(mpr)->scid), CLASSN(DP(mpr)->tcid));
 		Token *tk1 = DP(stmt)->tokens[1];
 		knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 		KNH_MOV(ctx, lsfp[0].o, DP(tk1)->data);
