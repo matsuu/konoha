@@ -1068,11 +1068,11 @@ void TERMs_ASM_JIFF(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_labelid_t labe
 	else {
 		if(TERMs_isCALLISNUL(stmt, n)) {
 			// o == null -> false  o == null;
-			TERMs_ASM_JIFNUL(ctx, DP(stmt)->stmts[n], 1, abr, label);
+			TERMs_ASM_JIFNN(ctx, DP(stmt)->stmts[n], 1, abr, label);
 			return;
 		}
 		else if(TERMs_isCALLISNN(stmt, n)) {
-			TERMs_ASM_JIFNN(ctx, DP(stmt)->stmts[n], 1, abr, label);
+			TERMs_ASM_JIFNUL(ctx, DP(stmt)->stmts[n], 1, abr, label);
 			return;
 		}
 		TERMs_asm(ctx, stmt, n, abr, NNTYPE_Boolean, DP(abr)->stack);
@@ -1092,11 +1092,11 @@ void TERMs_ASM_JIFF_LOOP(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_labelid_t
 	else {
 		if(TERMs_isCALLISNUL(stmt, n)) {
 			// o == null -> false  o == null;
-			TERMs_ASM_JIFNUL(ctx, DP(stmt)->stmts[n], 1, abr, label);
+			TERMs_ASM_JIFNN(ctx, DP(stmt)->stmts[n], 1, abr, label);
 			return;
 		}
 		else if(TERMs_isCALLISNN(stmt, n)) {
-			TERMs_ASM_JIFNN(ctx, DP(stmt)->stmts[n], 1, abr, label);
+			TERMs_ASM_JIFNUL(ctx, DP(stmt)->stmts[n], 1, abr, label);
 			return;
 		}
 		TERMs_asm(ctx, stmt, n, abr, NNTYPE_Boolean, DP(abr)->stack);
