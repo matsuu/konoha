@@ -863,6 +863,11 @@ static
 int knh_TokenTSTR_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqt)
 {
 	knh_bytes_t t = knh_Token_tobytes(ctx, tk), tag;
+	if(CLASS_type(reqt) == CLASS_Int && t.len == 1) {
+		/* 'A' ==> int if int requested */
+		knh_Token_setCONST(ctx, tk, new_Int(ctx, (int)t.buf[0]));
+		return 1;
+	}
 	if(!knh_bytes_splitTag(t, &tag, &t)) {
 		KNH_ASSERT(IS_String(DP(tk)->data));
 		return knh_TokenSTR_typing(ctx, tk, ns, reqt);
