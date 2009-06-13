@@ -7,6 +7,7 @@ Int XmlReader.readState();
 Int XmlReader.nodeType();
 Int XmlReader.isNamespaceDecl();
 Int XmlReader.isEmptyElement();
+Int XmlReader.getAttributeCount();
 Boolean XmlReader.hasAttributes();
 Boolean XmlReader.hasValue();
 Boolean XmlReader.getDepth();

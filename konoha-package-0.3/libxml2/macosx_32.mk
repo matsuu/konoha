@@ -1,7 +1,7 @@
 # Last modified by masahiro ide <imasahiro@sourceforge.jp>
 
 CC = gcc
-CFLAGS = -O2 -Wall -fmessage-length=0 -fPIC `xml2-config --cflags`
+CFLAGS = -O0 -Wall -g3 -fmessage-length=0 -fPIC `xml2-config --cflags`
 LDLIBS = -lkonoha `xml2-config --libs`
 target = macosx_32
 pkgname = libxml2

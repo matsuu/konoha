@@ -1,3 +1,7 @@
+2009-06-14 Masahiro Ide <imasahiro@users.sourceforge.jp>
+    * libxml2.{c,k}     update libxml2.
+    * sample/xmlreader_2.k     make sample. xmlreader_2.k
+
 2009-06-02 Masahiro Ide <imasahiro@users.sourceforge.jp>
     * libxml2.{c,k}     make libxml2 package.
 

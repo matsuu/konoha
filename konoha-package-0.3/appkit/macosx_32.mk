@@ -1,21 +1,21 @@
-# Last modified by Kimio Kuramitsu kkuramitsu@sourceforge.jp
+# AppKit makefile by imasahiro@users.sourceforge.net 
 
 CC = gcc
-CFLAGS = -O2 -Wall -fmessage-length=0 -fPIC
-LDLIBS = -lkonoha
+CFLAGS = -x objective-c -O2 -Wall -fmessage-length=0 -fPIC
+LDLIBS = -framework AppKit -lkonoha
 
 target = macosx_32
-pkgname = posix
+pkgname = appkit
 
 library = "$(pkgname)_$(target).dylib"
 
 .PHONY: all
 all: $(library)
 
-objs = "$(pkgname).o"
+objs = $(pkgname).o
 
 "$(pkgname).o": $(pkgname).c
-	$(CC) $(CFLAGS) -c $^ -o $@
+	$(CC) $(CFLAGS) -o $@ -c $^
 
 $(library): $(objs)
 	$(CC) -dynamiclib -o $@ $^ $(LDLIBS)

@@ -44,24 +44,24 @@ extern "C" {
 
 static
 knh_IntConstData_t IntConstData[] = {
-	{"Posix.SIG_HUP", SIGHUP},   // hang up (1)
-	{"Posix.SIG_INT", SIGINT},   // interrupt (2)
-	{"Posix.SIG_QUIT", SIGQUIT}, // quit (3)
-	{"Posix.SIG_ABRT", SIGABRT}, // abort (9)
-	{"Posix.SIG_KILL", SIGKILL}, // kill 9
-	{"Posix.SIG_ALRM", SIGALRM}, // alarm clock (14)
-	{"Posix.SIG_TERM", SIGTERM}, // software termination signal 15
-	{NULL}  // end of const data
+    {"Posix.SIG_HUP", SIGHUP},   // hang up (1)
+    {"Posix.SIG_INT", SIGINT},   // interrupt (2)
+    {"Posix.SIG_QUIT", SIGQUIT}, // quit (3)
+    {"Posix.SIG_ABRT", SIGABRT}, // abort (9)
+    {"Posix.SIG_KILL", SIGKILL}, // kill 9
+    {"Posix.SIG_ALRM", SIGALRM}, // alarm clock (14)
+    {"Posix.SIG_TERM", SIGTERM}, // software termination signal 15
+    {NULL}  // end of const data
 };
 
 static
 knh_FloatConstData_t FloatConstData[] = {
-	{NULL}  // end of const data
+    {NULL}  // end of const data
 };
 
 static
 knh_StringConstData_t StringConstData[] = {
-	{NULL}  // end of const data
+    {NULL}  // end of const data
 };
 
 /* ======================================================================== */
@@ -72,11 +72,11 @@ knh_StringConstData_t StringConstData[] = {
 
 METHOD System_getHostName(Ctx *ctx, knh_sfp_t *sfp)
 {
-	char buf[256];
-	if(gethostname(buf, sizeof(buf)) == -1) {
-		KNH_PERRNO(ctx, "OS!!", "gethostname");
-	}
-	KNH_RETURN(ctx, sfp, new_String(ctx, B(buf), NULL));
+    char buf[256];
+    if(gethostname(buf, sizeof(buf)) == -1) {
+        KNH_PERRNO(ctx, "OS!!", "gethostname");
+    }
+    KNH_RETURN(ctx, sfp, new_String(ctx, B(buf), NULL));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -84,7 +84,7 @@ METHOD System_getHostName(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD System_getPid(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Int(ctx, sfp, getpid());
+    KNH_RETURN_Int(ctx, sfp, getpid());
 }
 
 /* ------------------------------------------------------------------------ */
@@ -92,7 +92,7 @@ METHOD System_getPid(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD System_getPPid(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Int(ctx, sfp, getppid());
+    KNH_RETURN_Int(ctx, sfp, getppid());
 }
 
 /* ------------------------------------------------------------------------ */
@@ -100,23 +100,24 @@ METHOD System_getPPid(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD System_kill(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_SECURE(ctx);
-	if(kill(p_int(sfp[1]), p_int(sfp[2])) == -1) {
-		KNH_PERRNO(ctx, "OS!!", "kill");
-	}
-	KNH_RETURN_void(ctx, sfp);
+    KNH_SECURE(ctx);
+    if(kill(p_int(sfp[1]), p_int(sfp[2])) == -1) {
+        KNH_PERRNO(ctx, "OS!!", "kill");
+    }
+    KNH_RETURN_void(ctx, sfp);
 }
 
 /* ------------------------------------------------------------------------ */
-// >>> void System.system(String! cmd);
+// >>> int System.system(String! cmd);
 
 METHOD System_system(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_SECURE(ctx);
-	if(system(p_char(sfp[1])) == -1) {
-		KNH_PERRNO(ctx, "OS!!", "system");
-	}
-	KNH_RETURN_void(ctx, sfp);
+    KNH_SECURE(ctx);
+    int ret = system(p_char(sfp[1]));
+    if(ret  == -1) {
+        KNH_PERRNO(ctx, "OS!!", "system");
+    }
+    KNH_RETURN_Int(ctx, sfp,ret);
 }
 
 /* ======================================================================== */
@@ -127,23 +128,23 @@ METHOD System_system(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD System_listDir(Ctx *ctx, knh_sfp_t *sfp)
 {
-	DIR *dirptr;
-	struct dirent *direntp;
-	char dirname[FILENAME_BUFSIZ];
-	knh_format_ospath(ctx, dirname, sizeof(dirname), knh_StringNULL_tobytes(sfp[1].s, STEXT(".")));
-	Array *a = new_Array(ctx, CLASS_String, 0);
+    DIR *dirptr;
+    struct dirent *direntp;
+    char dirname[FILENAME_BUFSIZ];
+    knh_format_ospath(ctx, dirname, sizeof(dirname), knh_StringNULL_tobytes(sfp[1].s, STEXT(".")));
+    Array *a = new_Array(ctx, CLASS_String, 0);
 
-	if ((dirptr = opendir(dirname)) == NULL) {
-		KNH_PERRNO(ctx, "OS!!", "opendir");
-	} else {
-		while ((direntp = readdir(dirptr)) != NULL) {
-			char *p = direntp->d_name;
-			if(p[0] == '.' && (p[1] == 0 || p[1] == '.')) continue;
-			knh_Array_add(ctx, a, UP(new_String(ctx, B(p), NULL)));
-		}
-		closedir(dirptr);
-	}
-	KNH_RETURN(ctx, sfp, a);
+    if ((dirptr = opendir(dirname)) == NULL) {
+        KNH_PERRNO(ctx, "OS!!", "opendir");
+    } else {
+        while ((direntp = readdir(dirptr)) != NULL) {
+            char *p = direntp->d_name;
+            if(p[0] == '.' && (p[1] == 0 || p[1] == '.')) continue;
+            knh_Array_add(ctx, a, UP(new_String(ctx, B(p), NULL)));
+        }
+        closedir(dirptr);
+    }
+    KNH_RETURN(ctx, sfp, a);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -151,16 +152,16 @@ METHOD System_listDir(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD System_getCwd(Ctx *ctx, knh_sfp_t *sfp)
 {
-	// TODO: when filename is longer than 1024
-	// to escape this, if we use getcwd(NULL, 0), system malloc buf for filename.
-	char *res = NULL;
-	char tmpbuf[FILENAME_BUFSIZ];
-	res = getcwd(tmpbuf, sizeof(tmpbuf));
-	if (res == NULL) {
-		KNH_PERRNO(ctx, "OS!!", "getcwd");
-	}
-	String *s = new_String(ctx, B(tmpbuf), NULL);
-	KNH_RETURN(ctx, sfp, s);
+    // TODO: when filename is longer than 1024
+    // to escape this, if we use getcwd(NULL, 0), system malloc buf for filename.
+    char *res = NULL;
+    char tmpbuf[FILENAME_BUFSIZ];
+    res = getcwd(tmpbuf, sizeof(tmpbuf));
+    if (res == NULL) {
+        KNH_PERRNO(ctx, "OS!!", "getcwd");
+    }
+    String *s = new_String(ctx, B(tmpbuf), NULL);
+    KNH_RETURN(ctx, sfp, s);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -168,93 +169,93 @@ METHOD System_getCwd(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD System_chDir(Ctx *ctx, knh_sfp_t *sfp)
 {
-	char dirname[FILENAME_BUFSIZ];
-	knh_format_ospath(ctx, dirname, sizeof(dirname), knh_StringNULL_tobytes(sfp[1].s, STEXT(".")));
-	if(chdir(dirname) == -1) {
-		KNH_PERRNO(ctx, "OS!!", "chdir");
-	}
-	KNH_RETURN_void(ctx, sfp);
+    char dirname[FILENAME_BUFSIZ];
+    knh_format_ospath(ctx, dirname, sizeof(dirname), knh_StringNULL_tobytes(sfp[1].s, STEXT(".")));
+    if(chdir(dirname) == -1) {
+        KNH_PERRNO(ctx, "OS!!", "chdir");
+    }
+    KNH_RETURN_void(ctx, sfp);
 }
 
 /* ======================================================================== */
 /* [PIPE] */
 
-static
+    static
 knh_io_t knh_iodrv_open__PIPE(Ctx *ctx, knh_bytes_t file, char *mode)
 {
-	char *cmd = (char*)knh_bytes_skipscheme(file).buf;
-	FILE *fp = NULL;
-	KNH_WARNING(ctx, "opening pipe '%s'", cmd);
-	KNH_SECURE(ctx);
-	if(mode != NULL && mode[0] == 'r') {
-		fp = popen(cmd, "r");
-	}
-	else {
-		fp = popen(cmd, "w");
-	}
-	if(fp == NULL) {
-		KNH_PERRNO(ctx, "IO!!", "popen");
-		return (knh_io_t)-1;
-	}
-	return (knh_io_t)fp;
+    char *cmd = (char*)knh_bytes_skipscheme(file).buf;
+    FILE *fp = NULL;
+    KNH_WARNING(ctx, "opening pipe '%s'", cmd);
+    KNH_SECURE(ctx);
+    if(mode != NULL && mode[0] == 'r') {
+        fp = popen(cmd, "r");
+    }
+    else {
+        fp = popen(cmd, "w");
+    }
+    if(fp == NULL) {
+        KNH_PERRNO(ctx, "IO!!", "popen");
+        return (knh_io_t)-1;
+    }
+    return (knh_io_t)fp;
 }
 
 /* ------------------------------------------------------------------------ */
 
-static
+    static
 knh_intptr_t knh_iodrv_read__PIPE(Ctx *ctx, knh_io_t fd, char *buf, size_t bufsiz)
 {
-	FILE *fp = (FILE*)fd;
-	size_t ssize = fread(buf, 1, bufsiz, fp);
-	return ssize;
+    FILE *fp = (FILE*)fd;
+    size_t ssize = fread(buf, 1, bufsiz, fp);
+    return ssize;
 }
 
 /* ------------------------------------------------------------------------ */
 
-static
+    static
 knh_intptr_t knh_iodrv_write__PIPE(Ctx *ctx, knh_io_t fd, char *buf, size_t bufsiz)
 {
-	FILE *fp = (FILE*)fd;
-	size_t ssize = fwrite(buf, 1, bufsiz, fp);
-	fflush(fp);
-	return ssize;
+    FILE *fp = (FILE*)fd;
+    size_t ssize = fwrite(buf, 1, bufsiz, fp);
+    fflush(fp);
+    return ssize;
 }
 
 /* ------------------------------------------------------------------------ */
 
-static
+    static
 void knh_iodrv_close__PIPE(Ctx *ctx, knh_io_t fd)
 {
-	FILE *fp = (FILE*)fd;
-	pclose(fp);
+    FILE *fp = (FILE*)fd;
+    pclose(fp);
 }
 
 /* ------------------------------------------------------------------------ */
 /* @data */
 
 static knh_iodrv_t IO__PIPE = {
-	KNH_DRVAPI_TYPE__IO, "pipe",
-	0,
-	knh_iodrv_open__PIPE,
-	knh_iodrv_read__PIPE,
-	knh_iodrv_write__PIPE,
-	knh_iodrv_close__PIPE
+    KNH_DRVAPI_TYPE__IO, "pipe",
+    0,
+    knh_iodrv_open__PIPE,
+    knh_iodrv_read__PIPE,
+    knh_iodrv_write__PIPE,
+    knh_iodrv_close__PIPE
 };
 
 /* ======================================================================== */
 
 KNHAPI(int) init(Ctx *ctx)
 {
-	KNH_NOTICE(ctx, "loading unix..");
-	konoha_loadIntConstData(ctx, IntConstData);
-	konoha_loadFloatConstData(ctx, FloatConstData);
-	konoha_loadStringConstData(ctx, StringConstData);
+    KNH_NOTICE(ctx, "loading unix..");
+    konoha_loadIntConstData(ctx, IntConstData);
+    konoha_loadFloatConstData(ctx, FloatConstData);
+    konoha_loadStringConstData(ctx, StringConstData);
 
-	// pipe dirver
-	konoha_addIODriver(ctx, NULL, &IO__PIPE);
-	konoha_addIODriver(ctx, "sh", &IO__PIPE);
-	konoha_addIODriver(ctx, "cmd", &IO__PIPE);
-	return 1;
+    // pipe dirver
+    konoha_addIODriver(ctx, NULL, &IO__PIPE);
+    konoha_addIODriver(ctx, "sh", &IO__PIPE);
+    konoha_addIODriver(ctx, "cmd", &IO__PIPE);
+    return 1;
 }
 
 /* ------------------------------------------------------------------------ */

@@ -110,6 +110,14 @@ METHOD XmlReader_getDepth(Ctx *ctx, knh_sfp_t *sfp)
     KNH_RETURN_Boolean(ctx,sfp,ret);
 }
 
+/* @method Int XmlReader.getAttributeCount() */
+METHOD XmlReader_getAttributeCount(Ctx *ctx, knh_sfp_t *sfp)
+{
+    xmlTextReaderPtr reader = p_cptr(sfp[0]);
+    int ret = xmlTextReaderAttributeCount(reader);
+    KNH_RETURN_Int(ctx,sfp,ret);
+}
+
 /* @method Boolean XmlReader.moveToFirstAttribute() */
 METHOD XmlReader_moveToFirstAttribute(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -205,6 +213,9 @@ METHOD XmlReader_getAttribute(Ctx *ctx, knh_sfp_t *sfp)
     xmlTextReaderPtr reader = p_cptr(sfp[0]);
     xmlChar * ns = (xmlChar *) p_char(sfp[1]);
     char* ret = (char*) xmlTextReaderGetAttribute(reader,ns);
+    if(ret == NULL){
+        ret = "";
+    }
     KNH_RETURN(ctx,sfp,new_String(ctx,B(ret),NULL));
 }
 
@@ -212,9 +223,8 @@ METHOD XmlReader_getAttribute(Ctx *ctx, knh_sfp_t *sfp)
 METHOD XmlReader_getAttributeNo(Ctx *ctx, knh_sfp_t *sfp)
 {
     xmlTextReaderPtr reader = p_cptr(sfp[0]);
-    xmlChar* ns   = (xmlChar*) p_char(sfp[1]);
-    xmlChar* name = (xmlChar*) p_char(sfp[2]);
-    char* ret = (char*) xmlTextReaderGetAttributeNs(reader,ns,name);
+    int num = p_int(sfp[1]);
+    char* ret = (char*) xmlTextReaderGetAttributeNo(reader,num);
     KNH_RETURN(ctx,sfp,new_String(ctx,B(ret),NULL));
 }
 

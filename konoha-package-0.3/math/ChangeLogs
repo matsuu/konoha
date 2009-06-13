@@ -1,3 +1,7 @@
+2009-05-30 Masahiro Ide <imasahiro@users.sourceforge.jp>
+    * windows_32.mk create windows dll
+    * math.c        bind round(),nearbyint()
+
 2009-04-07 Masahiro Ide <imasahiro@users.sourceforge.jp>
     * Makefile  make Makefile.
     * math.c    add functions.
