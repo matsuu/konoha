@@ -1572,7 +1572,6 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 		else {
 			KNH_ASSERT(stmt == NULL);
 			DBG2_P("**** FIRST TOKEN=%s", knh_token_tochar(tt0));
-			KNH_ABORT();
 			Term *tm = new_TermVALUE(ctx, ts[oc], lr);
 			if(SP((Token*)tm)->tt == TT_ERR) {
 				return tm;
