@@ -32,28 +32,28 @@ double random(double max) {
 
  alub = alu.getBytes();
 
- isb = [    new Frequency('a'.getChar(), 0.27),
-            new Frequency('c'.getChar(), 0.12),
-            new Frequency('g'.getChar(), 0.12),
-            new Frequency('t'.getChar(), 0.27),
+ isb = [    new Frequency('a', 0.27),
+            new Frequency('c', 0.12),
+            new Frequency('g', 0.12),
+            new Frequency('t', 0.27),
 
-            new Frequency('B'.getChar(), 0.02),
-            new Frequency('D'.getChar(), 0.02),
-            new Frequency('H'.getChar(), 0.02),
-            new Frequency('K'.getChar(), 0.02),
-            new Frequency('M'.getChar(), 0.02),
-            new Frequency('N'.getChar(), 0.02),
-            new Frequency('R'.getChar(), 0.02),
-            new Frequency('S'.getChar(), 0.02),
-            new Frequency('V'.getChar(), 0.02),
-            new Frequency('W'.getChar(), 0.02),
-            new Frequency('Y'.getChar(), 0.02) ];
+            new Frequency('B', 0.02),
+            new Frequency('D', 0.02),
+            new Frequency('H', 0.02),
+            new Frequency('K', 0.02),
+            new Frequency('M', 0.02),
+            new Frequency('N', 0.02),
+            new Frequency('R', 0.02),
+            new Frequency('S', 0.02),
+            new Frequency('V', 0.02),
+            new Frequency('W', 0.02),
+            new Frequency('Y', 0.02) ];
 
 homoSapiens = [
-            new Frequency('a'.getChar(), 0.3029549426680d),
-            new Frequency('c'.getChar(), 0.1979883004921d),
-            new Frequency('g'.getChar(), 0.1975473066391d),
-            new Frequency('t'.getChar(), 0.3015094502008d)];
+            new Frequency('a', 0.3029549426680d),
+            new Frequency('c', 0.1979883004921d),
+            new Frequency('g', 0.1975473066391d),
+            new Frequency('t', 0.3015094502008d)];
 
 void makeCumulative(Frequency[] a) {
 	double cp = 0.0;
