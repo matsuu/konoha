@@ -677,7 +677,7 @@ typedef struct {
 /* ------------------------------------------------------------------------ */
 
 #ifndef KNH_TOBJECTPAGE_SIZE
-#define KNH_TOBJECTPAGE_SIZE     1024
+#define KNH_TOBJECTPAGE_SIZE     (1024 * 100)
 #endif
 
 #define SIZEOF_TOBJECTPAGE       (sizeof(knh_ObjectPageTable_t) * KNH_TOBJECTPAGE_SIZE)
