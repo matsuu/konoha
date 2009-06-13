@@ -583,7 +583,7 @@ void knh_Bytes_init(Ctx *ctx, knh_Bytes_t *b, int init)
 static
 void knh_Bytes_traverse(Ctx *ctx, knh_Bytes_t *b, knh_ftraverse ftr)
 {
-	if(IS_SWEEP(ftr)) {
+	if(b->capacity > 0 && IS_SWEEP(ftr)) {
 		KNH_FREE(ctx, b->buf, b->capacity);
 		b->buf = NULL;
 		b->capacity = 0;
