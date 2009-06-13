@@ -42,8 +42,8 @@ knh_bool_t knh_class_instanceof(Ctx *ctx, knh_class_t scid, knh_class_t tcid)
 {
 	KNH_ASSERT_cid(scid);
 	KNH_ASSERT_cid(tcid);
-
 	//DBG2_P("@@@@@@@@@ %s %s", CLASSN(ctx->share->ClassTable[scid].bcid), CLASSN(tcid));
+	if(scid == CLASS_Nue) return 0;
 	if(ctx->share->ClassTable[scid].bcid == tcid /* Int:km Int */
 			|| scid == tcid
 			|| tcid == CLASS_Object  /* Int    Object */
