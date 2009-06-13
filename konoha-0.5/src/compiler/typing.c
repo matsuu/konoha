@@ -1666,7 +1666,7 @@ Term *knh_StmtPARAMS_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_c
 			}
 		}
 	}
-	else if(i + 2 != size) {
+	else if(i + 2 < size) {
 		//DBG2_P("i+2=%d, size=%d", i+2, size);
 		knh_Asm_perror(ctx, abr, KERR_DWARN, _("too many parameters: %C.%M"), mtd_cid, DP(mtd)->mn);
 		DP(stmt)->size = i + 2;
