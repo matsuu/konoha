@@ -1947,14 +1947,13 @@ void knh_StmtIF_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 /* ------------------------------------------------------------------------ */
 
 static
-Token *knh_StmtMETA_getLabel(Ctx *ctx, Stmt *o)
+Token *knh_StmtMETA_getLabelNULL(Ctx *ctx, Stmt *o)
 {
 	if(IS_DictMap(DP(o)->metaDictMap)) {
 		Token *tk = (Token*)knh_DictMap_get(ctx, DP(o)->metaDictMap, TS_ATlabel);
-		KNH_ASSERT(IS_Token(tk));
-		return tk;
+		if(IS_Token(tk)) return tk;
 	}
-	return (Token*)KNH_NULL;
+	return NULL;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1962,23 +1961,22 @@ Token *knh_StmtMETA_getLabel(Ctx *ctx, Stmt *o)
 static
 knh_labelid_t knh_Asm_pushLabelStack(Ctx *ctx, Asm *abr, Stmt *stmt)
 {
-	Token *ltk = knh_StmtMETA_getLabel(ctx, stmt);
-	if(IS_NULL(ltk)) {
+	Token *tkL = knh_StmtMETA_getLabelNULL(ctx, stmt);
+	if(tkL == NULL) {
 		char lbn[8];
 		knh_snprintf(lbn, sizeof(lbn), "%d", DP(abr)->llstep);
-		ltk = new_TokenCONST(ctx, FL(stmt), UP(new_String(ctx, B(lbn), NULL)));
-		SP(ltk)->tt = TT_LABEL;
+		tkL = new_TokenCONST(ctx, FL(stmt), UP(new_String(ctx, B(lbn), NULL)));
+		SP(tkL)->tt = TT_LABEL;
 	}
-	else {
-		DBG2_P("label=%s", sToken(ltk));
+	DP(tkL)->index = (DP(abr)->llstep)++;
+	knh_Array_add(ctx, DP(abr)->lstacks, UP(tkL));
+	{
+		knh_labelid_t labelid = knh_Asm_newLabelId(ctx, abr, tkL);
+		knh_labelid_t labelid2 = knh_Asm_newLabelId(ctx, abr, NULL);
+		DBG2_P("label %s (begin, end) = %d, %d", sToken(tkL), labelid, labelid2);
+		KNH_ASSERT(labelid + 1 == labelid2);
+		return labelid;
 	}
-	DP(ltk)->index = (DP(abr)->llstep)++;
-	knh_Array_add(ctx, DP(abr)->lstacks, UP(ltk));
-	knh_labelid_t labelid = knh_Asm_newLabelId(ctx, abr, ltk);
-	knh_labelid_t labelid2 = knh_Asm_newLabelId(ctx, abr, NULL);
-	DBG2_P("label L1, L2 = %d, %d", labelid, labelid2);
-	KNH_ASSERT(labelid + 1 == labelid2);
-	return labelid;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1988,32 +1986,35 @@ knh_labelid_t knh_Asm_stackLabelId(Ctx *ctx, Asm *abr, Stmt *stmt)
 {
 	size_t s = knh_Array_size(DP(abr)->lstacks);
 	if(s == 0) {
-		if(SP(stmt)->stt == STT_CONTINUE)
-			knh_Asm_perror(ctx, abr, KERR_ERROR, _("continue"));
-		else
-			knh_Asm_perror(ctx, abr, KERR_ERROR, _("break"));
+		knh_Asm_perror(ctx, abr, KERR_ERROR, _("don't use '%s' HERE"), knh_stmt_tochar(SP(stmt)->stt));
+		knh_Stmt_done(ctx, stmt);
 		return -1;
 	}
-	Token *tk = NULL;
-	if(DP(stmt)->size == 1) {
-		tk = DP(stmt)->tokens[0];
-		if(SP(tk)->tt == TT_ASIS) tk = NULL;
-	}
-	if(tk != NULL) {
-		int i;
-		for(i = s - 1; i >= 0; i--) {
-			Token *tk2 = (Token*)knh_Array_n(DP(abr)->lstacks, i);
-			if(knh_String_equals(DP(tk)->text, knh_String_tobytes(DP(tk2)->text))) {
-				tk = tk2;
+	else {
+		Token *tkL = NULL;
+		if(DP(stmt)->size == 1) {
+			tkL = DP(stmt)->tokens[0];
+			if(SP(tkL)->tt == TT_ASIS) tkL = NULL;
+		}
+		if(tkL != NULL) {
+			int i;
+			for(i = s - 1; i >= 0; i--) {
+				Token *tk2 = (Token*)knh_Array_n(DP(abr)->lstacks, i);
+				//DBG2_P("i=%d, %s %s", i, sToken(tkL), sToken(tk2));
+				if(knh_String_equals(DP(tkL)->text, knh_String_tobytes(DP(tk2)->text))) {
+					tkL = tk2;
+					break;
+				}
+			}
+			if(tkL == NULL) {
+				knh_Asm_perror(ctx, abr, KERR_EWARN, _("unknown label: %s"), sToken(tkL));
 			}
 		}
-		knh_Asm_perror(ctx, abr, KERR_ERROR, _("unknown label: %s"), sToken(tk));
-		tk = NULL;
+		if(tkL == NULL) {
+			tkL = (Token*)knh_Array_n(DP(abr)->lstacks, s-1);
+		}
+		return knh_Asm_findLabelId(ctx, abr, tkL);
 	}
-	if(tk == NULL) {
-		tk = (Token*)knh_Array_n(DP(abr)->lstacks, s-1);
-	}
-	return knh_Asm_findLabelId(ctx, abr, tk);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2033,7 +2034,7 @@ void knh_StmtCONTINUE_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 	if(labelid != -1) {
 		KNH_ASM_JMP(ctx, abr, labelid);
 	}
-	else {
+	else if(SP(stmt)->stt == STT_CONTINUE) {
 		KNH_ASM_PANIC(ctx, abr, "unknown continue label");
 	}
 }
@@ -2047,7 +2048,7 @@ void knh_StmtBREAK_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 	if(labelid != -1) {
 		KNH_ASM_JMP(ctx, abr, labelid + 1);
 	}
-	else {
+	else if(SP(stmt)->stt == STT_BREAK) {
 		KNH_ASM_PANIC(ctx, abr, "unknown break label");
 	}
 }

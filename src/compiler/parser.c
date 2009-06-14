@@ -45,7 +45,7 @@ static Stmt *new_StmtMETA(Ctx *ctx,  knh_tokens_t *tc, knh_stmt_t stt);
 static void knh_Stmt_addMETA(Ctx *ctx, Stmt *o, knh_tokens_t *tc);
 static void knh_Stmt_add_STMT1(Ctx *ctx, Stmt *o, knh_tokens_t *tc);
 static void knh_Stmt_add_SEMICOLON(Ctx *ctx, Stmt *o, knh_tokens_t *tc);
-static int knh_Token_isLVALUE(Ctx *ctx, Token *tk);
+static int knh_Token_isLVALUE(Ctx *ctx, Token *tkL);
 static void knh_Stmt_toLVALUE(Ctx *ctx, Stmt *stmt, int pe, char *fmt);
 
 /* ------------------------------------------------------------------------ */
@@ -1657,12 +1657,12 @@ static int knh_Token_isLCONSTN(Ctx *ctx, Token *tk)
 
 /* ------------------------------------------------------------------------ */
 
-static int knh_Token_isLVALUE(Ctx *ctx, Token *tk)
+static int knh_Token_isLVALUE(Ctx *ctx, Token *tkL)
 {
-	if(SP(tk)->tt == TT_TYPEN && knh_Token_isLCONSTN(ctx, tk)) {
-		SP(tk)->tt = TT_CONSTN;
+	if(SP(tkL)->tt == TT_TYPEN && knh_Token_isLCONSTN(ctx, tkL)) {
+		SP(tkL)->tt = TT_CONSTN;
 	}
-	return knh_Token_isVARN(tk) || SP(tk)->tt == TT_CONSTN;
+	return knh_Token_isVARN(tkL) || SP(tkL)->tt == TT_CONSTN;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1854,13 +1854,14 @@ Stmt* new_StmtLETEXPR(Ctx *ctx, knh_tokens_t *tc)
 /* [new_Stmt] */
 
 static
-void knh_StmtMETA_addLabel(Ctx *ctx, Stmt *o, Token *tk)
+void knh_StmtMETA_addLabel(Ctx *ctx, Stmt *o, Token *tkL)
 {
 	if(IS_NULL(DP(o)->metaDictMap)) {
 		KNH_SETv(ctx, DP(o)->metaDictMap, new_DictMap0(ctx, 2));
 	}
+	DBG2_P("label: %s", sToken(tkL))
 	if(IS_DictMap(DP(o)->metaDictMap)) {
-		knh_DictMap_set(ctx, DP(o)->metaDictMap, TS_ATlabel, UP(tk));
+		knh_DictMap_set(ctx, DP(o)->metaDictMap, TS_ATlabel, UP(tkL));
 	}
 }
 
@@ -1911,7 +1912,8 @@ void knh_StmtMETA_addMeta2(Ctx *ctx, Stmt *o, String *k, Token *p)
 static
 void knh_Stmt_addMETA(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 {
-	if(SP(o)->stt == STT_DONE || SP(o)->stt == STT_ERR || tc->meta == -1) {
+	DBG2_P("stt=%s, meta=%d", knh_stmt_tochar(o->stt), tc->meta);
+	if(tc->meta == -1 || SP(o)->stt == STT_DONE || SP(o)->stt == STT_ERR) {
 		return ;
 	}
 	Token **ts = tc->ts;
@@ -2991,7 +2993,10 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 	switch(SP(tkc)->tt) {
 
 	case TT_LABEL:
+	{
+		if(tc->meta == -1) tc->meta = tc->c - 1;
 		goto L_TAIL;
+	}
 	case TT_METAN:
 	{
 		if(tc->meta == -1) tc->meta = tc->c - 1;
