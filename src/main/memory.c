@@ -134,10 +134,15 @@ knh_Object_t *new_UnusedObject(Ctx *ctx)
 {
 	KNH_LOCK(ctx, LOCK_MEMORY, NULL);
 	int tindex = ctx->share->ObjectPageTableSize;
-	if(unlikely(!(tindex < KNH_TOBJECTPAGE_SIZE))) {
-		KNH_EXIT("Enlarge %d x %d", KNH_OBJECTPAGE_SIZE, KNH_TOBJECTPAGE_SIZE);
-		KNH_UNLOCK(ctx, LOCK_MEMORY, NULL);
-		return NULL;
+	if(unlikely(!(tindex < ctx->share->ObjectPageTableMaxSize))) {
+		size_t newsize = ctx->share->ObjectPageTableMaxSize * 2;
+		knh_ObjectPageTable_t *newpage
+			= (knh_ObjectPageTable_t*)KNH_MALLOC(ctx, sizeof(knh_ObjectPageTable_t) * newsize);
+		knh_bzero(newpage, sizeof(knh_ObjectPageTable_t) * newsize);
+		knh_memcpy(newpage, ctx->share->ObjectPageTable, ctx->share->ObjectPageTableMaxSize);
+		KNH_FREE(ctx, ctx->share->ObjectPageTable, ctx->share->ObjectPageTableMaxSize);
+		ctx->share->ObjectPageTable = newpage;
+		ctx->share->ObjectPageTableMaxSize = newsize;
 	}
 	ctx->share->ObjectPageTableSize += 1;
 	KNH_UNLOCK(ctx, LOCK_MEMORY, NULL);
