@@ -177,6 +177,31 @@ METHOD System_chDir(Ctx *ctx, knh_sfp_t *sfp)
     KNH_RETURN_void(ctx, sfp);
 }
 
+/* ------------------------------------------------------------------------ */
+// void System.unlink(String filename);
+
+METHOD System_unlink(Ctx *ctx, knh_sfp_t *sfp)
+{
+  char *filename = p_char(sfp[1]);
+  if(remove(filename) != 0){
+        KNH_PERRNO(ctx, "OS!!", "unlink");
+  }
+  KNH_RETURN_void(ctx,sfp);
+}
+
+/* ------------------------------------------------------------------------ */
+// void System.rename(String filename);
+
+METHOD System_rename(Ctx *ctx, knh_sfp_t *sfp)
+{
+  char *oldname = p_char(sfp[1]);
+  char *newname = p_char(sfp[2]);
+  if(rename(oldname,newname) != 0){
+        KNH_PERRNO(ctx, "OS!!", "unlink");
+  }
+  KNH_RETURN_void(ctx,sfp);
+}
+
 /* ======================================================================== */
 /* [PIPE] */
 

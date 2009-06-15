@@ -33,4 +33,6 @@ int System.system(String! cmd);
 String[] System.listDir(String dirname);
 String! System.getCwd();
 void System.chDir(String dirname);
+void System.unlink(String filename);
+void System.rename(String filename);
 
