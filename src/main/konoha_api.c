@@ -123,13 +123,21 @@ KNHAPI(Ctx*) konoha_getThreadContext(Ctx *ctx)
 /* ======================================================================== */
 /* [option] */
 
-static int debugMode2 = 0;    // this is -d2 debug mode for konoha itself
+static int dumpLevel2 = 0;    // this is -d2 debug mode for konoha itself
+static int debugLevel = 0;
 
 /* ----------------------------------------------------------------------- */
 
-KNHAPI(int) konoha_isDebugMode2()
+KNHAPI(int) konoha_debugLevel()
 {
-	return debugMode2;
+	return debugLevel;
+}
+
+/* ----------------------------------------------------------------------- */
+
+KNHAPI(int) konoha_isSystemDump2()
+{
+	return (dumpLevel2 == 2);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -158,17 +166,22 @@ KNHAPI(int) konoha_parseopt(konoha_t konoha, int argc, char **argv)
 		if(t[1] == 's' && t[2] == 0) {
 			knh_Context_setTrusted(konoha.ctx, 1);
 		}
-		if(t[1] == 'c' && t[2] == 0) {
+		else if(t[1] == 'c' && t[2] == 0) {
 			knh_Context_setCompiling(konoha.ctx, 1);
 		}
-		if(t[1] == 'v') {
+		else if(t[1] == 'v') {
 			knh_Context_setVerbose(konoha.ctx, 1);
 		}
-		if(t[1] == 'g') {
+		else if(t[1] == 'g' && t[2] == 0) {
+			debugLevel = 1;
 			knh_Context_setDebug(konoha.ctx, 1);
 		}
-		if(t[1] == 'd' && t[2] == '2' && t[3] == 0) {
-			debugMode2 = 1;
+		else if(t[1] == 'g' && t[2] == '2' && t[3] == 0) {
+			debugLevel = 2;
+			knh_Context_setDebug(konoha.ctx, 1);
+		}
+		else if(t[1] == 'd' && t[2] == '2' && t[3] == 0) {
+			dumpLevel2 = 2;
 			konoha_dumpInit();
 		}
 	}

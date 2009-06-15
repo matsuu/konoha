@@ -69,7 +69,6 @@ void knh_stack_beginPRINT(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, OutputStrea
 	//		knh_snprintf(buf, sizeof(buf), "[%d/%d/%d %d/%d/%d] ", now->tm_year, now->tm_mon, now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
 	//		knh_write__s(ctx, w, buf);
 		}
-		knh_putc(ctx, w, '[');
 	}
 }
 
@@ -79,7 +78,6 @@ static
 void knh_stack_endPRINT(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, OutputStream *w)
 {
 	if(KNH_FLAG_IS(flag, KNH_FLAG_PF_BOL)) {
-		knh_putc(ctx, w, ']');
 		knh_putc(ctx, w, ' ');
 	}
 	else if(KNH_FLAG_IS(flag, KNH_FLAG_PF_EOL)) {
@@ -101,8 +99,12 @@ void knh_stack_pmsg(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, String *s)
 {
 	OutputStream *w = knh_stack_pstream(ctx, flag);
 	knh_stack_beginPRINT(ctx, sfp, flag, w);
-	if(IS_bString(s)) {
+	KNH_ASSERT(IS_bString(s));
+	if((s)->size > 0) {  /* remove TS_EMPTY */
 		knh_print(ctx, w, knh_String_tobytes(s));
+	}
+	else {
+		flag = (flag & ~(KNH_FLAG_PF_BOL));
 	}
 	knh_stack_endPRINT(ctx, sfp, flag, w);
 }
