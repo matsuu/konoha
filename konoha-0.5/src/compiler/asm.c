@@ -2313,12 +2313,14 @@ void knh_StmtPRINT_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 	knh_flag_t flag = knh_StmtPRINT_flag(ctx, stmt);
 	knh_labelid_t lbskip = knh_Asm_newLabelId(ctx, abr, NULL);
 	KNH_ASM_SKIP_(ctx, abr, lbskip);
-	/* header */ {
+	if(konoha_debugLevel() > 1) {
 		char buf[128];
-		knh_snprintf(buf, sizeof(buf), "%s:%d", FILEIDN(DP(abr)->fileid), DP(abr)->line);
+		knh_snprintf(buf, sizeof(buf), "[%s:%d]", FILEIDN(DP(abr)->fileid), DP(abr)->line);
 		KNH_ASM_PMSG_(ctx, abr, flag | KNH_FLAG_PF_BOL, UP(new_String(ctx, B(buf), NULL)));
 	}
-
+	else if(flag != 0 ) {
+		KNH_ASM_PMSG_(ctx, abr, flag | KNH_FLAG_PF_BOL, UP(TS_EMPTY));
+	}
 	int i;
 	for(i = 0; i < DP(stmt)->size; i++) {
 		L_REDO:;
