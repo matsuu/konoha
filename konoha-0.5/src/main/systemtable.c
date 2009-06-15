@@ -272,9 +272,12 @@ Ctx *konoha_createContext0(size_t stacksize)
 	/* System Table */
 	size_t i;
 	KNH_ASSERT(ctx->share->ObjectPageTable == NULL);
+	ctx->share->ObjectPageTableMaxSize = KNH_TOBJECTPAGE_INITSIZE;
 	ctx->share->ObjectPageTable =
-		(knh_ObjectPageTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TOBJECTPAGE);
-	knh_bzero(ctx->share->ObjectPageTable, SIZEOF_TOBJECTPAGE);
+		(knh_ObjectPageTable_t*)KNH_MALLOC((Ctx*)ctx,
+			ctx->share->ObjectPageTableMaxSize * sizeof(knh_ObjectPageTable_t));
+	knh_bzero(ctx->share->ObjectPageTable,
+		ctx->share->ObjectPageTableMaxSize * sizeof(knh_ObjectPageTable_t));
 	ctx->share->ObjectPageTableSize = 0;
 
 	KNH_ASSERT(ctx->share->LockTable == NULL);
@@ -491,9 +494,9 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 		KNH_FREE(ctx, ctx->share->StructTable, SIZEOF_TSTRUCT);
 		ctx->share->StructTable = NULL;
 
-		KNH_FREE(ctx, ctx->share->ObjectPageTable, SIZEOF_TOBJECTPAGE);
+		KNH_FREE(ctx, ctx->share->ObjectPageTable,
+				ctx->share->ObjectPageTableMaxSize * sizeof(knh_ObjectPageTable_t));
 		ctx->share->ObjectPageTable = NULL;
-
 
 		if(ctx->stat->usedMemorySize != 0) {
 			fprintf(stderr, "memory leaks: %d bytes", (int)ctx->stat->usedMemorySize);

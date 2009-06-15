@@ -676,11 +676,11 @@ typedef struct {
 
 /* ------------------------------------------------------------------------ */
 
-#ifndef KNH_TOBJECTPAGE_SIZE
-#define KNH_TOBJECTPAGE_SIZE     (1024 * 100)
+#ifndef KNH_TOBJECTPAGE_INITSIZE
+#define KNH_TOBJECTPAGE_INITSIZE     1024
 #endif
 
-#define SIZEOF_TOBJECTPAGE       (sizeof(knh_ObjectPageTable_t) * KNH_TOBJECTPAGE_SIZE)
+//#define SIZEOF_TOBJECTPAGE       (sizeof(knh_ObjectPageTable_t) * KNH_TOBJECTPAGE_INITSIZE)
 
 #ifndef KNH_OBJECTPAGE_SIZE
 #define KNH_OBJECTPAGE_SIZE     4096
@@ -700,7 +700,8 @@ typedef struct {
 	size_t              threadSize;
 	knh_LockTable_t    *LockTable;
 	knh_LockTable_t    *unusedLockTable;
-	knh_ObjectPageTable_t  *ObjectPageTable; size_t ObjectPageTableSize;
+	knh_ObjectPageTable_t  *ObjectPageTable;
+	size_t ObjectPageTableSize; size_t ObjectPageTableMaxSize;
 	knh_StructTable_t  *StructTable; size_t StructTableSize;
 	knh_ClassTable_t   *ClassTable;  size_t ClassTableSize;
 	knh_ExptTable_t    *ExptTable;   size_t ExptTableSize;
