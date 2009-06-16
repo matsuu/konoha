@@ -2697,26 +2697,33 @@ static Stmt *new_StmtCONTINUE(Ctx *ctx, knh_tokens_t *tc)
 
 static Stmt *new_StmtCATCH(Ctx *ctx, knh_tokens_t *tc)
 {
-	Stmt *o = new_Stmt(ctx, 0, STT_CATCH);
+	Stmt *stmt = NULL;
 	if(tc->c < tc->e && SP(tc->ts[tc->c])->tt == TT_PARENTHESIS) {
-		knh_tokens_t p_tc;
-		knh_Token_tc(tc->ts[tc->c], &p_tc);
-		knh_Stmt_add_TYPEN(ctx, o, &p_tc);
-		knh_Stmt_add_VARN(ctx, o, &p_tc);
-		knh_tokens_ignore(ctx, &p_tc);
-		tc->c += 1;
+		knh_tokens_t tcP;  /* (tcP)*/
+		knh_Token_tc(tc->ts[tc->c], &tcP);
+		if(tcP.e < 1) {
+			knh_Token_perror(ctx, tc->ts[tc->c], KERR_DWARN, _("nothing to catch"));
+			return new_Stmt(ctx, 0, STT_DONE);
+		}
+		else {
+			stmt = new_Stmt(ctx, 0, STT_CATCH);
+			knh_Stmt_add_TYPEN(ctx, stmt, &tcP);
+			knh_Stmt_add_VARN(ctx, stmt, &tcP);
+			knh_tokens_ignore(ctx, &tcP);
+			tc->c += 1;
+		}
+		knh_Stmt_add_STMT1(ctx, stmt, tc);
 	}
 	else {
-		knh_Stmt_tokens_perror(ctx, o, tc, _("syntax error: needs ()"));
-		return o;
+		knh_Stmt_tokens_perror(ctx, stmt, tc, _("syntax error: needs ()"));
+		return new_Stmt(ctx, 0, STT_DONE);
 	}
-	knh_Stmt_add_STMT1(ctx, o, tc);
 
 	if(tc->c < tc->e && SP(tc->ts[tc->c])->tt == TT_CATCH) {
 		tc->c += 1;
-		knh_StmtNULL_tail_append(ctx, o, new_StmtCATCH(ctx, tc));
+		knh_StmtNULL_tail_append(ctx, stmt, new_StmtCATCH(ctx, tc));
 	}
-	return o;
+	return stmt;
 }
 
 /* ------------------------------------------------------------------------ */
