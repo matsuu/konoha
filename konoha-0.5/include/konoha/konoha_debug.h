@@ -120,7 +120,7 @@
 
 #define DBG_(stmt)
 #define DBG_P(fmt, ...) \
-	if(konoha_isDebugMode2()) {\
+	if(konoha_isSystemDump2()) {\
 		fflush(stdout); \
 		fprintf(stderr, "DBG[%s:%d/%s]: ", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
 		fprintf(stderr, fmt, ## __VA_ARGS__); \
@@ -128,7 +128,7 @@
 	}\
 
 #define DBG_DUMP(ctx, o, opt, msg) \
-	if(konoha_isDebugMode2()) {\
+	if(konoha_isSystemDump2()) {\
 		fprintf(stdout, "DBG[%s]: %s\n", __FUNCTION__, msg); \
 		knh_format(ctx, KNH_STDOUT, METHODN__dump, UP(o), UP(opt)); \
 		knh_flush(ctx, KNH_STDOUT);\
