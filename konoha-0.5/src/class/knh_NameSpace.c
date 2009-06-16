@@ -100,7 +100,7 @@ knh_class_t konoha_getcid(Ctx *ctx, knh_bytes_t lname)
 
 /* ------------------------------------------------------------------------ */
 
-knh_class_t konoha_findcid(Ctx *ctx, knh_bytes_t lname)
+KNHAPI(knh_class_t) konoha_findcid(Ctx *ctx, knh_bytes_t lname)
 {
 	knh_class_t cid = konoha_getcid(ctx, lname);
 	if(cid != CLASS_unknown) {
