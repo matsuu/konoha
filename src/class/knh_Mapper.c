@@ -60,7 +60,7 @@ knh_fmapper konoha_findMapperFunc(Ctx *ctx, Object *mapdata, knh_class_t scid, k
 /* ======================================================================== */
 /* [constructors] */
 
-Mapper* new_Mapper(Ctx *ctx, knh_flag_t flag, knh_class_t scid, knh_class_t tcid, knh_fmapper fmap, Object *mapdata)
+KNHAPI(Mapper*) new_Mapper(Ctx *ctx, knh_flag_t flag, knh_class_t scid, knh_class_t tcid, knh_fmapper fmap, Object *mapdata)
 {
 	knh_Mapper_t* o = (Mapper*)new_Object_bcid(ctx, CLASS_Mapper, 0);
 	DP(o)->size = 0;
@@ -140,7 +140,7 @@ void knh_Mapper__k(Ctx *ctx, Mapper *o, OutputStream *w, String *m)
 /* ======================================================================== */
 /* [mapper] */
 
-void konoha_addMapper(Ctx *ctx, Mapper *mpr)
+KNHAPI(void) konoha_addMapper(Ctx *ctx, Mapper *mpr)
 {
 	knh_ClassTable_readyClassMap(ctx, DP(mpr)->scid);
 	knh_ClassMap_add(ctx, ctx->share->ClassTable[DP(mpr)->scid].cmap, mpr);

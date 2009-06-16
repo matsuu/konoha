@@ -555,8 +555,8 @@ KNHAPI(void) konoha_loadURNAliasData(Ctx *ctx, knh_StringConstData_t *data)
 	knh_StringConstData_t *d = data;
 	while(d->name != NULL) {
 		String *s =(String*)knh_DictMap_get__b(ctx,  map, B(d->name));
-		if(IS_NOTNULL(s)) {
-			KNH_WARNING(ctx, _("Overriding %s %s"), data->value, knh_String_tochar(s));
+		if(IS_NOTNULL(s) && !knh_String_equals(s, B(d->value))) {
+			KNH_WARNING(ctx, _("overriding alias %s %s as %s"), d->name, knh_String_tochar(s), d->value);
 		}
 		d++;
 	}

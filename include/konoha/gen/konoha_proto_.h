@@ -251,10 +251,8 @@ MAPPER knh_Bytes_InputStream(Ctx *ctx, knh_sfp_t *sfp);
 void knh_Iterator_close(Ctx *ctx, Iterator *it);
 Iterator* new_Iterator(Ctx *ctx, knh_class_t p1, Any *source, knh_fitrnext fnext);
 /* ../src/class/knh_Mapper.c */
-Mapper* new_Mapper(Ctx *ctx, knh_flag_t flag, knh_class_t scid, knh_class_t tcid, knh_fmapper fmap, Object *mapdata);
 Mapper* new_MapMap(Ctx *ctx, Mapper *m1, Mapper *m2);
 void knh_Mapper__k(Ctx *ctx, Mapper *o, OutputStream *w, String *m);
-void konoha_addMapper(Ctx *ctx, Mapper *mpr);
 void konoha_addMapperFunc(Ctx *ctx, knh_flag_t flag, knh_type_t stype, knh_type_t ttype, knh_fmapper fmap, Object *mapdata);
 MAPPER knh_Mapper_fasis(Ctx *ctx, knh_sfp_t *sfp);
 MAPPER knh_fmapper_null(Ctx *ctx, knh_sfp_t *sfp);
@@ -296,7 +294,6 @@ NameSpace* new_NameSpace(Ctx *ctx, String *nsname);
 void knh_NameSpace_importNameSpace(Ctx *ctx, NameSpace *ns, NameSpace *other);
 Script *knh_NameSpace_getScript(Ctx *ctx, NameSpace *ns);
 knh_class_t konoha_getcid(Ctx *ctx, knh_bytes_t lname);
-knh_class_t konoha_findcid(Ctx *ctx, knh_bytes_t lname);
 void knh_NameSpace_setcid(Ctx *ctx, NameSpace *o, String *name, knh_class_t c);
 void knh_NameSpace_setLocalName(Ctx *ctx, NameSpace *o, knh_class_t cid);
 knh_class_t knh_NameSpace_getcid(Ctx *ctx, NameSpace *o, knh_bytes_t name);

@@ -275,7 +275,7 @@ int knh_StmtUIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	Token *tk = DP(stmt)->tokens[0];
 	knh_bytes_t name = knh_Token_tobytes(ctx, tk);
 	knh_index_t loc = knh_bytes_rindex(name, '.');
-	if(loc != -1) { /* using math.Math */
+	if(loc != -1 && isupper(name.buf[loc+1])) { /* using math.Math */
 		if(knh_System_loadPackage(ctx, knh_bytes_first(name, loc))) {
 			knh_class_t newcid = konoha_getcid(ctx, name);
 			if(newcid == CLASS_unknown) {

@@ -564,31 +564,61 @@ knh_drvapi_t *konoha_getDriverAPI(Ctx *ctx, int type, knh_bytes_t name)
 static
 char *knh_lookup_packageScript(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t pkgname)
 {
-	char pbuf[40];
+	char pbuf[40], fbuf[40], *file1 = NULL, *file2 = NULL, *rootdir;
+	knh_index_t loc = knh_bytes_rindex(pkgname, '.');
 	knh_format_bytes(pbuf, sizeof(pbuf), pkgname);
-	char *p = knh_getenv("KONOHA_PACKAGE");
-	if(p != NULL) {
-		knh_snprintf(buf, bufsiz, "%s/%s/%s.k", p, pbuf, pbuf);
+	if(loc == -1) {
+		file1 = pbuf;
+	}
+	else {
+		file1 = pbuf + loc + 1;
+		knh_format_bytes(fbuf, sizeof(fbuf), knh_bytes_first(pkgname, loc));
+		file2 = fbuf;
+	}
+
+	rootdir = knh_getenv("KONOHA_PACKAGE");
+	if(rootdir != NULL) {
+		knh_snprintf(buf, bufsiz, "%s/%s/%s.k", rootdir, pbuf, file1);
+		if(knh_isfile(ctx, B(buf))) return buf;
+		if(file2 != NULL) {
+			knh_snprintf(buf, bufsiz, "%s/%s/%s.k", rootdir, pbuf, file2);
+		}
 		if(knh_isfile(ctx, B(buf))) return buf;
 	}
 #ifdef KNH_PREFIX
-	knh_snprintf(buf, bufsiz, "%s/lib/konoha/%s/%s.k", KNH_PREFIX, pbuf, pbuf);
-#else
-	knh_snprintf(buf, bufsiz, "%s/package/%s/%s.k", knh_String_tochar(knh_homeDir), pbuf, pbuf);
-#endif
+	knh_snprintf(buf, bufsiz, "%s/lib/konoha/%s/%s.k", KNH_PREFIX, pbuf, file1);
 	if(knh_isfile(ctx, B(buf))) return buf;
-	p = knh_getenv("HOME");
-	if(p != NULL) {
-		knh_snprintf(buf, bufsiz, "%s/.konoha/%s/%s.k", p, pbuf, pbuf);
+	if(file2 != NULL) {
+		knh_snprintf(buf, bufsiz, "%s/lib/konoha/%s/%s.k", KNH_PREFIX, pbuf, file2);
 		if(knh_isfile(ctx, B(buf))) return buf;
 	}
-	if(ctx->cwd == NULL) {
-		knh_snprintf(buf, bufsiz, "./.konoha/%s/%s.k", pbuf, pbuf);
-	}
-	else {
-		knh_snprintf(buf, bufsiz, "%s/.konoha/%s/%s.k", ctx->cwd, pbuf, pbuf);
-	}
+#else
+	knh_snprintf(buf, bufsiz, "%s/package/%s/%s.k", knh_String_tochar(knh_homeDir), pbuf, file1);
 	if(knh_isfile(ctx, B(buf))) return buf;
+	if(file2 != NULL) {
+		knh_snprintf(buf, bufsiz, "%s/package/%s/%s.k", knh_String_tochar(knh_homeDir), pbuf, file2);
+		if(knh_isfile(ctx, B(buf))) return buf;
+	}
+#endif
+
+	rootdir = knh_getenv("HOME");
+	if(rootdir != NULL) {
+		knh_snprintf(buf, bufsiz, "%s/.konoha/%s/%s.k", rootdir, pbuf, file1);
+		if(knh_isfile(ctx, B(buf))) return buf;
+		if(file2 != NULL) {
+			knh_snprintf(buf, bufsiz, "%s/.konoha/%s/%s.k", rootdir, pbuf, file2);
+			if(knh_isfile(ctx, B(buf))) return buf;
+		}
+	}
+
+	if(ctx->cwd == NULL) rootdir = ".";
+	else rootdir = ctx->cwd;
+	knh_snprintf(buf, bufsiz, "%s/.konoha/%s/%s.k", rootdir, pbuf, file1);
+	if(knh_isfile(ctx, B(buf))) return buf;
+	if(file2 != NULL) {
+		knh_snprintf(buf, bufsiz, "%s/.konoha/%s/%s.k", rootdir, pbuf, file2);
+		if(knh_isfile(ctx, B(buf))) return buf;
+	}
 	return NULL;
 }
 
