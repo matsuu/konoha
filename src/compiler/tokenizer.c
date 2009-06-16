@@ -585,7 +585,7 @@ knh_token_t knh_char_totoken(int ch)
 		case '\'': return TT_TSTR;
 		case '`': return TT_ESTR;
 	}
-	KNH_ASSERT(ch == -1);
+	DBG2_P("unknown ch=%c", ch);
 	return TT_ERR;
 }
 
