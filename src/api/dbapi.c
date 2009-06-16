@@ -143,8 +143,10 @@ static METHOD knh__ResultSet_getInt(Ctx *ctx, knh_sfp_t *sfp)
 		switch(DP(o)->column[n].ctype) {
 		case knh_ResultSet_CTYPE__integer :
 			res = *((knh_int_t*)p);
+#ifndef KNH_USING_NOFLOAT
 		case knh_ResultSet_CTYPE__float :
 			res = (knh_int_t)(*((knh_float_t*)p));
+#endif
 		case knh_ResultSet_CTYPE__null :
 		default:
 			goto L_RETURN_NULL;
@@ -158,6 +160,7 @@ static METHOD knh__ResultSet_getInt(Ctx *ctx, knh_sfp_t *sfp)
 
 /* ------------------------------------------------------------------------ */
 /* @method Float ResultSet.getFloat(Any! n) */
+#ifndef KNH_USING_NOFLOAT
 
 static METHOD knh__ResultSet_getFloat(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -181,6 +184,7 @@ static METHOD knh__ResultSet_getFloat(Ctx *ctx, knh_sfp_t *sfp)
 	L_RETURN_NULL:;
 	KNH_RETURN(ctx, sfp, KNH_NULL);
 }
+#endif
 
 /* ------------------------------------------------------------------------ */
 /* @method String ResultSet.getString(Any! n) */
@@ -208,8 +212,10 @@ static METHOD knh__ResultSet_get(Ctx *ctx, knh_sfp_t *sfp)
 		switch(DP(o)->column[n].ctype) {
 		case knh_ResultSet_CTYPE__integer :
 			KNH_RETURN_NNInt(ctx, sfp, (*((knh_int_t*)p)));
+#ifndef KNH_USING_NOFLOAT
 		case knh_ResultSet_CTYPE__float :
 			KNH_RETURN_NNFloat(ctx, sfp, (*((knh_float_t*)p)));
+#endif
 		case knh_ResultSet_CTYPE__text :
 			v = UP(new_String(ctx, B2(knh_Bytes_tochar(DP(o)->databuf) + DP(o)->column[n].start, DP(o)->column[n].len), NULL));
 			break;
@@ -248,9 +254,11 @@ static void knh_ResultSet__dump(Ctx *ctx, ResultSet *o, OutputStream *w, String 
 			case knh_ResultSet_CTYPE__integer :
 				knh_write_integerfmt(ctx, w, KNH_INT_FMT, (knh_int_t)(*((knh_int_t*)p)));
 				break;
+#ifndef KNH_USING_NOFLOAT
 			case knh_ResultSet_CTYPE__float :
 				knh_write__f(ctx, w, (knh_float_t)(*((knh_float_t*)p)));
 				break;
+#endif
 			case knh_ResultSet_CTYPE__text :
 				knh_write(ctx, w, B2(p, DP(o)->column[n].len));
 				break;

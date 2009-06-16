@@ -407,6 +407,7 @@ int knh_Asm_declareScriptVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_
 			knh_int_t *v = (knh_int_t*)(scr->fields + idx);
 			v[0] = (IS_NULL(value)) ? 0 : ((Int*)value)->n.ivalue;
 		}
+#ifndef KNH_USING_NOFLOAT
 		else if(IS_ubxfloat(type)) {
 			if(sizeof(knh_float_t) > sizeof(void*)) {
 				if(knh_Asm_addVariableTable(ctx, abr, cf, KNH_SCRIPT_FIELDSIZE, 0, TYPE_void, FIELDN_register, value) == -1) {
@@ -416,6 +417,7 @@ int knh_Asm_declareScriptVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_
 			knh_float_t *v = (knh_float_t*)(scr->fields + idx);
 			v[0] = (IS_NULL(value)) ? 0.0 : ((Float*)value)->n.fvalue;
 		}
+#endif /* KNH_USING_NOFLOAT */
 		else if(IS_ubxboolean(type)) {
 			knh_boolean_t *v = (knh_boolean_t*)(scr->fields + idx);
 			v[0] = (IS_NULL(value)) ? 0 : ((Int*)value)->n.bvalue;
@@ -452,6 +454,7 @@ int knh_Asm_declareFieldVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_t
 				return idx;
 			}
 		}
+#ifndef KNH_USING_NOFLOAT
 		else if(IS_ubxfloat(type)) {
 			if(sizeof(knh_float_t) > sizeof(void*)) {
 				if(knh_Asm_addVariableTable(ctx, abr,
@@ -464,6 +467,7 @@ int knh_Asm_declareFieldVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_t
 				return idx;
 			}
 		}
+#endif /* KNH_USING_NOFLOAT */
 #endif/*KNH_USING_UNBOXFIELD*/
 		if((idx + 1) > DP(abr)->vars_size) {
 			DP(abr)->vars_size = (knh_ushort_t)(idx + 1);
@@ -747,9 +751,11 @@ knh_class_t knh_bytes_guessNUMcid(Ctx *ctx, knh_bytes_t t)
 			return CLASS_Decimal;
 #endif
 		}
+#ifndef KNH_USING_NOFLOAT
 		else if(t.buf[i] == '.') {
 			return CLASS_Float;
 		}
+#endif
 		if(!isdigit(t.buf[i])) break;
 	}
 	return CLASS_Int;
@@ -790,6 +796,7 @@ int knh_TokenNUM_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqc)
 	}
 
 	if(breqc == CLASS_Float) {
+#ifndef KNH_USING_NOFLOAT
 		knh_float_t n = 0.0;
 		if(!knh_bytes_parsefloat(t, &n)) {
 			knh_Token_perror(ctx, tk, KERR_EWARN, _("float overflow: %B"), t);
@@ -803,8 +810,10 @@ int knh_TokenNUM_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqc)
 		else {
 			knh_Token_setCONST(ctx, tk, UP(new_FloatX(ctx, tagc, n)));
 		}
+#endif
 	}
-	else { /* if(req_bcid == CLASS_Int) */
+	else 
+    { /* if(req_bcid == CLASS_Int) */
 		knh_int_t n = 0;
 		if(!knh_bytes_parseint(t, &n)) {
 			knh_Token_perror(ctx, tk, KERR_EWARN, _("int overflow: %B"), t);
@@ -1579,7 +1588,7 @@ void KNH_BOX(Ctx *ctx, knh_sfp_t *sfp, knh_type_t type)
 	knh_class_t cid = CLASS_type(type);
 	KNH_ASSERT_cid(cid);
 	knh_class_t bcid = ctx->share->ClassTable[cid].bcid;
-	if(bcid == CLASS_Int || bcid == CLASS_Float || bcid == CLASS_Boolean) {
+	if(bcid == CLASS_Int || bcid == CLASS_Boolean|| bcid == CLASS_Float ){
 		if(IS_NNTYPE(type) || IS_NOTNULL(sfp[0].o)) {
 			KNH_SETv(ctx, sfp[0].o, new_Object_boxing(ctx, cid, sfp));
 		}
@@ -2169,12 +2178,14 @@ knh_class_t knh_StmtOPADD_basecid(Ctx *ctx, Stmt *stmt)
 
 	if(bcid1 == bcid2) return bcid1;
 
+#ifndef KNH_USING_NOFLOAT
 	if(bcid1 == CLASS_Float && bcid2 == CLASS_Int) {
 		return cid1;
 	}
 	if(bcid2 == CLASS_Float && bcid1 == CLASS_Int) {
 		return cid2;
 	}
+#endif
 	return cid1;
 }
 
@@ -2195,12 +2206,14 @@ knh_class_t knh_StmtOPEQ_basecid(Ctx *ctx, Stmt *stmt)
 	if(bcid1 == cid2) return bcid1;
 	if(bcid2 == cid1) return bcid2;
 
+#ifndef KNH_USING_NOFLOAT
 	if(bcid1 == CLASS_Float && bcid2 == CLASS_Int) {
 		return cid1;
 	}
 	if(bcid2 == CLASS_Float && bcid1 == CLASS_Int) {
 		return cid2;
 	}
+#endif
 	return CLASS_unknown;
 }
 
@@ -2732,9 +2745,12 @@ int TERMs_typecheck(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_type_t reqt, i
 
 	if(mode == TITERCONV_ && ctx->share->ClassTable[varc].bcid == CLASS_Iterator) return 1;
 
-	if(varc == CLASS_Any ||
-		(varc == CLASS_Float && reqc == CLASS_Int) ||
-		(varc == CLASS_Int && CLASS_Float)) {
+	if(varc == CLASS_Any 
+#ifndef KNH_USING_NOFLOAT
+		 || (varc == CLASS_Float && reqc == CLASS_Int) ||
+		(varc == CLASS_Int && CLASS_Float)
+#endif
+    ){
 		mode = TCONV_;
 	}
 

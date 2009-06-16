@@ -487,6 +487,7 @@ static
 METHOD knh_fmethod_fgetter(Ctx *ctx, knh_sfp_t *sfp)
 {
 	DBG2_ASSERT(IS_Method(sfp[-1].mtd));
+#ifndef KNH_USING_NOFLOAT
 #ifdef KNH_USING_UNBOXFIELD
 	knh_float_t *data = (knh_float_t*)(&(KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta)));
 	KNH_RETURN_Float(ctx, sfp, data[0]);
@@ -494,6 +495,7 @@ METHOD knh_fmethod_fgetter(Ctx *ctx, knh_sfp_t *sfp)
 	Float *o = (Float*)KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta);
 	KNH_RETURN_Float(ctx, sfp, o->n.fvalue);
 #endif/*KNH_USING_UNBOXFIELD*/
+#endif /* KNH_USING_NOFLOAT */
 }
 
 /* ------------------------------------------------------------------------ */
@@ -569,6 +571,7 @@ static
 METHOD knh_fmethod_fsetter(Ctx *ctx, knh_sfp_t *sfp)
 {
 	DBG2_ASSERT(IS_Method(sfp[-1].mtd));
+#ifndef KNH_USING_NOFLOAT
 #ifdef KNH_USING_UNBOXFIELD
 	knh_float_t *data = (knh_float_t*)(&(KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta)));
 	data[0] = sfp[1].fvalue;
@@ -576,6 +579,7 @@ METHOD knh_fmethod_fsetter(Ctx *ctx, knh_sfp_t *sfp)
 	Float *n = new_Float(ctx, sfp[1].fvalue);
 	KNH_MOV(ctx, KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta), n);
 #endif/*KNH_USING_UNBOXFIELD*/
+#endif /* KNH_USING_NOFLOAT */
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -585,8 +589,10 @@ static
 METHOD knh_fmethod_fnsetter(Ctx *ctx, knh_sfp_t *sfp)
 {
 	DBG2_ASSERT(IS_Method(sfp[-1].mtd));
+#ifndef KNH_USING_NOFLOAT
 	Float *n = IS_NULL(sfp[1].o) ? sfp[1].f : new_Float(ctx, sfp[1].fvalue);
 	KNH_MOV(ctx, KNH_FIELDn(sfp[0].o, DP(sfp[-1].mtd)->delta), n);
+#endif /* KNH_USING_NOFLOAT */
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -600,9 +606,11 @@ Method *new_Method_getter(Ctx *ctx, knh_class_t cid, knh_methodn_t mn, knh_type_
 	if(IS_ubxint(type)) {
 		f = knh_fmethod_igetter;
 	}
+#ifndef KNH_USING_NOFLOAT
 	else if(IS_ubxfloat(type)) {
 		f = knh_fmethod_fgetter;
 	}
+#endif
 	else if(IS_ubxboolean(type)) {
 		f = knh_fmethod_bgetter;
 	}
@@ -624,12 +632,14 @@ Method *new_Method_setter(Ctx *ctx, knh_class_t cid, knh_methodn_t mn, knh_type_
 	else if(IS_bxint(type)) {
 		f = knh_fmethod_insetter;
 	}
+#ifndef KNH_USING_NOFLOAT
 	else if(IS_ubxfloat(type)) {
 		f = knh_fmethod_fsetter;
 	}
 	else if(IS_bxfloat(type)) {
 		f = knh_fmethod_fnsetter;
 	}
+#endif
 	else if(IS_ubxboolean(type)) {
 		f = knh_fmethod_bsetter;
 	}

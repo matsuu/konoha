@@ -1028,8 +1028,11 @@ extern "C" {
 
 /* ------------------------------------------------------------------------ */
 /* Float */
+#ifndef KNH_USING_NOFLOAT
 #define STRUCT_Float            ((knh_struct_t)6)
+#endif
 #define CLASS_Float             ((knh_class_t)6)
+#ifndef KNH_USING_NOFLOAT
 #define IS_bFloat(o)            ((o)->h.bcid == CLASS_Float)
 #ifndef Float
 #define Float                   knh_Float_t
@@ -1040,6 +1043,7 @@ extern "C" {
 #define NNTYPE_Float            TYPE_TONNTYPE(CLASS_Float)
 #define CFLAG_Float             ((knh_flag_t)KNH_FLAG_CF_IMMUTABLE)
 #define FLAG_Float              KNH_FLAG_CF2OF(CFLAG_Float)
+#endif
 
 /* ------------------------------------------------------------------------ */
 
@@ -1708,9 +1712,11 @@ extern "C" {
 #define ACLASS_Int              CLASS_IArray
 #define ATYPE_Int               CLASS_IArray
 #define NNATYPE_Int             NNTYPE_cid(CLASS_IArray)
+#ifndef KNH_USING_NOFLOAT
 #define ACLASS_Float            CLASS_FArray
 #define ATYPE_Float             CLASS_FArray
 #define NNATYPE_Float           NNTYPE_cid(CLASS_FArray)
+#endif
 
 /* ======================================================================== */
 /* [Array<X>] */
@@ -2042,6 +2048,8 @@ extern "C" {
 #define METHODN__file                   ((knh_methodn_t)48|KNH_FLAG_MN_MOVTEXT)
 #define METHODN_getFile                 ((knh_methodn_t)48|KNH_FLAG_MN_GETTER)
 #define METHODN_setFile                 ((knh_methodn_t)48|KNH_FLAG_MN_SETTER)
+
+#ifndef KNH_USING_NOFLOAT
 #define FIELDN_float                    ((knh_fieldn_t)49)
 #define METHODN_float                   ((knh_methodn_t)49)
 #define METHODN__float                  ((knh_methodn_t)49|KNH_FLAG_MN_MOVTEXT)
@@ -2052,6 +2060,8 @@ extern "C" {
 #define METHODN__floatToIntBits         ((knh_methodn_t)50|KNH_FLAG_MN_MOVTEXT)
 #define METHODN_getFloatToIntBits       ((knh_methodn_t)50|KNH_FLAG_MN_GETTER)
 #define METHODN_setFloatToIntBits       ((knh_methodn_t)50|KNH_FLAG_MN_SETTER)
+#endif
+
 #define FIELDN_flush                    ((knh_fieldn_t)51)
 #define METHODN_flush                   ((knh_methodn_t)51)
 #define METHODN__flush                  ((knh_methodn_t)51|KNH_FLAG_MN_MOVTEXT)
@@ -2160,11 +2170,15 @@ extern "C" {
 #define METHODN__int                    ((knh_methodn_t)72|KNH_FLAG_MN_MOVTEXT)
 #define METHODN_getInt                  ((knh_methodn_t)72|KNH_FLAG_MN_GETTER)
 #define METHODN_setInt                  ((knh_methodn_t)72|KNH_FLAG_MN_SETTER)
+
+#ifndef KNH_USING_NOFLOAT
 #define FIELDN_intToFloatBits           ((knh_fieldn_t)73)
 #define METHODN_intToFloatBits          ((knh_methodn_t)73)
 #define METHODN__intToFloatBits         ((knh_methodn_t)73|KNH_FLAG_MN_MOVTEXT)
 #define METHODN_getIntToFloatBits       ((knh_methodn_t)73|KNH_FLAG_MN_GETTER)
 #define METHODN_setIntToFloatBits       ((knh_methodn_t)73|KNH_FLAG_MN_SETTER)
+#endif
+
 #define FIELDN_invoke                   ((knh_fieldn_t)74)
 #define METHODN_invoke                  ((knh_methodn_t)74)
 #define METHODN__invoke                 ((knh_methodn_t)74|KNH_FLAG_MN_MOVTEXT)
@@ -3015,8 +3029,12 @@ extern "C" {
 #define MF_nThis_Any1_                  knh_tMethodField(ctx, MFN_nThis_Any1_)
 #define MFN_nThis_nInt_         3
 #define MF_nThis_nInt_                  knh_tMethodField(ctx, MFN_nThis_nInt_)
+
+#ifndef KNH_USING_NOFLOAT
 #define MFN_nThis_nFloat_       4
 #define MF_nThis_nFloat_                knh_tMethodField(ctx, MFN_nThis_nFloat_)
+#endif
+
 #define MFN_void_nAny1          5
 #define MF_void_nAny1                   knh_tMethodField(ctx, MFN_void_nAny1)
 #define MFN_void_nAny1_         6
@@ -3025,24 +3043,36 @@ extern "C" {
 #define MF_void_nInt                    knh_tMethodField(ctx, MFN_void_nInt)
 #define MFN_void_nInt_          8
 #define MF_void_nInt_                   knh_tMethodField(ctx, MFN_void_nInt_)
+
+#ifndef KNH_USING_NOFLOAT
 #define MFN_void_nFloat         9
 #define MF_void_nFloat                  knh_tMethodField(ctx, MFN_void_nFloat)
 #define MFN_void_nFloat_        10
 #define MF_void_nFloat_                 knh_tMethodField(ctx, MFN_void_nFloat_)
+#endif
+
 #define MFN_nInt                11
 #define MF_nInt                         knh_tMethodField(ctx, MFN_nInt)
 #define MFN_nAny1_nInt          12
 #define MF_nAny1_nInt                   knh_tMethodField(ctx, MFN_nAny1_nInt)
 #define MFN_nInt_nInt           13
 #define MF_nInt_nInt                    knh_tMethodField(ctx, MFN_nInt_nInt)
+
+#ifndef KNH_USING_NOFLOAT
 #define MFN_nFloat_nInt         14
 #define MF_nFloat_nInt                  knh_tMethodField(ctx, MFN_nFloat_nInt)
+#endif
+
 #define MFN_void_nInt_nAny1     15
 #define MF_void_nInt_nAny1              knh_tMethodField(ctx, MFN_void_nInt_nAny1)
 #define MFN_void_nInt_nInt      16
 #define MF_void_nInt_nInt               knh_tMethodField(ctx, MFN_void_nInt_nInt)
+
+#ifndef KNH_USING_NOFLOAT
 #define MFN_void_nInt_nFloat    17
 #define MF_void_nInt_nFloat             knh_tMethodField(ctx, MFN_void_nInt_nFloat)
+#endif
+
 #define MFN_void_Any1           18
 #define MF_void_Any1                    knh_tMethodField(ctx, MFN_void_Any1)
 #define MFN_nThis_Int_Int       19
@@ -3085,6 +3115,8 @@ extern "C" {
 #define MF_void_nInt_nInt_nInt          knh_tMethodField(ctx, MFN_void_nInt_nInt_nInt)
 #define MFN_void_nInt_nInt_nInt_nInt 38
 #define MF_void_nInt_nInt_nInt_nInt     knh_tMethodField(ctx, MFN_void_nInt_nInt_nInt_nInt)
+
+#ifndef KNH_USING_NOFLOAT
 #define MFN_nFloat_nInt_nInt    39
 #define MF_nFloat_nInt_nInt             knh_tMethodField(ctx, MFN_nFloat_nInt_nInt)
 #define MFN_nFloat_nInt_nInt_nInt 40
@@ -3093,6 +3125,8 @@ extern "C" {
 #define MF_void_nInt_nInt_nFloat        knh_tMethodField(ctx, MFN_void_nInt_nInt_nFloat)
 #define MFN_void_nInt_nInt_nInt_nFloat 42
 #define MF_void_nInt_nInt_nInt_nFloat   knh_tMethodField(ctx, MFN_void_nInt_nInt_nInt_nFloat)
+#endif
+
 #define MFN_nBytes_Int          43
 #define MF_nBytes_Int                   knh_tMethodField(ctx, MFN_nBytes_Int)
 #define MFN_void_nBytes_Int_Int 44
@@ -3109,8 +3143,12 @@ extern "C" {
 #define MF_nString_nInt                 knh_tMethodField(ctx, MFN_nString_nInt)
 #define MFN_Int_nAny            50
 #define MF_Int_nAny                     knh_tMethodField(ctx, MFN_Int_nAny)
+
+#ifndef KNH_USING_NOFLOAT
 #define MFN_Float_nAny          51
 #define MF_Float_nAny                   knh_tMethodField(ctx, MFN_Float_nAny)
+#endif
+
 #define MFN_String_nAny         52
 #define MF_String_nAny                  knh_tMethodField(ctx, MFN_String_nAny)
 #define MFN_Any_nAny            53
@@ -3143,6 +3181,8 @@ extern "C" {
 #define MF_nInt_nInt_                   knh_tMethodField(ctx, MFN_nInt_nInt_)
 #define MFN_nInt_Int            67
 #define MF_nInt_Int                     knh_tMethodField(ctx, MFN_nInt_Int)
+
+#ifndef KNH_USING_NOFLOAT
 #define MFN_nFloat_nFloat       68
 #define MF_nFloat_nFloat                knh_tMethodField(ctx, MFN_nFloat_nFloat)
 #define MFN_nFloat              69
@@ -3153,6 +3193,8 @@ extern "C" {
 #define MF_nBoolean_nFloat              knh_tMethodField(ctx, MFN_nBoolean_nFloat)
 #define MFN_nInt_nFloat         72
 #define MF_nInt_nFloat                  knh_tMethodField(ctx, MFN_nInt_nFloat)
+#endif
+
 #define MFN_nThis_Any_          73
 #define MF_nThis_Any_                   knh_tMethodField(ctx, MFN_nThis_Any_)
 #define MFN_nBoolean_Any        74

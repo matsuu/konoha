@@ -50,8 +50,10 @@ knh_int_t knh_Number_tointeger(Any *o)
 			return (IS_TRUE(n)) ? 1 : 0;
 		case CLASS_Int :
 			return (knh_int_t)((Int*)n)->n.ivalue;
+#ifndef KNH_USING_NOFLOAT
 		case CLASS_Float :
 			return (knh_int_t)((Float*)n)->n.fvalue;
+#endif
 	}
 	KNH_ASSERT(n->h.bcid == CLASS_Int); /* STOP */
 	return 0;
@@ -69,8 +71,10 @@ knh_float_t knh_Number_tofloat(Any *o)
 			return (IS_TRUE(n)) ? 1.0 : 0.0;
 		case CLASS_Int :
 			return (knh_float_t)((Int*)n)->n.ivalue;
+#ifndef KNH_USING_NOFLOAT
 		case CLASS_Float :
 			return (knh_float_t)((Float*)n)->n.fvalue;
+#endif
 	}
 	KNH_ASSERT(n->h.bcid == CLASS_Int); /* STOP */
 	return (knh_float_t)0.0;
@@ -130,6 +134,7 @@ knh_int_t knh_IntNULL_toint(Int *v)
 /* ======================================================================== */
 /* [Float] */
 
+#ifndef KNH_USING_NOFLOAT
 KNHAPI(Float*) new_Float(Ctx *ctx, knh_float_t value)
 {
 	Float *b = (Float*)new_hObject(ctx, FLAG_Float, CLASS_Float, CLASS_Float);
@@ -162,10 +167,12 @@ KNHAPI(Float*) new_FloatX(Ctx *ctx, knh_class_t cid, knh_float_t value)
 		return DP(u)->fvalue;
 	}
 }
+#endif
 
 /* ======================================================================== */
 /* [Affine] */
 
+#ifndef KNH_USING_NOFLOAT
 static
 AffineConv *new_AffineConv(Ctx *ctx, knh_float_t fa, knh_float_t fb)
 {
@@ -265,7 +272,7 @@ KNHAPI(void) konoha_addAffineMapper(Ctx *ctx, knh_class_t scid, char *text, knh_
 		}
 	}
 }
-
+#endif /*  KNH_USING_NOFLOAT */
 /* ------------------------------------------------------------------------ */
 
 #ifdef __cplusplus

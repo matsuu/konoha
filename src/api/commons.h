@@ -28,7 +28,7 @@
 #ifndef COMMONS_H_
 #define COMMONS_H_
 
-#include<konoha/konoha_dev.h>
+#include"../../include/konoha/konoha_dev.h"
 
 
 #ifdef __cplusplus
@@ -51,8 +51,10 @@ extern "C" {
 #define KNH_LONGUNIT_BUFSIZ 80
 #endif
 
+#ifndef KNH_USING_NOFLOAT
 #ifndef KNH_FLOATUNIT_BUFSIZ
 #define BUFSIZ_FLOAT 80
+#endif
 #endif
 
 /* Array */

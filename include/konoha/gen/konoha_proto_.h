@@ -105,7 +105,9 @@ knh_bytes_t knh_bytes_subset(knh_bytes_t t, size_t s, size_t e);
 knh_bytes_t knh_bytes_offlen(knh_bytes_t t, size_t off, size_t len);
 knh_bytes_t knh_bytes_trim(knh_bytes_t t /*, knh_intptr_t ch*/);
 int knh_bytes_parseint(knh_bytes_t t, knh_int_t *value);
+#ifndef KNH_USING_NOFLOAT
 int knh_bytes_parsefloat(knh_bytes_t t, knh_float_t *value);
+#endif
 /* ../src/class/knh_BytesConv.c */
 size_t knh_BytesConv_conv(Ctx *ctx, BytesConv *o, knh_bytes_t t, knh_Bytes_t *ba);
 iconv_t knh_iconv_open(Ctx *ctx, char *to, char *from);
@@ -144,7 +146,9 @@ void knh_ClassMap__dump(Ctx *ctx, ClassMap *o, OutputStream *w, String *m);
 void knh_ClassMap__man(Ctx *ctx, ClassMap *o, OutputStream *w, knh_class_t cid);
 /* ../src/class/knh_ClassSpec.c */
 void knh_write_intx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_int_t v);
+#ifndef KNH_USING_NOFLOAT
 void knh_write_floatx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_float_t v);
+#endif
 void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid);
 knh_bytes_t konoha_getURNAlias(Ctx *ctx, knh_bytes_t aurn);
 ClassSpec *konoha_getClassSpec(Ctx *ctx, knh_class_t cid);
@@ -310,7 +314,9 @@ knh_class_t knh_NameSpace_getFuncClass(Ctx *ctx, NameSpace *o, knh_bytes_t funcn
 knh_type_t knh_NameSpace_tagcid(Ctx *ctx, NameSpace *o, knh_class_t cid, knh_bytes_t tag);
 /* ../src/class/knh_Number.c */
 knh_int_t knh_Number_tointeger(Any *o);
+#ifndef KNH_USING_NOFLOAT
 knh_float_t knh_Number_tofloat(Any *o);
+#endif
 knh_int_t knh_IntNULL_toint(Int *v);
 /* ../src/class/knh_Object.c */
 Object *new_Nue(Ctx *ctx, String *msg);
@@ -345,7 +351,9 @@ String *knh_ResultSet_getName(Ctx *ctx, ResultSet *o, size_t n);
 int knh_ResultSet_findColumn(Ctx *ctx, ResultSet *o, knh_bytes_t name);
 knh_type_t knh_ResultSet_get_type(Ctx *ctx, ResultSet *o, size_t n);
 knh_int_t knh_ResultSet_getInt(Ctx *ctx, ResultSet *o, size_t n);
+#ifndef KNH_USING_NOFLOAT
 knh_float_t knh_ResultSet_getFloat(Ctx *ctx, ResultSet *o, size_t n);
+#endif
 String* knh_ResultSet_getString(Ctx *ctx, ResultSet *o, size_t n);
 /* ../src/class/knh_Script.c */
 Script *new_Script(Ctx *ctx, knh_bytes_t nsname);
@@ -358,7 +366,9 @@ knh_String_t *new_StringX__T(Ctx *ctx, knh_class_t cid, const char *text);
 String *new_StringX__fast(Ctx *ctx, knh_class_t cid, knh_bytes_t t, String *orign);
 String *new_StringX(Ctx *ctx, knh_class_t cid, knh_bytes_t t, String *orign);
 String *new_String__int(Ctx *ctx, knh_int_t n);
+#ifndef KNH_USING_NOFLOAT
 String *new_String__float(Ctx *ctx, knh_float_t n);
+#endif
 char *knh_StringNULL_tochar(String *o);
 knh_bool_t knh_String_equals(String *o, knh_bytes_t s);
 knh_bool_t knh_String_startsWith(String *b, knh_bytes_t s);
@@ -390,7 +400,9 @@ char *knh_TYPEN(Ctx *ctx, knh_type_t type);
 void knh_write__s(Ctx *ctx, OutputStream *w, char *s);
 void knh_write__p(Ctx *ctx, OutputStream *w, void *ptr);
 void knh_write__ifmt(Ctx *ctx, OutputStream *w, char *fmt, knh_intptr_t n);
+#ifndef KNH_USING_NOFLOAT
 void knh_write__ffmt(Ctx *ctx, OutputStream *w, char *fmt, knh_float_t n);
+#endif
 void knh_write_integerfmt(Ctx *ctx, OutputStream *w, char *fmt, knh_int_t n);
 void knh_write__flag(Ctx *ctx, OutputStream *w, knh_flag_t flag);
 void knh_write_cid(Ctx *ctx, OutputStream *w, knh_class_t cid);
@@ -585,7 +597,9 @@ METHOD knh__Script_addHistory(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/main/konoha_ext.c */
 void knh_srand(knh_uint_t seed);
 knh_uint_t knh_rand();
+#ifndef KNH_USING_NOFLOAT
 knh_float_t knh_float_rand();
+#endif
 /* ../src/main/logging.c */
 void knh_stack_pmsg(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, String *s);
 void knh_stack_p(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, knh_methodn_t mn, int sfpidx);

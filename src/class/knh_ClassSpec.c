@@ -75,7 +75,7 @@ int knh_ficmp__unsigned(ClassSpec *u, knh_uint_t v1, knh_uint_t v2)
 
 /* ------------------------------------------------------------------------ */
 /* [Float] */
-
+#ifndef KNH_USING_NOFLOAT
 static
 int knh_ffchk__range(ClassSpec *u, knh_float_t v)
 {
@@ -92,18 +92,19 @@ int knh_ffcmp__step(ClassSpec *u, knh_float_t v1, knh_float_t v2)
 	if(v <= -(DP(u)->fstep)) return -1;
 	return 0;
 }
-
+#endif
 /* ------------------------------------------------------------------------ */
 
 static
 void knh_ClassSpec_initIntRange(Ctx *ctx, ClassSpec *u, knh_int_t min, knh_int_t max)
 {
 	DP(u)->imin = min;
-	DP(u)->fmin = (knh_float_t)min;
 	DP(u)->imax = max;
+#ifndef KNH_USING_NOFLOAT
+	DP(u)->fmin = (knh_float_t)min;
 	DP(u)->fmax = (knh_float_t)max;
 	DP(u)->fstep = 1.0;
-
+#endif
 	if(min >= 0) {
 		DP(u)->ficmp = (knh_ficmp)knh_ficmp__unsigned;
 		if(min == 0) {
@@ -112,15 +113,21 @@ void knh_ClassSpec_initIntRange(Ctx *ctx, ClassSpec *u, knh_int_t min, knh_int_t
 		else {
 			DP(u)->fichk = (knh_fichk)knh_fichk__urange;
 		}
+#ifndef KNH_USING_NOFLOAT
 		DP(u)->ffchk = knh_ffchk__range;
+#endif
 	}
 	else {
 		if(min != KNH_INT_MIN || max != KNH_INT_MAX) {
 			DP(u)->fichk = knh_fichk__range;
+#ifndef KNH_USING_NOFLOAT
 			DP(u)->ffchk = knh_ffchk__range;
+#endif
 		}
 	}
+#ifndef KNH_USING_NOFLOAT
 	DP(u)->ffcmp = knh_ffcmp__step;
+#endif
 }
 
 /* ------------------------------------------------------------------------ */
@@ -144,6 +151,7 @@ void knh_write_intx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_int_t v)
 
 /* ------------------------------------------------------------------------ */
 
+#ifndef KNH_USING_NOFLOAT
 static
 void knh_ClassSpec_initFloatRange(Ctx *ctx, ClassSpec *u, knh_float_t min, knh_float_t max, knh_float_t step)
 {
@@ -216,7 +224,7 @@ static MAPPER knh_FloatX_IntX(Ctx *ctx, knh_sfp_t *sfp)
 	knh_int_t v = (knh_int_t)sfp[0].fvalue;
 	KNH_MAPPED_Int(ctx, sfp, v);
 }
-
+#endif
 /* ------------------------------------------------------------------------ */
 
 static
@@ -271,12 +279,14 @@ void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid)
 		}
 		KNH_ASSERT(DP(u)->ivalue == NULL);
 		KNH_INITv(DP(u)->ivalue, new_IntX__fast(ctx, cid, v));
+#ifndef KNH_USING_NOFLOAT
 		if(DP(u)->fvalue != NULL) {
 			Mapper *mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, DP(u)->ucid, cid, knh_FloatX_IntX, (Object*)u);
 			konoha_addMapper(ctx, mpr);
 			mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, cid, DP(u)->ucid, knh_IntX_FloatX, (Object*)u);
 			konoha_addMapper(ctx, mpr);
 		}
+#endif
 		if(DP(u)->svalue != NULL) {
 			if(knh_ClassSpec_isVocab(u)) {
 				Mapper *mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, cid, DP(u)->ucid, knh_IntX_Vocab, (Object*)u);
@@ -286,6 +296,7 @@ void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid)
 			}
 		}
 	}
+#ifndef KNH_USING_NOFLOAT
 	else if(bcid == CLASS_Float) {
 		knh_float_t v = 0;
 		if(!DP(u)->ffchk(u, v)) {
@@ -300,6 +311,7 @@ void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid)
 			konoha_addMapper(ctx, mpr);
 		}
 	}
+#endif
 	else {
 		KNH_ASSERT(bcid == CLASS_String);
 		TODO();
@@ -331,6 +343,7 @@ KNHAPI(ClassSpec*) new_Enum(Ctx *ctx, char *tag, knh_bytes_t urn, knh_int_t min,
 
 /* ------------------------------------------------------------------------ */
 
+#ifndef KNH_USING_NOFLOAT
 KNHAPI(ClassSpec*) new_Unit(Ctx *ctx, char *tag, knh_bytes_t urn, knh_float_t min, knh_float_t max, knh_float_t step)
 {
 	knh_class_t cid = knh_ClassTable_newId(ctx);
@@ -350,6 +363,7 @@ KNHAPI(ClassSpec*) new_Unit(Ctx *ctx, char *tag, knh_bytes_t urn, knh_float_t mi
 	konoha_addSpecializedType(ctx, cid, CLASS_Float, u);
 	return u;
 }
+#endif
 
 /* ======================================================================== */
 /* [String] */
@@ -703,10 +717,12 @@ knh_class_t konoha_addSpecializedType(Ctx *ctx, knh_class_t cid, knh_class_t bci
 		KNH_ASSERT(DP(u)->ivalue != NULL);
 		ctx->share->ClassTable[cid].fdefault = knh_ClassTable_fdefault__ISPEC;
 	}
+#ifndef KNH_USING_NOFLOAT
 	else if(bcid == CLASS_Float) {
 		KNH_ASSERT(DP(u)->fvalue != NULL);
 		ctx->share->ClassTable[cid].fdefault = knh_ClassTable_fdefault__FSPEC;
 	}
+#endif
 	else {
 		KNH_ASSERT(bcid == CLASS_String);
 		KNH_ASSERT(DP(u)->svalue != NULL);
@@ -729,11 +745,13 @@ ClassSpec* konoha_findClassSpecNULL(Ctx *ctx, knh_bytes_t lname)
 		if(cid != CLASS_unknown) {
 			return konoha_getClassSpec(ctx, cid);
 		}
+#ifndef KNH_USING_NOFLOAT
 		knh_snprintf(cname, sizeof(cname), "Float%s", postfix);
 		cid = konoha_getcid(ctx, B(cname));
 		if(cid != CLASS_unknown) {
 			return konoha_getClassSpec(ctx, cid);
 		}
+#endif
 		knh_snprintf(cname, sizeof(cname), "String%s", postfix);
 		cid = konoha_getcid(ctx, B(cname));
 		if(cid != CLASS_unknown) {

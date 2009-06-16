@@ -376,7 +376,11 @@ void KNH_ASM_SETLINE(Ctx *ctx, Asm *abr, int line)
 
 #define sfi_(n)    ((knh_sfi_t)(n))
 
+#ifdef KNH_USING_NOFLOAT
+#define IS_VAL(t) (IS_BOOL(t)||IS_INT(t))
+#else
 #define IS_VAL(t) (IS_BOOL(t)||IS_INT(t)||IS_FLOAT(t))
+#endif
 #define IS_ANY(t) (CLASS_type(t) == CLASS_Any || CLASS_type(t) == CLASS_Object)
 
 /* ------------------------------------------------------------------------ */
@@ -403,7 +407,11 @@ void KNH_ASM_BOX(Ctx *ctx, Asm *abr, knh_type_t atype, int a)
 	knh_class_t cid = CLASS_type(atype);
 	KNH_ASSERT_cid(cid);
 	knh_class_t bcid = ctx->share->ClassTable[cid].bcid;
-	if(bcid == CLASS_Boolean || bcid == CLASS_Int || bcid == CLASS_Float) {
+	if(bcid == CLASS_Boolean || bcid == CLASS_Int || bcid == CLASS_Float
+#ifndef KNH_USING_NOFLOAT
+	 || bcid == CLASS_Float
+#endif
+         ) {
 		if(IS_NNTYPE(atype)) {
 			KNH_ASM_BOX_(ctx, abr, a, cid);
 		}
@@ -423,7 +431,11 @@ void KNH_ASM_NNBOX(Ctx *ctx, Asm *abr, knh_type_t atype, int a)
 	knh_class_t cid = CLASS_type(atype);
 	KNH_ASSERT_cid(cid);
 	knh_class_t bcid = ctx->share->ClassTable[cid].bcid;
-	if(bcid == CLASS_Boolean || bcid == CLASS_Int || bcid == CLASS_Float) {
+	if(bcid == CLASS_Boolean || bcid == CLASS_Int 
+#ifndef KNH_USING_NOFLOAT
+	 || bcid == CLASS_Float
+#endif 
+         ) {
 		if(IS_NNTYPE(atype)) {
 			KNH_ASM_NNBOX_(ctx, abr, a, cid);
 		}
@@ -446,6 +458,7 @@ void KNH_ASM_SMOVx(Ctx *ctx, Asm *abr, knh_type_t atype, int a, knh_type_t btype
 		}
 		return;
 	}
+#ifndef KNH_USING_NOFLOAT
 	if(IS_ubxfloat(btype)) {
 		KNH_ASM_MOVxf_(ctx, abr, sfi_(a), bx);
 		if(!IS_NNTYPE(atype)) {
@@ -453,6 +466,7 @@ void KNH_ASM_SMOVx(Ctx *ctx, Asm *abr, knh_type_t atype, int a, knh_type_t btype
 		}
 		return;
 	}
+#endif
 	if(IS_ubxboolean(btype)) {
 		KNH_ASM_MOVxb_(ctx, abr, sfi_(a), bx);
 		if(!IS_NNTYPE(atype)) {
@@ -499,7 +513,11 @@ void KNH_ASM_SMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, Token *tkb)
 					KNH_ASM_NNBOX(ctx, abr, btype, a);
 				}
 			}
-			else if(IS_bxint(btype) || IS_bxfloat(btype)) {
+			else if(IS_bxint(btype) 
+#ifndef KNH_USING_NOFLOAT
+			 || IS_bxfloat(btype)
+#endif
+             ) {
 				KNH_ASM_MOVa_(ctx, abr, sfi_(a), sfi_(b));
 				if(IS_ANY(atype)) {
 					KNH_ASM_NNBOX(ctx, abr, btype, a);
@@ -583,6 +601,7 @@ void KNH_ASM_XMOVx(Ctx *ctx, Asm *abr, knh_type_t atype, knh_sfx_t ax, knh_type_
 		}
 		return;
 	}
+#ifndef KNH_USING_NOFLOAT
 	if(IS_ubxfloat(atype)) {
 		if(IS_ubxfloat(btype)) {
 			KNH_ASM_XMOVxf_(ctx, abr, ax, bx);
@@ -592,6 +611,7 @@ void KNH_ASM_XMOVx(Ctx *ctx, Asm *abr, knh_type_t atype, knh_sfx_t ax, knh_type_
 		}
 		return;
 	}
+#endif
 	if(IS_ubxboolean(atype) && IS_ubxboolean(btype)) {
 		KNH_ASM_XMOVxb_(ctx, abr, ax, bx);
 		return;
@@ -600,10 +620,12 @@ void KNH_ASM_XMOVx(Ctx *ctx, Asm *abr, knh_type_t atype, knh_sfx_t ax, knh_type_
 		KNH_ASM_XMOVxBXi_(ctx, abr, ax, bx, CLASS_type(btype));
 		return;
 	}
+#ifndef KNH_USING_NOFLOAT
 	if(IS_bxfloat(atype) && IS_ubxfloat(btype)) {
 		KNH_ASM_XMOVxBXf_(ctx, abr, ax, bx, CLASS_type(btype));
 		return;
 	}
+#endif
 	KNH_ASM_XMOVx_(ctx, abr, ax, bx);
 }
 
@@ -624,10 +646,12 @@ void KNH_ASM_XMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, size_t an, Token 
 				KNH_ASM_XMOVoi_(ctx, abr, ax, v);
 				break;
 			}
+#ifndef KNH_USING_NOFLOAT
 			if(IS_ubxfloat(atype)) {
 				KNH_ASM_XMOVof_(ctx, abr, ax, v);
 				break;
 			}
+#endif
 			if(IS_ubxboolean(atype)) {
 				KNH_ASM_XMOVob_(ctx, abr, ax, v);
 				break;
@@ -648,10 +672,12 @@ void KNH_ASM_XMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, size_t an, Token 
 				KNH_ASM_XMOVsi_(ctx, abr, ax, sfi_(b));
 				break;
 			}
+#ifndef KNH_USING_NOFLOAT
 			if(IS_ubxfloat(atype)) {
 				KNH_ASM_XMOVsf_(ctx, abr, ax, sfi_(b));
 				break;
 			}
+#endif
 			if(IS_ubxboolean(atype)) {
 				KNH_ASM_XMOVsb_(ctx, abr, ax, sfi_(b));
 				break;
@@ -867,6 +893,7 @@ void KNH_ASM_MAP(Ctx *ctx, Asm *abr, knh_type_t reqt, int sfpidx, Token *tkb, kn
 //				TYPEQN(reqt), CLASSN(DP(mpr)->tcid), TYPEQN(srct), isNonNullCast);
 		if(knh_Mapper_isFinal(mpr)) {
 			if(IS_NNTYPE(srct)) {
+#ifndef KNH_USING_NOFLOAT
 				if(DP(mpr)->scid == CLASS_Int && DP(mpr)->tcid == CLASS_Float) {
 					KNH_ASM_fCAST_(ctx, abr, sfpidx);
 					return;
@@ -875,10 +902,12 @@ void KNH_ASM_MAP(Ctx *ctx, Asm *abr, knh_type_t reqt, int sfpidx, Token *tkb, kn
 					KNH_ASM_iCAST_(ctx, abr, sfpidx);
 					return;
 				}
+#endif
 				KNH_ASM_SMAP_(ctx, abr, sfpidx, UP(mpr));
 				if(!knh_Mapper_isTotal(mpr)) srct = CLASS_type(srct);
 			}
 			else {
+#ifndef KNH_USING_NOFLOAT
 				if(DP(mpr)->scid == CLASS_Int && DP(mpr)->tcid == CLASS_Float) {
 					KNH_ASM_fnCAST_(ctx, abr, sfpidx);
 					return;
@@ -887,6 +916,7 @@ void KNH_ASM_MAP(Ctx *ctx, Asm *abr, knh_type_t reqt, int sfpidx, Token *tkb, kn
 					KNH_ASM_inCAST_(ctx, abr, sfpidx);
 					return;
 				}
+#endif
 				KNH_ASM_SMAPnc_(ctx, abr, sfpidx, UP(mpr));
 			}
 		}
@@ -1229,6 +1259,7 @@ knh_int_t TERMs_int(Stmt *stmt, size_t n)
 
 /* ------------------------------------------------------------------------ */
 
+#ifndef KNH_USING_NOFLOAT
 static
 knh_float_t TERMs_float(Stmt *stmt, size_t n)
 {
@@ -1236,7 +1267,7 @@ knh_float_t TERMs_float(Stmt *stmt, size_t n)
 	KNH_ASSERT(SP(tk)->tt == TT_CONST);
 	return (DP(tk)->num)->n.fvalue;
 }
-
+#endif
 /* ------------------------------------------------------------------------ */
 
 static
@@ -1389,6 +1420,7 @@ int knh_StmtOP_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 			return 0;
 		}
 	} /* CLASS_Int */
+#ifndef KNH_USING_NOFLOAT
 	if(cid == CLASS_Float) {
 		if(IS_OPSIM(mn)) {
 			if(knh_StmtOP_checkConst(ctx, stmt, &mn, /*swap*/ 1)) {
@@ -1486,6 +1518,7 @@ int knh_StmtOP_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 			return 0;
 		}
 	} /* CLASS_Float */
+#endif
 	return 0;
 }
 

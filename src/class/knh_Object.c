@@ -173,10 +173,17 @@ int knh_Object_compareTo(Ctx *ctx, Object *o1, Object *o2)
 		return ctx->share->StructTable[bcid].fcompareTo(o1, o2);
 	}
 	else {
+
+#ifndef KNH_USING_NOFLOAT
 		if((o1->h.cid == CLASS_Int || o1->h.cid == CLASS_Float)
 		&& (o2->h.cid == CLASS_Int || o2->h.cid == CLASS_Float)) {
 			return (int)(knh_Number_tofloat(o1) - knh_Number_tofloat(o2));
 		}
+#else
+		if((o1->h.cid == CLASS_Int) && (o2->h.cid == CLASS_Int)) {
+			return (int)(knh_Number_toint(o1) - knh_Number_toint(o2));
+		}
+#endif
 		DBG2_P("Compared Incompatible Type %s - %s", CLASSN(o1->h.cid), CLASSN(o2->h.cid));
 		return (int)(o1 - o2);
 	}

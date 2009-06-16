@@ -323,8 +323,10 @@ Ctx *konoha_createContext0(size_t stacksize)
 	KNH_INITv(ctx->share->constVoid, new_Nue__T(ctx, "Null!!: return void"));
 	KNH_INITv(ctx->share->constTrue, new_Boolean0(ctx, 1));
 	KNH_INITv(ctx->share->constFalse, new_Boolean0(ctx, 0));
+#ifndef KNH_USING_NOFLOAT
 	KNH_INITv(ctx->share->constFloat0, new_hObject(ctx, FLAG_Float, CLASS_Float, CLASS_Float));
 	(ctx->share->constFloat0)->n.fvalue = 0.0;
+#endif
 
 	/*TINT*/ {
 		knh_intptr_t i;
@@ -384,7 +386,9 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 	ftr(ctx, ctx->share->constVoid);
 	ftr(ctx, ctx->share->constTrue);
 	ftr(ctx, ctx->share->constFalse);
+#ifndef KNH_USING_NOFLOAT
 	ftr(ctx, UP(ctx->share->constFloat0));
+#endif
 	ftr(ctx, UP(ctx->sys));
 
 	int i;

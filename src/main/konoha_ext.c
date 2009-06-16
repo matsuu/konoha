@@ -79,6 +79,7 @@ knh_uint_t knh_rand()
 }
 
 /* ------------------------------------------------------------------------ */
+#ifndef KNH_USING_NOFLOAT
 
 knh_float_t knh_float_rand()
 {
@@ -88,7 +89,7 @@ knh_float_t knh_float_rand()
 	return (knh_float_t)genrand64_real1();
 #endif
 }
-
+#endif
 /* ------------------------------------------------------------------------ */
 
 #ifdef __cplusplus

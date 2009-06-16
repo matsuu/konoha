@@ -44,7 +44,12 @@ static
 knh_hcode_t knh_stack_hashCode(Ctx *ctx, knh_sfp_t *sfp)
 {
 	knh_class_t bcid = (sfp[0].o)->h.bcid;
-	if(CLASS_Boolean <= bcid && bcid <= CLASS_Float) {
+
+	if(CLASS_Boolean <= bcid 
+#ifndef KNH_USING_NOFLOAT
+	    && bcid <= CLASS_Float
+#endif
+	 ) {
 		return (knh_hcode_t)(sfp[0].i)->n.data;
 	}
 	return ctx->share->StructTable[bcid].fhashCode(ctx, sfp[0].o);
@@ -56,7 +61,11 @@ static
 int knh_stack_equals(Ctx *ctx, knh_sfp_t *sfp, Object *o)
 {
 	knh_class_t bcid = (sfp[0].o)->h.bcid;
-	if(CLASS_Boolean <= bcid && bcid <= CLASS_Float) {
+	if(CLASS_Boolean <= bcid 
+#ifndef KNH_USING_NOFLOAT
+	    && bcid <= CLASS_Float
+#endif
+	 ) {
 		return ((sfp[0].i)->n.data == ((Int*)o)->n.data);
 	}
 	return (knh_Object_compareTo(ctx, sfp[0].o, o) == 0);

@@ -2246,9 +2246,11 @@ Stmt *new_StmtUSING(Ctx *ctx, knh_tokens_t *tc)
 			if(knh_bytes_startsWith(op, STEXT("Int:"))||knh_bytes_startsWith(op, STEXT("int:"))) {
 				return new_StmtUENUM(ctx, tc);
 			}
+#ifndef KNH_USING_NOFLOAT
 			if(knh_bytes_startsWith(op, STEXT("Float:"))||knh_bytes_startsWith(op, STEXT("float:"))) {
 				return new_StmtUUNIT(ctx, tc);
 			}
+#endif
 			if(knh_bytes_startsWith(op, STEXT("String:"))) {
 				return new_StmtUVOCAB(ctx, tc);
 			}

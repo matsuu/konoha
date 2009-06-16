@@ -378,12 +378,20 @@ KNHAPI(Object*) new_Object_boxing(Ctx *ctx, knh_class_t cid, knh_sfp_t *sfp)
 		knh_stat_incUsedObjectSize(ctx, 1);
 		o->h.magic = KNH_OBJECT_MAGIC;
 		knh_Object_RCset(o, KNH_RCGC_INIT);
+#ifndef KNH_USING_NOFLOAT
 		o->h.flag = FLAG_Float;
+#else
+		o->h.flag = FLAG_Int;
+#endif
 		o->h.bcid = ctx->share->ClassTable[cid].bcid;
 		o->h.cid  = cid;
 		o->h.ctxid = ctx->ctxid;
 		o->h.lock  = LOCK_NO;
+#ifndef KNH_USING_NOFLOAT
 		knh_Float_t *v = (knh_Float_t*)o;
+#else
+		knh_Int_t *v = (knh_Int_t*)o;
+#endif
 		v->n.data = sfp[0].data;
 		return o;
 	}

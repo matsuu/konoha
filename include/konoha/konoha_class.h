@@ -28,7 +28,7 @@
 #ifndef CLASS_KONOHA_H_
 #define CLASS_KONOHA_H_
 
-#include<konoha/konoha_t.h>
+#include "konoha/konoha_t.h"
 
 /* ************************************************************************ */
 
@@ -111,7 +111,9 @@ typedef struct {
 	union {
 		knh_boolean_t bvalue;
 		knh_int_t ivalue;
+#ifndef KNH_USING_NOFLOAT
 		knh_float_t   fvalue;
+#endif
 		knh_uint64_t  data;
 	};
 } knh_nObject_t ;
@@ -143,14 +145,14 @@ typedef knh_Int_t knh_IntX_t;
 /* ------------------------------------------------------------------------ */
 /* @class Float Number knh_Float_t @Immutable */
 /* @ class FloatX Number knh_Float_t @Immutable */
-
+#ifndef KNH_USING_NOFLOAT
 typedef struct knh_Float_t {
 	knh_hObject_t h;
 	knh_nObject_t n;
 } knh_Float_t;
 
 typedef knh_Float_t knh_FloatX_t;
-
+#endif
 /* ------------------------------------------------------------------------ */
 /* @class String Object knh_String_t @Immutable */
 /* @ class StringX String knh_String_t @Immutable */
@@ -225,7 +227,7 @@ typedef struct knh_IArray_t {
 /* ------------------------------------------------------------------------ */
 /* @class FArray Object knh_FArray_t @Cyclic @Param1 */
 /* @flag FArray.Dim ARY:1 (%s)->h.flag 'is:set:*:*' */
-
+#ifndef KNH_USING_NOFLOAT
 #define KNH_FARRAY_INITSIZE  (KONOHA_SMALLPAGESIZE / sizeof(knh_float_t))
 
 typedef struct knh_FArray_t {
@@ -234,7 +236,7 @@ typedef struct knh_FArray_t {
 	size_t size;
 	size_t capacity;
 } knh_FArray_t;
-
+#endif
 /* ------------------------------------------------------------------------ */
 /* @class Iterator Object knh_Iterator_struct @Param1 */
 
@@ -521,6 +523,7 @@ typedef struct knh_Closure {
 /* ------------------------------------------------------------------------ */
 /* @class AffineConv Object knh_AffineConv_t @Private */
 
+#ifndef KNH_USING_NOFLOAT
 typedef float knh_affinefloat_t;
 
 typedef struct knh_AffineConv_t {
@@ -528,6 +531,7 @@ typedef struct knh_AffineConv_t {
 	knh_affinefloat_t scale;
 	knh_affinefloat_t shift;
 } knh_AffineConv_t;
+#endif
 
 /* ------------------------------------------------------------------------ */
 /* @class Regex Object knh_Regex_t @Immutable */
@@ -571,8 +575,10 @@ struct  knh_ClassSpec_t;
 typedef int (*knh_fichk)(struct knh_ClassSpec_t *, knh_int_t v);
 typedef int (*knh_ficmp)(struct knh_ClassSpec_t *, knh_int_t v1, knh_int_t v2);
 
+#ifndef KNH_USING_NOFLOAT
 typedef int (*knh_ffchk)(struct knh_ClassSpec_t *, knh_float_t v);
 typedef int (*knh_ffcmp)(struct knh_ClassSpec_t *, knh_float_t v1, knh_float_t v2);
+#endif
 
 typedef knh_String_t *(*knh_fsnew)(Ctx *, knh_class_t cid, knh_bytes_t, struct knh_String_t *, int *);
 typedef int (*knh_fscmp)(struct knh_ClassSpec_t *, knh_bytes_t, knh_bytes_t);
@@ -584,7 +590,9 @@ typedef struct {
 	knh_String_t* urn;
 	knh_String_t* tag;
 	struct knh_Int_t    *ivalue;
+#ifndef KNH_USING_NOFLOAT
 	struct knh_Float_t  *fvalue;
+#endif
 	struct knh_String_t *svalue;
 
 	// int
@@ -598,14 +606,14 @@ typedef struct {
 	};
 	knh_fichk fichk;
 	knh_ficmp ficmp;
-
+#ifndef KNH_USING_NOFLOAT
 	// float
 	knh_float_t fmin;
 	knh_float_t fmax;
 	knh_float_t fstep;
 	knh_ffchk   ffchk;
 	knh_ffcmp   ffcmp;
-
+#endif
 	// String
 	size_t bytelen;
 	size_t charlen;

@@ -166,11 +166,13 @@ void knh_ClassStruct_initField(Ctx *ctx, ClassStruct *cs, knh_class_t self_cid, 
 			data[0] = IS_NULL(cf[i].value) ? 0 : ((Int*)cf[i].value)->n.ivalue;
 			continue;
 		}
+#ifndef KNH_USING_NOFLOAT
 		else if(IS_ubxfloat(type)) {
 			knh_float_t *data = (knh_float_t*)(v + i);
 			data[0] = IS_NULL(cf[i].value) ? 0.0 : ((Int*)cf[i].value)->n.fvalue;
 			continue;
 		}
+#endif
 		else if(IS_ubxboolean(type)) {
 			knh_bool_t *data = (knh_bool_t*)(v + i);
 			data[0] = IS_NULL(cf[i].value) ? 0 : ((Int*)cf[i].value)->n.bvalue;
@@ -421,6 +423,7 @@ String *knh_Int_getkey(Ctx *ctx, knh_sfp_t *lsfp)
 /* ======================================================================== */
 /* Float */
 
+#ifndef KNH_USING_NOFLOAT
 #define knh_Float_init_ NULL
 #define knh_Float_copy NULL
 #define knh_Float_traverse NULL
@@ -469,7 +472,7 @@ int knh_Float_compareTo(Float *o, Float *o2)
 //	knh_snprintf(buf, sizeof(buf), "%020llu", lsfp[0].ivalue);
 //	return new_String(ctx, B(buf), NULL);
 //}
-
+#endif
 /* ======================================================================== */
 /* String */
 
@@ -721,6 +724,7 @@ void knh_IArray_traverse(Ctx *ctx, knh_IArray_t *a, knh_ftraverse ftr)
 
 /* ======================================================================== */
 /* FArray */
+#ifndef KNH_USING_NOFLOAT
 
 #define knh_FArray_init_ NULL
 #define knh_FArray_copy NULL
@@ -760,7 +764,7 @@ void knh_FArray_traverse(Ctx *ctx, knh_FArray_t *a, knh_ftraverse ftr)
 		a->capacity = 0;
 	}
 }
-
+#endif
 /* ======================================================================== */
 /* Iterator */
 
@@ -1501,6 +1505,7 @@ int knh_ficmp__signed(ClassSpec *u, knh_int_t v1, knh_int_t v2)
 
 /* ------------------------------------------------------------------------ */
 
+#ifndef KNH_USING_NOFLOAT
 static
 int knh_ffchk__default(ClassSpec *u, knh_float_t v)
 {
@@ -1516,7 +1521,7 @@ int knh_ffcmp__default(ClassSpec *u, knh_float_t v1, knh_float_t v2)
 	if(delta == 0.0) return 0;
 	return delta < 0 ? -1 : 1;
 }
-
+#endif
 
 /* ------------------------------------------------------------------------ */
 
@@ -1556,6 +1561,7 @@ void knh_ClassSpec_init(Ctx *ctx, ClassSpec *u, int init)
 	b->ficmp = knh_ficmp__signed;
 
 	// float
+#ifndef KNH_USING_NOFLOAT
 	b->fstep = 0.001;
 	b->fmax  = KNH_FLOAT_MAX;
 	b->fmin  = KNH_FLOAT_MIN;
@@ -1563,6 +1569,7 @@ void knh_ClassSpec_init(Ctx *ctx, ClassSpec *u, int init)
 	b->ffcmp = knh_ffcmp__default;
 //	b->ffmt = knh_funitfmt__default;
 //	b->FMT  = KNH_FLOAT_FMT;
+#endif
 
 	// String
 	b->fsnew = knh_fsnew__default;
@@ -2345,8 +2352,12 @@ void knh_KLRCode_traverse(Ctx *ctx, KLRCode *o, knh_ftraverse ftr)
 #define knh_Number_fdefault NULL
 #define knh_Int_fdefault_ NULL
 #define knh_IntX_fdefault_ NULL
+
+#ifndef KNH_USING_NOFLOAT
 #define knh_Float_fdefault_ NULL
 #define knh_FloatX_fdefault_ NULL
+#endif
+
 #define knh_String_fdefault_ NULL
 #define knh_StringX_fdefault_ NULL
 #define knh_Bytes_fdefault NULL
@@ -2426,11 +2437,13 @@ Object *knh_ExceptionHandler_fdefault(Ctx *ctx, knh_class_t cid)
 
 /* ------------------------------------------------------------------------ */
 
+#ifndef KNH_USING_NOFLOAT
 static
 Object *knh_Float_fdefault(Ctx *ctx, knh_class_t cid)
 {
 	return (Object*)KNH_FLOAT0;
 }
+#endif
 
 ///* ------------------------------------------------------------------------ */
 //
@@ -2854,11 +2867,13 @@ static knh_IntConstData_t IntConstData[] = {
 	{NULL, 0}
 };
 
+#ifndef KNH_USING_NOFLOAT
 static knh_FloatConstData_t FloatConstData[] = {
 	{"Float.MAX", KNH_FLOAT_MAX},
 	{"Float.MIN", KNH_FLOAT_MIN},
 	{NULL, 0.0}
 };
+#endif
 
 static knh_StringConstData_t StringConstData[] = {
 	{NULL, NULL}
@@ -2877,10 +2892,14 @@ static void konoha_loadClassProperties(Ctx *ctx)
 {
 	ClassSpec *u = (ClassSpec*)new_Object_bcid(ctx, CLASS_ClassSpec, 0);
 	KNH_INITv(DP(u)->ivalue, KNH_INT0);
+#ifndef KNH_USING_NOFLOAT
 	KNH_INITv(DP(u)->fvalue, KNH_FLOAT0);
+#endif
 	KNH_INITv(DP(u)->svalue, TS_EMPTY);
 	KNH_SETv(ctx, ctx->share->ClassTable[CLASS_Int].cspec, u);
+#ifndef KNH_USING_NOFLOAT
 	KNH_SETv(ctx, ctx->share->ClassTable[CLASS_Float].cspec, u);
+#endif
 	KNH_SETv(ctx, ctx->share->ClassTable[CLASS_String].cspec, u);
 
 	konoha_setClassParam(ctx, CLASS_Array, CLASS_Any, CLASS_Nue);
@@ -2895,7 +2914,9 @@ static void konoha_loadClassProperties(Ctx *ctx)
 	ctx->share->ClassTable[CLASS_Closure].p3 = CLASS_Any;
 
 	konoha_loadIntConstData(ctx, IntConstData);
+#ifndef KNH_USING_NOFLOAT
 	konoha_loadFloatConstData(ctx, FloatConstData);
+#endif
 	konoha_loadStringConstData(ctx, StringConstData);
 	konoha_loadStringPropertyData(ctx, StringPropertyData);
 }

@@ -106,7 +106,9 @@ knh_bool_t konoha_initcheck(void)
 #ifdef KONOHA_SAFEMODE
 	fprintf(stderr, "\taddress sizeof(void*) = %d bytes\n", (int)sizeof(void *));
 	fprintf(stderr, "\tint sizeof(knh_int_t) = %d bytes\n", (int)sizeof(knh_intptr_t));
+#ifndef KNH_USING_NOFLOAT
 	fprintf(stderr, "\tfloat sizeof(knh_float_t) = %d bytes\n", (int)sizeof(knh_float_t));
+#endif
 	fprintf(stderr, "\tlong sizeof(knh_long_t) = %d bytes\n", (int)sizeof(knh_int64_t));
 	fprintf(stderr, "\tshort sizeof(knh_short_t) = %d bytes\n", (int)sizeof(knh_short_t));
 	fprintf(stderr, "\tObject(header) sizeof(hObject) = %d bytes\n", (int)sizeof(knh_hObject_t));

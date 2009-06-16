@@ -42,7 +42,9 @@ extern "C" {
 #define p_integer(a)     ((a).ivalue)
 #define p_uinteger(a)    ((knh_uint_t)(a).ivalue)
 
+#ifndef KNH_USING_NOFLOAT
 #define p_float(a)       ((a).fvalue)
+#endif
 #define p_double(a)      ((double)(a).fvalue)
 #define p_bool(a)        ((a).bvalue)
 #define p_char(a)        (knh_String_tochar(a.s))
@@ -56,10 +58,12 @@ extern "C" {
 #define sfp_bool(n_)           (sfp[n_].bvalue)
 #define sfp_int(n_)            sfp[n_].ivalue
 #define sfp_intOR(n_, d_)      (IS_bInt(sfp[n_].o) ? (sfp[n_].ivalue) : (d_))
+#ifndef KNH_USING_NOFLOAT
 #define sfp_float(n_)          (sfp[n_].fvalue)
 #define sfp_floatOR(n_, d_)    (IS_bFloat(sfp[n_].o) ? (sfp[n_].fvalue) : (d_))
 #define sfp_double(n_)         (sfp[n_].fvalue)
 #define sfp_doubleOR(n_, d_)   (IS_bFloat(sfp[n_].o) ? (sfp[n_].fvalue) : (d_))
+#endif
 
 #define sfp_charptr(n_)            knh_Object_charptr(ctx, sfp[n_].s)
 #define sfp_charptrOR(n_, d_)      (IS_NULL(sfp[n_].o) ? (d_) : knh_Object_charptr(ctx, sfp[n_].s))
@@ -98,6 +102,7 @@ extern "C" {
 		return; \
 	}\
 
+#ifndef KNH_USING_NOFLOAT
 #define KNH_RETURN_Float(ctx, sfp, n)      {\
 		sfp[-1].fvalue = (knh_float_t)n;\
 		return; \
@@ -108,6 +113,8 @@ extern "C" {
 		sfp[-1].fvalue = (knh_float_t)n;\
 		return; \
 	}\
+
+#endif
 
 /* --------------------------------------------------------------------------- */
 /* [Iterator] */
@@ -124,11 +131,14 @@ extern "C" {
 		return 1; \
 	}\
 
+#ifndef KNH_USING_NOFLOAT
 #define KNH_ITRNEXT_Float(ctx, sfp, i, n) {\
 		KNH_MOV(ctx, sfp[i].o, KNH_FLOAT0);\
 		sfp[i].fvalue = n;\
 		return 1; \
 	}\
+
+#endif
 
 #define KNH_ITREND(ctx, sfp, n) {\
 		knh_Iterator_close(ctx, sfp[0].it);\
@@ -157,11 +167,14 @@ extern "C" {
 		return; \
 	}\
 
+#ifndef KNH_USING_NOFLOAT
 #define KNH_MAPPED_Float(ctx, sfp, value) {\
 		KNH_MOV(ctx, sfp[0].o, KNH_FLOAT0);\
 		sfp[0].fvalue = value;\
 		return;\
 	}\
+
+#endif
 
 
 /* ------------------------------------------------------------------------ */
