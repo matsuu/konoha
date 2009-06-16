@@ -34,5 +34,5 @@ String[] System.listDir(String dirname);
 String! System.getCwd();
 void System.chDir(String dirname);
 int System.unlink(String filename);
-int System.rename(String filename);
+int System.rename(String oldname, String newname);
 

@@ -112,7 +112,7 @@ METHOD System_kill(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD System_system(Ctx *ctx, knh_sfp_t *sfp)
 {
-    KNH_SECURE(ctx);
+//    KNH_SECURE(ctx);
     int ret = system(p_char(sfp[1]));
     if(ret  == -1) {
         KNH_PERRNO(ctx, "OS!!", "system");
@@ -191,7 +191,7 @@ METHOD System_unlink(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-// int System.rename(String filename);
+// int System.rename(String oldname, String newname);
 
 METHOD System_rename(Ctx *ctx, knh_sfp_t *sfp)
 {
