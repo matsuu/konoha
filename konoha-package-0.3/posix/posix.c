@@ -199,7 +199,7 @@ METHOD System_rename(Ctx *ctx, knh_sfp_t *sfp)
   char *newname = p_char(sfp[2]);
   int ret = rename(oldname,newname);
   if(ret != 0){
-        KNH_PERRNO(ctx, "OS!!", "unlink");
+        KNH_PERRNO(ctx, "OS!!", "rename");
   }
   KNH_RETURN_Int(ctx, sfp,ret);
 }
