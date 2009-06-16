@@ -1877,12 +1877,13 @@ Term *knh_StmtCALLBASE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh
 	else if(mn == METHODN_super || mn == METHODN_this) {
 		knh_class_t mtd_cid = CLASS_type(DP(abr)->vars[0].type);
 		if(mn == METHODN_super) {
-			KNH_ASSERT_cid(mtd_cid); mtd_cid = ctx->share->ClassTable[mtd_cid].supcid;
+			KNH_ASSERT_cid(mtd_cid);
+			mtd_cid = ctx->share->ClassTable[mtd_cid].supcid;
 		}
 		Token *mtk = DP(stmt)->tokens[0]; /* change */
 		SP(mtk)->tt = TT_MN;
 		DP(mtk)->mn = METHODN_new;
-		knh_Token_toSTACK(ctx, tk, 0, DP(abr)->vars[0].type);
+		knh_Token_toSTACK(ctx, tk, 0, NNTYPE_cid(mtd_cid));
 		return TM(stmt);
 	}
 	else if(mn == METHODN_delegate) { /* delegate */
