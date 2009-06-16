@@ -302,6 +302,7 @@ knh_index_t knh_Class_indexOfField(Ctx *ctx, knh_class_t cid, knh_fieldn_t fn)
 {
 	L_TAIL:;
 	KNH_ASSERT_cid(cid);
+	DBG2_P("******* cid=%s, offset=%d, supcid=%s", CLASSN(cid), ctx->share->ClassTable[cid].offset, CLASSN(ctx->share->ClassTable[cid].supcid));
 	{
 		knh_index_t idx = -1;
 		ClassStruct *cs = ctx->share->ClassTable[cid].cstruct;

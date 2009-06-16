@@ -180,17 +180,13 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	TC->cflag  = knh_StmtCLASS_flag(ctx, stmt);
 	TC->oflag  = KNH_FLAG_CF2OF(TC->cflag);
 	if(SP(StmtCLASS_instmt(stmt))->stt == STT_DONE) {
-		TC->bcid   = CLASS_Any;
+		TC->bcid   = CLASS_Any;    /* Glue */
 	}
 	else {
 		TC->bcid   = CLASS_Object;
 	}
 	TC->supcid = supcid;
-	if(supcid == CLASS_Object) {
-		TC->offset = 0;
-	}else {
-		TC->offset = ctx->share->ClassTable[supcid].bsize;
-	}
+	TC->offset = 0; /* will be extended in CLASS_typing */
 	KNH_ASSERT(TC->class_cid == NULL);
 	konoha_setClassName(ctx, cid, new_String(ctx, B(bufn), NULL));
 	KNH_INITv(TC->cstruct, new_ClassStruct0(ctx, 0, 8));
