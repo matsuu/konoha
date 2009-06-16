@@ -810,7 +810,7 @@ void KNH_ASM_CALL(Ctx *ctx, Asm *abr, knh_type_t reqt, int sfpidx, Token *tkb, s
 	Method *mtd = DP(tkb)->mtd;
 	knh_type_t rtype = CLASS_Any;
 	if(IS_Method(mtd)) {
-		if(knh_Method_isFinal(mtd) || knh_Method_isConstructor(ctx, mtd)) {
+		if(knh_Method_isFinal(mtd) || knh_Method_isConstructor(ctx, mtd) || knh_Token_isSUPER(tkb)) {
 			KNH_ASM_SCALL_(ctx, abr, sfpidx, args + 2, UP(mtd));
 		}
 		else {

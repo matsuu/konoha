@@ -858,6 +858,9 @@ typedef knh_ushort_t   knh_stmt_t;
 #define knh_Token_isPNAME(o)  knh_Token_isTailWildCard(o)
 #define knh_Token_setPNAME(o, b) knh_Token_setTailWildCard(o, b)
 
+#define knh_Token_isSUPER(o)      knh_Token_isTailWildCard(o)
+#define knh_Token_setSUPER(o, b)  knh_Token_setTailWildCard(o, b)
+
 /* ------------------------------------------------------------------------ */
 
 #define knh_Token_isTyped(o)    (TT_CONST <= SP(o)->tt && SP(o)->tt <=TT_NOP)

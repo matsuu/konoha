@@ -249,6 +249,7 @@ KNHAPI(void) konoha_FINALv(Ctx *ctx, Object **v);
 KNHAPI(char*) knh_format_ospath(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t path);
 KNHAPI(Ctx*) konoha_getCurrentContext(void);
 KNHAPI(Ctx*) konoha_getThreadContext(Ctx *ctx);
+KNHAPI(int) konoha_debugLevel();
 KNHAPI(int) konoha_isSystemDump2();
 KNHAPI(int) konoha_parseopt(konoha_t konoha, int argc, char **argv);
 KNHAPI(char*) konoha_eval(konoha_t konoha, char *script);

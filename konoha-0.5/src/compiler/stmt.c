@@ -171,6 +171,10 @@ knh_flag_t knh_StmtMETHOD_flag(Ctx *ctx, Stmt *o)
 		if(IS_NOTNULL(v)) {
 			flag |= KNH_FLAG_MF_VIRTUAL;
 		}
+		v = knh_DictMap_get__b(ctx, DP(o)->metaDictMap, STEXT("Abstract"));
+		if(IS_NOTNULL(v)) {
+			flag |= KNH_FLAG_MF_VIRTUAL;
+		}
 		v = knh_DictMap_get__b(ctx, DP(o)->metaDictMap, STEXT("Private"));
 		if(IS_NOTNULL(v)) {
 			flag |= KNH_FLAG_MF_PRIVATE;
