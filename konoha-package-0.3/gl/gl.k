@@ -6,6 +6,8 @@ void GL.glutReshapeFunc(Closure c);
 void GL.glutIdleFunc(Closure c);
 void GL.glutMouseFunc(Closure c);
 void GL.glutTimerFunc(int msec, Closure c, int value);
+void GL.glutKeyboardFunc(Closure c);
+void GL.glutSpecialFunc(Closure c);
 
 
 void GL.glutInit(String[] argv);
@@ -191,6 +193,9 @@ void GL.glEvalPoint2(Int i0, Int i1);
 void GL.glFinish();
 void GL.glFlush();
 void GL.glFogf(Int i0, Float f1);
+
+void GL.glFogfv(Int i0, Float[] fa);
+
 void GL.glFogi(Int i0, Int i1);
 void GL.glFrontFace(Int i0);
 void GL.glFrustum(Float f0, Float f1, Float f2, Float f3, Float f4, Float f5);
@@ -479,3 +484,7 @@ Int GL.glutGameModeGet(Int i0);
 
 void GL.glDepthMask(Int mode);
 
+/* textures */
+
+void GL.glGenTextures(Int n, Int[] ia);
+void GL.glTexImage2D(Int i1, Int i2, Int[] array);

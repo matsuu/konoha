@@ -16,6 +16,8 @@ Closure *reshapefunc;
 Closure *mousefunc;
 Closure *idlefunc = NULL;
 Closure *timerfunc;
+Closure *keyboardfunc;
+Closure *specialfunc;
 
 // for pthread
 Ctx gl_ctx;
@@ -61,6 +63,91 @@ knh_IntConstData_t IntConstData[] = {
   {"GL.GL_T", GL_T},
   {"GL.GL_TEXTURE_GEN_MODE", GL_TEXTURE_GEN_MODE},
   {"GL.GL_SPHERE_MAP", GL_SPHERE_MAP},
+  {"GL.GL_FOG", GL_FOG},
+  // FOGs
+  {"GL.GL_FOG_END", GL_FOG_END},
+  {"GL.GL_FOG_MODE", GL_FOG_MODE},
+  {"GL.GL_FOG_START", GL_FOG_START},
+  {"GL.GL_FOG_COLOR", GL_FOG_COLOR},
+  {"GL.GL_LINEAR", GL_LINEAR},
+  {"GL.GL_TEXTURE", GL_TEXTURE},
+  // GL_Texture
+  {"GL.GL_ALPHA", GL_ALPHA},
+  {"GL.GL_ALPHA4", GL_ALPHA4},
+  {"GL.GL_ALPHA8", GL_ALPHA8},
+  {"GL.GL_ALPHA12", GL_ALPHA12},
+  {"GL.GL_ALPHA16", GL_ALPHA16},
+  {"GL.GL_LUMINANCE", GL_LUMINANCE},
+  {"GL.GL_LUMINANCE4", GL_LUMINANCE4},
+  {"GL.GL_LUMINANCE8", GL_LUMINANCE8},
+  {"GL.GL_LUMINANCE12", GL_LUMINANCE12},
+  {"GL.GL_LUMINANCE16", GL_LUMINANCE16},
+  {"GL.GL_LUMINANCE_ALPHA", GL_LUMINANCE_ALPHA},
+  {"GL.GL_LUMINANCE4_ALPHA4", GL_LUMINANCE4_ALPHA4},
+  {"GL.GL_LUMINANCE6_ALPHA2", GL_LUMINANCE6_ALPHA2},
+  {"GL.GL_LUMINANCE8_ALPHA8", GL_LUMINANCE8_ALPHA8},
+  {"GL.GL_LUMINANCE12_ALPHA4", GL_LUMINANCE12_ALPHA4},
+  {"GL.GL_LUMINANCE12_ALPHA12", GL_LUMINANCE12_ALPHA12},
+  {"GL.GL_LUMINANCE16_ALPHA16", GL_LUMINANCE16_ALPHA16},
+  {"GL.GL_INTENSITY", GL_INTENSITY},
+  {"GL.GL_INTENSITY4", GL_INTENSITY4},
+  {"GL.GL_INTENSITY8", GL_INTENSITY8},
+  {"GL.GL_INTENSITY12", GL_INTENSITY12},
+  {"GL.GL_INTENSITY16", GL_INTENSITY16},
+  {"GL.GL_R3_G3_B2", GL_R3_G3_B2},
+  {"GL.GL_RGB", GL_RGB},
+  {"GL.GL_RGB4", GL_RGB4},
+  {"GL.GL_RGB5", GL_RGB5},
+  {"GL.GL_RGB8", GL_RGB8},
+  {"GL.GL_RGB10", GL_RGB10},
+  {"GL.GL_RGB12", GL_RGB12},
+  {"GL.GL_RGB16", GL_RGB16},
+  {"GL.GL_RGBA", GL_RGBA},
+  {"GL.GL_RGBA2", GL_RGBA2},
+  {"GL.GL_RGBA4", GL_RGBA4},
+  {"GL.GL_RGB5_A1", GL_RGB5_A1},
+  {"GL.GL_RGBA8", GL_RGBA8},
+  {"GL.GL_RGB10_A2", GL_RGB10_A2},
+  {"GL.GL_RGBA12", GL_RGBA12},
+  {"GL.GL_RGBA16", GL_RGBA16},
+  //keyboard
+  {"GL.GLUT_KEY_F1", GLUT_KEY_F1},
+  {"GL.GLUT_KEY_F2", GLUT_KEY_F2},
+  {"GL.GLUT_KEY_F3", GLUT_KEY_F3},
+  {"GL.GLUT_KEY_F4", GLUT_KEY_F4},
+  {"GL.GLUT_KEY_F5", GLUT_KEY_F5},
+  {"GL.GLUT_KEY_F6", GLUT_KEY_F6},
+  {"GL.GLUT_KEY_F7", GLUT_KEY_F7},
+  {"GL.GLUT_KEY_F8", GLUT_KEY_F8},
+  {"GL.GLUT_KEY_F9", GLUT_KEY_F9},
+  {"GL.GLUT_KEY_F10", GLUT_KEY_F10},
+  {"GL.GLUT_KEY_F11", GLUT_KEY_F11},
+  {"GL.GLUT_KEY_F12", GLUT_KEY_F12},
+  {"GL.GLUT_KEY_LEFT", GLUT_KEY_LEFT},
+  {"GL.GLUT_KEY_UP", GLUT_KEY_UP},
+  {"GL.GLUT_KEY_RIGHT", GLUT_KEY_RIGHT},
+  {"GL.GLUT_KEY_DOWN", GLUT_KEY_DOWN},
+  {"GL.GLUT_KEY_PAGE_UP", GLUT_KEY_PAGE_UP},
+  {"GL.GLUT_KEY_PAGE_DOWN", GLUT_KEY_PAGE_DOWN},
+  {"GL.GLUT_KEY_HOME", GLUT_KEY_HOME},
+  {"GL.GLUT_KEY_END", GLUT_KEY_END},
+  {"GL.GLUT_KEY_INSERT", GLUT_KEY_INSERT},
+  // anti ailas
+  {"GL.GL_POLYGON_SMOOTH", GL_POLYGON_SMOOTH},
+  {"GL.GL_LINE_SMOOTH", GL_LINE_SMOOTH},
+  {"GL.GL_BLEND", GL_BLEND},
+  {"GL.GL_SRC_ALPHA", GL_SRC_ALPHA},
+  {"GL.GL_ONE_MINUS_SRC_ALPHA", GL_ONE_MINUS_SRC_ALPHA},
+  // unkonwn
+  {"GL.GL_LEQUAL", GL_LEQUAL},
+  {"GL.GL_UNPACK_ALIGNMENT", GL_UNPACK_ALIGNMENT},
+  {"GL.GL_TEXTURE_WRAP_S", GL_TEXTURE_WRAP_S},
+  {"GL.GL_TEXTURE_WRAP_T", GL_TEXTURE_WRAP_T},
+  {"GL.GL_REPEAT", GL_REPEAT},
+  {"GL.GL_TEXTURE_MAG_FILTER", GL_TEXTURE_MAG_FILTER},
+  {"GL.GL_NEAREST", GL_NEAREST},
+  {"GL.GL_TEXTURE_MIN_FILTER", GL_TEXTURE_MIN_FILTER},
+  {"GL.GL_UNSIGNED_BYTE", GL_UNSIGNED_BYTE},
   {NULL} // end of const
 };
 
@@ -107,7 +194,6 @@ void knh_glut_reshape(int w, int h)
   knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
   knh_putsfp(lctx, lsfp, 3, (Object *)arg2);
   knh_Closure_invokesfp(lctx, reshapefunc, lsfp, 2);
-
 }
 
 void knh_glut_idle (void)
@@ -132,7 +218,6 @@ void knh_glut_timer (int value)
   Ctx *lctx = &gl_ctx;
 #endif
   knh_sfp_t *lsfp = KNH_LOCAL(lctx);
-  fprintf(stderr, "%d\n", value);
   Int *arg1 = new_Int(lctx, value);
   knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
   knh_Closure_invokesfp(lctx, timerfunc, lsfp, 1);
@@ -150,14 +235,46 @@ void knh_glut_mouse(int button, int state, int x, int y)
   Int *arg2 = new_Int(lctx, state);
   Int *arg3 = new_Int(lctx, x);
   Int *arg4 = new_Int(lctx, y);
-
   knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
   knh_putsfp(lctx, lsfp, 3, (Object *)arg2);
   knh_putsfp(lctx, lsfp, 4, (Object *)arg3);
   knh_putsfp(lctx, lsfp, 5, (Object *)arg4);
   
   knh_Closure_invokesfp(lctx, mousefunc, lsfp, 4);
+}
 
+void knh_glut_keyboard(unsigned char key, int x, int y)
+{
+#ifndef KNH_USING_PTHREAD
+  Ctx *lctx = konoha_getCurrentContext();
+#else
+  Ctx *lctx = &gl_ctx;
+#endif
+  knh_sfp_t *lsfp = KNH_LOCAL(lctx);
+  Int *arg1 = new_Int(lctx, (int)key);
+  Int *arg2 = new_Int(lctx, x);
+  Int *arg3 = new_Int(lctx, y);
+  knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
+  knh_putsfp(lctx, lsfp, 3, (Object *)arg2);
+  knh_putsfp(lctx, lsfp, 4, (Object *)arg3);
+  knh_Closure_invokesfp(lctx, keyboardfunc, lsfp, 3);
+}
+
+void knh_glut_special(int key, int x, int y)
+{
+#ifndef KNH_USING_PTHREAD
+  Ctx *lctx = konoha_getCurrentContext();
+#else
+  Ctx *lctx = &gl_ctx;
+#endif
+  knh_sfp_t *lsfp = KNH_LOCAL(lctx);
+  Int *arg1 = new_Int(lctx, key);
+  Int *arg2 = new_Int(lctx, x);
+  Int *arg3 = new_Int(lctx, y);
+  knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
+  knh_putsfp(lctx, lsfp, 3, (Object *)arg2);
+  knh_putsfp(lctx, lsfp, 4, (Object *)arg3);
+  knh_Closure_invokesfp(lctx, specialfunc, lsfp, 3);
 }
 
 METHOD GL_glutInit(Ctx *ctx, knh_sfp_t *sfp)
@@ -253,7 +370,19 @@ METHOD GL_glutMouseFunc(Ctx *ctx, knh_sfp_t *sfp)
   KNH_RETURN_void(ctx, sfp);
 }
 
+METHOD GL_glutKeyboardFunc(Ctx *ctx, knh_sfp_t *sfp)
+{
+  keyboardfunc = sfp[1].cc;
+  glutKeyboardFunc(knh_glut_keyboard);
+  KNH_RETURN_void(ctx, sfp);
+}
 
+METHOD GL_glutSpecialFunc(Ctx *ctx, knh_sfp_t *sfp)
+{
+  specialfunc = sfp[1].cc;
+  glutSpecialFunc(knh_glut_special);
+  KNH_RETURN_void(ctx, sfp);
+}
 
 METHOD GL_glClear(Ctx *ctx, knh_sfp_t *sfp)
 {

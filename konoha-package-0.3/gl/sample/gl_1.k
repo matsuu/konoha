@@ -5,7 +5,8 @@ using gl.*;
 		GL.glClear(GL.GL_COLOR_BUFFER_BIT);
 		GL.glColor3d(0.0, 1.0, 1.0);
 		GL.glutWireTeapot(0.5);
-		GL.glutSwapBuffers();
+//		GL.glutWireSphere(0.7, 36, 18);
+GL.glutSwapBuffers();
 	}
 
 	void event()

@@ -44,18 +44,18 @@ METHOD GL_glNormal3dv(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 	
-METHOD GL_glLightfv(Ctx *ctx, knh_sfp_t *sfp)
+METHOD GL_glFogfv(Ctx *ctx, knh_sfp_t *sfp)
 {
   int i;
   GLenum e1 = p_int(sfp[1]);
-  GLenum e2 = p_int(sfp[2]);
-  knh_FArray_t *fa = (knh_FArray_t *)sfp[3].o;
+  knh_FArray_t *fa = (knh_FArray_t *)sfp[2].o;
+  
   int argc = knh_Array_size(fa);
-  GLfloat array[3];
+  GLfloat array[4];
   for (i = 0; i < argc; i++) {
 	array[i] = (GLfloat)fa->flist[i];
   }
-  glLightfv(e1, e2, (const GLfloat *)array);
+  glFogfv(e1, (const GLfloat *)array);
   KNH_RETURN_void(ctx, sfp);
 }
 
@@ -66,11 +66,25 @@ METHOD GL_glMaterialfv(Ctx *ctx, knh_sfp_t *sfp)
   GLenum e2 = p_int(sfp[2]);
   knh_FArray_t *fa = (knh_FArray_t *)sfp[3].o;
   int argc = knh_Array_size(fa);
-  GLfloat array[3];
+  GLfloat array[4];
   for (i = 0; i < argc; i++) {
 	array[i] = (GLfloat)fa->flist[i];
   }
   glMaterialfv(e1, e2, (const GLfloat *)array);
+  KNH_RETURN_void(ctx, sfp);
+}
+METHOD GL_glLightfv(Ctx *ctx, knh_sfp_t *sfp)
+{
+  int i;
+  GLenum e1 = p_int(sfp[1]);
+  GLenum e2 = p_int(sfp[2]);
+  knh_FArray_t *fa = (knh_FArray_t *)sfp[3].o;
+  int argc = knh_Array_size(fa);
+  GLfloat array[4];
+  for (i = 0; i < argc; i++) {
+	array[i] = (GLfloat)fa->flist[i];
+  }
+  glLightfv(e1, e2, (const GLfloat *)array);
   KNH_RETURN_void(ctx, sfp);
 }
 

@@ -1,4 +1,5 @@
 using gl.*;
+using math.*;
 
 Float[] vertex = new Float[8, 3];
 Float[] color = new Float[8, 3];
@@ -90,52 +91,54 @@ void init_face()
 }
 
 
+int switch1 = 1;
+float r = 0.0;
+float zoom = 1.0;
 
+void cube(int dx, int dy, int dz)
+{
+  GL.glBegin(GL.GL_QUADS);
+  for (j = 0; j < 6; j++) {
+	  GL.glColor3d(color[j,0], color[j,1], color[j,2]);
+    for (i = 0; i < 4; i++) {
+  	  GL.glVertex3d(vertex[face[j,i],0] + dx,
+			vertex[face[j,i],1] + dy,
+			vertex[face[j,i],2] + dz);
+    }
+  }
+  GL.glEnd();
 
-Float r = 0;
+}
 
-Float[] fogcolor = [0.8, 0.8, 0.8, 0.8];
-Float diff = 0.001;
-Float diffx=0.0;
-Float diffy=0.0;
-float diffz = 0.0;
 void go_display()
 {
   int i;
   int j;
-
+  
   GL.glClear(GL.GL_COLOR_BUFFER_BIT| GL.GL_DEPTH_BUFFER_BIT);
   GL.glLoadIdentity();
+  // gluLookAt(x, y, z, lookat(x,y,z), direction(x,y,z))
+  pi = Math.PI;
+  GL.gluLookAt(zoom * 5.0 * Math.cos(2 * pi * r / 360),
+	       4.0,
+	       zoom * 5.0 * Math.sin(2 * pi * r / 360),
+	       0.0, 0.0, 0.0, 
+	       0.0, 1.0, 0.0);  
 
-  if (0.0 > 30-diffx ) {
-    diff = 0.0
+  GL.glPushMatrix();
+  for (i = -5; i<= 5; i++) {
+	  for (j = -5; j <= 5; j++) {
+		  for (k = -5; k <= 5; k++) {
+			  if (i % 2 == 0 || j % 2 == 0|| k % 2 == 0) {
+				  cube(i*2, j*2, k*2);
+			  }
+		  }
+	  } 
   }
-
-  diffx = diffx + diff*3;
-  diffy = diffy + diff*4;
-  diffz = diffz + diff*5;
-  GL.gluLookAt(30.0-diffx, 40.0-diffy, 50.0-diffz, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);  
-  GL.glRotatef((Float)r, 0.0, 1.0, 0.0);
-
-
-  GL.glEnable(GL.GL_FOG);
-  GL.glFogi(GL.GL_FOG_MODE , GL.GL_LINEAR);
-  GL.glFogi(GL.GL_FOG_START , -10);
-  GL.glFogi(GL.GL_FOG_END , 10);
-  GL.glFogfv(GL.GL_FOG_COLOR , fogcolor);
-
-//  GL.glBegin(GL.GL_LINES);
-  GL.glBegin(GL.GL_QUADS);
-  for (j = 0; j < 6; j++) {
-    GL.glColor3d(color[j,0], color[j,1], color[j,2]);
-    for (i = 0; i < 4; i++) {
-  	  GL.glVertex3d(vertex[face[j,i],0], vertex[face[j,i],1], vertex[face[j,i],2]);
-    }
-  }
-  GL.glEnd();
+  GL.glPopMatrix();
   GL.glutSwapBuffers();
-  r = r + 0.1
-  if (r >= 360) r = 0;
+  if (r >= 180) r = -179;
+  if (r <= -180) r = 179;
 }
 
 void resize(int w, int h)
@@ -165,28 +168,20 @@ void stop_disp()
  ;
 }
 
-void mouse(int button, int state, int x, int y)
+void keyboard(int keycode, int x, int y)
 {
 	Closure c;
-
-	if (button == GL.GLUT_LEFT_BUTTON) {
-		if (state == GL.GLUT_DOWN) {
-		    diff = 0.001;
-			c = delegate(idle_func);
-			GL.glutIdleFunc(c);
-		}else {
-			c = delegate(stop_disp);
-			GL.glutIdleFunc(c);
-		}
-	} else if (button == GL.GLUT_RIGHT_BUTTON) {
-	  if (state == GL.GLUT_DOWN) {
-		  diff = -0.001;
-		  c = delegate(idle_func);
-		  GL.glutIdleFunc(c);
-	  } else {
-		  c = delegate(stop_disp);
-		  GL.glutIdleFunc(c);
-	  }
+	if (keycode == GL.GLUT_KEY_LEFT) {
+	  r = r + 5;
+	} else if(keycode == GL.GLUT_KEY_RIGHT) {
+	  r = r - 5;
+	} else if (keycode == GL.GLUT_KEY_UP) {
+	  zoom = zoom + 0.05;
+	} else if (keycode == GL.GLUT_KEY_DOWN) {
+	  zoom = zoom - 0.05;
+	} else {
+//	  c = delegate(idle_func);
+//	  GL.glutIdleFunc(c);
 	}
 }
 
@@ -205,10 +200,13 @@ int main(String[] args)
   GL.glutDisplayFunc(dis);
   Closure r = delegate(resize);
   GL.glutReshapeFunc(r);
-  Closure id = delegate(stop_disp);
+  Closure id = delegate(idle_func);
   GL.glutIdleFunc(id);
-  Closure mou = delegate(mouse);
-  GL.glutMouseFunc(mou);
+  Closure key = delegate(keyboard);
+  GL.glutSpecialFunc(key);
+  GL.glEnable(GL.GL_POLYGON_SMOOTH);
+  GL.glEnable(GL.GL_BLEND);
+  GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
   init();
   GL.glutMainLoop();
 
