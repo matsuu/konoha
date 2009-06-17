@@ -102,42 +102,10 @@
 
 #ifdef KONOHA_OS__MACOSX
 #define KONOHA_OS "macosx"
-#define KNH_USING_NOFLOAT    1
-#undef KNH_USING_PTHREAD
-#undef KNH_USING_THREAD
-#undef KNH_USING_SOCKET
-#undef KNH_USING_SQLITE3
-#undef KNH_USING_READLINE
-#undef KNH_USING_REGEX
-#undef HAVE_DLFCN_H 
-
 #endif
 
 #ifdef KONOHA_OS__TB
 #define KONOHA_OS "teaboard"
-#endif
-
-/* ------------------------------------------------------------------------ */
-
-#ifdef KONOHA_OS__LKM
-
-#define KNH_USING_INT32      1
-#define KNH_USING_NOFLOAT    1
-#define KNH_USING_NOFILE     1
-#define KNH_USING_NODB       1
-#define KNH_USING_NOLIB      1
-
-#define KNH_EXT_QSORT  1
-#define KNH_EXT_SETJMP 1
-
-#undef KNH_USING_PTHREAD
-#undef KNH_USING_THREAD
-#undef KNH_USING_SOCKET
-#undef KNH_USING_SQLITE3
-#undef KNH_USING_READLINE
-#undef KNH_USING_REGEX
-#undef HAVE_DLFCN_H 
-#undef HAVE_ICONV_H
 #endif
 
 /* ======================================================================== */

@@ -255,7 +255,6 @@ static METHOD knh__Int_random(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-#ifndef KNH_USING_NOFLOAT
 /* @method[CONST] Float! Float.opAdd(Float! v) */
 
 static METHOD knh__Float_opAdd(Ctx *ctx, knh_sfp_t *sfp)
@@ -397,7 +396,6 @@ static METHOD knh__Float_getSize(Ctx *ctx, knh_sfp_t *sfp)
 		KNH_RETURN_Int(ctx, sfp, n);
 	}
 }
-#endif /* KNH_USING_NOFLOAT */
 
 /* ------------------------------------------------------------------------ */
 /* @method void Boolean.%s(OutputStream w, String m) */
@@ -474,7 +472,6 @@ static METHOD knh__Int__u(Ctx *ctx, knh_sfp_t *sfp)
 
 /* ------------------------------------------------------------------------ */
 /* @method void Int.%f(OutputStream w, String m) */
-#ifndef KNH_USING_NOFLOAT
 
 static METHOD knh__Int__f(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -487,7 +484,6 @@ static METHOD knh__Int__f(Ctx *ctx, knh_sfp_t *sfp)
 		knh_write__f(ctx, sfp[1].w, (knh_float_t)sfp[0].ivalue);
 	}
 }
-#endif
 
 /* ------------------------------------------------------------------------ */
 /* @method void Int.%x(OutputStream w, String m) */
@@ -538,7 +534,6 @@ static METHOD knh__Int__c(Ctx *ctx, knh_sfp_t *sfp)
 /* ------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------ */
 /* @method void Float.%s(OutputStream w, String m) */
-#ifndef KNH_USING_NOFLOAT
 
 static METHOD knh__Float__s(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -593,7 +588,6 @@ static METHOD knh__Float__k(Ctx *ctx, knh_sfp_t *sfp)
 	ClassSpec *u = konoha_getClassSpec(ctx, knh_Object_cid(sfp[0].o));
 	knh_write_floatx(ctx, sfp[1].w, u, p_float(sfp[0]));
 }
-#endif /* KNH_USING_NOFLOAT */
 
 /* ======================================================================== */
 /* [Boolean] */
@@ -642,7 +636,6 @@ static MAPPER knh_Int_String(Ctx *ctx, knh_sfp_t *sfp)
 
 /* ------------------------------------------------------------------------ */
 /* @map String Float @Final @Const */
-#ifndef KNH_USING_NOFLOAT
 
 static MAPPER knh_String_Float(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -682,7 +675,6 @@ static MAPPER knh_Float_Int(Ctx *ctx, knh_sfp_t *sfp)
 	knh_int_t v = (knh_int_t)sfp[0].fvalue;
 	KNH_MAPPED_Int(ctx, sfp, v);
 }
-#endif /* KNH_USING_NOFLOAT */
 
 /* ------------------------------------------------------------------------ */
 

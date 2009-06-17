@@ -30,9 +30,7 @@
 
 #include<stdio.h>
 #include<limits.h>
-#ifndef KNH_USING_NOFLOAT
 #include<float.h>
-#endif
 #include<setjmp.h>
 
 #define __STDC_LIMIT_MACROS
@@ -141,7 +139,7 @@ typedef knh_uint64_t       knh_uint_t;
 /* Float, knh_float_t */
 /* ------------------------------------------------------------------------ */
 
-#ifndef KNH_USING_NOFLOAT
+#ifdef KNH_USING_NOFLOAT
 /* dummy */
 typedef int               knh_float_t;
 #define KNH_FLOAT_MAX             0
@@ -156,6 +154,7 @@ typedef int               knh_float_t;
 #define KNH_FLOAT_NAN             0
 #define KNH_FLOAT_NULL            KNH_FLOAT_NAN
 #define KNH_FLOAT_FMTSIZ          40
+#endif/*KNH_USING_NOFLOAT*/
 
 #if defined(KNH_USING_LONGDOUBLE) && !defined(KNH_FLOAT_FMT)
 typedef long double               knh_float_t;
@@ -201,7 +200,6 @@ typedef double                    knh_float_t;
 #define KNH_FLOAT_NULL            KNH_FLOAT_NAN
 #define KNH_FLOAT_FMTSIZ          80
 #endif/*KNH_FILAT_NAN*/
-#endif/*KNH_USING_NOFLOAT*/
 
 /* ------------------------------------------------------------------------ */
 /* String, knh_uchar_t */
@@ -225,12 +223,10 @@ typedef struct {
 	knh_int_t ivalue;
 } knh_IntConstData_t;
 
-#ifndef KNH_USING_NOFLOAT
 typedef struct {
 	char *name;
 	knh_float_t fvalue;
 } knh_FloatConstData_t;
-#endif
 
 typedef struct {
 	char *name;
@@ -309,16 +305,11 @@ typedef knh_uint16_t       knh_expt_t;    /* knh_expt_t */
 #define TYPE_TONNTYPE(t)              (t|KNH_FLAG_TF_NN)
 
 #define IS_ubxint(t)                  (IS_NNTYPE(t) && ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Int)
-#ifndef KNH_USING_NOFLOAT
 #define IS_ubxfloat(t)                (IS_NNTYPE(t) && ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Float)
-#endif
 #define IS_ubxboolean(t)              (NNTYPE_Boolean == t)
 #define IS_ubxtype(t)                 (IS_NNTYPE(t) && (ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Int || ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Float || t == NNTYPE_Boolean) )
 #define IS_bxint(t)                   (!IS_NNTYPE(t) && ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Int)
-
-#ifndef KNH_USING_NOFLOAT
 #define IS_bxfloat(t)                 (!IS_NNTYPE(t) && ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Float)
-#endif
 
 // @NOUSE
 #define TYPEQN(t)                     TYPEN(t), TYPEQ(t)
@@ -500,9 +491,7 @@ typedef struct knh_sfp_t {
 		void   *ref;
 		Object *o;
 		struct knh_Int_t    *i;
-#ifndef KNH_USING_NOFLOAT
 		struct knh_Float_t  *f;
-#endif
 		struct knh_Class_t  *c;
 		struct knh_String_t *s;
 		struct knh_Bytes_t  *ba;
@@ -518,9 +507,7 @@ typedef struct knh_sfp_t {
 	union {
 		knh_boolean_t bvalue;
 		knh_int_t     ivalue;
-#ifndef KNH_USING_NOFLOAT
 		knh_float_t   fvalue;
-#endif
 		knh_uint64_t  data;
 		knh_code_t    *pc;
 	};
@@ -680,9 +667,7 @@ typedef struct {
 #define KNH_FALSE           (ctx->share->constFalse)
 #define KNH_SYSTEM          (ctx->sys)
 #define KNH_INT0            (ctx->share->tInt[0 - KNH_TINT_MIN])
-#ifndef KNH_USING_NOFLOAT
 #define KNH_FLOAT0          (ctx->share->constFloat0)
-#endif
 
 /* ------------------------------------------------------------------------ */
 
@@ -726,9 +711,7 @@ typedef struct {
 	knh_Object_t   *constVoid;
 	knh_Object_t   *constTrue;
 	knh_Object_t   *constFalse;
-#ifndef KNH_USING_NOFLOAT
 	struct knh_Float_t   *constFloat0;
-#endif
 	struct knh_Int_t     **tInt;
 	struct knh_String_t  **tString;
 } knh_ctxshare_t ;

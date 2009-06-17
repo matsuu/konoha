@@ -386,13 +386,13 @@ int knh_StmtUENUM_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 }
 
 /* ------------------------------------------------------------------------ */
-#ifndef KNH_USING_NOFLOAT
+
 static
 int knh_StmtUUNIT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 {
 	return knh_StmtXCLASS_decl(ctx, stmt, abr, ns, CLASS_Float);
 }
-#endif
+
 /* ------------------------------------------------------------------------ */
 
 static

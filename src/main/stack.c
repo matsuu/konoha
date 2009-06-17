@@ -51,11 +51,7 @@ int knh_sfp_argc(Ctx *ctx, knh_sfp_t *v)
 KNHAPI(void) knh_sfp_boxing(Ctx *ctx, knh_sfp_t *sfp)
 {
 	knh_class_t bcid = (sfp[0].o)->h.bcid;
-	if(CLASS_Boolean <= bcid
-#ifndef KNH_USING_NOFLOAT
-            && bcid <= CLASS_Float
-#endif
-            && sfp[0].data != knh_Object_data(sfp[0].o)) {
+	if(CLASS_Boolean <= bcid && bcid <= CLASS_Float && sfp[0].data != knh_Object_data(sfp[0].o)) {
 		KNH_MOV(ctx, sfp[0].o, new_Object_boxing(ctx, knh_Object_cid(sfp[0].o), sfp));
 	}
 }

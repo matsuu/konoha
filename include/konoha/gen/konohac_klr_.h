@@ -143,7 +143,6 @@ knh_code_t* KNH_ASM_iGT_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a3
 knh_code_t* KNH_ASM_iGTn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_int_t a3);
 knh_code_t* KNH_ASM_iGTE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a3);
 knh_code_t* KNH_ASM_iGTEn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_int_t a3);
-#ifndef KNH_USING_NOFLOAT
 knh_code_t* KNH_ASM_fNEG_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2);
 knh_code_t* KNH_ASM_fADD_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a3);
 knh_code_t* KNH_ASM_fADDn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_float_t a3);
@@ -165,7 +164,6 @@ knh_code_t* KNH_ASM_fGT_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a3
 knh_code_t* KNH_ASM_fGTn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_float_t a3);
 knh_code_t* KNH_ASM_fGTE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a3);
 knh_code_t* KNH_ASM_fGTEn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_float_t a3);
-#endif
 knh_code_t* KNH_ASM_AGET_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a3);
 knh_code_t* KNH_ASM_AGETn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_intptr_t a3);
 knh_code_t* KNH_ASM_IAGET_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a3);
@@ -1718,9 +1716,7 @@ typedef struct {
 	knh_opcode_t opcode;
 	knh_sfi_t a1;
 	knh_sfi_t a2;
-#ifndef KNH_USING_NOFLOAT
 	knh_float_t a3;
-#endif
 	void *nextaddr;
 } klr_faddn_t;
 
@@ -1748,9 +1744,7 @@ typedef struct {
 	knh_opcode_t opcode;
 	knh_sfi_t a1;
 	knh_sfi_t a2;
-#ifndef KNH_USING_NOFLOAT
 	knh_float_t a3;
-#endif
 	void *nextaddr;
 } klr_fsubn_t;
 
@@ -1778,9 +1772,7 @@ typedef struct {
 	knh_opcode_t opcode;
 	knh_sfi_t a1;
 	knh_sfi_t a2;
-#ifndef KNH_USING_NOFLOAT
 	knh_float_t a3;
-#endif
 	void *nextaddr;
 } klr_fmuln_t;
 
@@ -1808,9 +1800,7 @@ typedef struct {
 	knh_opcode_t opcode;
 	knh_sfi_t a1;
 	knh_sfi_t a2;
-#ifndef KNH_USING_NOFLOAT
 	knh_float_t a3;
-#endif
 	void *nextaddr;
 } klr_fdivn_t;
 
@@ -1838,9 +1828,7 @@ typedef struct {
 	knh_opcode_t opcode;
 	knh_sfi_t a1;
 	knh_sfi_t a2;
-#ifndef KNH_USING_NOFLOAT
 	knh_float_t a3;
-#endif
 	void *nextaddr;
 } klr_feqn_t;
 
@@ -1868,9 +1856,7 @@ typedef struct {
 	knh_opcode_t opcode;
 	knh_sfi_t a1;
 	knh_sfi_t a2;
-#ifndef KNH_USING_NOFLOAT
 	knh_float_t a3;
-#endif
 	void *nextaddr;
 } klr_fneqn_t;
 
@@ -1898,9 +1884,7 @@ typedef struct {
 	knh_opcode_t opcode;
 	knh_sfi_t a1;
 	knh_sfi_t a2;
-#ifndef KNH_USING_NOFLOAT
 	knh_float_t a3;
-#endif
 	void *nextaddr;
 } klr_fltn_t;
 
@@ -1928,9 +1912,7 @@ typedef struct {
 	knh_opcode_t opcode;
 	knh_sfi_t a1;
 	knh_sfi_t a2;
-#ifndef KNH_USING_NOFLOAT
 	knh_float_t a3;
-#endif
 	void *nextaddr;
 } klr_flten_t;
 
@@ -1958,9 +1940,7 @@ typedef struct {
 	knh_opcode_t opcode;
 	knh_sfi_t a1;
 	knh_sfi_t a2;
-#ifndef KNH_USING_NOFLOAT
 	knh_float_t a3;
-#endif
 	void *nextaddr;
 } klr_fgtn_t;
 
@@ -1988,9 +1968,7 @@ typedef struct {
 	knh_opcode_t opcode;
 	knh_sfi_t a1;
 	knh_sfi_t a2;
-#ifndef KNH_USING_NOFLOAT
 	knh_float_t a3;
-#endif
 	void *nextaddr;
 } klr_fgten_t;
 

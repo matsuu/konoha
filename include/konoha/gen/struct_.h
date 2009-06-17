@@ -74,9 +74,7 @@ static char* StructName[] =  {
 	"Boolean",
 	"Number",
 	"Int",
-#ifndef KNH_USING_NOFLOAT
 	"Float",
-#endif
 	"String",
 	"Bytes",
 	"Tuple2",
@@ -179,7 +177,6 @@ static knh_StructData_t StructData[] = {
 		(knh_fstruct_newClass)knh_Int_newClass,
 		knh_Int_getkey
 	},
-#ifndef KNH_USING_NOFLOAT
 	{
 		"Float", STRUCT_Float, FLAG_Float, 0,
 		(knh_fstruct_init)knh_Float_init,
@@ -190,7 +187,6 @@ static knh_StructData_t StructData[] = {
 		(knh_fstruct_newClass)knh_Float_newClass,
 		knh_Float_getkey
 	},
-#endif
 	{
 		"String", STRUCT_String, FLAG_String, 0,
 		(knh_fstruct_init)knh_String_init,
@@ -596,18 +592,14 @@ static knh_ClassData_t ClassData[] = {
 	{"konoha.Boolean", CLASS_Boolean, CFLAG_Boolean, STRUCT_Boolean, CLASS_Object, 0, 3, 0, knh_Boolean_fdefault},
 	{"konoha.Number", CLASS_Number, CFLAG_Number, STRUCT_Number, CLASS_Object, 0, 0, 0, knh_Number_fdefault},
 	{"konoha.Int", CLASS_Int, CFLAG_Int, STRUCT_Int, CLASS_Number, 0, 31, 0, knh_Int_fdefault},
-#ifndef KNH_USING_NOFLOAT
 	{"konoha.Float", CLASS_Float, CFLAG_Float, STRUCT_Float, CLASS_Number, 0, 22, 0, knh_Float_fdefault},
-#endif
 	{"konoha.String", CLASS_String, CFLAG_String, STRUCT_String, CLASS_Object, 0, 36, 0, knh_String_fdefault},
 	{"konoha.Bytes", CLASS_Bytes, CFLAG_Bytes, STRUCT_Bytes, CLASS_Object, 0, 10, 0, knh_Bytes_fdefault},
 	{"konoha.Tuple2", CLASS_Tuple2, CFLAG_Tuple2, STRUCT_Tuple2, CLASS_Object, 0, 0, 0, knh_Tuple2_fdefault},
 	{"konoha.Range", CLASS_Range, CFLAG_Range, STRUCT_Range, CLASS_Object, 0, 0, 0, knh_Range_fdefault},
 	{"konoha.Array", CLASS_Array, CFLAG_Array, STRUCT_Array, CLASS_Object, 0, 31, 0, knh_Array_fdefault},
 	{"Int[]", CLASS_IArray, CFLAG_IArray, STRUCT_IArray, CLASS_Object, 0, 20, 0, knh_IArray_fdefault},
-#ifndef KNH_USING_NOFLOAT
 	{"Float[]", CLASS_FArray, CFLAG_FArray, STRUCT_FArray, CLASS_Object, 0, 20, 0, knh_FArray_fdefault},
-#endif
 	{"konoha.Iterator", CLASS_Iterator, CFLAG_Iterator, STRUCT_Iterator, CLASS_Object, 0, 1, 0, knh_Iterator_fdefault},
 	{"konoha.DictMap", CLASS_DictMap, CFLAG_DictMap, STRUCT_DictMap, CLASS_Object, 0, 12, 0, knh_DictMap_fdefault},
 	{"konoha.DictSet", CLASS_DictSet, CFLAG_DictSet, STRUCT_DictSet, CLASS_Object, 0, 13, 0, knh_DictSet_fdefault},
@@ -727,10 +719,8 @@ static knh_FieldNameData_t FieldNameData[] = {
 	{"exit", FIELDN_exit},
 	{"f", FIELDN_f},
 	{"file", FIELDN_file},
-#ifndef KNH_USING_NOFLOAT
 	{"float", FIELDN_float},
 	{"floatToIntBits", FIELDN_floatToIntBits},
-#endif
 	{"flush", FIELDN_flush},
 	{"format", FIELDN_format},
 	{"formatted", FIELDN_formatted},
@@ -753,9 +743,7 @@ static knh_FieldNameData_t FieldNameData[] = {
 	{"inputStream", FIELDN_inputStream},
 	{"insert", FIELDN_insert},
 	{"int", FIELDN_int},
-#ifndef KNH_USING_NOFLOAT
 	{"intToFloatBits", FIELDN_intToFloatBits},
-#endif
 	{"invoke", FIELDN_invoke},
 	{"isAbstract", FIELDN_isAbstract},
 	{"isAspect", FIELDN_isAspect},
@@ -936,28 +924,20 @@ static knh_MethodFieldData_t MethodFieldData[] = {
 	{MFN_nThis_nInt, 1+ 0, NNTYPE_This, NNTYPE_Int, FIELDN_n},
 	{MFN_nThis_Any1_, 1+ 0, NNTYPE_This, TYPE_Any1, FIELDN_v},
 	{MFN_nThis_nInt_, 1+ 0, NNTYPE_This, NNTYPE_Int, FIELDN_v},
-#ifndef KNH_USING_NOFLOAT
 	{MFN_nThis_nFloat_, 1+ 0, NNTYPE_This, NNTYPE_Float, FIELDN_v},
-#endif
 	{MFN_void_nAny1, 1+ 0, TYPE_void, NNTYPE_Any1, FIELDN_v},
 	{MFN_void_nAny1_, 1+ 0, TYPE_void, NNTYPE_Any1, FIELDN_v},
 	{MFN_void_nInt, 1+ 0, TYPE_void, NNTYPE_Int, FIELDN_v},
 	{MFN_void_nInt_, 1+ 0, TYPE_void, NNTYPE_Int, FIELDN_v},
-#ifndef KNH_USING_NOFLOAT
 	{MFN_void_nFloat, 1+ 0, TYPE_void, NNTYPE_Float, FIELDN_v},
 	{MFN_void_nFloat_, 1+ 0, TYPE_void, NNTYPE_Float, FIELDN_v},
-#endif
 	{MFN_nInt, 0+ 0, NNTYPE_Int},
 	{MFN_nAny1_nInt, 1+ 0, NNTYPE_Any1, NNTYPE_Int, FIELDN_n},
 	{MFN_nInt_nInt, 1+ 0, NNTYPE_Int, NNTYPE_Int, FIELDN_n},
-#ifndef KNH_USING_NOFLOAT
 	{MFN_nFloat_nInt, 1+ 0, NNTYPE_Float, NNTYPE_Int, FIELDN_n},
-#endif
 	{MFN_void_nInt_nAny1, 2+ 0, TYPE_void, NNTYPE_Int, FIELDN_n, NNTYPE_Any1, FIELDN_v},
 	{MFN_void_nInt_nInt, 2+ 0, TYPE_void, NNTYPE_Int, FIELDN_n, NNTYPE_Int, FIELDN_v},
-#ifndef KNH_USING_NOFLOAT
 	{MFN_void_nInt_nFloat, 2+ 0, TYPE_void, NNTYPE_Int, FIELDN_n, NNTYPE_Float, FIELDN_v},
-#endif
 	{MFN_void_Any1, 1+ 0, TYPE_void, TYPE_Any1, FIELDN_v},
 	{MFN_nThis_Int_Int, 2+ 0, NNTYPE_This, TYPE_Int, FIELDN_s, TYPE_Int, FIELDN_e},
 	{MFN_void_nInt_Any1, 2+ 0, TYPE_void, NNTYPE_Int, FIELDN_n, TYPE_Any1, FIELDN_v},
@@ -979,12 +959,10 @@ static knh_MethodFieldData_t MethodFieldData[] = {
 	{MFN_nInt_nInt_nInt_nInt, 3+ 0, NNTYPE_Int, NNTYPE_Int, FIELDN_x, NNTYPE_Int, FIELDN_y, NNTYPE_Int, FIELDN_z},
 	{MFN_void_nInt_nInt_nInt, 3+ 0, TYPE_void, NNTYPE_Int, FIELDN_x, NNTYPE_Int, FIELDN_y, NNTYPE_Int, FIELDN_v},
 	{MFN_void_nInt_nInt_nInt_nInt, 4+ 0, TYPE_void, NNTYPE_Int, FIELDN_x, NNTYPE_Int, FIELDN_y, NNTYPE_Int, FIELDN_z, NNTYPE_Int, FIELDN_v},
-#ifndef KNH_USING_NOFLOAT
 	{MFN_nFloat_nInt_nInt, 2+ 0, NNTYPE_Float, NNTYPE_Int, FIELDN_x, NNTYPE_Int, FIELDN_y},
 	{MFN_nFloat_nInt_nInt_nInt, 3+ 0, NNTYPE_Float, NNTYPE_Int, FIELDN_x, NNTYPE_Int, FIELDN_y, NNTYPE_Int, FIELDN_z},
 	{MFN_void_nInt_nInt_nFloat, 3+ 0, TYPE_void, NNTYPE_Int, FIELDN_x, NNTYPE_Int, FIELDN_y, NNTYPE_Float, FIELDN_v},
 	{MFN_void_nInt_nInt_nInt_nFloat, 4+ 0, TYPE_void, NNTYPE_Int, FIELDN_x, NNTYPE_Int, FIELDN_y, NNTYPE_Int, FIELDN_z, NNTYPE_Float, FIELDN_v},
-#endif
 	{MFN_nBytes_Int, 1+ 0, NNTYPE_Bytes, TYPE_Int, FIELDN_i},
 	{MFN_void_nBytes_Int_Int, 3+ 0, TYPE_void, NNTYPE_Bytes, FIELDN_b, TYPE_Int, FIELDN_n, TYPE_Int, FIELDN_l},
 	{MFN_nConnection_nString, 1+ 0, NNTYPE_Connection, NNTYPE_String, FIELDN_u},
@@ -993,9 +971,7 @@ static knh_MethodFieldData_t MethodFieldData[] = {
 	{MFN_nInt_nAny, 1+ 0, NNTYPE_Int, NNTYPE_Any, FIELDN_n},
 	{MFN_nString_nInt, 1+ 0, NNTYPE_String, NNTYPE_Int, FIELDN_n},
 	{MFN_Int_nAny, 1+ 0, TYPE_Int, NNTYPE_Any, FIELDN_n},
-#ifndef KNH_USING_NOFLOAT
 	{MFN_Float_nAny, 1+ 0, TYPE_Float, NNTYPE_Any, FIELDN_n},
-#endif
 	{MFN_String_nAny, 1+ 0, TYPE_String, NNTYPE_Any, FIELDN_n},
 	{MFN_Any_nAny, 1+ 0, TYPE_Any, NNTYPE_Any, FIELDN_n},
 	{MFN_Any1_nString, 1+ 0, TYPE_Any1, NNTYPE_String, FIELDN_k},
@@ -1012,13 +988,11 @@ static knh_MethodFieldData_t MethodFieldData[] = {
 	{MFN_nBoolean_nInt, 1+ 0, NNTYPE_Boolean, NNTYPE_Int, FIELDN_v},
 	{MFN_nInt_nInt_, 1+ 0, NNTYPE_Int, NNTYPE_Int, FIELDN_v},
 	{MFN_nInt_Int, 1+ 0, NNTYPE_Int, TYPE_Int, FIELDN_n},
-#ifndef KNH_USING_NOFLOAT
 	{MFN_nFloat_nFloat, 1+ 0, NNTYPE_Float, NNTYPE_Float, FIELDN_v},
 	{MFN_nFloat, 0+ 0, NNTYPE_Float},
 	{MFN_nBoolean_Float, 1+ 0, NNTYPE_Boolean, TYPE_Float, FIELDN_v},
 	{MFN_nBoolean_nFloat, 1+ 0, NNTYPE_Boolean, NNTYPE_Float, FIELDN_v},
 	{MFN_nInt_nFloat, 1+ 0, NNTYPE_Int, NNTYPE_Float, FIELDN_n},
-#endif
 	{MFN_nThis_Any_, 1+ 0, NNTYPE_This, TYPE_Any, FIELDN_v},
 	{MFN_nBoolean_Any, 1+ 0, NNTYPE_Boolean, TYPE_Any, FIELDN_v},
 	{MFN_nBoolean_nClass, 1+ 0, NNTYPE_Boolean, NNTYPE_Class, FIELDN_c},
@@ -1073,30 +1047,22 @@ static knh_MethodData_t MethodData[] = {
 	{knh__IArray_new__init, KNH_FLAG_MF_VARARGS, CLASS_IArray, METHODN_new__init, 0, MFN_nThis_nInt_, (void*)NULL},
 	{knh__FArray_new, 0, CLASS_FArray, METHODN_new, 0, MFN_nThis_Int, (void*)NULL},
 	{knh__FArray_new__array, 0, CLASS_FArray, METHODN_new__array, 0, MFN_nThis_nInt, (void*)NULL},
-#ifndef KNH_USING_NOFLOAT
 	{knh__FArray_new__init, KNH_FLAG_MF_VARARGS, CLASS_FArray, METHODN_new__init, 0, MFN_nThis_nFloat_, (void*)NULL},
-#endif
 	{knh__Array_add, 0, CLASS_Array, METHODN_add, 0, MFN_void_nAny1, (void*)NULL},
 	{knh__Array_opLshift, KNH_FLAG_MF_VARARGS, CLASS_Array, METHODN_opLshift, 0, MFN_void_nAny1_, (void*)NULL},
 	{knh__IArray_add, 0, CLASS_IArray, METHODN_add, 0, MFN_void_nInt, (void*)NULL},
 	{knh__IArray_opLshift, KNH_FLAG_MF_VARARGS, CLASS_IArray, METHODN_opLshift, 0, MFN_void_nInt_, (void*)NULL},
-#ifndef KNH_USING_NOFLOAT
 	{knh__FArray_add, 0, CLASS_FArray, METHODN_add, 0, MFN_void_nFloat, (void*)NULL},
 	{knh__FArray_opLshift, KNH_FLAG_MF_VARARGS, CLASS_FArray, METHODN_opLshift, 0, MFN_void_nFloat_, (void*)NULL},
-#endif
 	{knh__Array_getSize, 0, CLASS_Array, METHODN_getSize, 0, MFN_nInt, (void*)NULL},
 	{knh__Array_getSize, 0, CLASS_IArray, METHODN_getSize, 0, MFN_nInt, (void*)NULL},
 	{knh__Array_getSize, 0, CLASS_FArray, METHODN_getSize, 0, MFN_nInt, (void*)NULL},
 	{knh__Array_get, 0, CLASS_Array, METHODN_get, 0, MFN_nAny1_nInt, (void*)NULL},
 	{knh__IArray_get, 0, CLASS_IArray, METHODN_get, 0, MFN_nInt_nInt, (void*)NULL},
-#ifndef KNH_USING_NOFLOAT
 	{knh__FArray_get, 0, CLASS_FArray, METHODN_get, 0, MFN_nFloat_nInt, (void*)NULL},
-#endif
 	{knh__Array_set, 0, CLASS_Array, METHODN_set, 0, MFN_void_nInt_nAny1, (void*)NULL},
 	{knh__IArray_set, 0, CLASS_IArray, METHODN_set, 0, MFN_void_nInt_nInt, (void*)NULL},
-#ifndef KNH_USING_NOFLOAT
 	{knh__FArray_set, 0, CLASS_FArray, METHODN_set, 0, MFN_void_nInt_nFloat, (void*)NULL},
-#endif
 	{knh__Array_setAll, 0, CLASS_Array, METHODN_setAll, 0, MFN_void_Any1, (void*)NULL},
 	{knh__Array_opSubset, 0, CLASS_Array, METHODN_opSubset, 0, MFN_nThis_Int_Int, (void*)NULL},
 	{knh__Array_opSubsete, 0, CLASS_Array, METHODN_opSubsete, 0, MFN_nThis_Int_Int, (void*)NULL},
@@ -1140,12 +1106,10 @@ static knh_MethodData_t MethodData[] = {
 	{knh__IArray_set3D, 0, CLASS_IArray, METHODN_set3D, 0, MFN_void_nInt_nInt_nInt_nInt, (void*)NULL},
 	{knh__FArray_new__array2D, 0, CLASS_FArray, METHODN_new__array2D, 0, MFN_nThis_nInt_nInt, (void*)NULL},
 	{knh__FArray_new__array3D, 0, CLASS_FArray, METHODN_new__array3D, 0, MFN_nThis_nInt_nInt_nInt, (void*)NULL},
-#ifndef KNH_USING_NOFLOAT
 	{knh__FArray_get2D, 0, CLASS_FArray, METHODN_get2D, 0, MFN_nFloat_nInt_nInt, (void*)NULL},
 	{knh__FArray_get3D, 0, CLASS_FArray, METHODN_get3D, 0, MFN_nFloat_nInt_nInt_nInt, (void*)NULL},
 	{knh__FArray_set2D, 0, CLASS_FArray, METHODN_set2D, 0, MFN_void_nInt_nInt_nFloat, (void*)NULL},
 	{knh__FArray_set3D, 0, CLASS_FArray, METHODN_set3D, 0, MFN_void_nInt_nInt_nInt_nFloat, (void*)NULL},
-#endif
 	{knh_fmethod_movableText, 0, CLASS_Iterator, METHODN__k, 0, MFN_void_OutputStream_Any, (void*)knh_Iterator__k},
 	{knh__Bytes_new, 0, CLASS_Bytes, METHODN_new, 0, MFN_nBytes_Int, (void*)NULL},
 	{knh__Bytes_putc, 0, CLASS_Bytes, METHODN_putc, 0, MFN_void_nInt, (void*)NULL},
@@ -1163,9 +1127,7 @@ static knh_MethodData_t MethodData[] = {
 	{knh__ResultSet_getSize, 0, CLASS_ResultSet, METHODN_getSize, 0, MFN_nInt_nAny, (void*)NULL},
 	{knh__ResultSet_getName, 0, CLASS_ResultSet, METHODN_getName, 0, MFN_nString_nInt, (void*)NULL},
 	{knh__ResultSet_getInt, 0, CLASS_ResultSet, METHODN_getInt, 0, MFN_Int_nAny, (void*)NULL},
-#ifndef KNH_USING_NOFLOAT
 	{knh__ResultSet_getFloat, 0, CLASS_ResultSet, METHODN_getFloat, 0, MFN_Float_nAny, (void*)NULL},
-#endif
 	{knh__ResultSet_getString, 0, CLASS_ResultSet, METHODN_getString, 0, MFN_String_nAny, (void*)NULL},
 	{knh__ResultSet_get, 0, CLASS_ResultSet, METHODN_get, 0, MFN_Any_nAny, (void*)NULL},
 	{knh_fmethod_movableText, 0, CLASS_ResultSet, METHODN__dump, 0, MFN_void_OutputStream_Any, (void*)knh_ResultSet__dump},
@@ -1223,7 +1185,6 @@ static knh_MethodData_t MethodData[] = {
 	{knh__Int_opPrev, KNH_FLAG_MF_CONST, CLASS_Int, METHODN_opPrev, 0, MFN_nInt, (void*)NULL},
 	{knh__Int_getSize, KNH_FLAG_MF_NULLBASE|KNH_FLAG_MF_CONST, CLASS_Int, METHODN_getSize, 0, MFN_nInt, (void*)NULL},
 	{knh__Int_random, KNH_FLAG_MF_STATIC, CLASS_Int, METHODN_random, 0, MFN_nInt_Int, (void*)NULL},
-#ifndef KNH_USING_NOFLOAT
 	{knh__Float_opAdd, KNH_FLAG_MF_CONST, CLASS_Float, METHODN_opAdd, 0, MFN_nFloat_nFloat, (void*)NULL},
 	{knh__Float_opNeg, KNH_FLAG_MF_CONST, CLASS_Float, METHODN_opNeg, 0, MFN_nFloat, (void*)NULL},
 	{knh__Float_opSub, KNH_FLAG_MF_CONST, CLASS_Float, METHODN_opSub, 0, MFN_nFloat_nFloat, (void*)NULL},
@@ -1241,7 +1202,6 @@ static knh_MethodData_t MethodData[] = {
 	{knh__Float_floatToIntBits, KNH_FLAG_MF_STATIC, CLASS_Float, METHODN_floatToIntBits, 0, MFN_nInt_nFloat, (void*)NULL},
 	{knh__Float_intToFloatBits, KNH_FLAG_MF_STATIC, CLASS_Float, METHODN_intToFloatBits, 0, MFN_nFloat_nInt, (void*)NULL},
 	{knh__Float_getSize, KNH_FLAG_MF_NULLBASE|KNH_FLAG_MF_CONST, CLASS_Float, METHODN_getSize, 0, MFN_nInt, (void*)NULL},
-#endif
 	{knh__Boolean__s, 0, CLASS_Boolean, METHODN__s, 0, MFN_void_OutputStream_Any, (void*)NULL},
 	{knh__Boolean__k, 0, CLASS_Boolean, METHODN__k, 0, MFN_void_OutputStream_Any, (void*)NULL},
 	{knh__Int__s, 0, CLASS_Int, METHODN__s, 0, MFN_void_OutputStream_Any, (void*)NULL},
@@ -1252,14 +1212,11 @@ static knh_MethodData_t MethodData[] = {
 	{knh__Int__x, 0, CLASS_Int, METHODN__x, 0, MFN_void_OutputStream_Any, (void*)NULL},
 	{knh__Int__bits, 0, CLASS_Int, METHODN__bits, 0, MFN_void_OutputStream_Any, (void*)NULL},
 	{knh__Int__c, 0, CLASS_Int, METHODN__c, 0, MFN_void_OutputStream_Any, (void*)NULL},
-
-#ifndef KNH_USING_NOFLOAT
 	{knh__Float__s, 0, CLASS_Float, METHODN__s, 0, MFN_void_OutputStream_Any, (void*)NULL},
 	{knh__Float__d, 0, CLASS_Float, METHODN__d, 0, MFN_void_OutputStream_Any, (void*)NULL},
 	{knh__Float__f, 0, CLASS_Float, METHODN__f, 0, MFN_void_OutputStream_Any, (void*)NULL},
 	{knh__Float__bits, 0, CLASS_Float, METHODN__bits, 0, MFN_void_OutputStream_Any, (void*)NULL},
 	{knh__Float__k, 0, CLASS_Float, METHODN__k, 0, MFN_void_OutputStream_Any, (void*)NULL},
-#endif
 	{knh__Object_new__init, KNH_FLAG_MF_VARARGS, CLASS_Object, METHODN_new__init, 0, MFN_nThis_Any_, (void*)NULL},
 	{knh__Object_opAddr, KNH_FLAG_MF_NULLBASE, CLASS_Object, METHODN_opAddr, 0, MFN_nInt, (void*)NULL},
 	{knh__Object_opEq, KNH_FLAG_MF_CONST|KNH_FLAG_MF_NULLBASE, CLASS_Object, METHODN_opEq, 0, MFN_nBoolean_Any, (void*)NULL},
@@ -1496,12 +1453,10 @@ static knh_MapperData_t MapperData[] = {
 	{knh_String_Boolean, KNH_FLAG_MMF_CONST|KNH_FLAG_MMF_FINAL|KNH_FLAG_MMF_TOTAL, CLASS_String, CLASS_Boolean},
 	{knh_String_Int, KNH_FLAG_MMF_CONST|KNH_FLAG_MMF_FINAL, CLASS_String, CLASS_Int},
 	{knh_Int_String, KNH_FLAG_MMF_CONST|KNH_FLAG_MMF_FINAL|KNH_FLAG_MMF_LOSSLESS|KNH_FLAG_MMF_TOTAL, CLASS_Int, CLASS_String},
-#ifndef KNH_USING_NOFLOAT
 	{knh_String_Float, KNH_FLAG_MMF_FINAL|KNH_FLAG_MMF_CONST, CLASS_String, CLASS_Float},
 	{knh_Float_String, KNH_FLAG_MMF_CONST|KNH_FLAG_MMF_FINAL|KNH_FLAG_MMF_LOSSLESS|KNH_FLAG_MMF_TOTAL, CLASS_Float, CLASS_String},
 	{knh_Int_Float, KNH_FLAG_MMF_CONST|KNH_FLAG_MMF_FINAL|KNH_FLAG_MMF_TOTAL, CLASS_Int, CLASS_Float},
 	{knh_Float_Int, KNH_FLAG_MMF_CONST|KNH_FLAG_MMF_FINAL|KNH_FLAG_MMF_TOTAL, CLASS_Float, CLASS_Int},
-#endif
 	{knh_Object_Iterator, KNH_FLAG_MMF_CONST|KNH_FLAG_MMF_TOTAL, CLASS_Object, CLASS_Iterator},
 	{knh_Object_String, KNH_FLAG_MMF_TOTAL, CLASS_Object, CLASS_String},
 	{knh_InputStream_String__, KNH_FLAG_MMF_FINAL|KNH_FLAG_MMF_TOTAL, CLASS_InputStream, ICLASS_String},

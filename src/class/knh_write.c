@@ -138,7 +138,6 @@ void knh_write__ifmt(Ctx *ctx, OutputStream *w, char *fmt, knh_intptr_t n)
 #define _knh_write__x(ctx, w, n)   knh_write__ifmt(ctx, w, KNH_INTPTR_FMTX, n)
 
 /* ------------------------------------------------------------------------ */
-#ifndef KNH_USING_NOFLOAT
 
 void knh_write__ffmt(Ctx *ctx, OutputStream *w, char *fmt, knh_float_t n)
 {
@@ -150,7 +149,6 @@ void knh_write__ffmt(Ctx *ctx, OutputStream *w, char *fmt, knh_float_t n)
 #define _knh_write__f(ctx, w, f)  knh_write__ffmt(ctx, w, KNH_FLOAT_FMT, f)
 #define _knh_write__e(ctx, w, f)  knh_write__ffmt(ctx, w, KNH_FLOAT_FMTE, f)
 
-#endif
 /* ------------------------------------------------------------------------ */
 
 void knh_write_integerfmt(Ctx *ctx, OutputStream *w, char *fmt, knh_int_t n)
@@ -308,10 +306,8 @@ typedef struct {
 	union {
 		knh_intptr_t  ivalue;
 		knh_uintptr_t uvalue;
-#ifndef KNH_USING_NOFLOAT
 		knh_float_t   fvalue;
 		knh_float_t   evalue;
-#endif
 		void         *pvalue;
 		char         *svalue;
 		Object       *ovalue;
@@ -343,11 +339,9 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 				case 'd': case 'u':
 					args[index].atype = VA_INT;
 					break;
-#ifndef KNH_USING_NOFLOAT
 				case 'f': case 'e':
 					args[index].atype = VA_FLOAT;
 					break;
-#endif
 				case 's':
 					args[index].atype = VA_CHAR;
 					break;
@@ -388,11 +382,9 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 		case VA_INT:
 			args[i].ivalue = (knh_intptr_t)va_arg(ap, knh_intptr_t);
 			break;
-#ifndef KNH_USING_NOFLOAT
 		case VA_FLOAT:
 			args[i].fvalue = (knh_float_t)va_arg(ap, double);
 			break;
-#endif
 		case VA_CHAR:
 			args[i].svalue = (char*)va_arg(ap, char*);
 			break;
@@ -465,7 +457,6 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 						KNH_ASSERT(args[index].atype == VA_INT);
 						knh_write__u(ctx, w, args[index].uvalue);
 						break;
-#ifndef KNH_USING_NOFLOAT
 					case 'f':
 						KNH_ASSERT(args[index].atype == VA_FLOAT);
 						knh_write__f(ctx, w, args[index].fvalue);
@@ -474,7 +465,6 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 						KNH_ASSERT(args[index].atype == VA_FLOAT);
 						knh_write__e(ctx, w, args[index].fvalue);
 						break;
-#endif
 					case 's':
 						KNH_ASSERT(args[index].atype == VA_CHAR);
 						knh_write__s(ctx, w, args[index].svalue);

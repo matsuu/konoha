@@ -129,13 +129,11 @@ KNHAPI(knh_sfp_t*) knh_Closure_invokef(Ctx *ctx, Closure *c, const char *fmt, ..
 			lsfp[n].ivalue = (knh_int_t)va_arg(args, knh_int_t);
 			n++;
 		break;
-#ifndef KNH_USING_NOFLOAT
 		case 'f':
 			KNH_SETv(ctx, lsfp[n].o, KNH_FLOAT0);  // NONNULL
 			lsfp[n].fvalue = (knh_float_t)va_arg(args, knh_float_t);
 			n++;
 		break;
-#endif
 		case 'o':
 		{
 			Int *num = (Int*)va_arg(args, knh_Object_t*);

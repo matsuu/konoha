@@ -109,7 +109,6 @@ KNHAPI(void) konoha_loadIntConstData(Ctx *ctx, knh_IntConstData_t *data)
 
 /* ------------------------------------------------------------------------ */
 
-#ifndef KNH_USING_NOFLOAT
 KNHAPI(void) konoha_loadFloatConstData(Ctx *ctx, knh_FloatConstData_t *data)
 {
 	while(data->name != NULL) {
@@ -118,7 +117,7 @@ KNHAPI(void) konoha_loadFloatConstData(Ctx *ctx, knh_FloatConstData_t *data)
 		data++;
 	}
 }
-#endif
+
 /* ------------------------------------------------------------------------ */
 
 KNHAPI(void) konoha_loadStringConstData(Ctx *ctx, knh_StringConstData_t *data)

@@ -191,14 +191,12 @@ String *new_String__int(Ctx *ctx, knh_int_t n)
 
 /* ------------------------------------------------------------------------ */
 
-#ifndef KNH_USING_NOFLOAT
 String *new_String__float(Ctx *ctx, knh_float_t n)
 {
 	char buf[KNH_INTUNIT_BUFSIZ];
 	knh_snprintf(buf, sizeof(buf), KNH_FLOAT_FMT, n);
 	return new_String(ctx, B(buf), NULL);
 }
-#endif
 
 
 /* ======================================================================== */

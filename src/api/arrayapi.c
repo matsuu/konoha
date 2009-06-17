@@ -172,7 +172,7 @@ static METHOD knh__IArray_new__init(Ctx *ctx, knh_sfp_t *sfp)
 
 /* ------------------------------------------------------------------------ */
 /* [FArray] */
-#ifndef KNH_USING_NOFLOAT
+
 static
 void knh_FArray_grow(Ctx *ctx, FArray *a, size_t newsize, knh_float_t v)
 {
@@ -252,8 +252,6 @@ static METHOD knh__FArray_new__init(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN(ctx, sfp, o);
 }
 
-#endif /* KNH_USING_NOFLOAT */
-
 /* ======================================================================== */
 /* [add] */
 
@@ -324,7 +322,6 @@ static METHOD knh__IArray_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 
 /* ------------------------------------------------------------------------ */
 /* @method void FArray.add(Float! value) */
-#ifndef KNH_USING_NOFLOAT
 
 static METHOD knh__FArray_add(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -354,7 +351,7 @@ static METHOD knh__FArray_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 	}
 	KNH_RETURN_void(ctx, sfp);
 }
-#endif /* KNH_USING_NOFLOAT */
+
 /* ======================================================================== */
 /* @method Int! Array.getSize() */
 /* @method Int! IArray.getSize() */
@@ -389,14 +386,12 @@ static METHOD knh__IArray_get(Ctx *ctx, knh_sfp_t *sfp)
 /* ------------------------------------------------------------------------ */
 /* @method Float! FArray.get(Int! n) */
 
-#ifndef KNH_USING_NOFLOAT
 static METHOD knh__FArray_get(Ctx *ctx, knh_sfp_t *sfp)
 {
 	FArray *o = (FArray*)sfp[0].o;
 	size_t n2 = knh_array_index(ctx, p_int(sfp[1]), o->size);
 	KNH_RETURN_Float(ctx, sfp, o->flist[n2]);
 }
-#endif
 
 /* ------------------------------------------------------------------------ */
 /* @method void Array.set(Int! n, Any1! v) */
@@ -428,7 +423,6 @@ static METHOD knh__IArray_set(Ctx *ctx, knh_sfp_t *sfp)
 /* ------------------------------------------------------------------------ */
 /* @method void FArray.set(Int! n, Float! v) */
 
-#ifndef KNH_USING_NOFLOAT
 static METHOD knh__FArray_set(Ctx *ctx, knh_sfp_t *sfp)
 {
 	if(IS_IMM(sfp[0].o)) {;
@@ -438,7 +432,6 @@ static METHOD knh__FArray_set(Ctx *ctx, knh_sfp_t *sfp)
 	}
 	KNH_RETURN_void(ctx, sfp);
 }
-#endif
 
 /* ------------------------------------------------------------------------ */
 /* @method void Array.setAll(Any1 v) */
@@ -781,7 +774,6 @@ static METHOD knh__IArray_shuffle(Ctx *ctx, knh_sfp_t *sfp)
 /* ------------------------------------------------------------------------ */
 /* [FArray] */
 
-#ifndef KNH_USING_NOFLOAT
 static int qsort_fcmp(const void* ap, const void* bp)
 {
 	knh_float_t a = *((knh_float_t*)ap);
@@ -855,7 +847,6 @@ static METHOD knh__FArray_shuffle(Ctx *ctx, knh_sfp_t *sfp)
 	}
 	KNH_RETURN_void(ctx, sfp);
 }
-#endif /* KNH_USING_NOFLOAT */
 
 /* ======================================================================== */
 /* [movabletext] */
@@ -1013,7 +1004,6 @@ static METHOD knh__IArray_opItr(Ctx *ctx, knh_sfp_t *sfp)
 
 /* ------------------------------------------------------------------------ */
 /* [FArray] */
-#ifndef KNH_USING_NOFLOAT
 
 static
 ITRNEXT knh_FArray_var_next(Ctx *ctx, knh_sfp_t *sfp, int n)
@@ -1061,7 +1051,6 @@ static METHOD knh__FArray_opItr(Ctx *ctx, knh_sfp_t *sfp)
 //	}
 //	KNH_MAPPED(ctx, sfp, a);
 //}
-#endif /* KNH_USING_NOFLOAT */
 
 /* ------------------------------------------------------------------------ */
 
@@ -1301,7 +1290,6 @@ static METHOD knh__IArray_set3D(Ctx *ctx, knh_sfp_t *sfp)
 
 /* ------------------------------------------------------------------------ */
 /* [FArray] */
-#ifndef KNH_USING_NOFLOAT
 
 static
 void knh_FArrayDim_init(Ctx *ctx, FArray *a, size_t x, size_t y, size_t z)
@@ -1315,7 +1303,6 @@ void knh_FArrayDim_init(Ctx *ctx, FArray *a, size_t x, size_t y, size_t z)
 	}
 	a->size = a->capacity;
 }
-#endif /* KNH_USING_NOFLOAT */
 
 /* ------------------------------------------------------------------------ */
 /* @method This! FArray.new:array2D(Int! x, Int! y) @Private */
@@ -1337,7 +1324,6 @@ static METHOD knh__FArray_new__array3D(Ctx *ctx, knh_sfp_t *sfp)
 
 /* ------------------------------------------------------------------------ */
 /* @method Float! FArray.get2D(Int! x, Int! y) */
-#ifndef KNH_USING_NOFLOAT
 
 static METHOD knh__FArray_get2D(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -1391,9 +1377,6 @@ static METHOD knh__FArray_set3D(Ctx *ctx, knh_sfp_t *sfp)
 	}
 	KNH_RETURN_void(ctx, sfp);
 }
-
-
-#endif /* KNH_USING_NOFLOAT */
 
 /* ------------------------------------------------------------------------ */
 /* [Iterator] */

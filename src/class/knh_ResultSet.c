@@ -203,7 +203,7 @@ KNHAPI(void) knh_ResultSet_setInt(Ctx *ctx, ResultSet *o, size_t n, knh_int_t va
 }
 
 /* ------------------------------------------------------------------------ */
-#ifndef KNH_USING_NOFLOAT
+
 KNHAPI(void) knh_ResultSet_setFloat(Ctx *ctx, ResultSet *o, size_t n, knh_float_t value)
 {
 	KNH_ASSERT(n < DP(o)->column_size);
@@ -215,7 +215,6 @@ KNHAPI(void) knh_ResultSet_setFloat(Ctx *ctx, ResultSet *o, size_t n, knh_float_
 	int i, c = t.len % sizeof(void*);
 	for(i = 0; i < c; i++) knh_Bytes_putc(ctx, DP(o)->databuf, 0);    /* zero */
 }
-#endif
 
 /* ------------------------------------------------------------------------ */
 
@@ -264,10 +263,8 @@ knh_int_t knh_ResultSet_getInt(Ctx *ctx, ResultSet *o, size_t n)
 		return 0;
 	case knh_ResultSet_CTYPE__integer :
 		return (knh_int_t)(*((knh_int_t*)p));
-#ifndef KNH_USING_NOFLOAT
 	case knh_ResultSet_CTYPE__float :
 		return (knh_int_t)(*((knh_float_t*)p));
-#endif
 	case knh_ResultSet_CTYPE__bytes :
 		TODO();
 //		return knh_bytes_toint(B2(p, DP(o)->column[n].len));
@@ -276,7 +273,6 @@ knh_int_t knh_ResultSet_getInt(Ctx *ctx, ResultSet *o, size_t n)
 }
 
 /* ------------------------------------------------------------------------ */
-#ifndef KNH_USING_NOFLOAT
 
 knh_float_t knh_ResultSet_getFloat(Ctx *ctx, ResultSet *o, size_t n)
 {
@@ -295,7 +291,7 @@ knh_float_t knh_ResultSet_getFloat(Ctx *ctx, ResultSet *o, size_t n)
 	}
 	return 0.0;
 }
-#endif
+
 /* ------------------------------------------------------------------------ */
 
 String* knh_ResultSet_getString(Ctx *ctx, ResultSet *o, size_t n)
@@ -307,10 +303,8 @@ String* knh_ResultSet_getString(Ctx *ctx, ResultSet *o, size_t n)
 		return (String*)KNH_NULL;
 	case knh_ResultSet_CTYPE__integer :
 		return new_String__int(ctx, (knh_int_t)(*((knh_int_t*)p)));
-#ifndef KNH_USING_NOFLOAT
 	case knh_ResultSet_CTYPE__float :
 		return new_String__float(ctx, (knh_float_t)(*((knh_float_t*)p)));
-#endif
 	case knh_ResultSet_CTYPE__text :
 		return new_String(ctx, B2(p, DP(o)->column[n].len), NULL);
 	}

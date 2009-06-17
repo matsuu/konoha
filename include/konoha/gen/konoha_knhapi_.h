@@ -108,12 +108,8 @@ extern "C" {
 #define knh_write__i(ctx, w, n)   knh_write__ifmt(ctx, w, KNH_INTPTR_FMT, n)
 #define knh_write__u(ctx, w, n)   knh_write__ifmt(ctx, w, KNH_UINT_FMT, n)
 #define knh_write__x(ctx, w, n)   knh_write__ifmt(ctx, w, KNH_INTPTR_FMTX, n)
-
-#ifndef KNH_USING_NOFLOAT
 #define knh_write__f(ctx, w, f)  knh_write__ffmt(ctx, w, KNH_FLOAT_FMT, f)
 #define knh_write__e(ctx, w, f)  knh_write__ffmt(ctx, w, KNH_FLOAT_FMTE, f)
-#endif
-
 #define knh_write_fn(ctx, w, fn)   knh_write__s(ctx, w, FIELDN(fn))
 #define knh_write__O(ctx, w, o)    knh_format(ctx, w, METHODN__k, o, KNH_NULL)
 #define KNH_ASM_JMP(ctx, abr, l)  KNH_ASM_JMP_(ctx, abr, l);
@@ -178,15 +174,11 @@ KNHAPI(knh_bytes_t) knh_bytes_last(knh_bytes_t t, knh_intptr_t loc);
 KNHAPI(knh_bytes_t) knh_bytes_skipscheme(knh_bytes_t t);
 KNHAPI(char*) knh_format_bytes(char *buf, size_t bufsiz, knh_bytes_t t);
 KNHAPI(knh_intptr_t) knh_bytes_toint(knh_bytes_t t);
-#ifndef KNH_USING_NOFLOAT
 KNHAPI(knh_float_t) knh_bytes_tofloat(knh_bytes_t t);
-#endif
 KNHAPI(knh_int64_t) knh_bytes_toint64(knh_bytes_t t);
 KNHAPI(String*) new_String__fbcnv(Ctx *ctx, String *s, knh_fbyteconv fbcnv, BytesConv *bc);
 KNHAPI(ClassSpec*) new_Enum(Ctx *ctx, char *tag, knh_bytes_t urn, knh_int_t min, knh_int_t max);
-#ifndef KNH_USING_NOFLOAT
 KNHAPI(ClassSpec*) new_Unit(Ctx *ctx, char *tag, knh_bytes_t urn, knh_float_t min, knh_float_t max, knh_float_t step);
-#endif
 KNHAPI(ClassSpec*) new_Vocab(Ctx *ctx, char *tag, knh_bytes_t urn, int base, char **terms);
 KNHAPI(void) konoha_loadURNAliasData(Ctx *ctx, knh_StringConstData_t *data);
 KNHAPI(void) konoha_loadClassSpecFuncData(Ctx *ctx, knh_NamedPointerData_t *data);
@@ -205,12 +197,10 @@ KNHAPI(InputStream*) new_StringInputStream(Ctx *ctx, String *str, size_t s, size
 KNHAPI(Int*) new_Int(Ctx *ctx, knh_int_t value);
 KNHAPI(Int*) new_IntX__fast(Ctx *ctx, knh_class_t cid, knh_int_t value);
 KNHAPI(Int*) new_IntX(Ctx *ctx, knh_class_t cid, knh_int_t value);
-#ifndef KNH_USING_NOFLOAT
 KNHAPI(Float*) new_Float(Ctx *ctx, knh_float_t value);
 KNHAPI(Float*) new_FloatX__fast(Ctx *ctx, knh_class_t cid, knh_float_t value);
 KNHAPI(Float*) new_FloatX(Ctx *ctx, knh_class_t cid, knh_float_t value);
 KNHAPI(void) konoha_addAffineMapper(Ctx *ctx, knh_class_t scid, char *text, knh_float_t scale, knh_float_t shift);
-#endif
 KNHAPI(void) knh_Glue_init(Ctx *ctx, knh_Glue_t *g, void *ptr, knh_fgfree gfree);
 KNHAPI(Object*) new_Glue(Ctx *ctx, char *lname, void *ptr, knh_fgfree gfree);
 KNHAPI(OutputStream*) new_OutputStream__io(Ctx *ctx, String *urn, knh_io_t fd, knh_iodrv_t *drv);
@@ -221,9 +211,7 @@ KNHAPI(void) knh_ResultSet_initColumn(Ctx *ctx, ResultSet *o, size_t column_size
 KNHAPI(void) knh_ResultSet_setName(Ctx *ctx, ResultSet *o, size_t n, String *name);
 KNHAPI(void) knh_ResultSet_initData(Ctx *ctx, ResultSet *o);
 KNHAPI(void) knh_ResultSet_setInt(Ctx *ctx, ResultSet *o, size_t n, knh_int_t value);
-#ifndef KNH_USING_NOFLOAT
 KNHAPI(void) knh_ResultSet_setFloat(Ctx *ctx, ResultSet *o, size_t n, knh_float_t value);
-#endif
 KNHAPI(void) knh_ResultSet_setText(Ctx *ctx, ResultSet *o, size_t n, knh_bytes_t t);
 KNHAPI(void) knh_ResultSet_setBlob(Ctx *ctx, ResultSet *o, size_t n, knh_bytes_t t);
 KNHAPI(void) knh_ResultSet_setNULL(Ctx *ctx, ResultSet *o, size_t n);
@@ -281,9 +269,7 @@ KNHAPI(void) knh_throw__s(Ctx *ctx, char *msg, char *file, int line);
 KNHAPI(void) knh_throw(Ctx *ctx, Object *e, char *file, int line);
 KNHAPI(void) konoha_throwSecurityException(void);
 KNHAPI(void) konoha_loadIntConstData(Ctx *ctx, knh_IntConstData_t *data);
-#ifndef KNH_USING_NOFLOAT
 KNHAPI(void) konoha_loadFloatConstData(Ctx *ctx, knh_FloatConstData_t *data);
-#endif
 KNHAPI(void) konoha_loadStringConstData(Ctx *ctx, knh_StringConstData_t *data);
 KNHAPI(konoha_t) konoha_open(size_t stacksize);
 KNHAPI(void) konoha_close(konoha_t konoha);

@@ -73,11 +73,7 @@ static METHOD knh__Object_new__init(Ctx *ctx, knh_sfp_t *sfp)
 static METHOD knh__Object_opAddr(Ctx *ctx, knh_sfp_t *sfp)
 {
 	void *p = NULL;
-	if(IS_bInt(sfp[0].o) 
-#ifndef KNH_USING_NOFLOAT
-	 || IS_bFloat(sfp[0].o)
-#endif
-	 ) {
+	if(IS_bInt(sfp[0].o) || IS_bFloat(sfp[0].o)) {
 		p = (void*)(&sfp[0] + sizeof(void*));
 	}
 	else if(IS_Boolean(sfp[0].o)) {
@@ -256,11 +252,7 @@ void knh_Object__s(Ctx *ctx, Object *b, OutputStream *w, String *m)
 static METHOD knh__Object__p(Ctx *ctx, knh_sfp_t *sfp)
 {
 	void *p = NULL;
-	if(IS_bInt(sfp[0].o) 
-#ifndef KNH_USING_NOFLOAT
-	 || IS_bFloat(sfp[0].o)
-#endif
-	 ) {
+	if(IS_bInt(sfp[0].o) || IS_bFloat(sfp[0].o)) {
 		p = (void*)(&sfp[0] + sizeof(void*));
 	}
 	else if(IS_Boolean(sfp[0].o)) {
@@ -299,13 +291,11 @@ void knh_Object__k(Ctx *ctx, Object *o, OutputStream *w, String *m)
 					knh_write__i(ctx, w, data[0]);
 					continue;
 				}
-#ifndef KNH_USING_NOFLOAT
 				else if(IS_ubxfloat(cf->type)) {
 					knh_float_t *data = (knh_float_t*)(v + i);
 					knh_write__f(ctx, w, data[0]);
 					continue;
 				}
-#endif /* KNH_USING_NOFLOAT */
 				else if(IS_ubxboolean(cf->type)) {
 					knh_boolean_t *data = (knh_boolean_t*)(v + i);
 					if(data[0]) knh_write(ctx, w, STEXT("true"));
