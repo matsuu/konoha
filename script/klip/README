@@ -12,8 +12,10 @@ KLIP (Konoha LIbrary Provider)
 
 
 *USAGE
- $ konoha klip.k install package_name
+ $ ./klip search package_name
 
- $ konoha klip.k remove package_name
+ $ ./klip install package_name
 
- $ konoha klip.k undo
+ $ ./klip remove package_name
+
+ $ ./klip undo
