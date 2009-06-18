@@ -1,8 +1,13 @@
 #ifndef KONOHA_DEPS_H_
 #define KONOHA_DEPS_H_
 #include"konoha_t.h"
+#ifdef KONOHA_OS__LKM
+#include<linux/string.h>
+#include<linux/slab.h>
+#else
 #include<stdlib.h>
 #include<string.h>
+#endif
 
 /* ======================================================================== */
 /* [UNIX] */
@@ -35,7 +40,6 @@
 #endif
 
 #ifdef KONOHA_OS__MACOSX
-#define KONOHA_OS__LKM
 #define 	KNH_USING_POSIX    1
 #define 	KNH_USING_UNIX     1
 #define 	KNH_USING_SOCKET   1
@@ -220,7 +224,7 @@
 
 /* ======================================================================== */
 
-#ifdef KNH_USING_POSIX
+#if defined(KNH_USING_POSIX) && !defined(KONOHA_OS__LKM)
 #include<dlfcn.h>
 #define KNH_RTLD_LAZY               RTLD_LAZY
 #else

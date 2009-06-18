@@ -28,6 +28,13 @@
 #ifndef KONOHA_T_H_
 #define KONOHA_T_H_
 
+#ifdef KONOHA_OS__LKM
+#include<float.h>
+#include<linux/types.h>
+#include<linux/ctype.h>
+#include<linux/kernel.h>
+typedef long jmp_buf ;
+#else
 #include<stdio.h>
 #include<limits.h>
 #include<float.h>
@@ -37,6 +44,7 @@
 #include<stdint.h>
 #define __STDC_FORMAT_MACROS
 #include<inttypes.h>
+#endif
 
 #include"konoha_config.h"
 
@@ -81,6 +89,12 @@ typedef int32_t           knh_int32_t;
 typedef uint32_t          knh_uint32_t;
 typedef int64_t           knh_int64_t;
 typedef uint64_t          knh_uint64_t;
+
+/* stdint.h */
+#ifndef _INTPTR_T
+#define _INTPTR_T
+typedef long                      intptr_t;
+#endif
 
 typedef intptr_t                  knh_intptr_t;
 typedef uintptr_t                 knh_uintptr_t;
@@ -849,6 +863,10 @@ typedef struct {
 
 /* ------------------------------------------------------------------------ */
 /* KNH_DRVAPI_TYPE__IO */
+
+#ifdef KONOHA_OS__LKM
+typedef knh_intptr_t FILE;
+#endif
 
 typedef knh_intptr_t knh_io_t;
 

@@ -28,9 +28,12 @@
 /* ************************************************************************ */
 
 #include"commons.h"
+
+#ifndef KONOHA_OS__LKM
 #include<time.h>
 #ifdef KNH_USING_POSIX
 #include<unistd.h>
+#endif
 #endif
 
 /* ************************************************************************ */
@@ -54,10 +57,14 @@ double genrand64_real1(void);
 void knh_srand(knh_uint_t seed)
 {
 	if(seed == 0) {
+#ifdef KONOHA_OS__LKM
+		seed = 1;
+#else
 #ifdef KNH_USING_POSIX
 		seed = (knh_uint_t)time(NULL) + getpid();
 #else
 		seed = (knh_uint_t)time(NULL);
+#endif
 #endif
 	}
 #ifdef KNH_USING_INT32

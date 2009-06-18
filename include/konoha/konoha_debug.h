@@ -183,4 +183,17 @@
 
 /* ======================================================================== */
 
+#ifdef KONOHA_OS__LKM
+#undef KNH_ASSERT
+#define KNH_ASSERT(c) 
+#undef  DBG_
+#define DBG_(stmt)
+#undef  DBG_P
+#define DBG_P(fmt, ...) 
+#endif
+
+
+
+/* ======================================================================== */
+
 #endif /*KONOHA_DEBUG_H_*/

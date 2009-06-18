@@ -208,7 +208,7 @@
 
 /* ======================================================================== */
 
-#ifndef L1_CACHE_BYTES
+#if !defined(L1_CACHE_BYTES) && !defined(KONOHA_OS__LKM)
 #define L1_CACHE_BYTES   32
 #endif
 

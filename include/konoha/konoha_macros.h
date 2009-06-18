@@ -34,5 +34,21 @@
 #define KNH_MID(a,b)     (((a) + (b)) / 2)
 
 /* ------------------------------------------------------------------------ */
+#ifdef KONOHA_OS__LKM
+#define getenv(a) NULL
+#define stdin 
+#define stdout KERN_INFO
+#define stderr KERN_ALERT
+#define malloc(x) kmalloc(x,GFP_KERNEL)
+#define free(x)   kfree(x)
+#define fprintf(out,fmt, arg...) printk(out fmt , ##arg)
+#define fputs(prompt, fp) 
+#define fgetc(fp) (-1)
+#define EOF -1
+#define fflush(x)
+#define exit(i)  printk(KERN_EMERG "KONOHA_exit!!!")
+#define setjmp(j) (j)
+#endif
 
+/* ------------------------------------------------------------------------ */
 #endif /*KONOHA_MACRO_H_*/

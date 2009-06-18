@@ -128,21 +128,21 @@ static int debugLevel = 0;
 
 /* ----------------------------------------------------------------------- */
 
-KNHAPI(int) konoha_debugLevel()
+KNHAPI(int) konoha_debugLevel(void)
 {
 	return debugLevel;
 }
 
 /* ----------------------------------------------------------------------- */
 
-KNHAPI(int) konoha_isSystemDump2()
+KNHAPI(int) konoha_isSystemDump2(void)
 {
 	return (dumpLevel2 == 2);
 }
 
 /* ----------------------------------------------------------------------- */
 
-static void konoha_dumpInit()
+static void konoha_dumpInit(void)
 {
 	fprintf(stderr, "sizeof(knh_int_t)=%lu, sizeof(void*)=%lu\n", sizeof(knh_intptr_t), sizeof(void*));
 	KNH_ASSERT(sizeof(knh_intptr_t) == sizeof(void*));
