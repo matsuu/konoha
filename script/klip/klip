@@ -15,8 +15,6 @@ void dispError(String code)
 		txt = "!ERR : undefined such operation ";
 	} else if (code == "argofver"){
 		txt = "!ERR : please set Float value @ args.version ";
-	} else if (code == "setFromklip"){
-		txt = "!ERR : can't find this package @ klip.xml ";
 	} else{
 		txt = "!ERR : " + code + " failed";
 	}
@@ -199,14 +197,10 @@ void upLatestInst(Package target)
 /*-----main-----*/
 int  main (String[] args)
 {
-	if ( |args| < 2 ) {
-		OUT << "USAGE: kget.k operation package_name" << EOL;
-		OUT << "USAGE: operation = [ search , install , remove , undo ]" << EOL;
-		return EXIT_ERROR;
-	} else if (|args| == 2 && args[1] == "undo"){
+	if (|args| == 2 && args[1] == "undo"){
 		copyXML(CURXML,BUFXML);
 		if( !undo() ) { dispError("undo"); return EXIT_ERROR; }
-	} else if ( 3 <= |args| || |args| <= 4 ) {
+	} else if ( |args| == 3 || |args| == 4 ) {
 		operation = args[1];
 		name = args[2];
 		if ( |args| == 4 ) {
@@ -221,7 +215,7 @@ int  main (String[] args)
 					OUT << "KLIP : package is NOT FOUND..." << EOL;		
 					return EXIT_SUCCESS;
 				}
-				dispError("setFromklip");
+				OUT << "!ERR : can't find this package @ klip.xml " << EOL;
 				return EXIT_ERROR;
 			}
 			if(operation == "search"){
@@ -257,6 +251,10 @@ int  main (String[] args)
 			dispError("operation");
 			OUT << "USAGE: operation = [ search , install , remove , undo ]" << EOL;
 			return EXIT_ERROR;	}
+	} else {
+		OUT << "USAGE: ./klip operation package_name" << EOL;
+		OUT << "USAGE: operation = [ search , install , remove , undo ]" << EOL;
+		return EXIT_ERROR
 	}
 	OUT << "KLIP : closing..." << EOL;
 	System.rename( BUFXML, PREVXML );
