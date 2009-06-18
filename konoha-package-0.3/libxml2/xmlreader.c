@@ -1,4 +1,7 @@
 #include <libxml/xmlreader.h>
+
+#define KNH_USING_ICONV
+
 #include <konoha.h>
 
 /* ----------------------------------------------------------------- */

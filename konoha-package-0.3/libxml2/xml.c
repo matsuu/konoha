@@ -2,6 +2,9 @@
 #include <libxml/xpath.h>
 #include <libxml/parser.h>
 #include <libxml/xmlreader.h>
+
+#define KNH_USING_ICONV
+
 #include <konoha.h>
 
 static void knh_xml_gfree(Ctx *ctx, knh_Glue_t *g)
