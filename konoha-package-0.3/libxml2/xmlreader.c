@@ -10,6 +10,7 @@
 #define METHOD void __declspec(dllexport)
 #undef KNHAPI
 #define KNHAPI(T) T __declspec(dllexport)
+#endif
 
 #ifdef __cplusplus
 extern "C" {

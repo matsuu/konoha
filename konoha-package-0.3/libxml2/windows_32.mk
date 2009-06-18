@@ -4,9 +4,15 @@ LINK32=link.exe
 # path to "konoha.lib"
 KONOHA_LIB="konoha.lib"
 
+#path to konoha's include dir
+KONOHA_INCLUDE="../include"
+
+#path to libxml2's include dir
+EXT_INCLUDE="./etx/include"
+
 LINK32DLL_FLAGS=\
  /nologo /dll /LTCG /incremental:no\
- /DEFAULTLIB:"libxml2.lib"\
+ /DEFAULTLIB:"./libxml2.lib"\
  /machine:I386 /out:"libxml2_windows_32.dll"\
  /implib:"./libxml2_windows_32.lib"
 
@@ -17,9 +23,8 @@ CFLAGS=\
   /nologo\
   /c /TP /Od /Oy /GL /W3\
   /D_WINDOWS\
-  /I"..\..\konoha-0.5\windows\libxml2\include"\
-  /I"..\..\konoha-0.5\windows\include"\
-  /I"..\..\konoha-0.5\include"
+  /I$(EXT_INCLUDE)\
+  /I$(KONOHA_INCLUDE)\
 
 xml.obj : "xml.c"
     $(CC) $(CFLAGS) /Fo"xml.obj" "xml.c"
