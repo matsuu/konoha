@@ -7,6 +7,17 @@
 
 #include <konoha.h>
 
+#ifdef KONOHA_OS__WINDOWS
+#define _USE_XML_DEFINES
+#undef METHOD
+#define METHOD void __declspec(dllexport)
+#undef KNHAPI
+#define KNHAPI(T) T __declspec(dllexport)
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static void knh_xml_gfree(Ctx *ctx, knh_Glue_t *g)
 {
     xmlDocPtr doc = (xmlDocPtr) g->ptr;
@@ -189,3 +200,6 @@ METHOD XPath_find(Ctx *ctx, knh_sfp_t *sfp)
     KNH_RETURN(ctx,sfp,new_Glue(ctx,(char*)"libxml2.XmlNode",node,NULL));
 }
 
+#ifdef __cplusplus
+}
+#endif

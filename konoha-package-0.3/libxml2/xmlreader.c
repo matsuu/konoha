@@ -4,6 +4,17 @@
 
 #include <konoha.h>
 
+#ifdef KONOHA_OS__WINDOWS
+#define _USE_XML_DEFINES
+#undef METHOD
+#define METHOD void __declspec(dllexport)
+#undef KNHAPI
+#define KNHAPI(T) T __declspec(dllexport)
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+  
 /* ----------------------------------------------------------------- */
 /* [xmlTextReader] */
 static void knh_xmlreader_gfree(Ctx *ctx, knh_Glue_t *g)
@@ -286,3 +297,7 @@ KNHAPI(int) init(Ctx *ctx)
     konoha_loadIntConstData(ctx, IntConstData);
     return 1;
 }
+
+#ifdef __cplusplus
+}
+#endif
