@@ -1,0 +1,19 @@
+KLIP (Konoha LIbrary Provider)
+
+
+*USING PACKAGES OF Konoha
+ - posix.*;
+ - libxml2.*;
+
+
+*NEED TO CHANGE
+ -at const.k : Line 20 
+ Please overwrite INSTDIR to your .KONOHA_DIRECTRY (by ABSOLUTE PATH)
+
+
+*USAGE
+ $ konoha klip.k install package_name
+
+ $ konoha klip.k remove package_name
+
+ $ konoha klip.k undo
