@@ -3,7 +3,7 @@
 CC = gcc
 CFLAGS = -O2 -Wall -fmessage-length=0 -fPIC `xml2-config --cflags`
 LDLIBS = -lkonoha `xml2-config --libs`
-target = macosx_32
+target = linux_32
 pkgname = libxml2
 objs = xml.o xmlreader.o
 
@@ -17,7 +17,7 @@ all: $(library)
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 $(library): $(objs)
-	$(CC) -dynamiclib -o $@ $^ $(LDLIBS)
+	$(CC) -shared -o $@ $^ $(LDLIBS)
 
 .PHONY: clean
 clean:
