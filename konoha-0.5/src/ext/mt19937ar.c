@@ -41,7 +41,9 @@
    email: m-mat @ math.sci.hiroshima-u.ac.jp (remove space)
 */
 
+#ifndef KONOHA_OS__LKM
 #include <stdio.h>
+#endif
 
 /* Period parameters */
 #define N 624

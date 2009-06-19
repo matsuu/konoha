@@ -53,8 +53,9 @@
    email: m-mat @ math.sci.hiroshima-u.ac.jp (remove spaces)
 */
 
-
+#ifndef KONOHA_OS__LKM
 #include <stdio.h>
+#endif
 
 #define NN 312
 #define MM 156

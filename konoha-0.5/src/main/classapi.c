@@ -2522,7 +2522,11 @@ Object *knh_System_fdefault(Ctx *ctx, knh_class_t cid)
 #include"../api/streamapi.c"
 #include"../api/dbapi.c"
 
+#ifdef KONOHA_OS__LKM
+#include"../../include/konoha/gen/struct_.h"
+#else
 #include<konoha/gen/struct_.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {

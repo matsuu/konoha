@@ -29,7 +29,9 @@
 
 #include"commons.h"
 
-#ifndef KONOHA_OS__LKM
+#ifdef KONOHA_OS__LKM
+#include <linux/random.h>
+#else
 #include<time.h>
 #ifdef KNH_USING_POSIX
 #include<unistd.h>
@@ -49,8 +51,10 @@ void init_genrand(unsigned long s);
 void init_genrand64(unsigned long long seed);
 unsigned long genrand_int31(void);
 unsigned long long genrand64_int63(void);
+#ifndef KONOHA_OS__LKM
 double genrand_real1(void);
 double genrand64_real1(void);
+#endif
 
 /* ------------------------------------------------------------------------ */
 
@@ -67,21 +71,27 @@ void knh_srand(knh_uint_t seed)
 #endif
 #endif
 	}
+#ifndef KONOHA_OS__LKM
 #ifdef KNH_USING_INT32
 	init_genrand((unsigned long)seed);
 #else
 	init_genrand64((unsigned long long int)seed);
 #endif
+#endif /* KONOHA_OS__LKM */
 }
 
 /* ------------------------------------------------------------------------ */
 
 knh_uint_t knh_rand()
 {
+#ifdef KONOHA_OS__LKM
+	return (knh_uint_t)random32();
+#else
 #ifdef KNH_USING_INT32
 	return (knh_uint_t)genrand_int31();
 #else
 	return (knh_uint_t)genrand64_int63();
+#endif
 #endif
 }
 
@@ -89,11 +99,16 @@ knh_uint_t knh_rand()
 
 knh_float_t knh_float_rand()
 {
+#ifdef KNH_USING_NOFLOAT
+	return (knh_float_t)knh_rand();
+#else
+
 #ifdef KNH_USING_INT32
 	return (knh_float_t)genrand_real1();
 #else
 	return (knh_float_t)genrand64_real1();
 #endif
+#endif /* KNH_USING_NOFLOAT */
 }
 
 /* ------------------------------------------------------------------------ */

@@ -28,7 +28,12 @@
 /* ************************************************************************ */
 
 #include"commons.h"
+#ifdef KONOHA_OS__LKM
+#include<linux/string.h>
+#else
 #include<string.h>
+#endif
+
 #ifdef KNH_USING_MATH
 #include<math.h>
 #endif

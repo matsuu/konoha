@@ -27,12 +27,18 @@
 
 /* ************************************************************************ */
 
+#include"commons.h"
+
+#ifdef KONOHA_OS__LKM
+#define KNH_USING_NOAPI
+#undef KNH_USING_POSIX
+#endif
+
 #ifdef KNH_USING_WINDOWS
 #include <windows.h>
 #include <winsock2.h>
 #endif
 
-#include"commons.h"
 
 #ifdef KNH_USING_POSIX
 #undef KNH_USING_NOPAI
@@ -42,10 +48,6 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#endif
-
-#ifdef KONOHA_OS__LKM
-#define KNH_USING_NOAPI
 #endif
 
 #ifdef __cplusplus
