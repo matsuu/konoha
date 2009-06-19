@@ -28,7 +28,11 @@
 #ifndef STRUCT__H
 #define STRUCT__H
 
+#ifdef KONOHA_OS__LKM
+#include"../konoha_t.h"
+#else
 #include<konoha/konoha_t.h>
+#endif
 
 
 #ifdef __cplusplus 

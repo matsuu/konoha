@@ -553,6 +553,11 @@ void konoha_setverbose(int v)
 
 KNHAPI(void) konoha_says(Ctx *ctx, int type, char *fmt, ...)
 {
+#ifndef KONOHA_OS__LKM
+// TODO_LKM
+// how to print this.
+// printk? or something...
+
 	if(type == KONOHA_NOTICE && (!knh_Context_isVerbose(ctx) || !knh_Context_isInteractive(ctx))) {
 		return;
 	}
@@ -627,6 +632,7 @@ KNHAPI(void) konoha_says(Ctx *ctx, int type, char *fmt, ...)
 		va_end(args);
 		knh_write_EOL(ctx, w);
 	}
+#endif
 }
 
 /* ------------------------------------------------------------------------ */

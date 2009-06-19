@@ -25,13 +25,23 @@
 #undef KNH_USING_READLINE
 
 
-typedef long jmp_buf ;
-typedef knh_intptr_t FILE;
-
 /* stdint.h */
 #ifndef _STDINT_H
 #define _STDINT_H
 typedef long                      intptr_t;
+#endif
+
+/* /usr/include/inttypes.h */
+#define __PRI64_PREFIX	"ll"
+#define __PRIPTR_PREFIX
+#define PRIdPTR __PRIPTR_PREFIX "d"
+
+
+typedef long jmp_buf ;
+typedef intptr_t FILE;
+
+#define TODO_LKM
+// how to treat debug and assert,exit
 
 #undef KNH_ASSERT
 #define KNH_ASSERT(c) 
@@ -41,18 +51,29 @@ typedef long                      intptr_t;
 #define DBG_P(fmt, ...) 
 
 #define getenv(a) NULL
-#define stdin 
+#define stdin  ((FILE*)NULL)
 #define stdout KERN_INFO
 #define stderr KERN_ALERT
+
 #define malloc(x) kmalloc(x,GFP_KERNEL)
 #define free(x)   kfree(x)
+
 #define fprintf(out,fmt, arg...) printk(out fmt , ##arg)
 #define fputs(prompt, fp) 
 #define fgetc(fp) (-1)
 #define EOF -1
 #define fflush(x)
 #define exit(i)  printk(KERN_EMERG "KONOHA_exit!!!")
-#define setjmp(j) (j)
+#define setjmp(j) 0
+#define longjmp(a,b)
+#define assert(x) 
+#define abort() 
+
+/* ../../src/ext/qsort.c */
+void qsort(void* base,size_t total,size_t size, int (*comp)(const void*,const void*));
+
+/* ../../src/ext/strerror.c */
+char* strerror(int errno);
 #endif
 
 /* ------------------------------------------------------------------------ */

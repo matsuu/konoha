@@ -43,7 +43,11 @@ extern "C" {
 #define p_uinteger(a)    ((knh_uint_t)(a).ivalue)
 
 #define p_float(a)       ((a).fvalue)
+#ifdef KONOHA_OS__LKM
+#define p_double(a)      ((a).fvalue)
+#else
 #define p_double(a)      ((double)(a).fvalue)
+#endif
 #define p_bool(a)        ((a).bvalue)
 #define p_char(a)        (knh_String_tochar(a.s))
 #define p_bytes(a)       (knh_Bytes_tobytes(a.s))

@@ -6,6 +6,8 @@
 
 #include"commons.h" // added by Kimio Kuramitsu
 
+#ifndef KONOHA_OS__LKM
+
 #ifndef KONOHA_OS__WINDOWS
 //#ifdef KNH_USING_POSIX
 #include<unistd.h>
@@ -307,4 +309,6 @@ int konohaget(Ctx *ctx, knh_bytes_t pkgname)
 }
 
 /* ------ end of konohaget implementation ----------------*/
+#endif
+
 #endif

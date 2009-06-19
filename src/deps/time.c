@@ -29,6 +29,9 @@
 
 
 #include"commons.h"
+#ifdef KONOHA_OS__LKM
+#undef KNH_USING_POSIX
+#endif
 
 #define KNH_USING_NOAPI 1
 

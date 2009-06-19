@@ -43,9 +43,8 @@ konohadev-objs := \
 ./src/class/knh_Context.o \
 ./src/class/knh_Number.o \
 ./src/class/knh_type_t.o \
-./src/ext/mt19937-64.o \
 ./src/ext/qsort.o \
-./src/ext/mt19937ar.o \
+./src/ext/strerror.o \
 ./src/api/hashapi.o \
 ./src/api/stringapi.o \
 ./src/api/systemapi.o \
@@ -80,24 +79,35 @@ konohadev-objs := \
 ./src/deps/regex.o \
 ./src/deps/thread.o \
 ./src/deps/time.o \
-./src/konoha.o \
+./src/konohadev_main.o \
 
 #./src/gen/codetemplate.s \
 #./src/gen/codetemplate.c \
 #./src/gen/fibo.c \
 #./src/gen/fibo.s \
+#./src/ext/mt19937ar.o \
+#./src/ext/mt19937-64.o \
 
 KDIR  := /lib/modules/$(shell uname -r)/build
 PWD   := $(shell pwd)
 KBUILD_CFLAGS += -DKONOHA_OS__LKM
 KBUILD_CFLAGS += -I$(PWD)./include/
+VERBOSE=0
 
 default:
-	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules KBUILD_VERBOSE=1
+	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules KBUILD_VERBOSE=$(VERBOSE)
 
 clean:
-	rm -f *.o
-	rm -f *.ko
-	rm -f *.mod.c
-	rm -f *~
-	rm -f ./src/main/.*.o.cmd
+	rm -f *.o *.ko *.mod.c  *~ *.cmd .*.ko.cmd
+	rm -f ./modules.order ./Module.* ./.konohadev.* 
+	rm -rf .tmp_versions
+	rm -f ./src/.*.o.cmd  ./src/*.o
+	rm -f ./src/main/.*.o.cmd  ./src/main/*.o
+	rm -f ./src/api/.*.o.cmd  ./src/api/*.o
+	rm -f ./src/class/.*.o.cmd ./src/class/*.o
+	rm -f ./src/ext/.*.o.cmd ./src/ext/*.o
+	rm -f ./src/labs/.*.o.cmd ./src/labs/*.o
+	rm -f ./src/gen/.*.o.cmd ./src/gen/*.o
+	rm -f ./src/deps/.*.o.cmd ./src/deps/*.o
+	rm -f ./src/compiler/.*.o.cmd ./src/compiler/*.o
+
