@@ -28,6 +28,7 @@
 #ifndef KONOHA_T_H_
 #define KONOHA_T_H_
 
+#ifndef KONOHA_OS__LKM
 #include<stdio.h>
 #include<limits.h>
 #include<float.h>
@@ -37,6 +38,7 @@
 #include<stdint.h>
 #define __STDC_FORMAT_MACROS
 #include<inttypes.h>
+#endif
 
 #include"konoha_config.h"
 
