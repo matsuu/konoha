@@ -1,8 +1,11 @@
 #ifndef KONOHA_DEPS_H_
 #define KONOHA_DEPS_H_
 #include"konoha_t.h"
+
+#ifndef KONOHA_OS__LKM
 #include<stdlib.h>
 #include<string.h>
+#endif
 
 /* ======================================================================== */
 /* [UNIX] */
@@ -49,6 +52,27 @@
 #define 	KNH_USING_READLINE 1
 #define		KONOHA_MONOLITHIC  1
 #endif
+#endif
+
+/* ------------------------------------------------------------------------ */
+
+#ifdef KONOHA_OS__LKM
+#define KNH_USING_INT32      1
+#define KNH_USING_NOFLOAT    1
+#define KNH_USING_NOFILE     1
+
+#define KNH_EXT_QSORT  1
+#define KNH_EXT_SETJMP 1
+
+#undef KNH_USING_SOCKET
+#undef KNH_USING_ICONV
+#undef KNH_USING_REGEX
+#undef KNH_USING_SQLITE3
+#undef KNH_USING_KONOHAGET
+#undef KNH_USING_PTHREAD
+#undef KNH_USING_THREAD
+#undef KNH_USING_READLINE
+
 #endif
 
 /* ======================================================================== */
@@ -198,7 +222,7 @@
 
 /* ======================================================================== */
 
-#ifdef KNH_USING_POSIX
+#if defined(KNH_USING_POSIX) && !defined(KONOHA_OS__LKM)
 #include<dlfcn.h>
 #define KNH_RTLD_LAZY               RTLD_LAZY
 #else

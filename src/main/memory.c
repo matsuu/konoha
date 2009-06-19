@@ -432,7 +432,7 @@ void knh_Object_traverse(Ctx *ctx, knh_Object_t *o, knh_ftraverse ftr)
 
 #define BSHIFT ((KONOHA_PAGESIZE / sizeof(knh_Object_t)) / (sizeof(knh_uintptr_t) * 8))
 
-static int mcount = 0;
+static int _mcount = 0;
 
 /* ------------------------------------------------------------------------ */
 
@@ -452,7 +452,7 @@ void knh_Object_mark1(Ctx *ctx, Object *o)
 		knh_uintptr_t mask = 1 << (n % (sizeof(knh_uintptr_t)*8));
 		if(!((b[x] & mask) == mask)) {
 			//DBG2_P("marked %p, cid=%d,%s", o, knh_Object_cid(o), CLASSN(knh_Object_cid(o)));
-			mcount++;
+			_mcount++;
 			b[x] = b[x] | mask;
 			knh_Object_traverse(ctx, o, knh_Object_mark1);
 		}
@@ -494,10 +494,10 @@ METHOD knh__System_gc(Ctx *ctx, knh_sfp_t *sfp)
 	}
 
 	DBG_DISABLE_FREE();
-	mcount = 0;
+	_mcount = 0;
 	konoha_traverse(ctx, knh_Object_mark1);
 	DBG_ENABLE_FREE();
-	DBG_P("** GC - Marked %d/%d object(s)", (int)mcount, (int)ctx->stat->usedObjectSize);
+	DBG_P("** GC - Marked %d/%d object(s)", (int)_mcount, (int)ctx->stat->usedObjectSize);
 
 	size_t cnt = 0;
 	knh_ftraverse fsweep = ctx->fsweep;

@@ -31,6 +31,8 @@
 
 #ifdef KNH_USING_POSIX
 #include<errno.h>
+#else
+static int errno;
 #endif
 
 /* ************************************************************************ */

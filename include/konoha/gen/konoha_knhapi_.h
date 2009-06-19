@@ -28,7 +28,11 @@
 #ifndef KONOHA_KNHAPI__H
 #define KONOHA_KNHAPI__H
 
+#ifdef KONOHA_OS__LKM
+#include"konoha_class_.h"
+#else
 #include<konoha/gen/konoha_class_.h>
+#endif
 
 
 #ifdef __cplusplus 
@@ -252,8 +256,8 @@ KNHAPI(void) konoha_FINALv(Ctx *ctx, Object **v);
 KNHAPI(char*) knh_format_ospath(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t path);
 KNHAPI(Ctx*) konoha_getCurrentContext(void);
 KNHAPI(Ctx*) konoha_getThreadContext(Ctx *ctx);
-KNHAPI(int) konoha_debugLevel();
-KNHAPI(int) konoha_isSystemDump2();
+KNHAPI(int) konoha_debugLevel(void);
+KNHAPI(int) konoha_isSystemDump2(void);
 KNHAPI(int) konoha_parseopt(konoha_t konoha, int argc, char **argv);
 KNHAPI(char*) konoha_eval(konoha_t konoha, char *script);
 KNHAPI(void) konoha_readFile(Ctx *ctx, char *fpath);

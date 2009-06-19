@@ -28,11 +28,13 @@
 #ifndef KONOHA_DEV_H_
 #define KONOHA_DEV_H_
 
+#ifndef KONOHA_OS__LKM
 #include<stdio.h>
 #include<ctype.h>
 #include<assert.h>
-#include<stdarg.h>
 #include<setjmp.h>
+#endif
+#include<stdarg.h>
 
 #ifndef LIBKONOHA
 #ifdef HAVE_CONFIG_H

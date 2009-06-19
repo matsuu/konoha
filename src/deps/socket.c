@@ -44,6 +44,9 @@
 #include <unistd.h>
 #endif
 
+#ifdef KONOHA_OS__LKM
+#define KNH_USING_NOAPI
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,7 +57,7 @@ extern "C" {
 
 KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port)
 {
-
+#ifdef KNH_USING_POSIX
 #ifdef KNH_USING_WINDOWS
   WSADATA wsaData;
   WSAStartup(MAKEWORD(2,0), &wsaData);
@@ -87,6 +90,7 @@ KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port)
 		return -1;
 	}
 	return sd;
+#endif
 
 #ifdef KNH_USING_NOAPI
 	return -1;
