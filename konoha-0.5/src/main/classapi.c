@@ -2051,9 +2051,11 @@ static void knh_System_traverse(Ctx *ctx, System *o, knh_ftraverse ftr)
 	knh_System_struct *sys = DP(o);
 
 	ftr(ctx, UP(sys->enc));
+#ifndef KONOHA_OS__LKM
 	ftr(ctx, UP(sys->in));
 	ftr(ctx, UP(sys->out));
 	ftr(ctx, UP(sys->err));
+#endif
 
 	ftr(ctx, UP(sys->props));
 	ftr(ctx, UP(sys->ExptNameDictSet));
