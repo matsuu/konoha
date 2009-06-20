@@ -207,14 +207,16 @@ KNHAPI(char*) konoha_eval(konoha_t konoha, char *script)
 		KNH_LPUSH(ctx, in);
 		DP(in)->fileid = konoha_getFileId(ctx, STEXT("(eval)"));
 		DP(in)->line = 0;
-
 		ba = new_Bytes(ctx, 1024);
 		OutputStream *out = new_BytesOutputStream(ctx, ba);
 		KNH_LPUSH(ctx, out);
+		//		printk("ctx : %p %p\n", (Context*)ctx->out, out);
 		KNH_SETv(ctx, ((Context*)ctx)->out, out);
+		//		printk("2\n");
 		KNH_SETv(ctx, ((Context*)ctx)->err, out);
 
 		konohac_eval(ctx, TS_main, in);
+
 		knh_cwb_clear(cwb);
 		knh_OutputStream_flush(ctx, out);
 		KNH_LOCALBACK(ctx, lsfp);
