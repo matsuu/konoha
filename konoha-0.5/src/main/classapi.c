@@ -2026,6 +2026,10 @@ void knh_System_init(Ctx *ctx, System *o, int init)
 	KNH_INITv(sys->in,    new_InputStream__stdio(ctx, stdin, sys->enc));
 	KNH_INITv(sys->out,   new_OutputStream__stdio(ctx, stdout, sys->enc));
 	KNH_INITv(sys->err,   new_OutputStream__stdio(ctx, stderr, sys->enc));
+#else
+	KNH_INITv(sys->in,    new_InputStream__stdio(ctx, NULL, sys->enc));
+	KNH_INITv(sys->out,   new_OutputStream__stdio(ctx, NULL, sys->enc));
+	KNH_INITv(sys->err,   new_OutputStream__stdio(ctx, NULL,  sys->enc));
 #endif
 
 	KNH_INITv(sys->props, new_DictMap0(ctx, 64));

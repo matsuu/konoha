@@ -128,11 +128,17 @@ static int knh_dev_write(struct file *filp,const char __user *user_buf,
     //        return -ERESTARTSYS;
     //    }
 
-    len = copy_from_user(buf,user_buf,count);
-    printk(KERN_DEBUG "[%s]",konoha_eval(dev->konoha,buf));
+    //    len = copy_from_user(buf,user_buf,count);
+    //    printk("%ld %s\n", len, buf);
+    //    konoha_eval(dev->konoha, buf);
+    printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "int fib(int n) { if (n==3) { return 1;}}"));
+    printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "fib(10);"));
+    //    printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, buf));
     //    up(&dev->sem);
-    *offset += count - len;
-    return count -len;
+    //    *offset += count - len;
+    //    return count -len;
+    *offset = 0;
+    return 1;
 }
 
 static void knh_dev_setup(struct konohadev_t *dev){
