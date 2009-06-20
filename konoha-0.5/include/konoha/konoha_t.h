@@ -75,6 +75,7 @@ typedef int                      knh_boolean_t;
 /* Int, knh_int_t */
 /* ------------------------------------------------------------------------ */
 
+
 typedef int16_t           knh_int16_t;
 typedef uint16_t          knh_uint16_t;
 typedef int16_t           knh_short_t;
@@ -196,12 +197,6 @@ typedef double                    knh_float_t;
 #define KNH_FLOAT_FMT4            "%.4f"
 #define KNH_FLOAT_FMTE            "%e"
 #endif
-
-#ifndef KNH_FLOAT_NAN
-#define KNH_FLOAT_NAN             (0.0/0.0)
-#define KNH_FLOAT_NULL            KNH_FLOAT_NAN
-#define KNH_FLOAT_FMTSIZ          80
-#endif/*KNH_FILAT_NAN*/
 
 /* ------------------------------------------------------------------------ */
 /* String, knh_uchar_t */
