@@ -198,6 +198,12 @@ typedef double                    knh_float_t;
 #define KNH_FLOAT_FMTE            "%e"
 #endif
 
+#ifndef KNH_FLOAT_NAN
+#define KNH_FLOAT_NAN             (0.0/0.0)
+#define KNH_FLOAT_NULL            KNH_FLOAT_NAN
+#define KNH_FLOAT_FMTSIZ          80
+#endif /*KNH_FLOAT_NAN*/
+
 /* ------------------------------------------------------------------------ */
 /* String, knh_uchar_t */
 /* ------------------------------------------------------------------------ */
