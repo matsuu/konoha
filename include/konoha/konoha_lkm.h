@@ -4,6 +4,7 @@
 #ifdef KONOHA_OS__LKM
 #include<linux/kernel.h>
 #include<linux/string.h>
+#include<linux/version.h>
 #include<linux/slab.h>
 #include<linux/types.h>
 #include<linux/ctype.h>
