@@ -525,7 +525,11 @@ typedef struct knh_Closure {
 /* ------------------------------------------------------------------------ */
 /* @class AffineConv Object knh_AffineConv_t @Private */
 
-typedef float knh_affinefloat_t;
+#ifndef KONOHA_OS__LKM
+  typedef float knh_affinefloat_t;
+#else
+  typedef int knh_affinefloat_t;
+#endif
 
 typedef struct knh_AffineConv_t {
 	knh_hObject_t h;

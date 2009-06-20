@@ -36,7 +36,8 @@
 #include<assert.h>
 #include<setjmp.h>
 #endif
-#include<stdarg.h>
+
+//#include<stdarg.h>
 
 #ifndef LIBKONOHA
 #ifdef HAVE_CONFIG_H
