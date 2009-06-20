@@ -11,7 +11,7 @@
 #include <linux/cdev.h>
 #include <linux/init.h>
 #include <asm/uaccess.h>
-#include <linux/semaphore.h>
+//#include <linux/semaphore.h>
 #include "../include/konoha.h"
 
 
@@ -23,41 +23,30 @@ MODULE_AUTHOR("masahiro ide");
 // I think it seam that "float" or "double" is still active.
 // so, remove these type that can remove these functions.
 //
-float  __floatdisf (signed int i) { return i; }
-double __floatdidf (signed int i) { return i; }
-float  __floatsisf (int i) { return i; }
-double __floatsidf (int i) { return i; }
-double __floatunsidf (unsigned int i) { return i; }
-signed   int __fixsfsi    (float  d) { return d; }
-unsigned int __fixunssfsi (float  d) { return d; }
-signed   int __fixdfsi (float  d) { return d; }
-signed   int __fixdfdi (double d) { return d; }
-unsigned int __fixunsdfsi (float  d) { return d; }
-unsigned int __fixunsdfdi (double d) { return d; }
-double __adddf3(double a, double b) { return a+b; }
-double __addsf3(float a, float b) { return a+b; }
-double __subdf3(double a, double b) { return a-b; }
-double __mulsf3(double a, double b) { return a*b; }
-double __muldf3(double a, double b) { return a*b; }
-double __divdf3(double a, double b) { return a/b; }
-int    __divdi3(double a, double b) { return a/b; }
-int __moddi3(double a, double b) { return a/b; }
-unsigned int __umoddi3(double a, double b) { return a/b; }
 
-double __gesf2(float a,float b) { return (a >= b) -1 ; }
-double __gedf2(double a,double b) { return (a >= b) -1 ; }
-float  __lesf2(float  a,float  b) { return 1 - (a <= b); }
-double __ledf2(double a,double b) { return 1 - (a <= b); }
+
+float  __floatsisf (int i) { return i; } //need
+double __floatsidf (int i) { return i; } //need
+signed   int __fixsfsi    (float  d) { return d; } //need
+unsigned int __fixunssfsi (float  d) { return d; } //need
+signed   int __fixdfsi (float  d) { return d; } //need
+unsigned int __fixunsdfsi (float  d) { return d; } //need
+double __adddf3(double a, double b) { return a+b; }//need
+double __addsf3(float a, float b) { return a+b; } //ne
+double __subdf3(double a, double b) { return a-b; } //need
+double __mulsf3(double a, double b) { return a*b; } //need
+double __muldf3(double a, double b) { return a*b; }//need
+double __divdf3(double a, double b) { return a/b; } //need
+double __gedf2(double a,double b) { return (a >= b) -1 ; } //need
 float __nedf2(float a,float b) { return (a != b); }
 float __nesf2(float a,float b) { return (a != b); }
 float  __gtsf2(float  a,float  b) { return (a > b); }
 double __gtdf2(double a,double b) { return (a > b); }
-float __ltdf2(float a,float b) { return (a < b); }
-float __ltsf2(float a,float b) { return (a < b); }
 float __eqsf2(float a,float b) { return !(a == b); }
 float __eqdf2(float a,float b) { return !(a == b); }
 double __extendsfdf2(float a) {return a;}
-double __truncdfsf2(float a) {return a;}
+
+
 #endif
 
 enum {
@@ -66,7 +55,7 @@ enum {
 
 struct konohadev_t {
     dev_t id;
-    struct semaphore sem;
+  //    struct semaphore sem;
     struct cdev cdev;
     konoha_t  konoha;
 };
@@ -109,19 +98,19 @@ static int knh_dev_read (struct file* filp, char __user *user_buf,
 
     if(*offset > 0) return 0;
 
-    if(down_interruptible(&dev->sem)){
-        return -ERESTARTSYS;
-    }
+    //    if(down_interruptible(&dev->sem)){
+    //        return -ERESTARTSYS;
+    //    }
 
     len = snprintf(buf,MAXCOPYBUF,"%s\n","konoha");
 
     if(copy_to_user(user_buf,buf,len)){
-        up(&dev->sem);
+      //        up(&dev->sem);
         printk(KERN_ALERT "%s: copy_to_user failed\n",msg);
         return -EFAULT;
     }
 
-    up(&dev->sem);
+    //    up(&dev->sem);
     *offset += len;
 
     return len;
@@ -133,13 +122,13 @@ static int knh_dev_write(struct file *filp,const char __user *user_buf,
     struct konohadev_t *dev = filp->private_data;
     long len;
 
-    if(down_interruptible(&dev->sem)){
-        return -ERESTARTSYS;
-    }
+    //    if(down_interruptible(&dev->sem)){
+    //        return -ERESTARTSYS;
+    //    }
 
     len = copy_from_user(buf,user_buf,count);
     printk(KERN_DEBUG "[%s]",konoha_eval(dev->konoha,buf));
-    up(&dev->sem);
+    //    up(&dev->sem);
     *offset += count - len;
     return count -len;
 }
@@ -154,7 +143,7 @@ static void knh_dev_setup(struct konohadev_t *dev){
     cdev_init(&dev->cdev,&knh_fops);
     dev->cdev.owner = THIS_MODULE;
     dev->konoha = konoha_open(128);
-    init_MUTEX(&dev->sem);
+    //    init_MUTEX(&dev->sem);
 
     err = cdev_add(&dev->cdev, dev->id, 1);
     if(err){
