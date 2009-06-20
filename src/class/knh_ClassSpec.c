@@ -102,8 +102,11 @@ void knh_ClassSpec_initIntRange(Ctx *ctx, ClassSpec *u, knh_int_t min, knh_int_t
 	DP(u)->fmin = (knh_float_t)min;
 	DP(u)->imax = max;
 	DP(u)->fmax = (knh_float_t)max;
+#ifndef KONOHA_OS__LKM
 	DP(u)->fstep = 1.0;
-
+#else
+	DP(u)->fstep = 1;
+#endif
 	if(min >= 0) {
 		DP(u)->ficmp = (knh_ficmp)knh_ficmp__unsigned;
 		if(min == 0) {
@@ -153,7 +156,11 @@ void knh_ClassSpec_initFloatRange(Ctx *ctx, ClassSpec *u, knh_float_t min, knh_f
 	DP(u)->imax = (knh_int_t)max;
 	DP(u)->imin = (knh_int_t)min;
 
+#ifndef KONOHA_OS__LKM
 	if(min >= 0.0) {
+#else
+	if(min >= 0) {
+#endif
 		DP(u)->ficmp = (knh_ficmp)knh_ficmp__unsigned;
 		if(min == 0) {
 			DP(u)->fichk = (knh_fichk)knh_fichk__umax;
@@ -169,7 +176,12 @@ void knh_ClassSpec_initFloatRange(Ctx *ctx, ClassSpec *u, knh_float_t min, knh_f
 			DP(u)->ffchk = knh_ffchk__range;
 		}
 	}
+
+#ifndef KONOHA_OS__LKM
 	if(step != 0.0) {
+#else
+	if(step != 0) {
+#endif
 		DP(u)->ffcmp = knh_ffcmp__step;
 	}
 }
@@ -180,6 +192,7 @@ void knh_write_floatx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_float_t v)
 {
 	char *FMT = KNH_FLOAT_FMT;
 	knh_float_t step = DP(u)->fstep;
+#ifndef KONOHA_OS__LKM
 	if(0.1 <= step && step < 1.0) {
 		FMT = KNH_FLOAT_FMT1;
 	}
@@ -192,6 +205,9 @@ void knh_write_floatx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_float_t v)
 	else if(0.0001 <= step && step < 0.001) {
 		FMT = KNH_FLOAT_FMT4;
 	}
+#else
+	FMT = KNH_FLOAT_FMT;
+#endif
 	knh_write__ffmt(ctx, w, FMT, v);
 	knh_bytes_t tag = knh_String_tobytes(DP(u)->tag);
 	if(tag.len > 0) {
@@ -331,6 +347,7 @@ KNHAPI(ClassSpec*) new_Enum(Ctx *ctx, char *tag, knh_bytes_t urn, knh_int_t min,
 
 /* ------------------------------------------------------------------------ */
 
+
 KNHAPI(ClassSpec*) new_Unit(Ctx *ctx, char *tag, knh_bytes_t urn, knh_float_t min, knh_float_t max, knh_float_t step)
 {
 	knh_class_t cid = knh_ClassTable_newId(ctx);
@@ -339,6 +356,7 @@ KNHAPI(ClassSpec*) new_Unit(Ctx *ctx, char *tag, knh_bytes_t urn, knh_float_t mi
 	KNH_SETv(ctx, DP(u)->urn, new_String(ctx, urn, NULL));
 	if(tag != NULL || tag[0] != 0) {
 		KNH_SETv(ctx, DP(u)->tag, new_String__T(ctx, tag));
+
 	}
 	knh_ClassSpec_initFloatRange(ctx, u, min, max, step);
 	if(!DP(u)->ffchk(u, 0.0)) {

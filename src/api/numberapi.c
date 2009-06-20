@@ -348,7 +348,11 @@ static METHOD knh__Float_opGte(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Float_opNext(Ctx *ctx, knh_sfp_t *sfp)
 {
+  #ifndef KONOHA_OS__LKM
 	KNH_RETURN_Float(ctx, sfp, (p_float(sfp[0]))+1.0);
+  #else
+	KNH_RETURN_Float(ctx, sfp, (p_float(sfp[0]))+1);
+  #endif
 }
 
 /* ------------------------------------------------------------------------ */
@@ -356,7 +360,11 @@ static METHOD knh__Float_opNext(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Float_opPrev(Ctx *ctx, knh_sfp_t *sfp)
 {
+#ifndef KONOHA_OS__LKM
 	KNH_RETURN_Float(ctx, sfp, (p_float(sfp[0]))-1.0);
+#else
+	KNH_RETURN_Float(ctx, sfp, (p_float(sfp[0])) - 1);
+#endif
 }
 
 /* ------------------------------------------------------------------------ */

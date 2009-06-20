@@ -64,16 +64,29 @@ knh_float_t knh_Number_tofloat(Any *o)
 	Object *n = (Object*)o;
 	switch(n->h.bcid) {
 		case CLASS_Nue :
+#ifndef KONOHA_OS__LKM
 			return 0.0;
+#else
+			return 0;
+#endif
 		case CLASS_Boolean :
+
+#ifndef KONOHA_OS__LKM
 			return (IS_TRUE(n)) ? 1.0 : 0.0;
+#else
+			return (IS_TRUE(n)) ? 1 : 0;
+#endif
 		case CLASS_Int :
 			return (knh_float_t)((Int*)n)->n.ivalue;
 		case CLASS_Float :
 			return (knh_float_t)((Float*)n)->n.fvalue;
 	}
 	KNH_ASSERT(n->h.bcid == CLASS_Int); /* STOP */
+#ifndef KONOHA_OS__LKM
 	return (knh_float_t)0.0;
+#else
+	return (knh_float_t)0;
+#endif
 }
 
 /* ======================================================================== */
@@ -260,9 +273,17 @@ KNHAPI(void) konoha_addAffineMapper(Ctx *ctx, knh_class_t scid, char *text, knh_
 	knh_class_t tcid = konoha_findcid(ctx, B(text));
 	if(tcid != CLASS_unknown && ctx->share->ClassTable[tcid].bcid != tcid) {
 		KNH_TAFFINE(ctx, scid, tcid, scale, shift);
+#ifndef KONOHA_OS__LKM
 		if(scale != 0.0) {
 			KNH_TAFFINE(ctx, tcid, scid, 1.0 / scale, -(shift/scale));
 		}
+#else
+		if(scale != 0) {
+			KNH_TAFFINE(ctx, tcid, scid, 1 / scale, -(shift/scale));
+		}
+#endif
+
+
 	}
 }
 

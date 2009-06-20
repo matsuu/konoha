@@ -25,11 +25,13 @@ MODULE_AUTHOR("masahiro ide");
 //
 
 
+/*
 float  __floatsisf (int i) { return i; } //need
 double __floatsidf (int i) { return i; } //need
+
 signed   int __fixsfsi    (float  d) { return d; } //need
-unsigned int __fixunssfsi (float  d) { return d; } //need
 signed   int __fixdfsi (float  d) { return d; } //need
+
 unsigned int __fixunsdfsi (float  d) { return d; } //need
 double __adddf3(double a, double b) { return a+b; }//need
 double __addsf3(float a, float b) { return a+b; } //ne
@@ -45,7 +47,7 @@ double __gtdf2(double a,double b) { return (a > b); }
 float __eqsf2(float a,float b) { return !(a == b); }
 float __eqdf2(float a,float b) { return !(a == b); }
 double __extendsfdf2(float a) {return a;}
-
+*/
 
 #endif
 

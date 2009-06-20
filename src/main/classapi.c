@@ -168,7 +168,11 @@ void knh_ClassStruct_initField(Ctx *ctx, ClassStruct *cs, knh_class_t self_cid, 
 		}
 		else if(IS_ubxfloat(type)) {
 			knh_float_t *data = (knh_float_t*)(v + i);
+#ifndef KONOHA_OS__LKM
 			data[0] = IS_NULL(cf[i].value) ? 0.0 : ((Int*)cf[i].value)->n.fvalue;
+#else
+			data[0] = IS_NULL(cf[i].value) ? 0 : ((Int*)cf[i].value)->n.fvalue;
+#endif
 			continue;
 		}
 		else if(IS_ubxboolean(type)) {
@@ -1513,7 +1517,11 @@ static
 int knh_ffcmp__default(ClassSpec *u, knh_float_t v1, knh_float_t v2)
 {
 	knh_float_t delta = v1 - v2;
+#ifndef KONOHA_OS__LKM
 	if(delta == 0.0) return 0;
+#else
+	if(delta == 0) return 0;
+#endif
 	return delta < 0 ? -1 : 1;
 }
 
@@ -1556,7 +1564,11 @@ void knh_ClassSpec_init(Ctx *ctx, ClassSpec *u, int init)
 	b->ficmp = knh_ficmp__signed;
 
 	// float
+#ifndef KONOHA_OS__LKM
 	b->fstep = 0.001;
+#else
+	b->fstep = 1;
+#endif
 	b->fmax  = KNH_FLOAT_MAX;
 	b->fmin  = KNH_FLOAT_MIN;
 	b->ffchk = knh_ffchk__default;

@@ -339,9 +339,11 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 				case 'd': case 'u':
 					args[index].atype = VA_INT;
 					break;
+#ifdef KONOHA_OS__LKM
 				case 'f': case 'e':
 					args[index].atype = VA_FLOAT;
 					break;
+#endif
 				case 's':
 					args[index].atype = VA_CHAR;
 					break;
@@ -382,9 +384,11 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 		case VA_INT:
 			args[i].ivalue = (knh_intptr_t)va_arg(ap, knh_intptr_t);
 			break;
+#ifndef KONOHA_OS__LKM
 		case VA_FLOAT:
 			args[i].fvalue = (knh_float_t)va_arg(ap, double);
 			break;
+#endif
 		case VA_CHAR:
 			args[i].svalue = (char*)va_arg(ap, char*);
 			break;
@@ -457,6 +461,7 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 						KNH_ASSERT(args[index].atype == VA_INT);
 						knh_write__u(ctx, w, args[index].uvalue);
 						break;
+#ifndef KONOHA_OS__LKM
 					case 'f':
 						KNH_ASSERT(args[index].atype == VA_FLOAT);
 						knh_write__f(ctx, w, args[index].fvalue);
@@ -465,6 +470,7 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 						KNH_ASSERT(args[index].atype == VA_FLOAT);
 						knh_write__e(ctx, w, args[index].fvalue);
 						break;
+#endif
 					case 's':
 						KNH_ASSERT(args[index].atype == VA_CHAR);
 						knh_write__s(ctx, w, args[index].svalue);
