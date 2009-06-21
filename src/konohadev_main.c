@@ -15,7 +15,7 @@
 #include "../include/konoha.h"
 
 
-MODULE_LICENSE("LGPL");
+MODULE_LICENSE("GPL");
 MODULE_AUTHOR("masahiro ide");
 #if 1
 // TODO_LKM
@@ -60,6 +60,7 @@ struct konohadev_t {
   //    struct semaphore sem;
     struct cdev cdev;
     konoha_t  konoha;
+    char* buffer;
 };
 
 static const char *msg = "konohadev";
@@ -104,7 +105,7 @@ static int knh_dev_read (struct file* filp, char __user *user_buf,
     //        return -ERESTARTSYS;
     //    }
 
-    len = snprintf(buf,MAXCOPYBUF,"%s\n","konoha");
+    len = snprintf(buf,MAXCOPYBUF,"%s\n",dev->buffer);
 
     if(copy_to_user(user_buf,buf,len)){
       //        up(&dev->sem);
@@ -128,17 +129,18 @@ static int knh_dev_write(struct file *filp,const char __user *user_buf,
     //        return -ERESTARTSYS;
     //    }
 
-    //    len = copy_from_user(buf,user_buf,count);
-    //    printk("%ld %s\n", len, buf);
-    //    konoha_eval(dev->konoha, buf);
-    printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "int fib(int n) { if (n==3) { return 1;}}"));
-    printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "fib(10);"));
-    //    printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, buf));
+    len = copy_from_user(buf,user_buf,count);
+    buf[count-1] = '\0';
+    //printk("write:line=%d,%ld %ld [%s]\n", __LINE__,len, count,buf);
+    //printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "int fib(int n) { if (n==3) { return 1;}}"));
+    //printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "fib(10);"));
+    snprintf(dev->buffer,MAXCOPYBUF,"%s",konoha_eval(dev->konoha,buf));
+    printk(KERN_DEBUG "%s\n",dev->buffer);
     //    up(&dev->sem);
-    //    *offset += count - len;
-    //    return count -len;
-    *offset = 0;
-    return 1;
+    *offset += count - len;
+    return count -len;
+    //*offset = 0;
+    //return 1;
 }
 
 static void knh_dev_setup(struct konohadev_t *dev){
@@ -151,6 +153,8 @@ static void knh_dev_setup(struct konohadev_t *dev){
     cdev_init(&dev->cdev,&knh_fops);
     dev->cdev.owner = THIS_MODULE;
     dev->konoha = konoha_open(128);
+    dev->buffer = kmalloc(sizeof(char)*MAXCOPYBUF,GFP_KERNEL);
+    memset(dev->buffer,0,sizeof(char)*MAXCOPYBUF);
     //    init_MUTEX(&dev->sem);
 
     err = cdev_add(&dev->cdev, dev->id, 1);
