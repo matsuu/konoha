@@ -17,7 +17,7 @@
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("masahiro ide");
-#if 1
+//#if 1
 // TODO_LKM
 // cant find these functions
 // I think it seam that "float" or "double" is still active.
@@ -49,7 +49,7 @@ float __eqdf2(float a,float b) { return !(a == b); }
 double __extendsfdf2(float a) {return a;}
 */
 
-#endif
+//#endif
 
 enum {
     MAXCOPYBUF = 128
@@ -122,6 +122,7 @@ static int knh_dev_read (struct file* filp, char __user *user_buf,
 static int knh_dev_write(struct file *filp,const char __user *user_buf,
         size_t count,loff_t *offset) {
     char buf[MAXCOPYBUF];
+    char* konoha_ret = NULL;
     struct konohadev_t *dev = filp->private_data;
     long len;
 
@@ -130,12 +131,17 @@ static int knh_dev_write(struct file *filp,const char __user *user_buf,
     //    }
 
     len = copy_from_user(buf,user_buf,count);
-    buf[count-1] = '\0';
-    //printk("write:line=%d,%ld %ld [%s]\n", __LINE__,len, count,buf);
+    memset(dev->buffer,0,sizeof(char)*MAXCOPYBUF);
+    buf[count] = '\0';
+    printk("write:line=%d,%ld %u [%s]\n", __LINE__,len, count,buf);
     //printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "int fib(int n) { if (n==3) { return 1;}}"));
     //printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "fib(10);"));
+    konoha_ret = konoha_eval(dev->konoha,buf);
+    printk(KERN_DEBUG "[%d,%s]\n",strlen(konoha_ret),konoha_ret);
+
     snprintf(dev->buffer,MAXCOPYBUF,"%s",konoha_eval(dev->konoha,buf));
-    printk(KERN_DEBUG "%s\n",dev->buffer);
+    printk(KERN_DEBUG "%d[%s]\n",__LINE__,konoha_eval(dev->konoha,buf));
+    printk(KERN_DEBUG "[%s]\n",dev->buffer);
     //    up(&dev->sem);
     *offset += count - len;
     return count -len;
@@ -180,6 +186,8 @@ static int __init konoha_init(void) {
 // End/Cleanup function
 static void __exit konoha_exit(void) {
     printk(KERN_ALERT "Goodbye!\n");
+    konoha_close(konohadev_p->konoha);
+    kfree(konohadev_p->buffer);
     cdev_del(&konohadev_p->cdev);
     unregister_chrdev_region(konohadev_p->id,1);
     kfree(konohadev_p);
