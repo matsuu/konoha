@@ -120,6 +120,13 @@ METHOD System_system(Ctx *ctx, knh_sfp_t *sfp)
     KNH_RETURN_Int(ctx, sfp,ret);
 }
 
+
+METHOD System_sleep(Ctx *ctx, knh_sfp_t *sfp)
+{
+  int sec = p_int(sfp[1]);
+  sleep(sec);
+  KNH_RETURN_void(ctx, sfp);
+}
 /* ======================================================================== */
 /* [FILESYSTEM] */
 

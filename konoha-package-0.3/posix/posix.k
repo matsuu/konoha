@@ -29,6 +29,7 @@ String! System.getHostName();
 int System.getPid();
 int System.getPPid();
 void System.kill(int pid, int signal);
+void System.sleep(Int sec);
 int System.system(String! cmd);
 String[] System.listDir(String dirname);
 String! System.getCwd();
