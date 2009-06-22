@@ -91,11 +91,19 @@ konohadev-objs := \
 KDIR  := /lib/modules/$(shell uname -r)/build
 PWD   := $(shell pwd)
 KBUILD_CFLAGS += -DKONOHA_OS__LKM
-KBUILD_CFLAGS += -I$(PWD)./include/
-VERBOSE=0
+KBUILD_CFLAGS += -Wno-declaration-after-statement
+KBUILD_CFLAGS += -I./include/
+VERBOSE=1
 
 default:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules KBUILD_VERBOSE=$(VERBOSE)
+
+install:
+	sh ./loader
+
+uninstall:
+	/sbin/rmmod konohadev
+
 
 clean:
 	rm -f *.o *.ko *.mod.c  *~ *.cmd .*.ko.cmd

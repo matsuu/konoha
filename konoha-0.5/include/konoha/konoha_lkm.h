@@ -43,14 +43,14 @@ typedef intptr_t FILE;
 
 #define TODO_LKM
 // how to treat debug and assert,exit
-
+/*
 #undef KNH_ASSERT
 #define KNH_ASSERT(c) 
 #undef  DBG_
 #define DBG_(stmt)
 #undef  DBG_P
 #define DBG_P(fmt, ...) 
-
+*/
 #define getenv(a) NULL
 #define stdin  ((FILE*)NULL)
 #define stdout KERN_INFO
