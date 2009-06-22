@@ -77,7 +77,6 @@ static void knh_tokens_nextStmt(knh_tokens_t *tc)
 	Token **ts = tc->ts;
 	int i;
 	for(i = tc->c; i < tc->e; i++) {
-		//DBG2_P("i=%d, '%s'", i, TOKENNo(ts[i]));
 		if(knh_Token_isBOL(ts[i])) {
 			tc->c = i;
 			knh_tokens_skipSEMICOLON(tc);

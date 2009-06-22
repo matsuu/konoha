@@ -133,8 +133,6 @@ void knh_Mapper__k(Ctx *ctx, Mapper *o, OutputStream *w, String *m)
 		knh_write(ctx, w, STEXT("-->"));
 	}
 	knh_write_cid(ctx, w, DP(o)->tcid);
-//	knh_putc(ctx, w, ':');
-//	knh_write__flag(ctx, w, DP(o)->flag);
 }
 
 /* ======================================================================== */
@@ -204,10 +202,11 @@ Mapper* new_Mapper__asis(Ctx *ctx, knh_class_t scid, knh_class_t tcid)
 
 MAPPER knh_fmapper_null(Ctx *ctx, knh_sfp_t *sfp)
 {
+	DBG2_(
 	Mapper *mpr = sfp[1].mpr;
 	DBG2_P("mpr: %s ==> %s", DP(mpr)->scid, DP(mpr)->tcid);
+	);
 	KNH_THROWs(ctx, "ClassCast!!");
-	//KNH_MAPPED(ctx, sfp, KNH_NULL);
 }
 
 /* ------------------------------------------------------------------------ */

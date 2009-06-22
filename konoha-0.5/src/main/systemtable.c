@@ -512,7 +512,7 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 		knh_bzero(ctx->share, sizeof(knh_ctxshare_t) + sizeof(knh_ctxstat_t));
 		free(ctx->share);
 
-		knh_bzero((void*)ctx, sizeof(knh_Context_t));
+		knh_bzero(ctx, sizeof(knh_Context_t));
 		free((void*)ctx);
 	}
 }
