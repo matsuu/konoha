@@ -1,56 +1,102 @@
 #!/usr/local/bin/konoha
 
 using posix.*;
-using libxml2.*;
 
 import "const.k";
+import "parser.k";
 import "package.k";
 
 
-/*-----for klip.k ERROR message-----*/
-void dispError(String code)
+/*-----for ERROR message-----*/
+void dispError(String code,int level)
 {
 	String txt = "";
-	if (code == "opration"){
-		txt = "!ERR : undefined such operation ";
-	} else if (code == "argofver"){
+	if (code == "usage"){
+		txt = "USAGE: ./klip [operation] [package_name]\n";
+		txt += "USAGE: operation = [ search , install , remove , undo ]";
+	} else if (code == "operation"){
+		txt = "!ERR : undefined such operation\n";
+		txt += "USAGE: operation = [ search , install , remove , undo ]";
+	} else if ( code == "arg_ver" ){
 		txt = "!ERR : please set Float value @ args.version ";
+	} else if ( code == "KLIP" ) {
+		txt = "!ERR : failed to get KLIPDATA";
+	} else if ( code == "klip" ) {
+		txt = "!ERR : can't find this package @ klip.xml";
 	} else{
 		txt = "!ERR : " + code + " failed";
 	}
-	print txt;
+	if( level == HIDE ) { print txt; }
+	else if ( level == SHOW ) { OUT << txt << EOL; }
 }
 
 
-/*-----get server xml-----*/
-boolean getKlipXml()
+/*-----copy Xml(or Text)------*/
+void copyXML(String fromXml,String toXml)
 {
-	String input = "hoge";
-	if ( System.hasFile(KLIPXML) ) { System.unlink(KLIPXML); }
-	InputStream ins = new InputStream(XMLURL,"r");
-	OutputStream ous = new OutputStream(KLIPXML,"a");
-	foreach( String txt from ins ) {
-		if( !txt.startsWith("<") && input != "" ) {  }
-		else if( input == "" ){ ous << txt << EOL; }
-		else { input = ""; }
+	if( System.hasFile(toXml) ) { System.unlink(toXml); }
+	ins = new InputStream(fromXml,"r");
+	ous = new OutputStream(toXml,"a");
+	foreach( String txt from ins ) { ous << txt << EOL; }
+	ins.close();
+	ous.close();
+}
+
+
+/*-----update latest install------*/
+void upLatestInst(Package target)
+{
+	String txt = %("latest installing : %s{0}=%s{1}",target.name,target.version);
+	if( System.hasFile(LATEST) ) { System.unlink(LATEST); }	
+	ous = new OutputStream(LATEST,"a");
+	ous << txt << EOL;
+	ous.close();
+}
+
+
+/*-----get klip_data from server -----*/
+boolean getKlipData()
+{
+	boolean checked = false;
+	if ( System.hasFile(KLIPDATA) ) { 
+		//need to check : update of klip_data
+		System.unlink(KLIPDATA); 
+	}
+	ins = new InputStream(DATAURL,"r");
+	ous = new OutputStream(KLIPDATA,"a");
+	String filetype = KLIPDATA.split(".",0).pop();
+	if ( filetype == "xml" ) {
+		foreach( String txt from ins ) {
+			if( !checked && !txt.startsWith("<") ) {  }
+			else if( checked ){ ous << txt << EOL; }
+			else { checked = true; }
+		}
+	} else if ( filetype == "json" ) {
+		foreach( String txt from ins ) {
+			if( !checked && txt.startsWith("{") ) {
+				ous << txt << EOL;
+				checked = true;
+			} else if (checked) { ous << txt << EOL; }
+		}
 	}
 	ins.close();
 	ous.close();
+	if ( System.hasFile(KLIPDATA) != 0 ) { return false; }
 	return true;
 }
 
 
-/*-----functions of dependency-----*/
+/*-----functions for dependency-----*/
 boolean searchList(String dpackage,String[] list,int mode)
 {
 	int i = 0;
-	name = dpackage / "=";
-	version = dpackage % "=";
+	String name = dpackage / "=";
+	String version = dpackage % "=";
 	while ( i < |list| ) {
-		lname = list[i] / "=";
-		lver = list[i] % "=";
-		if( lname == name ) {
-			if ( lver >= version ) { return false; }
+		String listname = list[i] / "=";
+		String listver = list[i] % "=";
+		if( listname == name ) {
+			if ( listver >= version ) { dispError("depend_ver",HIDE); return false; }
 			else if ( mode == ADD ) { list[i] = dpackage; return true; }
 		}
 		i++;
@@ -63,18 +109,16 @@ boolean searchList(String dpackage,String[] list,int mode)
 boolean resolveDepend ( Package target, String[] list )
 {
 	int i = 0;
-	String dpackage;
 	while( i < |target.depend| ) {
-		dpackage = target.depend[i];
-		if( dpackage == "" ) { break; }
+		String dpackage = target.depend[i];
 		if( !searchList(dpackage,list,CHECK) ) { i++; continue; }
-		dname = dpackage / "=";
-		dver = dpackage % "=";
+		String dname = dpackage / "=";
+		String dver = dpackage % "=";
 		Package pac = new Package(dname,dver,"");
-		OUT << %("KLIP : depend package : %s{0} ver=%s{1}",pac.name,pac.version) << EOL;
-		if( pac.setMember(KLIPXML) == "") { dispError("setMembOfDep"); return false; }
+		OUT << "KLIP : depend package : " + dname + "ver=" + dver << EOL;
+		if( !pac.setMember(KLIPDATA)) { dispError("dpac->klip",HIDE); return false; }
 		String instpac = %("%s{0}=%s{1}",pac.name,pac.version);
-		if( !searchList(instpac,list,ADD) ) { dispError("addInstList"); return false; }
+		searchList(instpac,list,ADD);
 		if( !resolveDepend(pac,list) ) { return false; }
 		i++;
 	}
@@ -86,111 +130,66 @@ boolean installwithDepend ( Package target )
 {
 	OUT << "KLIP : resolve dependency..." << EOL;
 	String[] instList = [%("%s{0}=%s{1}",target.name,target.version)];
-	if( !resolveDepend(target,instList) ) { dispError("resolve"); return false; }
-	int i = |instList| ;	
+	if( !resolveDepend(target,instList) ) { return false; }
+	int i = |instList|;
 	while( i > 0 ) {
-		name = instList[i - 1] / "=";
-		version = instList[i - 1] % "=";
+		String name = instList[i - 1] / "=";
+		String version = instList[i - 1] % "=";
 		Package p = new Package(name,version,"");
-		p.setMember(KLIPXML);
-		if( !p.install() ) { break; }
+		OUT << "KLIP : install [" + name + "] ver==" + version << EOL;
+		if ( !p.setMember(KLIPDATA) ) { break; }
+		upLatestInst(p);
+		if ( !p.install() ) { break; }
 		i--;
 	}
-	if ( i != 0 ) {
-		int chk = |instList| - i;
-		dispError("instDepend");
-		OUT << %("!ERR : %d{0} packages are installed",chk) << EOL;
-		if(chk == 0) { return false; }
-		else { return true; }
-	}
+	OUT << %("KLIP : %d{0} packages are installed",|instList| - i) << EOL;
+	if ( i != 0 ) {	dispError("instDepend",HIDE); return false;	}
 	return true;
 }
 
 
-/*---for undo---*/
-
-void searchAdded(String[] rmList)
+/*-----for undo-----*/
+void searchChanged( String[] list, String opr )
 {
-	ins = new InputStream(CURXML,"r");
-	boolean chk;
+	if(opr == "install"){ ins = new InputStream(CURXML,"r"); }
+	else if( opr == "remove" ) { ins = new InputStream(PREVXML,"r"); }
 	foreach( String txt from ins ) {
-		chk = true;
-		inr = new InputStream(PREVXML,"r");
-		foreach( String txr from inr ) {
-			if( txt == txr ) { chk = false;}
-		}
+		boolean chk = true;
+		if(opr == "install"){ inr = new InputStream(PREVXML,"r"); }
+		else if( opr == "remove" ) { inr = new InputStream(CURXML,"r");	}
+		foreach( String txr from inr ) { if( txt == txr ) { chk = false;} }
 		inr.close();
-		if (chk == true) { rmList << txt; }
+		if (chk == true) { list << txt; }
 	}
 	ins.close();
 }
 
 
-void searchRemoved(String[] instList)
+boolean inUndo(String opr)
 {
-	ins = new InputStream(PREVXML,"r");
-	boolean chk;
-	foreach( String txt from ins ) {
-		chk = true;
-		inr = new InputStream(CURXML,"r");
-		foreach( String txr from inr ) {
-			if( txt == txr ) { chk = false;}
-		}
-		inr.close();
-		if (chk == true) { instList << txt; }
-	}
-	ins.close();
-}
-
-
-
-boolean undo()
-{
-	String[] instList = [];
-	searchRemoved(instList);
-	String[] rmList = [];
-	searchAdded(rmList);
+	String[] list;
+	searchChanged(list, opr);
 	int i = 0;
-	String pstr,name,version,url;
-	while( i < |instList| ) {
-		pstr = instList[i];
-		name = pstr / "</name>" % "<name>";
-		version = pstr / "</version>" % "<version>";
-		url = pstr / "</url>" % "<url>";
+	boolean ret = true;
+	while( i < |list| ) {
+		String pstr = list[i];
+		String name = pstr / "</name>" % "<name>";
+		String version = pstr / "</version>" % "<version>";
+		String url = pstr / "</url>" % "<url>";
 		Package pick = new Package( name,version,url );
-		pick.install();
+		if( opr == "install") {	ret = pick.install(); }
+		else if ( opr == "remove" ) { ret =  pick.remove(); }
+		if ( ret == false ) { break; }
 		i++;
 	}
-	int i = 0;
-	while( i < |rmList| ) {
-		pstr = rmList[i];
-		name = pstr / "</name>" % "<name>";
-		Package pick = new Package( name,"","" );
-		pick.remove();
-		i++;
-	}
+	return ret;
+}
+
+
+boolean undo(){
+	if ( !inUndo("install") ) { dispError("inst_undo",HIDE); return false; }
+	if ( !inUndo("remove") ) { dispError("remove_undo",HIDE); return false; }
 	return true;
-}
-
-
-void copyXML(String fromXml,String toXml)
-{
-	if( System.hasFile(toXml) ) { System.unlink(toXml); }
-	InputStream ins = new InputStream(fromXml,"r");
-	OutputStream ous = new OutputStream(toXml,"a");
-	foreach( String txt from ins ) { ous << txt << EOL; }
-	ins.close();
-	ous.close();
-}
-
-
-void upLatestInst(Package target)
-{
-	String txt = %("%s{0}=%s{1}",target.name,target.version);
-	if( System.hasFile(LATEST) ) { System.unlink(LATEST); }	
-	OutputStream ous = new OutputStream(LATEST,"a");
-	ous << txt << EOL;
-	ous.close();
 }
 
 
@@ -199,43 +198,40 @@ int  main (String[] args)
 {
 	if (|args| == 2 && args[1] == "undo"){
 		copyXML(CURXML,BUFXML);
-		if( !undo() ) { dispError("undo"); return EXIT_ERROR; }
+		if( !undo() ) { dispError("undo",SHOW); return EXIT_ERROR; }
 	} else if ( |args| == 3 || |args| == 4 ) {
-		operation = args[1];
-		name = args[2];
+		String operation = args[1];
+		String name = args[2];
 		if ( |args| == 4 ) {
-			version = args[3];
-			if ( (Float)version == 0.0) { dispError("argofver"); return EXIT_ERROR; }
+			String version = args[3];
+			if ( (Float)version == 0.0) { dispError("arg_ver",SHOW); return EXIT_ERROR; }
 		} else { version = ""; }
 		Package target = new Package(name,version,"");
-		if(operation == "install" || operation == "search"){ 
-			if( !getKlipXml() ) { dispError("getxml"); return EXIT_ERROR; }
-			if( target.setMember(KLIPXML) == "" ) {
-				if(operation == "search") {
-					OUT << "KLIP : package is NOT FOUND..." << EOL;		
-					return EXIT_SUCCESS;
-				}
-				OUT << "!ERR : can't find this package @ klip.xml " << EOL;
-				return EXIT_ERROR;
-			}
-			if(operation == "search"){
-				OUT << "KLIP : package is FOUND!" << EOL;
-				OUT << %("KLIP : %s{0} ver=%s{1}",target.name,target.version) << EOL;
+		if ( operation == "search" ) {
+			if ( !getKlipData() ) { dispError("KLIP",SHOW); return EXIT_ERROR; }
+			if ( !target.setMember(KLIPDATA) ) {
+				OUT << "KLIP : package is NOT FOUND..." << EOL;
 				return EXIT_SUCCESS;
 			}
+			OUT << "KLIP : package is FOUND!" << EOL;
+			OUT << %("KLIP : %s{0} ver=%s{1}",target.name,target.version) << EOL;
+			return EXIT_SUCCESS;
+		} else if(operation == "install"){ 
+			if ( !getKlipData() ) { dispError("KLIP",SHOW); return EXIT_ERROR; }
+			if ( !target.setMember(KLIPDATA) ) { dispError("klip",SHOW); return EXIT_ERROR; }
 			upLatestInst(target);
 			copyXML(CURXML,BUFXML);
 			if( target.depend[0] != "" ) {
-				OUT << "KLIP : package has dependency" << EOL+
-					if( !installwithDepend(target) ) {
-						dispError("dinstall");
-						System.rename( BUFXML, CURXML);
-						return EXIT_ERROR;
-					}
+				OUT << "KLIP : this package has dependency" << EOL;
+				if( !installwithDepend(target) ) {
+					dispError("dinstall",SHOW);
+					System.rename( BUFXML, CURXML);
+					return EXIT_ERROR;
+				}
 			} else {
 				OUT << "KLIP : package has no dependency" << EOL;
 				if( !target.install() ) {
-					dispError("install"); 
+					dispError("install",SHOW); 
 					System.rename( BUFXML,CURXML );
 					return EXIT_ERROR;
 				}
@@ -243,22 +239,13 @@ int  main (String[] args)
 		} else if (operation == "remove"){
 			copyXML(CURXML,BUFXML);
 			if( !target.remove() ) {
-				dispError("remove");
+				dispError("remove",SHOW);
 				System.rename( BUFXML, CURXML );
 				return EXIT_ERROR; 
 			}
-		} else {
-			dispError("operation");
-			OUT << "USAGE: operation = [ search , install , remove , undo ]" << EOL;
-			return EXIT_ERROR;	}
-	} else {
-		OUT << "USAGE: ./klip operation package_name" << EOL;
-		OUT << "USAGE: operation = [ search , install , remove , undo ]" << EOL;
-		return EXIT_ERROR
-	}
-	OUT << "KLIP : closing..." << EOL;
+		} else { dispError("operation",SHOW); return EXIT_ERROR; }
+	} else { dispError("usage",SHOW); return EXIT_ERROR }
 	System.rename( BUFXML, PREVXML );
-	OUT << "KLIP : ...bye!" << EOL;
+	OUT << "KLIP : success all" << EOL;
 	return EXIT_SUCCESS;
 }
-

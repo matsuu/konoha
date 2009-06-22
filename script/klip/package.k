@@ -2,138 +2,99 @@
 /// define class Package 
 ///
 using posix.*;
-using libxml2.*;
-
-
 
 /*-----Package's class-----*/
-class Package
+class Package extends Form
 {
-	String name;
-	String version;
-	String url;
-	String[] depend;
-	
-	/*---constructor---*/
+
+	/*-----constructor-----*/
 	Package(String name,String version,String url)
 	{
 		this.name = name;
 		this.version = version;
 		this.url = url;
 	}
-
 	
-	/*-----for klip_c.k ERROR message-----*/
-	void dispErrorClass(String code)
+
+	/*-----methods for set member variables-----*/
+	boolean setMember(String file)
 	{
-		String txt = "";
-		if (code == "break"){
-			txt = "BREAK:";
-		} else if (code == "not existed"){
-			txt = "!ERR : can't find this package @ INSTDIR";
-		} else if (code == "version"){
-			txt = "!ERR : can't find this package of such version";
-		} else{
-			txt = "!ERR : " + code + " failed";
+		String check = file;
+		String filetype;
+		while ( check != "" ) { filetype = check; check %= "." }
+		if( filetype == "xml" ) { return xml2Package(file); }
+		else if ( filetype == "json" ) { return json2Package(file); }
+		return false;
+	}
+
+
+	boolean json2Package(String jsonfile)
+	{
+		ParserJson p = new ParserJson(this.name,jsonfile);
+		jsonversion = p.getVersion();
+		if( this.version == "" || this.version == jsonversion) { 
+		} else if ( this.version < jsonversion) {
+			String detected = %("%s{0} ver=%s{1}",this.name,jsonversion);
+			print "!WARN: upper version is found!";
+			OUT << "KLIP : install " + detected << EOL;
+		} else {
+			OUT << "!ERR : selected version is incorrect!" << EOL;
+			return false;
 		}
-		OUT << txt << EOL;
-	}	
-	
+		this.version = jsonversion;
+		this.url = p.getUrl();
+		this.depend = p.getDepend();
+		if ( this.url == "" ) { return false; }
+		return true;
+	}
 
-	/*---methods for set member variables---*/
-	String setMember(String xmlfile)
+
+	boolean xml2Package(String xmlfile)
 	{
-		xmlversion = getElementFromXml(this.name,"version",xmlfile);
-		if(this.version != "" && this.version != xmlversion) {
-			if( (Float)this.version < (Float)xmlversion ){
-				String detected = %("%s{0} ver=%s{1}",this.name,xmlversion);
-				OUT << "!WARN: upper version is found : " + detected << EOL;
-				//need to select [y/n]?
-			} else {
-				dispErrorClass("version");
-				return "";
-			}
-		} 
+		ParserXml p = new ParserXml(this.name,xmlfile);
+		xmlversion = p.getVersion();
+		if( this.version == "" || this.version == xmlversion) { 
+		} else if ( this.version < xmlversion) {
+			String detected = %("%s{0} ver=%s{1}",this.name,xmlversion);
+			print "!WARN: upper version is found!";
+			OUT << "KLIP : install " + detected << EOL;
+		} else {
+			OUT << "!ERR : selected version is incorrect!" << EOL;
+			return false;
+		}
 		this.version = xmlversion;
-		this.url = getElementFromXml(this.name,"url",xmlfile);
-		depend_str = getElementFromXml(this.name,"depend",xmlfile);
-		this.depend = depend_str.split("&",0);
-		return this.url;
+		this.url = p.getUrl();
+		this.depend = p.getDepend();
+		if ( this.url == "" ) { return false; }
+		return true;
 	}
 
 
-	String getElementFromXml(String pkgname, String elemname, String xmlfile)
-	{ 
-		XmlReader reader = new XmlReader (xmlfile);
-		String ans = "";
-		while (reader.read()) {
-			type = reader.nodeType();
-			if (type == XmlReader.TYPE_ELEMENT && reader.constName() == 'name') {
-				reader.read();
-				if (type == XmlReader.TYPE_ELEMENT && reader.constValue() == pkgname) {
-					ret = parseThisTree(reader, elemname);
-					reader.close();
-					return ret;
-				}
-			}
-		}
-		reader.close();
-		return ans;
-	}
-	
-
-	String parseThisTree(XmlReader reader, String elemname)
+	/*-----getting package from server-----*/
+	boolean getPackage()
 	{
-		String ans = "";
-		while (reader.read()) {
-			type = reader.nodeType();
-			if (type == XmlReader.TYPE_ELEMENT) {
-				curelem = reader.constName();
-				if ( curelem == elemname ){
-					if ( elemname == "depend" ) {
-						return getDependencies(reader);
-					} else if (reader.read() && type == XmlReader.TYPE_ELEMENT) {
-						return reader.constValue();
-					}
-				}
-			}
-		}
-		return ans;
+		String mirror = sites[Int.random(|sites|)];
+		String baseurl = this.url;
+		String pkgurl = %(this.url,mirror);
+		String filename;
+		while ( baseurl != "" ) { filename = baseurl; baseurl %= "/"; }
+		System.system("wget -q -N " + pkgurl);
+		//another way
+		if ( !System.hasFile(filename) ) { return false; }
+		return true;
 	}
+
 	
-	String getDependencies(XmlReader reader)
-	{
-		String ans = "";
-		while (reader.read()) {
-			type = reader.nodeType();
-			if (type == XmlReader.TYPE_ELEMENT) {
-				curelem = reader.constName();
-				if (curelem == 'dname') {
-					if (reader.read() && type == XmlReader.TYPE_ELEMENT) {
-						ans += reader.constValue() + '=';
-					}
-				} else if (curelem == 'dversion') {
-					if (reader.read() && type == XmlReader.TYPE_ELEMENT) {
-						ans += reader.constValue() + '&';
-					}
-				} else if (curelem == 'depend') {
-					return ans;
-				}
-			}
-		}
-		return ans;
-	}
-	
-	
-	/*---methods for operation---*/
+	/*-----methods for operation-----*/
 	boolean install()
 	{
-		String filename = %("%s{0}-%s{1}.tar.gz",this.name,this.version);
-		path = INSTDIR + this.name;
+		path = instDIR + this.name;
 		boolean res = false;
-		OUT << "SEEK : " + path << EOL;
-		if( System.hasDir(path) ){
-			String message = %("%s{0} is found! overwrite it?",this.name );
+		String pkgurl = this.url;
+		ParserXml cur = new ParserXml(this.name,CURXML);
+		String getver = cur.getVersion();
+		if( getver != "" && System.hasDir(path) ){
+			String message = this.name + " ver=" + getver + " is found! overwrite it?";
 			res = selectYorN(message);
 			if( res == false ) { 
 				OUT << "KLIP : denyed to update" << EOL;
@@ -142,15 +103,11 @@ class Package
 				OUT << "KLIP : update this package" << EOL;
 			}
 		} else { OUT << "KLIP : install this package" << EOL; }
-		String mirror = sites[Int.random(|sites|)];
-		String pkgurl = %(this.url,mirror);
-		OUT << "GET  : " + pkgurl << EOL;
-		System.system("wget -q -N " + pkgurl);
-		OUT << "DECOM: " + filename + " @ " + INSTDIR << EOL;
-		System.system(%("tar -xzf %s{0} -C %s{1}",filename,INSTDIR));
-		OUT << "REMOV: " + filename << EOL;
-		System.unlink(filename);
-		if(System.hasDir(path) == false) { dispErrorClass("decomp"); return false; }
+		String filename;
+		while ( pkgurl != "" ) { filename = pkgurl; pkgurl %= "/"; }
+		if ( !getPackage() ) { return false; }
+		if ( System.system("tar -xzf " + filename + " -C " + instDIR) != 0 ) { return false; }
+		if ( System.unlink(filename) != 0 ) { return false; }
 		if ( res == true ) { modCurXml(this.name,this.version,this.url,"r");
 		} else if ( res == false ) { modCurXml(this.name,this.version,this.url,"a"); }
 		return true;
@@ -159,9 +116,9 @@ class Package
 
 	boolean remove()
 	{
-		path = INSTDIR + this.name;
-		OUT << "SEEK : " + path << EOL;
-		if ( System.hasDir(path) ) {
+		path = instDIR + this.name;
+		ParserXml cur = new ParserXml(this.name,CURXML);
+		if ( cur.getVersion() != "" && System.hasDir(path) ) {
 			String message = "target package is detected! remove it?";
 			res = selectYorN(message);
 			if( res == false ) { 
@@ -169,31 +126,31 @@ class Package
 				return false;
 			} else { OUT << "KLIP : remove this package" << EOL; }
 		} else {
-			dispErrorClass("not existed");
+			OUT << "!ERR : " + this.name + " isn't existed" << EOL;
 			return false;
 		}
-		OUT << "REMOV: " + path << EOL;
-		System.system("rm -rf " + path);
-		if( System.hasDir(path) ) { dispErrorClass("remove"); return false; }
+		if ( System.system("rm -rf " + path) != 0 ) { return false; }
 		modCurXml(this.name,"","","d");
 		return true;
 	}
 
 
-	/*---check before install [installed or not]---*/
+	/*-----check before install [installed or not]-----*/
 	boolean selectYorN(String message)
 	{
+		boolean ret;
 		OUT << %("!ASK : %s{0} [y/n] : ",message);
-		while(true){
+		while( true ){
 			input = IN.readLine();
-			if ( input == "y" ) { return true; }
-			else if ( input == "n" ) { return false; }
+			if ( input == "y" ) { ret = true; break; }
+			else if ( input == "n" ) { ret = false; break; }
 			else { OUT << "!ASK : please input [y/n] : " ; }
 		}
+		return ret;
 	} 
 
 
-	/*---modification of current.xml [use TMPXML]---*/
+	/*-----modification of current.xml [use TMPXML]-----*/
 	void modCurXml(String name,String version,String url,String mode)
 	{
 		InputStream ins = new InputStream(CURXML,"r");

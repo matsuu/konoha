@@ -6,11 +6,6 @@ KLIP (Konoha LIbrary Provider)
  - libxml2.*;
 
 
-*NEED TO CHANGE
- -at const.k : Line 20 
- Please overwrite INSTDIR to your .KONOHA_DIRECTRY (by ABSOLUTE PATH)
-
-
 *USAGE
  $ ./klip search package_name
 
