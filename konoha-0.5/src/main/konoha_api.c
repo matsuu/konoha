@@ -148,7 +148,7 @@ static void konoha_dumpInit(void)
 	KNH_ASSERT(sizeof(knh_intptr_t) == sizeof(void*));
 	fprintf(stderr, "sizeof(knh_int_t)=%d, sizeof(knh_float_t)=%d\n", (int)sizeof(knh_int_t), (int)sizeof(knh_float_t));
 	KNH_ASSERT(sizeof(knh_int_t) <= sizeof(knh_float_t));
-	fprintf(stderr, "sizeof(knh_sfp_t)=%lu, sizeof(Ctx)=%lu\n", (int)sizeof(knh_sfp_t), (int)sizeof(knh_Context_t));
+	fprintf(stderr, "sizeof(knh_sfp_t)=%d, sizeof(Ctx)=%d\n", (int)sizeof(knh_sfp_t), (int)sizeof(knh_Context_t));
 	fprintf(stderr, "sizeof(Object)=%d FASTMALLOC=%d\n", (int)sizeof(knh_Object_t), (int)KNH_FASTMALLOC_SIZE);
 	fprintf(stderr, "sizeof(Int)=%d\n", (int)sizeof(knh_Int_t));
 }
