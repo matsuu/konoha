@@ -38,36 +38,6 @@ extern "C" {
 
 /* ======================================================================== */
 
-//static Object *fiboMethod = NULL;
-//
-///* ------------------------------------------------------------------------ */
-///* @method Int! Script.initfibo() */
-//
-//METHOD knh__Script_initfibo(Ctx *ctx, knh_sfp_t *sfp)
-//{
-//	fiboMethod = (Object*)knh_Class_getMethod(ctx, CLASS_Script, METHODN_fibo);
-//	KNH_ASSERT(IS_Method(fiboMethod));
-//}
-//
-//
-///* ------------------------------------------------------------------------ */
-///* @method Int! Script.fibo(Int! n) */
-//
-//METHOD knh__Script_fibo(Ctx *ctx, knh_sfp_t *sfp)
-//{
-//	JIT_SETESP(ctx, 2);
-//	JIT_iLTn(ctx, 2, 1, 3);
-//	JIT_bJIFF(ctx, NPC, L_JUMP, 2);
-//	JIT_RETo(ctx, -1, ctx->share->tInt[1  - KNH_TINT_MIN]);
-//	L_JUMP:;
-//	JIT_iSUBn(ctx, 5, 1, 1);
-//	JIT_FCALL(ctx, 3, 3, 0, fiboMethod);
-//	JIT_iSUBn(ctx, 6, 1, 2);
-//	JIT_FCALL(ctx, 4, 3, 0, fiboMethod);
-//	JIT_iADD(ctx, -1, 3, 4);
-//	JIT_RET(ctx);
-//}
-
 /* ------------------------------------------------------------------------ */
 /* @method void Script.changeChannel(Int! ch) */
 
@@ -207,28 +177,28 @@ ClassSpec *unit_Date(Ctx *ctx, knh_bytes_t urn)
 /* ======================================================================== */
 /* @data */
 
-static
-knh_StringConstData_t URNAliasData[] = {
-//	{":摂氏", "http://konoha/Temperature/Celsius"},
-//	{":華氏", "http://konoha/Temperature/Fahrenheit"},
-	{":C", "http://konoha/Temperature/Celsius"},
-	{":F", "http://konoha/Temperature/Fahrenheit"},
-	{":K", "http://konoha/Temperature/Kelvin"},
-	{":Celsius", "http://konoha/Temperature/Celsius"},
-	{":Fahrenheit", "http://konoha/Temperature/Fahrenheit"},
-	{":Kelvin", "http://konoha/Temperature/Kelvin"},
-	{":MyRoom", "http://konoha/Temperature/MyRoom"},
-	{":M", "http://konoha/English/Date/Month"},
-	{":W", "http://konoha/English/Date/Week"},
-	{NULL}
-};
-
-static
-knh_NamedPointerData_t ClassSpecFuncData[] = {
-	{"http://konoha/Temperature", unit_Temperature},
-	{"http://konoha/English/Date", unit_Date},
-	{NULL}
-};
+//static
+//knh_StringConstData_t URNAliasData[] = {
+////	{":摂氏", "http://konoha/Temperature/Celsius"},
+////	{":華氏", "http://konoha/Temperature/Fahrenheit"},
+//	{":C", "http://konoha/Temperature/Celsius"},
+//	{":F", "http://konoha/Temperature/Fahrenheit"},
+//	{":K", "http://konoha/Temperature/Kelvin"},
+//	{":Celsius", "http://konoha/Temperature/Celsius"},
+//	{":Fahrenheit", "http://konoha/Temperature/Fahrenheit"},
+//	{":Kelvin", "http://konoha/Temperature/Kelvin"},
+//	{":MyRoom", "http://konoha/Temperature/MyRoom"},
+//	{":M", "http://konoha/English/Date/Month"},
+//	{":W", "http://konoha/English/Date/Week"},
+//	{NULL}
+//};
+//
+//static
+//knh_NamedPointerData_t ClassSpecFuncData[] = {
+//	{"http://konoha/Temperature", unit_Temperature},
+//	{"http://konoha/English/Date", unit_Date},
+//	{NULL}
+//};
 
 /* ------------------------------------------------------------------------ */
 
@@ -241,8 +211,6 @@ int package_init(Ctx *ctx)
 }
 
 /* ------------------------------------------------------------------------ */
-
-
 
 #ifdef __cplusplus
 }

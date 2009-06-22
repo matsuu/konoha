@@ -414,10 +414,10 @@ String *knh_Int_getkey(Ctx *ctx, knh_sfp_t *lsfp)
 {
 	char buf[40];
 #ifdef KNH_USING_INT32
-	knh_snprintf(buf, sizeof(buf), "%016lu", lsfp[0].ivalue);
+	knh_snprintf(buf, sizeof(buf), "%016lu", lsfp[0].uvalue);
 #else
 	//18446744073709551615ULL
-	knh_snprintf(buf, sizeof(buf), "%020llu", lsfp[0].ivalue);
+	knh_snprintf(buf, sizeof(buf), "%020llu", lsfp[0].uvalue);
 #endif
 	return new_String(ctx, B(buf), NULL);
 }

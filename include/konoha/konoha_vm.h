@@ -426,7 +426,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		((Context*)ctx)->esp = &(sfp[n + shift]); \
 		sfp[-1].pc = pc; \
 		sfp[n].pc = (sfp[n].mtd)->pc_start; \
-		(sfp[n].mtd)->fcall_1(ctx, sfp + n + 1); \
+		(sfp[n].mtd)->fcall_1(ctx, sfp + (n + 1)); \
 		((Context*)ctx)->esp = &(sfp[n]); \
 	} \
 

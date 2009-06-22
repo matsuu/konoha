@@ -49,10 +49,10 @@
 #else
 #define KONOHA_NAME     "konoha"
 #define KONOHA_MAJOR_VERSION "0.5"
-#define KONOHA_VERSION  "0.5b"
+#define KONOHA_VERSION  "0.5RC"
 #endif
 
-#define KONOHA_XCODE    "Toguro"
+#define KONOHA_XCODE    "toguro"
 #define KONOHA_URL		"http://konoha.sourceforge.jp/"
 #define KONOHA_URLBASE  "kttp://konoha.sourceforge.jp/wiki/"
 

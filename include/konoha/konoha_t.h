@@ -97,8 +97,8 @@ typedef knh_intptr_t              knh_index_t;
 
 #ifdef KNH_USING_INT32
 
-typedef int32_t        knh_int_t;
-typedef uint32_t       knh_uint_t;
+typedef long                knh_int_t;
+typedef unsigned long       knh_uint_t;
 
 #define KNH_INT_MAX               LONG_MAX
 #define KNH_INT_MIN               (LONG_MIN + 1)
@@ -510,6 +510,7 @@ typedef struct knh_sfp_t {
 	union {
 		knh_boolean_t bvalue;
 		knh_int_t     ivalue;
+		knh_uint_t    uvalue;
 		knh_float_t   fvalue;
 		knh_uint64_t  data;
 		knh_code_t    *pc;

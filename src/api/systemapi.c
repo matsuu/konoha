@@ -127,10 +127,12 @@ METHOD knh__System_setRandomSeed(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__System_exit(Ctx *ctx, knh_sfp_t *sfp)
 {
+#ifndef KONOHA_OS__LKM
 	knh_intptr_t status = IS_NULL(sfp[1].o) ? 0 : p_int(sfp[1]);
 	KNH_SECURE(ctx);
 	KNH_NOTICE(ctx, "exiting by a user");
 	exit((int)status);
+#endif
 	KNH_RETURN_void(ctx, sfp);
 }
 
