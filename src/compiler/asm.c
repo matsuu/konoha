@@ -28,11 +28,11 @@
 /* ************************************************************************ */
 
 #include"commons.h"
-//#ifdef KONOHA_OS__LKM
-//#include"../../include/konoha/gen/konohac_klr_.h"
-//#else
+#ifdef KONOHA_OS__LKM
+#include"../../include/konoha/gen/konohac_klr_.h"
+#else
 #include<konoha/gen/konohac_klr_.h>
-//#endif
+#endif
 
 /* ************************************************************************ */
 
@@ -1984,7 +1984,7 @@ knh_labelid_t knh_Asm_pushLabelStack(Ctx *ctx, Asm *abr, Stmt *stmt)
 	{
 		knh_labelid_t labelid = knh_Asm_newLabelId(ctx, abr, tkL);
 		knh_labelid_t labelid2 = knh_Asm_newLabelId(ctx, abr, NULL);
-		if(labelid + 1 == labelid) {
+		if(labelid + 1 == labelid2) {
 			return labelid;
 		}
 		else {

@@ -303,12 +303,16 @@ OutputStream *new_OutputStream__stdio(Ctx *ctx, FILE *fp, String *enc)
 {
 	KNH_ASSERT(fp == stdout || fp == stderr);
 	OutputStream* o = NULL;
+#ifdef KNH_USING_NOFILE
+	o = new_OutputStream__FILE(ctx, TS_DEVSTDOUT, NULL, &IO__stdio);
+#else
 	if(fp == stdout) {
 		o = new_OutputStream__FILE(ctx, TS_DEVSTDOUT, stdout, &IO__stdio);
 	}
 	else {
 		o = new_OutputStream__FILE(ctx, TS_DEVSTDERR, stderr, &IO__stdio);
 	}
+#endif
 	knh_OutputStream_setAutoFlush(o, 1);
 	knh_OutputStream_setEncoding(ctx, o, enc);
 	return o;
