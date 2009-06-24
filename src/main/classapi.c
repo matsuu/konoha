@@ -1225,18 +1225,22 @@ void knh_Method_init(Ctx *ctx, Method *mtd, int init)
 	b->fproceed  = knh_fmethod_abstract;
 	KNH_INITv(b->mf, konoha_findMethodField0(ctx, TYPE_Any));
 	b->code  = NULL;
+#ifdef KNH_USING_KONOHA_PROF
+	b->prof_count = 0;
+	b->prof_time = 0;
+#endif
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_Method_traverse(Ctx *ctx, Method *mtd, knh_ftraverse gc)
+void knh_Method_traverse(Ctx *ctx, Method *mtd, knh_ftraverse ftr)
 {
 	knh_Method_struct *b = DP(mtd);
-	gc(ctx, UP(b->mf));
+	ftr(ctx, UP(b->mf));
 	if((b->flag & KNH_FLAG_MF_OBJECTCODE) == KNH_FLAG_MF_OBJECTCODE) {
-		gc(ctx, (Object*)b->code);
-		if(IS_SWEEP(gc)) {
+		ftr(ctx, (Object*)b->code);
+		if(IS_SWEEP(ftr)) {
 			b->code = NULL;
 		}
 	}

@@ -1,6 +1,5 @@
 #ifdef KONOHA_OS__LKM
 #include<linux/errno.h>
-#endif
 #define EDOM        33 /* Numerical argument out of domain */
 #define ERANGE      34 /* Result too large */
 
@@ -27,4 +26,5 @@ char *strerror(int errnum)
     }
     return result;
 }
+#endif
 

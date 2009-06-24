@@ -406,8 +406,6 @@ typedef struct knh_Class_t {
 #define KNH_FLAG_CF2OF(f)        (f)
 #define knh_Class_isGenerics(cid)    (ctx->share->ClassTable[cid].p1 != CLASS_Nue)
 
-
-
 /* ------------------------------------------------------------------------ */
 /* @class ClassStruct Object knh_ClassStruct_t @Private */
 /* @flag ClassStruct.Hidden CFF ((ClassStruct)%s)->fields[n].flag 'is:set:*:*' */
@@ -467,12 +465,18 @@ typedef struct knh_MethodField_t {
 /* @flag Method.ObjectCode MF DP((Method*)%s)->flag 'is:set:*:*' */
 /* @flag Method.Generated MF DP((Method*)%s)->flag 'is:set:*:*' */
 
-typedef struct knh_Method {
+typedef knh_uint64_t   knh_proftime_t;
+
+typedef struct {
 	knh_flag_t     flag;  knh_class_t    cid;
 	knh_methodn_t  mn;    knh_ushort_t   delta;
 	struct knh_MethodField_t* mf;
 	knh_fmethod       fproceed;
 	void*             code;
+#ifdef KNH_USING_KONOHA_PROF
+	knh_uintptr_t     prof_count;  /*recode how many times called */
+	knh_proftime_t    prof_time;   /*recode how long spending */
+#endif
 } knh_Method_struct;
 
 /* ------------------------------------------------------------------------ */

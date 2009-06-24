@@ -4,6 +4,7 @@
  *
  * ------------------------------------------------------------------------ */
 
+#ifdef KONOHA_OS__LKM
 
 #include <linux/module.h>
 #include <linux/kernel.h>
@@ -195,4 +196,6 @@ static void __exit konoha_exit(void) {
 
 module_init(konoha_init);
 module_exit(konoha_exit);
+
+#endif /*KONOHA_OS__LKM*/
 
