@@ -81,7 +81,7 @@ knh_uint_t knh_initseed()
 
 /* ------------------------------------------------------------------------ */
 
-knh_uint64_t konoha_gettime()
+knh_uint64_t konoha_getTimeMilliSecond(void)
 {
 #ifdef KNH_USING_WINDOWS
 	DWORD tickCount = GetTickCount();
@@ -94,6 +94,37 @@ knh_uint64_t konoha_gettime()
 #endif/*KNH_USING_POSIX*/
 #ifdef KNH_USING_NOAPI
 	return 0;
+#endif
+}
+
+/* ------------------------------------------------------------------------ */
+/* [Profiler] */
+
+knh_uint64_t konoha_getProfCount(void)
+{
+#ifdef KNH_USING_WINDOWS
+
+#endif/*KNH_USING_WINDOWS*/
+#ifdef KNH_USING_POSIX
+
+#endif/*KNH_USING_POSIX*/
+#ifdef KNH_USING_NOAPI
+	return 0;
+#endif
+}
+
+/* ------------------------------------------------------------------------ */
+
+knh_uint64_t konoha_getProfCountPerSecond(void)
+{
+#ifdef KNH_USING_WINDOWS
+
+#endif/*KNH_USING_WINDOWS*/
+#ifdef KNH_USING_POSIX
+
+#endif/*KNH_USING_POSIX*/
+#ifdef KNH_USING_NOAPI
+	return 1;
 #endif
 }
 

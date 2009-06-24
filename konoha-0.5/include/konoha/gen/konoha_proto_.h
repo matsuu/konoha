@@ -553,7 +553,7 @@ void* knh_thread_getspecific(knh_thread_key_t key);
 int knh_thread_key_delete(knh_thread_key_t key);
 /* ../src/deps/time.c */
 knh_uint_t knh_initseed(void);
-knh_uint64_t konoha_gettime(void);
+knh_uint64_t konoha_getTimeMilliSecond(void);
 /* ../src/konoha.c */
 int main(int argc, char **argv);
 /* ../src/labs/b4.c */

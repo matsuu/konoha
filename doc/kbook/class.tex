@@ -1,1 +1,815 @@
-\chapter{関数}関数(function)は、プログラムの一部をモジュール化するための代表的な手段である。名前が示すとおり、数学の関数 $y = f(x)$ をモデルとして、引数 $x$ に対して結果$y$が得られるという形でプログラムのモジュール化とパラメータ化を実現する。Konohaにおける関数は、単に{\sf Script} クラスのメソッドである。しかし、関数のアイディアはオブジェクト指向プログラミングより古く、クラス概念を導入しなくても利用できる伝統的なモジュールであるため、オブジェクトを意識しないで呼び出せるメソッドを「関数」と呼んでいる。関数をファーストクラスオブジェクトとして扱う手法を「クロージャ」と呼んでいる。\section{関数を定義する}プログラマは、既存の関数を利用するだけなく、新しい関数を自由に定義することができる。Konohaでは、関数定義のための特別なステートメントは用意されておらず、C/C++, Java と同様に、型宣言にパラメータとモジュールを追加する形式で行う。\begin{quote}$T$ $f$ ($T_1\; p_1$, $T_2\; p_2$, ...) \verb| | $stmt$\end{quote}$T$型の評価値を返す関数は、Konohaの名前規則にしたがい、英小文字で始まる名前$f$を持ち、0個以上のパラメータ(変数）$p_1, p_2, ...$をとるように定義する。モジュール本体は、続けて $stmt$ の部分に書き、ここでは一般的にステートメントブロックを用いてプログラムを構成する。次は、$f(x) = x + 1$ という式を関数でモジュール化した例である。関数の評価結果は、{\sf return}文で書く。\begin{ksource}int f(int x) {    return x + 1; }\end{ksource}一旦、関数を定義すると、関数をコール演算子で呼び出すことで、何回でもモジュール化されたプログラムを再利用することができる。\begin{kshell}>>> int f(int x) { ...    return x + 1; ... }>>> y = f(1)>>> y2>>> f(2)3\end{kshell}プログラミング言語における関数は、引数や戻り値に対して「型」が必要な点が特徴的であるといえる。Konoha は、C/C++, Javaなどの静的な型付け言語と同様に、関数定義のときに、これらの型を明示的に宣言することになっている。原則、パラメータや戻り値の型推論は行わない。これは、変数宣言における型推論に比べ、極めて保守的なスタンスをとっているように思われるかも知れない。関数（及びメソッド）は、異なる開発主体が開発するソフトウェア境界のインターフェースとなり、今日のソフトウェア開発ではインターフェースを明示的に仕様化することが望ましいとされている。更に、型検査などで機械的に検査されることがもっと望ましいとされている。そういうわけで、Konohaの関数定義では、しかし、プログラミングのしやすさよりも、ソフトウェア工学的な実践面を重視した言語設計を採用している。\subsection{{\sf function}文}Konohaは、動的な型付けを可能とする{\sf Any}型を持っているため、型宣言なしの関数定義もそれらの型を{\sf Any}型として扱うことで推論なしに定義可能である。したがって、次のようなJavaScript風の関数定義もそのままかくことができる。\begin{ksource}function f(x) {    return x + 1; }\end{ksource}注意： Konohaでは、{\sf function}文は、無名関数を定義するときに用いることを前提に導入されている。したがって、戻り値の型が決定的であれば、型推論される。詳しくは、「第\ref{closure}章 クロージャ」を参考にして欲しい。\section{{\sf return}文}リターン\subsection{戻り値*}モジュールの処理が終れば、その処理内容を評価結果として返すことができる。これを戻り値(return value)、もしくは返り値と呼ぶ。$T$は、戻り値の型であるが、{\sf void}型を指定すれば特定の値を返さない関数も作成することができる。\section{パラメータ}関数の引数は、モジュール化されたプログラムの振る舞いをかえることに役立っている。そのため、これをモジュールのパラメータ化と呼び、関数の引数のことを「パラメータ(parameter)」と呼ぶこともある。\subsection{参照渡し}関数の引数は、モジュール間のデータをやり取りするインターフェースになる。プログラミング言語の教科書を読めば、値渡し(call by value)、参照渡し(call by reference)、名前渡し(call by name)の３種類存在することになっているが、Konoha は、結論から言えば、全て参照渡し(call by reference)である。理由は、"Everything is an Object"の世界であり、関数コールの度にオブジェクトをコピーするのはコストが大きすぎるためである。オブジェクト自体の代わりに、オブジェクトの参照、つまりオブジェクトのポインタを渡すことで、効率よい関数コールを実現している。\begin{kshell}>>> void f(String t) { print %p(t); }>>> s="a">>> print %p(s)[(shell):3] "0x6cc00"            // s と>>> f(s)[(shell):4] "0x6cc00"            // t は同じポインタ>>> \end{kshell}参照渡しで注意すべき点は、関数内部でオブジェクトの値を変更すると、関数を呼び出した外部でもその変更が継続することである。(関数の外と内で、同じオブジェクトを参照しているから当たり前といえば、当たり前である。)\begin{kshell}>>> void g(Array a) {...   a << 1;... }>>> Array list = [];>>> list[]>>> g(list)>>> list                         // 関数内のリスト操作が残る[1]\end{kshell}注意：{\sf Int}, {\sf Float}, {\sf String} オブジェクトは、不変オブジェクトなので、関数内で変更しても、そのとき実際はオブジェクトのコピーが行われている。そのため、関数内部の変更によって外部のオブジェクトまで変更されることはない。\subsection{可変長パラメータ**}Konoha は、可変長変数を採用することができる。\subsection{パラメータ初期値*}\section{関数内同一スコープ}Konoha は、C/C++ や Javaとは大きく異なり、ブロックレベルの変数スコープをサポートしていない。関数内で宣言された全ての変数は、どこで宣言されても関数内で利用できる。ただし、変数宣言より先に変数を使うことはできない。% Unlike C, C++, and Java, Konoha does not have block-level scope. All variables declared in a function, no matter where they are declared, are defined throughout the function. In the following code, the variables i, j, and k all have the same scope; all three are defined throughout the body of the function.例えば、次のコードにおいて、変数 \verb|k|, \verb|j| は、スコープ内として扱われる。\begin{kshell}void test(int n) {   int i = 0;   if(n > 10) {      int j = 0;      for(int k = 0; k < n; k++) {         print k;      }      print k;                    // スコープ外ではない   }   print j;                       // スコープ外ではない}\end{kshell}次のような例外処理のコードを書くときも都合がよい。\begin{ksource}try {   InputStream in = new InputStream("file.txt");   for(String line from in) {      print line;   }}catch(IO!! e) {   print format("Error at %d", in.line);}finally {   in.close();}\end{ksource}また、Konoha は同一スコープ内であっても同じ型であれば、何回、型宣言を行ってもエラーとならない。そのため、コピー＆ペーストする場合も支障とならない。\section{関数呼び出し}コール演算子\verb|()|は、メソッド/関数 \verb|f|、コンストラクタ\verb|new C|、もしくはフォーマッタ\verb|%f|に続いて用いられ、メソッド/関数を呼び出すときに用いる。括弧\verb|()|の中には、0個以上のパラメータ/引数を\verb|,|で区切って与えることができる。コール演算子の評価値は、メソッド/関数の戻り値となる。(ただし、メソッド/関数の戻り値void 型の場合は、評価値はない。)\begin{ksource}f()                        // 関数 f()のコールo.f()                      // o のメソッドf()をコールnew C()                    // クラスCのコンストラクタ%f(o)                      // o のフォーマッティング\end{ksource}コール演算子で与えられるパラメータは、メソッド/関数ごとに個別に定義されている。定義と異なるパラメータでコールしようとしたときは、型エラーとなる。\begin{kshell}>>> fibo(10)55>>> Math.abs(-1)1.000000\end{kshell}\subsection{コール演算子の省略}コール演算子は、パラメータの数が１個であり、かつそれが文字リテラルである場合のみ、括弧\verb|()|自体を省略することもできる。次は、\verb|c.query("""...""")|と同じであるが、省略した方がすっきりとする。\begin{kshell}>>> c.query """select name, salary from PERSON_TBL  where age > 45 and age < 65;"""\end{kshell}\section{ビルトイン関数}関数は、通常、プログラム実行時に評価される。しかし、いくつかのプログラミング言語機能は、コンパイル時に評価しなければならなかったり、もしくは評価した方が効率がよい場合がある。Konoha では、これらのコンパイラと密接に結びついた機能をビルトイン関数として提供している。\subsection{スタティックな型付け typeof()}ビルトイン関数 \verb|typeof(expr)| は、プログラム中で、与えられた式exprのスタティックな型を調べるビルトイン関数である。\begin{kshell}>>> a = 1>>> typeof(a)Int>>> typeof("hello,world")String\end{kshell}これに対し、\verb|(expr).class| は、実行時のexprがもつクラス（型）を調べるメソッドである。typeof(expr)とinstanceof の関係が成り立つが、必ずしも一致するとは限らない。また、型をもたないトークン（例えば予約語など)を評価した場合、{\sf void}型が返される。\verb|typeof()| 関数の評価は、コンパイラの型検査時に行われる。つまり、あまりおすすめではないが、次のように型名の代わりに型宣言にも利用できる。\begin{kshell}int f(int n) {   typeof(n) m = n + 1;   return m;}\end{kshell}\subsection{識別子の存在 defined()}ビルトイン関数 \verb|defined(name)| は、識別子 nameが定義されているかどうか調べる関数である。\begin{kshell}>>> defined(Class)true>>> defined(System.LINUX)false>>> defined(a)false>>> a = 1>>> defined(a)true\end{kshell}\verb|defined()| 関数の評価も、コンパイラの型検査時に行われ、必ず論理値 {\sf true} もしくは{\sf false} に置き換えられている。\begin{kshell}if(!defined(System.LINUX)) {   print os.uname;}\end{kshell}\subsection{デフォルト値をえる default()}デフォルト関数\verb|default(expr)| は、プログラム中で、与えられた式exprの型からそのデフォルト値をえる関数である。\begin{kshell}>>> default(String)"">>> default(%s(1))"">>> default(Script)                // Script は実行依存main.Script\end{kshell}多くのデフォルト値は、スタティックに解決される。しかし、いくつかのクラスは、実行コンテクストに依存する。そのため、デフォルト値も存在する。そのため、\verb|default()|は\verb|typeof()|と同様にスタティックに型まで決定し、一部のデフォルト値は実行時に得ている。\subsection{デリゲートの生成 delegate()}ビルトイン関数 \verb|delegate()| は、デリゲートクロージャを生成する関数である。デリゲートの詳細は、「第\ref{sec:delegate}節 デリゲート」で述べる。デリゲート\verb|delegate(o, m)|は、閉包するオブジェクト\verb|o|と呼び出すメソッド名\verb|g|をセットにしてクロージャを生成する。\begin{kshell}>>> String s = "name";>>> f = delegate(s, split);>>> f()                             // s.split() が呼ばれる["n", "a", "m", "e"]\end{kshell}もしくは、\verb|delegate(f)|のように関数名\verb|f|のみを引数として与え、クロージャを生成することもできる。\begin{kshell}>>> g = delegate(fibo);>>> g(10)                           // Script.fibo(10) が呼ばれる55\end{kshell}\subsection{フォーマッティング {\sf format()}}\verb|format()| は、「第\ref{template_formatting}節 テンプレート・フォーマッティング」のとおり、テンプレート・フォーマッティングのためのビルトイン関数である。この関数がビルトイン関数である理由は、もし可能であれば、テンプレートのインライン展開を行い、フォーマッティングの性能を向上させるためである。\subsection{{\sf likely()}/{\sf unlikely()}*}\verb|likely()|/\verb|unlikely()|は、論理値(true/false)を受け取り、その値をそのまま返すビルトイン関数である。ほとんどのプログラマには、この関数の存在意義からして疑わしいものかも知れないが、Linux カーネル開発者など一部からは非常に好まれている。少なくとも、ソースコードが読みやすくなるという効果は認められるようである。\begin{ksource}if(unlikely(a == b)) {   // あまり起こらないケース}\end{ksource}現在、Konohaでは、クラスルーム利用において、コンピュータアーキテクチャと結びつけて、プログラミングの深淵（の一部）を説明するときに役立つように導入している。将来、優れたKonohaコンパイラが登場したとき、\verb|likely()|/\verb|unlikely()|をひょっとしたら正しく解釈して、分岐予測の最適化を行ってくれるかも知れない。現在は、無害で副作用のないビルトイン関数であるが、もし使うのなら正しく使うことをオススメする。%\section{クロージャ}%\section{デリゲートクロージャ}%\section{無名関数}\chapter{クラスとオブジェクト}%The object-oriented programming features in Konoha are mostly inspired by Java, nominal class and single-inheritance. Here is a running example in this section.Konohaのオブジェクト指向プログラミングは、名前ベースのクラス(nominal class)、単一継承(single-inheritance)など、主にJava 言語のそれから影響を受けている。\section{class 宣言}新しいクラスは、class 文を用いて宣言することで定義できる。class 文の最も簡単なシンタックスは、次のとおりである。クラス継承を含めたシンタックスは、「第\ref{class_inheritance}節 クラス継承」で扱う。\begin{quote}\verb|class | $C$ \verb| {| \\\verb|  | $members$ // クラスのメンバー \\\verb|}| \\\end{quote}クラスのメンバーには、フィールド変数(field variable)、メソッド(method)、コンストラクタ(constructor)が含まれる。\begin{itemize}\item {\bf フィールド変数}は、SmallTalk ではインスタンス変数、C++ではメンバ変数、Java ではフィールドとそろぞれ異なる呼称をもつが、オブジェクトの内部状態を表す変数である。Java ではフィールド変数と呼ばないのが正しいが、Konoha では変数の種類をその位置によって区別する統一呼称を用いているので、「フィールド変数」と呼んでいる。\item {\bf メソッド}は、SmallTalkではメッセージ、C++ではメンバ関数とも呼ばれるが、オブジェクトの内部状態を操作する手続きである。メソッドは、関数のフォームをとり、パラメータ（メソッドにおける引数のこと）を受けて処理を行い、その結果を戻り値として返す。Konoha では、オブジェクトへの操作が明確なときはメソッド/パラメータ、そうでないときは手続き型言語風に関数/引数と呼び分けている。どちらも同じである。\item {\bf コンストラクタ}は、新しくオブジェクトを生成するときに、\verb|new|演算子を用いて呼び出される特別なメソッドである。なお、Konoha は、ガベージコレクションの機構を備えているため、明示的なオブジェクト破壊を行う必要なない。\end{itemize}さて、次はKonoha におけるクラス定義の例である。フィールド変数、コンストラクタ、メソッドの定義をもっている。フィールド変数は、{\sf class} ブロックの一番先頭で宣言することが（よみやすいため）一般的であるが、定義する順番は自由に変えても構わない。\begin{kshell}class Person {   String _name;                  // フィールド変数   int age;                                  // コンストラクタ   Person(String name, int age) {      _name = name;      _age = age;   }   String getName () {           // メソッド      return _name;    }}\end{kshell}Konoha は、スクリプティング言語の柔軟さを提供するため、メソッドやコンストラクタを既存のクラスに追加するを認めている。しかし、フィールド変数のみは、{\sf class}ブロックであらかじめ定義しなければならない。\subsection{クラスの種類}Konohaは、いくつかの特性の異なったクラスを分類している。これらは、{\sf class 文} の前に、アノテーションを与えることで宣言することができる。\begin{kshell}アノテーション         説明@Private              名前空間からみることはできない。@Final                これ以上、継承することはできない@Singleton            Singleton 関数@Interface            インターフェースとして利用することが可能@Release              デバッグの完了したクラス\end{kshell}\subsection{{\sf Glue}クラス}\section{フィールド変数}%The names of field variables should start with an underscore character. If you forget this rule (like age), the complier automatically adds _ to its name;フィールド変数は、アンダースコア(\verb|_|)で始まる変数名をもつ。これは、Java プログラマがよく使っているローカル変数とフィールドを区別する慣習に由来するが、フィールド変数宣言のとき、アンダースコアを付け忘れなくても、コンパイラは自動的にフィールド変数にアンダースコアを付加する。\begin{kshell}class Person {   String _name;     int age;       // もし _ を付けなくても   Person(String name, int age) {      _name = name;      _age = age;  // _ は、フィールド変数へのアクセスに必要   }}\end{kshell}%More importantly, the declaration of non-underscored field variables is shorthand for the automatic generation of its getter/setter. The compiler generates: 重要な留意点は、フィールド変数宣言のとき、アンダースコアを付けないことは、自動的な getter/setter メソッドの生成を意味する。これは、次節で述べるとおり、フィールド変数の public 宣言に等しい。\begin{kshell}class Person {   ...   int age;   int getAge() { return _age;}           // 自動生成   void setAge(int age) { _age = age; }   // 自動生成}\end{kshell}%\subsection{Field accessors}\subsection{フィールドアクセサ}%In Konoha, all of field variables are private. You will have to access fields through getter/setter methods. Konohaは、全てのフィールド変数はいわゆる {\sf private} である。オブジェクト外部から直接参照はできず、全て getter/setter メソッドを用いて行う。\begin{kshell}>>> p = new Person("naruto", 17);>>> p.getName();"naruto">>> p.setAge(18);>>> p.getAge();18\end{kshell}% This looks cumbersome. Konoha has the dot(.) operator for the shorthand of getter/setter. Using this, the above is same as:フィールドへのアクセスに getter/setter メソッドを多用するのは、Java が産み出したトレンドである。しかし、これは何かと不便に感じる人も多い。そこで、Konohaは、フィールドアクセサ(\verb|.|演算子)を、getter/setter を呼び出すための省略形(シンタックスシュガー）として再利用している。\begin{kshell}>>> p = new Person("naruto", 17);>>> p.name;                   // 実は p.getName()"naruto">>> p.age = 18;               // 実は p.setAge(18)>>> p.age;18\end{kshell}今までどおり、フィールドアクセスをしているように見えて、実は全てgetter/setter メソッドによってふるまいを変更することができる。\subsection{バーチャルフィールド}バーチャルフィールドとは、フィールド変数の実体がなくても、getter/setter を通して、あたかもフィールドが存在するようにふるまうことである。\begin{kshell}class Person {   ...   String name;   String getFirstName() {       return _name.split(" ")[0];   }}>>> p = new Person("naruto uzumaki", 17);>>> p.name                    // 実は p.getName()"naruto uzumaki">>> p.firstName               // 実は p.getFirstName()"naruto"\end{kshell}Konoha では、そのオブジェクトのクラス{\sf Class}インタフェースを通して、フィールド変数、（バーチャル）フィールドのリストを得ることができる。\begin{kshell}>>> p = new Person("naruto", 17);>>> p.class.fiedls("variable")["_name", "_age"]>>> p.class.fields("getter")["name", "age", "firstName", "lastName"]>>> p.class.fields("setter") ["name", "age"]\end{kshell}\subsection{this 参照}キーワード\verb|this|は、自オブジェクト参照への参照である。\verb|this|を用いたフィールドアクセサを用いると、フィールド変数を直接参照する代わりに、getter/setter を経由してアクセスすることになる。\begin{kshell}   ...   int age;   boolean isDrinkable() {      return (this.age => 20);   }\end{kshell}フィールドアクセサによる特別な結果を期待する場合でもない限り、\verb|_age|で直接フィールド変数を参照した方が高速である。次のように、getter/setter メソッド内でthis参照を用いると、予期しない依存関係から無限ループに陥る危険性もある。\begin{kshell}   int _age;                        // やってはいけない   int getAge() { return this.age;}    void setAge(int age) { this.age = age; } \end{kshell}Konoha コンパイラは、getter/setter 内では、this 参照を使うとエラーになる。\section{メソッド}メソッドは、オブジェクトに対してメッセージを送受信する手段である。0個以上のパラメータを受け取り、0もしくは1つの戻り値を返すことができる。次の \verb|isChild()|は、0個のパラメータ、Boolean 型の戻り値をもったメソッドの例である。\begin{kshell}class Person {   String name;   int age;    ...   boolean isChild () {       return (_age < 21);     }}\end{kshell}\subsection{メソッド追加}Java 言語では、class 文の中でのみメソッドを定義することができました。Konoha では、動的言語の柔軟さを実現するため、既存のクラスに対して、スクリプト中どこでも新たなメソッドを追加定義することができます。次のPerso.isChild()関数は、class Person 内で定義されたisChild() と同じ定義になります。\begin{kshell}boolean Person.isChild () {   return (_age < 21);}\end{kshell}メソッド追加は、これからインスタンス化されるオブジェクトのみでなく、（追加した時点で）既にインスタンス化されたオブジェクトにも影響が及びます。\begin{kshell}>>> Person p = new Person("naruto", 17);>>> boolean Person.isChild () {...   return (_age < 21);... }>>> p.isChild()true\end{kshell}\subsection{抽象メソッド}抽象メソッドは、メソッドのインターフェースのみ定義され、実装パートが定義されていないメソッドである。Konohaでは、メソッドにつづくブロックが存在しなければ、抽象メソッドと解釈される。また、メソッドのコンパイルに失敗したとき、自動的に抽象メソッドとして扱われる。\begin{kshell}class Person {   String name;   int age;    ...   boolean hasFriend();           // 抽象メソッド}\end{kshell}抽象メソッドの本来の用途は、抽象クラスやインターフェースなど、クラス設計においてポリモーフィズムを実現する手段としての利用である。厳密なスタティック言語では、全ての抽象クラスが実装されていない限り、クラスのインスタンス化はできない。しかし、Konoha は、抽象メソッドが含まれているクラスであっても、インスタンス化を認めている。これは、ラピッドプロトタイピングにおいて、単純に抽象メソッドを未実装なメソッドとして扱うためである。抽象メソッドを実行すると、実行時例外となる。\begin{kshell}>>> p = new Person("naruto", 17);>>> p.hasFriend()AbstractMethod!!: Person.hasFriend()\end{kshell}我々は、実行前にスタティックな抽象メソッドを検査する機構を検討している。現在のところ、実行時に\verb|isAbstract()|によって検査する方法しかない。\begin{kshell}>>> String.isAbstract()false>>> Person.isAbstarct()true\end{kshell}\subsection{パラメータの初期値}メソッドの多重定義(overloding)は、異なる型のパラメータを同じ名前で定義することである。オブジェクトプログラミング言語の標準的な機能として、C++やJava言語で広く採用されているが、Konoha はメソッド再定義をサポートしていない。その代替機能として、パラメータの初期値を設定できる。\begin{kshell}class {   ...   void Person.say(String msg="hello") {      OUT << _name << " says " + msg << EOL;   }}\end{kshell}初期値が設定されたパラメータは、Nullable 型となる。したがって、パラメータを省略すると、自動的に null が与えられたものと解釈され、設定された初期値が渡される。\begin{kshell}>>> Person.says;void main.Person.says(String? msg);>>> p.say("aloha");naruto says aloha>>> p.say();　　                    // 省略, p.say(null) と同義naruto says aloha\end{kshell}Konoha は、メソッドの多重定義をサポートしていない理由は、パラメータ初期値を活用することで、多くの場合のメソッド多重定義のバリエーションをカバーできるからである。あわせて、マップキャスト機能や{\sf Any}型パラメータを活用することで、いくつもメソッドを多重定義することなしに、同等なプログラミングが可能となる。\subsection{メソッドのバージョニング}Konoha は、複数のメソッド実装をバージョン管理する機構を備えている。まず、メソッドのバージョニングは、オリジナルなメソッドに対し、パラメータの型と戻り値の型はそのまま同じで、メソッド名にバージョンタグ(:tag)を付けることで作成できる。次は、\verb|:JA|タグを付加して定義したsays()メソッドの日本語版である。\begin{kshell}void Person.says:JA(String msg = "こんにちは") {   OUT << _naame << "は、"　<< msg << "と言った．" << EOL;}\end{kshell}注意：（まだ厳密に決まった仕様ではないが、）英大文字で始まるタグは、言語ロケール用に予約されている。小文字で始まるタグは、ユーザが自由に利用して構わない。バージョニングされたメソッドは、呼び出すときに明示的にバージョンタグを付けることで呼び出すことができる。\begin{kshell}>>> p.says();naruto says hello>>> p.says:JA();　　                    // 日本語版の利用naruto はこんにちはと言った.\end{kshell}\subsubsection{将来の拡張計画}将来のKonohaでは、型による自動的なバージョン切り換えも導入を予定している。この機構には、セマンティックプログラミングの意味タグ型を流用する予定であるが、セマンティックプログラミングとの一貫性に関して検討を必要としている。次は、{\sf Person}クラスに対し、意味タグを追加して、意味タグ型 {\sf Person:JA}型の例である。意味タグ型は、同じタグが付けられたメソッドを優先して呼び出す出されることになる。\begin{kshell}>>> Person:JA p = new Person("なると", 17);>>> p.says();                           // says:JA()を利用するnaruto はこんにちはと言った.\end{kshell}\section{クラス関数}\index{くらすかんすう@クラス関数}\label{class_function}クラス関数は、クラス名を直接レシーバにして利用できる特別なメソッドである。通常、メソッドは、クラスのオブジェクトを操作するための手段である。したがって、メソッドを利用するとき、クラスがインスタンス化されている必要がある。しかし、特定のインスタンスから独立しており、インスタンスを特定できない、もしくはする必要がない場合がある。乱数生成メソッド \verb|random()|は、特定の数値（インスタンス）の操作というより、それに独立したユーティリティ機能となる。ただし、{\sf Int} や {\sf Float} クラス程度に操作を区別する必要もある。Konoha では、これらは、クラス関数としてそれぞれ定義されて提供されている。\begin{kshell}>>> Int.random()143980198322>>> Float.random()0.39810\end{kshell}クラス関数は、メソッド定義のとき、\verb|@Static| アノテーションを付けることで定義することができる。\begin{kshell}@Staticint Int.max(int a, int b) {   return (a > b) ? : a : b;}\end{kshell}\verb|@Static|アノテーションは、Java のスタティックメソッド\index{すたてぃっくめそっど@スタティックメソッド}に由来している。事実、見かけ上、クラス関数はスタティックメソッドと同様に利用することができる。しかし、実際はクラスのデフォルト値をレシーバとしてメソッドを呼んでいる。{\sf this} キーワードを用いれば、自オブジェクトとして参照もできる。\begin{kshell}>>> Int.max(1, 2)2>>> (default(Int)).max(1, 2)     // 同じ2\end{kshell}また、シングルトンクラスは、\verb|@Static|アノテーションがなくても、自動的にクラス関数として解釈される。そのため、クラス関数としてコールしてもよいし、メソッドとしてコールしても構わない。\begin{kshell}>>> System.exit()                // System はシングルトン>>> os = default(System)>>> os.exit()                    // 同じ\end{kshell}Konoha は、シンプルな言語構造を実現するため、Java風のスタティックフィールドをサポートしていない。クラスで共有したい変数は、単にスクリプト変数を用いることができる。\section{コンストラクタ}\section{オペレータとメソッド}Konohaでは、全てのオペレータはメソッドのシンタックスシュガーである。例えば、加算演算 \verb|x + y| は、次のように単純にメソッド\verb|opAdd()|に置き換えられて実行されている。\begin{kshell}x.opAdd(y)                            // x + y\end{kshell}そこで、演算子と対応つけられた\verb|op| で始まるメソッドを定義すれば、オペレータの振る舞いを変更することも可能である。ただし、演算子の再定義は、Konohaではあまり積極的に推奨されない。\begin{tabular}{llll}\verb|x + y| & \verb|x.opAdd(y)| & \verb|x - y| & \verb|x.opSub(y)| \\\verb|x * y| & \verb|x.opMul(y)| & \verb|x / y| & \verb|x.opDiv(y)| \\\verb|x mod y| & \verb|x.opMod(y)| & & \\\verb/x++/ & \verb|x = x.opNext()| & \verb/x--/ & \verb|x = x.opPerv()| \\\verb|x == y| & \verb|x.opEq(y)| & \verb|x != y| & \verb|x.opNeq(y)| \\\verb|x < y| & \verb|x.opLt(y)| & \verb|x <= y| & \verb|x.opLte(y)| \\\verb|x > y| & \verb|x.opEq(y)| & \verb|x >= y| & \verb|x.opNeq(y)| \\\verb|x & y| & \verb|x.opLand(y)| & \verb/x | y/ & \verb|x.opLor(y)| \\\verb|x ^ y| & \verb|x.opXor(y)| & \verb|~x| & \verb|x.opLnot(y)| \\\verb|x << y| & \verb|x.opLshift(y)| & \verb|x >> y| & \verb|x.opRshift(y)| \\\verb/|x|/ & \verb|x.getSize()| & \verb/y in? x/ & \verb|x.opHas(y)| \\\verb|x[n]| & \verb|x.get(n)| & \verb|x[n] = y| & \verb|x.set(n)| \\\verb|x[] = y| & \verb|x.setAll(n)| & \verb|x[s..e]| & \verb|x.opSubsete(s,e)| \\\verb|x[s..<e]| & \verb|x.opSubset(s,e)| & \verb|x[s..+n]| & \verb|x.opOffset(s,n)| \\\end{tabular}\begin{comment}\section{フォーマッタの定義}\subsection{フォーマッタメソッド}You can define or add new formatters as methods, since formatters are a specialized method with the following signature.\begin{kshell}void Object.%fmt(OutputStream w, String fmt) ;\end{kshell}Formatting is designed to output data to OutputStream. \begin{kshell}void Person.%xml(OutputStream w, String fmt) {   w << "<person name='%s{0}'/>" %% _name << EOL;}\end{kshell}\begin{kshell}>>> p = new Person("naruto", 17);>>> %xml(p)<person name='naruto'/>\end{kshell}\section{マッパーの定義}\end{comment}\chapter{クラス継承と抽象化}クラス継承(class inheritance)は、オブジェクト指向プログラミング黎明期の一大関心事であった。しかし、オブジェクト指向プログラミングが広く普及し、多種多様なオブジェクトのデザインパターンが実践されるにつれ、それほど関心を集める話でなくなった。Konoha は、そんな時代に設計されたので、「クラス継承」に関して、必要最小限の機能をサポートするのみにとどめている。（しかも、現在のところ、ほとんどクラス継承を使う機会はない。）\section{クラス継承} \label{class_inheritance}Konoha のオブジェクト指向プログラミングは、Javaから強い影響を受けている。クラス継承を用いるクラス定義は、Java同様、 {\sf class}文において{\sf extends} 節によって上位クラス$D$を指定することができる。クラス継承によって定義されたクラス$D$は、上位クラス$C$に対し、「サブクラス(subclass)」と呼ぶ。\begin{quote}\verb|class | $D$ \verb| extends | $C$ \verb| {| \\\verb|  | $members$ // クラスのメンバー \\\verb|}| \\Konoha は、Javaのオブジェクト指向プログラミングの特徴を強く受け継いで設計されている。\end{quote}クラス継承とは、上位クラスの振る舞い、つまりメソッドを引き継ぐことである。サブクラスでは、上位クラスのメソッドを継承するのみならず、新たなメソッドを追加することもできる。次のクラス{\sf D}は、クラス{\sf C}のサブクラスである。メソッド\verb|C.sayHi()|を継承し、新たに\verb|D.sayBye()|を追加している。\begin{kshell}>>> class C {...    void sayHi() { print "hi"; }... }>>> class D extends C {...    void sayBye() { print "bye"; }... }>>> D d = new D();>>> d.sayHi()           // c.sayHi()が呼ばれるhi>>> d.sayBye()          // 追加されたメソッド bye\end{kshell}\subsection{{\sf final} クラス}Konoha では、クラス定義において、Java 言語同様、{\sf final}修飾子、もしくは{\sf @Final}アノテーションを付けることで、クラス継承不可能なクラスとして宣言できる。\begin{ksource}final class C {   void sayHi() { print "hi"; }}class D extends C {    // C は継承できない   void sayBye() { print "bye"; }}\end{ksource}\section{オーバーライド}オーバーライドは、継承されたメソッドをサブクラスにおいて上書き、つまり新たに作り直す機構である。オブジェクトに対しポリモーフィズム(polymorphism)を与える重要な機構であるが、同時に、ダイナミックバインディングによる性能低下が議論となる機構でもある。Konoha は、C++ や C\#の流儀にしたがって、{\sf @Virtual}アノテーションが付けられたメソッドのみオーバライドすることができる。これは、実際のプログラミングにおいて、メソッドがオーバーライドされることは稀であり、Java のようにデフォルトでオーバーライドを認めることによる性能ロスを無視できないと判断したためである。プログラマがダイナミックバインディングを避けるため{\sf final}を追加するようなテクニックを駆使することなく、ふつうに書いて最適な速度が得られる方を好んだといえる。\begin{ksource}class C {   @Virtual void sayHi() { print "hi"; }}class D extends C {       // オーバライド   @Override void sayHi() { print "Hey"; }   void sayBye() { print "bye"; }}\end{ksource}注意： {\sf @Virtaul} メソッドは、ダイナミックバインディングされるため、どうしてもスタティックバインディングに比べると遅くなる。Konoha では、インラインキャッシュによる高速化の工夫をしているが、オーバーライドする必要のないメソッドは@Virtual 宣言しないようにすべきである。また、抽象メソッドもオーバーライドされたメソッドも、同様に、ダイナミックバインドされる。\subsection{ポリモーフィズム}\section{{\sf super}}{ｴsf super} は、上位クラスのフィールドやメソッドへアクセスするためのリファレンスを表す表現である。\section{インターフェース*}Konoha は、Javaと同様に、単一継承(single inheritance)である。複数のクラスの振る舞いを継承するクラスを定義したいときは、インターフェースを実装する方法を用いる。次は、クラス$D$とクラス$E$のインターフェースを実装することを宣言したクラスである。\begin{quote}\verb|class | $C$ \verb| implements | $D$, $E$ \verb| {| \\\verb|  | $members$ // クラスのメンバー \\\verb|}| \\\end{quote}Konoha は、Java と異なり、インターフェースを定義する専用の{\sf interface} 文は存在しない。その代わり、任意のクラスをインターフェースとして実装することができる。\begin{kshell}>>> class C {...    void sayHi() { print "hi"; }...    void sayBye() { print "bye"; }... }>>> class D implements C {...    void sayHi() { print "Hai"; }... }>>> D d = new D();>>> d.sayHi()                      // 自分で作るHai>>> d.sayBye()                     // 継承されない ** AbstractMethod!!\end{kshell}注意: インターフェースは、あくまでもメソッドの設計（シグネチャ）のみ継承し、実装は継承しない。Konoha では、抽象メソッドとして継承される。そのため、新たに追加しない限り、{\sf implements} されたインターフェースのメソッドは、\verb|Abstract!!|例外になる。\subsection{インターフェースへのメソッド追加**}\section{{\sf Object} クラス}{\sf Object} クラスは、全てのクラスの共通した上位クラスである。全てのオブジェクトは、{\sf Object}クラスのメソッド（オペレータ、フォーマッタも含む）を継承している。
+\chapter{関数}
+
+
+関数(function)は、プログラムの一部をモジュール化するための代表的な手段である。名前が示すとおり、数学の関数 $y = f(x)$ をモデルとして、引数 $x$ に対して結果$y$が得られるという形でプログラムのモジュール化とパラメータ化を実現する。
+
+Konohaにおける関数は、単に{\sf Script} クラスのメソッドである。しかし、関数のアイディアはオブジェクト指向プログラミングより古く、クラス概念を導入しなくても利用できる伝統的なモジュールであるため、オブジェクトを意識しないで呼び出せるメソッドを「関数」と呼んでいる。関数をファーストクラスオブジェクトとして扱う手法を「クロージャ」と呼んでいる。
+
+\section{関数を定義する}
+
+プログラマは、既存の関数を利用するだけなく、新しい関数を自由に定義することができる。Konohaでは、関数定義のための特別なステートメントは用意されておらず、C/C++, Java と同様に、型宣言にパラメータとモジュールを追加する形式で行う。
+
+\begin{quote}
+$T$ $f$ ($T_1\; p_1$, $T_2\; p_2$, ...) \verb| | $stmt$
+\end{quote}
+
+$T$型の評価値を返す関数は、Konohaの名前規則にしたがい、英小文字で始まる名前$f$を持ち、0個以上のパラメータ(変数）$p_1, p_2, ...$をとるように定義する。モジュール本体は、続けて $stmt$ の部分に書き、ここでは一般的にステートメントブロックを用いてプログラムを構成する。
+
+次は、$f(x) = x + 1$ という式を関数でモジュール化した例である。関数の評価結果は、{\sf return}文で書く。
+
+\begin{ksource}
+int f(int x) { 
+   return x + 1; 
+}
+\end{ksource}
+
+一旦、関数を定義すると、関数をコール演算子で呼び出すことで、何回でもモジュール化されたプログラムを再利用することができる。
+
+\begin{kshell}
+>>> int f(int x) { 
+...    return x + 1; 
+... }
+>>> y = f(1)
+>>> y
+2
+>>> f(2)
+3
+\end{kshell}
+
+プログラミング言語における関数は、引数や戻り値に対して「型」が必要な点が特徴的であるといえる。Konoha は、C/C++, Javaなどの静的な型付け言語と同様に、関数定義のときに、これらの型を明示的に宣言することになっている。原則、パラメータや戻り値の型推論は行わない。
+
+これは、変数宣言における型推論に比べ、極めて保守的なスタンスをとっているように思われるかも知れない。関数（及びメソッド）は、異なる開発主体が開発するソフトウェア境界のインターフェースとなり、今日のソフトウェア開発ではインターフェースを明示的に仕様化することが望ましいとされている。更に、型検査などで機械的に検査されることがもっと望ましいとされている。そういうわけで、Konohaの関数定義では、しかし、プログラミングのしやすさよりも、ソフトウェア工学的な実践面を重視した言語設計を採用している。
+
+\subsection{{\sf function}文}
+
+Konohaは、動的な型付けを可能とする{\sf Any}型を持っているため、型宣言なしの関数定義もそれらの型を{\sf Any}型として扱うことで推論なしに定義可能である。したがって、次のようなJavaScript風の関数定義もそのままかくことができる。
+
+\begin{ksource}
+function f(x) { 
+   return x + 1; 
+}
+\end{ksource}
+
+注意： Konohaでは、{\sf function}文は、無名関数を定義するときに用いることを前提に導入されている。したがって、戻り値の型が決定的であれば、型推論される。詳しくは、「第\ref{closure}章 クロージャ」を参考にして欲しい。
+
+\section{{\sf return}文}
+
+リターン
+
+
+\subsection{戻り値*}
+
+モジュールの処理が終れば、その処理内容を評価結果として返すことができる。これを戻り値(return value)、もしくは返り値と呼ぶ。$T$は、戻り値の型であるが、{\sf void}型を指定すれば特定の値を返さない関数も作成することができる。
+
+\section{パラメータ}
+
+関数の引数は、モジュール化されたプログラムの振る舞いをかえることに役立っている。そのため、これをモジュールのパラメータ化と呼び、関数の引数のことを「パラメータ(parameter)」と呼ぶこともある。
+
+\subsection{参照渡し}
+
+関数の引数は、モジュール間のデータをやり取りするインターフェースになる。プログラミング言語の教科書を読めば、値渡し(call by value)、参照渡し(call by reference)、名前渡し(call by name)の３種類存在することになっているが、
+
+Konoha は、結論から言えば、全て参照渡し(call by reference)である。理由は、"Everything is an Object"の世界であり、関数コールの度にオブジェクトをコピーするのはコストが大きすぎるためである。オブジェクト自体の代わりに、オブジェクトの参照、つまりオブジェクトのポインタを渡すことで、効率よい関数コールを実現している。
+
+\begin{kshell}
+>>> void f(String t) { print %p(t); }
+>>> s="a"
+>>> print %p(s)
+[(shell):3] "0x6cc00"            // s と
+>>> f(s)
+[(shell):4] "0x6cc00"            // t は同じポインタ
+>>> 
+\end{kshell}
+
+参照渡しで注意すべき点は、関数内部でオブジェクトの値を変更すると、関数を呼び出した外部でもその変更が継続することである。(関数の外と内で、同じオブジェクトを参照しているから当たり前といえば、当たり前である。)
+
+\begin{kshell}
+>>> void g(Array a) {
+...   a << 1;
+... }
+>>> Array list = [];
+>>> list
+[]
+>>> g(list)
+>>> list                         // 関数内のリスト操作が残る
+[1]
+\end{kshell}
+
+注意：{\sf Int}, {\sf Float}, {\sf String} オブジェクトは、不変オブジェクトなので、関数内で変更しても、そのとき実際はオブジェクトのコピーが行われている。そのため、関数内部の変更によって外部のオブジェクトまで変更されることはない。
+
+\subsection{可変長パラメータ**}
+
+Konoha は、可変長変数を採用することができる。
+
+\subsection{パラメータ初期値*}
+
+
+\section{関数内同一スコープ}
+
+Konoha は、C/C++ や Javaとは大きく異なり、ブロックレベルの変数スコープをサポートしていない。関数内で宣言された全ての変数は、どこで宣言されても関数内で利用できる。ただし、変数宣言より先に変数を使うことはできない。
+
+% Unlike C, C++, and Java, Konoha does not have block-level scope. All variables declared in a function, no matter where they are declared, are defined throughout the function. In the following code, the variables i, j, and k all have the same scope; all three are defined throughout the body of the function.
+
+例えば、次のコードにおいて、変数 \verb|k|, \verb|j| は、スコープ内として扱われる。
+
+\begin{kshell}
+void test(int n) {
+   int i = 0;
+   if(n > 10) {
+      int j = 0;
+      for(int k = 0; k < n; k++) {
+         print k;
+      }
+      print k;                    // スコープ外ではない
+   }
+   print j;                       // スコープ外ではない
+}
+\end{kshell}
+
+次のような例外処理のコードを書くときも都合がよい。
+
+\begin{ksource}
+try {
+   InputStream in = new InputStream("file.txt");
+   for(String line from in) {
+      print line;
+   }
+}
+catch(IO!! e) {
+   print format("Error at %d", in.line);
+}
+finally {
+   in.close();
+}
+\end{ksource}
+
+また、Konoha は同一スコープ内であっても同じ型であれば、何回、型宣言を行ってもエラーとならない。そのため、コピー＆ペーストする場合も支障とならない。
+
+\section{関数呼び出し}
+
+コール演算子\verb|()|は、メソッド/関数 \verb|f|、コンストラクタ\verb|new C|、もしくはフォーマッタ\verb|%f|に続いて用いられ、メソッド/関数を呼び出すときに用いる。括弧\verb|()|の中には、0個以上のパラメータ/引数を\verb|,|で区切って与えることができる。コール演算子の評価値は、メソッド/関数の戻り値となる。(ただし、メソッド/関数の戻り値void 型の場合は、評価値はない。)
+
+\begin{ksource}
+f()                        // 関数 f()のコール
+o.f()                      // o のメソッドf()をコール
+new C()                    // クラスCのコンストラクタ
+%f(o)                      // o のフォーマッティング
+\end{ksource}
+
+コール演算子で与えられるパラメータは、メソッド/関数ごとに個別に定義されている。定義と異なるパラメータでコールしようとしたときは、型エラーとなる。
+
+\begin{kshell}
+>>> fibo(10)
+55
+>>> Math.abs(-1)
+1.000000
+\end{kshell}
+
+\subsection{コール演算子の省略}
+
+コール演算子は、パラメータの数が１個であり、かつそれが文字リテラルである場合のみ、括弧\verb|()|自体を省略することもできる。次は、\verb|c.query("""...""")|と同じであるが、省略した方がすっきりとする。
+
+\begin{kshell}
+>>> c.query """
+select name, salary from PERSON_TBL
+  where age > 45 and age < 65;
+"""
+\end{kshell}
+
+\section{ビルトイン関数}
+
+関数は、通常、プログラム実行時に評価される。しかし、いくつかのプログラミング言語機能は、コンパイル時に評価しなければならなかったり、もしくは評価した方が効率がよい場合がある。Konoha では、これらのコンパイラと密接に結びついた機能をビルトイン関数として提供している。
+
+\subsection{スタティックな型付け typeof()}
+
+ビルトイン関数 \verb|typeof(expr)| は、プログラム中で、与えられた式exprのスタティックな型を調べるビルトイン関数である。
+
+\begin{kshell}
+>>> a = 1
+>>> typeof(a)
+Int
+>>> typeof("hello,world")
+String
+\end{kshell}
+
+これに対し、\verb|(expr).class| は、実行時のexprがもつクラス（型）を調べるメソッドである。typeof(expr)とinstanceof の関係が成り立つが、必ずしも一致するとは限らない。また、型をもたないトークン（例えば予約語など)を評価した場合、{\sf void}型が返される。
+
+\verb|typeof()| 関数の評価は、コンパイラの型検査時に行われる。つまり、あまりおすすめではないが、次のように型名の代わりに型宣言にも利用できる。
+
+\begin{kshell}
+int f(int n) {
+   typeof(n) m = n + 1;
+   return m;
+}
+\end{kshell}
+
+\subsection{識別子の存在 defined()}
+
+ビルトイン関数 \verb|defined(name)| は、識別子 nameが定義されているかどうか調べる関数である。
+
+\begin{kshell}
+>>> defined(Class)
+true
+>>> defined(System.LINUX)
+false
+>>> defined(a)
+false
+>>> a = 1
+>>> defined(a)
+true
+\end{kshell}
+
+\verb|defined()| 関数の評価も、コンパイラの型検査時に行われ、必ず論理値 {\sf true} もしくは{\sf false} に置き換えられている。
+
+\begin{kshell}
+if(!defined(System.LINUX)) {
+   print os.uname;
+}
+\end{kshell}
+
+\subsection{デフォルト値をえる default()}
+
+デフォルト関数\verb|default(expr)| は、プログラム中で、与えられた式exprの型からそのデフォルト値をえる関数である。
+
+\begin{kshell}
+>>> default(String)
+""
+>>> default(%s(1))
+""
+>>> default(Script)                // Script は実行依存
+main.Script
+\end{kshell}
+
+多くのデフォルト値は、スタティックに解決される。しかし、いくつかのクラスは、実行コンテクストに依存する。そのため、デフォルト値も存在する。そのため、\verb|default()|は\verb|typeof()|と同様にスタティックに型まで決定し、一部のデフォルト値は実行時に得ている。
+
+\subsection{デリゲートの生成 delegate()}
+
+ビルトイン関数 \verb|delegate()| は、デリゲートクロージャを生成する関数である。デリゲートの詳細は、「第\ref{sec:delegate}節 デリゲート」で述べる。
+
+デリゲート\verb|delegate(o, m)|は、閉包するオブジェクト\verb|o|と呼び出すメソッド名\verb|g|をセットにしてクロージャを生成する。
+
+\begin{kshell}
+>>> String s = "name";
+>>> f = delegate(s, split);
+>>> f()                             // s.split() が呼ばれる
+["n", "a", "m", "e"]
+\end{kshell}
+
+もしくは、\verb|delegate(f)|のように関数名\verb|f|のみを引数として与え、クロージャを生成することもできる。
+
+\begin{kshell}
+>>> g = delegate(fibo);
+>>> g(10)                           // Script.fibo(10) が呼ばれる
+55
+\end{kshell}
+
+\subsection{フォーマッティング {\sf format()}}
+
+\verb|format()| は、「第\ref{template_formatting}節 テンプレート・フォーマッティング」のとおり、テンプレート・フォーマッティングのためのビルトイン関数である。この関数がビルトイン関数である理由は、もし可能であれば、テンプレートのインライン展開を行い、フォーマッティングの性能を向上させるためである。
+
+\subsection{{\sf likely()}/{\sf unlikely()}*}
+
+\verb|likely()|/\verb|unlikely()|は、論理値(true/false)を受け取り、その値をそのまま返すビルトイン関数である。ほとんどのプログラマには、この関数の存在意義からして疑わしいものかも知れないが、
+Linux カーネル開発者など一部からは非常に好まれている。少なくとも、ソースコードが読みやすくなるという効果は認められるようである。
+
+\begin{ksource}
+if(unlikely(a == b)) {
+   // あまり起こらないケース
+}
+\end{ksource}
+
+現在、Konohaでは、クラスルーム利用において、コンピュータアーキテクチャと結びつけて、プログラミングの深淵（の一部）を説明するときに役立つように導入している。
+
+将来、優れたKonohaコンパイラが登場したとき、\verb|likely()|/\verb|unlikely()|をひょっとしたら正しく解釈して、分岐予測の最適化を行ってくれるかも知れない。現在は、無害で副作用のないビルトイン関数であるが、もし使うのなら正しく使うことをオススメする。
+
+%\section{クロージャ}
+%\section{デリゲートクロージャ}
+%\section{無名関数}
+
+\chapter{クラスとオブジェクト}
+
+%The object-oriented programming features in Konoha are mostly inspired by Java, nominal class and single-inheritance. Here is a running example in this section.
+
+Konohaのオブジェクト指向プログラミングは、名前ベースのクラス(nominal class)、単一継承(single-inheritance)など、主にJava 言語のそれから影響を受けている。
+
+\section{class 宣言}
+
+新しいクラスは、class 文を用いて宣言することで定義できる。class 文の最も簡単なシンタックスは、次のとおりである。クラス継承を含めたシンタックスは、「第\ref{class_inheritance}節 クラス継承」で扱う。
+
+\begin{quote}
+\verb|class | $C$ \verb| {| \\
+\verb|  | $members$ // クラスのメンバー \\
+\verb|}| \\
+\end{quote}
+
+クラスのメンバーには、フィールド変数(field variable)、メソッド(method)、コンストラクタ(constructor)が含まれる。
+
+\begin{itemize}
+
+\item {\bf フィールド変数}は、SmallTalk ではインスタンス変数、C++ではメンバ変数、Java ではフィールドとそろぞれ異なる呼称をもつが、オブジェクトの内部状態を表す変数である。Java ではフィールド変数と呼ばないのが正しいが、Konoha では変数の種類をその位置によって区別する統一呼称を用いているので、「フィールド変数」と呼んでいる。
+
+\item {\bf メソッド}は、SmallTalkではメッセージ、C++ではメンバ関数とも呼ばれるが、オブジェクトの内部状態を操作する手続きである。メソッドは、関数のフォームをとり、パラメータ（メソッドにおける引数のこと）を受けて処理を行い、その結果を戻り値として返す。Konoha では、オブジェクトへの操作が明確なときはメソッド/パラメータ、そうでないときは手続き型言語風に関数/引数と呼び分けている。どちらも同じである。
+
+\item {\bf コンストラクタ}は、新しくオブジェクトを生成するときに、\verb|new|演算子を用いて呼び出される特別なメソッドである。なお、Konoha は、ガベージコレクションの機構を備えているため、明示的なオブジェクト破壊を行う必要なない。
+
+\end{itemize}
+
+さて、次はKonoha におけるクラス定義の例である。フィールド変数、コンストラクタ、メソッドの定義をもっている。フィールド変数は、{\sf class} ブロックの一番先頭で宣言することが（よみやすいため）一般的であるが、定義する順番は自由に変えても構わない。
+
+\begin{kshell}
+class Person {
+   String _name;                  // フィールド変数
+   int age;
+                                  // コンストラクタ
+   Person(String name, int age) {
+      _name = name;
+      _age = age;
+   }
+   String getName () {           // メソッド
+      return _name; 
+   }
+}
+\end{kshell}
+
+Konoha は、スクリプティング言語の柔軟さを提供するため、メソッドやコンストラクタを既存のクラスに追加するを認めている。しかし、フィールド変数のみは、{\sf class}ブロックであらかじめ定義しなければならない。
+
+\subsection{クラスの種類}
+
+Konohaは、いくつかの特性の異なったクラスを分類している。これらは、{\sf class 文} の前に、アノテーションを与えることで宣言することができる。
+
+\begin{kshell}
+アノテーション         説明
+@Private              名前空間からみることはできない。
+@Final                これ以上、継承することはできない
+@Singleton            Singleton 関数
+@Interface            インターフェースとして利用することが可能
+@Release              デバッグの完了したクラス
+\end{kshell}
+
+\subsection{{\sf Glue}クラス}
+
+
+\section{フィールド変数}
+
+%The names of field variables should start with an underscore character. If you forget this rule (like age), the complier automatically adds _ to its name;
+
+フィールド変数は、アンダースコア(\verb|_|)で始まる変数名をもつ。これは、Java プログラマがよく使っているローカル変数とフィールドを区別する慣習に由来するが、フィールド変数宣言のとき、アンダースコアを付け忘れなくても、コンパイラは自動的にフィールド変数にアンダースコアを付加する。
+
+\begin{kshell}
+class Person {
+   String _name;  
+   int age;       // もし _ を付けなくても
+   Person(String name, int age) {
+      _name = name;
+      _age = age;  // _ は、フィールド変数へのアクセスに必要
+   }
+}
+\end{kshell}
+
+%More importantly, the declaration of non-underscored field variables is shorthand for the automatic generation of its getter/setter. The compiler generates: 
+
+重要な留意点は、フィールド変数宣言のとき、アンダースコアを付けないことは、自動的な getter/setter メソッドの生成を意味する。これは、次節で述べるとおり、フィールド変数の public 宣言に等しい。
+
+\begin{kshell}
+class Person {
+   ...
+   int age;
+   int getAge() { return _age;}           // 自動生成
+   void setAge(int age) { _age = age; }   // 自動生成
+}
+\end{kshell}
+
+%\subsection{Field accessors}
+\subsection{フィールドアクセサ}
+
+%In Konoha, all of field variables are private. You will have to access fields through getter/setter methods. 
+
+Konohaは、全てのフィールド変数はいわゆる {\sf private} である。オブジェクト外部から直接参照はできず、全て getter/setter メソッドを用いて行う。
+
+\begin{kshell}
+>>> p = new Person("naruto", 17);
+>>> p.getName();
+"naruto"
+>>> p.setAge(18);
+>>> p.getAge();
+18
+\end{kshell}
+
+% This looks cumbersome. Konoha has the dot(.) operator for the shorthand of getter/setter. Using this, the above is same as:
+
+フィールドへのアクセスに getter/setter メソッドを多用するのは、Java が産み出したトレンドである。しかし、これは何かと不便に感じる人も多い。そこで、Konohaは、フィールドアクセサ(\verb|.|演算子)を、getter/setter を呼び出すための省略形(シンタックスシュガー）として再利用している。
+
+\begin{kshell}
+>>> p = new Person("naruto", 17);
+>>> p.name;                   // 実は p.getName()
+"naruto"
+>>> p.age = 18;               // 実は p.setAge(18)
+>>> p.age;
+18
+\end{kshell}
+
+今までどおり、フィールドアクセスをしているように見えて、実は全てgetter/setter メソッドによってふるまいを変更することができる。
+
+\subsection{バーチャルフィールド}
+
+バーチャルフィールドとは、フィールド変数の実体がなくても、getter/setter を通して、あたかもフィールドが存在するようにふるまうことである。
+
+\begin{kshell}
+class Person {
+   ...
+   String name;
+   String getFirstName() { 
+      return _name.split(" ")[0];
+   }
+}
+
+>>> p = new Person("naruto uzumaki", 17);
+>>> p.name                    // 実は p.getName()
+"naruto uzumaki"
+>>> p.firstName               // 実は p.getFirstName()
+"naruto"
+\end{kshell}
+
+Konoha では、そのオブジェクトのクラス{\sf Class}インタフェースを通して、フィールド変数、（バーチャル）フィールドのリストを得ることができる。
+
+\begin{kshell}
+>>> p = new Person("naruto", 17);
+>>> p.class.fiedls("variable")
+["_name", "_age"]
+>>> p.class.fields("getter")
+["name", "age", "firstName", "lastName"]
+>>> p.class.fields("setter") 
+["name", "age"]
+\end{kshell}
+
+\subsection{this 参照}
+
+キーワード\verb|this|は、自オブジェクト参照への参照である。\verb|this|を用いたフィールドアクセサを用いると、フィールド変数を直接参照する代わりに、getter/setter を経由してアクセスすることになる。
+
+\begin{kshell}
+   ...
+   int age;
+   boolean isDrinkable() {
+      return (this.age => 20);
+   }
+\end{kshell}
+
+フィールドアクセサによる特別な結果を期待する場合でもない限り、\verb|_age|で直接フィールド変数を参照した方が高速である。次のように、getter/setter メソッド内でthis参照を用いると、予期しない依存関係から無限ループに陥る危険性もある。
+
+\begin{kshell}
+   int _age;                        // やってはいけない
+   int getAge() { return this.age;} 
+   void setAge(int age) { this.age = age; } 
+\end{kshell}
+
+Konoha コンパイラは、getter/setter 内では、this 参照を使うとエラーになる。
+
+\section{メソッド}
+
+メソッドは、オブジェクトに対してメッセージを送受信する手段である。0個以上のパラメータを受け取り、0もしくは1つの戻り値を返すことができる。次の \verb|isChild()|は、0個のパラメータ、Boolean 型の戻り値をもったメソッドの例である。
+
+\begin{kshell}
+class Person {
+   String name;
+   int age;
+    ...
+   boolean isChild () {
+       return (_age < 21);
+     }
+}
+\end{kshell}
+
+
+
+\subsection{メソッド追加}
+Java 言語では、class 文の中でのみメソッドを定義することができました。Konoha では、動的言語の柔軟さを実現するため、既存のクラスに対して、スクリプト中どこでも新たなメソッドを追加定義することができます。次のPerso.isChild()関数は、class Person 内で定義されたisChild() と同じ定義になります。
+
+\begin{kshell}
+boolean Person.isChild () {
+   return (_age < 21);
+}
+\end{kshell}
+
+メソッド追加は、これからインスタンス化されるオブジェクトのみでなく、（追加した時点で）既にインスタンス化されたオブジェクトにも影響が及びます。
+
+\begin{kshell}
+>>> Person p = new Person("naruto", 17);
+>>> boolean Person.isChild () {
+...   return (_age < 21);
+... }
+>>> p.isChild()
+true
+\end{kshell}
+
+\subsection{抽象メソッド}
+
+抽象メソッドは、メソッドのインターフェースのみ定義され、実装パートが定義されていないメソッドである。Konohaでは、メソッドにつづくブロックが存在しなければ、抽象メソッドと解釈される。また、メソッドのコンパイルに失敗したとき、自動的に抽象メソッドとして扱われる。
+
+\begin{kshell}
+class Person {
+   String name;
+   int age;
+    ...
+   boolean hasFriend();           // 抽象メソッド
+}
+\end{kshell}
+
+抽象メソッドの本来の用途は、抽象クラスやインターフェースなど、クラス設計においてポリモーフィズムを実現する手段としての利用である。厳密なスタティック言語では、全ての抽象クラスが実装されていない限り、クラスのインスタンス化はできない。しかし、Konoha は、抽象メソッドが含まれているクラスであっても、インスタンス化を認めている。これは、ラピッドプロトタイピングにおいて、単純に抽象メソッドを未実装なメソッドとして扱うためである。
+
+抽象メソッドを実行すると、実行時例外となる。
+
+\begin{kshell}
+>>> p = new Person("naruto", 17);
+>>> p.hasFriend()
+AbstractMethod!!: Person.hasFriend()
+\end{kshell}
+
+我々は、実行前にスタティックな抽象メソッドを検査する機構を検討している。現在のところ、実行時に\verb|isAbstract()|によって検査する方法しかない。
+
+\begin{kshell}
+>>> String.isAbstract()
+false
+>>> Person.isAbstarct()
+true
+\end{kshell}
+
+\subsection{パラメータの初期値}
+
+メソッドの多重定義(overloding)は、異なる型のパラメータを同じ名前で定義することである。オブジェクトプログラミング言語の標準的な機能として、C++やJava言語で広く採用されているが、Konoha はメソッド再定義をサポートしていない。その代替機能として、パラメータの初期値を設定できる。
+
+\begin{kshell}
+class {
+   ...
+   void Person.say(String msg="hello") {
+      OUT << _name << " says " + msg << EOL;
+   }
+}
+\end{kshell}
+
+初期値が設定されたパラメータは、Nullable 型となる。したがって、パラメータを省略すると、自動的に null が与えられたものと解釈され、設定された初期値が渡される。
+
+\begin{kshell}
+>>> Person.says;
+void main.Person.says(String? msg);
+>>> p.say("aloha");
+naruto says aloha
+>>> p.say();　　                    // 省略, p.say(null) と同義
+naruto says aloha
+\end{kshell}
+
+Konoha は、メソッドの多重定義をサポートしていない理由は、パラメータ初期値を活用することで、多くの場合のメソッド多重定義のバリエーションをカバーできるからである。あわせて、マップキャスト機能や{\sf Any}型パラメータを活用することで、いくつもメソッドを多重定義することなしに、同等なプログラミングが可能となる。
+
+\subsection{メソッドのバージョニング}
+
+Konoha は、複数のメソッド実装をバージョン管理する機構を備えている。まず、メソッドのバージョニングは、オリジナルなメソッドに対し、パラメータの型と戻り値の型はそのまま同じで、メソッド名にバージョンタグ(:tag)を付けることで作成できる。
+
+次は、\verb|:JA|タグを付加して定義したsays()メソッドの日本語版である。
+
+\begin{kshell}
+void Person.says:JA(String msg = "こんにちは") {
+   OUT << _naame << "は、"　<< msg << "と言った．" << EOL;
+}
+\end{kshell}
+
+注意：（まだ厳密に決まった仕様ではないが、）英大文字で始まるタグは、言語ロケール用に予約されている。小文字で始まるタグは、ユーザが自由に利用して構わない。
+
+バージョニングされたメソッドは、呼び出すときに明示的にバージョンタグを付けることで呼び出すことができる。
+
+\begin{kshell}
+>>> p.says();
+naruto says hello
+>>> p.says:JA();　　                    // 日本語版の利用
+naruto はこんにちはと言った.
+\end{kshell}
+
+\subsubsection{将来の拡張計画}
+
+将来のKonohaでは、型による自動的なバージョン切り換えも導入を予定している。この機構には、セマンティックプログラミングの意味タグ型を流用する予定であるが、セマンティックプログラミングとの一貫性に関して検討を必要としている。
+
+次は、{\sf Person}クラスに対し、意味タグを追加して、意味タグ型 {\sf Person:JA}型の例である。意味タグ型は、同じタグが付けられたメソッドを優先して呼び出す出されることになる。
+
+\begin{kshell}
+>>> Person:JA p = new Person("なると", 17);
+>>> p.says();                           // says:JA()を利用する
+naruto はこんにちはと言った.
+\end{kshell}
+
+\section{クラス関数}
+\index{くらすかんすう@クラス関数}
+\label{class_function}
+
+クラス関数は、クラス名を直接レシーバにして利用できる特別なメソッドである。通常、メソッドは、クラスのオブジェクトを操作するための手段である。したがって、メソッドを利用するとき、クラスがインスタンス化されている必要がある。しかし、特定のインスタンスから独立しており、インスタンスを特定できない、もしくはする必要がない場合がある。
+
+
+乱数生成メソッド \verb|random()|は、特定の数値（インスタンス）の操作というより、それに独立したユーティリティ機能となる。ただし、{\sf Int} や {\sf Float} クラス程度に操作を区別する必要もある。Konoha では、これらは、クラス関数としてそれぞれ定義されて提供されている。
+
+\begin{kshell}
+>>> Int.random()
+143980198322
+>>> Float.random()
+0.39810
+\end{kshell}
+
+クラス関数は、メソッド定義のとき、\verb|@Static| アノテーションを付けることで定義することができる。
+
+\begin{kshell}
+@Static
+int Int.max(int a, int b) {
+   return (a > b) ? : a : b;
+}
+\end{kshell}
+
+\verb|@Static|アノテーションは、Java のスタティックメソッド\index{すたてぃっくめそっど@スタティックメソッド}に由来している。事実、見かけ上、クラス関数はスタティックメソッドと同様に利用することができる。しかし、実際はクラスのデフォルト値をレシーバとしてメソッドを呼んでいる。{\sf this} キーワードを用いれば、自オブジェクトとして参照もできる。
+
+\begin{kshell}
+>>> Int.max(1, 2)
+2
+>>> (default(Int)).max(1, 2)     // 同じ
+2
+\end{kshell}
+
+また、シングルトンクラスは、\verb|@Static|アノテーションがなくても、自動的にクラス関数として解釈される。そのため、クラス関数としてコールしてもよいし、メソッドとしてコールしても構わない。
+
+\begin{kshell}
+>>> System.exit()                // System はシングルトン
+>>> os = default(System)
+>>> os.exit()                    // 同じ
+\end{kshell}
+
+Konoha は、シンプルな言語構造を実現するため、Java風のスタティックフィールドをサポートしていない。クラスで共有したい変数は、単にスクリプト変数を用いることができる。
+
+\section{コンストラクタ}
+
+
+\section{オペレータとメソッド}
+
+Konohaでは、全てのオペレータはメソッドのシンタックスシュガーである。例えば、加算演算 \verb|x + y| は、次のように単純にメソッド\verb|opAdd()|に置き換えられて実行されている。
+
+\begin{kshell}
+x.opAdd(y)                            // x + y
+\end{kshell}
+
+そこで、演算子と対応つけられた\verb|op| で始まるメソッドを定義すれば、オペレータの振る舞いを変更することも可能である。ただし、演算子の再定義は、Konohaではあまり積極的に推奨されない。
+
+\begin{tabular}{llll}
+\verb|x + y| & \verb|x.opAdd(y)| & \verb|x - y| & \verb|x.opSub(y)| \\
+\verb|x * y| & \verb|x.opMul(y)| & \verb|x / y| & \verb|x.opDiv(y)| \\
+\verb|x mod y| & \verb|x.opMod(y)| & & \\
+\verb/x++/ & \verb|x = x.opNext()| & \verb/x--/ & \verb|x = x.opPerv()| \\
+
+\verb|x == y| & \verb|x.opEq(y)| & \verb|x != y| & \verb|x.opNeq(y)| \\
+\verb|x < y| & \verb|x.opLt(y)| & \verb|x <= y| & \verb|x.opLte(y)| \\
+\verb|x > y| & \verb|x.opEq(y)| & \verb|x >= y| & \verb|x.opNeq(y)| \\
+
+\verb|x & y| & \verb|x.opLand(y)| & \verb/x | y/ & \verb|x.opLor(y)| \\
+\verb|x ^ y| & \verb|x.opXor(y)| & \verb|~x| & \verb|x.opLnot(y)| \\
+
+\verb|x << y| & \verb|x.opLshift(y)| & \verb|x >> y| & \verb|x.opRshift(y)| \\
+\verb/|x|/ & \verb|x.getSize()| & \verb/y in? x/ & \verb|x.opHas(y)| \\
+
+\verb|x[n]| & \verb|x.get(n)| & \verb|x[n] = y| & \verb|x.set(n)| \\
+\verb|x[] = y| & \verb|x.setAll(n)| & \verb|x[s..e]| & \verb|x.opSubsete(s,e)| \\
+\verb|x[s..<e]| & \verb|x.opSubset(s,e)| & \verb|x[s..+n]| & \verb|x.opOffset(s,n)| \\
+\end{tabular}
+
+\begin{comment}
+\section{フォーマッタの定義}
+
+\subsection{フォーマッタメソッド}
+
+You can define or add new formatters as methods, since formatters are a specialized method with the following signature.
+
+\begin{kshell}
+void Object.%fmt(OutputStream w, String fmt) ;
+\end{kshell}
+
+Formatting is designed to output data to OutputStream. 
+
+\begin{kshell}
+void Person.%xml(OutputStream w, String fmt) {
+   w << "<person name='%s{0}'/>" %% _name << EOL;
+}
+\end{kshell}
+
+\begin{kshell}
+>>> p = new Person("naruto", 17);
+>>> %xml(p)
+<person name='naruto'/>
+\end{kshell}
+
+\section{マッパーの定義}
+\end{comment}
+
+\chapter{クラス継承と抽象化}
+
+クラス継承(class inheritance)は、オブジェクト指向プログラミング黎明期の一大関心事であった。しかし、オブジェクト指向プログラミングが広く普及し、多種多様なオブジェクトのデザインパターンが実践されるにつれ、それほど関心を集める話でなくなった。
+
+Konoha は、そんな時代に設計されたので、「クラス継承」に関して、必要最小限の機能をサポートするのみにとどめている。（しかも、現在のところ、ほとんどクラス継承を使う機会はない。）
+
+\section{クラス継承} \label{class_inheritance}
+
+Konoha のオブジェクト指向プログラミングは、Javaから強い影響を受けている。クラス継承を用いるクラス定義は、Java同様、 {\sf class}文において{\sf extends} 節によって上位クラス$D$を指定することができる。クラス継承によって定義されたクラス$D$は、上位クラス$C$に対し、「サブクラス(subclass)」と呼ぶ。
+
+\begin{quote}
+\verb|class | $D$ \verb| extends | $C$ \verb| {| \\
+\verb|  | $members$ // クラスのメンバー \\
+\verb|}| \\Konoha は、Javaのオブジェクト指向プログラミングの特徴を強く受け継いで設計されている。
+\end{quote}
+
+クラス継承とは、上位クラスの振る舞い、つまりメソッドを引き継ぐことである。サブクラスでは、上位クラスのメソッドを継承するのみならず、新たなメソッドを追加することもできる。次のクラス{\sf D}は、クラス{\sf C}のサブクラスである。メソッド\verb|C.sayHi()|を継承し、新たに\verb|D.sayBye()|を追加している。
+
+\begin{kshell}
+>>> class C {
+...    void sayHi() { print "hi"; }
+... }
+
+>>> class D extends C {
+...    void sayBye() { print "bye"; }
+... }
+
+>>> D d = new D();
+>>> d.sayHi()           // c.sayHi()が呼ばれる
+hi
+>>> d.sayBye()          // 追加されたメソッド 
+bye
+\end{kshell}
+
+\subsection{{\sf final} クラス}
+
+Konoha では、クラス定義において、Java 言語同様、{\sf final}修飾子、もしくは{\sf @Final}アノテーションを付けることで、クラス継承不可能なクラスとして宣言できる。
+
+\begin{ksource}
+final class C {
+   void sayHi() { print "hi"; }
+}
+
+class D extends C {    // C は継承できない
+   void sayBye() { print "bye"; }
+}
+
+\end{ksource}
+
+\section{オーバーライド}
+
+オーバーライドは、継承されたメソッドをサブクラスにおいて上書き、つまり新たに作り直す機構である。オブジェクトに対しポリモーフィズム(polymorphism)を与える重要な機構であるが、同時に、ダイナミックバインディングによる性能低下が議論となる機構でもある。
+
+Konoha は、C++ や C\#の流儀にしたがって、{\sf @Virtual}アノテーションが付けられたメソッドのみオーバライドすることができる。これは、実際のプログラミングにおいて、メソッドがオーバーライドされることは稀であり、Java のようにデフォルトでオーバーライドを認めることによる性能ロスを無視できないと判断したためである。プログラマがダイナミックバインディングを避けるため{\sf final}を追加するようなテクニックを駆使することなく、ふつうに書いて最適な速度が得られる方を好んだといえる。
+
+\begin{ksource}
+class C {
+   @Virtual void sayHi() { print "hi"; }
+}
+
+class D extends C {    
+   // オーバライド
+   @Override void sayHi() { print "Hey"; }
+   void sayBye() { print "bye"; }
+}
+\end{ksource}
+
+注意： {\sf @Virtaul} メソッドは、ダイナミックバインディングされるため、どうしてもスタティックバインディングに比べると遅くなる。Konoha では、インラインキャッシュによる高速化の工夫をしているが、オーバーライドする必要のないメソッドは@Virtual 宣言しないようにすべきである。また、抽象メソッドもオーバーライドされたメソッドも、同様に、ダイナミックバインドされる。
+
+\subsection{ポリモーフィズム}
+
+\section{{\sf super}}
+
+{ｴsf super} は、上位クラスのフィールドやメソッドへアクセスするためのリファレンスを表す表現である。
+
+\section{インターフェース*}
+
+Konoha は、Javaと同様に、単一継承(single inheritance)である。複数のクラスの振る舞いを継承するクラスを定義したいときは、インターフェースを実装する方法を用いる。次は、クラス$D$とクラス$E$のインターフェースを実装することを宣言したクラスである。
+
+\begin{quote}
+\verb|class | $C$ \verb| implements | $D$, $E$ \verb| {| \\
+\verb|  | $members$ // クラスのメンバー \\
+\verb|}| \\
+\end{quote}
+
+Konoha は、Java と異なり、インターフェースを定義する専用の{\sf interface} 文は存在しない。その代わり、任意のクラスをインターフェースとして実装することができる。
+
+\begin{kshell}
+>>> class C {
+...    void sayHi() { print "hi"; }
+...    void sayBye() { print "bye"; }
+... }
+
+>>> class D implements C {
+...    void sayHi() { print "Hai"; }
+... }
+>>> D d = new D();
+>>> d.sayHi()                      // 自分で作る
+Hai
+>>> d.sayBye()                     // 継承されない
+ ** AbstractMethod!!
+\end{kshell}
+
+注意: インターフェースは、あくまでもメソッドの設計（シグネチャ）のみ継承し、実装は継承しない。Konoha では、抽象メソッドとして継承される。そのため、新たに追加しない限り、{\sf implements} されたインターフェースのメソッドは、\verb|Abstract!!|例外になる。
+
+\subsection{インターフェースへのメソッド追加**}
+
+
+
+\section{{\sf Object} クラス}
+
+{\sf Object} クラスは、全てのクラスの共通した上位クラスである。全てのオブジェクトは、{\sf Object}クラスのメソッド（オペレータ、フォーマッタも含む）を継承している。
+
