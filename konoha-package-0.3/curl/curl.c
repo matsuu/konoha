@@ -35,7 +35,6 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-/* [method] */
 
 static
 void knh_curl_gfree(Ctx *ctx, knh_Glue_t *g)
@@ -57,9 +56,10 @@ METHOD Curl_new(Ctx *ctx, knh_sfp_t *sfp)
 /* @method void Curl.setopt(Int! type, Any data) */
 // cutting from http://www.phpmanual.jp/function.curl-setopt.html
 
-METHOD Curl_setOpt(Ctx *ctx, knh_sfp_t *sfp)
+METHOD Curl_easySetOpt(Ctx *ctx, knh_sfp_t *sfp)
 {
 	CURL* curl = (CURL*)p_cptr(sfp[0]);
+	FILE* fp;
 	if(curl != NULL) {
 		knh_int_t curlopt = p_int(sfp[1]);
 		switch(curlopt) {
@@ -190,6 +190,18 @@ METHOD Curl_setOpt(Ctx *ctx, knh_sfp_t *sfp)
 				KNH_WARNING(ctx, "curl_easy_setopt: data must be String");
 			}
 			break;
+		case CURLOPT_FILE:
+			fp = (FILE*) (sfp[2].w->b->fd);
+            if(fp != NULL) {
+                curl_easy_setopt(curl, curlopt, fp);
+            }
+            else {
+                if(knh_Context_isStrict(ctx)) {
+                    KNH_THROWs(ctx, "Type!!: data must be InputStream");
+                }
+                KNH_WARNING(ctx, "curl_easy_setopt: data must be InputStream");
+            }
+			break;
 		default :
 			KNH_WARNING(ctx, "curl_easy_setopt: unknown option =%d", curlopt);
 			break;
@@ -199,17 +211,16 @@ METHOD Curl_setOpt(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Boolean! Curl.perform() */
+/* @method Boolean! Curl.easyPerform() */
 
-METHOD Curl_perform(Ctx *ctx, knh_sfp_t *sfp)
+METHOD Curl_easyPerform(Ctx *ctx, knh_sfp_t *sfp)
 {
 	CURL* curl = (CURL*)p_cptr(sfp[0]);
+	CURLcode res;
 	if(curl != NULL) {
-		char errbuf[CURL_ERROR_SIZE];
-		curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, &errbuf);
-		CURLcode res = curl_easy_perform(curl);
-		if (res != CURLE_OK) {
-			KNH_WARNING(ctx, "[curl] %s", errbuf);
+		res = curl_easy_perform(curl);
+		if ( res != CURLE_OK ){
+			KNH_WARNING(ctx, "[curl] perform");
 			KNH_RETURN_Boolean(ctx, sfp, 0);
 		}
 	}
@@ -223,19 +234,9 @@ METHOD Curl_perform(Ctx *ctx, knh_sfp_t *sfp)
 static
 knh_IntConstData_t IntConstData[] = {
 	{"Curl.CURLOPT_URL", CURLOPT_URL},
+	{"Curl.CURLOPT_FILE", CURLOPT_FILE},
 	{NULL}  // end of const data
 };
-
-static
-knh_FloatConstData_t FloatConstData[] = {
-	{NULL}  // end of const data
-};
-
-static
-knh_StringConstData_t StringConstData[] = {
-	{NULL}  // end of const data
-};
-
 
 /* ------------------------------------------------------------------------ */
 
@@ -243,8 +244,6 @@ KNH_EXPORTS(int) init(Ctx *ctx)
 {
 	KNH_NOTICE(ctx, "loading curl..");
 	konoha_loadIntConstData(ctx, IntConstData);
-	konoha_loadFloatConstData(ctx, FloatConstData);
-	konoha_loadStringConstData(ctx, StringConstData);
 
 	return 1;
 }
