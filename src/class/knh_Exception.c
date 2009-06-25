@@ -305,6 +305,26 @@ KNHAPI(void) knh_perrno(Ctx *ctx, char *emsg, char *func, char *file, int line)
 
 /* ------------------------------------------------------------------------ */
 
+#define _KNH_NOAPI(ctx) { \
+		knh_throw_Unsupported(ctx, __FUNCNAME__, __FILE__, __LINE__); \
+	}\
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(void) knh_throw_Unsupported(Ctx *ctx, char *func, char *file, int line)
+{
+	if(((ctx)->flag & KNH_FLAG_CTXF_STRICT) != KNH_FLAG_CTXF_STRICT) {
+		char buf[256];
+		knh_snprintf(buf, sizeof(buf), "Unsupported!!: func=%s", func);
+		knh_throwException(ctx, new_Exception__b(ctx, B(buf)), KNH_SAFEFILE(file), line);
+	}
+	else {
+		KNH_NOTICE(ctx, "unsupported: %s", func);
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
 KNHAPI(void) knh_throw_OutOfIndex(Ctx *ctx, knh_int_t n, size_t max, char *file, int line)
 {
 	char buf[80];

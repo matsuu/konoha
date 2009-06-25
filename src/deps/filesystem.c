@@ -67,7 +67,7 @@ extern "C" {
 /* ======================================================================== */
 /* [file] */
 
-int knh_isfile(Ctx *ctx, knh_bytes_t path)
+knh_boolean_t knh_isfile(Ctx *ctx, knh_bytes_t path)
 {
 	char dirname[FILENAME_BUFSIZ];
 	knh_format_ospath(ctx, dirname, sizeof(dirname), path);
@@ -89,26 +89,84 @@ int knh_isfile(Ctx *ctx, knh_bytes_t path)
 
 /* ------------------------------------------------------------------------ */
 
-int knh_isdir(Ctx *ctx, knh_bytes_t path)
+knh_boolean_t knh_isdir(Ctx *ctx, knh_bytes_t path)
 {
+#ifdef KNH_USING_WINDOWS
 	char dirname[FILENAME_BUFSIZ];
 	knh_format_ospath(ctx, dirname, sizeof(dirname), path);
-#ifdef KNH_USING_WINDOWS
 	DWORD attr = GetFileAttributesA(dirname);
 	if(attr == -1) return 0;
 	return ((attr & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
 #endif
-#ifdef KNH_USING_NOAPI
-	return 0;
-#endif/*KNH_USING_WINDOWS*/
 #ifdef KNH_USING_POSIX
+	char dirname[FILENAME_BUFSIZ];
+	knh_format_ospath(ctx, dirname, sizeof(dirname), path);
     struct stat buf;
 	if(stat(dirname, &buf) == -1) return 0;
 	return S_ISDIR(buf.st_mode);
 #endif/*KNH_USING_POSIX*/
 #ifdef KNH_USING_NOAPI
+	KNH_NOAPI(ctx);
 	return 0;
 #endif
+}
+
+/* ------------------------------------------------------------------------ */
+
+knh_boolean_t knh_unlink(Ctx *ctx, knh_bytes_t f, int isThrowable)
+{
+#if defined(KNH_USING_POSIX)
+	char fbuf[FILENAME_BUFSIZ];
+	knh_format_ospath(ctx, fbuf, sizeof(fbuf), f);
+	if(unlink(fbuf) == -1) {
+		KNH_PERRNO(ctx, "OS!!", "unlink");
+		return 0;
+	}
+	return 1;
+#endif/*KNH_USING_POSIX*/
+#if defined(KNH_USING_WINDOWS)
+	char fbuf[FILENAME_BUFSIZ];
+	knh_format_ospath(ctx, fbuf, sizeof(fbuf), f);
+	if(DeleteFileA(fbuf) == 0) {
+		KNH_PERRNO(ctx, "OS!!", "DeleteFile");
+		return 0;
+	}
+	return 1;
+#endif/*KNH_USING_WINDOWS*/
+#ifdef KNH_USING_NOAPI
+	KNH_NOAPI(ctx);
+	return 0;
+#endif/*KNH_USING_WINDOWS*/
+}
+
+/* ------------------------------------------------------------------------ */
+
+knh_boolean_t knh_rename(Ctx *ctx, knh_bytes_t on, knh_bytes_t nn, int isThrowable)
+{
+#if defined(KNH_USING_POSIX)
+	char oldbuf[FILENAME_BUFSIZ], newbuf[FILENAME_BUFSIZ];
+	knh_format_ospath(ctx, oldbuf, sizeof(oldbuf), on);
+	knh_format_ospath(ctx, newbuf, sizeof(newbuf), nn);
+	if(rename(oldbuf, newbuf) == -1) {
+		KNH_PERRNO(ctx, "OS!!", "rename");
+		return 0;
+	}
+	return 1;
+#endif/*KNH_USING_POSIX*/
+#if defined(KNH_USING_WINDOWS)
+	char oldbuf[FILENAME_BUFSIZ], newbuf[FILENAME_BUFSIZ];
+	knh_format_ospath(ctx, oldbuf, sizeof(oldbuf), on);
+	knh_format_ospath(ctx, newbuf, sizeof(newbuf), nn);
+	if(MoveFileA(oldbuf, newbuf) == 0) {
+		KNH_PERRNO(ctx, "OS!!", "MoveFile");
+		return 0;
+	}
+	return 1;
+#endif/*KNH_USING_WINDOWS*/
+#ifdef KNH_USING_NOAPI
+	KNH_NOAPI(ctx);
+	return 0;
+#endif/*KNH_USING_WINDOWS*/
 }
 
 /* ======================================================================== */

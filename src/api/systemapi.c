@@ -152,6 +152,25 @@ static METHOD knh__System_hasFile(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_Boolean(ctx,sfp, knh_isfile(ctx, knh_String_tobytes(sfp[1].s)));
 }
 
+/* ------------------------------------------------------------------------ */
+/* @method Boolean! System.unlink(String! filename) */
+
+static METHOD knh__System_unlink(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN_Boolean(ctx, sfp,
+		knh_unlink(ctx, knh_String_tobytes(sfp[1].s), knh_Context_isStrict(ctx))
+	);
+}
+
+/* ------------------------------------------------------------------------ */
+// @method Boolean! System.rename(String oldname, String newname);
+
+static METHOD knh__System_rename(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN_Boolean(ctx, sfp,
+		knh_rename(ctx, knh_String_tobytes(sfp[1].s), knh_String_tobytes(sfp[2].s), knh_Context_isStrict(ctx))
+	);
+}
 
 /* ======================================================================== */
 /* [Context] */
