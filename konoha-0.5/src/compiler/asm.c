@@ -1525,7 +1525,7 @@ void knh_StmtCALL_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpid
 			TERMs_asm(ctx, stmt, i, abr, TYPE_Any, local + i);
 		}
 		KNH_ASM_AINVOKE_(ctx, abr, sfi_(local), (knh_ushort_t)DP(stmt)->size, UP(mtd));
-		return;
+		goto L_RTYPE;
 	}
 	/* INSTRUCTION */
 	if(cid == CLASS_Array || cid == CLASS_IArray || cid == CLASS_FArray) {
@@ -1854,6 +1854,9 @@ knh_StmtEXPR_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 	}
 	if(IS_ANY(reqt)) {
 		KNH_ASM_NNBOX(ctx, abr, DP(stmt)->type, sfpidx);
+	}
+	else if(IS_NNTYPE(reqt) && !IS_NNTYPE(DP(stmt)->type)) {
+		KNH_ASM_ISNULL_(ctx, abr, sfpidx);
 	}
 }
 
