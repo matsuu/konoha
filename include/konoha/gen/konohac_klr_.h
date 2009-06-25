@@ -28,11 +28,7 @@
 #ifndef KONOHAC_KLR__H
 #define KONOHAC_KLR__H
 
-#ifdef KONOHA_OS__LKM
-#include"konoha_class_.h"
-#else
 #include<konoha/konoha_dev.h>
-#endif
 
 
 #ifdef __cplusplus 

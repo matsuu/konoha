@@ -1098,8 +1098,6 @@ typedef struct knh_KLRCode {
 
 #endif
 
-
-
 #ifdef __cplusplus
 }
 #endif

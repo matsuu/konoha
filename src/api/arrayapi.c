@@ -902,29 +902,13 @@ void knh_FArray__k(Ctx *ctx, FArray *o, OutputStream *w, String *m)
 /* ======================================================================== */
 /* [mapping] */
 
-static
-ITRNEXT knh_Array_var_next(Ctx *ctx, knh_sfp_t *sfp, int n)
-{
-	Array *o = (Array*)DP(sfp[0].it)->source;
-	KNH_ASSERT(IS_bArray(o));
-	size_t pos = DP(sfp[0].it)->pos;
-	while(pos < o->size) {
-		if(IS_NOTNULL(o->list[pos])) {
-			DP(sfp[0].it)->pos = pos+1;
-			KNH_ITRNEXT(ctx, sfp, n, o->list[pos]);
-		}
-		pos++;
-	}
-	KNH_ITREND(ctx, sfp, n);
-}
-
 /* ------------------------------------------------------------------------ */
 /* @map Array Iterator! */
 
 MAPPER knh_Array_Iterator(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_MAPPED(ctx, sfp,
-		new_Iterator(ctx, ctx->share->ClassTable[(sfp[0].o)->h.cid].p1, sfp[0].o, knh_Array_var_next));
+		new_ArrayIterator(ctx, ctx->share->ClassTable[(sfp[0].o)->h.cid].p1, sfp[0].o));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -932,8 +916,8 @@ MAPPER knh_Array_Iterator(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Array_opItr(Ctx *ctx, knh_sfp_t *sfp)
 {
-	Array *o = (Array*)sfp[0].o;
-	KNH_RETURN(ctx, sfp, new_Iterator(ctx, ctx->share->ClassTable[o->h.cid].p1, UP(o), knh_Array_var_next));
+	KNH_MAPPED(ctx, sfp,
+		new_ArrayIterator(ctx, ctx->share->ClassTable[(sfp[0].o)->h.cid].p1, sfp[0].o));
 }
 
 /* ------------------------------------------------------------------------ */
