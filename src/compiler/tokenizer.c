@@ -134,7 +134,7 @@ Token *new_Token__NAME(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t
 				goto TOKEN_PART;
 			}
 			if(!isalnum(t.buf[i]) && t.buf[i] != ':') {
-				knh_InputStream_perror(ctx, in, KERR_EWARN, _("used strange character: %B"), t);
+				knh_InputStream_perror(ctx, in, KERR_DWARN, _("included illegal character: '%B'"), t);
 				goto TOKEN_PART;
 			}
 			if(islower(t.buf[i])) has_lower = 1;
@@ -158,7 +158,7 @@ Token *new_Token__NAME(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t
 				goto NAME_PART;
 			}
 			else {
-				knh_InputStream_perror(ctx, in, KERR_EWARN, _("used strange character: %B"), t);
+				knh_InputStream_perror(ctx, in, KERR_DWARN, _("included strange character: '%B'"), t);
 				goto TOKEN_PART;
 			}
 		}
@@ -193,7 +193,7 @@ Token *new_Token__NAME(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t
 					continue;
 				}
 				else {
-					knh_InputStream_perror(ctx, in, KERR_EWARN, _("used strange character: %B"), t);
+					knh_InputStream_perror(ctx, in, KERR_DWARN, _("included strange character: '%B'"), t);
 					goto TOKEN_PART;
 				}
 			}
