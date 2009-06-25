@@ -44,94 +44,115 @@ extern "C" {
 /* ======================================================================== */
 /* [FILE] */
 
-KNHAPI(FILE*) knh_fopen(Ctx *ctx, char *filename, char *mode)
+KNHAPI(FILE*) knh_fopen(Ctx *ctx, char *filename, char *mode, int isThrowable)
 {
-#ifdef KNH_USING_WINDOWS
-#undef KNH_USING_NOAPI
-	return fopen(filename, mode);
-#endif
-#ifdef KNH_USING_POSIX
-#undef KNH_USING_NOAPI
-	return fopen(filename, mode);
+#ifdef KNH_USING_NOFILE
+	return NULL;
+#else
+
+#if defined(KNH_USING_WINDOWS) || defined(KNH_USING_POSIX)
+	FILE *fp = fopen(filename, mode);
+	if(fp == NULL) {
+		KNH_PERRNO(ctx, "IO!!", "fopen", isThrowable);
+	}
+	return fp;
 #endif
 #ifdef KNH_USING_NOAPI
+	KNH_NOAPI(ctx, isThrowable);
 	return NULL;
 #endif
+
+#endif/*KNH_USING_NOFILE*/
 }
 
 /* ------------------------------------------------------------------------ */
 
 KNHAPI(size_t) knh_fgetc(Ctx *ctx, FILE *fp)
 {
-#ifdef KNH_USING_WINDOWS
-	return fgetc(fp);
-#endif
-#ifdef KNH_USING_POSIX
+#ifdef KNH_USING_NOFILE
+	return NULL;
+#else
+
+#if defined(KNH_USING_WINDOWS) || defined(KNH_USING_POSIX)
 	return fgetc(fp);
 #endif
 #ifdef KNH_USING_NOAPI
 	return 0;
 #endif
+
+#endif/*KNH_USING_NOFILE*/
 }
 
 /* ------------------------------------------------------------------------ */
 
 KNHAPI(size_t) knh_fread(Ctx *ctx, void *ptr, size_t size, FILE *fp)
 {
-#ifdef KNH_USING_WINDOWS
-	return fread(ptr, 1, size, fp);
-#endif
-#ifdef KNH_USING_POSIX
+#ifdef KNH_USING_NOFILE
+	return 0;
+#else
+
+#if defined(KNH_USING_WINDOWS) || defined(KNH_USING_POSIX)
 	return fread(ptr, 1, size, fp);
 #endif
 #ifdef KNH_USING_NOAPI
 	return 0;
 #endif
+
+#endif/*KNH_USING_NOFILE*/
 }
 
 /* ------------------------------------------------------------------------ */
 
 KNHAPI(size_t) knh_fwrite(Ctx *ctx, void *ptr, size_t size, FILE *fp)
 {
-#ifdef KNH_USING_WINDOWS
-	return fwrite(ptr, 1, size, fp);
-#endif
-#ifdef KNH_USING_POSIX
+#ifdef KNH_USING_NOFILE
+	return 0;
+#else
+
+#if defined(KNH_USING_WINDOWS) || defined(KNH_USING_POSIX)
 	return fwrite(ptr, 1, size, fp);
 #endif
 #ifdef KNH_USING_NOAPI
 	return 0;
 #endif
+
+#endif/*KNH_USING_NOFILE*/
 }
 
 /* ------------------------------------------------------------------------ */
 
 KNHAPI(int) knh_fflush(Ctx *ctx, FILE *fp)
 {
-#ifdef KNH_USING_WINDOWS
-	return fflush(fp);
-#endif
-#ifdef KNH_USING_POSIX
+#ifdef KNH_USING_NOFILE
+	return 0;
+#else
+
+#if defined(KNH_USING_WINDOWS) || defined(KNH_USING_POSIX)
 	return fflush(fp);
 #endif
 #ifdef KNH_USING_NOAPI
 	return 0;
 #endif
+
+#endif/*KNH_USING_NOFILE*/
 }
 
 /* ------------------------------------------------------------------------ */
 
 KNHAPI(int) knh_fclose(Ctx *ctx, FILE *fp)
 {
-#ifdef KNH_USING_WINDOWS
-	return fclose(fp);
-#endif
-#ifdef KNH_USING_POSIX
+#ifdef KNH_USING_NOFILE
+	return 0;
+#else
+
+#if defined(KNH_USING_WINDOWS) || defined(KNH_USING_POSIX)
 	return fclose(fp);
 #endif
 #ifdef KNH_USING_NOAPI
 	return 0;
 #endif
+
+#endif/*KNH_USING_NOFILE*/
 }
 
 /* ======================================================================== */
@@ -174,15 +195,14 @@ static void knh_iodrv_close__NOP(Ctx *ctx, knh_io_t fd)
 /* ======================================================================== */
 /* [FILE] */
 
-static knh_io_t knh_iodrv_open__FILE(Ctx *ctx, knh_bytes_t file, char *mode)
+static knh_io_t knh_iodrv_open__FILE(Ctx *ctx, knh_bytes_t file, char *mode, int isThrowable)
 {
 	char buf[FILENAME_BUFSIZ];
 	knh_format_ospath(ctx, buf, sizeof(buf), file);
 	DBG2_P("opening '%s'", buf);
 	{
-		FILE *fp = knh_fopen(ctx, buf, mode);
+		FILE *fp = knh_fopen(ctx, buf, mode, isThrowable);
 		if(fp == NULL) {
-			KNH_PERRNO(ctx, "IO!!", "fopen");
 			return (knh_io_t)-1;
 		}
 		return (knh_io_t)fp;
@@ -302,10 +322,10 @@ InputStream *new_InputStream__stdio(Ctx *ctx, FILE *fp, String *enc)
 OutputStream *new_OutputStream__stdio(Ctx *ctx, FILE *fp, String *enc)
 {
 	KNH_ASSERT(fp == stdout || fp == stderr);
-	OutputStream* o = NULL;
 #ifdef KNH_USING_NOFILE
-	o = new_OutputStream__FILE(ctx, TS_DEVSTDOUT, NULL, &IO__stdio);
+	OutputStream* o = new_OutputStream__FILE(ctx, TS_DEVSTDOUT, NULL, &IO__stdio);
 #else
+	OutputStream* o = NULL;
 	if(fp == stdout) {
 		o = new_OutputStream__FILE(ctx, TS_DEVSTDOUT, stdout, &IO__stdio);
 	}

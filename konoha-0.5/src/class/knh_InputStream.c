@@ -89,7 +89,7 @@ Object *knh_InputStream_open(Ctx *ctx, InputStream *o, String *urn, String *m)
 	KNH_SETv(ctx, DP(o)->urn, new_String(ctx, fname, NULL));
 	char *mode = "r";
 	if(IS_NOTNULL(m)) mode = knh_String_tochar(m);
-	DP(o)->fd = DP(o)->driver->fopen(ctx, fname, mode);
+	DP(o)->fd = DP(o)->driver->fopen(ctx, fname, mode, knh_Context_isStrict(ctx));
 	if(DP(o)->fd != -1) {
 		KNH_SETv(ctx, DP(o)->urn, urn);
 		DP(o)->bufsiz = DP(o)->driver->bufsiz;
@@ -216,10 +216,10 @@ int knh_InputStream_isClosed(InputStream *o)
 /* ======================================================================== */
 /* [File] */
 
-KNHAPI(InputStream*) new_FileInputStream(Ctx *ctx, knh_bytes_t file)
+KNHAPI(InputStream*) new_FileInputStream(Ctx *ctx, knh_bytes_t file, int isThrowable)
 {
 	knh_iodrv_t *drv = konoha_getIODriver(ctx, STEXT("file"));
-	knh_io_t fd = drv->fopen(ctx, file, "r");
+	knh_io_t fd = drv->fopen(ctx, file, "r", isThrowable);
 	return new_InputStream__io(ctx, new_String(ctx, file, NULL), fd, drv);
 }
 

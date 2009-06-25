@@ -119,7 +119,7 @@ knh_boolean_t knh_unlink(Ctx *ctx, knh_bytes_t f, int isThrowable)
 	char fbuf[FILENAME_BUFSIZ];
 	knh_format_ospath(ctx, fbuf, sizeof(fbuf), f);
 	if(unlink(fbuf) == -1) {
-		KNH_PERRNO(ctx, "OS!!", "unlink");
+		KNH_PERRNO(ctx, "OS!!", "unlink", isThrowable);
 		return 0;
 	}
 	return 1;
@@ -128,13 +128,13 @@ knh_boolean_t knh_unlink(Ctx *ctx, knh_bytes_t f, int isThrowable)
 	char fbuf[FILENAME_BUFSIZ];
 	knh_format_ospath(ctx, fbuf, sizeof(fbuf), f);
 	if(DeleteFileA(fbuf) == 0) {
-		KNH_PERRNO(ctx, "OS!!", "DeleteFile");
+		KNH_PERRNO(ctx, "OS!!", "DeleteFile", isThrowable);
 		return 0;
 	}
 	return 1;
 #endif/*KNH_USING_WINDOWS*/
 #ifdef KNH_USING_NOAPI
-	KNH_NOAPI(ctx);
+	KNH_NOAPI(ctx, isThrowable);
 	return 0;
 #endif/*KNH_USING_WINDOWS*/
 }
@@ -148,7 +148,7 @@ knh_boolean_t knh_rename(Ctx *ctx, knh_bytes_t on, knh_bytes_t nn, int isThrowab
 	knh_format_ospath(ctx, oldbuf, sizeof(oldbuf), on);
 	knh_format_ospath(ctx, newbuf, sizeof(newbuf), nn);
 	if(rename(oldbuf, newbuf) == -1) {
-		KNH_PERRNO(ctx, "OS!!", "rename");
+		KNH_PERRNO(ctx, "OS!!", "rename", isThrowable);
 		return 0;
 	}
 	return 1;
@@ -158,13 +158,13 @@ knh_boolean_t knh_rename(Ctx *ctx, knh_bytes_t on, knh_bytes_t nn, int isThrowab
 	knh_format_ospath(ctx, oldbuf, sizeof(oldbuf), on);
 	knh_format_ospath(ctx, newbuf, sizeof(newbuf), nn);
 	if(MoveFileA(oldbuf, newbuf) == 0) {
-		KNH_PERRNO(ctx, "OS!!", "MoveFile");
+		KNH_PERRNO(ctx, "OS!!", "MoveFile", isThrowable);
 		return 0;
 	}
 	return 1;
 #endif/*KNH_USING_WINDOWS*/
 #ifdef KNH_USING_NOAPI
-	KNH_NOAPI(ctx);
+	KNH_NOAPI(ctx, isThrowable);
 	return 0;
 #endif/*KNH_USING_WINDOWS*/
 }

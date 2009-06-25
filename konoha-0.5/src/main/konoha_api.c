@@ -232,7 +232,7 @@ KNHAPI(void) konoha_readFile(Ctx *ctx, char *fpath)
 		KNH_WARNING(ctx, "No such file: %s\n", fpath);
 		return ;
 	}
-	InputStream *in = new_FileInputStream(ctx, B(fpath));
+	InputStream *in = new_FileInputStream(ctx, B(fpath), 1);
 	if(knh_InputStream_isClosed(in)) {
 		KNH_WARNING(ctx, "No such script file: %s\n", fpath);
 	}
