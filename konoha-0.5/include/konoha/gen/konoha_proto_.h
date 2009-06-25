@@ -28,11 +28,7 @@
 #ifndef KONOHA_PROTO__H
 #define KONOHA_PROTO__H
 
-#ifdef KONOHA_OS__LKM
-#include"konoha_class_.h"
-#else
 #include<konoha/gen/konoha_class_.h>
-#endif
 
 
 #ifdef __cplusplus 
@@ -96,6 +92,7 @@ knh_Array_t* new_Array0(Ctx *ctx, size_t capacity);
 Object** knh_Array_list(Array *o);
 Object* knh_Array_last(Array *o);
 void knh_Array_subclear(Ctx *ctx, Array *o, size_t n);
+void knh_Array_addArray(Ctx *ctx, Array *o, Array *other);
 void knh_Array_remove(Ctx *ctx, Array *o, size_t n);
 Any* knh_Array_pop(Ctx *ctx, Array *o);
 /* ../src/class/knh_Bytes.c */
@@ -130,8 +127,6 @@ Object *konoha_getClassDefaultValue(Ctx *ctx, knh_class_t cid);
 Object *konoha_getDefaultValue(Ctx *ctx, knh_type_t type);
 void konoha_setClassParam(Ctx *ctx, knh_class_t cid, knh_class_t p1, knh_class_t p2);
 knh_class_t konoha_addGenericsClass(Ctx *ctx, knh_class_t cid, String *name, knh_class_t bcid, knh_class_t p1, knh_class_t p2);
-void KNH_ACLASS(Ctx *ctx, knh_class_t cid, knh_class_t p1);
-void KNH_ICLASS(Ctx *ctx, knh_class_t cid, knh_class_t p1);
 ClassStruct* new_ClassStruct0(Ctx *ctx, int field_size, int method_size);
 knh_index_t knh_Class_indexOfField(Ctx *ctx, knh_class_t cid, knh_fieldn_t fn);
 knh_index_t knh_Class_queryField(Ctx *ctx, knh_class_t cid, knh_fieldn_t fnq);
@@ -146,6 +141,7 @@ void knh_ClassMap_sort(Ctx *ctx, ClassMap *o);
 void knh_ClassMap_add(Ctx *ctx, ClassMap *o, Mapper *map);
 void knh_ClassMap__dump(Ctx *ctx, ClassMap *o, OutputStream *w, String *m);
 void knh_ClassMap__man(Ctx *ctx, ClassMap *o, OutputStream *w, knh_class_t cid);
+Array* konoha_getClassDomain(Ctx *ctx, knh_class_t cid);
 /* ../src/class/knh_ClassSpec.c */
 void knh_write_intx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_int_t v);
 void knh_write_floatx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_float_t v);
@@ -254,6 +250,7 @@ MAPPER knh_Bytes_InputStream(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/class/knh_Iterator.c */
 void knh_Iterator_close(Ctx *ctx, Iterator *it);
 Iterator* new_Iterator(Ctx *ctx, knh_class_t p1, Any *source, knh_fitrnext fnext);
+Iterator* new_ArrayIterator(Ctx *ctx, knh_class_t cid, Array *a);
 /* ../src/class/knh_Mapper.c */
 Mapper* new_MapMap(Ctx *ctx, Mapper *m1, Mapper *m2);
 void knh_Mapper__k(Ctx *ctx, Mapper *o, OutputStream *w, String *m);
@@ -520,7 +517,7 @@ const char *knh_dlerror(Ctx *ctx);
 int knh_dlclose(Ctx *ctx, void* hdr);
 /* ../src/deps/fileio.c */
 knh_iodrv_t *konoha_getIODriver(Ctx *ctx, knh_bytes_t name);
-knh_iodrv_t *konoha_getDefaultIODriver(void);
+knh_iodrv_t *konoha_getDefaultIODriver();
 void  init_IO(Ctx *ctx);
 InputStream *new_InputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
 OutputStream *new_OutputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
@@ -529,31 +526,33 @@ int knh_isfile(Ctx *ctx, knh_bytes_t path);
 int knh_isdir(Ctx *ctx, knh_bytes_t path);
 char * knh_format_homepath(char *buf, size_t bufsiz);
 /* ../src/deps/konoha_locale.c */
-char *konoha_encoding(void);
+char *konoha_encoding();
 char *knh_format_lang(char *buf, size_t bufsiz);
 /* ../src/deps/regex.c */
 void knh_write_USING_REGEX(Ctx *ctx, OutputStream *w);
 knh_regex_drvapi_t *knh_System_getRegexDriver(Ctx *ctx, knh_bytes_t name);
 void  init_Regex(Ctx *ctx);
 /* ../src/deps/socket.c */
-knh_iodrv_t *konoha_getSocketDriver(void);
+knh_iodrv_t *konoha_getSocketDriver();
 void  init_SocketDriver(Ctx *ctx);
 /* ../src/deps/sqlite3.c */
 void knh_dbcurfree__NOP(knh_dbcur_t *dbcur);
 void knh_write_USING_SQLITE3(Ctx *ctx, OutputStream *w);
-knh_db_drvapi_t *knh_System_getDefaultDBDriver(void);
+knh_db_drvapi_t *knh_System_getDefaultDBDriver();
 knh_db_drvapi_t *knh_System_getDBDriver(Ctx *ctx, knh_bytes_t name);
 void  init_DB(Ctx *ctx);
 /* ../src/deps/thread.c */
-knh_thread_t knh_thread_self(void);
+knh_thread_t knh_thread_self();
 int thread_create(knh_thread_t *thread, void *attr, void *(*frun)(void *), void * arg);
 int knh_thread_key_create(knh_thread_key_t *key);
 int knh_thread_setspecific(knh_thread_key_t key, const void *data);
 void* knh_thread_getspecific(knh_thread_key_t key);
 int knh_thread_key_delete(knh_thread_key_t key);
 /* ../src/deps/time.c */
-knh_uint_t knh_initseed(void);
+knh_uint_t knh_initseed();
 knh_uint64_t konoha_getTimeMilliSecond(void);
+knh_uint64_t konoha_getProfCount(void);
+knh_uint64_t konoha_getProfCountPerSecond(void);
 /* ../src/konoha.c */
 int main(int argc, char **argv);
 /* ../src/labs/b4.c */
@@ -585,8 +584,8 @@ METHOD knh__Script_readLine(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_addHistory(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/main/konoha_ext.c */
 void knh_srand(knh_uint_t seed);
-knh_uint_t knh_rand(void);
-knh_float_t knh_float_rand(void);
+knh_uint_t knh_rand();
+knh_float_t knh_float_rand();
 /* ../src/main/logging.c */
 void knh_stack_pmsg(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, String *s);
 void knh_stack_p(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, knh_methodn_t mn, int sfpidx);
@@ -608,7 +607,7 @@ void knh_Object_mark1(Ctx *ctx, Object *o);
 METHOD knh__System_gc(Ctx *ctx, knh_sfp_t *sfp);
 void knh_System_gc(Ctx *ctx);
 void knh_Object_RCsweep(Ctx *ctx, Object *o);
-knh_ftraverse konoha_getDefaultSweepFunc(void);
+knh_ftraverse konoha_getDefaultSweepFunc();
 /* ../src/main/stack.c */
 int knh_sfp_argc(Ctx *ctx, knh_sfp_t *v);
 METHOD knh__System_stackdump(Ctx *ctx, knh_sfp_t *sfp);

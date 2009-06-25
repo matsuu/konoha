@@ -1876,6 +1876,27 @@ Term *knh_StmtCALLBASE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh
 		}
 		return NULL;
 	}
+	else if(mn == METHODN_domain) {
+		if(DP(stmt)->size != 3) goto L_ERROR;
+		if(TERMs_typing(ctx, stmt, 2, abr, ns, CLASS_Any, TWARN_)) {
+			knh_class_t cid1;
+			if(TERMs_isCLASSID(stmt, 2)) {
+				cid1 = DP(DP(stmt)->tokens[2])->cid;
+			}
+			else {
+				cid1 = TERMs_getcid(stmt, 2);
+			}
+			KNH_ASSERT_cid(cid1);
+			knh_Token_setCONST(ctx, tk1, UP(ctx->share->ClassTable[cid1].class_cid));
+			DP(stmt)->size = 2;
+			knh_Token_toMTD(ctx, DP(stmt)->tokens[0], METHODN_domain,
+					knh_Class_getMethod(ctx, CLASS_Class, METHODN_domain));
+			knh_Stmt_setType(ctx, stmt,
+				NNTYPE_cid(knh_class_Generics(ctx, CLASS_Array, cid1, CLASS_Any)));
+			return TM(stmt);
+		}
+		return NULL;
+	}
 	else if(mn == METHODN_defined) {
 		if(DP(stmt)->size != 3) goto L_ERROR;
 		if(TERMs_typing(ctx, stmt, 2, abr, ns, CLASS_Any, TWARN_)) {

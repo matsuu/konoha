@@ -601,9 +601,12 @@ typedef struct {
 	struct knh_Object_t       *cspec;
 	struct knh_DictMap_t      *constPool;
 	knh_fdefault               fdefault;
+
+#ifndef KNH_USING_NODATAPOOL
 	knh_mutex_t                dataLock;
 	struct knh_Array_t        *dataList;
 	struct knh_DictMap_t      *dataMap;
+#endif
 } knh_ClassTable_t;
 
 /* ------------------------------------------------------------------------ */

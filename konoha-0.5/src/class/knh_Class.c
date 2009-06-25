@@ -266,21 +266,21 @@ konoha_addGenericsClass(Ctx *ctx, knh_class_t cid, String *name, knh_class_t bci
 
 /* ======================================================================== */
 
-void KNH_ACLASS(Ctx *ctx, knh_class_t cid, knh_class_t p1)
-{
-	char buf[CLASSNAME_BUFSIZ];
-	knh_snprintf(buf, sizeof(buf), "%s[]", CLASSN(p1));
-	konoha_addGenericsClass(ctx, cid, new_String(ctx, B(buf), NULL), CLASS_Array, p1, CLASS_Nue);
-}
-
-/* ------------------------------------------------------------------------ */
-
-void KNH_ICLASS(Ctx *ctx, knh_class_t cid, knh_class_t p1)
-{
-	char buf[CLASSNAME_BUFSIZ];
-	knh_snprintf(buf, sizeof(buf), "%s..", CLASSN(p1));
-	konoha_addGenericsClass(ctx, cid, new_String(ctx, B(buf), NULL), CLASS_Iterator, p1, CLASS_Nue);
-}
+//void KNH_ACLASS(Ctx *ctx, knh_class_t cid, knh_class_t p1)
+//{
+//	char buf[CLASSNAME_BUFSIZ];
+//	knh_snprintf(buf, sizeof(buf), "%s[]", CLASSN(p1));
+//	konoha_addGenericsClass(ctx, cid, new_String(ctx, B(buf), NULL), CLASS_Array, p1, CLASS_Nue);
+//}
+//
+///* ------------------------------------------------------------------------ */
+//
+//void KNH_ICLASS(Ctx *ctx, knh_class_t cid, knh_class_t p1)
+//{
+//	char buf[CLASSNAME_BUFSIZ];
+//	knh_snprintf(buf, sizeof(buf), "%s..", CLASSN(p1));
+//	konoha_addGenericsClass(ctx, cid, new_String(ctx, B(buf), NULL), CLASS_Iterator, p1, CLASS_Nue);
+//}
 
 
 /* ======================================================================== */
@@ -529,6 +529,65 @@ void knh_ClassMap__man(Ctx *ctx, ClassMap *o, OutputStream *w, knh_class_t cid)
 }
 
 /* ------------------------------------------------------------------------ */
+/* [DataPool] */
+/* ------------------------------------------------------------------------ */
+
+static Array* knh_Class_domain(Ctx *ctx)
+{
+	Array *a = new_Array(ctx, CLASS_Class, 0);
+	int i = 0;
+	for(i = 0; i < ctx->share->StructTableSize; i++) {
+		knh_Array_add(ctx, a, UP(ctx->share->ClassTable[i].class_cid));
+	}
+	for(i = ctx->share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
+		knh_Array_add(ctx, a, UP(ctx->share->ClassTable[i].class_cid));
+	}
+	return a;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static Array* knh_Method_domain(Ctx *ctx)
+{
+	Array *a = new_Array(ctx, CLASS_Method, 0);
+	int i = 0;
+	for(i = 0; i < ctx->share->StructTableSize; i++) {
+		ClassStruct *cs = ctx->share->ClassTable[i].cstruct;
+		DBG2_ASSERT(cs != NULL);
+		knh_Array_addArray(ctx, a, cs->methods);
+	}
+	for(i = ctx->share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
+		ClassStruct *cs = ctx->share->ClassTable[i].cstruct;
+		DBG2_ASSERT(cs != NULL);
+		knh_Array_addArray(ctx, a, cs->methods);
+	}
+	return a;
+}
+
+/* ------------------------------------------------------------------------ */
+
+Array* konoha_getClassDomain(Ctx *ctx, knh_class_t cid)
+{
+	Array *a = NULL;
+	switch(cid) {
+	case CLASS_Class:
+		a = knh_Class_domain(ctx);
+		break;
+	case CLASS_Method:
+		a = knh_Method_domain(ctx);
+		break;
+	default:
+		a = NULL;
+	}
+	if(a == NULL) {
+		DBG2_P("Empty domain cid=%s", CLASSN(cid));
+		a = new_Array0(ctx, 0);
+	}
+	return a;
+}
+
+/* ------------------------------------------------------------------------ */
+
 
 #ifdef __cplusplus
 }

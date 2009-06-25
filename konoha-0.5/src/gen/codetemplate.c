@@ -25,8 +25,8 @@
  *  
  ****************************************************************************/
 
-#include"../../include/konoha/konoha_dev.h"
-#include"../../include/konoha/gen/konohac_klr_.h"
+#include<konoha/konoha_dev.h>
+#include<konoha/gen/konohac_klr_.h>
 
 
 #ifdef __cplusplus 

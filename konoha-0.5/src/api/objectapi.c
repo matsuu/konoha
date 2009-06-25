@@ -386,6 +386,15 @@ void knh_Nue__k(Ctx *ctx, Nue *b, OutputStream *w, String *m)
 /* ======================================================================== */
 /* [Class] */
 
+/* @method Array! Class.domain() */
+
+static
+METHOD knh__Class_domain(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN(ctx, sfp, konoha_getClassDomain(ctx, (sfp[0].c)->cid));
+}
+
+/* ------------------------------------------------------------------------ */
 /* @method void Class.%s(OutputStream w, String m) */
 
 static
