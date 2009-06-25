@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-#define KONOHA_BUILDID                  586
+#define KONOHA_BUILDID                  587
 
 /* ======================================================================== */
 
@@ -3112,8 +3112,8 @@ extern "C" {
 #define MF_nBytes_Int                   knh_tMethodField(ctx, MFN_nBytes_Int)
 #define MFN_void_nBytes_Int_Int 44
 #define MF_void_nBytes_Int_Int          knh_tMethodField(ctx, MFN_void_nBytes_Int_Int)
-#define MFN_void_nBytes_Int_nBytes_Int_Int 45
-#define MF_void_nBytes_Int_nBytes_Int_Int knh_tMethodField(ctx, MFN_void_nBytes_Int_nBytes_Int_Int)
+#define MFN_void_Int_nBytes_Int_Int 45
+#define MF_void_Int_nBytes_Int_Int      knh_tMethodField(ctx, MFN_void_Int_nBytes_Int_Int)
 #define MFN_nConnection_nString 46
 #define MF_nConnection_nString          knh_tMethodField(ctx, MFN_nConnection_nString)
 #define MFN_nResultSet_nString  47

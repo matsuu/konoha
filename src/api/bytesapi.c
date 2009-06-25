@@ -155,16 +155,16 @@ static METHOD knh__Bytes_opFill(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method void Bytes.memcpy(Bytes! d, Int off, Bytes! s, Int off, Int len) @Static */
+/* @method void Bytes.memcpy(Int off, Bytes! s, Int off, Int len)  */
 
 static METHOD knh__Bytes_memcpy(Ctx *ctx, knh_sfp_t *sfp)
 {
-	Bytes *d = (Bytes*)sfp[1].o;
+	Bytes *d = (Bytes*)sfp[0].o;
 	if(!knh_Object_isImmutable(d)) {
-		size_t doff = IS_NULL(sfp[2].o) ? 0 : p_int(sfp[2]);
-		Bytes *s = (Bytes*)sfp[3].o;
-		size_t soff = IS_NULL(sfp[4].o) ? 0 : p_int(sfp[4]);
-		size_t slen = IS_NULL(sfp[5].o) ? 0 : ((s)->size - soff);
+		size_t doff = IS_NULL(sfp[1].o) ? 0 : p_int(sfp[1]);
+		Bytes *s = (Bytes*)sfp[2].o;
+		size_t soff = IS_NULL(sfp[3].o) ? 0 : p_int(sfp[3]);
+		size_t slen = IS_NULL(sfp[4].o) ? 0 : ((s)->size - soff);
 		if(doff + slen < (d)->size) {
 			knh_memcpy(d->buf + doff, s->buf + soff, slen);
 		}
