@@ -61,8 +61,8 @@ KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port)
 {
 #ifdef KNH_USING_POSIX
 #ifdef KNH_USING_WINDOWS
-  WSADATA wsaData;
-  WSAStartup(MAKEWORD(2,0), &wsaData);
+	WSADATA wsaData;
+	WSAStartup(MAKEWORD(2,0), &wsaData);
 #endif
 	struct in_addr addr = {0};
 	struct hostent	*host;
@@ -74,7 +74,7 @@ KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port)
 	if ((addr.s_addr = inet_addr(ip_or_host)) == -1) {
 		host = gethostbyname(ip_or_host);
 		if (host == NULL) {
-			KNH_PERRNO(ctx, "Socket!!", "gethostbyname");
+			KNH_PERRNO(ctx, "Socket!!", "gethostbyname", knh_Context_isStrict(ctx));
 			return -1;
 		}
 		memcpy(&addr, (struct in_addr *)*host->h_addr_list, sizeof(struct in_addr));
@@ -84,11 +84,11 @@ KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port)
 	server.sin_port = htons(port);
 
 	if((sd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-		KNH_PERRNO(ctx, "Socket!!", "socket");
+		KNH_PERRNO(ctx, "Socket!!", "socket", knh_Context_isStrict(ctx));
 		return -1;
 	}
 	if (connect(sd, (struct sockaddr *)&server, sizeof(server)) == -1) {
-		KNH_PERRNO(ctx, "Socket!!", "connect");
+		KNH_PERRNO(ctx, "Socket!!", "connect", knh_Context_isStrict(ctx));
 		return -1;
 	}
 	return sd;
@@ -111,7 +111,7 @@ KNHAPI(int) knh_socket_send(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz,
 	res = send((SOCKET)sd, buf, bufsiz, flags);
 #endif
 	if(res == -1) {
-		KNH_PERRNO(ctx, "Socket!!", "send");
+		KNH_PERRNO(ctx, "Socket!!", "send", knh_Context_isStrict(ctx));
 	}
 	return res;
 }
@@ -127,7 +127,7 @@ KNHAPI(int) knh_socket_recv(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz,
 	res = recv((SOCKET)sd, buf, bufsiz, flags);
 #endif
 	if(res == -1) {
-		KNH_PERRNO(ctx, "Socket!!", "recv");
+		KNH_PERRNO(ctx, "Socket!!", "recv", knh_Context_isStrict(ctx));
 	}
 	return res;
 }
@@ -156,7 +156,7 @@ KNHAPI(int) knh_socket_close(Ctx *ctx, knh_intptr_t sd)
 /* 'socket:localhost:80' */
 
 static
-knh_io_t knh_iodrv_open__SOCKET(Ctx *ctx, knh_bytes_t file, char *mode)
+knh_io_t knh_iodrv_open__SOCKET(Ctx *ctx, knh_bytes_t file, char *mode, int isThrowable)
 {
 	knh_bytes_t urn = knh_bytes_skipscheme(file);
 	knh_index_t loc = knh_bytes_rindex(urn, ':');

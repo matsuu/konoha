@@ -275,13 +275,13 @@ Exception* new_Exception__Nue(Ctx *ctx, Object *o)
 
 /* ------------------------------------------------------------------------ */
 
-#define _KNH_PERRNO(ctx, emsg, func) { \
-		knh_perrno(ctx, emsg, func, __FILE__, __LINE__); \
+#define _KNH_PERRNO(ctx, emsg, func, isThrowable) { \
+		knh_perrno(ctx, emsg, func, __FILE__, __LINE__, isThrowable); \
 	}\
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) knh_perrno(Ctx *ctx, char *emsg, char *func, char *file, int line)
+KNHAPI(void) knh_perrno(Ctx *ctx, char *emsg, char *func, char *file, int line, int isThrowable)
 {
 	if(emsg == NULL) emsg = "Exception!!";
 	if(errno == 13) {
@@ -293,7 +293,7 @@ KNHAPI(void) knh_perrno(Ctx *ctx, char *emsg, char *func, char *file, int line)
 #else
 	char *emsg2 = strerror(errno);
 #endif
-	if(((ctx)->flag & KNH_FLAG_CTXF_STRICT) != KNH_FLAG_CTXF_STRICT) {
+	if(isThrowable) {
 		char buf[256];
 		knh_snprintf(buf, sizeof(buf), "%s: func=%s, errno=%d: %s", emsg, func, errno, emsg2);
 		knh_throwException(ctx, new_Exception__b(ctx, B(buf)), KNH_SAFEFILE(file), line);
@@ -305,15 +305,15 @@ KNHAPI(void) knh_perrno(Ctx *ctx, char *emsg, char *func, char *file, int line)
 
 /* ------------------------------------------------------------------------ */
 
-#define _KNH_NOAPI(ctx) { \
-		knh_throw_Unsupported(ctx, __FUNCNAME__, __FILE__, __LINE__); \
+#define _KNH_NOAPI(ctx, isThrowable) { \
+		knh_throw_Unsupported(ctx, __FUNCTION__, __FILE__, __LINE__, isThrowable); \
 	}\
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) knh_throw_Unsupported(Ctx *ctx, char *func, char *file, int line)
+KNHAPI(void) knh_throw_Unsupported(Ctx *ctx, char *func, char *file, int line, int isThrowable)
 {
-	if(((ctx)->flag & KNH_FLAG_CTXF_STRICT) != KNH_FLAG_CTXF_STRICT) {
+	if(isThrowable) {
 		char buf[256];
 		knh_snprintf(buf, sizeof(buf), "Unsupported!!: func=%s", func);
 		knh_throwException(ctx, new_Exception__b(ctx, B(buf)), KNH_SAFEFILE(file), line);

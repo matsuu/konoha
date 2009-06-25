@@ -776,7 +776,7 @@ int knh_NameSpace_loadScript(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isE
 	}
 	knh_NameSpace_loaded(ctx, ns, fileid);
 	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
-	InputStream *in = new_FileInputStream(ctx, fpath);
+	InputStream *in = new_FileInputStream(ctx, fpath, 1);
 	KNH_LPUSH(ctx, in);
 	DP(in)->fileid = fileid;
 	knh_InputStream_setEncoding(ctx, in, knh_systemEncoding);

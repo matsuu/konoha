@@ -82,7 +82,7 @@ Object *knh_OutputStream_open(Ctx *ctx, OutputStream *o, String *urn, String *m)
 	}
 	char *mode = "r";
 	if(IS_NOTNULL(m)) mode = knh_String_tochar(m);
-	DP(o)->fd = DP(o)->driver->fopen(ctx, fname, mode);
+	DP(o)->fd = DP(o)->driver->fopen(ctx, fname, mode, knh_Context_isStrict(ctx));
 	if(DP(o)->fd != -1) {
 		KNH_SETv(ctx, DP(o)->urn, urn);
 		KNH_SETv(ctx, DP(o)->ba, new_Bytes(ctx, 4096));
@@ -213,10 +213,10 @@ void knh_OutputStream_print_(Ctx *ctx, OutputStream *o, knh_bytes_t str, knh_boo
 
 /* ======================================================================== */
 
-KNHAPI(OutputStream*) new_FileOutputStream(Ctx *ctx, knh_bytes_t file, char *mode)
+KNHAPI(OutputStream*) new_FileOutputStream(Ctx *ctx, knh_bytes_t file, char *mode, int isThrowable)
 {
 	knh_iodrv_t *drv = konoha_getIODriver(ctx, STEXT("file"));
-	knh_io_t fd = drv->fopen(ctx, file, mode);
+	knh_io_t fd = drv->fopen(ctx, file, mode, isThrowable);
 	return new_OutputStream__io(ctx, new_String(ctx, file, NULL), fd, drv);
 }
 

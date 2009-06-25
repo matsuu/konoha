@@ -859,7 +859,7 @@ typedef struct {
 
 typedef knh_intptr_t knh_io_t;
 
-typedef knh_io_t (*f_io_open)(Ctx *ctx, knh_bytes_t urn, char *mode);
+typedef knh_io_t (*f_io_open)(Ctx *ctx, knh_bytes_t urn, char *mode, int isThrowable);
 typedef void (*f_io_init)(Ctx *ctx, Object *stream, char *mode);
 typedef knh_intptr_t (*f_io_read)(Ctx *ctx, knh_io_t fd, char *buf, size_t bufsiz);
 typedef knh_intptr_t (*f_io_write)(Ctx *ctx, knh_io_t fd, char *buf, size_t bufsiz);
