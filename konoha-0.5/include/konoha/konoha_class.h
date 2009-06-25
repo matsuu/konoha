@@ -1075,29 +1075,6 @@ typedef struct knh_KLRCode {
 
 /* ======================================================================== */
 
-#ifdef OLD
-#define KNH_PERROR_BUFSIZ   1024
-
-#define KNH_PERROR(ctx, fid, line, pe, fmt, ...) \
-	if(fmt != NULL){ \
-		char buf_[KNH_PERROR_BUFSIZ]; \
-		knh_snprintf(buf_, sizeof(buf_), ": " fmt, ## __VA_ARGS__); \
-		knh_perror0(ctx, fid, line, pe, buf_); \
-	}else { \
-		knh_perror0(ctx, fid, line, pe, NULL); \
-	} \
-
-#define KNH_TOKEN_PERROR(ctx, tk, pe, fmt, ...) \
-	if(fmt != NULL){ \
-		char buf_[KNH_PERROR_BUFSIZ]; \
-		knh_snprintf(buf_, sizeof(buf_), ": " fmt, ## __VA_ARGS__); \
-		knh_Token_perror(ctx, tk, pe, buf_); \
-	}else { \
-		knh_Token_perror(ctx, tk, pe, NULL); \
-	} \
-
-#endif
-
 #ifdef __cplusplus
 }
 #endif
