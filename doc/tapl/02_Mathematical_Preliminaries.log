@@ -1,5 +1,5 @@
-This is pTeX, Version 3.141592-p3.1.9 (sjis) (Web2C 7.5.4) (format=platex-sjis 2005.11.2)  11 JUN 2009 01:37
-**02_Mathematical_Preliminaries
+This is pTeX, Version 3.141592-p3.1.9 (sjis) (Web2C 7.5.4) (format=platex-sjis 2005.11.2)  25 JUN 2009 14:53
+**02_Mathematical_Preliminaries.tex
 (./02_Mathematical_Preliminaries.tex
 pLaTeX2e <2005/01/04>+0 (based on LaTeX2e <2003/12/01> patch level 0)
 (/usr/local/share/texmf/ptex/platex/misc/jsclasses/jsbook.cls
@@ -85,35 +85,49 @@ LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
 (Font)              scaled to size 9.60999pt on input line 1.
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
 (Font)              scaled to size 9.60999pt on input line 1.
-) (./02/02_3.tex) (./02/02_4.tex
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 9.
+(Font)              <7> on input line 7.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 9.
+(Font)              <5> on input line 7.
 LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
-(Font)              scaled to size 6.72699pt on input line 9.
+(Font)              scaled to size 6.72699pt on input line 7.
 LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
-(Font)              scaled to size 4.805pt on input line 9.
+(Font)              scaled to size 4.805pt on input line 7.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 9.
+
+(/usr/local/share/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 9.
+LaTeX Font Info:    Font shape `JT1/mc/m/it' in size <10> not available
+(Font)              Font shape `JT1/mc/m/n' tried instead on input line 17.
+LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
+(Font)              scaled to size 9.60999pt on input line 17.
+LaTeX Font Info:    Font shape `JY1/mc/m/it' in size <10> not available
+(Font)              Font shape `JY1/mc/m/n' tried instead on input line 17.
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 9.60999pt on input line 17.
 LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <10> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 11.
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 26.
 LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
-(Font)              scaled to size 9.60999pt on input line 11.
+(Font)              scaled to size 9.60999pt on input line 26.
 LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <10> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 11.
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 26.
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 9.60999pt on input line 11.
+(Font)              scaled to size 9.60999pt on input line 26.
+ [1
 
-[1
 
-
-]) [2] (./02_Mathematical_Preliminaries.aux) ) 
+]) (./02/02_3.tex)
+(./02/02_4.tex [2]) [3] (./02_Mathematical_Preliminaries.aux) ) 
 Here is how much of TeX's memory you used:
- 431 strings out of 95552
- 4527 string characters out of 1187504
- 52931 words of memory out of 1000000
- 3627 multiletter control sequences out of 10000+50000
- 12371 words of font info for 57 fonts, out of 500000 for 2000
+ 453 strings out of 95552
+ 4907 string characters out of 1187504
+ 54931 words of memory out of 1000000
+ 3644 multiletter control sequences out of 10000+50000
+ 12717 words of font info for 58 fonts, out of 500000 for 2000
  19 hyphenation exceptions out of 1000
- 29i,8n,19p,152b,378s stack positions out of 1500i,500n,5000p,200000b,5000s
+ 28i,8n,19p,189b,340s stack positions out of 1500i,500n,5000p,200000b,5000s
 
-Output written on 02_Mathematical_Preliminaries.dvi (2 pages, 3260 bytes).
+Output written on 02_Mathematical_Preliminaries.dvi (3 pages, 6440 bytes).
