@@ -205,12 +205,12 @@ Token* new_TokenCONST(Ctx *ctx, Any *fln, Any *data)
 void knh_Token_setCONST(Ctx *ctx, Token *o, Any *data)
 {
 	KNH_SETv(ctx, DP(o)->data, data);
-	knh_Token_toCONST(o);
+	knh_Token_toCONST(ctx, o);
 }
 
 /* ------------------------------------------------------------------------ */
 
-Token* knh_Token_toCONST(Token *o)
+Token* knh_Token_toCONST(Ctx *ctx, Token *o)
 {
 	SP(o)->tt = TT_CONST;
 	DP(o)->type = knh_Object_cid(DP(o)->data);
@@ -844,7 +844,7 @@ int knh_TokenSTR_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqt)
 	knh_class_t reqc = CLASS_type(reqt);
 	if(reqc == CLASS_String || reqc == CLASS_Object || reqc == CLASS_Any) {
 		KNH_ASSERT(IS_String(DP(tk)->data));
-		knh_Token_toCONST(tk);
+		knh_Token_toCONST(ctx, tk);
 		return 1;
 	}
 	else if(reqc == CLASS_Exception) {
@@ -933,7 +933,7 @@ int knh_Token_typing(Ctx *ctx, Token *tk, Asm *abr, NameSpace *ns, knh_type_t re
 		return knh_TokenCMETHODN_typing(ctx, tk, ns);
 	case TT_URN:
 		KNH_ASSERT(IS_String(DP(tk)->data));
-		knh_Token_toCONST(tk);
+		knh_Token_toCONST(ctx, tk);
 		return 1;
 
 	case TT_ESTR:
@@ -1091,7 +1091,7 @@ static Object *TERMs_const(Stmt *stmt, size_t n)
 
 /* ------------------------------------------------------------------------ */
 
-static int TERMs_isNULL(Stmt *stmt, size_t n)
+static int TERMs_isNULL(Ctx *ctx, Stmt *stmt, size_t n)
 {
 	if(n < DP(stmt)->size) {
 		return (IS_Token(DP(stmt)->tokens[n]) && IS_NULL(DP(DP(stmt)->tokens[n])->data));
@@ -1287,7 +1287,7 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	knh_type_t pmztype  = knh_Token_gettype(ctx, StmtDECL_type(stmt), ns, TYPE_var);
 	knh_type_t type = knh_pmztype_totype(ctx, pmztype, DP(abr)->this_cid);
 
-	if(TERMs_isNULL(stmt, 2) && !TERMs_isASIS(stmt, 2)
+	if(TERMs_isNULL(ctx, stmt, 2) && !TERMs_isASIS(stmt, 2)
 			&& !knh_Token_isNotNullType(DP(stmt)->tokens[0])) {
 		DBG2_P("type inferencing: Nullable");
 		type = CLASS_type(type);
@@ -2312,12 +2312,12 @@ Term *knh_StmtOP_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_
 		if(!knh_Stmt_checkOPSIZE(ctx, stmt, 2)) {
 			return NULL;
 		}
-		if(TERMs_isNULL(stmt, 1) || TERMs_isTRUE(stmt, 1) || TERMs_isFALSE(stmt, 1)) {
+		if(TERMs_isNULL(ctx, stmt, 1) || TERMs_isTRUE(stmt, 1) || TERMs_isFALSE(stmt, 1)) {
 			Term *temp = DP(stmt)->terms[1];
 			DP(stmt)->terms[1] = DP(stmt)->terms[2];
 			DP(stmt)->terms[2] = temp;
 		}
-		if(TERMs_isNULL(stmt, 2)) { /* o == null */
+		if(TERMs_isNULL(ctx, stmt, 2)) { /* o == null */
 			if(IS_NNTYPE(TERMs_gettype(stmt,1))) {
 				return TM(new_TokenCONST(ctx, FL(stmt), KNH_FALSE));
 			}
@@ -2351,12 +2351,12 @@ Term *knh_StmtOP_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_
 		if(!knh_Stmt_checkOPSIZE(ctx, stmt, 2)) {
 			return NULL;
 		}
-		if(TERMs_isNULL(stmt, 1) || TERMs_isTRUE(stmt, 1) || TERMs_isFALSE(stmt, 1)) {
+		if(TERMs_isNULL(ctx, stmt, 1) || TERMs_isTRUE(stmt, 1) || TERMs_isFALSE(stmt, 1)) {
 			Term *temp = DP(stmt)->terms[1];
 			DP(stmt)->terms[1] = DP(stmt)->terms[2];
 			DP(stmt)->terms[2] = temp;
 		}
-		if(TERMs_isNULL(stmt, 2)) { /* o != null */
+		if(TERMs_isNULL(ctx, stmt, 2)) { /* o != null */
 			if(IS_NNTYPE(TERMs_gettype(stmt,1))) {
 				return TM(new_TokenCONST(ctx, FL(stmt), KNH_TRUE));
 			}
@@ -2496,7 +2496,7 @@ Term *knh_StmtMAPCAST_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_
 		}
 	}
 
-	if(TERMs_isNULL(stmt, 1)) {  /* (T)null */
+	if(TERMs_isNULL(ctx, stmt, 1)) {  /* (T)null */
 		if(isNonNullCast) {
 			knh_Token_toDEFVAL(DP(stmt)->tokens[1], mprcid);
 		}
@@ -2744,7 +2744,7 @@ int TERMs_typecheck(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_type_t reqt, i
 	knh_class_t varc = CLASS_type(vart);
 	knh_class_t reqc = CLASS_type(reqt);
 
-	if(TERMs_isNULL(stmt, n)) {
+	if(TERMs_isNULL(ctx, stmt, n)) {
 		//DBG2_P("reqc=%s varc=%s", CTXCLASSN(reqc), CTXCLASSN(varc));
 		if(IS_NNTYPE(reqt) && varc != reqc) {
 			TERMs_perrorTYPE(ctx, stmt, n, reqt);
@@ -3493,7 +3493,7 @@ MethodField *knh_tMethodField_find(Ctx *ctx, Asm *abr, knh_type_t rztype, size_t
 static
 int knh_Stmt_checkLastReturn(Ctx *ctx, Stmt *stmt, Method *mtd)
 {
-	Stmt *last_stmt = knh_Stmt_tail(stmt);
+	Stmt *last_stmt = knh_Stmt_tail(ctx, stmt);
 	knh_stmt_t stt = SP(last_stmt)->stt;
 	if(stt == STT_RETURN || stt == STT_THROW || stt == STT_ERR) {
 		return 1;

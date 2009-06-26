@@ -129,7 +129,7 @@ void knh_Stmt_add(Ctx *ctx, Stmt *o, Term *tm)
 /* ======================================================================== */
 /* [visit] */
 
-Stmt *knh_Stmt_tail(Stmt *o)
+Stmt *knh_Stmt_tail(Ctx *ctx, Stmt *o)
 {
 	Stmt *tail = o;
 	while(IS_NOTNULL(DP(tail)->next)) {
@@ -147,7 +147,7 @@ Stmt* knh_StmtNULL_tail_append(Ctx *ctx, Stmt *o, Stmt *stmt)
 		return stmt;
 	}
 	else {
-		Stmt *tail = knh_Stmt_tail(o);
+		Stmt *tail = knh_Stmt_tail(ctx, o);
 		KNH_SETv(ctx, DP(tail)->next, stmt);
 		return o;
 	}

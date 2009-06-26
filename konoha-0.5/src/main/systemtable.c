@@ -503,6 +503,7 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 		if(ctx->stat->usedMemorySize != 0) {
 			fprintf(stderr, "memory leaks: %d bytes", (int)ctx->stat->usedMemorySize);
 		}
+
 		DBG_P("method cache hit/miss %d/%d", (int)ctx->stat->mtdCacheHit, (int)ctx->stat->mtdCacheMiss);
 		DBG_P("formatter cache hit/miss %d/%d", (int)ctx->stat->fmtCacheHit, (int)ctx->stat->fmtCacheMiss);
 		DBG_P("mapper cache hit/miss %d/%d", (int)ctx->stat->mprCacheHit, (int)ctx->stat->mprCacheMiss);
