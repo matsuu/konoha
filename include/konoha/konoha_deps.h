@@ -10,11 +10,12 @@
 /* ======================================================================== */
 /* [UNIX] */
 
-#ifdef KONOHA_OS__UNKONWN
+#ifdef KONOHA_OS__UNKNOWN
 	#define KNH_USING_POSIX 1
 	#define KNH_USING_UNIX  1
 	#define KONOHA_OS_ENCODING "UTF-8"
 	#define KONOHA_OS_LINEFEED "\n"
+	#define KONOHA_OS_DLLEXT   ".so"
 #endif
 
 #ifdef KONOHA_OS__LINUX
@@ -23,18 +24,18 @@
 #define     KNH_USING_SOCKET 1
 #define		KONOHA_OS_ENCODING "UTF-8"
 #define 	KNH_USING_KONOHAGET 1
-#ifdef HAVE_ICONV_H
-#define		KNH_USING_ICONV 1
-#endif
+	#ifdef HAVE_ICONV_H
+	#define		KNH_USING_ICONV 1
+	#endif
 //#ifdef HAVE_REGEX_H
 #define		KNH_USING_REGEX 1
 //#endif
 #define		KONOHA_OS_LINEFEED "\n"
 #define		KONOHA_OS_DLLEXT   ".so"
-#ifdef KONOHA_CC_WITH_ECLIPSE
-#define 	KNH_USING_READLINE 1
-#define		KONOHA_MONOLITHIC  1
-#endif
+	#ifdef KONOHA_CC_WITH_ECLIPSE
+	#define 	KNH_USING_READLINE 1
+	#define		KONOHA_MONOLITHIC  1
+	#endif
 #endif
 
 #ifdef KONOHA_OS__MACOSX
