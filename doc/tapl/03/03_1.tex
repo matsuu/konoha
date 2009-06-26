@@ -1,0 +1,170 @@
+\documentclass{jsarticle}
+\usepackage[dvipdfm]{graphicx,color}
+\usepackage{amsmath,amssymb}
+\begin{document}
+
+\title{3 Untyped Arithmetic Expressions}
+\author{Gossy＆Kuwa}
+\maketitle
+
+{\Large
+
+型 systemと、その性質について厳密に述べるためには、より多くのプログラミング言語の基本を正しく扱う必要がある。
+
+とりわけ、プログラムの構文や語彙を表現し、意味づけるためには、きれいに、正確に、そして数学的に扱いやすい道具が必要である。
+
+\vspace*{1zw}
+
+第３、４章では、数値やブール値のような規模の小さい言語に必要な道具を発展させる。
+
+第５～７章にて、より影響力の高い言語（型付けされていないラムダ計算式）のための同様の話を詳しく述べる。
+
+第８章では現在の章のシンプルな言語に戻り、それを元に静的型付けの基礎概念を紹介することで、型systemsの学習を始める。
+
+第９章では、ラムダ計算へこれらの概念を拡張する。
+
+}
+
+\newpage
+{\large
+\section{3.1 Introduction}
+
+この章で使われる言語は、扱いやすい構文のみで成り立っている：
+
+\begin{itemize}
+\item ブール定数(true、false)
+\item 条件付き表現（if文）
+\item 定数０
+\item 算術演算子ｓｕｃｃ（インクリメント）、ｐｒｅｄ（デクリメント）
+\item 検査演算子ｉｓｚｅｒｏ(０の時、ｔｒｕｅを返し、それ以外の数字の時、ｆａｌｓｅを返す)
+\end{itemize}
+
+
+t ::＝ \hspace{25zw} $terms:$ 
+
+\hspace*{3zw}true     \hspace{20.5zw}                            $constant\ true$
+   
+\hspace*{3zw}false          \hspace{20zw}                      $constant\ false$
+     
+\hspace*{3zw}if  t  then  t  else  t    \hspace{16zw}           $conditional$
+     
+\hspace*{3zw}0                \hspace{22zw}                     $constant\ zero$
+     
+\hspace*{3zw}succ  t           \hspace{21zw}                    $successor$
+     
+\hspace*{3zw}pred  t             \hspace{20.5zw}                  $predecessor$
+     
+\hspace*{3zw}iszero  t          \hspace{20.5zw}                 $zero\ test$
+
+
+\vspace*{1zw}
+
+この文法で使われている規則は、標準ＢＮＦ\footnote{
+{\large バッカス・ナウア記法：文脈自由文法を定義するメタ言語のこと。コンピュータが扱う言語の文法を定義する際に用いる言語（言語を記述するための言語）}}\
+に近いものがある。
+
+\vspace*{1zw}
+第１行（ｔ::＝）で、termsという集合を定義し、これから、記号ｔはterms内のいずれかの要素を指す場合に用いる。
+
+第２行以降は、terms内の要素を表し、ｔと記述された部分を、terms内のいずれかの要素に置き換えることができる。
+（０以外の数字＝numbersについても扱う事ができる）
+
+右のイタリック体で簡単な説明を記す。
+
+\vspace*{1zw}
+文法規則の右側にあるシンボルｔは、metavariableと呼ばれ、termの中の特定の要素のための入れ物という定義で、変数のようなものである。
+ここでの「メタ」の定義は、オブジェクト言語（我々が容易に書くことのできる簡単なプログラミング言語）というよりはメタ言語のことで、与えられた記述は表現されている。
+
+（実際、現在のオブジェクト言語は変数すら持っていない。それについては第５章で述べる）
+\vspace*{1zw}
+
+\newpage
+\section{The prefix meta-・・・}
+
+接頭辞metaは、meta-mathematicsが由来であり、対象の論理的な部分集合は、数学的性質や論理的思考（プログラミング言語を含む）構造をもつことを表す。
+
+この分野（meta-mathemartics）はまた、我々にtermに関するメタ理論\footnote{
+{\large 我々がある特定の論理構造や、プログラミング言語を作ることができる本質的な文の集合理論}}\
+を提供してくれ、ひいては、その本質的な文の学習につながる。
+
+こうして、この本での“metatheory of subtyping”の様なフレーズは、“subtyping（細分類）を伴ったシステムの性質の学習形式”として理解できる。
+\vspace*{1zw}
+
+この本では、記号ｓ、ｕやｒやｔ１やｓ’と同様にメタ変数tを用いており、ｔは今議論している全てのオブジェクト言語でtermsという意味で使える。
+その他の記号については、他の構文カテゴリから得られたものを表現したい時に、その都度紹介する。
+メタ変数の規則に関する詳細は、Appendix B（巻末付録）にて紹介する。
+
+
+\vspace*{2zw}
+
+差し当たり、termと、expressionという単語を、交互に用いる。
+第８章からは、typesのような付加的な単語のまとまりの計算方法について議論する時に、expressionを色々な構文フレーズの種類（term expressions、type expressions、kind expressionsなど）として使用し、
+計算を表すフレーズ（メタ変数ｔを置き換えることができるフレーズ）のより特殊な意味のために、termを用意しておく。
+\vspace*{1zw}
+
+
+現在の言語で書かれるプログラムは、ちょうど上述した文法構造でtermが成り立っている。
+ここでいくつかのプログラム例を、評価結果とともに示す。
+（簡単のため、一般的なアラビア数字を数値として採用している。）
+
+\vspace*{1zw}
+
+例えば、0に対するsuccを階層的に表現すると、succ(succ(succ(0)))は３と書ける。
+
+\vspace*{1zw}
+
+if  false  then  0  else  1;
+
+⇒  １
+
+\vspace*{1zw}
+iszero  (pred(succ  0));
+
+⇒  true
+
+\vspace*{1zw}
+
+
+この本では、記号⇒を例題の評価結果として使用する。
+
+型付けしている間に、自動的にシステムに対応する実装によって処理される（ここではarithと呼ぶ）。表示されるのは、実装の実行結果である。
+
+\newpage
+\section{compound arguments to succ,pred and iszero・・}
+
+例では、succ、pred、iszeroを複合させる場合、読みやすくするため()で囲んでいる。
+
+termsの文法とは言えない()は、termsの外観的な構造とだけ定義されている。
+（‥termsをわかりやすくするために存在している）
+
+\vspace*{1zw}
+もちろん、（）のあるなしは、我々が今扱っている非常に単純な言語では小さな違いを生む。
+（）は文法上の不明確さを解決するのによく使われているが、termsを扱う文法はもともと不明確さを持っていない（ほぼ一通りにtermとしてそれぞれの単語毎に認識することができる）ので、（）がなくても大丈夫である。
+
+
+（）の話に戻して、抽象構造については5章で述べる。
+
+\vspace*{1zw}
+評価の結果は特定の単純な形のterms（ブール定数、０、numbers）になる。
+
+（0がいくつもの階層構造になっていたり、前述のsuccの例よりも階層構造になっていたり）
+
+\vspace*{1zw}
+これらのtermsは、valuesと呼ばれ、termsの他の要素（if文やsuccなど）の評価順を形式化することにおいて、重要な役割を担っている。
+（‥数値の値によって条件分岐やその他の操作を行うため）
+
+\vspace*{1zw}
+\section{まとめ}
+
+termsの構造は、tの部分に他のtermsの要素を代入できるという性質上succ trueやif 0 then 0 else 0のような疑わしいように見えるtermsの形式でも許容できてしまうことに気づく。
+
+
+
+現状では許容してしまっているが、型systemを考える上で、これらを排除できるようにしたいと考える。
+
+\vspace*{1zw}
+
+}
+
+\end{document}
+
