@@ -311,7 +311,6 @@ knh_int_t knh_Number_tointeger(Any *o);
 knh_float_t knh_Number_tofloat(Any *o);
 knh_int_t knh_IntNULL_toint(Int *v);
 /* ../src/class/knh_Object.c */
-Object *new_Nue(Ctx *ctx, String *msg);
 METHOD knh__Object_new(Ctx *ctx, knh_sfp_t *sfp);
 String *knh_Object_getkey(Ctx *ctx, Object *o);
 METHOD knh__Object_getKey(Ctx *ctx, knh_sfp_t *sfp);

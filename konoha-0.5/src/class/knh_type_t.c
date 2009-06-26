@@ -135,7 +135,7 @@ knh_class_t knh_class_Array(Ctx *ctx, knh_class_t p1)
 	knh_class_t cid = konoha_getcid(ctx, B(buf));
 	if(cid == CLASS_unknown) {
 		//DBG2_P("Generating %s", buf);
-		return konoha_addGenericsClass(ctx, CLASS_newid, new_String(ctx, B(buf), NULL), CLASS_Array, p1, CLASS_Nue);
+		return konoha_addGenericsClass(ctx, CLASS_newid, new_String(ctx, B(buf), NULL), CLASS_Array, p1, CLASS_unknown);
 	}
 	return cid;
 }
@@ -150,7 +150,7 @@ knh_class_t knh_class_Iterator(Ctx *ctx, knh_class_t p1)
 	knh_class_t cid = konoha_getcid(ctx, B(buf));
 	if(cid == CLASS_unknown) {
 		//DBG2_P("*** Generating %s ***", buf);
-		return konoha_addGenericsClass(ctx, CLASS_newid, new_String(ctx, B(buf), NULL), CLASS_Iterator, p1, CLASS_Nue);
+		return konoha_addGenericsClass(ctx, CLASS_newid, new_String(ctx, B(buf), NULL), CLASS_Iterator, p1, CLASS_unknown);
 	}
 	return cid;
 }
@@ -166,7 +166,7 @@ knh_class_t knh_class_Generics(Ctx *ctx, knh_class_t bcid, knh_class_t p1, knh_c
 	else if(bcid == CLASS_Array){
 		return knh_class_Array(ctx, p1);
 	}
-	if(p1 == CLASS_Any && (p2 == CLASS_Any || p2 == CLASS_Nue)) {
+	if(p1 == CLASS_Any && (p2 == CLASS_Any || p2 == CLASS_unknown)) {
 		return bcid;
 	}
 	else {

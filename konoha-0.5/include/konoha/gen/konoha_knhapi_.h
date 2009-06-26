@@ -90,17 +90,6 @@ extern "C" {
 #define CTXCLASSN(cid)     knh_Context_CLASSN(ctx,cid)
 #define CTXTYPEQN(cid)     knh_Context_CLASSN(ctx,CLASS_type(cid)), TYPEQ(cid)
 #define KNH_FLAG_MMF_AFFINE (KNH_FLAG_MMF_ICAST|KNH_FLAG_MMF_SYNONYM|KNH_FLAG_MMF_TOTAL|KNH_FLAG_MMF_CONST)
-#define knh_Object_cid(o)           (o)->h.cid
-#define knh_Object_bcid(o)          (o)->h.bcid
-#define IS_NULL(o)          (((Object*)o)->h.cid == CLASS_Nue)
-#define IS_NOTNULL(o)       (((Object*)o)->h.cid != CLASS_Nue)
-#define IS_TRUE(o)         ((o)->h.bcid == CLASS_Boolean && ((Int*)o)->n.bvalue)
-#define IS_FALSE(o)        ((o)->h.bcid == CLASS_Boolean && (((Int*)o)->n.bvalue == 0))
-#define new_Boolean(ctx, c)    (c) ? KNH_TRUE : KNH_FALSE
-#define BOOL_ISTRUE(o)         (o == KNH_TRUE)
-#define BOOL_ISFALSE(o)        (o == KNH_FALSE)
-#define new_Nue__b(ctx, txt)   new_Nue(ctx, new_String(ctx, txt, NULL));
-#define new_Nue__s(ctx, txt)   new_Nue(ctx, new_String(ctx, B(txt), NULL));
 #define knh_String_value(o)   ((o)->str)
 #define knh_String_tochar(o)  (char*)((o)->str)
 #define knh_String_strlen(o)  (o)->size

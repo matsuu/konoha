@@ -179,10 +179,10 @@ knh_class_t knh_Token_getcid(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t def
 		knh_Token_perror(ctx, tk, KERR_ERRATA, _("unknown class: %s ==> %C"), sToken(tk), defc);
 	}
 	if(knh_Token_isIteratorType(tk)) {
-		cid = knh_class_Generics(ctx, CLASS_Iterator, cid, CLASS_Nue);
+		cid = knh_class_Generics(ctx, CLASS_Iterator, cid, CLASS_unknown);
 	}
 	else if(knh_Token_isArrayType(tk)) {
-		cid = knh_class_Generics(ctx, CLASS_Array, cid, CLASS_Nue);
+		cid = knh_class_Generics(ctx, CLASS_Array, cid, CLASS_unknown);
 	}
 	return cid;
 }
@@ -237,7 +237,7 @@ Token* knh_Token_toDEFVAL(Token *o, knh_class_t cid)
 {
 	SP(o)->tt = TT_DEFVAL;
 	DP(o)->cid = cid;
-	if(cid != CLASS_Nue) {
+	if(cid != CLASS_Any) {
 		DP(o)->type = NNTYPE_cid(cid);
 	}
 	else {

@@ -44,8 +44,6 @@ knh_int_t knh_Number_tointeger(Any *o)
 {
 	Object *n = (Object*)o;
 	switch(n->h.bcid) {
-		case CLASS_Nue :
-			return 0;
 		case CLASS_Boolean :
 			return (IS_TRUE(n)) ? 1 : 0;
 		case CLASS_Int :
@@ -63,18 +61,11 @@ knh_float_t knh_Number_tofloat(Any *o)
 {
 	Object *n = (Object*)o;
 	switch(n->h.bcid) {
-		case CLASS_Nue :
-#ifndef KONOHA_OS__LKM
-			return 0.0;
-#else
-			return 0;
-#endif
 		case CLASS_Boolean :
-
-#ifndef KONOHA_OS__LKM
-			return (IS_TRUE(n)) ? 1.0 : 0.0;
-#else
+#ifndef KNH_USING_NOFLOAT
 			return (IS_TRUE(n)) ? 1 : 0;
+#else
+			return (IS_TRUE(n)) ? 1.0 : 0.0;
 #endif
 		case CLASS_Int :
 			return (knh_float_t)((Int*)n)->n.ivalue;
@@ -82,10 +73,10 @@ knh_float_t knh_Number_tofloat(Any *o)
 			return (knh_float_t)((Float*)n)->n.fvalue;
 	}
 	KNH_ASSERT(n->h.bcid == CLASS_Int); /* STOP */
-#ifndef KONOHA_OS__LKM
-	return (knh_float_t)0.0;
+#ifndef KNH_USING_NOFLOAT
+	return (IS_TRUE(n)) ? 1 : 0;
 #else
-	return (knh_float_t)0;
+	return (IS_TRUE(n)) ? 1.0 : 0.0;
 #endif
 }
 

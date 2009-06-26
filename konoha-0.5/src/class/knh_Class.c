@@ -155,9 +155,8 @@ knh_Object_t *knh_fdefault__CONST(Ctx *ctx, knh_class_t cid)
 static
 knh_Object_t *knh_fdefault__INIT(Ctx *ctx, knh_class_t cid)
 {
-	//DBG2_P("%s", CLASSN(cid));
 	KNH_ASSERT(IS_NULL(ctx->share->ClassTable[cid].cspec));
-	Object *v = new_Object_init(ctx, ctx->share->ClassTable[cid].oflag | KNH_FLAG_OF_IMMUTABLE, cid, 0);
+	Object *v = new_Object_init(ctx, ctx->share->ClassTable[cid].oflag | KNH_FLAG_OF_IMMUTABLE | KNH_FLAG_OF_UNDEFINED, cid, 0);
 	KNH_SETv(ctx, ctx->share->ClassTable[cid].cspec, v);
 	ctx->share->ClassTable[cid].fdefault = knh_fdefault__CONST;
 	return ctx->share->ClassTable[cid].cspec;
@@ -217,7 +216,6 @@ Object *konoha_getDefaultValue(Ctx *ctx, knh_type_t type)
 void konoha_setClassParam(Ctx *ctx, knh_class_t cid, knh_class_t p1, knh_class_t p2)
 {
 	KNH_ASSERT_cid(cid);
-	//KNH_ASSERT(ctx->share->ClassTable[cid].p1 == CLASS_Nue);
 	ctx->share->ClassTable[cid].p1 = p1;
 	ctx->share->ClassTable[cid].p2 = p2;
 	if(!knh_class_isCyclic(cid)) {
@@ -265,28 +263,7 @@ konoha_addGenericsClass(Ctx *ctx, knh_class_t cid, String *name, knh_class_t bci
 }
 
 /* ======================================================================== */
-
-//void KNH_ACLASS(Ctx *ctx, knh_class_t cid, knh_class_t p1)
-//{
-//	char buf[CLASSNAME_BUFSIZ];
-//	knh_snprintf(buf, sizeof(buf), "%s[]", CLASSN(p1));
-//	konoha_addGenericsClass(ctx, cid, new_String(ctx, B(buf), NULL), CLASS_Array, p1, CLASS_Nue);
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//void KNH_ICLASS(Ctx *ctx, knh_class_t cid, knh_class_t p1)
-//{
-//	char buf[CLASSNAME_BUFSIZ];
-//	knh_snprintf(buf, sizeof(buf), "%s..", CLASSN(p1));
-//	konoha_addGenericsClass(ctx, cid, new_String(ctx, B(buf), NULL), CLASS_Iterator, p1, CLASS_Nue);
-//}
-
-
-/* ======================================================================== */
 /* [ClassStruct] */
-
-//#define _knh_tstruct_isNative(sid)   (sid < KONOHA_TSTRUCT_SIZE)
 
 ClassStruct* new_ClassStruct0(Ctx *ctx, int field_size, int method_size)
 {

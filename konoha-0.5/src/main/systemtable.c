@@ -48,7 +48,7 @@ void konoha_loadSystemData(Ctx *ctx);
 /* [INITCONST] */
 
 static
-Object *new_Nue__T(Ctx *ctx, char *text)
+Object *new_Null(Ctx *ctx, char *text)
 {
 	knh_Nue_t *o = (knh_Nue_t*)new_hObject(ctx, FLAG_Nue, CLASS_Nue, CLASS_Nue);
 	o->str = (knh_uchar_t*)text;
@@ -306,8 +306,8 @@ Ctx *konoha_createContext0(size_t stacksize)
 	ctx->share->ClassTable = (knh_ClassTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TCLASS);
 	knh_bzero(ctx->share->ClassTable, SIZEOF_TCLASS);
 	for(i = 0; i < KNH_TCLASS_SIZE; i++) {
-		ctx->share->ClassTable[i].p1       = CLASS_Nue;   /* @deps knh_Class_isGenerics(cid)*/
-		ctx->share->ClassTable[i].p2       = CLASS_Nue;
+		ctx->share->ClassTable[i].p1       = CLASS_unknown;   /* @deps knh_Class_isGenerics(cid)*/
+		ctx->share->ClassTable[i].p2       = CLASS_unknown;
 		ctx->share->ClassTable[i].keyidx   = -1;
 		ctx->share->ClassTable[i].keyidx2   = -1;
 	}
@@ -323,8 +323,8 @@ Ctx *konoha_createContext0(size_t stacksize)
 
 	konoha_loadSystemStructData(ctx);
 
-	KNH_INITv(ctx->share->constNull, new_Nue__T(ctx, "Null!!"));
-	KNH_INITv(ctx->share->constVoid, new_Nue__T(ctx, "Null!!: return void"));
+	KNH_INITv(ctx->share->constNull, new_Null(ctx, "Null!!"));
+	KNH_INITv(ctx->share->constVoid, new_Null(ctx, "Null!!: return void"));
 	KNH_INITv(ctx->share->constTrue, new_Boolean0(ctx, 1));
 	KNH_INITv(ctx->share->constFalse, new_Boolean0(ctx, 0));
 	KNH_INITv(ctx->share->constFloat0, new_hObject(ctx, FLAG_Float, CLASS_Float, CLASS_Float));

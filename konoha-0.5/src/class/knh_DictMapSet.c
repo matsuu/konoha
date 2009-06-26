@@ -382,7 +382,7 @@ DictMap* new_DictMap0(Ctx *ctx, knh_intptr_t capacity)
 
 DictMap* new_DictMap(Ctx *ctx, knh_class_t p1, knh_intptr_t capacity)
 {
-	knh_class_t cid = knh_class_Generics(ctx, CLASS_DictMap, p1, CLASS_Nue);
+	knh_class_t cid = knh_class_Generics(ctx, CLASS_DictMap, p1, CLASS_unknown);
 	knh_DictMap_t *o = (knh_DictMap_t*)new_hObject(ctx, FLAG_DictMap, CLASS_DictMap, cid);
 	o->_list = knh_dict_malloc(ctx, capacity, knh_dictmap_finit, knh_dictmap_ftraverse, knh_dict_fcmp);
 	o->size = 0;

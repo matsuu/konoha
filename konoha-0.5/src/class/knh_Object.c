@@ -38,21 +38,6 @@ extern "C" {
 /* ======================================================================== */
 /* [macros] */
 
-#define _knh_Object_cid(o)           (o)->h.cid
-#define _knh_Object_bcid(o)          (o)->h.bcid
-
-/* ======================================================================== */
-/* [macros] */
-
-#define _IS_NULL(o)          (((Object*)o)->h.cid == CLASS_Nue)
-#define _IS_NOTNULL(o)       (((Object*)o)->h.cid != CLASS_Nue)
-
-#define _IS_TRUE(o)         ((o)->h.bcid == CLASS_Boolean && ((Int*)o)->n.bvalue)
-#define _IS_FALSE(o)        ((o)->h.bcid == CLASS_Boolean && (((Int*)o)->n.bvalue == 0))
-#define _new_Boolean(ctx, c)    (c) ? KNH_TRUE : KNH_FALSE
-
-#define _BOOL_ISTRUE(o)         (o == KNH_TRUE)
-#define _BOOL_ISFALSE(o)        (o == KNH_FALSE)
 
 ///* ------------------------------------------------------------------------ */
 //
@@ -64,20 +49,20 @@ extern "C" {
 /* ======================================================================== */
 /* [Null] */
 
-/* ------------------------------------------------------------------------ */
-
-Object *new_Nue(Ctx *ctx, String *msg)
-{
-	KNH_ASSERT(IS_String(msg));
-	knh_Nue_t *o = (knh_Nue_t*)new_hObject(ctx, FLAG_Nue, CLASS_Nue, CLASS_Nue);
-	KNH_INITv(o->orign, msg);
-	o->str = (knh_uchar_t*)knh_String_tochar(msg);
-	o->size = knh_String_strlen(msg);
-	return (Object*)o;
-}
-
-#define _new_Nue__b(ctx, txt)   new_Nue(ctx, new_String(ctx, txt, NULL));
-#define _new_Nue__s(ctx, txt)   new_Nue(ctx, new_String(ctx, B(txt), NULL));
+///* ------------------------------------------------------------------------ */
+//
+//Object *new_Nue(Ctx *ctx, String *msg)
+//{
+//	KNH_ASSERT(IS_String(msg));
+//	knh_Nue_t *o = (knh_Nue_t*)new_hObject(ctx, FLAG_Nue, CLASS_Nue, CLASS_Nue);
+//	KNH_INITv(o->orign, msg);
+//	o->str = (knh_uchar_t*)knh_String_tochar(msg);
+//	o->size = knh_String_strlen(msg);
+//	return (Object*)o;
+//}
+//
+//#define _new_Nue__b(ctx, txt)   new_Nue(ctx, new_String(ctx, txt, NULL));
+//#define _new_Nue__s(ctx, txt)   new_Nue(ctx, new_String(ctx, B(txt), NULL));
 
 /* ======================================================================== */
 /* [Glue] */
