@@ -128,8 +128,7 @@ knh_type_t knh_Token_gettype(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t def
 {
 	KNH_ASSERT(IS_Token(tk));
 	if(SP(tk)->tt == TT_ASIS) {
-		DBG2_ABORT();
-		return TYPE_var;
+		return defc;
 	}
 	if(SP(tk)->tt == TT_CID) {
 		return NNTYPE_cid(DP(tk)->cid);
@@ -150,11 +149,11 @@ knh_type_t knh_Token_gettype(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t def
 	}
 
 	if(knh_Token_isIteratorType(tk)) {
-		knh_class_t cid = knh_class_Generics(ctx, CLASS_Iterator, CLASS_type(type), CLASS_Any);
+		knh_class_t cid = knh_class_Generics(ctx, CLASS_Iterator, CLASS_type(type), CLASS_unknown);
 		return NNTYPE_cid(cid);
 	}
 	else if(knh_Token_isArrayType(tk)) {
-		knh_class_t cid = knh_class_Generics(ctx, CLASS_Array, CLASS_type(type), CLASS_Any);
+		knh_class_t cid = knh_class_Generics(ctx, CLASS_Array, CLASS_type(type), CLASS_unknown);
 		if(!knh_Token_isNullableType(tk)) return NNTYPE_cid(cid);
 		return cid;
 	}
@@ -366,6 +365,7 @@ knh_index_t knh_Asm_addVariableTable(Ctx *ctx, Asm *abr,
 		knh_cfield_t *cf, size_t max, knh_flag_t flag, knh_type_t type, knh_fieldn_t fn, Object *value)
 {
 	size_t idx;
+	KNH_ASSERT_cid(CLASS_type(type));
 	for(idx = 0; idx < max; idx++) {
 		if(cf[idx].fn == FIELDN_NONAME) {
 			cf[idx].flag = flag;
@@ -1283,7 +1283,7 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	knh_fieldn_t fn  = FIELDN_UNMASK(fnq);
 	knh_flag_t flag  = knh_Stmt_metaflag__field(ctx, stmt);
 
-	knh_type_t pmztype  = knh_Token_gettype(ctx, StmtDECL_type(stmt), ns, TYPE_var);
+	knh_type_t pmztype  = knh_Token_gettype(ctx, StmtDECL_type(stmt), ns, TYPE_Any/*var*/);
 	knh_type_t type = knh_pmztype_totype(ctx, pmztype, DP(abr)->this_cid);
 
 	if(TERMs_isNULL(ctx, stmt, 2) && !TERMs_isASIS(stmt, 2)
