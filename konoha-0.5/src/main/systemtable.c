@@ -324,7 +324,6 @@ Ctx *konoha_createContext0(size_t stacksize)
 	konoha_loadSystemStructData(ctx);
 
 	KNH_INITv(ctx->share->constNull, new_Null(ctx, "Null!!"));
-	KNH_INITv(ctx->share->constVoid, new_Null(ctx, "Null!!: return void"));
 	KNH_INITv(ctx->share->constTrue, new_Boolean0(ctx, 1));
 	KNH_INITv(ctx->share->constFalse, new_Boolean0(ctx, 0));
 	KNH_INITv(ctx->share->constFloat0, new_hObject(ctx, FLAG_Float, CLASS_Float, CLASS_Float));
@@ -385,7 +384,6 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 	knh_Context_traverseCommon(ctx, (knh_Context_t*)ctx, ftr);
 
 	ftr(ctx, ctx->share->constNull);
-	ftr(ctx, ctx->share->constVoid);
 	ftr(ctx, ctx->share->constTrue);
 	ftr(ctx, ctx->share->constFalse);
 	ftr(ctx, UP(ctx->share->constFloat0));

@@ -667,7 +667,7 @@ typedef struct {
 #define knh_systemEncoding    DP(ctx->sys)->enc
 
 #define KNH_NULL            (ctx->share->constNull)
-#define KNH_VOID            (ctx->share->constVoid)
+#define KNH_VOID            (ctx->share->constNull)
 #define KNH_TRUE            (ctx->share->constTrue)
 #define KNH_FALSE           (ctx->share->constFalse)
 #define KNH_SYSTEM          (ctx->sys)
@@ -713,7 +713,6 @@ typedef struct {
 
 	/* system const */
 	knh_Object_t   *constNull;
-	knh_Object_t   *constVoid;
 	knh_Object_t   *constTrue;
 	knh_Object_t   *constFalse;
 	struct knh_Float_t   *constFloat0;
