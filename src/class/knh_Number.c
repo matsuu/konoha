@@ -120,17 +120,6 @@ KNHAPI(Int*) new_IntX(Ctx *ctx, knh_class_t cid, knh_int_t value)
 	}
 }
 
-/* ------------------------------------------------------------------------ */
-
-knh_int_t knh_IntNULL_toint(Int *v)
-{
-	if(IS_NULL(v)) {
-		return 0;
-	}else {
-		return v->n.ivalue;
-	}
-}
-
 /* ======================================================================== */
 /* [Float] */
 

@@ -215,7 +215,6 @@ KNHAPI(void) knh_ResultSet_setBlob(Ctx *ctx, ResultSet *o, size_t n, knh_bytes_t
 KNHAPI(void) knh_ResultSet_setNULL(Ctx *ctx, ResultSet *o, size_t n);
 KNHAPI(String*) new_String(Ctx *ctx, knh_bytes_t t, String *orign);
 KNHAPI(knh_bytes_t) knh_String_tobytes(String *o);
-KNHAPI(knh_bytes_t) knh_StringNULL_tobytes(String *o, knh_bytes_t def);
 KNHAPI(void) konoha_addParserDriver(Ctx *ctx, char *alias, knh_parser_drvapi_t *d);
 KNHAPI(void) konoha_setSystemPropertyText(Ctx *ctx, char *key, char *value);
 KNHAPI(void) knh_putc(Ctx *ctx, OutputStream *w, int ch);

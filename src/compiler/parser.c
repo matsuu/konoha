@@ -380,7 +380,7 @@ void knh_Stmt_add_PARAMs(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		knh_Stmt_tokens_perror(ctx, o, tc, _("syntax error: %s"));
 	}
 	knh_tokens_t param_tc;
-	knh_Token_tc(tc->ts[tc->c], &param_tc); tc->c += 1;
+	knh_Token_tc(ctx, tc->ts[tc->c], &param_tc); tc->c += 1;
 	if(param_tc.c == param_tc.e) {
 		knh_Stmt_add(ctx, o, TM(new_Stmt(ctx, 0, STT_DONE)));
 		return;
@@ -688,7 +688,7 @@ Term *new_TermTUPLE(Ctx *ctx, Token *tk)
 {
 	knh_tokens_t tc;
 	int c;
-	knh_Token_tc(tk, &tc);
+	knh_Token_tc(ctx, tk, &tc);
 	if(tc.e == 0) {
 		return TM(new_TokenCONST(ctx, FL(tk), KNH_NULL));
 	}
@@ -739,7 +739,7 @@ static
 Stmt *new_StmtARRAY(Ctx *ctx, Token *tk)
 {
 	knh_tokens_t tc;
-	knh_Token_tc(tk, &tc);
+	knh_Token_tc(ctx, tk, &tc);
 	Stmt *stmt = new_Stmt(ctx, 0, STT_NEW);
 	knh_Stmt_add(ctx, stmt, TM(new_TokenMN(ctx, FL(tk), METHODN_new__init)));
 	knh_Stmt_add(ctx, stmt, TM(new_TokenCID(ctx, FL(tk), CLASS_Array)));
@@ -756,7 +756,7 @@ void knh_Stmt_add_IDX(Ctx *ctx, Stmt *stmt, Token *tkb, int lr)
 	knh_tokens_t tc;
 
 	Token *tkidx = NULL;
-	knh_Token_tc(tkb, &tc);
+	knh_Token_tc(ctx, tkb, &tc);
 	if(tc.e == 0) {
 		knh_Stmt_add(ctx, stmt, TM(new_TokenMN(ctx, FL(tkb), METHODN_setAll)));
 		knh_Stmt_swap01(stmt);
@@ -826,21 +826,21 @@ void knh_tokens_toArray(Ctx *ctx, knh_tokens_t *tc, Array *a, int ignoreCOMMA)
 		if(SP(ts[i])->tt == TT_PARENTHESIS) {
 			knh_tokens_t intc;
 			knh_Array_add(ctx, a, UP(TS_LP));
-			knh_Token_tc(ts[i], &intc);
+			knh_Token_tc(ctx, ts[i], &intc);
 			knh_tokens_toArray(ctx, &intc, a, 0);
 			knh_Array_add(ctx, a, UP(TS_RP));
 		}
 		else if(SP(ts[i])->tt == TT_BRACE) {
 			knh_tokens_t intc;
 			knh_Array_add(ctx, a, UP(TS_LB));
-			knh_Token_tc(ts[i], &intc);
+			knh_Token_tc(ctx, ts[i], &intc);
 			knh_tokens_toArray(ctx, &intc, a, 0);
 			knh_Array_add(ctx, a, UP(TS_RB));
 		}
 		else if(SP(ts[i])->tt == TT_BRANCET) {
 			knh_tokens_t intc;
 			knh_Array_add(ctx, a, UP(TS_LS));
-			knh_Token_tc(ts[i], &intc);
+			knh_Token_tc(ctx, ts[i], &intc);
 			knh_tokens_toArray(ctx, &intc, a, 0);
 			knh_Array_add(ctx, a, UP(TS_RS));
 		}
@@ -870,11 +870,11 @@ void knh_Stmt_add_PAIR(Ctx *ctx, Stmt *stmt, knh_tokens_t *tc)
 	}
 
 	if(SP(ts[s])->tt == TT_LABEL) {
-		knh_Stmt_add(ctx, stmt, TM(knh_Token_toCONST(ts[s])));
+		knh_Stmt_add(ctx, stmt, TM(knh_Token_toCONST(ctx, ts[s])));
 		s = tc->c + 1;
 	}
 	else if(DP(ts[s])->tt_next == TT_COLON) {
-		knh_Stmt_add(ctx, stmt, TM(knh_Token_toCONST(ts[s])));
+		knh_Stmt_add(ctx, stmt, TM(knh_Token_toCONST(ctx, ts[s])));
 		s = tc->c + 2;
 	}
 	else {
@@ -901,7 +901,7 @@ void knh_Stmt_add_PAIR(Ctx *ctx, Stmt *stmt, knh_tokens_t *tc)
 		if(!IS_bString(DP(ts[s])->data)) {
 			KNH_SETv(ctx, DP(ts[s])->data, new_String(ctx, knh_Token_tobytes(ctx, ts[s]), NULL));
 		}
-		knh_Stmt_add(ctx, stmt, TM(knh_Token_toCONST(ts[s])));
+		knh_Stmt_add(ctx, stmt, TM(knh_Token_toCONST(ctx, ts[s])));
 		return;
 	}
 
@@ -950,7 +950,7 @@ static
 Stmt *new_StmtDICTMAP(Ctx *ctx, Token *ctk, Token *tk)
 {
 	knh_tokens_t tc;
-	knh_Token_tc(tk, &tc);
+	knh_Token_tc(ctx, tk, &tc);
 	Stmt *stmt = new_Stmt(ctx, 0, STT_NEW);
 	knh_Stmt_add(ctx, stmt, TM(new_TokenMN(ctx, FL(tk), METHODN_new__init)));
 	if(IS_NULL(ctk)) {
@@ -998,7 +998,7 @@ Stmt *new_StmtPROPN(Ctx *ctx, Token *tk, int lr)
 		knh_Stmt_add(ctx, stmt, TM(new_TokenMN(ctx, FL(tk), METHODN_getProperty)));
 	}
 	knh_Stmt_add(ctx, stmt, TM(new_TokenCID(ctx, FL(tk), CLASS_Context)));
-	knh_Token_toCONST(tk);
+	knh_Token_toCONST(ctx, tk);
 	knh_Stmt_add(ctx, stmt, TM(tk));
 	return stmt;
 }
@@ -1060,7 +1060,7 @@ Stmt *new_StmtINSTMT(Ctx *ctx, Token *tk)
 	DBG2_ASSERT(SP(tk)->tt == TT_BRACE);
 
 	knh_tokens_t tc;
-	knh_Token_tc(tk, &tc);
+	knh_Token_tc(ctx, tk, &tc);
 	Stmt *first_stmt = NULL, *last_stmt = NULL;
 	int prev = 0;
 
@@ -1073,11 +1073,11 @@ Stmt *new_StmtINSTMT(Ctx *ctx, Token *tk)
 		prev = tc.c;
 		if(first_stmt == NULL) {
 			first_stmt = new_StmtSTMT1(ctx, &tc);
-			last_stmt = knh_Stmt_tail(first_stmt);
+			last_stmt = knh_Stmt_tail(ctx, first_stmt);
 		}
 		else {
 			KNH_SETv(ctx, DP(last_stmt)->next, new_StmtSTMT1(ctx, &tc));
-			last_stmt = knh_Stmt_tail(DP(last_stmt)->next);
+			last_stmt = knh_Stmt_tail(ctx, DP(last_stmt)->next);
 		}
 		if(prev == tc.c) { /* infinate loop */
 			DBG_P("Infinate loop? prev = %d, c = %d, e = %d", prev, tc.c, tc.e);
@@ -1100,7 +1100,7 @@ Term *new_TermPEXPR(Ctx *ctx, Token *tk)
 	KNH_ASSERT(SP(tk)->tt == TT_PARENTHESIS);
 	{
 		knh_tokens_t p_tc;
-		knh_Token_tc(tk, &p_tc);
+		knh_Token_tc(ctx, tk, &p_tc);
 		if(p_tc.e == 0) {
 			knh_Token_perror(ctx, tk, KERR_ERRATA, _("empty: () ==> false"));
 			return TM(new_TokenCONST(ctx, FL(tk), KNH_FALSE));
@@ -1245,7 +1245,7 @@ Stmt *new_StmtOPR(Ctx *ctx, knh_tokens_t *tc, Token *op)
 			knh_tokens_t op_tc = knh_tokens_splitEXPR(ctx, tc, SP(op)->tt);
 //			if(SP(op_tc.ts[tc->c])->tt == TT_PARENTHESIS) {
 //				knh_tokens_t ptc;
-//				knh_Token_tc(op_tc.ts[tc->c], &ptc);
+//				knh_Token_tc(ctx, op_tc.ts[tc->c], &ptc);
 //				knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &op_tc, KNH_RVALUE));
 //				knh_Stmt_add_EXPRs(ctx, stmt, &ptc);
 //				tc->c += 1;
@@ -1266,7 +1266,7 @@ static Token *knh_Token_findCASTNULL(Ctx *ctx, Token *tk, Token *ntk)
 {
 	if(SP(tk)->tt == TT_PARENTHESIS && !knh_Token_isTopDot(ntk)) {
 		knh_tokens_t tc;
-		knh_Token_tc(tk, &tc);
+		knh_Token_tc(ctx, tk, &tc);
 		if(tc.e == 0) return NULL;
 		if((tc.e > 2 && (tc.ts[1])->tt != TT_WITH)  || tc.e == 2) {
 			knh_Token_perror(ctx, tc.ts[1], KERR_ERROR, _("syntax error"));
@@ -1293,7 +1293,7 @@ Stmt *new_StmtCAST(Ctx *ctx, Token *tk, knh_tokens_t *tc)
 	Stmt *stmt = new_Stmt(ctx, 0, STT_MAPCAST);
 	KNH_ASSERT(SP(tk)->tt == TT_PARENTHESIS);
 	knh_tokens_t ctc;
-	knh_Token_tc(tk, &ctc);
+	knh_Token_tc(ctx, tk, &ctc);
 	knh_Stmt_add(ctx, stmt, TM(ctc.ts[0]));
 	knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, tc, KNH_RVALUE));
 	if(ctc.e > 2) {
@@ -1453,7 +1453,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 			else if(DP(ts[oc+1])->tt_next == TT_BRANCET) {   /* @TEST new Int[10] */
 				stmt = new_Stmt(ctx, 0, STT_NEW);
 				knh_tokens_t cma_tc;
-				knh_Token_tc(ts[oc+2], &cma_tc);
+				knh_Token_tc(ctx, ts[oc+2], &cma_tc);
 				if(knh_tokens_count(&cma_tc, TT_COMMA) == 1) {
 					knh_Stmt_add(ctx, stmt, TM(new_TokenMN(ctx, FL(ts[oc]), METHODN_new__array2D)));
 				}
@@ -1623,7 +1623,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 	KNH_ASSERT(SP(ts[pc])->tt == TT_PARENTHESIS);
 	{
 		knh_tokens_t ptc;
-		knh_Token_tc(ts[pc], &ptc);
+		knh_Token_tc(ctx, ts[pc], &ptc);
 		knh_Stmt_add_EXPRs(ctx, stmt, &ptc);
 	}
 	if(DP(stmt)->size == 1) {
@@ -1888,7 +1888,7 @@ void knh_StmtMETA_addMeta2(Ctx *ctx, Stmt *o, String *k, Token *p)
 	}
 	if(IS_DictMap(DP(o)->metaDictMap)) {
 		knh_tokens_t tc;
-		knh_Token_tc(p, &tc);
+		knh_Token_tc(ctx, p, &tc);
 		if(tc.e == 0) {
 			knh_DictMap_set(ctx, DP(o)->metaDictMap, k, UP(k));
 		}
@@ -2516,7 +2516,7 @@ knh_Stmt_add_PEACH(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 	knh_tokens_t ptc;
 	knh_tokens_t val_tc, from_tc, where_tc;
 	int i;
-	knh_Token_tc(tc->ts[tc->c], &ptc);
+	knh_Token_tc(ctx, tc->ts[tc->c], &ptc);
 	for(i = 1; i < ptc.e; i++) {
 		if(SP(ptc.ts[i])->tt == TT_FROM || SP(ptc.ts[i])->tt == TT_COLON
 			|| (i > 0 && SP(ptc.ts[i])->tt == TT_NAME && ISB(knh_Token_tobytes(ctx, ptc.ts[i]), "in"))) {
@@ -2584,7 +2584,7 @@ void knh_Stmt_add_PSTMT3(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 	}
 
 	knh_tokens_t ptc;
-	knh_Token_tc(tc->ts[tc->c], &ptc);
+	knh_Token_tc(ctx, tc->ts[tc->c], &ptc);
 
 	if(knh_tokens_count(&ptc, TT_COLON) > 0) {
 		/* java-style for(n : a) */
@@ -2699,7 +2699,7 @@ static Stmt *new_StmtCATCH(Ctx *ctx, knh_tokens_t *tc)
 	Stmt *stmt = NULL;
 	if(tc->c < tc->e && SP(tc->ts[tc->c])->tt == TT_PARENTHESIS) {
 		knh_tokens_t tcP;  /* (tcP)*/
-		knh_Token_tc(tc->ts[tc->c], &tcP);
+		knh_Token_tc(ctx, tc->ts[tc->c], &tcP);
 		if(tcP.e < 1) {
 			knh_Token_perror(ctx, tc->ts[tc->c], KERR_DWARN, _("nothing to catch"));
 			return new_Stmt(ctx, 0, STT_DONE);

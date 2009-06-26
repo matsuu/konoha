@@ -445,7 +445,7 @@ static
 int knh_Token_toClosureType(Ctx *ctx, Token *tkt, Token *tkp)
 {
 	knh_tokens_t tc ;
-	knh_Token_tc(tkp, &tc);
+	knh_Token_tc(ctx, tkp, &tc);
 	knh_cwb_t cwb = new_cwb(ctx);
 	knh_write_tktype(ctx, cwb.w, tkt);
 	knh_putc(ctx, cwb.w, '(');

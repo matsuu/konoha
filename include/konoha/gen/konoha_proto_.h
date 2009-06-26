@@ -97,8 +97,6 @@ void knh_Array_remove(Ctx *ctx, Array *o, size_t n);
 Any* knh_Array_pop(Ctx *ctx, Array *o);
 /* ../src/class/knh_Bytes.c */
 size_t knh_bytes_newsize(size_t s);
-knh_bytes_t knh_BytesNULL_tobytes(Bytes *o);
-char *knh_BytesNULL_tochar(Bytes *o);
 void knh_Bytes_unputc(Bytes *o);
 /* ../src/class/knh_bytes_t.c */
 size_t knh_size(size_t s);
@@ -309,7 +307,6 @@ knh_type_t knh_NameSpace_tagcid(Ctx *ctx, NameSpace *o, knh_class_t cid, knh_byt
 /* ../src/class/knh_Number.c */
 knh_int_t knh_Number_tointeger(Any *o);
 knh_float_t knh_Number_tofloat(Any *o);
-knh_int_t knh_IntNULL_toint(Int *v);
 /* ../src/class/knh_Object.c */
 METHOD knh__Object_new(Ctx *ctx, knh_sfp_t *sfp);
 String *knh_Object_getkey(Ctx *ctx, Object *o);
@@ -356,7 +353,6 @@ String *new_StringX__fast(Ctx *ctx, knh_class_t cid, knh_bytes_t t, String *orig
 String *new_StringX(Ctx *ctx, knh_class_t cid, knh_bytes_t t, String *orign);
 String *new_String__int(Ctx *ctx, knh_int_t n);
 String *new_String__float(Ctx *ctx, knh_float_t n);
-char *knh_StringNULL_tochar(String *o);
 knh_bool_t knh_String_equals(String *o, knh_bytes_t s);
 knh_bool_t knh_String_startsWith(String *b, knh_bytes_t s);
 knh_bool_t knh_String_endsWith(String *b, knh_bytes_t s);
@@ -455,7 +451,7 @@ void knh_Asm_perror(Ctx *ctx, Asm *abr, int pe, char *fmt, ...);
 Stmt* new_Stmt(Ctx *ctx, knh_flag_t flag, knh_stmt_t stt);
 void knh_Stmt_toERR(Ctx *ctx, Stmt *stmt, Term *tm);
 void knh_Stmt_add(Ctx *ctx, Stmt *o, Term *tm);
-Stmt *knh_Stmt_tail(Stmt *o);
+Stmt *knh_Stmt_tail(Ctx *ctx, Stmt *o);
 Stmt* knh_StmtNULL_tail_append(Ctx *ctx, Stmt *o, Stmt *stmt);
 knh_bool_t knh_Stmt_hasMeta(Stmt *o);
 knh_flag_t knh_StmtMETHOD_flag(Ctx *ctx, Stmt *o);
@@ -473,7 +469,7 @@ Token *new_TokenCID(Ctx *ctx, Any *fln, knh_class_t cid);
 Token *new_TokenMN(Ctx *ctx, Any *fln, knh_methodn_t mn);
 Token *new_TokenFN(Ctx *ctx, Any *fln, knh_fieldn_t fn);
 Token *new_Token__S(Ctx *ctx, Any *fln, knh_token_t tt, String *t);
-void knh_Token_tc(Token *o, knh_tokens_t *tc);
+void knh_Token_tc(Ctx *ctx, Token *o, knh_tokens_t *tc);
 void knh_Token_tokens_add(Ctx *ctx, Token *o, Token *tk);
 void knh_Token_tokens_empty(Ctx *ctx, Token *o);
 char *knh_Token_tochar(Ctx *ctx, Token *o);
@@ -489,7 +485,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in);
 /* ../src/compiler/typing.c */
 Token* new_TokenCONST(Ctx *ctx, Any *fln, Any *data);
 void knh_Token_setCONST(Ctx *ctx, Token *o, Any *data);
-Token* knh_Token_toCONST(Token *o);
+Token* knh_Token_toCONST(Ctx *ctx, Token *o);
 Token* new_TokenNULL(Ctx *ctx, Any *fln, knh_type_t type);
 knh_index_t knh_Asm_indexOfVariable(Asm *abr, knh_fieldn_t fnq);
 int knh_ismtchar(int c);

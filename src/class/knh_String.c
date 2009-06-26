@@ -202,34 +202,12 @@ String *new_String__float(Ctx *ctx, knh_float_t n)
 /* ======================================================================== */
 /* [misc] */
 
-char *knh_StringNULL_tochar(String *o)
-{
-	if(IS_NULL(o)) {
-		return "";
-	}else {
-		return (char*)o->str;
-	}
-}
-
-/* ------------------------------------------------------------------------ */
-
 KNHAPI(knh_bytes_t) knh_String_tobytes(String *o)
 {
 	knh_bytes_t bt = {o->str, o->size};
 	return bt;
 }
 
-/* ------------------------------------------------------------------------ */
-
-KNHAPI(knh_bytes_t) knh_StringNULL_tobytes(String *o, knh_bytes_t def)
-{
-	if(IS_NULL(o)) {
-		return def;
-	}else {
-		knh_bytes_t bt = {o->str, o->size};
-		return bt;
-	}
-}
 
 /* ------------------------------------------------------------------------ */
 

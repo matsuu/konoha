@@ -262,11 +262,7 @@ extern "C" {
 
 #define knh_class_isSingleton(o)  \
 	((ctx->share->ClassTable[(o)].cflag & KNH_FLAG_CF_SINGLETON) == KNH_FLAG_CF_SINGLETON)
-#define KNH_FLAG_CF_NULLOBJECT          KNH_FLAG_T7
-
-#define knh_class_isNullObject(o)  \
-	((ctx->share->ClassTable[(o)].cflag & KNH_FLAG_CF_NULLOBJECT) == KNH_FLAG_CF_NULLOBJECT)
-#define KNH_FLAG_CF_INTERFACE           KNH_FLAG_T8
+#define KNH_FLAG_CF_INTERFACE           KNH_FLAG_T7
 
 #define knh_class_isInterface(o)  \
 	((ctx->share->ClassTable[(o)].cflag & KNH_FLAG_CF_INTERFACE) == KNH_FLAG_CF_INTERFACE)

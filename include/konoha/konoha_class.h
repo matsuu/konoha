@@ -110,8 +110,10 @@ typedef struct knh_Nue_t {
 	struct knh_String_t *orign;
 } knh_Nue_t;
 
-#define IS_NULL(o)          (((Object*)o)->h.cid == CLASS_Nue)
-#define IS_NOTNULL(o)       (((Object*)o)->h.cid != CLASS_Nue)
+//#define IS_NULL(o)          (((Object*)o)->h.cid == CLASS_Nue)
+//#define IS_NOTNULL(o)       (((Object*)o)->h.cid != CLASS_Nue)
+#define IS_NULL(o)            ((ctx)->share->constNull == (o))
+#define IS_NOTNULL(o)         ((ctx)->share->constNull != (o))
 
 /* ------------------------------------------------------------------------ */
 /* @class Boolean Object knh_Boolean_t @Immutable */
@@ -396,8 +398,6 @@ typedef struct knh_DictIdx_t {
 /* @flag Class.Private!Public CF ctx->share->ClassTable[(%s)].cflag 'is:*:is:*' */
 /* @flag Class.Final CF ctx->share->ClassTable[(%s)].cflag 'is:*:is:*' */
 /* @flag Class.Singleton CF ctx->share->ClassTable[(%s)].cflag 'is:*:*:*' */
-/* @ flag Class.System CF ctx->share->ClassTable[(%s)].cflag 'is:*:is:*' */
-/* @flag Class.NullObject CF ctx->share->ClassTable[(%s)].cflag 'is:*:*:*' */
 /* @flag Class.Interface  CF ctx->share->ClassTable[(%s)].cflag 'is:*:is:*' */
 
 typedef struct knh_Class_t {
