@@ -47,11 +47,10 @@ extern "C" {
 /* @flag Object.Release!Debug OF (%s)->h.flag 'is:*:is:*' */
 /* @flag Object.Immutable OF (%s)->h.flag 'is:*:is:*' */
 /* @flag Object.Cyclic OF (%s)->h.flag 'is:set:*:*' */
-/* @flag Object.MetaData OF (%s)->h.flag 'has:set:has:*' */
-/* @flag Object.Synchronized OF (%s)->h.flag 'is:*:is:*' */
+/* @flag Object.Undefined OF (%s)->h.flag 'is:*:is:*' */
 /* @flag Object.Modified OF (%s)->h.flag 'is:set:is:set' */
-/* @flag Object.GCMarked OF (%s)->h.flag 'is:set:is:set' */
 /* @flag Object.Formatted OF (%s)->h.flag 'is:set:is:set' */
+/* @flag Object.Shared OF (%s)->h.flag 'is:set:is:set' */
 /* @flag Object.Local4 OF (%s)->h.flag 'is:set:*:*' */
 /* @flag Object.Local3 OF (%s)->h.flag 'is:set:*:*' */
 /* @flag Object.Local2 OF (%s)->h.flag 'is:set:*:*' */
@@ -66,6 +65,9 @@ typedef struct knh_ObjectField_t {
 	Object  **fields;
 	size_t  bsize;
 } knh_ObjectField_t ;
+
+#define knh_Object_cid(o)           (o)->h.cid
+#define knh_Object_bcid(o)          (o)->h.bcid
 
 /* ------------------------------------------------------------------------ */
 
@@ -108,6 +110,9 @@ typedef struct knh_Nue_t {
 	struct knh_String_t *orign;
 } knh_Nue_t;
 
+#define IS_NULL(o)          (((Object*)o)->h.cid == CLASS_Nue)
+#define IS_NOTNULL(o)       (((Object*)o)->h.cid != CLASS_Nue)
+
 /* ------------------------------------------------------------------------ */
 /* @class Boolean Object knh_Boolean_t @Immutable */
 
@@ -124,6 +129,13 @@ typedef struct knh_Boolean_t {
 	knh_hObject_t h;
 	knh_nObject_t n;
 } knh_Boolean_t;
+
+#define IS_TRUE(o)         ((o)->h.bcid == CLASS_Boolean && ((Int*)o)->n.bvalue)
+#define IS_FALSE(o)        ((o)->h.bcid == CLASS_Boolean && (((Int*)o)->n.bvalue == 0))
+#define new_Boolean(ctx, c)    (c) ? KNH_TRUE : KNH_FALSE
+
+#define _BOOL_ISTRUE(o)         (o == KNH_TRUE)
+#define _BOOL_ISFALSE(o)        (o == KNH_FALSE)
 
 /* ------------------------------------------------------------------------ */
 /* @class Number Object knh_Number_t @Immutable */
@@ -404,7 +416,7 @@ typedef struct knh_Class_t {
 
 #define knh_Class_cid(c)     (knh_class_t)(c)->cid
 #define KNH_FLAG_CF2OF(f)        (f)
-#define knh_Class_isGenerics(cid)    (ctx->share->ClassTable[cid].p1 != CLASS_Nue)
+#define knh_Class_isGenerics(cid)    (ctx->share->ClassTable[cid].p1 != CLASS_unknown)
 
 /* ------------------------------------------------------------------------ */
 /* @class ClassStruct Object knh_ClassStruct_t @Private */

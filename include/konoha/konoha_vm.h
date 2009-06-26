@@ -606,16 +606,9 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 
 #define KLR_AMAP(ctx, n, tcid)  { \
 		knh_class_t scid = knh_Object_cid(sfp[n].o);\
-		if(scid != ((knh_class_t)tcid) && !knh_class_instanceof(ctx, scid, tcid) && scid != CLASS_Nue) { \
+		if(scid != ((knh_class_t)tcid) && !knh_class_instanceof(ctx, scid, tcid) && IS_NOTNULL(sfp[n].o)) { \
 			KLR_MOV(ctx, sfp[n+1].o, konoha_findMapper(ctx, scid, tcid)); \
 			(sfp[n+1].mpr)->fmap_1(ctx, sfp + n); \
-		} \
-	} \
-
-#define KLR_DCAST(ctx, n, tcid)  { \
-		knh_class_t scid = knh_Object_cid(sfp[n].o);\
-		if(scid != ((knh_class_t)tcid) && !knh_class_instanceof(ctx, scid, tcid) && scid != CLASS_Nue) { \
-			KNH_THROWs(ctx, "ClassCast!!"); \
 		} \
 	} \
 

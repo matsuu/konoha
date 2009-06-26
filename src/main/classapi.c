@@ -2915,10 +2915,10 @@ static void konoha_loadClassProperties(Ctx *ctx)
 	KNH_SETv(ctx, ctx->share->ClassTable[CLASS_Float].cspec, u);
 	KNH_SETv(ctx, ctx->share->ClassTable[CLASS_String].cspec, u);
 
-	konoha_setClassParam(ctx, CLASS_Array, CLASS_Any, CLASS_Nue);
-	konoha_setClassParam(ctx, CLASS_Iterator, CLASS_Any, CLASS_Nue);
-	konoha_setClassParam(ctx, CLASS_DictMap, CLASS_Any, CLASS_Nue);
-	konoha_setClassParam(ctx, CLASS_DictSet, CLASS_Any, CLASS_Nue);
+	konoha_setClassParam(ctx, CLASS_Array, CLASS_Any, CLASS_unknown);
+	konoha_setClassParam(ctx, CLASS_Iterator, CLASS_Any, CLASS_unknown);
+	konoha_setClassParam(ctx, CLASS_DictMap, CLASS_Any, CLASS_unknown);
+	konoha_setClassParam(ctx, CLASS_DictSet, CLASS_Any, CLASS_unknown);
 	konoha_setClassParam(ctx, CLASS_HashMap, CLASS_Any, CLASS_Any);
 	konoha_setClassParam(ctx, CLASS_HashSet, CLASS_Any, CLASS_Any);
 	ctx->share->ClassTable[CLASS_Closure].r0 = CLASS_Any;

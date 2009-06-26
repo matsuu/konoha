@@ -320,8 +320,6 @@ typedef knh_uint16_t       knh_expt_t;    /* knh_expt_t */
 #define TYPE_var                      CLASS_Nue
 #define TYPE_void                     NNTYPE_cid(CLASS_Nue)
 #define NNTYPE_void                   NNTYPE_cid(CLASS_Nue)
-#define TYPE_any                      CLASS_Any
-#define NNTYPE_any                    CLASS_any
 
 /* ------------------------------------------------------------------------ */
 

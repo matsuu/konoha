@@ -28,11 +28,6 @@
 /* ************************************************************************ */
 
 #include"commons.h"
-#ifdef KONOHA_OS__LKM
-#include"../../include/konoha/gen/konohac_klr_.h"
-#else
-#include<konoha/gen/konohac_klr_.h>
-#endif
 
 /* ************************************************************************ */
 
@@ -59,10 +54,6 @@ static knh_labelid_t knh_Asm_newLabelId(Ctx *ctx, Asm *abr, Token *tk);
 
 static
 void TERMs_asm(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_type_t reqt, int sfpidx);
-
-/* ======================================================================== */
-/* [structs] */
-
 
 /* ======================================================================== */
 /* [constructor] */
@@ -1670,7 +1661,7 @@ static
 void knh_StmtMT_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 {
 	int local = ASML(abr, sfpidx);
-	TERMs_asm(ctx, stmt, 1, abr, TYPE_any, local);
+	TERMs_asm(ctx, stmt, 1, abr, TYPE_Any, local);
 	Token *tk = DP(stmt)->tokens[0];
 	if(DP(stmt)->size == 2) {
 		KNH_ASM_TOSTR_(ctx, abr, local, DP(tk)->mn);
