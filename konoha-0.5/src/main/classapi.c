@@ -264,64 +264,14 @@ static
 void knh_Any_traverse(Ctx *ctx, knh_Glue_t *g, knh_ftraverse ftr)
 {
 	if(IS_SWEEP(ftr)) {
-		g->gfree(ctx, g);
-		knh_Glue_init(ctx, g, NULL, NULL);
+		if(IS_NULL(g)) {
+			DBG_P("freeing null");
+		}
+		else {
+			g->gfree(ctx, g);
+			knh_Glue_init(ctx, g, NULL, NULL);
+		}
 	}
-}
-
-/* ======================================================================== */
-/* Nue */
-
-#define knh_Nue_init_ NULL
-#define knh_Nue_copy NULL
-#define knh_Nue_traverse_ NULL
-#define knh_Nue_compareTo_ NULL
-#define knh_Nue_hashCode_ NULL
-#define knh_Nue_newClass NULL
-#define knh_Nue_getkey_ NULL
-
-/* ------------------------------------------------------------------------ */
-
-static
-void knh_Nue_init(Ctx *ctx, knh_Nue_t *n, int init)
-{
-	n->orign = NULL;
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-void knh_Nue_traverse(Ctx *ctx, knh_Nue_t *n, knh_ftraverse ftr)
-{
-	if(n->orign != NULL) {
-		KNH_ASSERT(IS_bString(n->orign));
-		ftr(ctx, UP(n->orign));
-		n->orign = NULL;
-	}
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-int knh_Nue_compareTo(Nue *o, Nue *o1)
-{
-	return 0;
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-knh_hcode_t knh_Nue_hashCode(Ctx *ctx, Nue *o)
-{
-	return 0;
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-String *knh_Nue_getkey(Ctx *ctx, knh_sfp_t *lsfp)
-{
-	return TS_null;
 }
 
 /* ======================================================================== */
@@ -2368,6 +2318,7 @@ void knh_KLRCode_traverse(Ctx *ctx, KLRCode *o, knh_ftraverse ftr)
 #define knh_Any1_fdefault NULL
 #define knh_Any2_fdefault NULL
 #define knh_Any3_fdefault NULL
+#define knh_AnyVar_fdefault NULL
 #define knh_Nue_fdefault NULL
 #define knh_Boolean_fdefault_ NULL
 #define knh_Number_fdefault NULL

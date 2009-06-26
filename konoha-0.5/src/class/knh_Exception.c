@@ -260,17 +260,9 @@ KNHAPI(Exception*) new_Exception__b(Ctx *ctx, knh_bytes_t msg)
 
 /* ------------------------------------------------------------------------ */
 
-Exception* new_Exception__Nue(Ctx *ctx, Object *o)
+Exception* new_NullException (Ctx *ctx, Object *o)
 {
-	knh_Exception_t* e = (knh_Exception_t*)new_Object_bcid(ctx, CLASS_Exception, 0);
-	Nue *nue = (Nue*)o;
-	if(IS_NOTNULL(o) || nue->orign != NULL) {
-		knh_Exception_new__init(ctx, e, (String*)nue->orign, (String*)KNH_NULL, (Object*)KNH_NULL);
-	}
-	else {
-		knh_Exception_new__init(ctx, e, new_String(ctx, B((char*)nue->str), NULL), (String*)KNH_NULL, (Object*)KNH_NULL);
-	}
-	return e;
+	return new_Exception__b(ctx, STEXT("Null!!"));
 }
 
 /* ------------------------------------------------------------------------ */

@@ -70,7 +70,6 @@ static knh_StringData_t StringData[] = {
 static char* StructName[] =  {
 	"Object",
 	"Any",
-	"Nue",
 	"Boolean",
 	"Number",
 	"Int",
@@ -136,16 +135,6 @@ static knh_StructData_t StructData[] = {
 		(knh_fstruct_hashCode)knh_Any_hashCode,
 		(knh_fstruct_newClass)knh_Any_newClass,
 		knh_Any_getkey
-	},
-	{
-		"Nue", STRUCT_Nue, FLAG_Nue, 0,
-		(knh_fstruct_init)knh_Nue_init,
-		(knh_fstruct_copy)knh_Nue_copy, 
-		(knh_fstruct_traverse)knh_Nue_traverse,
-		(knh_fstruct_compareTo)knh_Nue_compareTo,
-		(knh_fstruct_hashCode)knh_Nue_hashCode,
-		(knh_fstruct_newClass)knh_Nue_newClass,
-		knh_Nue_getkey
 	},
 	{
 		"Boolean", STRUCT_Boolean, FLAG_Boolean, 0,
@@ -582,13 +571,13 @@ static knh_StructData_t StructData[] = {
 
 static knh_ClassData_t ClassData[] = {
 	{"konoha.Object", CLASS_Object, CFLAG_Object, STRUCT_Object, CLASS_Object, 0, 33, 0, knh_Object_fdefault},
-	{"konoha.Any", CLASS_Any, CFLAG_Any, STRUCT_Any, CLASS_Object, 0, 0, 0, knh_Any_fdefault},
+	{"konoha.Any", CLASS_Any, CFLAG_Any, STRUCT_Any, CLASS_Object, 0, 1, 0, knh_Any_fdefault},
 	{"konoha.This", CLASS_This, CFLAG_This, STRUCT_This, CLASS_Any, 0, 0, 0, knh_This_fdefault},
 	{"konoha.Any0", CLASS_Any0, CFLAG_Any0, STRUCT_Any0, CLASS_Any, 0, 0, 0, knh_Any0_fdefault},
 	{"konoha.Any1", CLASS_Any1, CFLAG_Any1, STRUCT_Any1, CLASS_Any, 0, 0, 0, knh_Any1_fdefault},
 	{"konoha.Any2", CLASS_Any2, CFLAG_Any2, STRUCT_Any2, CLASS_Any, 0, 0, 0, knh_Any2_fdefault},
 	{"konoha.Any3", CLASS_Any3, CFLAG_Any3, STRUCT_Any3, CLASS_Any, 0, 0, 0, knh_Any3_fdefault},
-	{"konoha.Nue", CLASS_Nue, CFLAG_Nue, STRUCT_Nue, CLASS_Object, 0, 1, 0, knh_Nue_fdefault},
+	{"konoha.AnyVar", CLASS_AnyVar, CFLAG_AnyVar, STRUCT_AnyVar, CLASS_Any, 0, 0, 0, knh_AnyVar_fdefault},
 	{"konoha.Boolean", CLASS_Boolean, CFLAG_Boolean, STRUCT_Boolean, CLASS_Object, 0, 3, 0, knh_Boolean_fdefault},
 	{"konoha.Number", CLASS_Number, CFLAG_Number, STRUCT_Number, CLASS_Object, 0, 0, 0, knh_Number_fdefault},
 	{"konoha.Int", CLASS_Int, CFLAG_Int, STRUCT_Int, CLASS_Number, 0, 31, 0, knh_Int_fdefault},
@@ -1244,7 +1233,7 @@ static knh_MethodData_t MethodData[] = {
 	{knh_fmethod_movableText, 0, CLASS_Object, METHODN__k, 0, MFN_void_OutputStream_Any, (void*)knh_Object__k},
 	{knh_fmethod_movableText, 0, CLASS_Object, METHODN__dump, 0, MFN_void_OutputStream_Any, (void*)knh_Object__dump},
 	{knh_fmethod_movableText, 0, CLASS_Object, METHODN__empty, 0, MFN_void_OutputStream_Any, (void*)knh_Object__empty},
-	{knh_fmethod_movableText, 0, CLASS_Nue, METHODN__k, 0, MFN_void_OutputStream_Any, (void*)knh_Nue__k},
+	{knh_fmethod_movableText, 0, CLASS_Any, METHODN__k, 0, MFN_void_OutputStream_Any, (void*)knh_Any__k},
 	{knh__Class_domain, 0, CLASS_Class, METHODN_domain, 0, MFN_nArray, (void*)NULL},
 	{knh_fmethod_movableText, 0, CLASS_Class, METHODN__s, 0, MFN_void_OutputStream_Any, (void*)knh_Class__s},
 	{knh_fmethod_movableText, 0, CLASS_Class, METHODN__k, 0, MFN_void_OutputStream_Any, (void*)knh_Class__k},

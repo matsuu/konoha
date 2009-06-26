@@ -317,9 +317,9 @@ typedef knh_uint16_t       knh_expt_t;    /* knh_expt_t */
 // @NOUSE
 #define TYPEQN(t)                     TYPEN(t), TYPEQ(t)
 
-#define TYPE_var                      CLASS_Nue
-#define TYPE_void                     NNTYPE_cid(CLASS_Nue)
-#define NNTYPE_void                   NNTYPE_cid(CLASS_Nue)
+#define TYPE_var                      CLASS_AnyVar
+#define TYPE_void                     NNTYPE_cid(CLASS_Any)
+#define NNTYPE_void                   NNTYPE_cid(CLASS_Any)
 
 /* ------------------------------------------------------------------------ */
 

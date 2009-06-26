@@ -260,7 +260,7 @@ KNHAPI(void) knh_throw__s(Ctx *ctx, char *msg, char *file, int line)
 KNHAPI(void) knh_throw(Ctx *ctx, Object *e, char *file, int line)
 {
 	if(IS_NULL(e)) {
-		knh_throwException(ctx, new_Exception__Nue(ctx, e), file, line);
+		knh_throwException(ctx, new_NullException (ctx, e), file, line);
 	}else if(IS_Exception(e)) {
 		knh_throwException(ctx, (Exception*)e, file, line);
 	}else if(IS_bString(e)) {

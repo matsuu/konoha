@@ -174,7 +174,7 @@ void konoha_setClassDefaultValue(Ctx *ctx, knh_class_t cid, Object *value, knh_f
 		KNH_SETv(ctx, ctx->share->ClassTable[cid].cspec, value);
 	}
 	if(fdefault == NULL) {
-		if(IS_NULL(value) && cid != CLASS_Nue) {
+		if(IS_NULL(value) && cid != CLASS_Any) {
 			fdefault = knh_fdefault__INIT;
 		}
 		else {
