@@ -389,12 +389,12 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 
 #define KLR_ISNULL(ctx, n) \
 	if(unlikely(IS_NULL(sfp[n].o))) { \
-		knh_throwException(ctx, new_Exception__Nue(ctx, sfp[n].o), _HERE_); \
+		knh_throwException(ctx, new_NullException (ctx, sfp[n].o), _HERE_); \
 	} \
 
 #define KLR_ISNULLx(ctx, n) \
 	if(unlikely(IS_NULL(SFX(n)))) { \
-		knh_throwException(ctx, new_Exception__Nue(ctx, SFX(n)), _HERE_); \
+		knh_throwException(ctx, new_NullException (ctx, SFX(n)), _HERE_); \
 	} \
 
 #define KLR_ISTYPE(ctx, n, cid) \
@@ -413,7 +413,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 
 #define JIT_ISNULLx(ctx, a, x) \
 	if(unlikely(IS_NULL(JITSFX(a, x)))) { \
-		knh_throwException(ctx, new_Exception__Nue(ctx, JITSFX(a, x)), _HERE_); \
+		knh_throwException(ctx, new_NullException (ctx, JITSFX(a, x)), _HERE_); \
 	} \
 
 /* ======================================================================== */

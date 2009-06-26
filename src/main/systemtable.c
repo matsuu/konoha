@@ -48,13 +48,11 @@ void konoha_loadSystemData(Ctx *ctx);
 /* [INITCONST] */
 
 static
-Object *new_Null(Ctx *ctx, char *text)
+Object *new_Null(Ctx *ctx)
 {
-	knh_Nue_t *o = (knh_Nue_t*)new_hObject(ctx, FLAG_Nue, CLASS_Nue, CLASS_Nue);
-	o->str = (knh_uchar_t*)text;
-	o->size = knh_strlen(text);
-	o->orign = NULL;
-	return (Object*)o;
+	knh_Glue_t *glue = (knh_Glue_t*)new_hObject(ctx, KNH_FLAG_OF_IMMUTABLE, CLASS_Any, CLASS_Any);
+	knh_Glue_init(ctx, glue, NULL, NULL);
+	return (Object*)glue;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -323,7 +321,7 @@ Ctx *konoha_createContext0(size_t stacksize)
 
 	konoha_loadSystemStructData(ctx);
 
-	KNH_INITv(ctx->share->constNull, new_Null(ctx, "Null!!"));
+	KNH_INITv(ctx->share->constNull, new_Null(ctx));
 	KNH_INITv(ctx->share->constTrue, new_Boolean0(ctx, 1));
 	KNH_INITv(ctx->share->constFalse, new_Boolean0(ctx, 0));
 	KNH_INITv(ctx->share->constFloat0, new_hObject(ctx, FLAG_Float, CLASS_Float, CLASS_Float));

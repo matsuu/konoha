@@ -38,32 +38,6 @@ extern "C" {
 /* ======================================================================== */
 /* [macros] */
 
-
-///* ------------------------------------------------------------------------ */
-//
-//knh_Object_t *new_Boolean(Ctx *ctx, int c)
-//{
-//	return (c) ? KNH_TRUE : KNH_FALSE;
-//}
-
-/* ======================================================================== */
-/* [Null] */
-
-///* ------------------------------------------------------------------------ */
-//
-//Object *new_Nue(Ctx *ctx, String *msg)
-//{
-//	KNH_ASSERT(IS_String(msg));
-//	knh_Nue_t *o = (knh_Nue_t*)new_hObject(ctx, FLAG_Nue, CLASS_Nue, CLASS_Nue);
-//	KNH_INITv(o->orign, msg);
-//	o->str = (knh_uchar_t*)knh_String_tochar(msg);
-//	o->size = knh_String_strlen(msg);
-//	return (Object*)o;
-//}
-//
-//#define _new_Nue__b(ctx, txt)   new_Nue(ctx, new_String(ctx, txt, NULL));
-//#define _new_Nue__s(ctx, txt)   new_Nue(ctx, new_String(ctx, B(txt), NULL));
-
 /* ======================================================================== */
 /* [Glue] */
 
@@ -78,7 +52,6 @@ void knh_fgfree__default(Ctx *ctx, knh_Glue_t *g)
 
 KNHAPI(void) knh_Glue_init(Ctx *ctx, knh_Glue_t *g, void *ptr, knh_fgfree gfree)
 {
-	DBG_P("bcid=%s, cid=%s", CLASSN(g->h.bcid), CLASSN(g->h.cid));
 	KNH_ASSERT(IS_bAny(g));
 	g->ptr = ptr;
 	if(gfree == NULL) gfree = knh_fgfree__default;

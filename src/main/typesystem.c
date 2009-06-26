@@ -187,7 +187,7 @@ knh_bool_t knh_Object_opTypeOf(Ctx *ctx, Object *o, knh_type_t t)
 Exception* new_Exception__type(Ctx *ctx, Object *value, knh_type_t spec_type)
 {
 	if(IS_NULL(value)) {
-		return new_Exception__Nue(ctx, value);
+		return new_NullException (ctx, value);
 	}
 	else {
 		char buf[CLASSNAME_BUFSIZ];

@@ -80,6 +80,7 @@ typedef struct knh_ObjectField_t {
 /* @class Any1 Any knh_Any_t @Cyclic  @Private */
 /* @class Any2 Any knh_Any_t @Cyclic  @Private */
 /* @class Any3 Any knh_Any_t @Cyclic  @Private */
+/* @class AnyVar Any knh_Any_t @Cyclic  @Private */
 
 struct knh_Glue_t;
 typedef void (*knh_fgfree)(Ctx *, struct knh_Glue_t *o);
@@ -99,19 +100,6 @@ typedef knh_Glue_t knh_Any1_t;
 typedef knh_Glue_t knh_Any2_t;
 typedef knh_Glue_t knh_Any3_t;
 
-/* ------------------------------------------------------------------------ */
-/* @class Nue Object knh_Nue_t @Immutable @Private */
-/* @flag Nue.GCHook NUE:1 (%s)->h.flag 'is:set:*:*' */
-
-typedef struct knh_Nue_t {
-	knh_hObject_t h;
-	knh_uchar_t *str;
-	size_t size;
-	struct knh_String_t *orign;
-} knh_Nue_t;
-
-//#define IS_NULL(o)          (((Object*)o)->h.cid == CLASS_Nue)
-//#define IS_NOTNULL(o)       (((Object*)o)->h.cid != CLASS_Nue)
 #define IS_NULL(o)            ((ctx)->share->constNull == (o))
 #define IS_NOTNULL(o)         ((ctx)->share->constNull != (o))
 

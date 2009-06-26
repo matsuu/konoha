@@ -375,10 +375,10 @@ MAPPER knh_Object_String(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method void Nue.%k(OutputStream w, String m) */
+/* @method void Any.%k(OutputStream w, String m) */
 
 static
-void knh_Nue__k(Ctx *ctx, Nue *b, OutputStream *w, String *m)
+void knh_Any__k(Ctx *ctx, knh_Any_t *o, OutputStream *w, String *m)
 {
 	knh_write(ctx, w, knh_String_tobytes(TS_null));
 }

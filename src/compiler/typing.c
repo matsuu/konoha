@@ -1213,7 +1213,6 @@ void TERMs_perrorTYPE(Ctx *ctx, Stmt *stmt, size_t n, knh_type_t reqt)
 static
 knh_type_t knh_Asm_typeinfer(Ctx *ctx, Asm *abr, knh_type_t type, char *varname)
 {
-	if(type == CLASS_Nue) type = CLASS_Any;
 	if(type == CLASS_Any || type == NNTYPE_Any) {
 //		knh_Asm_perror(ctx, abr, KERR_ERROR, _("error")WTYPEINF, varname);
 	}

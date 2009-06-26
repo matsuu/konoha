@@ -221,7 +221,7 @@ String *knh_ExptTable_name(Ctx *ctx, knh_expt_t eid);
 knh_expt_t konoha_addException(Ctx *ctx, knh_flag_t flag, knh_class_t eid, String *name, char *pname);
 Exception* knh_Exception_new__init(Ctx *ctx, Exception *o, String *e, String *msg, Object *bag);
 int knh_Exception_isa(Ctx *ctx, Exception *o, String *msg);
-Exception* new_Exception__Nue(Ctx *ctx, Object *o);
+Exception* new_NullException (Ctx *ctx, Object *o);
 ExceptionHandler* new_ExceptionHandler(Ctx *ctx);
 void knh_ExceptionHandler_longjmp(Ctx *ctx, ExceptionHandler *o, Exception *e);
 Exception* knh_ExceptionHandler_getCaughtException(ExceptionHandler *o);
