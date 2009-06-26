@@ -36,9 +36,6 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-/* [macros] */
-
-/* ======================================================================== */
 /* [Glue] */
 
 static
@@ -165,7 +162,6 @@ knh_bytes_t knh_Object_tobytes(Ctx *ctx, Object *o)
 		case STRUCT_String : return knh_String_tobytes((String*)o);
 		case STRUCT_Bytes : return knh_Bytes_tobytes((Bytes*)o);
 	}
-	TODO();
 	return STEXT("");
 }
 

@@ -259,6 +259,7 @@ konoha_addGenericsClass(Ctx *ctx, knh_class_t cid, String *name, knh_class_t bci
 	KNH_INITv(TC->cmap, new_ClassMap0(ctx, 0));
 	konoha_setClassDefaultValue(ctx, cid, KNH_NULL, NULL);
 	konoha_setClassParam(ctx, cid, p1, p2);
+	ctx->share->StructTable[bcid].fnewClass(ctx, cid);
 	return cid;
 }
 
