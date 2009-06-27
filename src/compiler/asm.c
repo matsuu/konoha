@@ -1458,7 +1458,7 @@ int knh_StmtOP_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 					KNH_ASM_fSUBn_(ctx, abr, sfi_(sfpidx), sfi_(a), b);
 					return 1;
 				case METHODN_opDiv:
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 					if(b == 0.0) {
 						b = 1.0;
 						knh_Asm_perror(ctx, abr, KERR_ERRATA, _("divided by zero: 0.0 ==> 1.0"));

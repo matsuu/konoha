@@ -51,7 +51,7 @@ extern "C" {
 /* ======================================================================== */
 /* [charset] */
 
-#ifdef KONOHA_OS__WINDOWS
+#ifdef KONOHA_ON_WINDOWS
 
 #define HAVE_LOCALCHARSET_H 1
 

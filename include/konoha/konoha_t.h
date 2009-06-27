@@ -28,7 +28,7 @@
 #ifndef KONOHA_T_H_
 #define KONOHA_T_H_
 
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 #include<stdio.h>
 #include<limits.h>
 #include<float.h>

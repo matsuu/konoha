@@ -1,5 +1,5 @@
 #include <konoha.h>
-#ifdef KONOHA_OS__WINDOWS
+#ifdef KONOHA_ON_WINDOWS
 #define _USE_MATH_DEFINES
 #undef METHOD
 #define METHOD void __declspec(dllexport) 
@@ -56,7 +56,7 @@ METHOD Math_ceil(Ctx *ctx, knh_sfp_t *sfp)
     KNH_RETURN_Float(ctx, sfp, ceil(p_double(sfp[1])));
 }
 
-#if KONOHA_OS__WINDOWS
+#if KONOHA_ON_WINDOWS
 METHOD Math_round(Ctx *ctx, knh_sfp_t *sfp)
 {
     KNH_RETURN_Float(ctx, sfp, round(p_double(sfp[1])));
@@ -143,7 +143,7 @@ METHOD Math_tanh(Ctx *ctx, knh_sfp_t *sfp)
     KNH_RETURN_Float(ctx, sfp, tanh(p_double(sfp[1])));
 }
 
-#if KONOHA_OS__WINDOWS
+#if KONOHA_ON_WINDOWS
 METHOD Math_asinh(Ctx *ctx, knh_sfp_t *sfp)
 {
     KNH_RETURN_Float(ctx, sfp, asinh(p_double(sfp[1])));

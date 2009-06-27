@@ -30,7 +30,7 @@
 #include"commons.h"
 
 #ifdef KNH_USING_REGEX
-#ifdef KONOHA_OS__WINDOWS
+#ifdef KONOHA_ON_WINDOWS
 #include "onigposix.h"
 #else
 #include<regex.h>

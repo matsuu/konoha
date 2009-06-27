@@ -53,7 +53,7 @@
    email: m-mat @ math.sci.hiroshima-u.ac.jp (remove spaces)
 */
 
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 #include <stdio.h>
 #endif
 

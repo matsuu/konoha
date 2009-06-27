@@ -1,7 +1,7 @@
 #ifndef KONOHA_LKM_H_
 #define KONOHA_LKM_H_
 
-#ifdef KONOHA_OS__LKM
+#ifdef KONOHA_ON_LKM
 #include<linux/kernel.h>
 #include<linux/string.h>
 #include<linux/version.h>

@@ -28,7 +28,7 @@
 #ifndef KONOHA_DEV_H_
 #define KONOHA_DEV_H_
 
-#ifdef KONOHA_OS__LKM
+#ifdef KONOHA_ON_LKM
 #include"konoha_lkm.h"
 #else
 #include<stdio.h>

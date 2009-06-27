@@ -6,9 +6,9 @@
 //
 //#include"commons.h" // added by Kimio Kuramitsu
 //
-//#ifndef KONOHA_OS__LKM
+//#ifndef KONOHA_ON_LKM
 //
-//#ifndef KONOHA_OS__WINDOWS
+//#ifndef KONOHA_ON_WINDOWS
 ////#ifdef KNH_USING_POSIX
 //#include<unistd.h>
 ////#endif
@@ -268,7 +268,7 @@
 //
 //
 //	if (system(command) == -1) return -1;
-//#ifdef KONOHA_OS__MACOSX
+//#ifdef KONOHA_ON_MACOSX
 //	memset(command, 0, sizeof(command));
 //	snprintf(command, sizeof(command), "mkdir -p .konoha/%s", pkgname.buf);
 //	if (system(command) == -1) return -1;

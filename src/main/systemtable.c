@@ -178,7 +178,7 @@ void knh_Context_initCommon(Ctx *ctx, knh_Context_t *o, size_t stacksize)
 	KNH_INITv(o->props, new_DictMap0(ctx, 16));
 
 	KNH_INITv(o->enc, DP(ctx->sys)->enc);
-	//#ifndef KONOHA_OS__LKM
+	//#ifndef KONOHA_ON_LKM
 	KNH_INITv(o->in,  DP(ctx->sys)->in);
 	KNH_INITv(o->out, DP(ctx->sys)->out);
 	KNH_INITv(o->err, DP(ctx->sys)->err);
@@ -205,7 +205,7 @@ void knh_Context_traverseCommon(Ctx *ctx, knh_Context_t *o, knh_ftraverse ftr)
 	ftr(ctx, UP(o->props));
 
 	ftr(ctx, UP(o->enc));
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 	ftr(ctx, UP(o->in));
 	ftr(ctx, UP(o->out));
 	ftr(ctx, UP(o->err));

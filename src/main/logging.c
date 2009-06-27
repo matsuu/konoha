@@ -28,7 +28,7 @@
 /* ************************************************************************ */
 
 #include"commons.h"
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 #include<time.h>
 #endif
 

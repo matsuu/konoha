@@ -28,7 +28,7 @@
 /* ************************************************************************ */
 
 #include"commons.h"
-#ifdef KONOHA_OS__LKM
+#ifdef KONOHA_ON_LKM
 #include"../../include/konoha/gen/konohac_klr_.h"
 #else
 #include<konoha/gen/konohac_klr_.h>

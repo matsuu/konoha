@@ -51,7 +51,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		KNH_THROWs(ctx, "Arithmetic!!: Zero Divided"); \
 	}\
 
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 #define KNH_THROW_fZERODIV(n)  \
 	if(unlikely(n == 0.0)) { \
 		KNH_THROWs(ctx, "Arithmetic!!: Zero Divided"); \

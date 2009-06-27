@@ -7,7 +7,7 @@
 
 #include <konoha.h>
 
-#ifdef KONOHA_OS__WINDOWS
+#ifdef KONOHA_ON_WINDOWS
 #define _USE_XML_DEFINES
 #undef METHOD
 #define METHOD void __declspec(dllexport)

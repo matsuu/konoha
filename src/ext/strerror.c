@@ -1,4 +1,4 @@
-#ifdef KONOHA_OS__LKM
+#ifdef KONOHA_ON_LKM
 #include<linux/errno.h>
 #define EDOM        33 /* Numerical argument out of domain */
 #define ERANGE      34 /* Result too large */

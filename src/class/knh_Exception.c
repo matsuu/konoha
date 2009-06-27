@@ -29,7 +29,7 @@
 
 #include"commons.h"
 
-#ifdef KONOHA_OS__LKM
+#ifdef KONOHA_ON_LKM
 #include<linux/errno.h>
 static int errno;
 #else

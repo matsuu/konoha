@@ -29,7 +29,7 @@
 
 
 #include"commons.h"
-#ifdef KONOHA_OS__LKM
+#ifdef KONOHA_ON_LKM
 #undef KNH_USING_POSIX
 #endif
 
@@ -45,7 +45,7 @@
 #include<time.h>
 #include<sys/time.h>
 
-#ifdef KONOHA_OS__MACOSX
+#ifdef KONOHA_ON_MACOSX
 #include <mach-o/dyld.h>
 #endif
 

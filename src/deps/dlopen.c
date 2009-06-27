@@ -29,7 +29,7 @@
 
 
 #include"commons.h"
-#ifdef KONOHA_OS__LKM
+#ifdef KONOHA_ON_LKM
 #undef KNH_USING_POSIX
 #endif
 
