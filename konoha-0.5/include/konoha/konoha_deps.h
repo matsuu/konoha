@@ -19,7 +19,6 @@
 #endif
 
 #ifdef KONOHA_OS__LINUX
-#define
 #define		KNH_USING_POSIX 1
 #define		KNH_USING_UNIX  1
 #define     KNH_USING_SOCKET 1
