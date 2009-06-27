@@ -1,4 +1,4 @@
-#ifdef KONOHA_OS__LKM
+#ifdef KONOHA_ON_LKM
 #include <linux/string.h>
 #define _quicksort qsort
 #else

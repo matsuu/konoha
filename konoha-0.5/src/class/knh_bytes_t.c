@@ -28,7 +28,7 @@
 /* ************************************************************************ */
 
 #include"commons.h"
-#ifdef KONOHA_OS__LKM
+#ifdef KONOHA_ON_LKM
 #include<linux/string.h>
 #else
 #include<string.h>
@@ -372,7 +372,7 @@ int knh_bytes_parsefloat(knh_bytes_t t, knh_float_t *value)
 		if('0' <= t.buf[i] && t.buf[i] <= '9') {
 			prev = v;
 			v = v * 10 + (t.buf[i] - '0');
-#if defined(KNH_USING_MATH) && !defined(KONOHA_OS__WINDOWS)
+#if defined(KNH_USING_MATH) && !defined(KONOHA_ON_WINDOWS)
 			if(isinf(v)||isnan(v)) {
 				*value = 0.0;
 				return 1;
@@ -393,7 +393,7 @@ int knh_bytes_parsefloat(knh_bytes_t t, knh_float_t *value)
 		if('0' <= t.buf[i] && t.buf[i] <= '9') {
 			prev = v;
 			c *= 10;
-#if defined(KNH_USING_MATH) && !defined(KONOHA_OS__WINDOWS)
+#if defined(KNH_USING_MATH) && !defined(KONOHA_ON_WINDOWS)
 			if(isinf(c)||isnan(c)) {
 				break;
 			}

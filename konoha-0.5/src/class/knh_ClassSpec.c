@@ -102,7 +102,7 @@ void knh_ClassSpec_initIntRange(Ctx *ctx, ClassSpec *u, knh_int_t min, knh_int_t
 	DP(u)->fmin = (knh_float_t)min;
 	DP(u)->imax = max;
 	DP(u)->fmax = (knh_float_t)max;
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 	DP(u)->fstep = 1.0;
 #else
 	DP(u)->fstep = 1;
@@ -156,7 +156,7 @@ void knh_ClassSpec_initFloatRange(Ctx *ctx, ClassSpec *u, knh_float_t min, knh_f
 	DP(u)->imax = (knh_int_t)max;
 	DP(u)->imin = (knh_int_t)min;
 
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 	if(min >= 0.0) {
 #else
 	if(min >= 0) {
@@ -177,7 +177,7 @@ void knh_ClassSpec_initFloatRange(Ctx *ctx, ClassSpec *u, knh_float_t min, knh_f
 		}
 	}
 
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 	if(step != 0.0) {
 #else
 	if(step != 0) {
@@ -191,7 +191,7 @@ void knh_ClassSpec_initFloatRange(Ctx *ctx, ClassSpec *u, knh_float_t min, knh_f
 void knh_write_floatx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_float_t v)
 {
 	char *FMT = KNH_FLOAT_FMT;
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 	knh_float_t step = DP(u)->fstep;
 	if(0.1 <= step && step < 1.0) {
 		FMT = KNH_FLOAT_FMT1;

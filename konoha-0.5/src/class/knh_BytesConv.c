@@ -29,7 +29,7 @@
 
 #include"commons.h"
 
-#ifdef KONOHA_OS__WINDOWS
+#ifdef KONOHA_ON_WINDOWS
 #pragma comment(lib, "iconv.lib")
 #endif
 
@@ -102,7 +102,7 @@ size_t knh_fbyteconv_iconv(Ctx *ctx, BytesConv *bc, knh_bytes_t t, knh_Bytes_t *
 		char *obuf = buffer;
 		size_t olen = sizeof(buffer);
 //		DBG2_P("S in=%p,%d out=%p,%d", ibuf, ilen, obuf, olen);
-#if defined(KONOHA_OS__MACOSX)
+#if defined(KONOHA_ON_MACOSX)
 		size_t rc = iconv(cd, &ibuf, &ilen, &obuf, &olen);
 #else
 		size_t rc = iconv(cd, &ibuf, &ilen, &obuf, &olen);

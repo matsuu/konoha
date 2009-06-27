@@ -28,7 +28,7 @@
 #ifndef CLASS_KONOHA_H_
 #define CLASS_KONOHA_H_
 
-#ifdef KONOHA_OS__LKM
+#ifdef KONOHA_ON_LKM
 #include"konoha_t.h"
 #else
 #include<konoha/konoha_t.h>
@@ -529,7 +529,7 @@ typedef struct knh_Closure {
 /* ------------------------------------------------------------------------ */
 /* @class AffineConv Object knh_AffineConv_t @Private */
 
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
   typedef float knh_affinefloat_t;
 #else
   typedef int knh_affinefloat_t;

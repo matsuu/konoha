@@ -168,7 +168,7 @@ void knh_ClassStruct_initField(Ctx *ctx, ClassStruct *cs, knh_class_t self_cid, 
 		}
 		else if(IS_ubxfloat(type)) {
 			knh_float_t *data = (knh_float_t*)(v + i);
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 			data[0] = IS_NULL(cf[i].value) ? 0.0 : ((Int*)cf[i].value)->n.fvalue;
 #else
 			data[0] = IS_NULL(cf[i].value) ? 0 : ((Int*)cf[i].value)->n.fvalue;
@@ -1471,7 +1471,7 @@ static
 int knh_ffcmp__default(ClassSpec *u, knh_float_t v1, knh_float_t v2)
 {
 	knh_float_t delta = v1 - v2;
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 	if(delta == 0.0) return 0;
 #else
 	if(delta == 0) return 0;
@@ -1518,7 +1518,7 @@ void knh_ClassSpec_init(Ctx *ctx, ClassSpec *u, int init)
 	b->ficmp = knh_ficmp__signed;
 
 	// float
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 	b->fstep = 0.001;
 #else
 	b->fstep = 1;
@@ -1973,7 +1973,7 @@ static void knh_System_initProp(Ctx *ctx, System *o)
 	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.locale"),
 			UP(new_String(ctx, B(knh_format_lang(buf, sizeof(buf))), NULL)));
 
-	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.path.home"), UP(sys->homeDir));
+	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.path"), UP(sys->homeDir));
 
 #ifdef KNH_PREFIX
 	knh_snprintf(buf, sizeof(buf), "%s/lib/konoha/package", KNH_PREFIX);
@@ -2508,7 +2508,7 @@ Object *knh_System_fdefault(Ctx *ctx, knh_class_t cid)
 #include"../api/streamapi.c"
 #include"../api/dbapi.c"
 
-#ifdef KONOHA_OS__LKM
+#ifdef KONOHA_ON_LKM
 #include"../../include/konoha/gen/struct_.h"
 #else
 #include<konoha/gen/struct_.h>

@@ -253,7 +253,7 @@ KNHAPI(void) konoha_addAffineMapper(Ctx *ctx, knh_class_t scid, char *text, knh_
 	knh_class_t tcid = konoha_findcid(ctx, B(text));
 	if(tcid != CLASS_unknown && ctx->share->ClassTable[tcid].bcid != tcid) {
 		KNH_TAFFINE(ctx, scid, tcid, scale, shift);
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 		if(scale != 0.0) {
 			KNH_TAFFINE(ctx, tcid, scid, 1.0 / scale, -(shift/scale));
 		}

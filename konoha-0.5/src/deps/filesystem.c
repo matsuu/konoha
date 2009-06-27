@@ -30,7 +30,7 @@
 
 #include"commons.h"
 
-#ifdef KONOHA_OS__LKM
+#ifdef KONOHA_ON_LKM
 #undef KNH_USING_POSIX
 #endif
 
@@ -46,7 +46,7 @@
 #include<time.h>
 #include<sys/time.h>
 
-#ifdef KONOHA_OS__MACOSX
+#ifdef KONOHA_ON_MACOSX
 #include <mach-o/dyld.h>
 #endif
 
@@ -256,7 +256,7 @@ char *knh_format_homepath(char *buf, size_t bufsiz)
 	return buf;
 #endif/*KNH_USING_WINDOWS*/
 
-#ifdef KONOHA_OS__LINUX
+#ifdef KONOHA_ON_LINUX
 #define HOMEPATH 1
 	// @url(http://shinh.skr.jp/binary/b2con.html)
 	// http://doc.trolltech.com/3.3/qapplication.html#applicationDirPath
@@ -265,9 +265,9 @@ char *knh_format_homepath(char *buf, size_t bufsiz)
 	knh_format_nzpath(bufl, sizeof(bufl), B(buf));
 	knh_format_parentpath(buf, bufsiz, B(bufl), 2);
 	return buf;
-#endif/*KONOHA_OS__LINUX*/
+#endif/*KONOHA_ON_LINUX*/
 
-#ifdef KONOHA_OS__MACOSX
+#ifdef KONOHA_ON_MACOSX
 #define HOMEPATH 1
 	char bufl[FILEPATH_BUFSIZ];
 	const char *s = _dyld_get_image_name(0);

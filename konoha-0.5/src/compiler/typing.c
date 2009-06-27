@@ -414,7 +414,7 @@ int knh_Asm_declareScriptVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_
 				}
 			}
 			knh_float_t *v = (knh_float_t*)(scr->fields + idx);
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 			v[0] = (IS_NULL(value)) ? 0.0 : ((Float*)value)->n.fvalue;
 #else
 			v[0] = (IS_NULL(value)) ? 0 : ((Float*)value)->n.fvalue;
