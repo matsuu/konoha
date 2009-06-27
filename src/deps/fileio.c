@@ -197,9 +197,9 @@ static void knh_iodrv_close__NOP(Ctx *ctx, knh_io_t fd)
 
 static knh_io_t knh_iodrv_open__FILE(Ctx *ctx, knh_bytes_t file, char *mode, int isThrowable)
 {
-	char buf[FILENAME_BUFSIZ];
+	char buf[FILEPATH_BUFSIZ];
 	knh_format_ospath(ctx, buf, sizeof(buf), file);
-	DBG2_P("opening '%s'", buf);
+	//DBG2_P("opening '%s'", buf);
 	{
 		FILE *fp = knh_fopen(ctx, buf, mode, isThrowable);
 		if(fp == NULL) {
@@ -321,11 +321,11 @@ InputStream *new_InputStream__stdio(Ctx *ctx, FILE *fp, String *enc)
 
 OutputStream *new_OutputStream__stdio(Ctx *ctx, FILE *fp, String *enc)
 {
-	KNH_ASSERT(fp == stdout || fp == stderr);
 #ifdef KNH_USING_NOFILE
 	OutputStream* o = new_OutputStream__FILE(ctx, TS_DEVSTDOUT, NULL, &IO__stdio);
 #else
 	OutputStream* o = NULL;
+	KNH_ASSERT(fp == stdout || fp == stderr);
 	if(fp == stdout) {
 		o = new_OutputStream__FILE(ctx, TS_DEVSTDOUT, stdout, &IO__stdio);
 	}

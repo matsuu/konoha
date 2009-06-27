@@ -19,6 +19,7 @@
 #endif
 
 #ifdef KONOHA_OS__LINUX
+#define
 #define		KNH_USING_POSIX 1
 #define		KNH_USING_UNIX  1
 #define     KNH_USING_SOCKET 1
@@ -32,10 +33,6 @@
 //#endif
 #define		KONOHA_OS_LINEFEED "\n"
 #define		KONOHA_OS_DLLEXT   ".so"
-	#ifdef KONOHA_CC_WITH_ECLIPSE
-	#define 	KNH_USING_READLINE 1
-	#define		KONOHA_MONOLITHIC  1
-	#endif
 #endif
 
 #ifdef KONOHA_OS__MACOSX
@@ -49,10 +46,6 @@
 #define 	KONOHA_OS_ENCODING "UTF-8"
 #define 	KONOHA_OS_LINEFEED "\n"
 #define 	KONOHA_OS_DLLEXT ".dylib"
-#ifdef KONOHA_CC_WITH_ECLIPSE
-#define 	KNH_USING_READLINE 1
-#define		KONOHA_MONOLITHIC  1
-#endif
 #endif
 
 /* ------------------------------------------------------------------------ */
@@ -64,6 +57,9 @@
 
 #define KNH_EXT_QSORT  1
 #define KNH_EXT_SETJMP 1
+
+#define FILEPATH_BUFSIZ     80  /* TO SAVE STACKSIZE */
+#define KONOHA_HOMEPATH     "/dev/konoha"   /* meaningless */
 
 #undef KNH_USING_SOCKET
 #undef KNH_USING_ICONV
@@ -236,6 +232,11 @@
 	#define knh_getenv(n)           ALT_getenv(n)
 #else
 	#define knh_getenv(n)           getenv(n)
+#endif
+
+
+#ifndef FILEPATH_BUFSIZ
+#define FILEPATH_BUFSIZ  256
 #endif
 
 /* ======================================================================== */

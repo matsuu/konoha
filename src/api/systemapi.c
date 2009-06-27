@@ -153,6 +153,16 @@ static METHOD knh__System_hasFile(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
+/* @method Boolean! System.mkdir(String! filename) */
+
+static METHOD knh__System_mkdir(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN_Boolean(ctx, sfp,
+		knh_mkdir(ctx, knh_String_tobytes(sfp[1].s), knh_Context_isStrict(ctx))
+	);
+}
+
+/* ------------------------------------------------------------------------ */
 /* @method Boolean! System.unlink(String! filename) */
 
 static METHOD knh__System_unlink(Ctx *ctx, knh_sfp_t *sfp)

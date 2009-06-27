@@ -113,7 +113,7 @@ int knh_regex_regcomp(Ctx *ctx, knh_regex_t *reg, char *pattern, char *option)
 	}
 	int res = regcomp((regex_t*)reg, pattern, flag);
 	if(res != 0) {
-		char buf[FILENAME_BUFSIZ * 4];
+		char buf[FILEPATH_BUFSIZ * 4];
 		regerror(res, (regex_t*)reg, buf, sizeof(buf));
 		KNH_WARNING(ctx, "regex(error): %s", buf);
 	}

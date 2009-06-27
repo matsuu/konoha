@@ -248,7 +248,7 @@ static
 int knh_StmtIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 {
 	String *fname = (String*)DP(StmtIMPORT_file(stmt))->data;
-	char bufp[FILENAME_BUFSIZ], buff[FILENAME_BUFSIZ];
+	char bufp[FILEPATH_BUFSIZ], buff[FILEPATH_BUFSIZ];
 
 	String *cfname = konoha_getFileName(ctx, SP(stmt)->fileid);
 	KNH_ASSERT(IS_String(fname));

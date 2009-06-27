@@ -1964,11 +1964,41 @@ static knh_uintptr_t knh_autoSystemId = 0;
 
 /* ------------------------------------------------------------------------ */
 
+static void knh_System_initProp(Ctx *ctx, System *o)
+{
+	char buf[FILEPATH_BUFSIZ];
+	knh_System_struct *sys = DP(o);
+	KNH_INITv(sys->homeDir, new_String(ctx, B(knh_format_homepath(buf,sizeof(buf))), NULL));
+	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.encoding"), UP(sys->enc));
+	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.locale"),
+			UP(new_String(ctx, B(knh_format_lang(buf, sizeof(buf))), NULL)));
+
+	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.path.home"), UP(sys->homeDir));
+
+#ifdef KNH_PREFIX
+	knh_snprintf(buf, sizeof(buf), "%s/lib/konoha/package", KNH_PREFIX);
+#else
+	knh_snprintf(buf, sizeof(buf), "%s/package", knh_String_tochar(sys->homeDir));
+#endif
+	knh_DictMap_set(ctx, sys->props,
+		new_String__T(ctx, "konoha.path.package"), UP(new_String(ctx, B(buf), NULL)));
+
+	{
+		char *rootdir = knh_getenv("HOME");
+		if(rootdir != NULL) {
+			knh_snprintf(buf, sizeof(buf), "%s/.konoha/package", rootdir);
+			knh_DictMap_set(ctx, sys->props,
+				new_String__T(ctx, "konoha.path.user.package"), UP(new_String(ctx, B(buf), NULL)));
+		}
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
 static
 void knh_System_init(Ctx *ctx, System *o, int init)
 {
 	knh_System_struct *sys = DP(o);
-	char buf[FILENAME_BUFSIZ];
 	sys->sysid = knh_autoSystemId++;
 	sys->ctxcount = 0;
 
@@ -1976,42 +2006,30 @@ void knh_System_init(Ctx *ctx, System *o, int init)
 	KNH_INITv(sys->ExptNameDictSet, new_DictSet(ctx, KNH_TEXPT_SIZE/2));
 
 	KNH_INITv(sys->enc,   new_String__T(ctx, konoha_encoding()));
-#ifndef KONOHA_OS__LKM
-	KNH_INITv(sys->in,    new_InputStream__stdio(ctx, stdin, sys->enc));
-	KNH_INITv(sys->out,   new_OutputStream__stdio(ctx, stdout, sys->enc));
-	KNH_INITv(sys->err,   new_OutputStream__stdio(ctx, stderr, sys->enc));
-#else
+#ifdef KNH_USING_NOFILE
 	KNH_INITv(sys->in,    new_InputStream__stdio(ctx, NULL, sys->enc));
 	KNH_INITv(sys->out,   new_OutputStream__stdio(ctx, NULL, sys->enc));
 	KNH_INITv(sys->err,   new_OutputStream__stdio(ctx, NULL,  sys->enc));
+#else
+	KNH_INITv(sys->in,    new_InputStream__stdio(ctx, stdin, sys->enc));
+	KNH_INITv(sys->out,   new_OutputStream__stdio(ctx, stdout, sys->enc));
+	KNH_INITv(sys->err,   new_OutputStream__stdio(ctx, stderr, sys->enc));
 #endif
 
 	KNH_INITv(sys->props, new_DictMap0(ctx, 64));
-
 	KNH_INITv(sys->FieldNameDictIdx, new_DictIdx0__ignoreCase(ctx, KNH_TFIELDN_SIZE * 2, 0));
 	KNH_INITv(sys->FileNameDictIdx, new_DictIdx0(ctx, 32, 0));
 	knh_DictIdx_add__fast(ctx, sys->FileNameDictIdx, new_String__T(ctx, "(unknown)"));
 	KNH_INITv(sys->MethodFieldHashMap, new_HashMap(ctx, "System.MethodField", (KNH_TCLASS_SIZE * 2) + 31 ));
-
-	KNH_INITv(sys->homeDir, new_String(ctx, B(knh_format_homepath(buf,sizeof(buf))), NULL));
 	KNH_INITv(sys->DriversTableDictSet, new_DictSet(ctx, 32));
 	KNH_INITv(sys->SpecFuncDictSet, new_DictSet(ctx, 32));
 
 	KNH_INITv(sys->NameSpaceTableDictMap, new_DictMap0(ctx, 8));
 	KNH_INITv(sys->URNAliasDictMap, new_DictMap0(ctx, 8));
-
-	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.encoding"), UP(sys->enc));
-#ifndef KONOHA_OS__LKM
-	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.home"), UP(sys->homeDir));
-#endif
-	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.lang"),
-			UP(new_String(ctx, B(knh_format_lang(buf, sizeof(buf))), NULL)));
-	//knh_Asm_setLang(buf);
-
+	knh_System_initProp(ctx, o);
 	KNH_INITv(sys->UsingResources, new_Array0(ctx, 0));
 	//KNH_INITv(sys->sysnsDictMap_UNUSED, new_DictMap0(ctx, 16));
 	//KNH_INITv(sys->funcDictSet_UNUSED, new_DictSet(ctx, 16));
-
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2021,11 +2039,9 @@ static void knh_System_traverse(Ctx *ctx, System *o, knh_ftraverse ftr)
 	knh_System_struct *sys = DP(o);
 
 	ftr(ctx, UP(sys->enc));
-#ifndef KONOHA_OS__LKM
 	ftr(ctx, UP(sys->in));
 	ftr(ctx, UP(sys->out));
 	ftr(ctx, UP(sys->err));
-#endif
 
 	ftr(ctx, UP(sys->props));
 	ftr(ctx, UP(sys->ExptNameDictSet));
@@ -2037,10 +2053,7 @@ static void knh_System_traverse(Ctx *ctx, System *o, knh_ftraverse ftr)
 	ftr(ctx, UP(sys->MethodFieldHashMap));
 	ftr(ctx, UP(sys->NameSpaceTableDictMap));
 	ftr(ctx, UP(sys->URNAliasDictMap));
-
-#ifdef KONOHA_OS__LKM
 	ftr(ctx, UP(sys->homeDir));
-#endif
 	ftr(ctx, UP(sys->DriversTableDictSet));
 	ftr(ctx, UP(sys->SpecFuncDictSet));
 	ftr(ctx, UP(sys->UsingResources));
