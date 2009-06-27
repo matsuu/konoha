@@ -100,8 +100,8 @@ typedef knh_Glue_t knh_Any1_t;
 typedef knh_Glue_t knh_Any2_t;
 typedef knh_Glue_t knh_Any3_t;
 
-#define IS_NULL(o)            ((ctx)->share->constNull == (o))
-#define IS_NOTNULL(o)         ((ctx)->share->constNull != (o))
+#define IS_NULL(o)            ((ctx)->share->constNull == UP(o))
+#define IS_NOTNULL(o)         ((ctx)->share->constNull != UP(o))
 
 /* ------------------------------------------------------------------------ */
 /* @class Boolean Object knh_Boolean_t @Immutable */
