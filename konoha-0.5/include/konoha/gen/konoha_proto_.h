@@ -519,9 +519,10 @@ OutputStream *new_OutputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
 /* ../src/deps/filesystem.c */
 knh_boolean_t knh_isfile(Ctx *ctx, knh_bytes_t path);
 knh_boolean_t knh_isdir(Ctx *ctx, knh_bytes_t path);
+knh_boolean_t knh_mkdir(Ctx *ctx, knh_bytes_t path, int isThrowable);
 knh_boolean_t knh_unlink(Ctx *ctx, knh_bytes_t f, int isThrowable);
 knh_boolean_t knh_rename(Ctx *ctx, knh_bytes_t on, knh_bytes_t nn, int isThrowable);
-char * knh_format_homepath(char *buf, size_t bufsiz);
+char *knh_format_homepath(char *buf, size_t bufsiz);
 /* ../src/deps/konoha_locale.c */
 char *konoha_encoding();
 char *knh_format_lang(char *buf, size_t bufsiz);

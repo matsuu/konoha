@@ -140,7 +140,7 @@ METHOD System_listDir(Ctx *ctx, knh_sfp_t *sfp)
 {
 	DIR *dirptr;
 	struct dirent *direntp;
-	char dirname[FILENAME_BUFSIZ];
+	char dirname[FILEPATH_BUFSIZ];
 	knh_format_ospath(ctx, dirname, sizeof(dirname), knh_StringNULL_tobytes(sfp[1].s, STEXT(".")));
 	Array *a = new_Array(ctx, CLASS_String, 0);
 
@@ -165,7 +165,7 @@ METHOD System_getCwd(Ctx *ctx, knh_sfp_t *sfp)
     // TODO: when filename is longer than 1024
     // to escape this, if we use getcwd(NULL, 0), system malloc buf for filename.
     char *res = NULL;
-    char tmpbuf[FILENAME_BUFSIZ];
+    char tmpbuf[FILEPATH_BUFSIZ];
     res = getcwd(tmpbuf, sizeof(tmpbuf));
     if (res == NULL) {
         KNH_PERRNO(ctx, "OS!!", "getcwd", knh_Context_isStrict(ctx));
@@ -179,7 +179,7 @@ METHOD System_getCwd(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD System_chDir(Ctx *ctx, knh_sfp_t *sfp)
 {
-    char dirname[FILENAME_BUFSIZ];
+    char dirname[FILEPATH_BUFSIZ];
     knh_format_ospath(ctx, dirname, sizeof(dirname), knh_StringNULL_tobytes(sfp[1].s, STEXT(".")));
     if(chdir(dirname) == -1) {
         KNH_PERRNO(ctx, "OS!!", "chdir", knh_Context_isStrict(ctx));

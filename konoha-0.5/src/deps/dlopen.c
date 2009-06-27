@@ -61,7 +61,7 @@ extern "C" {
 
 void *knh_dlopen(Ctx *ctx, const char* path, int mode)
 {
-	char buff[FILENAME_BUFSIZ];
+	char buff[FILEPATH_BUFSIZ];
 	knh_format_ospath(ctx, buff, sizeof(buff), B((char*)path));
 	DBG_P("dlopen .. '%s'\n", buff);
 #ifdef KNH_USING_WINDOWS

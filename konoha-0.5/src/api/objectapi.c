@@ -273,6 +273,9 @@ void knh_Object__k(Ctx *ctx, Object *o, OutputStream *w, String *m)
 	if(knh_Object_isUndefined(o)) {
 		knh_write(ctx, w, STEXT("undefined"));
 	}
+	else if(IS_NULL(o)) {
+		knh_write(ctx, w, STEXT("null"));
+	}
 	else if(o->h.bcid == CLASS_Object) {
 		size_t bsize = ctx->share->ClassTable[o->h.cid].bsize;
 		knh_write__s(ctx, w, CLASSN(o->h.cid));

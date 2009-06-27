@@ -78,8 +78,6 @@
 #define KONOHA_DEFAULT_ARRAY_SIZE           16
 #define KONOHA_STRING_BUFSIZ               128
 #define CLASSNAME_BUFSIZ                   128
-#define FILENAME_BUFSIZ                    512
-#define ERRMSG_BUFSIZ                      512
 
 /* object specification */
 
@@ -197,17 +195,6 @@
 /* ======================================================================== */
 /* [OPTIONS_DEPS] */
 
-#define KNH_USING_RCGC 1
-
-#ifdef KNH_USING_DRCGC
-#define KNH_USING_RCGC 1
-#endif
-
-#ifdef KONOHA_CC_WITH_ECLIPSE
-	#define KONOHA_MONOLITHIC  1
-	#define KNH_USING_MATH    32
-#endif
-
 /* ======================================================================== */
 
 #define KNH_SECUREMODE 1
@@ -225,17 +212,6 @@
 #define KNH_USING_OBJECT32   (sizeof(void*)*8)
 //#define KNH_USING_WORDKLRC   1
 #endif
-
-
-/* ======================================================================== */
-/* Language Specification */
-
-/* ======================================================================== */
-/* ======================================================================== */
-
-/* Runtime */
-#define KONOHA_OBJECT_COPY                 1
-#define KONOHA_RUNTIME_SINGLE              1
 
 /* ======================================================================== */
 /* ======================================================================== */
