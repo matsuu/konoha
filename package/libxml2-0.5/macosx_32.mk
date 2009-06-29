@@ -16,7 +16,7 @@ all: $(library)
 xml.o : ./src/xml.c
 	$(CC) $(CFLAGS) -c $^ -o $@
 
-xmlreader.o : ./src/xml.c
+xmlreader.o : ./src/xmlreader.c
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 $(library): $(objs)
