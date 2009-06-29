@@ -908,7 +908,7 @@ void knh_FArray__k(Ctx *ctx, FArray *o, OutputStream *w, String *m)
 MAPPER knh_Array_Iterator(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_MAPPED(ctx, sfp,
-		new_ArrayIterator(ctx, ctx->share->ClassTable[(sfp[0].o)->h.cid].p1, sfp[0].o));
+		new_ArrayIterator(ctx, ctx->share->ClassTable[(sfp[0].o)->h.cid].p1, (Array*)sfp[0].o));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -917,7 +917,7 @@ MAPPER knh_Array_Iterator(Ctx *ctx, knh_sfp_t *sfp)
 static METHOD knh__Array_opItr(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_MAPPED(ctx, sfp,
-		new_ArrayIterator(ctx, ctx->share->ClassTable[(sfp[0].o)->h.cid].p1, sfp[0].o));
+		new_ArrayIterator(ctx, ctx->share->ClassTable[(sfp[0].o)->h.cid].p1, (Array*)sfp[0].o));
 }
 
 /* ------------------------------------------------------------------------ */

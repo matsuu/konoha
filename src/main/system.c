@@ -587,13 +587,13 @@ char *knh_lookup_packageScript(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t p
 //		if(knh_isfile(ctx, B(buf))) return buf;
 	}
 
-	path = knh_Context_getProperty(ctx, (Context*)ctx, STEXT("konoha.path.package"));
+	path = (String*)knh_Context_getProperty(ctx, (Context*)ctx, STEXT("konoha.path.package"));
 	if(IS_bString(path)){
 		knh_snprintf(buf, bufsiz, "%s/%s/%s.k", knh_String_tochar(path), pbuf, file1);
 		if(knh_isfile(ctx, B(buf))) return buf;
 	}
 
-	path = knh_Context_getProperty(ctx, (Context*)ctx, STEXT("konoha.path.user.package"));
+	path = (String*)knh_Context_getProperty(ctx, (Context*)ctx, STEXT("konoha.path.user.package"));
 	if(IS_bString(path)){
 		knh_snprintf(buf, bufsiz, "%s/%s/%s.k", knh_String_tochar(path), pbuf, file1);
 		if(knh_isfile(ctx, B(buf))) return buf;

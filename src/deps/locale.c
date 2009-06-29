@@ -58,7 +58,7 @@ extern "C" {
 static char *locale_charset()
 {
 	static char codepage[64];
-	knh_snprintf(codepage, sizeof(codepage), "CP%d", (int)GetACP ());
+	knh_snprintf(codepage, sizeof(codepage), "CP%d", (int)GetACP());
 	return codepage;
 }
 
@@ -68,11 +68,9 @@ static char *locale_charset()
 
 char *konoha_encoding()
 {
-#ifdef KONOHA_OS_ENCODING
+#if defined(KONOHA_OS_ENCODING)
 	return KONOHA_OS_ENCODING;
-#else
-
-#if defined(KNH_USING_ICONV) && defined(HAVE_LOCALCHARSET_H)
+#elif defined(KNH_USING_ICONV) && defined(HAVE_LOCALCHARSET_H)
 	return (char*)locale_charset();
 #else
 //	char *enc = knh_getenv("LC_CTYPE");
@@ -80,9 +78,7 @@ char *konoha_encoding()
 //		return (char*)enc;
 //	}
 	return KONOHA_ENCODING;
-#endif/*KNH_USING_ICONV*/
-
-#endif/*KNH_OS_ENCODING*/
+#endif
 }
 
 /* ------------------------------------------------------------------------ */

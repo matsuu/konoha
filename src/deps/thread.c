@@ -61,13 +61,11 @@ extern "C" {
 /* ======================================================================== */
 /* [TLS] */
 
-knh_thread_t knh_thread_self()
+knh_thread_t knh_thread_self(void)
 {
-#ifdef KNH_USING_PTHREAD
-#undef KNH_USING_NOTHREAD
+#if defined(KNH_USING_PTHREAD)
 	return pthread_self();
-#endif
-#ifdef KNH_USING_NOTHREAD
+#else
 	return 0;
 #endif
 }
@@ -76,11 +74,9 @@ knh_thread_t knh_thread_self()
 
 int thread_create(knh_thread_t *thread, void *attr, void *(*frun)(void *), void * arg)
 {
-#ifdef KNH_USING_PTHREAD
-#undef KNH_USING_NOTHREAD
+#if defined(KNH_USING_PTHREAD)
 	return pthread_create((pthread_t*)thread, attr, frun, arg);
-#endif
-#ifdef KNH_USING_NOTHREAD
+#else
 	return -1;
 #endif
 }
@@ -88,7 +84,7 @@ int thread_create(knh_thread_t *thread, void *attr, void *(*frun)(void *), void 
 /* ======================================================================== */
 /* [TLS] */
 
-#ifdef KNH_USING_PTHREAD
+#if defined(KNH_USING_PTHREAD)
 static void destr(void *data)
 {
 	DBG2_P("destruction data=%p", data)
@@ -99,10 +95,9 @@ static void destr(void *data)
 
 int knh_thread_key_create(knh_thread_key_t *key)
 {
-#ifdef KNH_USING_PTHREAD
+#if defined(KNH_USING_PTHREAD)
 	return pthread_key_create((pthread_key_t*)key, destr);
-#endif
-#ifdef KNH_USING_NOTHREAD
+#else
 	return -1;
 #endif
 }
@@ -111,10 +106,9 @@ int knh_thread_key_create(knh_thread_key_t *key)
 
 int knh_thread_setspecific(knh_thread_key_t key, const void *data)
 {
-#ifdef KNH_USING_PTHREAD
+#if defined(KNH_USING_PTHREAD)
 	return pthread_setspecific(key, data);
-#endif
-#ifdef KNH_USING_NOTHREAD
+#else
 	return -1;
 #endif
 }
@@ -123,10 +117,9 @@ int knh_thread_setspecific(knh_thread_key_t key, const void *data)
 
 void* knh_thread_getspecific(knh_thread_key_t key)
 {
-#ifdef KNH_USING_PTHREAD
+#if defined(KNH_USING_PTHREAD)
 	return pthread_getspecific(key);
-#endif
-#ifdef KNH_USING_NOTHREAD
+#else
 	return NULL;
 #endif
 }
@@ -135,11 +128,9 @@ void* knh_thread_getspecific(knh_thread_key_t key)
 
 int knh_thread_key_delete(knh_thread_key_t key)
 {
-#ifdef KNH_USING_PTHREAD
-#undef KNH_USING_NOTHREAD
+#if defined(KNH_USING_PTHREAD)
 	return pthread_key_delete(key);
-#endif
-#ifdef KNH_USING_NOTHREAD
+#else
 	return -1;
 #endif
 }

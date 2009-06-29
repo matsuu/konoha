@@ -46,120 +46,90 @@ extern "C" {
 
 KNHAPI(FILE*) knh_fopen(Ctx *ctx, char *filename, char *mode, int isThrowable)
 {
-#ifdef KNH_USING_NOFILE
+#if defined(KNH_USING_NOFILE)
 	return NULL;
-#else
-
-#if defined(KNH_USING_WINDOWS) || defined(KNH_USING_POSIX)
+#elif defined(KNH_USING_STDC) || defined(KNH_USING_POSIX)
 	FILE *fp = fopen(filename, mode);
 	if(fp == NULL) {
 		KNH_PERRNO(ctx, "IO!!", "fopen", isThrowable);
 	}
 	return fp;
-#endif
-#ifdef KNH_USING_NOAPI
+#else
 	KNH_NOAPI(ctx, isThrowable);
 	return NULL;
 #endif
-
-#endif/*KNH_USING_NOFILE*/
 }
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(size_t) knh_fgetc(Ctx *ctx, FILE *fp)
+KNHAPI(int) knh_fgetc(Ctx *ctx, FILE *fp)
 {
-#ifdef KNH_USING_NOFILE
-	return NULL;
-#else
-
-#if defined(KNH_USING_WINDOWS) || defined(KNH_USING_POSIX)
+#if defined(KNH_USING_NOFILE)
+	return -1;
+#elif defined(KNH_USING_STDC) || defined(KNH_USING_POSIX)
 	return fgetc(fp);
+#else
+	return -1;
 #endif
-#ifdef KNH_USING_NOAPI
-	return 0;
-#endif
-
-#endif/*KNH_USING_NOFILE*/
 }
 
 /* ------------------------------------------------------------------------ */
 
 KNHAPI(size_t) knh_fread(Ctx *ctx, void *ptr, size_t size, FILE *fp)
 {
-#ifdef KNH_USING_NOFILE
+#if defined(KNH_USING_NOFILE)
 	return 0;
-#else
-
-#if defined(KNH_USING_WINDOWS) || defined(KNH_USING_POSIX)
+#elif defined(KNH_USING_STDC) || defined(KNH_USING_POSIX)
 	return fread(ptr, 1, size, fp);
-#endif
-#ifdef KNH_USING_NOAPI
+#else
 	return 0;
 #endif
-
-#endif/*KNH_USING_NOFILE*/
 }
 
 /* ------------------------------------------------------------------------ */
 
 KNHAPI(size_t) knh_fwrite(Ctx *ctx, void *ptr, size_t size, FILE *fp)
 {
-#ifdef KNH_USING_NOFILE
+#if defined(KNH_USING_NOFILE)
 	return 0;
-#else
-
-#if defined(KNH_USING_WINDOWS) || defined(KNH_USING_POSIX)
+#elif defined(KNH_USING_STDC) || defined(KNH_USING_POSIX)
 	return fwrite(ptr, 1, size, fp);
-#endif
-#ifdef KNH_USING_NOAPI
+#else
 	return 0;
 #endif
-
-#endif/*KNH_USING_NOFILE*/
 }
 
 /* ------------------------------------------------------------------------ */
 
 KNHAPI(int) knh_fflush(Ctx *ctx, FILE *fp)
 {
-#ifdef KNH_USING_NOFILE
+#if defined(KNH_USING_NOFILE)
 	return 0;
-#else
-
-#if defined(KNH_USING_WINDOWS) || defined(KNH_USING_POSIX)
+#elif defined(KNH_USING_STDC) || defined(KNH_USING_POSIX)
 	return fflush(fp);
-#endif
-#ifdef KNH_USING_NOAPI
+#else
 	return 0;
 #endif
-
-#endif/*KNH_USING_NOFILE*/
 }
 
 /* ------------------------------------------------------------------------ */
 
 KNHAPI(int) knh_fclose(Ctx *ctx, FILE *fp)
 {
-#ifdef KNH_USING_NOFILE
-	return 0;
-#else
-
-#if defined(KNH_USING_WINDOWS) || defined(KNH_USING_POSIX)
+#if defined(KNH_USING_NOFILE)
+	return 1;
+#elif defined(KNH_USING_STDC) || defined(KNH_USING_POSIX)
 	return fclose(fp);
+#else
+	return 1;
 #endif
-#ifdef KNH_USING_NOAPI
-	return 0;
-#endif
-
-#endif/*KNH_USING_NOFILE*/
 }
 
 /* ======================================================================== */
 /* [NOP] */
 
 static
-knh_io_t knh_iodrv_open__NOP(Ctx *ctx, knh_bytes_t n, char *mode)
+knh_io_t knh_iodrv_open__NOP(Ctx *ctx, knh_bytes_t n, char *mode, int isThrowable)
 {
 	return 0;
 }
@@ -198,15 +168,13 @@ static void knh_iodrv_close__NOP(Ctx *ctx, knh_io_t fd)
 static knh_io_t knh_iodrv_open__FILE(Ctx *ctx, knh_bytes_t file, char *mode, int isThrowable)
 {
 	char buf[FILEPATH_BUFSIZ];
+	FILE *fp;
 	knh_format_ospath(ctx, buf, sizeof(buf), file);
-	//DBG2_P("opening '%s'", buf);
-	{
-		FILE *fp = knh_fopen(ctx, buf, mode, isThrowable);
-		if(fp == NULL) {
-			return (knh_io_t)-1;
-		}
-		return (knh_io_t)fp;
+	fp = knh_fopen(ctx, buf, mode, isThrowable);
+	if(fp == NULL) {
+		return (knh_io_t)-1;
 	}
+	return (knh_io_t)fp;
 }
 
 /* ------------------------------------------------------------------------ */

@@ -12,9 +12,10 @@ libkonoha_la_LDFLAGS = -no-undefined -release 0 -version-info 5:0:0
 
 AM_CPPFLAGS = -I../include
 #if MINGW
-#AM_CPPFLAGS += -DKONOHA_OS__MINGW
+#AM_CPPFLAGS += -DKONOHA_ON_MINGW
 #endif
 libkonoha_la_SOURCES = 
+libkonoha_la_SOURCES += ../src/konohadev_main.c
 libkonoha_la_SOURCES += ../src/api/anyapi.c
 libkonoha_la_SOURCES += ../src/api/arrayapi.c
 libkonoha_la_SOURCES += ../src/api/bytesapi.c
@@ -67,7 +68,7 @@ libkonoha_la_SOURCES += ../src/compiler/typing.c
 libkonoha_la_SOURCES += ../src/deps/dlopen.c
 libkonoha_la_SOURCES += ../src/deps/fileio.c
 libkonoha_la_SOURCES += ../src/deps/filesystem.c
-libkonoha_la_SOURCES += ../src/deps/konoha_locale.c
+libkonoha_la_SOURCES += ../src/deps/locale.c
 libkonoha_la_SOURCES += ../src/deps/regex.c
 libkonoha_la_SOURCES += ../src/deps/socket.c
 libkonoha_la_SOURCES += ../src/deps/sqlite3.c
@@ -75,6 +76,8 @@ libkonoha_la_SOURCES += ../src/deps/thread.c
 libkonoha_la_SOURCES += ../src/deps/time.c
 libkonoha_la_SOURCES += ../src/ext/mt19937-64.c
 libkonoha_la_SOURCES += ../src/ext/mt19937ar.c
+libkonoha_la_SOURCES += ../src/ext/qsort.c
+libkonoha_la_SOURCES += ../src/ext/strerror.c
 libkonoha_la_SOURCES += ../src/gen/codetemplate.c
 libkonoha_la_SOURCES += ../src/gen/fibo.c
 libkonoha_la_SOURCES += ../src/gen/konoha_klr_.c
@@ -107,6 +110,7 @@ libkonoha_la_includekonoha_HEADERS += ../include/konoha/konoha_deps.h
 libkonoha_la_includekonoha_HEADERS += ../include/konoha/konoha_dev.h
 libkonoha_la_includekonoha_HEADERS += ../include/konoha/konoha_gc.h
 libkonoha_la_includekonoha_HEADERS += ../include/konoha/konoha_glue.h
+libkonoha_la_includekonoha_HEADERS += ../include/konoha/konoha_lkm.h
 libkonoha_la_includekonoha_HEADERS += ../include/konoha/konoha_macros.h
 libkonoha_la_includekonoha_HEADERS += ../include/konoha/konoha_t.h
 libkonoha_la_includekonoha_HEADERS += ../include/konoha/konoha_vm.h

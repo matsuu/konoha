@@ -29,14 +29,9 @@
 
 
 #include"commons.h"
-#ifdef KONOHA_ON_LKM
-#undef KNH_USING_POSIX
-#endif
 
-#define KNH_USING_NOAPI 1
 
 #ifdef KNH_USING_POSIX
-#undef KNH_USING_NOAPI
 #include <unistd.h>
 #include <signal.h>
 #include <dirent.h>
@@ -52,7 +47,6 @@
 #endif/*KNH_USING_POSIX*/
 
 #ifdef KNH_USING_WINDOWS
-#undef KNH_USING_NOAPI
 #include<windows.h>
 #include <time.h>
 #endif
@@ -68,13 +62,11 @@ extern "C" {
 
 knh_uint_t knh_initseed()
 {
-#ifdef KNH_USING_WINDOWS
+#if defined(KNH_USING_WINDOWS)
 	return (knh_uint_t)time(NULL);
-#endif/*KNH_USING_WINDOWS*/
-#ifdef KNH_USING_POSIX
+#elif defined(KNH_USING_POSIX)
 	return (knh_uint_t)time(NULL) + getpid();
-#endif/*KNH_USING_POSIX*/
-#ifdef KNH_USING_NOAPI
+#else
 	return 0;
 #endif
 }
@@ -83,16 +75,14 @@ knh_uint_t knh_initseed()
 
 knh_uint64_t konoha_getTimeMilliSecond(void)
 {
-#ifdef KNH_USING_WINDOWS
+#if defined(KNH_USING_WINDOWS)
 	DWORD tickCount = GetTickCount();
 	return (knh_int64_t)tickCount;
-#endif/*KNH_USING_WINDOWS*/
-#ifdef KNH_USING_POSIX
+#elif defined(KNH_USING_POSIX)
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
 	return tv.tv_sec * 1000 + tv.tv_usec / 1000;
-#endif/*KNH_USING_POSIX*/
-#ifdef KNH_USING_NOAPI
+#else
 	return 0;
 #endif
 }
@@ -102,30 +92,14 @@ knh_uint64_t konoha_getTimeMilliSecond(void)
 
 knh_uint64_t konoha_getProfCount(void)
 {
-#ifdef KNH_USING_WINDOWS
-
-#endif/*KNH_USING_WINDOWS*/
-#ifdef KNH_USING_POSIX
-
-#endif/*KNH_USING_POSIX*/
-#ifdef KNH_USING_NOAPI
 	return 0;
-#endif
 }
 
 /* ------------------------------------------------------------------------ */
 
 knh_uint64_t konoha_getProfCountPerSecond(void)
 {
-#ifdef KNH_USING_WINDOWS
-
-#endif/*KNH_USING_WINDOWS*/
-#ifdef KNH_USING_POSIX
-
-#endif/*KNH_USING_POSIX*/
-#ifdef KNH_USING_NOAPI
 	return 1;
-#endif
 }
 
 /* ======================================================================== */
