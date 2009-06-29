@@ -38,4 +38,5 @@ void System.chDir(String dirname);
 void System.setSigSegv(Closure c);
 void System.setSigBus(Closure c);
 void System.setSigKill(Closure c);
+void System.setSigInt(Closure c);
 void System.raise(int signal);

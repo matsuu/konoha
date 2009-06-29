@@ -144,9 +144,13 @@ static void knh_sig_segv(int sig)
     knh_Closure_invokesfp(lctx, segvfunc, lsfp, 0);
 }
 
+struct sigaction sa_seg;
 METHOD System_setSigSegv(Ctx *ctx, knh_sfp_t *sfp)
 {
     segvfunc = sfp[1].cc;
+    memset(&sa_seg, 0, sizeof(struct sigaction));
+    sa_seg.sa_handler = knh_sig_segv;
+    sigaction(SIGSEGV, &sa_seg, NULL);
     KNH_RETURN_void(ctx, sfp);
 }
 
@@ -157,12 +161,16 @@ static void knh_sig_bus(int sig)
 {
     Ctx *lctx = konoha_getCurrentContext();
     knh_sfp_t *lsfp = KNH_LOCAL(lctx);
-    knh_Closure_invokesfp(lctx, segvfunc, lsfp, 0);
+    knh_Closure_invokesfp(lctx, busfunc, lsfp, 0);
 }
 
+struct sigaction sa_bus;
 METHOD System_setSigBus(Ctx *ctx, knh_sfp_t *sfp)
 {
     busfunc = sfp[1].cc;
+    memset(&sa_bus, 0, sizeof(struct sigaction));
+    sa_bus.sa_handler = knh_sig_bus;
+    sigaction(SIGBUS, &sa_bus, NULL);
     KNH_RETURN_void(ctx, sfp);
 }
 
@@ -173,21 +181,45 @@ static void knh_sig_kill(int sig)
 {
     Ctx *lctx = konoha_getCurrentContext();
     knh_sfp_t *lsfp = KNH_LOCAL(lctx);
-    knh_Closure_invokesfp(lctx, segvfunc, lsfp, 0);
+    knh_Closure_invokesfp(lctx, killfunc, lsfp, 0);
 }
 
+struct sigaction sa_kill;
 METHOD System_setSigKill(Ctx *ctx, knh_sfp_t *sfp)
 {
     killfunc = sfp[1].cc;
+    memset(&sa_kill, 0, sizeof(struct sigaction));
+    sa_kill.sa_handler = knh_sig_kill;
+    sigaction(SIGKILL, &sa_kill, NULL);
     KNH_RETURN_void(ctx, sfp);
 }
 
+/* ------------------------------------------------------------------------ */
+// void System.setSigInt(Closure c);
+Closure *intfunc = NULL;
+static void knh_sig_int(int sig)
+{
+    Ctx *lctx = konoha_getCurrentContext();
+    knh_sfp_t *lsfp = KNH_LOCAL(lctx);
+    knh_Closure_invokesfp(lctx, intfunc, lsfp, 0);
+}
+
+struct sigaction sa_int;
+METHOD System_setSigInt(Ctx *ctx, knh_sfp_t *sfp)
+{
+    intfunc = sfp[1].cc;
+    memset(&sa_int, 0, sizeof(struct sigaction));
+    sa_int.sa_handler = knh_sig_int;
+    sigaction(SIGINT, &sa_int, NULL);
+    KNH_RETURN_void(ctx, sfp);
+}
 
 /* ------------------------------------------------------------------------ */
 // void System.raise(int signal);
 METHOD System_raise(Ctx *ctx, knh_sfp_t *sfp)
 {
     int sig = p_int(sfp[1]);
+    fprintf(stderr,"raise:%d\n",sig);
     raise(sig);
     KNH_RETURN_void(ctx, sfp);
 }
@@ -336,10 +368,6 @@ KNHAPI(int) init(Ctx *ctx)
     konoha_loadIntConstData(ctx, IntConstData);
     konoha_loadFloatConstData(ctx, FloatConstData);
     konoha_loadStringConstData(ctx, StringConstData);
-
-    signal(SIGSEGV, knh_sig_segv);
-    signal(SIGBUS,  knh_sig_bus);
-    signal(SIGKILL,  knh_sig_kill);
 
     // pipe dirver
     konoha_addIODriver(ctx, NULL, &IO__PIPE);
