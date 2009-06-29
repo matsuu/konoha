@@ -523,7 +523,7 @@ knh_boolean_t knh_mkdir(Ctx *ctx, knh_bytes_t path, int isThrowable);
 knh_boolean_t knh_unlink(Ctx *ctx, knh_bytes_t f, int isThrowable);
 knh_boolean_t knh_rename(Ctx *ctx, knh_bytes_t on, knh_bytes_t nn, int isThrowable);
 char *knh_format_homepath(char *buf, size_t bufsiz);
-/* ../src/deps/konoha_locale.c */
+/* ../src/deps/locale.c */
 char *konoha_encoding();
 char *knh_format_lang(char *buf, size_t bufsiz);
 /* ../src/deps/regex.c */
@@ -540,7 +540,7 @@ knh_db_drvapi_t *knh_System_getDefaultDBDriver();
 knh_db_drvapi_t *knh_System_getDBDriver(Ctx *ctx, knh_bytes_t name);
 void  init_DB(Ctx *ctx);
 /* ../src/deps/thread.c */
-knh_thread_t knh_thread_self();
+knh_thread_t knh_thread_self(void);
 int thread_create(knh_thread_t *thread, void *attr, void *(*frun)(void *), void * arg);
 int knh_thread_key_create(knh_thread_key_t *key);
 int knh_thread_setspecific(knh_thread_key_t key, const void *data);
