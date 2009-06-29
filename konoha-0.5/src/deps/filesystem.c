@@ -27,17 +27,9 @@
 
 /* ************************************************************************ */
 
-
 #include"commons.h"
 
-#ifdef KONOHA_ON_LKM
-#undef KNH_USING_POSIX
-#endif
-
-#define KNH_USING_NOAPI 1
-
 #ifdef KNH_USING_POSIX
-#undef KNH_USING_NOAPI
 #include <unistd.h>
 #include <signal.h>
 #include <dirent.h>
@@ -53,7 +45,6 @@
 #endif/*KNH_USING_POSIX*/
 
 #ifdef KNH_USING_WINDOWS
-#undef KNH_USING_NOAPI
 #include<windows.h>
 #endif
 
@@ -69,22 +60,20 @@ extern "C" {
 
 knh_boolean_t knh_isfile(Ctx *ctx, knh_bytes_t path)
 {
-#ifdef KNH_USING_WINDOWS
+#if defined(KNH_USING_WINDOWS)
 	char dirname[FILEPATH_BUFSIZ];
 	knh_format_ospath(ctx, dirname, sizeof(dirname), path);
 	DWORD attr = GetFileAttributesA(dirname);
 	if(attr == -1) return 0;
 	if((attr & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) return 0;
 	return 1;
-#endif/*KNH_USING_WINDOWS*/
-#ifdef KNH_USING_POSIX
+#elif defined(KNH_USING_POSIX)
 	char dirname[FILEPATH_BUFSIZ];
 	knh_format_ospath(ctx, dirname, sizeof(dirname), path);
     struct stat buf;
 	if(stat(dirname, &buf) == -1) return 0;
 	return S_ISREG(buf.st_mode);
-#endif/*KNH_USING_POSIX*/
-#ifdef KNH_USING_NOAPI
+#else
 	return 0;
 #endif
 }
@@ -93,22 +82,19 @@ knh_boolean_t knh_isfile(Ctx *ctx, knh_bytes_t path)
 
 knh_boolean_t knh_isdir(Ctx *ctx, knh_bytes_t path)
 {
-#ifdef KNH_USING_WINDOWS
+#if defined(KNH_USING_WINDOWS)
 	char dirname[FILEPATH_BUFSIZ];
 	knh_format_ospath(ctx, dirname, sizeof(dirname), path);
 	DWORD attr = GetFileAttributesA(dirname);
 	if(attr == -1) return 0;
 	return ((attr & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY);
-#endif
-#ifdef KNH_USING_POSIX
+#elif defined(KNH_USING_POSIX)
 	char dirname[FILEPATH_BUFSIZ];
 	knh_format_ospath(ctx, dirname, sizeof(dirname), path);
     struct stat buf;
 	if(stat(dirname, &buf) == -1) return 0;
 	return S_ISDIR(buf.st_mode);
-#endif/*KNH_USING_POSIX*/
-#ifdef KNH_USING_NOAPI
-	KNH_NOAPI(ctx, isThrowable);
+#else
 	return 0;
 #endif
 }
@@ -134,7 +120,7 @@ knh_bytes_t knh_bytes_parentpath(knh_bytes_t path)
 static
 knh_boolean_t knh_mkdir0(Ctx *ctx, knh_bytes_t path, int isThrowable)
 {
-#ifdef KNH_USING_WINDOWS
+#if defined(KNH_USING_WINDOWS)
 	char dirname[FILEPATH_BUFSIZ];
 	knh_format_ospath(ctx, dirname, sizeof(dirname), path);
 	if(!CreateDirectoryA(dirname, NULL)) {
@@ -142,8 +128,7 @@ knh_boolean_t knh_mkdir0(Ctx *ctx, knh_bytes_t path, int isThrowable)
 		return 0;
 	}
 	return 1;
-#endif
-#ifdef KNH_USING_POSIX
+#elif defined(KNH_USING_POSIX)
 	char dirname[FILEPATH_BUFSIZ];
 	knh_format_ospath(ctx, dirname, sizeof(dirname), path);
 	if(mkdir(dirname, 0777) == -1) {
@@ -151,8 +136,7 @@ knh_boolean_t knh_mkdir0(Ctx *ctx, knh_bytes_t path, int isThrowable)
 		return 0;
 	}
 	return 1;
-#endif/*KNH_USING_POSIX*/
-#ifdef KNH_USING_NOAPI
+#else
 	KNH_NOAPI(ctx, isThrowable);
 	return 0;
 #endif
@@ -186,8 +170,7 @@ knh_boolean_t knh_unlink(Ctx *ctx, knh_bytes_t f, int isThrowable)
 		return 0;
 	}
 	return 1;
-#endif/*KNH_USING_POSIX*/
-#if defined(KNH_USING_WINDOWS)
+#elif defined(KNH_USING_WINDOWS)
 	char fbuf[FILEPATH_BUFSIZ];
 	knh_format_ospath(ctx, fbuf, sizeof(fbuf), f);
 	if(DeleteFileA(fbuf) == 0) {
@@ -195,8 +178,7 @@ knh_boolean_t knh_unlink(Ctx *ctx, knh_bytes_t f, int isThrowable)
 		return 0;
 	}
 	return 1;
-#endif/*KNH_USING_WINDOWS*/
-#ifdef KNH_USING_NOAPI
+#else
 	KNH_NOAPI(ctx, isThrowable);
 	return 0;
 #endif/*KNH_USING_WINDOWS*/
@@ -215,8 +197,7 @@ knh_boolean_t knh_rename(Ctx *ctx, knh_bytes_t on, knh_bytes_t nn, int isThrowab
 		return 0;
 	}
 	return 1;
-#endif/*KNH_USING_POSIX*/
-#if defined(KNH_USING_WINDOWS)
+#elif defined(KNH_USING_WINDOWS)
 	char oldbuf[FILEPATH_BUFSIZ], newbuf[FILEPATH_BUFSIZ];
 	knh_format_ospath(ctx, oldbuf, sizeof(oldbuf), on);
 	knh_format_ospath(ctx, newbuf, sizeof(newbuf), nn);
@@ -225,8 +206,7 @@ knh_boolean_t knh_rename(Ctx *ctx, knh_bytes_t on, knh_bytes_t nn, int isThrowab
 		return 0;
 	}
 	return 1;
-#endif/*KNH_USING_WINDOWS*/
-#ifdef KNH_USING_NOAPI
+#else
 	KNH_NOAPI(ctx, isThrowable);
 	return 0;
 #endif/*KNH_USING_WINDOWS*/
@@ -239,14 +219,10 @@ knh_boolean_t knh_rename(Ctx *ctx, knh_bytes_t on, knh_bytes_t nn, int isThrowab
 
 char *knh_format_homepath(char *buf, size_t bufsiz)
 {
-#ifdef KONOHA_HOMEPATH
-#define HOMEPATH 1
+#if defined(KONOHA_HOMEPATH)
 	knh_snprintf(buf, bufsiz, KONOHA_HOMEPATH);
 	return buf;
-#endif
-
-#ifdef KNH_USING_WINDOWS
-#define HOMEPATH 1
+#elif defined(KNH_USING_WINDOWS)
 	char bufl[FILEPATH_BUFSIZ];
 	HMODULE h = LoadLibrary(NULL);
 	GetModuleFileNameA(h, buf, bufsiz);
@@ -254,10 +230,7 @@ char *knh_format_homepath(char *buf, size_t bufsiz)
 	//DBG2_P("nzpath='%s'", bufl);
 	knh_format_parentpath(buf, bufsiz, B(bufl), 2);
 	return buf;
-#endif/*KNH_USING_WINDOWS*/
-
-#ifdef KONOHA_ON_LINUX
-#define HOMEPATH 1
+#elif defined(KONOHA_ON_LINUX)
 	// @url(http://shinh.skr.jp/binary/b2con.html)
 	// http://doc.trolltech.com/3.3/qapplication.html#applicationDirPath
 	char bufl[FILEPATH_BUFSIZ];
@@ -265,21 +238,16 @@ char *knh_format_homepath(char *buf, size_t bufsiz)
 	knh_format_nzpath(bufl, sizeof(bufl), B(buf));
 	knh_format_parentpath(buf, bufsiz, B(bufl), 2);
 	return buf;
-#endif/*KONOHA_ON_LINUX*/
-
-#ifdef KONOHA_ON_MACOSX
-#define HOMEPATH 1
+#elif defined(KONOHA_ON_MACOSX)
 	char bufl[FILEPATH_BUFSIZ];
 	const char *s = _dyld_get_image_name(0);
 	s = realpath(s, bufl);
 	knh_format_parentpath(buf, bufsiz, B((char*)s), 2);
 	return buf;
-#endif
-
-#ifndef HOMEPATH
-#ifndef KNH_PREFIX
-#define KNH_PREFIX "/konoha"
-#endif
+#else
+	#ifndef KNH_PREFIX
+	#define KNH_PREFIX "/konoha"
+	#endif
 	knh_snprintf(buf, bufsiz, KNH_PREFIX);
 	return buf;
 #endif

@@ -294,7 +294,7 @@ METHOD knh__Socket_new(Ctx *ctx, knh_sfp_t *sfp)
 	}
 	KNH_SETv(ctx, DP(so)->urn, sfp[1].o);
 	DP(so)->port = (int)sfp[2].ivalue;
-	DP(so)->sd = knh_socket_open(ctx, ip_or_host, DP(so)->port);
+	DP(so)->sd = knh_socket_open(ctx, ip_or_host, DP(so)->port, knh_Context_isStrict(ctx));
 	if(DP(so)->sd != -1) {
 		KNH_SETv(ctx, DP(so)->in,  new_InputStream__io(ctx, DP(so)->urn, (knh_io_t)DP(so)->sd, konoha_getSocketDriver()));
 		KNH_SETv(ctx, DP(so)->out, new_OutputStream__io(ctx, DP(so)->urn, (knh_io_t)DP(so)->sd, konoha_getSocketDriver()));

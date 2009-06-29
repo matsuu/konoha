@@ -92,7 +92,7 @@ ITRNEXT knh_Array_var_next(Ctx *ctx, knh_sfp_t *sfp, int n)
 
 Iterator* new_ArrayIterator(Ctx *ctx, knh_class_t cid, Array *a)
 {
-	return new_Iterator(ctx, cid, a, knh_Array_var_next);
+	return new_Iterator(ctx, cid, UP(a), knh_Array_var_next);
 }
 /* ------------------------------------------------------------------------ */
 
