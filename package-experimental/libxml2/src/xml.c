@@ -1,7 +1,5 @@
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
-#include <libxml/parser.h>
-#include <libxml/xmlreader.h>
 
 #define KNH_USING_ICONV
 
