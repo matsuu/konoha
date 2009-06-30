@@ -59,7 +59,7 @@ METHOD Curl_new(Ctx *ctx, knh_sfp_t *sfp)
 METHOD Curl_easySetOpt(Ctx *ctx, knh_sfp_t *sfp)
 {
 	CURL* curl = (CURL*)p_cptr(sfp[0]);
-	FILE* fp;
+	FILE* fp = NULL;
 	if(curl != NULL) {
 		knh_int_t curlopt = p_int(sfp[1]);
 		switch(curlopt) {
@@ -191,11 +191,14 @@ METHOD Curl_easySetOpt(Ctx *ctx, knh_sfp_t *sfp)
 			}
 			break;
 		case CURLOPT_FILE:
-			fp = (FILE*) (sfp[2].w->b->fd);
-            if(fp != NULL) {
-                curl_easy_setopt(curl, curlopt, fp);
-            }
-            else {
+		case CURLOPT_INFILE:
+		case CURLOPT_STDERR:
+		case CURLOPT_WRITEHEADER:
+			if(IS_OutputStream(sfp[2].o)) {
+				fp = (FILE*)sfp[2].w->b->fd;
+				curl_easy_setopt(curl, curlopt, fp);
+			}
+			else {
                 if(knh_Context_isStrict(ctx)) {
                     KNH_THROWs(ctx, "Type!!: data must be InputStream");
                 }
@@ -228,13 +231,63 @@ METHOD Curl_easyPerform(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 
+/* ------------------------------------------------------------------------ */
+/* @method Any Curl.easyGetInfo(Int! type) */
+
+METHOD Curl_easyGetInfo(Ctx *ctx, knh_sfp_t *sfp)
+{
+	CURL* curl = (CURL*)p_cptr(sfp[0]);
+	long* lngbuf = NULL;
+	double* dblbuf = NULL;
+	char* strbuf = NULL;
+    if(curl != NULL) {
+        knh_int_t curlinfo = p_int(sfp[1]);
+        switch(curlinfo) {
+		case CURLINFO_HEADER_SIZE:
+		case CURLINFO_REQUEST_SIZE:
+			curl_easy_getinfo(curl, curlinfo, &lngbuf);
+			KNH_RETURN_Int(ctx, sfp, (long)lngbuf);
+			break;
+		case CURLINFO_REDIRECT_TIME:
+		case CURLINFO_TOTAL_TIME:
+		case CURLINFO_NAMELOOKUP_TIME:
+		case CURLINFO_CONNECT_TIME:
+		case CURLINFO_PRETRANSFER_TIME:
+		case CURLINFO_STARTTRANSFER_TIME:
+		case CURLINFO_SIZE_UPLOAD:
+		case CURLINFO_SIZE_DOWNLOAD:
+		case CURLINFO_SPEED_DOWNLOAD:
+		case CURLINFO_SPEED_UPLOAD:
+			curl_easy_getinfo(curl, curlinfo, &dblbuf);
+			KNH_RETURN_Float(ctx, sfp, *dblbuf);
+			break;
+		case CURLINFO_EFFECTIVE_URL:
+		case CURLINFO_CONTENT_TYPE:
+			curl_easy_getinfo(curl, curlinfo, &strbuf);
+			KNH_RETURN(ctx, sfp, new_String(ctx,B(strbuf),NULL));
+			break;
+		default:
+			KNH_WARNING(ctx, "curl_easy_getinfo: unknown info =%d", curlinfo);
+			break;
+		}
+	}
+	KNH_RETURN(ctx, sfp, sfp[0].o);
+}
+
 /* ======================================================================== */
 /* [ConstData] */
 
 static
 knh_IntConstData_t IntConstData[] = {
+	{"Curl.CURLOPT_HEADER", CURLOPT_HEADER},
+	{"Curl.CURLOPT_NOBODY", CURLOPT_NOBODY},
 	{"Curl.CURLOPT_URL", CURLOPT_URL},
 	{"Curl.CURLOPT_FILE", CURLOPT_FILE},
+	{"Curl.CURLINFO_EFFECTIVE_URL", CURLINFO_EFFECTIVE_URL},
+	{"Curl.CURLINFO_CONTENT_TYPE", CURLINFO_CONTENT_TYPE},
+	{"Curl.CURLINFO_HEADER_SIZE", CURLINFO_HEADER_SIZE},
+	{"Curl.CURLINFO_REQUEST_SIZE",CURLINFO_REQUEST_SIZE},
+	{"Curl.CURLINFO_SIZE_DOWNLOAD", CURLINFO_SIZE_DOWNLOAD},
 	{NULL}  // end of const data
 };
 

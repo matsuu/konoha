@@ -27,7 +27,8 @@
 
 @Naitive class Curl;
 Curl! Curl.new();
-void Curl.easySetOpt(int type, Any data);
+void Curl.easySetOpt(Int! type, Any data);
+Any Curl.easyGetInfo(Int! type);
 boolean Curl.easyPerform();
 
 
