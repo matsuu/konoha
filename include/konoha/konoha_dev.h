@@ -49,6 +49,10 @@
 
 #include"konoha_deps.h"
 
+#ifdef KONOHA_ON_TB
+#include"konoha_tb.h"
+#endif
+
 #include"gen/konoha_class_.h"
 #include"gen/konoha_knhapi_.h"
 
