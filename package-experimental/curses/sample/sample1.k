@@ -13,7 +13,7 @@ String chmod()
 
 void rlc(Curses c,int code)
 {
-	c.mvwaddstr(10,i," " * 18);
+	c.mvwaddstr(10,3," " * |str|);
 	str = "key code:[" + code + "]";
 	c.mvwaddstr(10,3,str);
 }

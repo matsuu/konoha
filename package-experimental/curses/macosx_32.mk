@@ -1,14 +1,13 @@
 # Last modified by utr.hira utrhira@sourceforge.jp
 
 CC = gcc
-CFLAGS = -O2 -Wall -fmessage-length=0 -fpic
-LDLIBS = -lkonoha
-LDLIBS += -lncurses
+CFLAGS = -O2 -Wall -fmessage-length=0 -fPIC
+LDLIBS = -lncurses -lkonoha
 
-target = linux_32
+target = macosx_32
 pkgname = curses
 
-library = "$(pkgname)_$(target).so"
+library = "$(pkgname)_$(target).dylib"
 
 .PHONY: all
 all: $(library)
@@ -16,10 +15,10 @@ all: $(library)
 objs = "$(pkgname).o"
 
 "$(pkgname).o": $(pkgname).c
-	$(CC) $(CFLAGS) -o $@ -c $^
+	$(CC) $(CFLAGS) -c $^ -o $@
 
 $(library): $(objs)
-	$(CC) -shared -Wl -o $@ $^ $(LDLIBS)
+	$(CC) -dynamiclib -o $@ $^ $(LDLIBS)
 
 .PHONY: clean
 clean:
