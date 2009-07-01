@@ -55,7 +55,7 @@ extern "C" {
 
 #define HAVE_LOCALCHARSET_H 1
 
-static char *locale_charset()
+static char *locale_charset(void)
 {
 	static char codepage[64];
 	knh_snprintf(codepage, sizeof(codepage), "CP%d", (int)GetACP());

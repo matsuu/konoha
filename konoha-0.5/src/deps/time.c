@@ -60,7 +60,7 @@ extern "C" {
 /* ======================================================================== */
 /* [time] */
 
-knh_uint_t knh_initseed()
+knh_uint_t knh_initseed(void)
 {
 #if defined(KNH_USING_WINDOWS)
 	return (knh_uint_t)time(NULL);
