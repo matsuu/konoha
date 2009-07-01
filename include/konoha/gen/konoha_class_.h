@@ -28,13 +28,8 @@
 #ifndef KONOHA_CLASS__H
 #define KONOHA_CLASS__H
 
-#ifdef KONOHA_OS__LKM
-#include"../konoha_t.h"
-#include"../konoha_class.h"
-#else
 #include<konoha/konoha_t.h>
 #include<konoha/konoha_class.h>
-#endif
 
 #ifdef __cplusplus 
 extern "C" {

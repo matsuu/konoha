@@ -28,13 +28,8 @@
 #ifndef KONOHAC_STMT__H
 #define KONOHAC_STMT__H
 
-#ifdef KONOHA_OS__LKM
-#include"../konoha_t.h"
-#include"../konoha_class.h"
-#else
 #include<konoha/konoha_t.h>
 #include<konoha/konoha_class.h>
-#endif
 
 
 #ifdef __cplusplus 

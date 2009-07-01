@@ -1,6 +1,6 @@
 #ifndef KONOHA_DEPS_H_
 #define KONOHA_DEPS_H_
-#include"konoha_t.h"
+#include<konoha/konoha_t.h>
 
 #ifndef KONOHA_OS__LKM
 #include<stdlib.h>

@@ -28,7 +28,7 @@
 #ifndef COMMONS_H_
 #define COMMONS_H_
 
-#include"../../include/konoha/konoha_dev.h"
+#include<konoha/konoha_dev.h>
 
 
 #ifdef __cplusplus

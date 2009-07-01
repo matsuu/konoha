@@ -28,11 +28,7 @@
 #ifndef KONOHA_PROTO__H
 #define KONOHA_PROTO__H
 
-#ifdef KONOHA_OS__LKM
-#include"konoha_class_.h"
-#else
 #include<konoha/gen/konoha_class_.h>
-#endif
 
 
 #ifdef __cplusplus 
