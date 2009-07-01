@@ -1,6 +1,9 @@
 #include <konoha.h>
 #include <ncurses.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Int Curses.box(self, Int i1, Int i2) */
 
@@ -115,8 +118,7 @@ METHOD Curses_immedok(Ctx *ctx, knh_sfp_t* sfp)
 
 METHOD Curses_initscr(Ctx *ctx, knh_sfp_t* sfp)
 {
-    WINDOW *ret = initscr();
-
+    WINDOW* ret = initscr();
     KNH_RETURN(ctx, sfp, ret);
 }
 
@@ -131,9 +133,9 @@ METHOD Curses_intrflush(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN_Int(ctx, sfp, ret);
 }
 
-/* Boolean Curses.is_linetouched(self, Int i1) */
+/* Boolean Curses.isLinetouched(self, Int i1) */
 
-METHOD Curses_is_linetouched(Ctx *ctx, knh_sfp_t* sfp)
+METHOD Curses_isLinetouched(Ctx *ctx, knh_sfp_t* sfp)
 {
     WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
     int i1 = p_int(sfp[1]);
@@ -142,9 +144,9 @@ METHOD Curses_is_linetouched(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean Curses.is_wintouched(self) */
+/* Boolean Curses.isWintouched(self) */
 
-METHOD Curses_is_wintouched(Ctx *ctx, knh_sfp_t* sfp)
+METHOD Curses_isWintouched(Ctx *ctx, knh_sfp_t* sfp)
 {
     WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
     int ret = is_wintouched(self );
@@ -204,8 +206,8 @@ METHOD Curses_mvwaddch(Ctx *ctx, knh_sfp_t* sfp)
     WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
     int i1 = p_int(sfp[1]);
     int i2 = p_int(sfp[2]);
-    int i3 = p_int(sfp[3]);
-    int ret = mvwaddch(self ,i1 ,i2 ,i3 );
+    char* i3 = p_char(sfp[3]);
+    int ret = mvwaddch(self ,i1 ,i2 ,*i3 );
 
     KNH_RETURN_Int(ctx, sfp, ret);
 }
@@ -405,30 +407,6 @@ METHOD Curses_mvwvline(Ctx *ctx, knh_sfp_t* sfp)
     int ret = mvwvline(self ,i1 ,i2 ,i3 ,i4 );
 
     KNH_RETURN_Int(ctx, sfp, ret);
-}
-
-/* Curses Curses.newpad(Int i0, Int i1) */
-
-METHOD Curses_newpad(Ctx *ctx, knh_sfp_t* sfp)
-{
-    int i0 = p_int(sfp[1]);
-    int i1 = p_int(sfp[2]);
-    WINDOW *ret = newpad(i0 ,i1 );
-
-    KNH_RETURN(ctx, sfp, ret);
-}
-
-/* Curses Curses.newwin(Int i0, Int i1, Int i2, Int i3) */
-
-METHOD Curses_newwin(Ctx *ctx, knh_sfp_t* sfp)
-{
-    int i0 = p_int(sfp[1]);
-    int i1 = p_int(sfp[2]);
-    int i2 = p_int(sfp[3]);
-    int i3 = p_int(sfp[4]);
-    WINDOW *ret = newwin(i0 ,i1 ,i2 ,i3 );
-
-    KNH_RETURN(ctx, sfp, ret);
 }
 
 /* Int Curses.nodelay(self, Boolean b1) */
@@ -963,6 +941,18 @@ METHOD Curses_wrefresh(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN_Int(ctx, sfp, ret);
 }
 
+/* Int Curses.wresize(Int i1, Int i2) */
+
+METHOD Curses_wresize(Ctx *ctx, knh_sfp_t* sfp)
+{
+    WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
+	int i1 = p_int(sfp[1]);
+	int i2 = p_int(sfp[2]);
+    int ret = wresize(self, i1, i2);
+
+    KNH_RETURN_Int(ctx, sfp, ret);
+}
+
 /* Int Curses.wscrl(self, Int i1) */
 
 METHOD Curses_wscrl(Ctx *ctx, knh_sfp_t* sfp)
@@ -1062,9 +1052,9 @@ METHOD Curses_wvline(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN_Int(ctx, sfp, ret);
 }
 
-/* Int Curses.getattrs(self) */
+/* Int Curses.getAttrs(self) */
 
-METHOD Curses_getattrs(Ctx *ctx, knh_sfp_t* sfp)
+METHOD Curses_getAttrs(Ctx *ctx, knh_sfp_t* sfp)
 {
     WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
     int ret = getattrs(self );
@@ -1072,9 +1062,10 @@ METHOD Curses_getattrs(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN_Int(ctx, sfp, ret);
 }
 
-/* Int Curses.getcurx(self) */
 
-METHOD Curses_getcurx(Ctx *ctx, knh_sfp_t* sfp)
+/* Int Curses.getCurx(self) */
+
+METHOD Curses_getCurx(Ctx *ctx, knh_sfp_t* sfp)
 {
     WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
     int ret = getcurx(self );
@@ -1082,9 +1073,9 @@ METHOD Curses_getcurx(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN_Int(ctx, sfp, ret);
 }
 
-/* Int Curses.getcury(self) */
+/* Int Curses.getCury(self) */
 
-METHOD Curses_getcury(Ctx *ctx, knh_sfp_t* sfp)
+METHOD Curses_getCury(Ctx *ctx, knh_sfp_t* sfp)
 {
     WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
     int ret = getcury(self );
@@ -1092,7 +1083,77 @@ METHOD Curses_getcury(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN_Int(ctx, sfp, ret);
 }
 
-/* Int Curses.getbegx(self) */
+/* Int Curses.getBegx(self) */
+
+METHOD Curses_getBegx(Ctx *ctx, knh_sfp_t* sfp)
+{
+    WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
+    int ret = getbegx(self );
+
+    KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Int Curses.getBegy(self) */
+
+METHOD Curses_getBegy(Ctx *ctx, knh_sfp_t* sfp)
+{
+    WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
+    int ret = getbegy(self );
+
+    KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Int Curses.getBkgd(self) */
+
+METHOD Curses_getBkgd(Ctx *ctx, knh_sfp_t* sfp)
+{
+    WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
+    int ret = getbkgd(self );
+
+    KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Int Curses.getMaxx(self) */
+
+METHOD Curses_getMaxx(Ctx *ctx, knh_sfp_t* sfp)
+{
+    WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
+    int ret = getmaxx(self );
+
+    KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Int Curses.getMaxy(self) */
+
+METHOD Curses_getMaxy(Ctx *ctx, knh_sfp_t* sfp)
+{
+    WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
+    int ret = getmaxy(self );
+
+    KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Int Curses.getParx(self) */
+
+METHOD Curses_getParx(Ctx *ctx, knh_sfp_t* sfp)
+{
+    WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
+    int ret = getparx(self );
+
+    KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Int Curses.getPary(self) */
+
+METHOD Curses_getPary(Ctx *ctx, knh_sfp_t* sfp)
+{
+    WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
+    int ret = getpary(self );
+
+    KNH_RETURN_Int(ctx, sfp, ret);
+}
+
+/* Int Curses.wgetparent(self) */
 
 METHOD Curses_wgetparent(Ctx *ctx, knh_sfp_t* sfp)
 {
@@ -1102,9 +1163,9 @@ METHOD Curses_wgetparent(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN(ctx, sfp, ret);
 }
 
-/* Boolean Curses.is_cleared(self) */
+/* Boolean Curses.isCleared(self) */
 
-METHOD Curses_is_cleared(Ctx *ctx, knh_sfp_t* sfp)
+METHOD Curses_isCleared(Ctx *ctx, knh_sfp_t* sfp)
 {
     WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
     int ret = is_cleared(self );
@@ -1112,9 +1173,9 @@ METHOD Curses_is_cleared(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean Curses.is_idcok(self) */
+/* Boolean Curses.isIdcok(self) */
 
-METHOD Curses_is_idcok(Ctx *ctx, knh_sfp_t* sfp)
+METHOD Curses_isIdcok(Ctx *ctx, knh_sfp_t* sfp)
 {
     WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
     int ret = is_idcok(self );
@@ -1122,9 +1183,9 @@ METHOD Curses_is_idcok(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean Curses.is_idlok(self) */
+/* Boolean Curses.isIdlok(self) */
 
-METHOD Curses_is_idlok(Ctx *ctx, knh_sfp_t* sfp)
+METHOD Curses_isIdlok(Ctx *ctx, knh_sfp_t* sfp)
 {
     WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
     int ret = is_idlok(self );
@@ -1132,9 +1193,9 @@ METHOD Curses_is_idlok(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean Curses.is_immedok(self) */
+/* Boolean Curses.isImmedok(self) */
 
-METHOD Curses_is_immedok(Ctx *ctx, knh_sfp_t* sfp)
+METHOD Curses_isImmedok(Ctx *ctx, knh_sfp_t* sfp)
 {
     WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
     int ret = is_immedok(self );
@@ -1142,9 +1203,9 @@ METHOD Curses_is_immedok(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean Curses.is_keypad(self) */
+/* Boolean Curses.isKeypad(self) */
 
-METHOD Curses_is_keypad(Ctx *ctx, knh_sfp_t* sfp)
+METHOD Curses_isKeypad(Ctx *ctx, knh_sfp_t* sfp)
 {
     WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
     int ret = is_keypad(self );
@@ -1152,9 +1213,9 @@ METHOD Curses_is_keypad(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean Curses.is_leaveok(self) */
+/* Boolean Curses.isLeaveok(self) */
 
-METHOD Curses_is_leaveok(Ctx *ctx, knh_sfp_t* sfp)
+METHOD Curses_isLeaveok(Ctx *ctx, knh_sfp_t* sfp)
 {
     WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
     int ret = is_leaveok(self );
@@ -1162,9 +1223,9 @@ METHOD Curses_is_leaveok(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean Curses.is_nodelay(self) */
+/* Boolean Curses.isNodelay(self) */
 
-METHOD Curses_is_nodelay(Ctx *ctx, knh_sfp_t* sfp)
+METHOD Curses_isNodelay(Ctx *ctx, knh_sfp_t* sfp)
 {
     WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
     int ret = is_nodelay(self );
@@ -1172,9 +1233,9 @@ METHOD Curses_is_nodelay(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean Curses.is_notimeout(self) */
+/* Boolean Curses.isNotimeout(self) */
 
-METHOD Curses_is_notimeout(Ctx *ctx, knh_sfp_t* sfp)
+METHOD Curses_isNotimeout(Ctx *ctx, knh_sfp_t* sfp)
 {
     WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
     int ret = is_notimeout(self );
@@ -1182,9 +1243,9 @@ METHOD Curses_is_notimeout(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean Curses.is_scrollok(self) */
+/* Boolean Curses.isScrollok(self) */
 
-METHOD Curses_is_scrollok(Ctx *ctx, knh_sfp_t* sfp)
+METHOD Curses_isScrollok(Ctx *ctx, knh_sfp_t* sfp)
 {
     WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
     int ret = is_scrollok(self );
@@ -1192,9 +1253,9 @@ METHOD Curses_is_scrollok(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean Curses.is_syncok(self) */
+/* Boolean Curses.isSyncok(self) */
 
-METHOD Curses_is_syncok(Ctx *ctx, knh_sfp_t* sfp)
+METHOD Curses_isSyncok(Ctx *ctx, knh_sfp_t* sfp)
 {
     WINDOW *self =(WINDOW*)((sfp[0].glue)->ptr);
     int ret = is_syncok(self );
@@ -1214,6 +1275,40 @@ METHOD Curses_wenclose(Ctx *ctx, knh_sfp_t* sfp)
     KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
+/* Curses Curses.newpad(Int i0, Int i1) */
+
+METHOD Curses_newpad(Ctx *ctx, knh_sfp_t* sfp)
+{
+	WINDOW *win;
+	knh_Glue_t *glue = sfp[0].glue;
+    int i0 = p_int(sfp[1]);
+    int i1 = p_int(sfp[2]);
+    initscr();
+    noecho();
+    cbreak();
+    win = newpad(i0 ,i1 );
+	glue->ptr = (void*)win;
+    KNH_RETURN(ctx, sfp, sfp[0].o);
+}
+
+/* Curses Curses_newwin(Int i0, Int i1, Int i2, Int i3) */
+
+METHOD Curses_newwin(Ctx *ctx, knh_sfp_t* sfp)
+{
+    WINDOW *win;
+    knh_Glue_t *glue = sfp[0].glue;
+	int i0 = p_int(sfp[1]);
+    int i1 = p_int(sfp[2]);
+    int i2 = p_int(sfp[3]);
+    int i3 = p_int(sfp[4]);
+    initscr();
+    noecho();
+    cbreak();
+    win = newwin(i0 ,i1 ,i2 ,i3 );
+    glue->ptr = (void*)win;
+    KNH_RETURN(ctx, sfp, sfp[0].o);
+}
+
 
 /* Curses_new(Int i1, Int i2, Int i3, Int i4) */
 METHOD Curses_new(Ctx *ctx, knh_sfp_t* sfp)
@@ -1228,3 +1323,52 @@ METHOD Curses_new(Ctx *ctx, knh_sfp_t* sfp)
     glue->ptr = (void*)win;
     KNH_RETURN(ctx, sfp, sfp[0].o);
 }
+
+/* Curses_getLINES() */
+METHOD Curses_getLINES(Ctx *ctx, knh_sfp_t* sfp)
+{
+	initscr();
+	endwin();
+    KNH_RETURN_Int(ctx, sfp, LINES);
+}
+
+/* Curses_getCOLS() */
+METHOD Curses_getCOLS(Ctx *ctx, knh_sfp_t* sfp)
+{
+	initscr();
+	endwin();
+    KNH_RETURN_Int(ctx, sfp, COLS);
+}
+
+/* ======================================================================== */
+/* [ConstData] */
+
+static
+knh_IntConstData_t IntConstData[] = {
+	{"Curses.KEY_BS", KEY_BACKSPACE},
+	{"Curses.KEY_UP", KEY_UP},
+	{"Curses.KEY_DOWN", KEY_DOWN},
+	{"Curses.KEY_LEFT", KEY_LEFT},
+	{"Curses.KEY_RIGHT", KEY_RIGHT},
+	{"Curses.KEY_HOME", KEY_HOME},
+	{"Curses.KEY_RIGHT", KEY_RIGHT},
+	{"Curses.KEY_ENTER", 10},
+	{NULL}  // end of const data
+};
+
+/* ------------------------------------------------------------------------ */
+
+KNH_EXPORTS(int) init(Ctx *ctx)
+{
+	KNH_NOTICE(ctx, "loading curses..");
+	konoha_loadIntConstData(ctx, IntConstData);
+
+	return 1;
+}
+
+/* ------------------------------------------------------------------------ */
+
+#ifdef __cplusplus
+}
+#endif
+
