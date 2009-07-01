@@ -30,6 +30,9 @@
 
 #include"commons.h"
 
+#ifdef KONOHA_ON_LKM
+#undef KNH_USING_POSIX
+#endif
 
 #ifdef KNH_USING_POSIX
 #include <unistd.h>

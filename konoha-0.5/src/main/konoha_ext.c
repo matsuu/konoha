@@ -82,7 +82,7 @@ void knh_srand(knh_uint_t seed)
 
 /* ------------------------------------------------------------------------ */
 
-knh_uint_t knh_rand()
+knh_uint_t knh_rand(void)
 {
 #ifdef KONOHA_ON_LKM
 	return (knh_uint_t)random32();
@@ -97,7 +97,7 @@ knh_uint_t knh_rand()
 
 /* ------------------------------------------------------------------------ */
 
-knh_float_t knh_float_rand()
+knh_float_t knh_float_rand(void)
 {
 #ifdef KNH_USING_NOFLOAT
 	return (knh_float_t)knh_rand();

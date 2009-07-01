@@ -13,7 +13,7 @@
 #include <linux/init.h>
 #include <asm/uaccess.h>
 //#include <linux/semaphore.h>
-#include "../include/konoha.h"
+#include <konoha.h>
 
 
 MODULE_LICENSE("GPL");
@@ -75,7 +75,7 @@ static int knh_dev_ioctl (struct inode *inode, struct file *filp,
         unsigned int cmd, unsigned long arg);
 */
 
-static int knh_dev_write(struct file *file,const char __user *buf,
+static ssize_t knh_dev_write(struct file *file,const char __user *buf,
         size_t count,loff_t *offp) ;
 
 static struct file_operations knh_fops = {
@@ -93,7 +93,7 @@ static int knh_dev_open (struct inode* inode, struct file *filp)
     return 0;
 }
 
-static int knh_dev_read (struct file* filp, char __user *user_buf,
+static ssize_t knh_dev_read (struct file* filp, char __user *user_buf,
         size_t count, loff_t *offset)
 {
     struct konohadev_t *dev = filp->private_data;
@@ -120,7 +120,7 @@ static int knh_dev_read (struct file* filp, char __user *user_buf,
     return len;
 }
 
-static int knh_dev_write(struct file *filp,const char __user *user_buf,
+static ssize_t knh_dev_write(struct file *filp,const char __user *user_buf,
         size_t count,loff_t *offset) {
     char buf[MAXCOPYBUF];
     char* konoha_ret = NULL;

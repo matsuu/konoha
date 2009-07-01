@@ -536,7 +536,7 @@ void  init_SocketDriver(Ctx *ctx);
 /* ../src/deps/sqlite3.c */
 void knh_dbcurfree__NOP(knh_dbcur_t *dbcur);
 void knh_write_USING_SQLITE3(Ctx *ctx, OutputStream *w);
-knh_db_drvapi_t *knh_System_getDefaultDBDriver();
+knh_db_drvapi_t *knh_System_getDefaultDBDriver(void);
 knh_db_drvapi_t *knh_System_getDBDriver(Ctx *ctx, knh_bytes_t name);
 void  init_DB(Ctx *ctx);
 /* ../src/deps/thread.c */
@@ -582,8 +582,8 @@ METHOD knh__Script_readLine(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_addHistory(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/main/konoha_ext.c */
 void knh_srand(knh_uint_t seed);
-knh_uint_t knh_rand();
-knh_float_t knh_float_rand();
+knh_uint_t knh_rand(void);
+knh_float_t knh_float_rand(void);
 /* ../src/main/logging.c */
 void knh_stack_pmsg(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, String *s);
 void knh_stack_p(Ctx *ctx, knh_sfp_t *sfp, knh_flag_t flag, knh_methodn_t mn, int sfpidx);

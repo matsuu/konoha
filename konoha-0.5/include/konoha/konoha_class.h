@@ -28,11 +28,7 @@
 #ifndef CLASS_KONOHA_H_
 #define CLASS_KONOHA_H_
 
-#ifdef KONOHA_ON_LKM
-#include"konoha_t.h"
-#else
 #include<konoha/konoha_t.h>
-#endif
 
 /* ************************************************************************ */
 
