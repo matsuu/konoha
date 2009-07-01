@@ -25,7 +25,7 @@
  *  
  ****************************************************************************/
 
-#include"../../include/konoha/konoha_dev.h"
+#include<konoha/konoha_dev.h>
 
 
 #ifdef __cplusplus 

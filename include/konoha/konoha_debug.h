@@ -20,8 +20,6 @@
 /* ======================================================================== */
 /* [DBGMODE2] */
 
-#define KNH_USING_FASTMALLOC 1
-
 #ifdef KNH_DBGMODE2
 #define KNH_DBGMODE     1
 
@@ -47,13 +45,10 @@
 
 #define DBG2_ASSERT(c) KNH_ASSERT(c);
 
-#ifdef KNH_USING_FASTMALLOC2
-#define KNH_MALLOC(ctx, size)    knh_fastmalloc(ctx, size)
-#define KNH_FREE(ctx, p, size)   knh_fastfree(ctx, p, size)
-#else
+//#define KNH_MALLOC(ctx, size)    knh_fastmalloc(ctx, size)
+//#define KNH_FREE(ctx, p, size)   knh_fastfree(ctx, p, size)
 #define KNH_MALLOC(ctx, size)    DBG2_malloc(ctx, size, (char*)__FUNCTION__)
 #define KNH_FREE(ctx, p, size)   DBG2_free(ctx, p, size, (char*)__FUNCTION__)
-#endif
 
 #define DBG2_ABORT()    abort()
 
@@ -71,7 +66,7 @@
 #define 	KNH_MALLOC(ctx, size)    knh_fastmalloc(ctx, size)
 #define 	KNH_FREE(ctx, p, size)   knh_fastfree(ctx, p, size)
 #else/*KNH_USING_FASTMALLOC*/
-#define 	KNH_MALLOC(ctx, size) knh_malloc(ctx, size)
+#define 	KNH_MALLOC(ctx, size)    knh_malloc(ctx, size)
 #define 	KNH_FREE(ctx, p, size)   knh_free(ctx, p, size)
 #endif/*KNH_USING_FASTMALLOC*/
 

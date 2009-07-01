@@ -127,7 +127,7 @@ METHOD knh__System_setRandomSeed(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__System_exit(Ctx *ctx, knh_sfp_t *sfp)
 {
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 	knh_intptr_t status = IS_NULL(sfp[1].o) ? 0 : p_int(sfp[1]);
 	KNH_SECURE(ctx);
 	KNH_NOTICE(ctx, "exiting by a user");
@@ -152,6 +152,35 @@ static METHOD knh__System_hasFile(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_Boolean(ctx,sfp, knh_isfile(ctx, knh_String_tobytes(sfp[1].s)));
 }
 
+/* ------------------------------------------------------------------------ */
+/* @method Boolean! System.mkdir(String! filename) */
+
+static METHOD knh__System_mkdir(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN_Boolean(ctx, sfp,
+		knh_mkdir(ctx, knh_String_tobytes(sfp[1].s), knh_Context_isStrict(ctx))
+	);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Boolean! System.unlink(String! filename) */
+
+static METHOD knh__System_unlink(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN_Boolean(ctx, sfp,
+		knh_unlink(ctx, knh_String_tobytes(sfp[1].s), knh_Context_isStrict(ctx))
+	);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Boolean! System.rename(String oldname, String newname); */
+
+static METHOD knh__System_rename(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN_Boolean(ctx, sfp,
+		knh_rename(ctx, knh_String_tobytes(sfp[1].s), knh_String_tobytes(sfp[2].s), knh_Context_isStrict(ctx))
+	);
+}
 
 /* ======================================================================== */
 /* [Context] */

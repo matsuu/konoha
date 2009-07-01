@@ -238,7 +238,6 @@ Mapper *konoha_findMapper_(Ctx *ctx, knh_class_t scid, knh_class_t tcid, int isg
 		if(isgen == 0) return (Mapper*)KNH_NULL;
 		KNH_ASSERT(scid != CLASS_Any);
 	}
-	KNH_ASSERT(tcid != CLASS_Nue);
 
 	Mapper *mpr = knh_Context_getMapperCache(ctx, scid, tcid);
 	if(mpr != NULL) { return mpr; }
@@ -298,22 +297,12 @@ Mapper *konoha_findMapper_(Ctx *ctx, knh_class_t scid, knh_class_t tcid, int isg
 		}
 	}
 	/* GENERATIVE PART */
-	if(scid == tcid || scid == CLASS_Nue || knh_class_instanceof(ctx, scid, tcid)) {  /* default */
+	if(scid == tcid || knh_class_instanceof(ctx, scid, tcid)) {  /* default */
 		mpr = new_Mapper__asis(ctx, scid, tcid);
 		konoha_addMapper(ctx, mpr);
 		return knh_Context_setMapperCache(ctx, scid, tcid, mpr);
 	}
-//
-//	if(ctx->share->ClassTable[scid].p1 != CLASS_Nue && ctx->share->ClassTable[scid].p1 == ctx->share->ClassTable[tcid].p1) {
-//		/* C.. ==> C[] */
-//		if(ctx->share->ClassTable[scid].bcid == CLASS_Iterator && ctx->share->ClassTable[tcid].bcid == CLASS_Array) {
-//			return knh_tmapper_setcache(ctx, scid, tcid, knh_tMapper_newIteratorArray(ctx, scid, tcid));
-//		}
-//		/* C[] ==> C.. */
-//		if(ctx->share->ClassTable[scid].bcid == CLASS_Array && ctx->share->ClassTable[tcid].bcid == CLASS_Iterator) {
-//			return knh_tmapper_setcache(ctx, scid, tcid, knh_tMapper_newArrayIterator(ctx, scid, tcid));
-//		}
-//	}
+
 	if(isgen) {
 		mpr = new_Mapper__NoSuchMapping(ctx, scid, tcid);
 		konoha_addMapper(ctx, mpr);

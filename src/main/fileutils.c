@@ -77,6 +77,7 @@ knh_format_parentpath(char *buf, size_t bufsiz, knh_bytes_t path, int n)
 	return buf;
 }
 
+
 /* ------------------------------------------------------------------------ */
 
 char *
@@ -119,7 +120,7 @@ knh_format_catpath(char *buf, size_t bufsiz, knh_bytes_t path, knh_bytes_t file)
 		return knh_format_nzpath(buf, bufsiz, file);
 	}
 	else {
-		char buff[FILENAME_BUFSIZ];
+		char buff[FILEPATH_BUFSIZ];
 		knh_snprintf(buff, sizeof(buff), "%s/%s", (char*)path.buf, (char*)file.buf);
 		return knh_format_nzpath(buf, bufsiz, B(buff));
 	}

@@ -49,7 +49,7 @@ libkonoha_la_LDFLAGS = -no-undefined -release 0 -version-info 5:0:0
 
 AM_CPPFLAGS = -I../include
 #if MINGW
-#AM_CPPFLAGS += -DKONOHA_OS__MINGW
+#AM_CPPFLAGS += -DKONOHA_ON_MINGW
 #endif
 libkonoha_la_SOURCES = 
 """)

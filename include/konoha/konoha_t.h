@@ -28,7 +28,7 @@
 #ifndef KONOHA_T_H_
 #define KONOHA_T_H_
 
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 #include<stdio.h>
 #include<limits.h>
 #include<float.h>
@@ -317,11 +317,9 @@ typedef knh_uint16_t       knh_expt_t;    /* knh_expt_t */
 // @NOUSE
 #define TYPEQN(t)                     TYPEN(t), TYPEQ(t)
 
-#define TYPE_var                      CLASS_Nue
-#define TYPE_void                     NNTYPE_cid(CLASS_Nue)
-#define NNTYPE_void                   NNTYPE_cid(CLASS_Nue)
-#define TYPE_any                      CLASS_Any
-#define NNTYPE_any                    CLASS_any
+#define TYPE_var                      CLASS_AnyVar
+#define TYPE_void                     NNTYPE_cid(CLASS_Any)
+#define NNTYPE_void                   NNTYPE_cid(CLASS_Any)
 
 /* ------------------------------------------------------------------------ */
 
@@ -601,9 +599,12 @@ typedef struct {
 	struct knh_Object_t       *cspec;
 	struct knh_DictMap_t      *constPool;
 	knh_fdefault               fdefault;
+
+#ifndef KNH_USING_NODATAPOOL
 	knh_mutex_t                dataLock;
 	struct knh_Array_t        *dataList;
 	struct knh_DictMap_t      *dataMap;
+#endif
 } knh_ClassTable_t;
 
 /* ------------------------------------------------------------------------ */
@@ -666,7 +667,7 @@ typedef struct {
 #define knh_systemEncoding    DP(ctx->sys)->enc
 
 #define KNH_NULL            (ctx->share->constNull)
-#define KNH_VOID            (ctx->share->constVoid)
+#define KNH_VOID            (ctx->share->constNull)
 #define KNH_TRUE            (ctx->share->constTrue)
 #define KNH_FALSE           (ctx->share->constFalse)
 #define KNH_SYSTEM          (ctx->sys)
@@ -712,7 +713,6 @@ typedef struct {
 
 	/* system const */
 	knh_Object_t   *constNull;
-	knh_Object_t   *constVoid;
 	knh_Object_t   *constTrue;
 	knh_Object_t   *constFalse;
 	struct knh_Float_t   *constFloat0;
@@ -856,7 +856,7 @@ typedef struct {
 
 typedef knh_intptr_t knh_io_t;
 
-typedef knh_io_t (*f_io_open)(Ctx *ctx, knh_bytes_t urn, char *mode);
+typedef knh_io_t (*f_io_open)(Ctx *ctx, knh_bytes_t urn, char *mode, int isThrowable);
 typedef void (*f_io_init)(Ctx *ctx, Object *stream, char *mode);
 typedef knh_intptr_t (*f_io_read)(Ctx *ctx, knh_io_t fd, char *buf, size_t bufsiz);
 typedef knh_intptr_t (*f_io_write)(Ctx *ctx, knh_io_t fd, char *buf, size_t bufsiz);

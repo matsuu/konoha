@@ -47,7 +47,7 @@ static METHOD knh__Bytes_new(Ctx *ctx, knh_sfp_t *sfp)
 {
 	Bytes *o = (Bytes*)sfp[0].o;
 	size_t init = IS_NULL(sfp[1].o) ? 0 : knh_bytes_newsize(p_size(sfp[1]));
-	KNH_ASSERT(o->buf == NULL);
+	KNH_ASSERT(o->capacity == 0);
 	if(init > 0) {
 	  o->buf = (knh_uchar_t*)KNH_MALLOC(ctx, init);
 		o->capacity = init;
@@ -153,6 +153,29 @@ static METHOD knh__Bytes_opFill(Ctx *ctx, knh_sfp_t *sfp)
 	}
 	KNH_RETURN(ctx, sfp, o);
 }
+
+/* ------------------------------------------------------------------------ */
+/* @method void Bytes.memcpy(Int off, Bytes! s, Int off, Int len)  */
+
+static METHOD knh__Bytes_memcpy(Ctx *ctx, knh_sfp_t *sfp)
+{
+	Bytes *d = (Bytes*)sfp[0].o;
+	if(!knh_Object_isImmutable(d)) {
+		size_t doff = IS_NULL(sfp[1].o) ? 0 : p_int(sfp[1]);
+		Bytes *s = (Bytes*)sfp[2].o;
+		size_t soff = IS_NULL(sfp[3].o) ? 0 : p_int(sfp[3]);
+		size_t slen = IS_NULL(sfp[4].o) ? 0 : ((s)->size - soff);
+		if(doff + slen < (d)->size) {
+			knh_memcpy(d->buf + doff, s->buf + soff, slen);
+		}
+		else {
+			KNH_THROW_OUTOFINDEX(ctx, doff + slen, (d)->size);
+		}
+	}
+	KNH_RETURN_void(ctx, sfp);
+}
+
+
 
 /* ======================================================================== */
 /* [movabletext] */

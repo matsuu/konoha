@@ -168,7 +168,7 @@ void knh_ClassStruct_initField(Ctx *ctx, ClassStruct *cs, knh_class_t self_cid, 
 		}
 		else if(IS_ubxfloat(type)) {
 			knh_float_t *data = (knh_float_t*)(v + i);
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 			data[0] = IS_NULL(cf[i].value) ? 0.0 : ((Int*)cf[i].value)->n.fvalue;
 #else
 			data[0] = IS_NULL(cf[i].value) ? 0 : ((Int*)cf[i].value)->n.fvalue;
@@ -264,64 +264,14 @@ static
 void knh_Any_traverse(Ctx *ctx, knh_Glue_t *g, knh_ftraverse ftr)
 {
 	if(IS_SWEEP(ftr)) {
-		g->gfree(ctx, g);
-		knh_Glue_init(ctx, g, NULL, NULL);
+		if(IS_NULL(g)) {
+			DBG_P("freeing null");
+		}
+		else {
+			g->gfree(ctx, g);
+			knh_Glue_init(ctx, g, NULL, NULL);
+		}
 	}
-}
-
-/* ======================================================================== */
-/* Nue */
-
-#define knh_Nue_init_ NULL
-#define knh_Nue_copy NULL
-#define knh_Nue_traverse_ NULL
-#define knh_Nue_compareTo_ NULL
-#define knh_Nue_hashCode_ NULL
-#define knh_Nue_newClass NULL
-#define knh_Nue_getkey_ NULL
-
-/* ------------------------------------------------------------------------ */
-
-static
-void knh_Nue_init(Ctx *ctx, knh_Nue_t *n, int init)
-{
-	n->orign = NULL;
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-void knh_Nue_traverse(Ctx *ctx, knh_Nue_t *n, knh_ftraverse ftr)
-{
-	if(n->orign != NULL) {
-		KNH_ASSERT(IS_bString(n->orign));
-		ftr(ctx, UP(n->orign));
-		n->orign = NULL;
-	}
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-int knh_Nue_compareTo(Nue *o, Nue *o1)
-{
-	return 0;
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-knh_hcode_t knh_Nue_hashCode(Ctx *ctx, Nue *o)
-{
-	return 0;
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-String *knh_Nue_getkey(Ctx *ctx, knh_sfp_t *lsfp)
-{
-	return TS_null;
 }
 
 /* ======================================================================== */
@@ -1225,18 +1175,22 @@ void knh_Method_init(Ctx *ctx, Method *mtd, int init)
 	b->fproceed  = knh_fmethod_abstract;
 	KNH_INITv(b->mf, konoha_findMethodField0(ctx, TYPE_Any));
 	b->code  = NULL;
+#ifdef KNH_USING_KONOHA_PROF
+	b->prof_count = 0;
+	b->prof_time = 0;
+#endif
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_Method_traverse(Ctx *ctx, Method *mtd, knh_ftraverse gc)
+void knh_Method_traverse(Ctx *ctx, Method *mtd, knh_ftraverse ftr)
 {
 	knh_Method_struct *b = DP(mtd);
-	gc(ctx, UP(b->mf));
+	ftr(ctx, UP(b->mf));
 	if((b->flag & KNH_FLAG_MF_OBJECTCODE) == KNH_FLAG_MF_OBJECTCODE) {
-		gc(ctx, (Object*)b->code);
-		if(IS_SWEEP(gc)) {
+		ftr(ctx, (Object*)b->code);
+		if(IS_SWEEP(ftr)) {
 			b->code = NULL;
 		}
 	}
@@ -1517,7 +1471,7 @@ static
 int knh_ffcmp__default(ClassSpec *u, knh_float_t v1, knh_float_t v2)
 {
 	knh_float_t delta = v1 - v2;
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 	if(delta == 0.0) return 0;
 #else
 	if(delta == 0) return 0;
@@ -1564,7 +1518,7 @@ void knh_ClassSpec_init(Ctx *ctx, ClassSpec *u, int init)
 	b->ficmp = knh_ficmp__signed;
 
 	// float
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 	b->fstep = 0.001;
 #else
 	b->fstep = 1;
@@ -2010,11 +1964,41 @@ static knh_uintptr_t knh_autoSystemId = 0;
 
 /* ------------------------------------------------------------------------ */
 
+static void knh_System_initProp(Ctx *ctx, System *o)
+{
+	char buf[FILEPATH_BUFSIZ];
+	knh_System_struct *sys = DP(o);
+	KNH_INITv(sys->homeDir, new_String(ctx, B(knh_format_homepath(buf,sizeof(buf))), NULL));
+	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.encoding"), UP(sys->enc));
+	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.locale"),
+			UP(new_String(ctx, B(knh_format_lang(buf, sizeof(buf))), NULL)));
+
+	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.path"), UP(sys->homeDir));
+
+#ifdef KNH_PREFIX
+	knh_snprintf(buf, sizeof(buf), "%s/lib/konoha/package", KNH_PREFIX);
+#else
+	knh_snprintf(buf, sizeof(buf), "%s/package", knh_String_tochar(sys->homeDir));
+#endif
+	knh_DictMap_set(ctx, sys->props,
+		new_String__T(ctx, "konoha.path.package"), UP(new_String(ctx, B(buf), NULL)));
+
+	{
+		char *rootdir = knh_getenv("HOME");
+		if(rootdir != NULL) {
+			knh_snprintf(buf, sizeof(buf), "%s/.konoha/package", rootdir);
+			knh_DictMap_set(ctx, sys->props,
+				new_String__T(ctx, "konoha.path.user.package"), UP(new_String(ctx, B(buf), NULL)));
+		}
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
 static
 void knh_System_init(Ctx *ctx, System *o, int init)
 {
 	knh_System_struct *sys = DP(o);
-	char buf[FILENAME_BUFSIZ];
 	sys->sysid = knh_autoSystemId++;
 	sys->ctxcount = 0;
 
@@ -2022,42 +2006,30 @@ void knh_System_init(Ctx *ctx, System *o, int init)
 	KNH_INITv(sys->ExptNameDictSet, new_DictSet(ctx, KNH_TEXPT_SIZE/2));
 
 	KNH_INITv(sys->enc,   new_String__T(ctx, konoha_encoding()));
-#ifndef KONOHA_OS__LKM
-	KNH_INITv(sys->in,    new_InputStream__stdio(ctx, stdin, sys->enc));
-	KNH_INITv(sys->out,   new_OutputStream__stdio(ctx, stdout, sys->enc));
-	KNH_INITv(sys->err,   new_OutputStream__stdio(ctx, stderr, sys->enc));
-#else
+#ifdef KNH_USING_NOFILE
 	KNH_INITv(sys->in,    new_InputStream__stdio(ctx, NULL, sys->enc));
 	KNH_INITv(sys->out,   new_OutputStream__stdio(ctx, NULL, sys->enc));
 	KNH_INITv(sys->err,   new_OutputStream__stdio(ctx, NULL,  sys->enc));
+#else
+	KNH_INITv(sys->in,    new_InputStream__stdio(ctx, stdin, sys->enc));
+	KNH_INITv(sys->out,   new_OutputStream__stdio(ctx, stdout, sys->enc));
+	KNH_INITv(sys->err,   new_OutputStream__stdio(ctx, stderr, sys->enc));
 #endif
 
 	KNH_INITv(sys->props, new_DictMap0(ctx, 64));
-
 	KNH_INITv(sys->FieldNameDictIdx, new_DictIdx0__ignoreCase(ctx, KNH_TFIELDN_SIZE * 2, 0));
 	KNH_INITv(sys->FileNameDictIdx, new_DictIdx0(ctx, 32, 0));
 	knh_DictIdx_add__fast(ctx, sys->FileNameDictIdx, new_String__T(ctx, "(unknown)"));
 	KNH_INITv(sys->MethodFieldHashMap, new_HashMap(ctx, "System.MethodField", (KNH_TCLASS_SIZE * 2) + 31 ));
-
-	KNH_INITv(sys->homeDir, new_String(ctx, B(knh_format_homepath(buf,sizeof(buf))), NULL));
 	KNH_INITv(sys->DriversTableDictSet, new_DictSet(ctx, 32));
 	KNH_INITv(sys->SpecFuncDictSet, new_DictSet(ctx, 32));
 
 	KNH_INITv(sys->NameSpaceTableDictMap, new_DictMap0(ctx, 8));
 	KNH_INITv(sys->URNAliasDictMap, new_DictMap0(ctx, 8));
-
-	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.encoding"), UP(sys->enc));
-#ifndef KONOHA_OS__LKM
-	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.home"), UP(sys->homeDir));
-#endif
-	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.lang"),
-			UP(new_String(ctx, B(knh_format_lang(buf, sizeof(buf))), NULL)));
-	//knh_Asm_setLang(buf);
-
+	knh_System_initProp(ctx, o);
 	KNH_INITv(sys->UsingResources, new_Array0(ctx, 0));
 	//KNH_INITv(sys->sysnsDictMap_UNUSED, new_DictMap0(ctx, 16));
 	//KNH_INITv(sys->funcDictSet_UNUSED, new_DictSet(ctx, 16));
-
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2067,11 +2039,9 @@ static void knh_System_traverse(Ctx *ctx, System *o, knh_ftraverse ftr)
 	knh_System_struct *sys = DP(o);
 
 	ftr(ctx, UP(sys->enc));
-#ifndef KONOHA_OS__LKM
 	ftr(ctx, UP(sys->in));
 	ftr(ctx, UP(sys->out));
 	ftr(ctx, UP(sys->err));
-#endif
 
 	ftr(ctx, UP(sys->props));
 	ftr(ctx, UP(sys->ExptNameDictSet));
@@ -2083,10 +2053,7 @@ static void knh_System_traverse(Ctx *ctx, System *o, knh_ftraverse ftr)
 	ftr(ctx, UP(sys->MethodFieldHashMap));
 	ftr(ctx, UP(sys->NameSpaceTableDictMap));
 	ftr(ctx, UP(sys->URNAliasDictMap));
-
-#ifdef KONOHA_OS__LKM
 	ftr(ctx, UP(sys->homeDir));
-#endif
 	ftr(ctx, UP(sys->DriversTableDictSet));
 	ftr(ctx, UP(sys->SpecFuncDictSet));
 	ftr(ctx, UP(sys->UsingResources));
@@ -2364,6 +2331,7 @@ void knh_KLRCode_traverse(Ctx *ctx, KLRCode *o, knh_ftraverse ftr)
 #define knh_Any1_fdefault NULL
 #define knh_Any2_fdefault NULL
 #define knh_Any3_fdefault NULL
+#define knh_AnyVar_fdefault NULL
 #define knh_Nue_fdefault NULL
 #define knh_Boolean_fdefault_ NULL
 #define knh_Number_fdefault NULL
@@ -2540,7 +2508,7 @@ Object *knh_System_fdefault(Ctx *ctx, knh_class_t cid)
 #include"../api/streamapi.c"
 #include"../api/dbapi.c"
 
-#ifdef KONOHA_OS__LKM
+#ifdef KONOHA_ON_LKM
 #include"../../include/konoha/gen/struct_.h"
 #else
 #include<konoha/gen/struct_.h>
@@ -2911,10 +2879,10 @@ static void konoha_loadClassProperties(Ctx *ctx)
 	KNH_SETv(ctx, ctx->share->ClassTable[CLASS_Float].cspec, u);
 	KNH_SETv(ctx, ctx->share->ClassTable[CLASS_String].cspec, u);
 
-	konoha_setClassParam(ctx, CLASS_Array, CLASS_Any, CLASS_Nue);
-	konoha_setClassParam(ctx, CLASS_Iterator, CLASS_Any, CLASS_Nue);
-	konoha_setClassParam(ctx, CLASS_DictMap, CLASS_Any, CLASS_Nue);
-	konoha_setClassParam(ctx, CLASS_DictSet, CLASS_Any, CLASS_Nue);
+	konoha_setClassParam(ctx, CLASS_Array, CLASS_Any, CLASS_unknown);
+	konoha_setClassParam(ctx, CLASS_Iterator, CLASS_Any, CLASS_unknown);
+	konoha_setClassParam(ctx, CLASS_DictMap, CLASS_Any, CLASS_unknown);
+	konoha_setClassParam(ctx, CLASS_DictSet, CLASS_Any, CLASS_unknown);
 	konoha_setClassParam(ctx, CLASS_HashMap, CLASS_Any, CLASS_Any);
 	konoha_setClassParam(ctx, CLASS_HashSet, CLASS_Any, CLASS_Any);
 	ctx->share->ClassTable[CLASS_Closure].r0 = CLASS_Any;

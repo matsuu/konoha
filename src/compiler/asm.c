@@ -28,11 +28,6 @@
 /* ************************************************************************ */
 
 #include"commons.h"
-#ifdef KONOHA_OS__LKM
-#include"../../include/konoha/gen/konohac_klr_.h"
-#else
-#include<konoha/gen/konohac_klr_.h>
-#endif
 
 /* ************************************************************************ */
 
@@ -59,10 +54,6 @@ static knh_labelid_t knh_Asm_newLabelId(Ctx *ctx, Asm *abr, Token *tk);
 
 static
 void TERMs_asm(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_type_t reqt, int sfpidx);
-
-/* ======================================================================== */
-/* [structs] */
-
 
 /* ======================================================================== */
 /* [constructor] */
@@ -1467,7 +1458,7 @@ int knh_StmtOP_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 					KNH_ASM_fSUBn_(ctx, abr, sfi_(sfpidx), sfi_(a), b);
 					return 1;
 				case METHODN_opDiv:
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 					if(b == 0.0) {
 						b = 1.0;
 						knh_Asm_perror(ctx, abr, KERR_ERRATA, _("divided by zero: 0.0 ==> 1.0"));
@@ -1525,7 +1516,7 @@ void knh_StmtCALL_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpid
 			TERMs_asm(ctx, stmt, i, abr, TYPE_Any, local + i);
 		}
 		KNH_ASM_AINVOKE_(ctx, abr, sfi_(local), (knh_ushort_t)DP(stmt)->size, UP(mtd));
-		return;
+		goto L_RTYPE;
 	}
 	/* INSTRUCTION */
 	if(cid == CLASS_Array || cid == CLASS_IArray || cid == CLASS_FArray) {
@@ -1670,7 +1661,7 @@ static
 void knh_StmtMT_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 {
 	int local = ASML(abr, sfpidx);
-	TERMs_asm(ctx, stmt, 1, abr, TYPE_any, local);
+	TERMs_asm(ctx, stmt, 1, abr, TYPE_Any, local);
 	Token *tk = DP(stmt)->tokens[0];
 	if(DP(stmt)->size == 2) {
 		KNH_ASM_TOSTR_(ctx, abr, local, DP(tk)->mn);
@@ -1854,6 +1845,9 @@ knh_StmtEXPR_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 	}
 	if(IS_ANY(reqt)) {
 		KNH_ASM_NNBOX(ctx, abr, DP(stmt)->type, sfpidx);
+	}
+	else if(IS_NNTYPE(reqt) && !IS_NNTYPE(DP(stmt)->type)) {
+		KNH_ASM_ISNULL_(ctx, abr, sfpidx);
 	}
 }
 

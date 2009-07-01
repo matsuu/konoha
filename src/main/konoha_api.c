@@ -150,7 +150,7 @@ static void konoha_dumpInit(void)
 	KNH_ASSERT(sizeof(knh_int_t) <= sizeof(knh_float_t));
 	fprintf(stderr, "sizeof(knh_sfp_t)=%d, sizeof(Ctx)=%d\n", (int)sizeof(knh_sfp_t), (int)sizeof(knh_Context_t));
 	fprintf(stderr, "sizeof(Object)=%d FASTMALLOC=%d\n", (int)sizeof(knh_Object_t), (int)KNH_FASTMALLOC_SIZE);
-	fprintf(stderr, "sizeof(Int)=%d\n", (int)sizeof(knh_Int_t));
+	fprintf(stderr, "sizeof(Int)=%d, sizeof(Method)=%d\n", (int)sizeof(knh_Int_t), (int)sizeof(knh_Method_struct));
 }
 
 /* ----------------------------------------------------------------------- */
@@ -232,7 +232,7 @@ KNHAPI(void) konoha_readFile(Ctx *ctx, char *fpath)
 		KNH_WARNING(ctx, "No such file: %s\n", fpath);
 		return ;
 	}
-	InputStream *in = new_FileInputStream(ctx, B(fpath));
+	InputStream *in = new_FileInputStream(ctx, B(fpath), 1);
 	if(knh_InputStream_isClosed(in)) {
 		KNH_WARNING(ctx, "No such script file: %s\n", fpath);
 	}

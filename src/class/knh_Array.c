@@ -150,9 +150,6 @@ void knh_Array_subclear(Ctx *ctx, Array *o, size_t n)
 /* ======================================================================== */
 /* [utils] */
 
-
-/* ------------------------------------------------------------------------ */
-
 KNHAPI(void) knh_Array_add(Ctx *ctx, Array *o, Any *value)
 {
 	if(o->size == o->capacity) {
@@ -161,6 +158,25 @@ KNHAPI(void) knh_Array_add(Ctx *ctx, Array *o, Any *value)
 	DBG2_ASSERT(o->size < o->capacity);
 	KNH_SETv(ctx, o->list[o->size], value);
 	o->size++;
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_Array_addArray(Ctx *ctx, Array *o, Array *other)
+{
+	L_TAIL:;
+	{
+		size_t i, asize = other->size;
+		if(!(o->size + asize < o->capacity)) {
+			knh_Array_grow(ctx, o, knh_array_newsize(o->capacity * 2, sizeof(Object*)), KNH_NULL);
+			goto L_TAIL;
+		}
+		DBG2_ASSERT(o->size < o->capacity);
+		for(i = 0; i < asize; i++) {
+			KNH_SETv(ctx, o->list[o->size], knh_Array_n(other, i));
+			o->size++;
+		}
+	}
 }
 
 /* ------------------------------------------------------------------------ */

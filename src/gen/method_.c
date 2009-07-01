@@ -25,7 +25,7 @@
  *  
  ****************************************************************************/
 
-#include"../../include/konoha/konoha_dev.h"
+#include<konoha/konoha_dev.h>
 
 
 #ifdef __cplusplus 
@@ -58,15 +58,9 @@ METHOD knh__Object_isImmutable(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 static 
-METHOD knh__Object_hasMetaData(Ctx *ctx, knh_sfp_t *sfp)
+METHOD knh__Object_isUndefined(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Boolean(ctx, sfp, knh_Object_hasMetaData((knh_Object_t*)sfp[0].o));
-}
-
-static 
-METHOD knh__Object_isSynchronized(Ctx *ctx, knh_sfp_t *sfp)
-{
-	KNH_RETURN_Boolean(ctx, sfp, knh_Object_isSynchronized((knh_Object_t*)sfp[0].o));
+	KNH_RETURN_Boolean(ctx, sfp, knh_Object_isUndefined((knh_Object_t*)sfp[0].o));
 }
 
 static 
@@ -83,19 +77,6 @@ METHOD knh__Object_setModified(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 static 
-METHOD knh__Object_isGCMarked(Ctx *ctx, knh_sfp_t *sfp)
-{
-	KNH_RETURN_Boolean(ctx, sfp, knh_Object_isGCMarked((knh_Object_t*)sfp[0].o));
-}
-
-static
-METHOD knh__Object_setGCMarked(Ctx *ctx, knh_sfp_t *sfp)
-{
-	knh_Object_setGCMarked((knh_Object_t*)sfp[0].o, p_bool(sfp[1]));
-	KNH_RETURN_void(ctx, sfp);
-}
-
-static 
 METHOD knh__Object_isFormatted(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Object_isFormatted((knh_Object_t*)sfp[0].o));
@@ -105,6 +86,19 @@ static
 METHOD knh__Object_setFormatted(Ctx *ctx, knh_sfp_t *sfp)
 {
 	knh_Object_setFormatted((knh_Object_t*)sfp[0].o, p_bool(sfp[1]));
+	KNH_RETURN_void(ctx, sfp);
+}
+
+static 
+METHOD knh__Object_isShared(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN_Boolean(ctx, sfp, knh_Object_isShared((knh_Object_t*)sfp[0].o));
+}
+
+static
+METHOD knh__Object_setShared(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_Object_setShared((knh_Object_t*)sfp[0].o, p_bool(sfp[1]));
 	KNH_RETURN_void(ctx, sfp);
 }
 
@@ -400,7 +394,7 @@ METHOD knh__Array_clear(Ctx *ctx, knh_sfp_t *sfp)
 		ctx,
 		(knh_Array_t*)sfp[0].o
 	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
+	KNH_RETURN(ctx, sfp, KNH_NULL);
 }
 
 static
@@ -412,7 +406,7 @@ METHOD knh__InputStream_setEncoding(Ctx *ctx, knh_sfp_t *sfp)
 		(knh_InputStream_t*)sfp[0].o,
 		(String*)sfp[1].o /* String sfp[1].o => String* enc */
 	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
+	KNH_RETURN(ctx, sfp, KNH_NULL);
 }
 
 static
@@ -424,7 +418,7 @@ METHOD knh__OutputStream_setEncoding(Ctx *ctx, knh_sfp_t *sfp)
 		(knh_OutputStream_t*)sfp[0].o,
 		(String*)sfp[1].o /* String sfp[1].o => String* enc */
 	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
+	KNH_RETURN(ctx, sfp, KNH_NULL);
 }
 
 static
@@ -449,7 +443,7 @@ METHOD knh__Context_setProperty(Ctx *ctx, knh_sfp_t *sfp)
 		(String*)sfp[1].o /* String! sfp[1].o => String* key */,
 		(Any*)sfp[2].o /* Any sfp[2].o => Any* value */
 	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
+	KNH_RETURN(ctx, sfp, KNH_NULL);
 }
 
 static
@@ -461,7 +455,7 @@ METHOD knh__Context_setEncoding(Ctx *ctx, knh_sfp_t *sfp)
 		(knh_Context_t*)sfp[0].o,
 		(String*)sfp[1].o /* String sfp[1].o => String* enc */
 	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
+	KNH_RETURN(ctx, sfp, KNH_NULL);
 }
 
 static
@@ -472,7 +466,7 @@ METHOD knh__Connection_close(Ctx *ctx, knh_sfp_t *sfp)
 		ctx,
 		(knh_Connection_t*)sfp[0].o
 	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
+	KNH_RETURN(ctx, sfp, KNH_NULL);
 }
 
 static
@@ -533,7 +527,7 @@ METHOD knh__DictIdx_clear(Ctx *ctx, knh_sfp_t *sfp)
 		ctx,
 		(knh_DictIdx_t*)sfp[0].o
 	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
+	KNH_RETURN(ctx, sfp, KNH_NULL);
 }
 
 static
@@ -569,7 +563,7 @@ METHOD knh__InputStream_close(Ctx *ctx, knh_sfp_t *sfp)
 		ctx,
 		(knh_InputStream_t*)sfp[0].o
 	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
+	KNH_RETURN(ctx, sfp, KNH_NULL);
 }
 
 static
@@ -602,7 +596,7 @@ METHOD knh__OutputStream_flush(Ctx *ctx, knh_sfp_t *sfp)
 		ctx,
 		(knh_OutputStream_t*)sfp[0].o
 	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
+	KNH_RETURN(ctx, sfp, KNH_NULL);
 }
 
 static
@@ -613,7 +607,7 @@ METHOD knh__OutputStream_clear(Ctx *ctx, knh_sfp_t *sfp)
 		ctx,
 		(knh_OutputStream_t*)sfp[0].o
 	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
+	KNH_RETURN(ctx, sfp, KNH_NULL);
 }
 
 static
@@ -624,7 +618,7 @@ METHOD knh__OutputStream_close(Ctx *ctx, knh_sfp_t *sfp)
 		ctx,
 		(knh_OutputStream_t*)sfp[0].o
 	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
+	KNH_RETURN(ctx, sfp, KNH_NULL);
 }
 
 static
@@ -635,7 +629,7 @@ METHOD knh__ResultSet_close(Ctx *ctx, knh_sfp_t *sfp)
 		ctx,
 		(knh_ResultSet_t*)sfp[0].o
 	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
+	KNH_RETURN(ctx, sfp, KNH_NULL);
 }
 
 static
@@ -660,7 +654,7 @@ METHOD knh__System_setProperty(Ctx *ctx, knh_sfp_t *sfp)
 		(String*)sfp[1].o /* String! sfp[1].o => String* key */,
 		(Any*)sfp[2].o /* Any sfp[2].o => Any* value */
 	);
-	KNH_RETURN(ctx, sfp, KNH_VOID);
+	KNH_RETURN(ctx, sfp, KNH_NULL);
 }
 
 #endif/*KNH_CC_METHODAPI*/

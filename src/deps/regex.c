@@ -29,12 +29,15 @@
 
 #include"commons.h"
 
-#ifdef KNH_USING_REGEX
-#ifdef KONOHA_OS__WINDOWS
-#include "onigposix.h"
-#else
+#if defined(KNH_USING_ONIGURUMA)
+#define KNH_USING_REGEX
+	#ifdef KONOHA_ON_WINDOWS
+	#include "onigposix.h"  // this path was written by nakata. why?
+	#else
+	#include<onigposix.h>
+	#endif
+#elif defined(KNH_USING_REGEX)
 #include<regex.h>
-#endif
 #endif
 
 /* ************************************************************************ */
@@ -113,7 +116,7 @@ int knh_regex_regcomp(Ctx *ctx, knh_regex_t *reg, char *pattern, char *option)
 	}
 	int res = regcomp((regex_t*)reg, pattern, flag);
 	if(res != 0) {
-		char buf[FILENAME_BUFSIZ * 4];
+		char buf[FILEPATH_BUFSIZ * 4];
 		regerror(res, (regex_t*)reg, buf, sizeof(buf));
 		KNH_WARNING(ctx, "regex(error): %s", buf);
 	}
@@ -250,7 +253,11 @@ void KNHINIT init_Regex(Ctx *ctx)
 #ifdef KNH_USING_REGEX
 	konoha_addRegexDriver(ctx, NULL, &RE__regex);
 	konoha_addRegexDriver(ctx, "re", &RE__regex);
-	konoha_setSystemPropertyText(ctx, "konoha.regex", "regex/POSIX.2");
+#if defined(KNH_USING_ONIGURUMA)
+	konoha_setSystemPropertyText(ctx, "konoha.regex", "oniguruma");
+#else
+	konoha_setSystemPropertyText(ctx, "konoha.regex", "POSIX.2");
+#endif
 #endif
 }
 

@@ -339,7 +339,7 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 				case 'd': case 'u':
 					args[index].atype = VA_INT;
 					break;
-#ifdef KONOHA_OS__LKM
+#ifdef KONOHA_ON_LKM
 				case 'f': case 'e':
 					args[index].atype = VA_FLOAT;
 					break;
@@ -384,7 +384,7 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 		case VA_INT:
 			args[i].ivalue = (knh_intptr_t)va_arg(ap, knh_intptr_t);
 			break;
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 		case VA_FLOAT:
 			args[i].fvalue = (knh_float_t)va_arg(ap, double);
 			break;
@@ -461,7 +461,7 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 						KNH_ASSERT(args[index].atype == VA_INT);
 						knh_write__u(ctx, w, args[index].uvalue);
 						break;
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 					case 'f':
 						KNH_ASSERT(args[index].atype == VA_FLOAT);
 						knh_write__f(ctx, w, args[index].fvalue);
@@ -559,7 +559,7 @@ void konoha_setverbose(int v)
 
 KNHAPI(void) konoha_says(Ctx *ctx, int type, char *fmt, ...)
 {
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 // TODO_LKM
 // how to print this.
 // printk? or something...

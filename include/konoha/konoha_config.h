@@ -78,8 +78,6 @@
 #define KONOHA_DEFAULT_ARRAY_SIZE           16
 #define KONOHA_STRING_BUFSIZ               128
 #define CLASSNAME_BUFSIZ                   128
-#define FILENAME_BUFSIZ                    512
-#define ERRMSG_BUFSIZ                      512
 
 /* object specification */
 
@@ -88,23 +86,23 @@
 
 /* ======================================================================== */
 
-#ifdef KONOHA_OS__LINUX
+#ifdef KONOHA_ON_LINUX
 #define KONOHA_OS "linux"
 #endif
 
-#ifdef KONOHA_OS__CYGWIN
+#ifdef KONOHA_ON_CYGWIN
 #define KONOHA_OS "cygwin"
 #endif
 
-#ifdef KONOHA_OS__MINGW
+#ifdef KONOHA_ON_MINGW
 #define KONOHA_OS "mingw"
 #endif
 
-#ifdef KONOHA_OS__MACOSX
+#ifdef KONOHA_ON_MACOSX
 #define KONOHA_OS "macosx"
 #endif
 
-#ifdef KONOHA_OS__TB
+#ifdef KONOHA_ON_TB
 #define KONOHA_OS "teaboard"
 #endif
 
@@ -115,7 +113,7 @@
 #ifdef __GNUC__
 	#define KONOHA_CC_VERSION "GCC " __VERSION__
 	#ifdef __i386__
-                #if defined(KONOHA_OS__LKM)
+                #if defined(KONOHA_ON_LKM)
                 #if (LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,25))
                 #define KNH_CC_FASTCALL   fastcall
                 #else
@@ -133,23 +131,23 @@
 	#ifndef KONOHA_OS
 		#ifdef __linux__
 			#define KONOHA_OS  "linux"
-			#define KONOHA_OS__LINUX       1
+			#define KONOHA_ON_LINUX       1
 		#endif
 		#ifdef __APPLE__
 			#define KONOHA_OS  "macosx"
-			#define KONOHA_OS__MACOSX      1
+			#define KONOHA_ON_MACOSX      1
 		#endif
 		#ifdef __WIN32__
 			#define KONOHA_OS  "mingw"
-			#define KONOHA_OS__MINGW          1
+			#define KONOHA_ON_MINGW          1
 		#endif
 		#ifdef __CYGWIN__
 			#define KONOHA_OS  "cygwin"
-			#define KONOHA_OS__CYGWIN     1
+			#define KONOHA_ON_CYGWIN     1
 		#endif
 		#ifdef TBMX1
 			#define KONOHA_OS  "teaboard"
-			#define KONOHA_OS__TB       1
+			#define KONOHA_ON_TB       1
 		#endif
 	#endif/*KONOHA_OS*/
 #endif/*__GNUC__*/
@@ -164,14 +162,14 @@
 #endif
 	#ifndef KONOHA_OS
 		#define KONOHA_OS  "windows"
-		#define KONOHA_OS__WINDOWS
+		#define KONOHA_ON_WINDOWS
 	#endif
 #define _CRT_SECURE_NO_WARNINGS
 #endif  /* _MSC_VER */
 
 #ifndef KONOHA_OS
 	#define KONOHA_OS  "unknown"
-	#define KONOHA_OS__UNKNOWN
+	#define KONOHA_ON_UNKNOWN
 #endif
 
 #ifndef KONOHA_CC_VERSION
@@ -197,17 +195,6 @@
 /* ======================================================================== */
 /* [OPTIONS_DEPS] */
 
-#define KNH_USING_RCGC 1
-
-#ifdef KNH_USING_DRCGC
-#define KNH_USING_RCGC 1
-#endif
-
-#ifdef KONOHA_CC_WITH_ECLIPSE
-	#define KONOHA_MONOLITHIC  1
-	#define KNH_USING_MATH    32
-#endif
-
 /* ======================================================================== */
 
 #define KNH_SECUREMODE 1
@@ -216,7 +203,7 @@
 
 /* ======================================================================== */
 
-#if !defined(L1_CACHE_BYTES) && !defined(KONOHA_OS__LKM)
+#if !defined(L1_CACHE_BYTES) && !defined(KONOHA_ON_LKM)
 #define L1_CACHE_BYTES   32
 #endif
 
@@ -225,17 +212,6 @@
 #define KNH_USING_OBJECT32   (sizeof(void*)*8)
 //#define KNH_USING_WORDKLRC   1
 #endif
-
-
-/* ======================================================================== */
-/* Language Specification */
-
-/* ======================================================================== */
-/* ======================================================================== */
-
-/* Runtime */
-#define KONOHA_OBJECT_COPY                 1
-#define KONOHA_RUNTIME_SINGLE              1
 
 /* ======================================================================== */
 /* ======================================================================== */

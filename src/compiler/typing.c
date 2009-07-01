@@ -128,8 +128,7 @@ knh_type_t knh_Token_gettype(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t def
 {
 	KNH_ASSERT(IS_Token(tk));
 	if(SP(tk)->tt == TT_ASIS) {
-		DBG2_ABORT();
-		return TYPE_var;
+		return defc;
 	}
 	if(SP(tk)->tt == TT_CID) {
 		return NNTYPE_cid(DP(tk)->cid);
@@ -150,11 +149,11 @@ knh_type_t knh_Token_gettype(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t def
 	}
 
 	if(knh_Token_isIteratorType(tk)) {
-		knh_class_t cid = knh_class_Generics(ctx, CLASS_Iterator, CLASS_type(type), CLASS_Any);
+		knh_class_t cid = knh_class_Generics(ctx, CLASS_Iterator, CLASS_type(type), CLASS_unknown);
 		return NNTYPE_cid(cid);
 	}
 	else if(knh_Token_isArrayType(tk)) {
-		knh_class_t cid = knh_class_Generics(ctx, CLASS_Array, CLASS_type(type), CLASS_Any);
+		knh_class_t cid = knh_class_Generics(ctx, CLASS_Array, CLASS_type(type), CLASS_unknown);
 		if(!knh_Token_isNullableType(tk)) return NNTYPE_cid(cid);
 		return cid;
 	}
@@ -179,10 +178,10 @@ knh_class_t knh_Token_getcid(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t def
 		knh_Token_perror(ctx, tk, KERR_ERRATA, _("unknown class: %s ==> %C"), sToken(tk), defc);
 	}
 	if(knh_Token_isIteratorType(tk)) {
-		cid = knh_class_Generics(ctx, CLASS_Iterator, cid, CLASS_Nue);
+		cid = knh_class_Generics(ctx, CLASS_Iterator, cid, CLASS_unknown);
 	}
 	else if(knh_Token_isArrayType(tk)) {
-		cid = knh_class_Generics(ctx, CLASS_Array, cid, CLASS_Nue);
+		cid = knh_class_Generics(ctx, CLASS_Array, cid, CLASS_unknown);
 	}
 	return cid;
 }
@@ -205,12 +204,12 @@ Token* new_TokenCONST(Ctx *ctx, Any *fln, Any *data)
 void knh_Token_setCONST(Ctx *ctx, Token *o, Any *data)
 {
 	KNH_SETv(ctx, DP(o)->data, data);
-	knh_Token_toCONST(o);
+	knh_Token_toCONST(ctx, o);
 }
 
 /* ------------------------------------------------------------------------ */
 
-Token* knh_Token_toCONST(Token *o)
+Token* knh_Token_toCONST(Ctx *ctx, Token *o)
 {
 	SP(o)->tt = TT_CONST;
 	DP(o)->type = knh_Object_cid(DP(o)->data);
@@ -237,7 +236,7 @@ Token* knh_Token_toDEFVAL(Token *o, knh_class_t cid)
 {
 	SP(o)->tt = TT_DEFVAL;
 	DP(o)->cid = cid;
-	if(cid != CLASS_Nue) {
+	if(cid != CLASS_Any) {
 		DP(o)->type = NNTYPE_cid(cid);
 	}
 	else {
@@ -366,6 +365,7 @@ knh_index_t knh_Asm_addVariableTable(Ctx *ctx, Asm *abr,
 		knh_cfield_t *cf, size_t max, knh_flag_t flag, knh_type_t type, knh_fieldn_t fn, Object *value)
 {
 	size_t idx;
+	KNH_ASSERT_cid(CLASS_type(type));
 	for(idx = 0; idx < max; idx++) {
 		if(cf[idx].fn == FIELDN_NONAME) {
 			cf[idx].flag = flag;
@@ -414,7 +414,7 @@ int knh_Asm_declareScriptVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_
 				}
 			}
 			knh_float_t *v = (knh_float_t*)(scr->fields + idx);
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 			v[0] = (IS_NULL(value)) ? 0.0 : ((Float*)value)->n.fvalue;
 #else
 			v[0] = (IS_NULL(value)) ? 0 : ((Float*)value)->n.fvalue;
@@ -844,7 +844,7 @@ int knh_TokenSTR_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqt)
 	knh_class_t reqc = CLASS_type(reqt);
 	if(reqc == CLASS_String || reqc == CLASS_Object || reqc == CLASS_Any) {
 		KNH_ASSERT(IS_String(DP(tk)->data));
-		knh_Token_toCONST(tk);
+		knh_Token_toCONST(ctx, tk);
 		return 1;
 	}
 	else if(reqc == CLASS_Exception) {
@@ -933,7 +933,7 @@ int knh_Token_typing(Ctx *ctx, Token *tk, Asm *abr, NameSpace *ns, knh_type_t re
 		return knh_TokenCMETHODN_typing(ctx, tk, ns);
 	case TT_URN:
 		KNH_ASSERT(IS_String(DP(tk)->data));
-		knh_Token_toCONST(tk);
+		knh_Token_toCONST(ctx, tk);
 		return 1;
 
 	case TT_ESTR:
@@ -1091,7 +1091,7 @@ static Object *TERMs_const(Stmt *stmt, size_t n)
 
 /* ------------------------------------------------------------------------ */
 
-static int TERMs_isNULL(Stmt *stmt, size_t n)
+static int TERMs_isNULL(Ctx *ctx, Stmt *stmt, size_t n)
 {
 	if(n < DP(stmt)->size) {
 		return (IS_Token(DP(stmt)->tokens[n]) && IS_NULL(DP(DP(stmt)->tokens[n])->data));
@@ -1213,7 +1213,6 @@ void TERMs_perrorTYPE(Ctx *ctx, Stmt *stmt, size_t n, knh_type_t reqt)
 static
 knh_type_t knh_Asm_typeinfer(Ctx *ctx, Asm *abr, knh_type_t type, char *varname)
 {
-	if(type == CLASS_Nue) type = CLASS_Any;
 	if(type == CLASS_Any || type == NNTYPE_Any) {
 //		knh_Asm_perror(ctx, abr, KERR_ERROR, _("error")WTYPEINF, varname);
 	}
@@ -1284,10 +1283,10 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	knh_fieldn_t fn  = FIELDN_UNMASK(fnq);
 	knh_flag_t flag  = knh_Stmt_metaflag__field(ctx, stmt);
 
-	knh_type_t pmztype  = knh_Token_gettype(ctx, StmtDECL_type(stmt), ns, TYPE_var);
+	knh_type_t pmztype  = knh_Token_gettype(ctx, StmtDECL_type(stmt), ns, TYPE_Any/*var*/);
 	knh_type_t type = knh_pmztype_totype(ctx, pmztype, DP(abr)->this_cid);
 
-	if(TERMs_isNULL(stmt, 2) && !TERMs_isASIS(stmt, 2)
+	if(TERMs_isNULL(ctx, stmt, 2) && !TERMs_isASIS(stmt, 2)
 			&& !knh_Token_isNotNullType(DP(stmt)->tokens[0])) {
 		DBG2_P("type inferencing: Nullable");
 		type = CLASS_type(type);
@@ -1876,6 +1875,27 @@ Term *knh_StmtCALLBASE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh
 		}
 		return NULL;
 	}
+	else if(mn == METHODN_domain) {
+		if(DP(stmt)->size != 3) goto L_ERROR;
+		if(TERMs_typing(ctx, stmt, 2, abr, ns, CLASS_Any, TWARN_)) {
+			knh_class_t cid1;
+			if(TERMs_isCLASSID(stmt, 2)) {
+				cid1 = DP(DP(stmt)->tokens[2])->cid;
+			}
+			else {
+				cid1 = TERMs_getcid(stmt, 2);
+			}
+			KNH_ASSERT_cid(cid1);
+			knh_Token_setCONST(ctx, tk1, UP(ctx->share->ClassTable[cid1].class_cid));
+			DP(stmt)->size = 2;
+			knh_Token_toMTD(ctx, DP(stmt)->tokens[0], METHODN_domain,
+					knh_Class_getMethod(ctx, CLASS_Class, METHODN_domain));
+			knh_Stmt_setType(ctx, stmt,
+				NNTYPE_cid(knh_class_Generics(ctx, CLASS_Array, cid1, CLASS_Any)));
+			return TM(stmt);
+		}
+		return NULL;
+	}
 	else if(mn == METHODN_defined) {
 		if(DP(stmt)->size != 3) goto L_ERROR;
 		if(TERMs_typing(ctx, stmt, 2, abr, ns, CLASS_Any, TWARN_)) {
@@ -2291,12 +2311,12 @@ Term *knh_StmtOP_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_
 		if(!knh_Stmt_checkOPSIZE(ctx, stmt, 2)) {
 			return NULL;
 		}
-		if(TERMs_isNULL(stmt, 1) || TERMs_isTRUE(stmt, 1) || TERMs_isFALSE(stmt, 1)) {
+		if(TERMs_isNULL(ctx, stmt, 1) || TERMs_isTRUE(stmt, 1) || TERMs_isFALSE(stmt, 1)) {
 			Term *temp = DP(stmt)->terms[1];
 			DP(stmt)->terms[1] = DP(stmt)->terms[2];
 			DP(stmt)->terms[2] = temp;
 		}
-		if(TERMs_isNULL(stmt, 2)) { /* o == null */
+		if(TERMs_isNULL(ctx, stmt, 2)) { /* o == null */
 			if(IS_NNTYPE(TERMs_gettype(stmt,1))) {
 				return TM(new_TokenCONST(ctx, FL(stmt), KNH_FALSE));
 			}
@@ -2330,12 +2350,12 @@ Term *knh_StmtOP_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_
 		if(!knh_Stmt_checkOPSIZE(ctx, stmt, 2)) {
 			return NULL;
 		}
-		if(TERMs_isNULL(stmt, 1) || TERMs_isTRUE(stmt, 1) || TERMs_isFALSE(stmt, 1)) {
+		if(TERMs_isNULL(ctx, stmt, 1) || TERMs_isTRUE(stmt, 1) || TERMs_isFALSE(stmt, 1)) {
 			Term *temp = DP(stmt)->terms[1];
 			DP(stmt)->terms[1] = DP(stmt)->terms[2];
 			DP(stmt)->terms[2] = temp;
 		}
-		if(TERMs_isNULL(stmt, 2)) { /* o != null */
+		if(TERMs_isNULL(ctx, stmt, 2)) { /* o != null */
 			if(IS_NNTYPE(TERMs_gettype(stmt,1))) {
 				return TM(new_TokenCONST(ctx, FL(stmt), KNH_TRUE));
 			}
@@ -2475,7 +2495,7 @@ Term *knh_StmtMAPCAST_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_
 		}
 	}
 
-	if(TERMs_isNULL(stmt, 1)) {  /* (T)null */
+	if(TERMs_isNULL(ctx, stmt, 1)) {  /* (T)null */
 		if(isNonNullCast) {
 			knh_Token_toDEFVAL(DP(stmt)->tokens[1], mprcid);
 		}
@@ -2723,7 +2743,7 @@ int TERMs_typecheck(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_type_t reqt, i
 	knh_class_t varc = CLASS_type(vart);
 	knh_class_t reqc = CLASS_type(reqt);
 
-	if(TERMs_isNULL(stmt, n)) {
+	if(TERMs_isNULL(ctx, stmt, n)) {
 		//DBG2_P("reqc=%s varc=%s", CTXCLASSN(reqc), CTXCLASSN(varc));
 		if(IS_NNTYPE(reqt) && varc != reqc) {
 			TERMs_perrorTYPE(ctx, stmt, n, reqt);
@@ -3472,7 +3492,7 @@ MethodField *knh_tMethodField_find(Ctx *ctx, Asm *abr, knh_type_t rztype, size_t
 static
 int knh_Stmt_checkLastReturn(Ctx *ctx, Stmt *stmt, Method *mtd)
 {
-	Stmt *last_stmt = knh_Stmt_tail(stmt);
+	Stmt *last_stmt = knh_Stmt_tail(ctx, stmt);
 	knh_stmt_t stt = SP(last_stmt)->stt;
 	if(stt == STT_RETURN || stt == STT_THROW || stt == STT_ERR) {
 		return 1;

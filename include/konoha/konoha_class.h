@@ -43,11 +43,10 @@ extern "C" {
 /* @flag Object.Release!Debug OF (%s)->h.flag 'is:*:is:*' */
 /* @flag Object.Immutable OF (%s)->h.flag 'is:*:is:*' */
 /* @flag Object.Cyclic OF (%s)->h.flag 'is:set:*:*' */
-/* @flag Object.MetaData OF (%s)->h.flag 'has:set:has:*' */
-/* @flag Object.Synchronized OF (%s)->h.flag 'is:*:is:*' */
+/* @flag Object.Undefined OF (%s)->h.flag 'is:*:is:*' */
 /* @flag Object.Modified OF (%s)->h.flag 'is:set:is:set' */
-/* @flag Object.GCMarked OF (%s)->h.flag 'is:set:is:set' */
 /* @flag Object.Formatted OF (%s)->h.flag 'is:set:is:set' */
+/* @flag Object.Shared OF (%s)->h.flag 'is:set:is:set' */
 /* @flag Object.Local4 OF (%s)->h.flag 'is:set:*:*' */
 /* @flag Object.Local3 OF (%s)->h.flag 'is:set:*:*' */
 /* @flag Object.Local2 OF (%s)->h.flag 'is:set:*:*' */
@@ -63,6 +62,9 @@ typedef struct knh_ObjectField_t {
 	size_t  bsize;
 } knh_ObjectField_t ;
 
+#define knh_Object_cid(o)           (o)->h.cid
+#define knh_Object_bcid(o)          (o)->h.bcid
+
 /* ------------------------------------------------------------------------ */
 
 #define IS_IMM(o) (!knh_Object_isImmutable(o))
@@ -74,6 +76,7 @@ typedef struct knh_ObjectField_t {
 /* @class Any1 Any knh_Any_t @Cyclic  @Private */
 /* @class Any2 Any knh_Any_t @Cyclic  @Private */
 /* @class Any3 Any knh_Any_t @Cyclic  @Private */
+/* @class AnyVar Any knh_Any_t @Cyclic  @Private */
 
 struct knh_Glue_t;
 typedef void (*knh_fgfree)(Ctx *, struct knh_Glue_t *o);
@@ -93,16 +96,8 @@ typedef knh_Glue_t knh_Any1_t;
 typedef knh_Glue_t knh_Any2_t;
 typedef knh_Glue_t knh_Any3_t;
 
-/* ------------------------------------------------------------------------ */
-/* @class Nue Object knh_Nue_t @Immutable @Private */
-/* @flag Nue.GCHook NUE:1 (%s)->h.flag 'is:set:*:*' */
-
-typedef struct knh_Nue_t {
-	knh_hObject_t h;
-	knh_uchar_t *str;
-	size_t size;
-	struct knh_String_t *orign;
-} knh_Nue_t;
+#define IS_NULL(o)            ((ctx)->share->constNull == UP(o))
+#define IS_NOTNULL(o)         ((ctx)->share->constNull != UP(o))
 
 /* ------------------------------------------------------------------------ */
 /* @class Boolean Object knh_Boolean_t @Immutable */
@@ -120,6 +115,13 @@ typedef struct knh_Boolean_t {
 	knh_hObject_t h;
 	knh_nObject_t n;
 } knh_Boolean_t;
+
+#define IS_TRUE(o)         ((o)->h.bcid == CLASS_Boolean && ((Int*)o)->n.bvalue)
+#define IS_FALSE(o)        ((o)->h.bcid == CLASS_Boolean && (((Int*)o)->n.bvalue == 0))
+#define new_Boolean(ctx, c)    (c) ? KNH_TRUE : KNH_FALSE
+
+#define _BOOL_ISTRUE(o)         (o == KNH_TRUE)
+#define _BOOL_ISFALSE(o)        (o == KNH_FALSE)
 
 /* ------------------------------------------------------------------------ */
 /* @class Number Object knh_Number_t @Immutable */
@@ -380,8 +382,6 @@ typedef struct knh_DictIdx_t {
 /* @flag Class.Private!Public CF ctx->share->ClassTable[(%s)].cflag 'is:*:is:*' */
 /* @flag Class.Final CF ctx->share->ClassTable[(%s)].cflag 'is:*:is:*' */
 /* @flag Class.Singleton CF ctx->share->ClassTable[(%s)].cflag 'is:*:*:*' */
-/* @ flag Class.System CF ctx->share->ClassTable[(%s)].cflag 'is:*:is:*' */
-/* @flag Class.NullObject CF ctx->share->ClassTable[(%s)].cflag 'is:*:*:*' */
 /* @flag Class.Interface  CF ctx->share->ClassTable[(%s)].cflag 'is:*:is:*' */
 
 typedef struct knh_Class_t {
@@ -400,9 +400,7 @@ typedef struct knh_Class_t {
 
 #define knh_Class_cid(c)     (knh_class_t)(c)->cid
 #define KNH_FLAG_CF2OF(f)        (f)
-#define knh_Class_isGenerics(cid)    (ctx->share->ClassTable[cid].p1 != CLASS_Nue)
-
-
+#define knh_Class_isGenerics(cid)    (ctx->share->ClassTable[cid].p1 != CLASS_unknown)
 
 /* ------------------------------------------------------------------------ */
 /* @class ClassStruct Object knh_ClassStruct_t @Private */
@@ -463,12 +461,18 @@ typedef struct knh_MethodField_t {
 /* @flag Method.ObjectCode MF DP((Method*)%s)->flag 'is:set:*:*' */
 /* @flag Method.Generated MF DP((Method*)%s)->flag 'is:set:*:*' */
 
-typedef struct knh_Method {
+typedef knh_uint64_t   knh_proftime_t;
+
+typedef struct {
 	knh_flag_t     flag;  knh_class_t    cid;
 	knh_methodn_t  mn;    knh_ushort_t   delta;
 	struct knh_MethodField_t* mf;
 	knh_fmethod       fproceed;
 	void*             code;
+#ifdef KNH_USING_KONOHA_PROF
+	knh_uintptr_t     prof_count;  /*recode how many times called */
+	knh_proftime_t    prof_time;   /*recode how long spending */
+#endif
 } knh_Method_struct;
 
 /* ------------------------------------------------------------------------ */
@@ -521,7 +525,7 @@ typedef struct knh_Closure {
 /* ------------------------------------------------------------------------ */
 /* @class AffineConv Object knh_AffineConv_t @Private */
 
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
   typedef float knh_affinefloat_t;
 #else
   typedef int knh_affinefloat_t;
@@ -1066,31 +1070,6 @@ typedef struct knh_KLRCode {
 } knh_KLRCode_struct;
 
 /* ======================================================================== */
-
-#ifdef OLD
-#define KNH_PERROR_BUFSIZ   1024
-
-#define KNH_PERROR(ctx, fid, line, pe, fmt, ...) \
-	if(fmt != NULL){ \
-		char buf_[KNH_PERROR_BUFSIZ]; \
-		knh_snprintf(buf_, sizeof(buf_), ": " fmt, ## __VA_ARGS__); \
-		knh_perror0(ctx, fid, line, pe, buf_); \
-	}else { \
-		knh_perror0(ctx, fid, line, pe, NULL); \
-	} \
-
-#define KNH_TOKEN_PERROR(ctx, tk, pe, fmt, ...) \
-	if(fmt != NULL){ \
-		char buf_[KNH_PERROR_BUFSIZ]; \
-		knh_snprintf(buf_, sizeof(buf_), ": " fmt, ## __VA_ARGS__); \
-		knh_Token_perror(ctx, tk, pe, buf_); \
-	}else { \
-		knh_Token_perror(ctx, tk, pe, NULL); \
-	} \
-
-#endif
-
-
 
 #ifdef __cplusplus
 }

@@ -2,7 +2,7 @@
 #define KONOHA_DEPS_H_
 #include<konoha/konoha_t.h>
 
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 #include<stdlib.h>
 #include<string.h>
 #endif
@@ -10,34 +10,31 @@
 /* ======================================================================== */
 /* [UNIX] */
 
-#ifdef KONOHA_OS__UNKONWN
+#ifdef KONOHA_ON_UNKNOWN
 	#define KNH_USING_POSIX 1
 	#define KNH_USING_UNIX  1
 	#define KONOHA_OS_ENCODING "UTF-8"
 	#define KONOHA_OS_LINEFEED "\n"
+	#define KONOHA_OS_DLLEXT   ".so"
 #endif
 
-#ifdef KONOHA_OS__LINUX
+#ifdef KONOHA_ON_LINUX
 #define		KNH_USING_POSIX 1
 #define		KNH_USING_UNIX  1
 #define     KNH_USING_SOCKET 1
 #define		KONOHA_OS_ENCODING "UTF-8"
 #define 	KNH_USING_KONOHAGET 1
-#ifdef HAVE_ICONV_H
-#define		KNH_USING_ICONV 1
-#endif
+	#ifdef HAVE_ICONV_H
+	#define		KNH_USING_ICONV 1
+	#endif
 //#ifdef HAVE_REGEX_H
 #define		KNH_USING_REGEX 1
 //#endif
 #define		KONOHA_OS_LINEFEED "\n"
 #define		KONOHA_OS_DLLEXT   ".so"
-#ifdef KONOHA_CC_WITH_ECLIPSE
-#define 	KNH_USING_READLINE 1
-#define		KONOHA_MONOLITHIC  1
-#endif
 #endif
 
-#ifdef KONOHA_OS__MACOSX
+#ifdef KONOHA_ON_MACOSX
 #define 	KNH_USING_POSIX    1
 #define 	KNH_USING_UNIX     1
 #define 	KNH_USING_SOCKET   1
@@ -48,21 +45,20 @@
 #define 	KONOHA_OS_ENCODING "UTF-8"
 #define 	KONOHA_OS_LINEFEED "\n"
 #define 	KONOHA_OS_DLLEXT ".dylib"
-#ifdef KONOHA_CC_WITH_ECLIPSE
-#define 	KNH_USING_READLINE 1
-#define		KONOHA_MONOLITHIC  1
-#endif
 #endif
 
 /* ------------------------------------------------------------------------ */
 
-#ifdef KONOHA_OS__LKM
+#ifdef KONOHA_ON_LKM
 #define KNH_USING_INT32      1
 #define KNH_USING_NOFLOAT    1
 #define KNH_USING_NOFILE     1
 
 #define KNH_EXT_QSORT  1
 #define KNH_EXT_SETJMP 1
+
+#define FILEPATH_BUFSIZ     80  /* TO SAVE STACKSIZE */
+#define KONOHA_HOMEPATH     "/dev/konoha"   /* meaningless */
 
 #undef KNH_USING_SOCKET
 #undef KNH_USING_ICONV
@@ -78,7 +74,7 @@
 /* ======================================================================== */
 /* [WINDOWS] */
 
-#ifdef KONOHA_OS__WINDOWS
+#ifdef KONOHA_ON_WINDOWS
 #include<windows.h>
 #define 	KNH_USING_WIN32    1
 #define 	KNH_USING_WINDOWS  1
@@ -96,7 +92,7 @@
 #define		KONOHA_OS_FILE_SEPARATOR '\\'
 #endif
 
-#ifdef KONOHA_OS__MINGW
+#ifdef KONOHA_ON_MINGW
 #define 	KNH_USING_WIN32    1
 #define 	KNH_USING_WINDOWS  1
 #define 	KONOHA_OS_LINEFEED "\r\n"
@@ -114,7 +110,7 @@
 #endif
 #endif
 
-#ifdef KONOHA_OS__CYGWIN
+#ifdef KONOHA_ON_CYGWIN
 #define 	KNH_USING_POSIX    1
 #define 	KNH_USING_UNIX     1
 #define 	KNH_USING_REGEX    1
@@ -125,7 +121,7 @@
 /* ======================================================================== */
 /* [WINDOWS] */
 
-#ifdef KONOHA_OS__TB
+#ifdef KONOHA_ON_TB
 #define 	KNH_USING_BTRON    1
 #define 	KONOHA_OS_ENCODING KONOHA_ENCODING
 #define 	KONOHA_OS_LINEFEED "\n"
@@ -222,7 +218,7 @@
 
 /* ======================================================================== */
 
-#if defined(KNH_USING_POSIX) && !defined(KONOHA_OS__LKM)
+#if defined(KNH_USING_POSIX) && !defined(KONOHA_ON_LKM)
 #include<dlfcn.h>
 #define KNH_RTLD_LAZY               RTLD_LAZY
 #else
@@ -235,6 +231,11 @@
 	#define knh_getenv(n)           ALT_getenv(n)
 #else
 	#define knh_getenv(n)           getenv(n)
+#endif
+
+
+#ifndef FILEPATH_BUFSIZ
+#define FILEPATH_BUFSIZ  256
 #endif
 
 /* ======================================================================== */

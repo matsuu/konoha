@@ -48,13 +48,11 @@ void konoha_loadSystemData(Ctx *ctx);
 /* [INITCONST] */
 
 static
-Object *new_Nue__T(Ctx *ctx, char *text)
+Object *new_Null(Ctx *ctx)
 {
-	knh_Nue_t *o = (knh_Nue_t*)new_hObject(ctx, FLAG_Nue, CLASS_Nue, CLASS_Nue);
-	o->str = (knh_uchar_t*)text;
-	o->size = knh_strlen(text);
-	o->orign = NULL;
-	return (Object*)o;
+	knh_Glue_t *glue = (knh_Glue_t*)new_hObject(ctx, KNH_FLAG_OF_IMMUTABLE, CLASS_Any, CLASS_Any);
+	knh_Glue_init(ctx, glue, NULL, NULL);
+	return (Object*)glue;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -180,7 +178,7 @@ void knh_Context_initCommon(Ctx *ctx, knh_Context_t *o, size_t stacksize)
 	KNH_INITv(o->props, new_DictMap0(ctx, 16));
 
 	KNH_INITv(o->enc, DP(ctx->sys)->enc);
-	//#ifndef KONOHA_OS__LKM
+	//#ifndef KONOHA_ON_LKM
 	KNH_INITv(o->in,  DP(ctx->sys)->in);
 	KNH_INITv(o->out, DP(ctx->sys)->out);
 	KNH_INITv(o->err, DP(ctx->sys)->err);
@@ -207,7 +205,7 @@ void knh_Context_traverseCommon(Ctx *ctx, knh_Context_t *o, knh_ftraverse ftr)
 	ftr(ctx, UP(o->props));
 
 	ftr(ctx, UP(o->enc));
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 	ftr(ctx, UP(o->in));
 	ftr(ctx, UP(o->out));
 	ftr(ctx, UP(o->err));
@@ -306,8 +304,8 @@ Ctx *konoha_createContext0(size_t stacksize)
 	ctx->share->ClassTable = (knh_ClassTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TCLASS);
 	knh_bzero(ctx->share->ClassTable, SIZEOF_TCLASS);
 	for(i = 0; i < KNH_TCLASS_SIZE; i++) {
-		ctx->share->ClassTable[i].p1       = CLASS_Nue;   /* @deps knh_Class_isGenerics(cid)*/
-		ctx->share->ClassTable[i].p2       = CLASS_Nue;
+		ctx->share->ClassTable[i].p1       = CLASS_unknown;   /* @deps knh_Class_isGenerics(cid)*/
+		ctx->share->ClassTable[i].p2       = CLASS_unknown;
 		ctx->share->ClassTable[i].keyidx   = -1;
 		ctx->share->ClassTable[i].keyidx2   = -1;
 	}
@@ -323,8 +321,7 @@ Ctx *konoha_createContext0(size_t stacksize)
 
 	konoha_loadSystemStructData(ctx);
 
-	KNH_INITv(ctx->share->constNull, new_Nue__T(ctx, "Null!!"));
-	KNH_INITv(ctx->share->constVoid, new_Nue__T(ctx, "Null!!: return void"));
+	KNH_INITv(ctx->share->constNull, new_Null(ctx));
 	KNH_INITv(ctx->share->constTrue, new_Boolean0(ctx, 1));
 	KNH_INITv(ctx->share->constFalse, new_Boolean0(ctx, 0));
 	KNH_INITv(ctx->share->constFloat0, new_hObject(ctx, FLAG_Float, CLASS_Float, CLASS_Float));
@@ -385,7 +382,6 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 	knh_Context_traverseCommon(ctx, (knh_Context_t*)ctx, ftr);
 
 	ftr(ctx, ctx->share->constNull);
-	ftr(ctx, ctx->share->constVoid);
 	ftr(ctx, ctx->share->constTrue);
 	ftr(ctx, ctx->share->constFalse);
 	ftr(ctx, UP(ctx->share->constFloat0));
@@ -505,6 +501,7 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 		if(ctx->stat->usedMemorySize != 0) {
 			fprintf(stderr, "memory leaks: %d bytes", (int)ctx->stat->usedMemorySize);
 		}
+
 		DBG_P("method cache hit/miss %d/%d", (int)ctx->stat->mtdCacheHit, (int)ctx->stat->mtdCacheMiss);
 		DBG_P("formatter cache hit/miss %d/%d", (int)ctx->stat->fmtCacheHit, (int)ctx->stat->fmtCacheMiss);
 		DBG_P("mapper cache hit/miss %d/%d", (int)ctx->stat->mprCacheHit, (int)ctx->stat->mprCacheMiss);
@@ -512,7 +509,7 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 		knh_bzero(ctx->share, sizeof(knh_ctxshare_t) + sizeof(knh_ctxstat_t));
 		free(ctx->share);
 
-		knh_bzero(ctx, sizeof(knh_Context_t));
+		knh_bzero((void*)ctx, sizeof(knh_Context_t));
 		free((void*)ctx);
 	}
 }

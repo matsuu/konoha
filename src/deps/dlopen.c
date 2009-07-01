@@ -29,14 +29,16 @@
 
 
 #include"commons.h"
-#ifdef KONOHA_OS__LKM
+
+#ifdef KONOHA_ON_LKM
 #undef KNH_USING_POSIX
 #endif
 
-#define KNH_USING_NOAPI 1
+#ifdef KONOHA_ON_LKM
+#undef KNH_USING_POSIX
+#endif
 
 #ifdef KNH_USING_POSIX
-#undef KNH_USING_NOAPI
 #include <unistd.h>
 #include<dlfcn.h>
 
@@ -45,7 +47,6 @@
 #endif
 
 #ifdef KNH_USING_WINDOWS
-#undef KNH_USING_NOAPI
 #include<windows.h>
 #endif
 
@@ -61,16 +62,17 @@ extern "C" {
 
 void *knh_dlopen(Ctx *ctx, const char* path, int mode)
 {
-	char buff[FILENAME_BUFSIZ];
+#if defined(KNH_USING_WINDOWS)
+	char buff[FILEPATH_BUFSIZ];
 	knh_format_ospath(ctx, buff, sizeof(buff), B((char*)path));
-	DBG_P("dlopen .. '%s'\n", buff);
-#ifdef KNH_USING_WINDOWS
+	DBG_P("knh_dlopen .. '%s'\n", buff);
 	return (void*)LoadLibraryA((LPCTSTR)buff);
-#endif
-#ifdef KNH_USING_POSIX
+#elif defined(KNH_USING_POSIX)
+	char buff[FILEPATH_BUFSIZ];
+	knh_format_ospath(ctx, buff, sizeof(buff), B((char*)path));
+	DBG_P("knh_dlopen .. '%s'\n", buff);
 	return dlopen(buff, mode);
-#endif
-#ifdef KNH_USING_NOAPI
+#else
 	return NULL;
 #endif
 }
@@ -79,13 +81,11 @@ void *knh_dlopen(Ctx *ctx, const char* path, int mode)
 
 void *knh_dlsym(Ctx *ctx, void* hdr, const char* symbol)
 {
-#ifdef KNH_USING_WINDOWS
+#if defined(KNH_USING_WINDOWS)
 	return GetProcAddress((HMODULE)hdr, (LPCSTR)symbol);
-#endif
-#ifdef KNH_USING_POSIX
+#elif defined(KNH_USING_POSIX)
 	return dlsym(hdr, symbol);
-#endif
-#ifdef KNH_USING_NOAPI
+#else
 	return NULL;
 #endif
 }
@@ -94,13 +94,11 @@ void *knh_dlsym(Ctx *ctx, void* hdr, const char* symbol)
 
 const char *knh_dlerror(Ctx *ctx)
 {
-#ifdef KNH_USING_WINDOWS
+#if defined(KNH_USING_WINDOWS)
 	return "TODO: dlerror()";
-#endif
-#ifdef KNH_USING_POSIX
+#elif defined(KNH_USING_POSIX)
 	return dlerror();
-#endif
-#ifdef KNH_USING_NOAPI
+#else
 	return "Unsupported dlopen APIs";
 #endif
 }
@@ -109,14 +107,12 @@ const char *knh_dlerror(Ctx *ctx)
 
 int knh_dlclose(Ctx *ctx, void* hdr)
 {
-#ifdef KNH_USING_WINDOWS
+#if defined(KNH_USING_WINDOWS)
 	return (int)FreeLibrary((HMODULE)hdr);
-#endif
-#ifdef KNH_USING_POSIX
+#elif defined(KNH_USING_POSIX)
 	return dlclose(hdr);
-#endif
-#ifdef KNH_USING_NOAPI
-	return 1;
+#else
+	return 0;
 #endif
 }
 

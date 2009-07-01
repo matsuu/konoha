@@ -270,7 +270,13 @@ static METHOD knh__Object__p(Ctx *ctx, knh_sfp_t *sfp)
 static
 void knh_Object__k(Ctx *ctx, Object *o, OutputStream *w, String *m)
 {
-	if(o->h.bcid == CLASS_Object) {
+	if(knh_Object_isUndefined(o)) {
+		knh_write(ctx, w, STEXT("undefined"));
+	}
+	else if(IS_NULL(o)) {
+		knh_write(ctx, w, STEXT("null"));
+	}
+	else if(o->h.bcid == CLASS_Object) {
 		size_t bsize = ctx->share->ClassTable[o->h.cid].bsize;
 		knh_write__s(ctx, w, CLASSN(o->h.cid));
 		if(bsize > 0) {
@@ -375,10 +381,10 @@ MAPPER knh_Object_String(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method void Nue.%k(OutputStream w, String m) */
+/* @method void Any.%k(OutputStream w, String m) */
 
 static
-void knh_Nue__k(Ctx *ctx, Nue *b, OutputStream *w, String *m)
+void knh_Any__k(Ctx *ctx, knh_Any_t *o, OutputStream *w, String *m)
 {
 	knh_write(ctx, w, knh_String_tobytes(TS_null));
 }
@@ -386,6 +392,15 @@ void knh_Nue__k(Ctx *ctx, Nue *b, OutputStream *w, String *m)
 /* ======================================================================== */
 /* [Class] */
 
+/* @method Array! Class.domain() */
+
+static
+METHOD knh__Class_domain(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN(ctx, sfp, konoha_getClassDomain(ctx, (sfp[0].c)->cid));
+}
+
+/* ------------------------------------------------------------------------ */
 /* @method void Class.%s(OutputStream w, String m) */
 
 static
@@ -687,11 +702,9 @@ void knh_Method__k(Ctx *ctx, Method *o, OutputStream *w, String *m)
 		knh_write(ctx, w, STEXT("@abstract"));
 		knh_putc(ctx, w, ' ');
 	}
-
 	if(knh_Method_rztype(o) == TYPE_void) {
 		knh_write(ctx, w, knh_String_tobytes(TS_void));
 	}else{
-//		knh_write__type(ctx, w, knh_pmztype_totype(ctx, knh_Method_rtype(o), DP(o)->cid));
 		knh_write_type(ctx, w, knh_Method_rztype(o));
 	}
 	knh_putc(ctx, w, ' ');
@@ -703,7 +716,6 @@ void knh_Method__k(Ctx *ctx, Method *o, OutputStream *w, String *m)
 			knh_write_delim(ctx, w);
 		}
 		knh_mparam_t mf = knh_Method_param(o, i);
-		//knh_write__type(ctx, w, knh_pmztype_totype(ctx, mf.type, DP(o)->cid));
 		knh_write_type(ctx, w, mf.type);
 		knh_putc(ctx, w, ' ');
 		knh_write(ctx, w, B(FIELDN(mf.fn)));

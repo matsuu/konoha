@@ -61,8 +61,13 @@ extern "C" {
 #define KNH_ASSERT_eid(eid)    KNH_ASSERT(eid < ctx->share->ExptTableSize + 1)
 #define EXPTN(eid)   knh_String_tochar(knh_ExptTable_name(ctx, eid))
 #define new_Exception__s(ctx, s)     new_Exception__b(ctx, B(s))
-#define KNH_PERRNO(ctx, emsg, func) { \
-		knh_perrno(ctx, emsg, func, __FILE__, __LINE__); \
+#define KNH_PERRNO(ctx, emsg, func, isThrowable) { \
+		knh_perrno(ctx, emsg, func, __FILE__, __LINE__, isThrowable); \
+	}\
+
+
+#define KNH_NOAPI(ctx, isThrowable) { \
+		knh_throw_Unsupported(ctx, __FUNCTION__, __FILE__, __LINE__, isThrowable); \
 	}\
 
 
@@ -85,17 +90,6 @@ extern "C" {
 #define CTXCLASSN(cid)     knh_Context_CLASSN(ctx,cid)
 #define CTXTYPEQN(cid)     knh_Context_CLASSN(ctx,CLASS_type(cid)), TYPEQ(cid)
 #define KNH_FLAG_MMF_AFFINE (KNH_FLAG_MMF_ICAST|KNH_FLAG_MMF_SYNONYM|KNH_FLAG_MMF_TOTAL|KNH_FLAG_MMF_CONST)
-#define knh_Object_cid(o)           (o)->h.cid
-#define knh_Object_bcid(o)          (o)->h.bcid
-#define IS_NULL(o)          (((Object*)o)->h.cid == CLASS_Nue)
-#define IS_NOTNULL(o)       (((Object*)o)->h.cid != CLASS_Nue)
-#define IS_TRUE(o)         ((o)->h.bcid == CLASS_Boolean && ((Int*)o)->n.bvalue)
-#define IS_FALSE(o)        ((o)->h.bcid == CLASS_Boolean && (((Int*)o)->n.bvalue == 0))
-#define new_Boolean(ctx, c)    (c) ? KNH_TRUE : KNH_FALSE
-#define BOOL_ISTRUE(o)         (o == KNH_TRUE)
-#define BOOL_ISFALSE(o)        (o == KNH_FALSE)
-#define new_Nue__b(ctx, txt)   new_Nue(ctx, new_String(ctx, txt, NULL));
-#define new_Nue__s(ctx, txt)   new_Nue(ctx, new_String(ctx, B(txt), NULL));
 #define knh_String_value(o)   ((o)->str)
 #define knh_String_tochar(o)  (char*)((o)->str)
 #define knh_String_strlen(o)  (o)->size
@@ -187,11 +181,12 @@ KNHAPI(void) knh_Closure_invokesfp(Ctx *ctx, Closure *c, knh_sfp_t *lsfp, int ar
 KNHAPI(knh_sfp_t*) knh_Closure_invokef(Ctx *ctx, Closure *c, const char *fmt, ...);
 KNHAPI(Exception*) new_Exception(Ctx *ctx, String *msg);
 KNHAPI(Exception*) new_Exception__b(Ctx *ctx, knh_bytes_t msg);
-KNHAPI(void) knh_perrno(Ctx *ctx, char *emsg, char *func, char *file, int line);
+KNHAPI(void) knh_perrno(Ctx *ctx, char *emsg, char *func, char *file, int line, int isThrowable);
+KNHAPI(void) knh_throw_Unsupported(Ctx *ctx, char *func, char *file, int line, int isThrowable);
 KNHAPI(void) knh_throw_OutOfIndex(Ctx *ctx, knh_int_t n, size_t max, char *file, int line);
 KNHAPI(InputStream*) new_InputStream__io(Ctx *ctx, String *urn, knh_io_t fd, knh_iodrv_t *drv);
 KNHAPI(InputStream*) new_InputStream__FILE(Ctx *ctx, String *urn, FILE *fp, knh_iodrv_t *drv);
-KNHAPI(InputStream*) new_FileInputStream(Ctx *ctx, knh_bytes_t file);
+KNHAPI(InputStream*) new_FileInputStream(Ctx *ctx, knh_bytes_t file, int isThrowable);
 KNHAPI(InputStream*) new_BytesInputStream(Ctx *ctx, Bytes *ba, size_t s, size_t e);
 KNHAPI(InputStream*) new_StringInputStream(Ctx *ctx, String *str, size_t s, size_t e);
 KNHAPI(Mapper*) new_Mapper(Ctx *ctx, knh_flag_t flag, knh_class_t scid, knh_class_t tcid, knh_fmapper fmap, Object *mapdata);
@@ -208,7 +203,7 @@ KNHAPI(void) knh_Glue_init(Ctx *ctx, knh_Glue_t *g, void *ptr, knh_fgfree gfree)
 KNHAPI(Object*) new_Glue(Ctx *ctx, char *lname, void *ptr, knh_fgfree gfree);
 KNHAPI(OutputStream*) new_OutputStream__io(Ctx *ctx, String *urn, knh_io_t fd, knh_iodrv_t *drv);
 KNHAPI(OutputStream*) new_OutputStream__FILE(Ctx *ctx, String *urn, FILE *fp, knh_iodrv_t *drv);
-KNHAPI(OutputStream*) new_FileOutputStream(Ctx *ctx, knh_bytes_t file, char *mode);
+KNHAPI(OutputStream*) new_FileOutputStream(Ctx *ctx, knh_bytes_t file, char *mode, int isThrowable);
 KNHAPI(OutputStream*) new_BytesOutputStream(Ctx *ctx, Bytes *ba);
 KNHAPI(void) knh_ResultSet_initColumn(Ctx *ctx, ResultSet *o, size_t column_size);
 KNHAPI(void) knh_ResultSet_setName(Ctx *ctx, ResultSet *o, size_t n, String *name);
@@ -220,7 +215,6 @@ KNHAPI(void) knh_ResultSet_setBlob(Ctx *ctx, ResultSet *o, size_t n, knh_bytes_t
 KNHAPI(void) knh_ResultSet_setNULL(Ctx *ctx, ResultSet *o, size_t n);
 KNHAPI(String*) new_String(Ctx *ctx, knh_bytes_t t, String *orign);
 KNHAPI(knh_bytes_t) knh_String_tobytes(String *o);
-KNHAPI(knh_bytes_t) knh_StringNULL_tobytes(String *o, knh_bytes_t def);
 KNHAPI(void) konoha_addParserDriver(Ctx *ctx, char *alias, knh_parser_drvapi_t *d);
 KNHAPI(void) konoha_setSystemPropertyText(Ctx *ctx, char *key, char *value);
 KNHAPI(void) knh_putc(Ctx *ctx, OutputStream *w, int ch);
@@ -234,15 +228,15 @@ KNHAPI(void) knh_write_BOL(Ctx *ctx, OutputStream *w);
 KNHAPI(void) knh_format(Ctx *ctx, OutputStream *w, knh_methodn_t mn, Object *o, Any *m);
 KNHAPI(void) knh_printf(Ctx *ctx, OutputStream *w, char *fmt, ...);
 KNHAPI(void) konoha_says(Ctx *ctx, int type, char *fmt, ...);
-KNHAPI(FILE*) knh_fopen(Ctx *ctx, char *filename, char *mode);
-KNHAPI(size_t) knh_fgetc(Ctx *ctx, FILE *fp);
+KNHAPI(FILE*) knh_fopen(Ctx *ctx, char *filename, char *mode, int isThrowable);
+KNHAPI(int) knh_fgetc(Ctx *ctx, FILE *fp);
 KNHAPI(size_t) knh_fread(Ctx *ctx, void *ptr, size_t size, FILE *fp);
 KNHAPI(size_t) knh_fwrite(Ctx *ctx, void *ptr, size_t size, FILE *fp);
 KNHAPI(int) knh_fflush(Ctx *ctx, FILE *fp);
 KNHAPI(int) knh_fclose(Ctx *ctx, FILE *fp);
 KNHAPI(void) konoha_addIODriver(Ctx *ctx, char *alias, knh_iodrv_t *d);
 KNHAPI(void) konoha_addRegexDriver(Ctx *ctx, char *alias, knh_regex_drvapi_t *d);
-KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port);
+KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port, int isThrowable);
 KNHAPI(int) knh_socket_send(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz, int flags);
 KNHAPI(int) knh_socket_recv(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz, int flags);
 KNHAPI(int) knh_socket_close(Ctx *ctx, knh_intptr_t sd);

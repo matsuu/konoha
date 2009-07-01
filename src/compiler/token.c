@@ -137,7 +137,7 @@ Token *new_Token__S(Ctx *ctx, Any *fln, knh_token_t tt, String *t)
 
 /* ------------------------------------------------------------------------ */
 
-void knh_Token_tc(Token *o, knh_tokens_t *tc)
+void knh_Token_tc(Ctx *ctx, Token *o, knh_tokens_t *tc)
 {
 	KNH_ASSERT(knh_token_isNested(SP(o)->tt));
 	tc->c = 0;
@@ -271,7 +271,7 @@ void knh_Token__k(Ctx *ctx, Token *o, OutputStream *w, String *m)
 	if(knh_token_isNested(SP(o)->tt)) {
 		int i;
 		knh_tokens_t tc;
-		knh_Token_tc(o, &tc);
+		knh_Token_tc(ctx, o, &tc);
 		if(SP(o)->tt == TT_PARENTHESIS) {
 			knh_write(ctx, w, STEXT("("));
 		}
@@ -376,7 +376,7 @@ void knh_Token__dump(Ctx *ctx, Token *o, OutputStream *w, String *m)
 	if(knh_token_isNested(SP(o)->tt)) {
 		int i;
 		knh_tokens_t tc;
-		knh_Token_tc(o, &tc);
+		knh_Token_tc(ctx, o, &tc);
 		knh_OutputStream_indent_inc(ctx, w);
 		for(i = 0; i < tc.e; i++) {
 			knh_Token__dump(ctx, tc.ts[i], w, m);

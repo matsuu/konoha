@@ -51,7 +51,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		KNH_THROWs(ctx, "Arithmetic!!: Zero Divided"); \
 	}\
 
-#ifndef KONOHA_OS__LKM
+#ifndef KONOHA_ON_LKM
 #define KNH_THROW_fZERODIV(n)  \
 	if(unlikely(n == 0.0)) { \
 		KNH_THROWs(ctx, "Arithmetic!!: Zero Divided"); \
@@ -389,12 +389,12 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 
 #define KLR_ISNULL(ctx, n) \
 	if(unlikely(IS_NULL(sfp[n].o))) { \
-		knh_throwException(ctx, new_Exception__Nue(ctx, sfp[n].o), _HERE_); \
+		knh_throwException(ctx, new_NullException (ctx, sfp[n].o), _HERE_); \
 	} \
 
 #define KLR_ISNULLx(ctx, n) \
 	if(unlikely(IS_NULL(SFX(n)))) { \
-		knh_throwException(ctx, new_Exception__Nue(ctx, SFX(n)), _HERE_); \
+		knh_throwException(ctx, new_NullException (ctx, SFX(n)), _HERE_); \
 	} \
 
 #define KLR_ISTYPE(ctx, n, cid) \
@@ -413,7 +413,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 
 #define JIT_ISNULLx(ctx, a, x) \
 	if(unlikely(IS_NULL(JITSFX(a, x)))) { \
-		knh_throwException(ctx, new_Exception__Nue(ctx, JITSFX(a, x)), _HERE_); \
+		knh_throwException(ctx, new_NullException (ctx, JITSFX(a, x)), _HERE_); \
 	} \
 
 /* ======================================================================== */
@@ -606,16 +606,9 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 
 #define KLR_AMAP(ctx, n, tcid)  { \
 		knh_class_t scid = knh_Object_cid(sfp[n].o);\
-		if(scid != ((knh_class_t)tcid) && !knh_class_instanceof(ctx, scid, tcid) && scid != CLASS_Nue) { \
+		if(scid != ((knh_class_t)tcid) && !knh_class_instanceof(ctx, scid, tcid) && IS_NOTNULL(sfp[n].o)) { \
 			KLR_MOV(ctx, sfp[n+1].o, konoha_findMapper(ctx, scid, tcid)); \
 			(sfp[n+1].mpr)->fmap_1(ctx, sfp + n); \
-		} \
-	} \
-
-#define KLR_DCAST(ctx, n, tcid)  { \
-		knh_class_t scid = knh_Object_cid(sfp[n].o);\
-		if(scid != ((knh_class_t)tcid) && !knh_class_instanceof(ctx, scid, tcid) && scid != CLASS_Nue) { \
-			KNH_THROWs(ctx, "ClassCast!!"); \
 		} \
 	} \
 

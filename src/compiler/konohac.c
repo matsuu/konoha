@@ -248,7 +248,7 @@ static
 int knh_StmtIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 {
 	String *fname = (String*)DP(StmtIMPORT_file(stmt))->data;
-	char bufp[FILENAME_BUFSIZ], buff[FILENAME_BUFSIZ];
+	char bufp[FILEPATH_BUFSIZ], buff[FILEPATH_BUFSIZ];
 
 	String *cfname = konoha_getFileName(ctx, SP(stmt)->fileid);
 	KNH_ASSERT(IS_String(fname));
@@ -776,7 +776,7 @@ int knh_NameSpace_loadScript(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isE
 	}
 	knh_NameSpace_loaded(ctx, ns, fileid);
 	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
-	InputStream *in = new_FileInputStream(ctx, fpath);
+	InputStream *in = new_FileInputStream(ctx, fpath, 1);
 	KNH_LPUSH(ctx, in);
 	DP(in)->fileid = fileid;
 	knh_InputStream_setEncoding(ctx, in, knh_systemEncoding);

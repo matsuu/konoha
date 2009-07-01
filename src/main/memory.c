@@ -57,7 +57,7 @@ static int canFree = 1;
 
 void *knh_malloc(Ctx *ctx, size_t size)
 {
-#ifdef KONOHA_OS__TB
+#ifdef KONOHA_ON_TB
 	if(size == 0) size=4;
 #endif
 	void *block = malloc(size);

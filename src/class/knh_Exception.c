@@ -29,7 +29,7 @@
 
 #include"commons.h"
 
-#ifdef KONOHA_OS__LKM
+#ifdef KONOHA_ON_LKM
 #include<linux/errno.h>
 static int errno;
 #else
@@ -260,28 +260,20 @@ KNHAPI(Exception*) new_Exception__b(Ctx *ctx, knh_bytes_t msg)
 
 /* ------------------------------------------------------------------------ */
 
-Exception* new_Exception__Nue(Ctx *ctx, Object *o)
+Exception* new_NullException (Ctx *ctx, Object *o)
 {
-	knh_Exception_t* e = (knh_Exception_t*)new_Object_bcid(ctx, CLASS_Exception, 0);
-	Nue *nue = (Nue*)o;
-	if(IS_NOTNULL(o) || nue->orign != NULL) {
-		knh_Exception_new__init(ctx, e, (String*)nue->orign, (String*)KNH_NULL, (Object*)KNH_NULL);
-	}
-	else {
-		knh_Exception_new__init(ctx, e, new_String(ctx, B((char*)nue->str), NULL), (String*)KNH_NULL, (Object*)KNH_NULL);
-	}
-	return e;
+	return new_Exception__b(ctx, STEXT("Null!!"));
 }
 
 /* ------------------------------------------------------------------------ */
 
-#define _KNH_PERRNO(ctx, emsg, func) { \
-		knh_perrno(ctx, emsg, func, __FILE__, __LINE__); \
+#define _KNH_PERRNO(ctx, emsg, func, isThrowable) { \
+		knh_perrno(ctx, emsg, func, __FILE__, __LINE__, isThrowable); \
 	}\
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) knh_perrno(Ctx *ctx, char *emsg, char *func, char *file, int line)
+KNHAPI(void) knh_perrno(Ctx *ctx, char *emsg, char *func, char *file, int line, int isThrowable)
 {
 	if(emsg == NULL) emsg = "Exception!!";
 	if(errno == 13) {
@@ -293,13 +285,33 @@ KNHAPI(void) knh_perrno(Ctx *ctx, char *emsg, char *func, char *file, int line)
 #else
 	char *emsg2 = strerror(errno);
 #endif
-	if(((ctx)->flag & KNH_FLAG_CTXF_STRICT) != KNH_FLAG_CTXF_STRICT) {
+	if(isThrowable) {
 		char buf[256];
 		knh_snprintf(buf, sizeof(buf), "%s: func=%s, errno=%d: %s", emsg, func, errno, emsg2);
 		knh_throwException(ctx, new_Exception__b(ctx, B(buf)), KNH_SAFEFILE(file), line);
 	}
 	else {
 		KNH_NOTICE(ctx, "%s() says errno=%d: %s", func, errno, emsg2);
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+#define _KNH_NOAPI(ctx, isThrowable) { \
+		knh_throw_Unsupported(ctx, __FUNCTION__, __FILE__, __LINE__, isThrowable); \
+	}\
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(void) knh_throw_Unsupported(Ctx *ctx, char *func, char *file, int line, int isThrowable)
+{
+	if(isThrowable) {
+		char buf[256];
+		knh_snprintf(buf, sizeof(buf), "Unsupported!!: func=%s", func);
+		knh_throwException(ctx, new_Exception__b(ctx, B(buf)), KNH_SAFEFILE(file), line);
+	}
+	else {
+		KNH_NOTICE(ctx, "unsupported: %s", func);
 	}
 }
 

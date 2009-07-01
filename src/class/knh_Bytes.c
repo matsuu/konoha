@@ -99,32 +99,6 @@ KNHAPI(knh_bytes_t) knh_Bytes_tobytes(Bytes *o)
 
 /* ------------------------------------------------------------------------ */
 
-knh_bytes_t knh_BytesNULL_tobytes(Bytes *o)
-{
-	if(IS_NULL(o)) {
-		knh_bytes_t v = {(knh_uchar_t*)"", 0};
-		return v;
-	}
-	else {
-		knh_bytes_t v = {o->buf, o->size};
-		return v;
-	}
-}
-
-/* ------------------------------------------------------------------------ */
-
-char *knh_BytesNULL_tochar(Bytes *o)
-{
-	if(IS_NULL(o)) {
-		return "";
-	}
-	else {
-		return (char*)o->buf;
-	}
-}
-
-/* ------------------------------------------------------------------------ */
-
 KNHAPI(void) knh_Bytes_clear(Bytes *o, size_t pos)
 {
 	if(pos < o->size) {
