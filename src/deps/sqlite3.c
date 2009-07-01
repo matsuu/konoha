@@ -251,7 +251,7 @@ static knh_db_drvapi_t DB__sqlite3 = {
 /* ======================================================================== */
 /* [drivers] */
 
-knh_db_drvapi_t *knh_System_getDefaultDBDriver()
+knh_db_drvapi_t *knh_System_getDefaultDBDriver(void)
 {
 	return &DB__NOP;
 }

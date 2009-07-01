@@ -42,15 +42,13 @@ typedef long jmp_buf ;
 typedef intptr_t FILE;
 
 #define TODO_LKM
-// how to treat debug and assert,exit
 /*
-#undef KNH_ASSERT
-#define KNH_ASSERT(c) 
 #undef  DBG_
 #define DBG_(stmt)
 #undef  DBG_P
 #define DBG_P(fmt, ...) 
 */
+
 #define getenv(a) NULL
 #define stdin  ((FILE*)NULL)
 #define stdout KERN_INFO
@@ -67,8 +65,8 @@ typedef intptr_t FILE;
 #define exit(i)  printk(KERN_EMERG "KONOHA_exit!!!")
 #define setjmp(j) 0
 #define longjmp(a,b)
-#define assert(x) 
-#define abort() 
+#define assert(x) WARN_ON(x)
+#define abort() WARN_ON(1)
 
 /* ../../src/ext/qsort.c */
 void qsort(void* base,size_t total,size_t size, int (*comp)(const void*,const void*));

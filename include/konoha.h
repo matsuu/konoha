@@ -29,7 +29,7 @@
 #define LIBKONOHA
 
 #define KNHAPI_IMPORTS 1
-#include "konoha/konoha_dev.h"
+#include <konoha/konoha_dev.h>
 
 #undef KNH_SETv
 #undef KNH_FINALv
