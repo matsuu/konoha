@@ -2,7 +2,7 @@
 #define KONOHA_DEPS_H_
 #include<konoha/konoha_t.h>
 
-#ifndef KONOHA_ON_LKM
+#ifdef KNH_USING_STDC
 #include<stdlib.h>
 #include<string.h>
 #endif
@@ -11,8 +11,7 @@
 /* [UNIX] */
 
 #ifdef KONOHA_ON_UNKNOWN
-	#define KNH_USING_POSIX 1
-	#define KNH_USING_UNIX  1
+	#define KNH_USING_STDC  1
 	#define KONOHA_OS_ENCODING "UTF-8"
 	#define KONOHA_OS_LINEFEED "\n"
 	#define KONOHA_OS_DLLEXT   ".so"
