@@ -173,7 +173,7 @@ static METHOD knh__System_unlink(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Boolean! System.rename(String oldname, String newname); */
+/* @method Boolean! System.rename(String oldname, String newname) */
 
 static METHOD knh__System_rename(Ctx *ctx, knh_sfp_t *sfp)
 {

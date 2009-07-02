@@ -102,7 +102,8 @@ static void konoha_addConstData(Ctx *ctx, char *dname, Object *value)
 KNHAPI(void) konoha_loadIntConstData(Ctx *ctx, knh_IntConstData_t *data)
 {
 	while(data->name != NULL) {
-		konoha_addConstData(ctx, data->name, UP(new_Int(ctx, data->ivalue)));
+		Object *value = UP(new_Int(ctx, data->ivalue));
+		konoha_addConstData(ctx, data->name, value);
 		data++;
 	}
 }
@@ -676,9 +677,7 @@ NameSpace *knh_System_getNameSpace(Ctx *ctx, knh_bytes_t name)
 	}
 }
 
-
 /* ------------------------------------------------------------------------ */
-
 
 #ifdef __cplusplus
 }
