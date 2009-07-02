@@ -382,7 +382,7 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 	for(i = 0; i < 10; i++) {
 		switch(args[i].atype) {
 		case VA_INT:
-			args[i].ivalue = (knh_intptr_t)va_arg(ap, knh_intptr_t);
+			args[i].ivalue = (knh_int_t)va_arg(ap, knh_int_t);
 			break;
 #ifndef KONOHA_ON_LKM
 		case VA_FLOAT:
