@@ -453,7 +453,7 @@ void knh_ClassMap_add(Ctx *ctx, ClassMap *o, Mapper *map)
 
 void knh_ClassMap__dump(Ctx *ctx, ClassMap *o, OutputStream *w, String *m)
 {
-	int i;
+	size_t i;
 	for(i = 0; i < DP(o)->size; i++) {
 		knh_printf(ctx, w, "[%d]\t", i);
 		knh_Mapper__k(ctx, DP(o)->maplist[i], w, m);
@@ -465,9 +465,6 @@ void knh_ClassMap__dump(Ctx *ctx, ClassMap *o, OutputStream *w, String *m)
 
 void knh_ClassMap__man(Ctx *ctx, ClassMap *o, OutputStream *w, knh_class_t cid)
 {
-//	if(knh_ClassMap_isDefault(o)) {
-//		return;
-//	}
 	int i;
 	int hasCaption = 0, from = 0;
 	L_TAIL:;

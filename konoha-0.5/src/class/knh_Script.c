@@ -158,7 +158,7 @@ void knh_Script__k(Ctx *ctx, Script *o, OutputStream *w, String *m)
 
 void knh_Script__dump(Ctx *ctx, Script *o, OutputStream *w, String *m)
 {
-	int i;
+	size_t i;
 	for(i = 0; i < KNH_SCRIPT_FIELDSIZE; i++) {
 		knh_cfield_t *cf = knh_Class_fieldAt(ctx, knh_Object_cid(o), i);
 		if(cf == NULL) break;

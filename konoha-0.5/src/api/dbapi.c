@@ -239,7 +239,7 @@ static void knh_ResultSet__dump(Ctx *ctx, ResultSet *o, OutputStream *w, String 
 			knh_write_delim(ctx,w);
 		}
 		knh_write(ctx, w, knh_String_tobytes(DP(o)->column[n].name));
-		knh_printf(ctx, w, "(%d): ", (int)n);
+		knh_printf(ctx, w, "(%d): ", (knh_int_t)n);
 		char *p = knh_Bytes_tochar(DP(o)->databuf) + DP(o)->column[n].start;
 		switch(DP(o)->column[n].ctype) {
 			case knh_ResultSet_CTYPE__null :

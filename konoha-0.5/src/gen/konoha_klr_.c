@@ -2665,8 +2665,8 @@ void knh_code_traverse(Ctx *ctx, knh_code_t *pc, knh_ftraverse ftr)
 #define knh_write__integer(ctx, w, a) knh_write_integerfmt(ctx, w, KNH_INT_FMT, a)
 #define knh_write__intptr(ctx, w, a)  knh_write__i(ctx, w, a)
 #define knh_write__OBJ(ctx, w, a)  knh_format(ctx, w, METHODN__k, a, KNH_NULL)
-#define knh_write__sfi(ctx, w, a)  knh_printf(ctx, w, "sfp[%d]", (int)a);
-#define knh_write__sfx(ctx, w, a)  knh_printf(ctx, w, "sfp[%d]+%d", (int)a.i, (int)a.n)
+#define knh_write__sfi(ctx, w, a)  knh_printf(ctx, w, "sfp[%d]", (knh_int_t)a);
+#define knh_write__sfx(ctx, w, a)  knh_printf(ctx, w, "sfp[%d]+%d", (knh_int_t)a.i, (knh_int_t)a.n)
 #define knh_write__ushort(ctx, w, a)    knh_write__i(ctx, w, (knh_int_t)a)
 #define knh_write__mn(ctx, w, a)    knh_write_mn(ctx, w, (knh_methodn_t)a)
 #define knh_write__type(ctx, w, a)    knh_write_type(ctx, w, (knh_type_t)a)
@@ -2680,9 +2680,9 @@ void KNH_DUMP_OPCODE(Ctx *ctx, knh_code_t *pc, OutputStream *w, Method *mtd, cha
 		line = knh_Method_pctoline(mtd, pc);
 	}
 	if(line == 0) {
-		knh_printf(ctx, w, " [%p] %s(%d)", pc, name, op->opcode);
+		knh_printf(ctx, w, " [%p] %s(%d)", pc, name, (knh_int_t)op->opcode);
 	}else{
-		knh_printf(ctx, w, " [%d:%p] %s(%d)", line, pc, name, op->opcode);
+		knh_printf(ctx, w, " [%d:%p] %s(%d)", line, pc, name, (knh_int_t)op->opcode);
 	}
 }
 

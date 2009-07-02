@@ -752,8 +752,8 @@ typedef struct knh_Exception {
 	knh_String_t* message;
 	Object* bag;
 	knh_Array_t* traces;
-	char* file;
-	int line;
+	char*     file;
+	size_t    line;
 } knh_Exception_struct;
 
 /* ------------------------------------------------------------------------ */

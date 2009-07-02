@@ -347,7 +347,7 @@ static METHOD knh__HashMap_opItr(Ctx *ctx, knh_sfp_t *sfp)
 ////				break;
 ////			}
 ////			knh_Object__dump(ctx, cur->h.keyobj, w, lv+1);
-////			if(cur->value != 1) knh_printf(ctx, w, "<%d>", cur->value);
+////			if(cur->value != 1) knh_printf(ctx, w, "<%d>", (knh_int_t)cur->value);
 ////			c++;
 ////			cur = next;
 ////		}

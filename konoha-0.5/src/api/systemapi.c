@@ -389,7 +389,7 @@ void knh_Exception__dump(Ctx *ctx, Exception *o, OutputStream *w, String *m)
 void knh_System__k(Ctx *ctx, System *o, OutputStream *w, String *m)
 {
 	knh_printf(ctx, w, "Konoha %s(%s) %s (#%d, %s, %s)",
-		KONOHA_VERSION, KONOHA_XCODE, KONOHA_LICENSE, KONOHA_BUILDID, __DATE__, __TIME__);
+		KONOHA_VERSION, KONOHA_XCODE, KONOHA_LICENSE, (knh_int_t)KONOHA_BUILDID, __DATE__, __TIME__);
 }
 
 
@@ -413,15 +413,15 @@ void knh_System__dump(Ctx *ctx, System *o, OutputStream *w, String *m)
 #ifdef KNH_USING_INT32
 	knh_write__s(ctx, w, " int32");
 #endif
-#ifdef KNH_USING_MATH
-	knh_write__s(ctx, w, " math");
+#ifdef KNH_USING_RCGC
+	knh_write__s(ctx, w, " refc");
 #endif
 	knh_write_USING_SQLITE3(ctx, w);
 #ifdef KNH_USING_THREAD
 	knh_write__s(ctx, w, " thread");
 #endif
 	knh_write_USING_REGEX(ctx, w);
-	knh_printf(ctx, w, " used_memory:%d kb", (int)ctx->stat->usedMemorySize / 1024);
+	knh_printf(ctx, w, " used_memory:%d kb", (knh_int_t)(ctx->stat->usedMemorySize / 1024));
 	knh_write_EOL(ctx, w);
 }
 
