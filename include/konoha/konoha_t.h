@@ -28,7 +28,9 @@
 #ifndef KONOHA_T_H_
 #define KONOHA_T_H_
 
-#ifndef KONOHA_ON_LKM
+#include"konoha_config.h"
+
+#ifdef KNH_USING_STDC
 #include<stdio.h>
 #include<limits.h>
 #include<float.h>
@@ -39,8 +41,6 @@
 #define __STDC_FORMAT_MACROS
 #include<inttypes.h>
 #endif
-
-#include"konoha_config.h"
 
 #if defined(KNH_USING_PTHREAD)
 	#include<pthread.h>

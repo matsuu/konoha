@@ -106,6 +106,14 @@
 #define KONOHA_OS "teaboard"
 #endif
 
+#define KNH_USING_STDC   1
+
+#ifdef KONOHA_ON_LKM
+	#undef KNH_USING_STDC
+	#define KONOHA_OS "LKM"
+#endif
+
+
 /* ======================================================================== */
 /* [CC] */
 /* cpp -dM /dev/null */
@@ -113,7 +121,7 @@
 #ifdef __GNUC__
 	#define KONOHA_CC_VERSION "GCC " __VERSION__
 	#ifdef __i386__
-                #if defined(KONOHA_ON_LKM)
+		#if defined(KONOHA_ON_LKM)
                 #if (LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,25))
                 #define KNH_CC_FASTCALL   fastcall
                 #else
@@ -190,7 +198,6 @@
 #else
 #define KONOHA_PLATFORM KONOHA_OS "_32"
 #endif
-
 
 /* ======================================================================== */
 /* [OPTIONS_DEPS] */
