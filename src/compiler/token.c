@@ -366,7 +366,7 @@ void knh_Token__dump(Ctx *ctx, Token *o, OutputStream *w, String *m)
 {
 	KNH_ASSERT(IS_Token(o));
 	knh_OutputStream_write_indent(ctx, w);
-	knh_printf(ctx, w, "%s[%d]", knh_token_tochar(SP(o)->tt), (int)SP(o)->line);
+	knh_printf(ctx, w, "%s[%d]", knh_token_tochar(SP(o)->tt), (knh_int_t)SP(o)->line);
 	knh_putc(ctx, w, ' ');
 	knh_Token__s(ctx, o, w, m);
 	knh_printf(ctx, w, " (>>%s) ", knh_token_tochar(DP(o)->tt_next));
