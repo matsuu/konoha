@@ -389,7 +389,7 @@ void knh_Exception__dump(Ctx *ctx, Exception *o, OutputStream *w, String *m)
 void knh_System__k(Ctx *ctx, System *o, OutputStream *w, String *m)
 {
 	knh_printf(ctx, w, "Konoha %s(%s) %s (#%d, %s, %s)",
-		KONOHA_VERSION, KONOHA_XCODE, KONOHA_LICENSE, (knh_int_t)KONOHA_BUILDID, __DATE__, __TIME__);
+		KONOHA_VERSION, KONOHA_XCODE, KONOHA_LICENSE, (knh_intptr_t)KONOHA_BUILDID, __DATE__, __TIME__);
 }
 
 
