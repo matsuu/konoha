@@ -725,7 +725,7 @@ static Token *knh_tokens_findIDXNULL(knh_tokens_t *tc)
 	int i;
 	for(i = tc->c; i < tc->e; i++) {
 		knh_token_t tt = SP(tc->ts[i])->tt;
-		KNH_ASSERT(!knh_Token_isBOL(tc->ts[i]));
+		//KNH_ASSERT(!knh_Token_isBOL(tc->ts[i]));
 		if(tt == TT_SUBSETE || tt == TT_OFFSET || tt == TT_SUBSET) {
 			return tc->ts[i];
 		}
@@ -766,22 +766,12 @@ void knh_Stmt_add_IDX(Ctx *ctx, Stmt *stmt, Token *tkb, int lr)
 		knh_Stmt_add(ctx, stmt, TM(new_TokenMN(ctx, FL(tkb), METHODN_get)));
 		knh_Stmt_swap01(stmt);
 		knh_Stmt_add_EXPRs(ctx, stmt, &tc);
-#ifdef METHODN_set2D
+#if defined(METHODN_set2D)
 		if(DP(stmt)->size == 4) {
-//			if(lr == KNH_LVALUE) {
-//				DP(DP(stmt)->tokens[0])->mn = METHODN_set2D;
-//			}
-//			else{
 			DP(DP(stmt)->tokens[0])->mn = METHODN_get2D;
-//			}
 		}
 		else if(DP(stmt)->size == 5){
-////			if(lr == KNH_LVALUE) {
-////				DP(DP(stmt)->tokens[0])->mn = METHODN_set3D;
-////			}
-//			else{
 			DP(DP(stmt)->tokens[0])->mn = METHODN_get3D;
-//			}
 		}
 #endif
 	}
@@ -1047,7 +1037,6 @@ Term *new_TermVALUE(Ctx *ctx, Token *tk, int lr)
 		case TT_ERR:
 			return TM(tk);
 	}
-	//DBG2_P("unexpected value: (tt=%s) %s", knh_token_tochar(SP(tk)->tt), sToken(tk));
 	knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown token"), sToken(tk));
 	return TM(tk);
 }
@@ -1386,51 +1375,6 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int lr)
 		if(idx != -1) {
 			return TM(new_StmtOPR(ctx, tc, ts[idx]));
 		}
-//		if(idx != -1) {
-//			if(knh_token_getOpSize(SP(ts[idx])->tt) == 2) {
-//				if(tc->c < idx && idx+1 < tc->e) {
-//					Stmt *stmt = new_Stmt(ctx, 0, STT_OP);
-//					knh_Stmt_add(ctx, stmt, TM(ts[idx]));
-//					knh_tokens_t expr_tc = *tc;
-//					expr_tc.e = idx;
-//					knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &expr_tc, KNH_RVALUE));
-//					expr_tc = *tc;
-//					expr_tc.c = idx+1;
-//					knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &expr_tc, KNH_RVALUE));
-//					return TM(stmt);
-//				}
-//				else {
-//					knh_Token_perror(ctx, ts[idx], KERR_ERROR, _("unknown")OP2);
-//					SP(ts[idx])->tt = TT_ERR; return TM(ts[idx]);
-//				}
-//			}
-//			else if(knh_token_getOpSize(SP(ts[idx])->tt) == 1) {
-//				if(SP(ts[idx])->tt == TT_NEXT || SP(ts[idx])->tt == TT_PREV) {
-//					return TM(new_StmtOPR(ctx, tc, ts[idx]));
-//				}
-//				else if(tc->c == idx) {
-//					Stmt *stmt = new_Stmt(ctx, KNH_FLAG_STMTF_ADPOSITION, STT_OP);
-//					knh_Stmt_add(ctx, stmt, TM(ts[idx]));
-//					tc->c = idx + 1;
-//					knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, tc, KNH_RVALUE));
-//					return TM(stmt);
-//				}
-//				else if(idx == tc->e - 1) {
-//					Stmt *stmt = new_Stmt(ctx, 0, STT_OP);
-//					knh_Stmt_add(ctx, stmt, TM(ts[idx]));
-//					tc->e = idx;
-//					knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, tc, KNH_RVALUE));
-//					return TM(stmt);
-//				}
-//				else {
-//					knh_Token_perror(ctx, ts[idx], KERR_ERROR, _("unknown")OP1);
-//					SP(ts[idx])->tt = TT_ERR; return TM(ts[idx]);
-//				}
-//			}
-//			else {
-//				return TM(new_StmtOPR(ctx, tc, ts[idx]));
-//			}
-//		}
 	}
 
 	/* cast operator (C)a */ {
