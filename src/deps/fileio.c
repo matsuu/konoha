@@ -32,7 +32,7 @@
 #ifdef KONOHA_ON_LKM
 #undef KNH_USING_POSIX
 #endif
-
+#define KNH_USING_POSIX
 #define KNH_USING_NOAPI 1
 
 /* ************************************************************************ */

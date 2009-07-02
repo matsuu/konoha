@@ -1,14 +1,13 @@
-# ソースの依存関係ファイル (自動生成)
+
 DEPS = Dependencies
 DEPENDENCIES_OUTPUT := $(DEPS)
 
-# 標準ルール
 include $(BD)/bappl/etc/makerules
 
 VPATH = "./ $(shell find ../ -type d) ./"
 
 # knh_os__tb -> konoha_on_tb , +LIBKONOHA
-CFLAGS += -O2 -Wall -fmessage-length=0 -I$(BD)/include -I./support/include -I"../include" -DKONOHA_ON_TB -DKONOHA_MONOLITHIC
+CFLAGS += -O0 -Wall -fmessage-length=0 -I$(BD)/include -I./support/include -I"../include" -DKONOHA_ON_TB -DKONOHA_MONOLITHIC
 #LDLIBS = -m
 
 program = konoha
@@ -95,7 +94,7 @@ dist:
 clean:
 	$(RM) $(objs) $(program) $(program).out $(program).map $(library).a konoha.o $(program).trg
 
-# ソースの依存関係
+
 ifdef DEPENDENCIES_OUTPUT
   $(DEPS): ; touch $(DEPS)
 else
