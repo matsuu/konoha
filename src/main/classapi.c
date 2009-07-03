@@ -593,7 +593,6 @@ void knh_Tuple2_traverse(Ctx *ctx, knh_Tuple2_t *t, knh_ftraverse ftr)
 #define knh_Array_traverse_ NULL
 #define knh_Array_compareTo NULL
 #define knh_Array_hashCode NULL
-#define knh_Array_newClass NULL
 #define knh_Array_getkey NULL
 
 /* ------------------------------------------------------------------------ */
@@ -629,6 +628,23 @@ void knh_Array_traverse(Ctx *ctx, knh_Array_t *a, knh_ftraverse ftr)
 		a->size = 0;
 		a->capacity = 0;
 	}
+}
+
+
+
+/* ------------------------------------------------------------------------ */
+
+#define KNH_FLAG_MMF_ITERATION (KNH_FLAG_MMF_SYNONYM|KNH_FLAG_MMF_TOTAL)
+
+static
+void knh_Array_newClass(Ctx *ctx, knh_class_t cid)
+{
+	KNH_ASSERT_cid(cid);
+	knh_class_t p1 = ctx->share->ClassTable[cid].p1;
+	knh_class_t icid = knh_class_Iterator(ctx, p1);
+	DBG2_P("********* %s, %s", CLASSN(p1), CLASSN(icid));
+	konoha_addMapperFunc(ctx, KNH_FLAG_MMF_ITERATION, cid, icid, knh_Array_Iterator, KNH_NULL);
+	konoha_addMapperFunc(ctx, KNH_FLAG_MMF_ITERATION, icid, cid, knh_Iterator_Array, KNH_NULL);
 }
 
 /* ======================================================================== */

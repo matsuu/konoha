@@ -359,8 +359,8 @@ konoha_addClosureClass(Ctx *ctx, knh_class_t cid, String *name, knh_type_t r0, k
 {
 	if(cid == CLASS_newid) {
 		cid = knh_ClassTable_newId(ctx);
-	}else {
-		KNH_ASSERT(cid + 1 == ctx->share->ClassTableSize);
+	} else {
+		//KNH_ASSERT(cid + 1 == ctx->share->ClassTableSize);
 		ctx->share->ClassTableSize = cid;
 	}
 	knh_ClassTable_t *TC = (knh_ClassTable_t*)(&ctx->share->ClassTable[cid]);
