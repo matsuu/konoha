@@ -303,7 +303,7 @@ KNHAPI(void) knh_perrno(Ctx *ctx, char *emsg, char *func, char *file, int line, 
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) knh_throw_Unsupported(Ctx *ctx, char *func, char *file, int line, int isThrowable)
+KNHAPI(void) knh_throw_Unsupported(Ctx *ctx,const char *func, char *file, int line, int isThrowable)
 {
 	if(isThrowable) {
 		char buf[256];

@@ -389,7 +389,7 @@ void knh_Exception__dump(Ctx *ctx, Exception *o, OutputStream *w, String *m)
 void knh_System__k(Ctx *ctx, System *o, OutputStream *w, String *m)
 {
 	knh_printf(ctx, w, "Konoha %s(%s) %s (#%d, %s, %s)",
-		KONOHA_VERSION, KONOHA_XCODE, KONOHA_LICENSE, ((knh_intptr_t)KONOHA_BUILDID), __DATE__, __TIME__);
+		KONOHA_VERSION, KONOHA_XCODE, KONOHA_LICENSE, ((knh_int_t)KONOHA_BUILDID), __DATE__, __TIME__);
 }
 
 
@@ -400,7 +400,7 @@ void knh_System__dump(Ctx *ctx, System *o, OutputStream *w, String *m)
 {
 	knh_System__k(ctx, o, w, m);
 	knh_write_EOL(ctx, w);
-	knh_printf(ctx, w, "[%s] on %s (%d, %s)\n", KONOHA_CC_VERSION, KONOHA_PLATFORM, sizeof(void*) * 8, konoha_encoding());
+	knh_printf(ctx, w, "[%s] on %s (%d, %s)\n", KONOHA_CC_VERSION, KONOHA_PLATFORM, (knh_int_t)(sizeof(void*) * 8), konoha_encoding());
 	knh_write__s(ctx, w, "Options:");
 
 #ifdef KNH_FASTMODE

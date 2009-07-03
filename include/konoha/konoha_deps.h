@@ -68,6 +68,10 @@
 #undef KNH_USING_THREAD
 #undef KNH_USING_READLINE
 
+#define KONOHA_OS_ENCODING "UTF-8"
+#define KONOHA_OS_LINEFEED "\n"
+#define KONOHA_OS_DLLEXT   ""
+
 #endif
 
 /* ======================================================================== */
