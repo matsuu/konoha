@@ -135,7 +135,7 @@ void knh_sfp_typecheck(Ctx *ctx, knh_sfp_t *sfp, Method *mtd, knh_code_t *pc)
 	L_THROWERR:
 	{
 		knh_cwb_t cwb = new_cwb(ctx);
-		knh_printf(ctx, cwb.w, emsg, (knh_int_t)i, DP(mtd)->mn);
+		knh_printf(ctx, cwb.w, emsg, (knh_intptr_t)i, DP(mtd)->mn);
 		String *s = new_String__cwb(ctx, cwb);
 		knh_throw(ctx, (Object*)s, knh_Method_file(ctx, sfp[-1].mtd), knh_Method_pctoline(sfp[-1].mtd, pc));
 	}
