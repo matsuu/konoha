@@ -47,8 +47,14 @@ VERBOSE=0
 default:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules KBUILD_VERBOSE=$(VERBOSE)
 
-install:
-	sh ./loader
+install-lkm:
+	/sbin/insmod ./konohadev.ko  || exit 1
+
+install:install-lkm
+	rm -f /dev/konoha
+	mmknod /dev/konoha c $(shell awk "\$$2==\"konohadev\" {print \$$1}" /proc/devices) 0
+	chgrp wheel /dev/konoha
+	chmod 666   /dev/konoha
 
 uninstall:
 	/sbin/rmmod konohadev

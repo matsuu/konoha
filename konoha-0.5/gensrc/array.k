@@ -4,13 +4,8 @@
    Not surport Int[],Float[] but Number[]
 */
 void Array.addAll(String[] list){
-    /*
     foreach(String l in list){
         this.add(l);
-    }
-    */
-    for(i=0;i<|list|;i++){
-        this.add(list[i]);
     }
 }
 

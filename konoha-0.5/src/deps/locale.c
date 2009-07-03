@@ -66,7 +66,7 @@ static char *locale_charset(void)
 
 /* ------------------------------------------------------------------------ */
 
-char *konoha_encoding()
+char *konoha_encoding(void)
 {
 #if defined(KONOHA_OS_ENCODING)
 	return KONOHA_OS_ENCODING;

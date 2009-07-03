@@ -524,7 +524,7 @@ knh_boolean_t knh_unlink(Ctx *ctx, knh_bytes_t f, int isThrowable);
 knh_boolean_t knh_rename(Ctx *ctx, knh_bytes_t on, knh_bytes_t nn, int isThrowable);
 char *knh_format_homepath(char *buf, size_t bufsiz);
 /* ../src/deps/locale.c */
-char *konoha_encoding();
+char *konoha_encoding(void);
 char *knh_format_lang(char *buf, size_t bufsiz);
 /* ../src/deps/regex.c */
 void knh_write_USING_REGEX(Ctx *ctx, OutputStream *w);
@@ -605,7 +605,7 @@ void knh_Object_mark1(Ctx *ctx, Object *o);
 METHOD knh__System_gc(Ctx *ctx, knh_sfp_t *sfp);
 void knh_System_gc(Ctx *ctx);
 void knh_Object_RCsweep(Ctx *ctx, Object *o);
-knh_ftraverse konoha_getDefaultSweepFunc();
+knh_ftraverse konoha_getDefaultSweepFunc(void);
 /* ../src/main/stack.c */
 int knh_sfp_argc(Ctx *ctx, knh_sfp_t *v);
 METHOD knh__System_stackdump(Ctx *ctx, knh_sfp_t *sfp);
