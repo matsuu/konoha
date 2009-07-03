@@ -37,9 +37,9 @@ int main(String[] args)
     o << """
 KDIR  := /lib/modules/$(shell uname -r)/build
 PWD   := $(shell pwd)
-KBUILD_CFLAGS += -DKONOHA_OS__LKM
+KBUILD_CFLAGS += -DKONOHA_ON_LKM
 KBUILD_CFLAGS += -Wno-declaration-after-statement
-VERBOSE=1
+VERBOSE=0
 """;
     o.println(%("KBUILD_CFLAGS += -I%s{0}/include/",$env.PWD));
 
@@ -47,8 +47,14 @@ VERBOSE=1
 default:
 	$(MAKE) -C $(KDIR) SUBDIRS=$(PWD) modules KBUILD_VERBOSE=$(VERBOSE)
 
-install:
-	sh ./loader
+install-lkm:
+	/sbin/insmod ./konohadev.ko  || exit 1
+
+install:install-lkm
+	rm -f /dev/konoha
+	mmknod /dev/konoha c $(shell awk "\$$2==\"konohadev\" {print \$$1}" /proc/devices) 0
+	chgrp wheel /dev/konoha
+	chmod 666   /dev/konoha
 
 uninstall:
 	/sbin/rmmod konohadev
