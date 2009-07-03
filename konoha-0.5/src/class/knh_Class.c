@@ -64,12 +64,13 @@ knh_class_t knh_ClassTable_newId(Ctx *ctx)
 	if(ctx->share->StructTableSize < ctx->share->ClassTableSize) {
 		ctx->share->ClassTableSize--;
 		newid = ctx->share->ClassTableSize;
-		KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-		return newid;
+	}
+	else {
+		newid = CLASS_unknown;
+		KNH_EXIT("Enlarge KNH_TCLASS_SIZE %d", KNH_TCLASS_SIZE);
 	}
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-	KNH_EXIT("Enlarge KNH_TCLASS_SIZE %d", KNH_TCLASS_SIZE);
-	return CLASS_unknown;
+	return newid;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -233,7 +234,7 @@ konoha_addGenericsClass(Ctx *ctx, knh_class_t cid, String *name, knh_class_t bci
 	if(cid == CLASS_newid) {
 		cid = knh_ClassTable_newId(ctx);
 	}else {
-		KNH_ASSERT(cid + 1 == ctx->share->ClassTableSize);
+		//KNH_ASSERT(cid + 1 == ctx->share->ClassTableSize);
 		ctx->share->ClassTableSize = cid;
 	}
 	knh_ClassTable_t *TC = (knh_ClassTable_t*)(&ctx->share->ClassTable[cid]);
@@ -378,7 +379,6 @@ ClassMap* new_ClassMap0(Ctx *ctx, knh_ushort_t capacity)
 	knh_ClassMap_setSorted(o, 1);
 	return o;
 }
-
 
 /* ------------------------------------------------------------------------ */
 
