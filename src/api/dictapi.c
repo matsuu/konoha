@@ -579,10 +579,8 @@ static MAPPER knh_String___DictSet(Ctx *ctx, knh_sfp_t *sfp)
 {
 	Iterator *it = sfp[0].it;
 	DictSet *d = new_DictSet(ctx, 8);
-	it->fnext_1(ctx, sfp, 1);
-	while(HAS_ITRNEXT(sfp[1].o)) {
+	while(it->fnext_1(ctx, sfp, 1)) {
 		knh_DictSet_add(ctx, d, sfp[1].s);
-		it->fnext_1(ctx, sfp, 1);
 	}
 	KNH_MAPPED(ctx, sfp, d);
 }
@@ -623,7 +621,7 @@ static void knh_DictSet__dump(Ctx *ctx, DictSet *o, OutputStream *w, String *m)
 		}
 		knh_write(ctx, w, knh_String_tobytes(o->list[c].key));
 		knh_putc(ctx, w, ':');	knh_putc(ctx, w, ' ');
-		knh_write__i(ctx, w, o->list[c].value);
+		knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, o->list[c].value);
 	}
 	knh_putc(ctx, w, '}');
 }

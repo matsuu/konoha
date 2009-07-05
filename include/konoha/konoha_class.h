@@ -118,7 +118,7 @@ typedef struct knh_Boolean_t {
 
 #define IS_TRUE(o)         ((o)->h.bcid == CLASS_Boolean && ((Int*)o)->n.bvalue)
 #define IS_FALSE(o)        ((o)->h.bcid == CLASS_Boolean && (((Int*)o)->n.bvalue == 0))
-#define new_Boolean(ctx, c)    (c) ? KNH_TRUE : KNH_FALSE
+#define new_Boolean(ctx, c)    ((c) ? KNH_TRUE : KNH_FALSE)
 
 #define _BOOL_ISTRUE(o)         (o == KNH_TRUE)
 #define _BOOL_ISFALSE(o)        (o == KNH_FALSE)

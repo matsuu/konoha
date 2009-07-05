@@ -64,22 +64,8 @@ extern "C" {
 
 #define KONOHA_SYSTEM_BIT        (sizeof(void*) * CHAR_BIT))
 
-/* ------------------------------------------------------------------------ */
-/* Bool(ean), knh_bool_t */
-/* ------------------------------------------------------------------------ */
-
-typedef int                      knh_bool_t;
-typedef int                      knh_boolean_t;
-
-/* ------------------------------------------------------------------------ */
-/* Int, knh_int_t */
-/* ------------------------------------------------------------------------ */
-
-
 typedef int16_t           knh_int16_t;
 typedef uint16_t          knh_uint16_t;
-typedef int16_t           knh_short_t;
-typedef uint16_t          knh_ushort_t;
 typedef int32_t           knh_int32_t;
 typedef uint32_t          knh_uint32_t;
 typedef int64_t           knh_int64_t;
@@ -89,7 +75,27 @@ typedef intptr_t                  knh_intptr_t;
 typedef uintptr_t                 knh_uintptr_t;
 typedef knh_intptr_t              knh_index_t;
 
+#if defined(__LP64__)
+typedef int32_t           knh_short_t;
+typedef uint32_t          knh_ushort_t;
+#else
+typedef int16_t           knh_short_t;
+typedef uint16_t          knh_ushort_t;
+#endif
+
+/* ------------------------------------------------------------------------ */
+/* Bool(ean), knh_bool_t */
+/* ------------------------------------------------------------------------ */
+
+typedef knh_intptr_t      knh_bool_t;
+typedef knh_intptr_t      knh_boolean_t;
+
+/* ------------------------------------------------------------------------ */
+/* Int, knh_int_t */
+/* ------------------------------------------------------------------------ */
+
 #define KNH_INTPTR_FMT               "%"PRIdPTR
+#define KNH_INTPTR_UFMT              "%"PRIuPTR
 
 /* ------------------------------------------------------------------------ */
 /* Integer, knh_int_t */

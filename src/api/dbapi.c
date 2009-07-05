@@ -246,10 +246,10 @@ static void knh_ResultSet__dump(Ctx *ctx, ResultSet *o, OutputStream *w, String 
 				knh_write(ctx, w, STEXT("null"));
 				break;
 			case knh_ResultSet_CTYPE__integer :
-				knh_write_integerfmt(ctx, w, KNH_INT_FMT, (knh_int_t)(*((knh_int_t*)p)));
+				knh_write_ifmt(ctx, w, KNH_INT_FMT, (*((knh_int_t*)p)));
 				break;
 			case knh_ResultSet_CTYPE__float :
-				knh_write__f(ctx, w, (knh_float_t)(*((knh_float_t*)p)));
+				knh_write_ffmt(ctx, w, KNH_FLOAT_FMT, (*((knh_float_t*)p)));
 				break;
 			case knh_ResultSet_CTYPE__text :
 				knh_write(ctx, w, B2(p, DP(o)->column[n].len));

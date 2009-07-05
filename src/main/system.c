@@ -142,7 +142,7 @@ void knh_Const__man(Ctx *ctx, knh_class_t cid, OutputStream *w)
 	int hasCaption = 0;
 	for(i = 0; i < size; i++) {
 		if(!hasCaption) {
-			knh_write__s(ctx, w, _("Const"));
+			knh_write_char(ctx, w, _("Const"));
 			knh_write_EOL(ctx, w);
 			hasCaption = 1;
 		}

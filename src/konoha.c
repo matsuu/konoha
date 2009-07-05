@@ -38,7 +38,7 @@ main(int argc, char **argv)
 	konoha_t konoha = konoha_open(4096);
 	int n = konoha_parseopt(konoha, argc, argv);
 	if(argc - n == 0) {
-		package_init(konoha.ctx);
+		//package_init(konoha.ctx);
 		konoha_shell(konoha);
 	}
 	else {

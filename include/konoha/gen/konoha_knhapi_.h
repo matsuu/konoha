@@ -99,12 +99,7 @@ extern "C" {
 #define TYPEN(type)  knh_TYPEN(ctx,type)
 #define knh_write_delim(ctx, w)    knh_write(ctx, w, STEXT(", "))
 #define knh_write_dots(ctx, w)     knh_write(ctx, w, STEXT("..."))
-#define knh_write__i(ctx, w, n)   knh_write__ifmt(ctx, w, KNH_INTPTR_FMT, n)
-#define knh_write__u(ctx, w, n)   knh_write__ifmt(ctx, w, KNH_UINT_FMT, n)
-#define knh_write__x(ctx, w, n)   knh_write__ifmt(ctx, w, KNH_INTPTR_FMTX, n)
-#define knh_write__f(ctx, w, f)  knh_write__ffmt(ctx, w, KNH_FLOAT_FMT, f)
-#define knh_write__e(ctx, w, f)  knh_write__ffmt(ctx, w, KNH_FLOAT_FMTE, f)
-#define knh_write_fn(ctx, w, fn)   knh_write__s(ctx, w, FIELDN(fn))
+#define knh_write_fn(ctx, w, fn)   knh_write(ctx, w, B(FIELDN(fn)))
 #define knh_write__O(ctx, w, o)    knh_format(ctx, w, METHODN__k, o, KNH_NULL)
 #define KNH_ASM_JMP(ctx, abr, l)  KNH_ASM_JMP_(ctx, abr, l);
 #define sToken(o)  knh_Token_tochar(ctx, o)

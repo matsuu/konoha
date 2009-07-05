@@ -240,7 +240,7 @@ void knh_Object__s(Ctx *ctx, Object *b, OutputStream *w, String *m)
 		knh_write(ctx, w, STEXT("null"));
 	}
 	else {
-		knh_write__s(ctx,w, CLASSN(knh_Object_cid(b)));
+		knh_write_char(ctx,w, CLASSN(knh_Object_cid(b)));
 		knh_write(ctx,w, STEXT(":"));
 		knh_write__p(ctx,w, (void*)b);
 	}
@@ -278,7 +278,7 @@ void knh_Object__k(Ctx *ctx, Object *o, OutputStream *w, String *m)
 	}
 	else if(o->h.bcid == CLASS_Object) {
 		size_t bsize = ctx->share->ClassTable[o->h.cid].bsize;
-		knh_write__s(ctx, w, CLASSN(o->h.cid));
+		knh_write_char(ctx, w, CLASSN(o->h.cid));
 		if(bsize > 0) {
 			size_t i;
 			Object **v = (Object**)o->ref;
@@ -294,12 +294,12 @@ void knh_Object__k(Ctx *ctx, Object *o, OutputStream *w, String *m)
 #ifdef KNH_USING_UNBOXFIELD
 				if(IS_ubxint(cf->type)) {
 					knh_int_t *data = (knh_int_t*)(v + i);
-					knh_write__i(ctx, w, data[0]);
+					knh_write_ifmt(ctx, w, KNH_INT_FMT, data[0]);
 					continue;
 				}
 				else if(IS_ubxfloat(cf->type)) {
 					knh_float_t *data = (knh_float_t*)(v + i);
-					knh_write__f(ctx, w, data[0]);
+					knh_write_ffmt(ctx, w, KNH_FLOAT_FMT, data[0]);
 					continue;
 				}
 				else if(IS_ubxboolean(cf->type)) {
@@ -499,7 +499,7 @@ char *knh_methodop_tochar(knh_methodn_t mn)
 static
 void knh_Class_NAME__man(Ctx *ctx, knh_class_t cid, OutputStream *w)
 {
-	knh_write__s(ctx, w, _("Class"));
+	knh_write_char(ctx, w, _("Class"));
 	knh_write_EOL(ctx, w);
 
 	knh_write_TAB(ctx, w);
@@ -533,7 +533,7 @@ void knh_Method__man(Ctx *ctx, Method *o, OutputStream *w, knh_class_t cid)
 	knh_putc(ctx, w, ' ');
 
 	if(knh_Method_isStatic(o)) {
-		knh_write__s(ctx, w, CTXCLASSN(cid));
+		knh_write_char(ctx, w, CTXCLASSN(cid));
 		knh_putc(ctx, w, '.');
 	}
 	knh_write_mn(ctx, w, DP(o)->mn);
@@ -609,7 +609,7 @@ void knh_Class__man(Ctx *ctx, Class *o, OutputStream *w, String *m)
 			knh_DictMap_removeAt(ctx, dm, i);
 			if(DP(mtd)->cid == CLASS_Object && cid != CLASS_Object) continue;
 			if(hasCaption == 0) {
-				knh_write__s(ctx, w, _("Operator"));
+				knh_write_char(ctx, w, _("Operator"));
 				knh_write_EOL(ctx, w);
 				hasCaption = 1;
 			}
@@ -618,7 +618,7 @@ void knh_Class__man(Ctx *ctx, Class *o, OutputStream *w, String *m)
 				isBOL = 0;
 			}
 			knh_snprintf(bufmn, sizeof(bufmn), "%10s  ", op);
-			knh_write__s(ctx, w, bufmn);
+			knh_write_char(ctx, w, bufmn);
 			if(cnt % 5 == 4) {
 				knh_write_EOL(ctx, w);
 				isBOL = 1;
@@ -641,7 +641,7 @@ void knh_Class__man(Ctx *ctx, Class *o, OutputStream *w, String *m)
 			if(DP(mtd)->cid == CLASS_Object && cid != CLASS_Object) continue;
 //			if(DP(mtd)->cid != ctx->share->ClassTable[cid].bcid) continue;
 			if(hasCaption == 0) {
-				knh_write__s(ctx, w, _("Method"));
+				knh_write_char(ctx, w, _("Method"));
 				knh_write_EOL(ctx, w);
 				hasCaption = 1;
 			}
@@ -660,7 +660,7 @@ void knh_Class__man(Ctx *ctx, Class *o, OutputStream *w, String *m)
 			if(!METHODN_IS_MOVTEXT(DP(mtd)->mn)) continue;
 			if(DP(mtd)->cid == CLASS_Object && cid != CLASS_Object) continue;
 			if(hasCaption == 0) {
-				knh_write__s(ctx, w, _("Formatter"));
+				knh_write_char(ctx, w, _("Formatter"));
 				knh_write_EOL(ctx, w);
 				knh_write_TAB(ctx, w);
 				hasCaption = 1;
@@ -688,7 +688,7 @@ void knh_Class__man(Ctx *ctx, Class *o, OutputStream *w, String *m)
 
 void knh_Method__s(Ctx *ctx, Method *o, OutputStream *w, String *m)
 {
-	knh_write__s(ctx, w, CTXCLASSN(DP(o)->cid));
+	knh_write_char(ctx, w, CTXCLASSN(DP(o)->cid));
 	knh_putc(ctx, w, '.');
 	knh_write_mn(ctx, w, DP(o)->mn);
 }

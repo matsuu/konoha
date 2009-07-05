@@ -311,9 +311,9 @@ static METHOD knh__Exception_new(Ctx *ctx, knh_sfp_t *sfp)
 	DP(o)->flag = ctx->share->ExptTable[EXPT_Exception].flag;
 
 	knh_cwb_t cwb = new_cwb(ctx);
-	knh_write__s(ctx, cwb.w, "Exception!!");
+	knh_write_char(ctx, cwb.w, "Exception!!");
 	if(IS_NOTNULL(sfp[1].o)) {
-		knh_write__s(ctx, cwb.w, ": ");
+		knh_write_char(ctx, cwb.w, ": ");
 		knh_write(ctx, cwb.w, knh_String_tobytes(sfp[1].s));
 	}
 	KNH_SETv(ctx, DP(o)->message, new_String__cwb(ctx, cwb));
@@ -337,8 +337,8 @@ static
 void knh_Exception__s(Ctx *ctx, Exception *o, OutputStream *w, String *m)
 {
 	KNH_ASSERT(IS_Exception(o));
-	knh_write__s(ctx, w, EXPTN(DP(o)->eid));
-	knh_write__s(ctx, w, "!!");
+	knh_write_char(ctx, w, EXPTN(DP(o)->eid));
+	knh_write_char(ctx, w, "!!");
 }
 
 /* ------------------------------------------------------------------------ */
@@ -360,7 +360,7 @@ static
 void knh_Exception__dump(Ctx *ctx, Exception *o, OutputStream *w, String *m)
 {
 	KNH_ASSERT(IS_Exception(o));
-	knh_write__s(ctx, w, "---- ---- 8< 8< ---- ---- >8 >8 ---- ----");
+	knh_write_char(ctx, w, "---- ---- 8< 8< ---- ---- >8 >8 ---- ----");
 	knh_println(ctx, w, STEXT(""));
 	if(DP(o)->line != 0) {
 		knh_printf(ctx, w, "[%s:%d] ", DP(o)->file, DP(o)->line);
@@ -375,7 +375,7 @@ void knh_Exception__dump(Ctx *ctx, Exception *o, OutputStream *w, String *m)
 			knh_println(ctx, w, STEXT(""));
 		}
 	}
-	knh_write__s(ctx, w, "---- ---- 8< 8< ---- ---- >8 >8 ---- ----");
+	knh_write_char(ctx, w, "---- ---- 8< 8< ---- ---- >8 >8 ---- ----");
 	knh_println(ctx, w, STEXT(""));
 }
 
@@ -388,10 +388,10 @@ void knh_Exception__dump(Ctx *ctx, Exception *o, OutputStream *w, String *m)
 
 void knh_System__k(Ctx *ctx, System *o, OutputStream *w, String *m)
 {
-	knh_printf(ctx, w, "Konoha %s(%s) %s (#%d, %s, %s)",
-		KONOHA_VERSION, KONOHA_XCODE, KONOHA_LICENSE, ((knh_int_t)KONOHA_BUILDID), __DATE__, __TIME__);
+	knh_printf(ctx, w, "Konoha %s(%s) %s (#%d, %s %s)",
+		KONOHA_VERSION, KONOHA_XCODE, KONOHA_LICENSE,
+		((size_t)KONOHA_BUILDID), __DATE__, __TIME__);
 }
-
 
 /* ------------------------------------------------------------------------ */
 /* @method void System.%dump(OutputStream w, String m) */
@@ -401,24 +401,24 @@ void knh_System__dump(Ctx *ctx, System *o, OutputStream *w, String *m)
 	knh_System__k(ctx, o, w, m);
 	knh_write_EOL(ctx, w);
 	knh_printf(ctx, w, "[%s] on %s (%d, %s)\n", KONOHA_CC_VERSION, KONOHA_PLATFORM, (knh_int_t)(sizeof(void*) * 8), konoha_encoding());
-	knh_write__s(ctx, w, "Options:");
+	knh_write_char(ctx, w, "Options:");
 
 #ifdef KNH_FASTMODE
-	knh_write__s(ctx, w, " fastmode");
+	knh_write_char(ctx, w, " fastmode");
 #endif
 
 #ifdef KNH_USING_ICONV
-	knh_write__s(ctx, w, " iconv");
+	knh_write_char(ctx, w, " iconv");
 #endif
 #ifdef KNH_USING_INT32
-	knh_write__s(ctx, w, " int32");
+	knh_write_char(ctx, w, " int32");
 #endif
 #ifdef KNH_USING_RCGC
-	knh_write__s(ctx, w, " refc");
+	knh_write_char(ctx, w, " refc");
 #endif
 	knh_write_USING_SQLITE3(ctx, w);
 #ifdef KNH_USING_THREAD
-	knh_write__s(ctx, w, " thread");
+	knh_write_char(ctx, w, " thread");
 #endif
 	knh_write_USING_REGEX(ctx, w);
 	knh_printf(ctx, w, " used_memory:%d kb", (knh_intptr_t)(ctx->stat->usedMemorySize / 1024));

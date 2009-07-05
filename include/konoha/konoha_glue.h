@@ -134,13 +134,38 @@ extern "C" {
 		return 1; \
 	}\
 
+#if defined(KNH_USING_KONOHA_CLASSX)
+
+#define KNH_ITRNEXT_IntX(ctx, sfp, i, cid, n) {\
+		Object *def_ = KNH_DEF(ctx, cid);\
+		KNH_MOV(ctx, sfp[i].o, def_);\
+		sfp[i].ivalue = n; \
+		return 1; \
+	}\
+
+#define KNH_ITRNEXT_FloatX(ctx, sfp, i, cid, n) {\
+		Object *def_ = KNH_DEF(ctx, cid);\
+		KNH_MOV(ctx, sfp[i].o, def_);\
+		sfp[i].fvalue = n; \
+		return 1; \
+	}\
+
+#else
+#define KNH_ITRNEXT_IntX(ctx, sfp, i, cid, n)    KNH_ITRNEXT_Int(ctx, sfp, i, n)
+#define KNH_ITRNEXT_FloatX(ctx, sfp, i, cid, n)  KNH_ITRNEXT_Float(ctx, sfp, i, n)
+#endif/*KNH_USING_KONOHA_CLASSX*/
+
 #define KNH_ITREND(ctx, sfp, n) {\
 		knh_Iterator_close(ctx, sfp[0].it);\
-		KNH_MOV(ctx, sfp[n].o, KNH_VOID);\
+		/*KNH_MOV(ctx, sfp[n].o, KNH_VOID); */\
 		return 0; \
 	}\
 
-#define HAS_ITRNEXT(v)   IS_NOTNULL(v)
+//#define HAS_ITRNEXT(v)   IS_NOTNULL(v)
+
+/* --------------------------------------------------------------------------- */
+/* [Mapper] */
+
 
 #define KNH_MAPPED(ctx, sfp, v) {\
 		Int *vn_ = (Int*)(v);\

@@ -108,7 +108,7 @@ knh_boolean_t knh_isdir(Ctx *ctx, knh_bytes_t path)
 static
 knh_bytes_t knh_bytes_parentpath(knh_bytes_t path)
 {
-	int i;//, c = 0;
+	knh_intptr_t i;
 	for(i = path.len - 1; i > 0; i--) {
 		if(path.buf[i] == '/' || path.buf[i] == '\\') {
 			path.len = i;

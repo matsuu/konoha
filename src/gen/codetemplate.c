@@ -2157,7 +2157,7 @@ static
 METHOD jc0_NEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_NEXT(ctx, NPC, JUMP0, (-1), (-1), (-1));
+	JIT_NEXT(ctx, NPC, JUMP0, (-1), (-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -2166,7 +2166,7 @@ static
 METHOD jc1_NEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_NEXT(ctx, NPC, JUMP1, (-1), (-1), (-1));
+	JIT_NEXT(ctx, NPC, JUMP1, (-1), (-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -2175,7 +2175,7 @@ static
 METHOD jc2_NEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_NEXT(ctx, NPC, JUMP0, (2), (-1), (-1));
+	JIT_NEXT(ctx, NPC, JUMP0, (2), (-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -2184,16 +2184,7 @@ static
 METHOD jc3_NEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_NEXT(ctx, NPC, JUMP0, (-1), (3), (-1));
-	__asm__ __volatile__("int3");
-}
-
-
-static
-METHOD jc4_NEXT(Ctx *ctx, knh_sfp_t *sfp)
-{
-	__asm__ __volatile__("int3");
-	JIT_NEXT(ctx, NPC, JUMP0, (-1), (-1), (4));
+	JIT_NEXT(ctx, NPC, JUMP0, (-1), (3));
 	__asm__ __volatile__("int3");
 }
 
@@ -2202,7 +2193,7 @@ static
 METHOD jc0_INEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_INEXT(ctx, NPC, JUMP0, (-1), (-1), (-1), (-1));
+	JIT_INEXT(ctx, NPC, JUMP0, (-1), (-1), (-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -2211,7 +2202,7 @@ static
 METHOD jc1_INEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_INEXT(ctx, NPC, JUMP1, (-1), (-1), (-1), (-1));
+	JIT_INEXT(ctx, NPC, JUMP1, (-1), (-1), (-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -2220,7 +2211,7 @@ static
 METHOD jc2_INEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_INEXT(ctx, NPC, JUMP0, (2), (-1), (-1), (-1));
+	JIT_INEXT(ctx, NPC, JUMP0, (2), (-1), (-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -2229,7 +2220,7 @@ static
 METHOD jc3_INEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_INEXT(ctx, NPC, JUMP0, (-1), (3), (-1), (-1));
+	JIT_INEXT(ctx, NPC, JUMP0, (-1), (3), (-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -2238,16 +2229,7 @@ static
 METHOD jc4_INEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_INEXT(ctx, NPC, JUMP0, (-1), (-1), (4), (-1));
-	__asm__ __volatile__("int3");
-}
-
-
-static
-METHOD jc5_INEXT(Ctx *ctx, knh_sfp_t *sfp)
-{
-	__asm__ __volatile__("int3");
-	JIT_INEXT(ctx, NPC, JUMP0, (-1), (-1), (-1), (5));
+	JIT_INEXT(ctx, NPC, JUMP0, (-1), (-1), (4));
 	__asm__ __volatile__("int3");
 }
 
@@ -2256,7 +2238,7 @@ static
 METHOD jc0_MAPNEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_MAPNEXT(ctx, NPC, JUMP0, (-1), (-1), (-1), (-1));
+	JIT_MAPNEXT(ctx, NPC, JUMP0, (-1), (-1), (-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -2265,7 +2247,7 @@ static
 METHOD jc1_MAPNEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_MAPNEXT(ctx, NPC, JUMP1, (-1), (-1), (-1), (-1));
+	JIT_MAPNEXT(ctx, NPC, JUMP1, (-1), (-1), (-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -2274,7 +2256,7 @@ static
 METHOD jc2_MAPNEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_MAPNEXT(ctx, NPC, JUMP0, (2), (-1), (-1), (-1));
+	JIT_MAPNEXT(ctx, NPC, JUMP0, (2), (-1), (-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -2283,7 +2265,7 @@ static
 METHOD jc3_MAPNEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_MAPNEXT(ctx, NPC, JUMP0, (-1), (3), (-1), (-1));
+	JIT_MAPNEXT(ctx, NPC, JUMP0, (-1), (3), (-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -2292,16 +2274,7 @@ static
 METHOD jc4_MAPNEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_MAPNEXT(ctx, NPC, JUMP0, (-1), (-1), (4), (-1));
-	__asm__ __volatile__("int3");
-}
-
-
-static
-METHOD jc5_MAPNEXT(Ctx *ctx, knh_sfp_t *sfp)
-{
-	__asm__ __volatile__("int3");
-	JIT_MAPNEXT(ctx, NPC, JUMP0, (-1), (-1), (-1), (5));
+	JIT_MAPNEXT(ctx, NPC, JUMP0, (-1), (-1), (4));
 	__asm__ __volatile__("int3");
 }
 
@@ -2310,7 +2283,7 @@ static
 METHOD jc0_SMAPNEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_SMAPNEXT(ctx, NPC, JUMP0, (-1), (-1), (-1), ((Object*)-1));
+	JIT_SMAPNEXT(ctx, NPC, JUMP0, (-1), (-1), ((Object*)-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -2319,7 +2292,7 @@ static
 METHOD jc1_SMAPNEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_SMAPNEXT(ctx, NPC, JUMP1, (-1), (-1), (-1), ((Object*)-1));
+	JIT_SMAPNEXT(ctx, NPC, JUMP1, (-1), (-1), ((Object*)-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -2328,7 +2301,7 @@ static
 METHOD jc2_SMAPNEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_SMAPNEXT(ctx, NPC, JUMP0, (2), (-1), (-1), ((Object*)-1));
+	JIT_SMAPNEXT(ctx, NPC, JUMP0, (2), (-1), ((Object*)-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -2337,7 +2310,7 @@ static
 METHOD jc3_SMAPNEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_SMAPNEXT(ctx, NPC, JUMP0, (-1), (3), (-1), ((Object*)-1));
+	JIT_SMAPNEXT(ctx, NPC, JUMP0, (-1), (3), ((Object*)-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -2346,16 +2319,7 @@ static
 METHOD jc4_SMAPNEXT(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_SMAPNEXT(ctx, NPC, JUMP0, (-1), (-1), (4), ((Object*)-1));
-	__asm__ __volatile__("int3");
-}
-
-
-static
-METHOD jc5_SMAPNEXT(Ctx *ctx, knh_sfp_t *sfp)
-{
-	__asm__ __volatile__("int3");
-	JIT_SMAPNEXT(ctx, NPC, JUMP0, (-1), (-1), (-1), ((Object*)5));
+	JIT_SMAPNEXT(ctx, NPC, JUMP0, (-1), (-1), ((Object*)4));
 	__asm__ __volatile__("int3");
 }
 
@@ -4732,10 +4696,10 @@ static knh_fmethod codeTempList[140][6] = {
 	{jc0_BJIFF_LOOP,jc1_BJIFF_LOOP,jc2_BJIFF_LOOP},
 	{jc0_JIFNUL,jc1_JIFNUL,jc2_JIFNUL},
 	{jc0_JIFNN,jc1_JIFNN,jc2_JIFNN},
-	{jc0_NEXT,jc1_NEXT,jc2_NEXT,jc3_NEXT,jc4_NEXT},
-	{jc0_INEXT,jc1_INEXT,jc2_INEXT,jc3_INEXT,jc4_INEXT,jc5_INEXT},
-	{jc0_MAPNEXT,jc1_MAPNEXT,jc2_MAPNEXT,jc3_MAPNEXT,jc4_MAPNEXT,jc5_MAPNEXT},
-	{jc0_SMAPNEXT,jc1_SMAPNEXT,jc2_SMAPNEXT,jc3_SMAPNEXT,jc4_SMAPNEXT,jc5_SMAPNEXT},
+	{jc0_NEXT,jc1_NEXT,jc2_NEXT,jc3_NEXT},
+	{jc0_INEXT,jc1_INEXT,jc2_INEXT,jc3_INEXT,jc4_INEXT},
+	{jc0_MAPNEXT,jc1_MAPNEXT,jc2_MAPNEXT,jc3_MAPNEXT,jc4_MAPNEXT},
+	{jc0_SMAPNEXT,jc1_SMAPNEXT,jc2_SMAPNEXT,jc3_SMAPNEXT,jc4_SMAPNEXT},
 	{jc0_TRY,jc1_TRY,jc2_TRY},
 	{jc0_TRYEND,jc1_TRYEND},
 	{jc0_CATCH,jc1_CATCH,jc2_CATCH,jc3_CATCH,jc4_CATCH},

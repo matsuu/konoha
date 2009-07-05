@@ -232,31 +232,31 @@ void knh_Token__s(Ctx *ctx, Token *o, OutputStream *w, String *m)
 {
 	KNH_ASSERT(IS_Token(o));
 	if(SP(o)->tt < TT_NUM || SP(o)->tt == TT_ASIS) {
-		knh_write__s(ctx, w, knh_token_tochar(SP(o)->tt));
+		knh_write_char(ctx, w, knh_token_tochar(SP(o)->tt));
 	}else if(SP(o)->tt == TT_CID) {
-		knh_write__s(ctx, w, CLASSN(DP(o)->cid));
+		knh_write_char(ctx, w, CLASSN(DP(o)->cid));
 	}else if(SP(o)->tt == TT_FN) {
-		knh_write__s(ctx, w, FIELDN(DP(o)->fn));
+		knh_write_char(ctx, w, FIELDN(DP(o)->fn));
 	}else if(SP(o)->tt == TT_MN) {
 		char bufm[CLASSNAME_BUFSIZ];
 		knh_format_methodn(ctx, bufm, sizeof(bufm), DP(o)->mn);
-		knh_write__s(ctx, w, bufm);
+		knh_write_char(ctx, w, bufm);
 	}else if(IS_String(DP(o)->text)) {
 		if(SP(o)->tt == TT_STR) {
 			knh_putc(ctx, w, '"');
-			knh_write__s(ctx, w, knh_String_tochar(DP(o)->text));
+			knh_write_char(ctx, w, knh_String_tochar(DP(o)->text));
 			knh_putc(ctx, w, '"');
 		}
 		else if(SP(o)->tt == TT_TSTR) {
 			knh_putc(ctx, w, '\'');
-			knh_write__s(ctx, w, knh_String_tochar(DP(o)->text));
+			knh_write_char(ctx, w, knh_String_tochar(DP(o)->text));
 			knh_putc(ctx, w, '\'');
 		}
 		else {
-			knh_write__s(ctx, w, knh_String_tochar(DP(o)->text));
+			knh_write_char(ctx, w, knh_String_tochar(DP(o)->text));
 		}
 	}else if(IS_NULL(DP(o)->data)) {
-		knh_write__s(ctx, w, "null");
+		knh_write_char(ctx, w, "null");
 	}else {
 		knh_format(ctx, w, METHODN__k, DP(o)->data, KNH_NULL);
 	}
@@ -319,15 +319,15 @@ void knh_Token__k(Ctx *ctx, Token *o, OutputStream *w, String *m)
 
 	/* BODY */
 	if(SP(o)->tt == TT_CID) {
-		knh_write__s(ctx, w, CLASSN(DP(o)->cid));
+		knh_write_char(ctx, w, CLASSN(DP(o)->cid));
 	}else if(SP(o)->tt == TT_FN) {
-		knh_write__s(ctx, w, FIELDN(DP(o)->fn));
+		knh_write_char(ctx, w, FIELDN(DP(o)->fn));
 	}else if(SP(o)->tt == TT_MN) {
 		char bufm[CLASSNAME_BUFSIZ];
 		knh_format_methodn(ctx, bufm, sizeof(bufm), DP(o)->mn);
-		knh_write__s(ctx, w, bufm);
+		knh_write_char(ctx, w, bufm);
 	}else {
-		knh_write__s(ctx, w, sToken(o));
+		knh_write_char(ctx, w, sToken(o));
 	}
 	/* POSTFIX */
 	if(SP(o)->tt == TT_LABEL) {

@@ -436,7 +436,7 @@ static METHOD knh__Boolean__k(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Int__s(Ctx *ctx, knh_sfp_t *sfp)
 {
-	knh_write_integerfmt(ctx, sfp[1].w, KNH_INT_FMT, sfp[0].ivalue);
+	knh_write_ifmt(ctx, sfp[1].w, KNH_INT_FMT, sfp[0].ivalue);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -456,10 +456,10 @@ static METHOD knh__Int__d(Ctx *ctx, knh_sfp_t *sfp)
 	if(IS_String(sfp[2].s)) {
 		char fmt[40];
 		knh_format_newFMT(fmt, sizeof(fmt), knh_String_tobytes(sfp[2].s), 0, KNH_INT_FMT);
-		knh_write_integerfmt(ctx, sfp[1].w, fmt, sfp[0].ivalue);
+		knh_write_ifmt(ctx, sfp[1].w, fmt, sfp[0].ivalue);
 	}
 	else {
-		knh_write_integerfmt(ctx, sfp[1].w, KNH_INT_FMT, sfp[0].ivalue);
+		knh_write_ifmt(ctx, sfp[1].w, KNH_INT_FMT, sfp[0].ivalue);
 	}
 }
 
@@ -471,10 +471,10 @@ static METHOD knh__Int__u(Ctx *ctx, knh_sfp_t *sfp)
 	if(IS_String(sfp[2].s)) {
 		char fmt[40];
 		knh_format_newFMT(fmt, sizeof(fmt), knh_String_tobytes(sfp[2].s), 0, KNH_UINT_FMT);
-		knh_write_integerfmt(ctx, sfp[1].w, fmt, sfp[0].ivalue);
+		knh_write_ifmt(ctx, sfp[1].w, fmt, sfp[0].ivalue);
 	}
 	else {
-		knh_write_integerfmt(ctx, sfp[1].w, KNH_UINT_FMT, sfp[0].ivalue);
+		knh_write_ifmt(ctx, sfp[1].w, KNH_UINT_FMT, sfp[0].ivalue);
 	}
 }
 
@@ -486,10 +486,10 @@ static METHOD knh__Int__f(Ctx *ctx, knh_sfp_t *sfp)
 	if(IS_String(sfp[2].s)) {
 		char fmt[40];
 		knh_format_newFMT(fmt, sizeof(fmt), knh_String_tobytes(sfp[2].s), 1, KNH_FLOAT_FMT);
-		knh_write__ffmt(ctx, sfp[1].w, fmt, (knh_float_t)sfp[0].ivalue);
+		knh_write_ffmt(ctx, sfp[1].w, fmt, (knh_float_t)sfp[0].ivalue);
 	}
 	else {
-		knh_write__f(ctx, sfp[1].w, (knh_float_t)sfp[0].ivalue);
+		knh_write_ffmt(ctx, sfp[1].w, KNH_FLOAT_FMT, (knh_float_t)sfp[0].ivalue);
 	}
 }
 
@@ -498,7 +498,7 @@ static METHOD knh__Int__f(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Int__x(Ctx *ctx, knh_sfp_t *sfp)
 {
-	knh_write_integerfmt(ctx, sfp[1].w, KNH_INT_XFMT, sfp[0].ivalue);
+	knh_write_ifmt(ctx, sfp[1].w, KNH_INT_XFMT, sfp[0].ivalue);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -545,7 +545,7 @@ static METHOD knh__Int__c(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Float__s(Ctx *ctx, knh_sfp_t *sfp)
 {
-	knh_write__ffmt(ctx, sfp[1].w, KNH_FLOAT_FMT, p_float(sfp[0]));
+	knh_write_ffmt(ctx, sfp[1].w, KNH_FLOAT_FMT, p_float(sfp[0]));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -557,10 +557,10 @@ static METHOD knh__Float__d(Ctx *ctx, knh_sfp_t *sfp)
 		char fmt[40];
 		knh_format_newFMT(fmt, sizeof(fmt), knh_String_tobytes(sfp[2].s), 0, KNH_INT_FMT);
 		//DBG_P("fmt='%s'", fmt);
-		knh_write_integerfmt(ctx, sfp[1].w, fmt, (knh_int_t)p_float(sfp[0]));
+		knh_write_ifmt(ctx, sfp[1].w, fmt, (knh_int_t)p_float(sfp[0]));
 	}
 	else {
-		knh_write_integerfmt(ctx, sfp[1].w, KNH_INT_FMT, (knh_int_t)p_float(sfp[0]));
+		knh_write_ifmt(ctx, sfp[1].w, KNH_INT_FMT, (knh_int_t)p_float(sfp[0]));
 	}
 }
 
@@ -573,10 +573,10 @@ static METHOD knh__Float__f(Ctx *ctx, knh_sfp_t *sfp)
 		char fmt[40];
 		knh_format_newFMT(fmt, sizeof(fmt), knh_String_tobytes(sfp[2].s), 1, KNH_FLOAT_FMT);
 		//DBG_P("fmt='%s'", fmt);
-		knh_write__ffmt(ctx, sfp[1].w, fmt, p_float(sfp[0]));
+		knh_write_ffmt(ctx, sfp[1].w, fmt, p_float(sfp[0]));
 	}
 	else {
-		knh_write__ffmt(ctx, sfp[1].w, KNH_FLOAT_FMT, p_float(sfp[0]));
+		knh_write_ffmt(ctx, sfp[1].w, KNH_FLOAT_FMT, p_float(sfp[0]));
 	}
 }
 

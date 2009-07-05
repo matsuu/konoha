@@ -471,7 +471,7 @@ void knh_ClassMap__man(Ctx *ctx, ClassMap *o, OutputStream *w, knh_class_t cid)
 	knh_ClassMap_sort(ctx, o);
 	for(i = 0; i < DP(o)->size; i++) {
 		if(hasCaption == 0) {
-			knh_write__s(ctx, w, _("Mapper"));
+			knh_write_char(ctx, w, _("Mapper"));
 			knh_write_EOL(ctx, w);
 			hasCaption = 1;
 		}
@@ -484,13 +484,13 @@ void knh_ClassMap__man(Ctx *ctx, ClassMap *o, OutputStream *w, knh_class_t cid)
 		Mapper *mpr = DP(o)->maplist[i];
 		knh_write_TAB(ctx, w); knh_write_TAB(ctx, w);
 		if(knh_Mapper_isSynonym(mpr)) {
-			knh_write__s(ctx, w, "=== ");
+			knh_write_char(ctx, w, "=== ");
 		}
 		else if(knh_Mapper_isTotal(mpr)) {
-			knh_write__s(ctx, w, "==> ");
+			knh_write_char(ctx, w, "==> ");
 		}
 		else {
-			knh_write__s(ctx, w, "--> ");
+			knh_write_char(ctx, w, "--> ");
 		}
 		knh_write_cid(ctx, w, DP(mpr)->tcid);
 		knh_write_EOL(ctx, w);
