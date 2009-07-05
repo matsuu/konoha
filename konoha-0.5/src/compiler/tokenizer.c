@@ -56,6 +56,7 @@ void knh_InputStream_perror(Ctx *ctx, InputStream *in, int pe, char *fmt, ...)
 /* ======================================================================== */
 /* [NAME] */
 
+static
 String *new_String__NAME(Ctx *ctx, knh_bytes_t tname)
 {
 	knh_index_t idx = knh_DictMap_index__b((ctx)->tsymbolDictMap, tname);
@@ -88,6 +89,11 @@ Token *new_Token__NAME(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t
 	if(t.buf[0] == '.' && islower(t.buf[1])) {   /* .name   => name */
 		flag |= KNH_FLAG_TKF_TOPDOT;
 		t.buf++; t.len--;
+	}
+	if(t.len > 0 && t.buf[t.len-1] == '.') {
+		/* name. => name */
+		t.len--;
+		knh_InputStream_perror(ctx, in, KERR_ERRATA, _("ommit tailed noize: '%B.' ==> '%B'"), t, t);
 	}
 	if(isupper(t.buf[0])) { /* CLASS */
 		tt = TT_TYPEN;
