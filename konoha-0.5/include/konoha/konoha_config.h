@@ -186,8 +186,8 @@
 #endif
 
 #ifndef likely
-#define likely(x)	   x
-#define unlikely(x)	   x
+#define likely(x)	   (x)
+#define unlikely(x)	   (x)
 #endif
 
 #ifndef KONOHA_CPU
@@ -213,12 +213,6 @@
 
 #if !defined(L1_CACHE_BYTES) && !defined(KONOHA_ON_LKM)
 #define L1_CACHE_BYTES   32
-#endif
-
-#ifdef KNH_FASTMODE
-#define KNH_USING_FASTMALLOC 1
-#define KNH_USING_OBJECT32   (sizeof(void*)*8)
-//#define KNH_USING_WORDKLRC   1
 #endif
 
 /* ======================================================================== */
