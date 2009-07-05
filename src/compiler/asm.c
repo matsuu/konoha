@@ -490,7 +490,7 @@ void KNH_ASM_SMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, Token *tkb)
 			}
 			if(IS_ubxtype(btype)) {
 				KNH_ASM_MOVn_(ctx, abr, sfi_(a), sfi_(b));
-				if(IS_ANY(atype)) {
+				if(IS_ANY(atype) || !IS_NNTYPE(atype)) {
 					KNH_ASM_NNBOX(ctx, abr, btype, a);
 				}
 			}

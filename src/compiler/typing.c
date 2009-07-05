@@ -3359,7 +3359,7 @@ knh_class_t knh_StmtMETHOD_class(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, 
 		knh_bytes_t name = knh_Token_tobytes(ctx, tk);
 		if(SP(tk)->tt == TT_CMETHODN) {
 			knh_index_t idx = knh_bytes_rindex(name, '.');
-			KNH_ASSERT(idx != 1);
+			DBG2_ASSERT(idx != -1);
 			name = knh_bytes_first(name, idx);
 		}
 
