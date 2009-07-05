@@ -151,7 +151,7 @@ knh_boolean_t knh_mkdir(Ctx *ctx, knh_bytes_t path, int isThrowable)
 {
 	if(!knh_isdir(ctx, path)) {
 		knh_bytes_t ppath = knh_bytes_parentpath(path);
-		if(knh_isdir(ctx, ppath)) {
+		if(ppath.len == 0 || knh_isdir(ctx, ppath) ) {
 			return knh_mkdir0(ctx, path, isThrowable);
 		}
 		else if(knh_mkdir(ctx, ppath, isThrowable)) {
