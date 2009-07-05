@@ -539,7 +539,7 @@ static METHOD knh__String_substring(Ctx *ctx, knh_sfp_t *sfp)
 	if(knh_String_isASCII(sfp[0].s)) {
 		size_t offset = IS_NULL(sfp[1].o) ? 0 : knh_array_index(ctx, sfp[1].ivalue, base.len);
 		sub = knh_bytes_last(base, offset);
-		if(IS_NOTNULL(sfp[2].o)) {
+		if(IS_NOTNULL(sfp[2].o) || sfp[2].ivalue != 0) {
 			size_t len = (size_t)sfp[2].ivalue;
 			if(len < sub.len) sub = knh_bytes_first(sub, len);
 		}
@@ -577,7 +577,7 @@ static METHOD knh__String_opOffset(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__String_opSubset(Ctx *ctx, knh_sfp_t *sfp)
 {
-	if(IS_NOTNULL(sfp[2].o)) {
+  if(IS_NOTNULL(sfp[2].o)) {
 		size_t offset = IS_NULL(sfp[1].o) ? 0 : (size_t)sfp[1].ivalue;
 		sfp[2].ivalue = sfp[2].ivalue - offset;
 	}
@@ -589,11 +589,11 @@ static METHOD knh__String_opSubset(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__String_opSubsete(Ctx *ctx, knh_sfp_t *sfp)
 {
-	if(IS_NOTNULL(sfp[2].o)) {
-		size_t offset = IS_NULL(sfp[1].o) ? 0 : (size_t)sfp[1].ivalue;
-		sfp[2].ivalue = sfp[2].ivalue - offset + 1;
-	}
-	knh__String_substring(ctx, sfp);
+  if(IS_NOTNULL(sfp[2].o) || sfp[2].ivalue != 0) {
+	  size_t offset = IS_NULL(sfp[1].o) ? 0 : (size_t)sfp[1].ivalue;
+	  sfp[2].ivalue = sfp[2].ivalue - offset + 1;
+  }
+  knh__String_substring(ctx, sfp);
 }
 
 /* ======================================================================== */
