@@ -204,8 +204,8 @@ Exception* knh_Exception_new__init(Ctx *ctx, Exception *o, String *e, String *ms
 		if(IS_NOTNULL(msg)) {
 			KNH_RCSETv(ctx, DP(o)->bag, msg);
 			knh_cwb_t cwb = new_cwb(ctx);
-			knh_write__s(ctx, cwb.w, EXPTN(DP(o)->eid));
-			knh_write__s(ctx, cwb.w, "!!: ");
+			knh_write_char(ctx, cwb.w, EXPTN(DP(o)->eid));
+			knh_write_char(ctx, cwb.w, "!!: ");
 			knh_write(ctx, cwb.w, knh_String_tobytes(msg));
 			KNH_SETv(ctx, DP(o)->message, new_String__cwb(ctx, cwb));
 		}
@@ -216,10 +216,10 @@ Exception* knh_Exception_new__init(Ctx *ctx, Exception *o, String *e, String *ms
 				return o;
 			}
 			knh_cwb_t cwb = new_cwb(ctx);
-			knh_write__s(ctx, cwb.w, EXPTN(DP(o)->eid));
-			knh_write__s(ctx, cwb.w, "!!");
+			knh_write_char(ctx, cwb.w, EXPTN(DP(o)->eid));
+			knh_write_char(ctx, cwb.w, "!!");
 			if(loc > 0) {
-				knh_write__s(ctx, cwb.w, ": ");
+				knh_write_char(ctx, cwb.w, ": ");
 				knh_write(ctx, cwb.w, knh_bytes_last(knh_String_tobytes(e), loc+3));
 			}
 			KNH_SETv(ctx, DP(o)->message, new_String__cwb(ctx, cwb));

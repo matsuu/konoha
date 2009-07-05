@@ -97,7 +97,7 @@ static knh_db_drvapi_t DB__NOP = {
 void knh_write_USING_SQLITE3(Ctx *ctx, OutputStream *w)
 {
 #ifdef KNH_USING_SQLITE3
-	knh_write__s(ctx, w, " sqlite3");
+	knh_write_char(ctx, w, " sqlite3");
 #endif
 }
 

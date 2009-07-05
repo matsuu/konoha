@@ -2145,18 +2145,18 @@ void knh_StmtFOREACH_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 	knh_class_t itrcid = CLASS_type(DP(tkitr)->type);
 	KNH_ASSERT_cid(itrcid); itrcid = ctx->share->ClassTable[itrcid].p1;
 	if(ncid == itrcid || ncid == CLASS_Any || knh_class_instanceof(ctx, ncid, itrcid)) {
-		KNH_ASM_NEXT_(ctx, abr, lbend, sfi_(DP(tkn)->index), sfi_(DP(tkitr)->index), sfi_(DP(abr)->stack));
+		KNH_ASM_NEXT_(ctx, abr, lbend, sfi_(DP(tkn)->index), sfi_(DP(tkitr)->index));
 	}
 	else if(!knh_Stmt_isMAPNEXT(stmt)) {
-		KNH_ASM_INEXT_(ctx, abr, lbend, ncid, sfi_(DP(tkn)->index), sfi_(DP(tkitr)->index), sfi_(DP(abr)->stack));
+		KNH_ASM_INEXT_(ctx, abr, lbend, ncid, sfi_(DP(tkn)->index), sfi_(DP(tkitr)->index));
 	}
 	else {
 		Mapper *mpr = knh_Class_getMapper(ctx, itrcid, ncid);
 		if(IS_NOTNULL(mpr) && knh_Mapper_isFinal(mpr)) {
-			KNH_ASM_SMAPNEXT_(ctx, abr, lbend, sfi_(DP(tkn)->index), sfi_(DP(tkitr)->index), sfi_(DP(abr)->stack), UP(mpr));
+			KNH_ASM_SMAPNEXT_(ctx, abr, lbend, sfi_(DP(tkn)->index), sfi_(DP(tkitr)->index), UP(mpr));
 		}
 		else {
-			KNH_ASM_MAPNEXT_(ctx, abr, lbend, ncid, sfi_(DP(tkn)->index), sfi_(DP(tkitr)->index), sfi_(DP(abr)->stack));
+			KNH_ASM_MAPNEXT_(ctx, abr, lbend, ncid, sfi_(DP(tkn)->index), sfi_(DP(tkitr)->index));
 		}
 	}
 

@@ -179,7 +179,7 @@ int knh_Asm_classId(Ctx *ctx, Asm *abr, knh_class_t cid)
 void knh_Int__const(Ctx *ctx, Int *o, OutputStream *w, String *m)
 {
 	knh_write(ctx, w, STEXT("new_Int(ctx, "));
-	knh_write__i(ctx, w, o->n.ivalue);
+	knh_write_ifmt(ctx, w, KNH_INT_FMT, o->n.ivalue);
 	knh_write(ctx, w, STEXT(")"));
 }
 

@@ -1214,7 +1214,7 @@ knh_code_t* KNH_ASM_JIFNN_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2)
 
 /* ------------------------------------------------------------------------ */
 
-knh_code_t* KNH_ASM_NEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh_sfi_t a3,knh_sfi_t a4)
+knh_code_t* KNH_ASM_NEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh_sfi_t a3)
 {
 	klr_next_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
@@ -1223,7 +1223,6 @@ knh_code_t* KNH_ASM_NEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh_sfi
 		op->a1 = /*(knh_labelid_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
-		op->a4 = /*(knh_sfi_t)*/a4;
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
 	return (knh_code_t*)op;
@@ -1231,7 +1230,7 @@ knh_code_t* KNH_ASM_NEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh_sfi
 
 /* ------------------------------------------------------------------------ */
 
-knh_code_t* KNH_ASM_INEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_class_t a2,knh_sfi_t a3,knh_sfi_t a4,knh_sfi_t a5)
+knh_code_t* KNH_ASM_INEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_class_t a2,knh_sfi_t a3,knh_sfi_t a4)
 {
 	klr_inext_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
@@ -1242,7 +1241,6 @@ knh_code_t* KNH_ASM_INEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_class_t a2,knh_
 		op->a2 = /*(knh_class_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
 		op->a4 = /*(knh_sfi_t)*/a4;
-		op->a5 = /*(knh_sfi_t)*/a5;
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
 	return (knh_code_t*)op;
@@ -1250,7 +1248,7 @@ knh_code_t* KNH_ASM_INEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_class_t a2,knh_
 
 /* ------------------------------------------------------------------------ */
 
-knh_code_t* KNH_ASM_MAPNEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_class_t a2,knh_sfi_t a3,knh_sfi_t a4,knh_sfi_t a5)
+knh_code_t* KNH_ASM_MAPNEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_class_t a2,knh_sfi_t a3,knh_sfi_t a4)
 {
 	klr_mapnext_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
@@ -1261,7 +1259,6 @@ knh_code_t* KNH_ASM_MAPNEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_class_t a2,kn
 		op->a2 = /*(knh_class_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
 		op->a4 = /*(knh_sfi_t)*/a4;
-		op->a5 = /*(knh_sfi_t)*/a5;
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
 	return (knh_code_t*)op;
@@ -1269,7 +1266,7 @@ knh_code_t* KNH_ASM_MAPNEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_class_t a2,kn
 
 /* ------------------------------------------------------------------------ */
 
-knh_code_t* KNH_ASM_SMAPNEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh_sfi_t a3,knh_sfi_t a4,Object* a5)
+knh_code_t* KNH_ASM_SMAPNEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh_sfi_t a3,Object* a4)
 {
 	klr_smapnext_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
@@ -1278,9 +1275,8 @@ knh_code_t* KNH_ASM_SMAPNEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh
 		op->a1 = /*(knh_labelid_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
-		op->a4 = /*(knh_sfi_t)*/a4;
-		op->a5 = /*(Object*)*/a5;
-		knh_Object_RCinc(op->a5);
+		op->a4 = /*(Object*)*/a4;
+		knh_Object_RCinc(op->a4);
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
 	return (knh_code_t*)op;
@@ -2639,7 +2635,7 @@ void knh_code_traverse(Ctx *ctx, knh_code_t *pc, knh_ftraverse ftr)
 			ftr(ctx, ((klr_smapnc_t*)pc)->a2);
 			break;
 		case OPCODE_SMAPNEXT :
-			ftr(ctx, ((klr_smapnext_t*)pc)->a5);
+			ftr(ctx, ((klr_smapnext_t*)pc)->a4);
 			break;
 		case OPCODE_CATCH :
 			ftr(ctx, ((klr_catch_t*)pc)->a4);
@@ -2659,15 +2655,15 @@ void knh_code_traverse(Ctx *ctx, knh_code_t *pc, knh_ftraverse ftr)
 /* [dump] */
 
 #define knh_write__addr(ctx, w, a)  knh_printf(ctx, w, "%p", a)
-#define knh_write__boolean(ctx, w, a)  knh_write__s(ctx, w, (a) ? "true" : "false")
+#define knh_write__boolean(ctx, w, a)  knh_write_char(ctx, w, (a) ? "true" : "false")
 #define knh_write__cid(ctx, w, a) knh_write_cid(ctx, w, a)
-#define knh_write__float(ctx, w, a) knh_write__f(ctx, w, a)
-#define knh_write__integer(ctx, w, a) knh_write_integerfmt(ctx, w, KNH_INT_FMT, a)
-#define knh_write__intptr(ctx, w, a)  knh_write__i(ctx, w, a)
+#define knh_write__float(ctx, w, a) knh_write_ffmt(ctx, w, KNH_FLOAT_FMT, a)
+#define knh_write__integer(ctx, w, a) knh_write_ifmt(ctx, w, KNH_INT_FMT, a)
+#define knh_write__intptr(ctx, w, a)  knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, a)
 #define knh_write__OBJ(ctx, w, a)  knh_format(ctx, w, METHODN__k, a, KNH_NULL)
-#define knh_write__sfi(ctx, w, a)  knh_printf(ctx, w, "sfp[%d]", (knh_int_t)a);
-#define knh_write__sfx(ctx, w, a)  knh_printf(ctx, w, "sfp[%d]+%d", (knh_int_t)a.i, (knh_int_t)a.n)
-#define knh_write__ushort(ctx, w, a)    knh_write__i(ctx, w, (knh_int_t)a)
+#define knh_write__sfi(ctx, w, a)  knh_printf(ctx, w, "sfp[%d]", (knh_intptr_t)a);
+#define knh_write__sfx(ctx, w, a)  knh_printf(ctx, w, "sfp[%d]+%d", (knh_intptr_t)a.i, (knh_intptr_t)a.n)
+#define knh_write__ushort(ctx, w, a)    knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)a)
 #define knh_write__mn(ctx, w, a)    knh_write_mn(ctx, w, (knh_methodn_t)a)
 #define knh_write__type(ctx, w, a)    knh_write_type(ctx, w, (knh_type_t)a)
 
@@ -2680,9 +2676,9 @@ void KNH_DUMP_OPCODE(Ctx *ctx, knh_code_t *pc, OutputStream *w, Method *mtd, cha
 		line = knh_Method_pctoline(mtd, pc);
 	}
 	if(line == 0) {
-		knh_printf(ctx, w, " [%p] %s(%d)", pc, name, (knh_int_t)op->opcode);
+		knh_printf(ctx, w, " [%p] %s(%d)", pc, name, (knh_intptr_t)op->opcode);
 	}else{
-		knh_printf(ctx, w, " [%d:%p] %s(%d)", line, pc, name, (knh_int_t)op->opcode);
+		knh_printf(ctx, w, " [%d:%p] %s(%d)", line, pc, name, (knh_intptr_t)op->opcode);
 	}
 }
 
@@ -3502,7 +3498,6 @@ void KNH_DUMP_NEXT(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Method *
 	knh_putc(ctx, w, ' '); knh_write__addr(ctx, w, (op->a1));
 	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a2));
 	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a3));
-	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a4));
 	knh_write_EOL(ctx, w);
 }
 
@@ -3517,7 +3512,6 @@ void KNH_DUMP_INEXT(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Method 
 	knh_putc(ctx, w, ' '); knh_write__cid(ctx, w, (op->a2));
 	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a3));
 	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a4));
-	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a5));
 	knh_write_EOL(ctx, w);
 }
 
@@ -3532,7 +3526,6 @@ void KNH_DUMP_MAPNEXT(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Metho
 	knh_putc(ctx, w, ' '); knh_write__cid(ctx, w, (op->a2));
 	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a3));
 	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a4));
-	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a5));
 	knh_write_EOL(ctx, w);
 }
 
@@ -3546,8 +3539,7 @@ void KNH_DUMP_SMAPNEXT(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Meth
 	knh_putc(ctx, w, ' '); knh_write__addr(ctx, w, (op->a1));
 	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a2));
 	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a3));
-	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a4));
-	knh_putc(ctx, w, ' '); knh_write__OBJ(ctx, w, (op->a5));
+	knh_putc(ctx, w, ' '); knh_write__OBJ(ctx, w, (op->a4));
 	knh_write_EOL(ctx, w);
 }
 
@@ -5281,7 +5273,7 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		{
 			const klr_next_t* op = (klr_next_t*)pc;
 			DBG2_OPDUMP(ctx, pc);
-			KLR_NEXT(ctx, pc = op->jumppc, L_HEAD, op->a2, op->a3, op->a4);
+			KLR_NEXT(ctx, pc = op->jumppc, L_HEAD, op->a2, op->a3);
 			pc += OPSIZE_NEXT;
 			goto L_HEAD;
 		}
@@ -5290,7 +5282,7 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		{
 			const klr_inext_t* op = (klr_inext_t*)pc;
 			DBG2_OPDUMP(ctx, pc);
-			KLR_INEXT(ctx, pc = op->jumppc, L_HEAD, op->a2, op->a3, op->a4, op->a5);
+			KLR_INEXT(ctx, pc = op->jumppc, L_HEAD, op->a2, op->a3, op->a4);
 			pc += OPSIZE_INEXT;
 			goto L_HEAD;
 		}
@@ -5299,7 +5291,7 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		{
 			const klr_mapnext_t* op = (klr_mapnext_t*)pc;
 			DBG2_OPDUMP(ctx, pc);
-			KLR_MAPNEXT(ctx, pc = op->jumppc, L_HEAD, op->a2, op->a3, op->a4, op->a5);
+			KLR_MAPNEXT(ctx, pc = op->jumppc, L_HEAD, op->a2, op->a3, op->a4);
 			pc += OPSIZE_MAPNEXT;
 			goto L_HEAD;
 		}
@@ -5308,7 +5300,7 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		{
 			const klr_smapnext_t* op = (klr_smapnext_t*)pc;
 			DBG2_OPDUMP(ctx, pc);
-			KLR_SMAPNEXT(ctx, pc = op->jumppc, L_HEAD, op->a2, op->a3, op->a4, op->a5);
+			KLR_SMAPNEXT(ctx, pc = op->jumppc, L_HEAD, op->a2, op->a3, op->a4);
 			pc += OPSIZE_SMAPNEXT;
 			goto L_HEAD;
 		}
@@ -6721,7 +6713,7 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		const klr_next_t *op = (klr_next_t*)pc;
 		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
-		KLR_NEXT(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2, op->a3, op->a4);
+		KLR_NEXT(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2, op->a3);
 		pc += OPSIZE_NEXT;
 		goto *(op->nextaddr);
 	}
@@ -6730,7 +6722,7 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		const klr_inext_t *op = (klr_inext_t*)pc;
 		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
-		KLR_INEXT(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2, op->a3, op->a4, op->a5);
+		KLR_INEXT(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2, op->a3, op->a4);
 		pc += OPSIZE_INEXT;
 		goto *(op->nextaddr);
 	}
@@ -6739,7 +6731,7 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		const klr_mapnext_t *op = (klr_mapnext_t*)pc;
 		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
-		KLR_MAPNEXT(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2, op->a3, op->a4, op->a5);
+		KLR_MAPNEXT(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2, op->a3, op->a4);
 		pc += OPSIZE_MAPNEXT;
 		goto *(op->nextaddr);
 	}
@@ -6748,7 +6740,7 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		const klr_smapnext_t *op = (klr_smapnext_t*)pc;
 		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
-		KLR_SMAPNEXT(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2, op->a3, op->a4, op->a5);
+		KLR_SMAPNEXT(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2, op->a3, op->a4);
 		pc += OPSIZE_SMAPNEXT;
 		goto *(op->nextaddr);
 	}
@@ -7598,9 +7590,9 @@ void KNH_KLR_MOVa(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_mova_t *op = (klr_mova_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_MOVa(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -7612,9 +7604,9 @@ void KNH_KLR_MOVn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_movn_t *op = (klr_movn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_MOVn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -7626,7 +7618,7 @@ void KNH_KLR_MOVo(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_movo_t *op = (klr_movo_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_MOVo(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "CONSTPOOL(ctx, delta + %d)", knh_Asm_constId(ctx, abr, op->a2));
 	knh_println(ctx, w, STEXT(");"));
@@ -7641,7 +7633,7 @@ void KNH_KLR_MOVx(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_MOVx(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "x%d_2", step);
 	knh_println(ctx, w, STEXT(");"));
@@ -7655,7 +7647,7 @@ void KNH_KLR_MOVDEF(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	klr_movdef_t *op = (klr_movdef_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_MOVDEF(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "_CLASS_%d /* %s */", knh_Asm_classId(ctx, abr, op->a2), CTXCLASSN(op->a2));
 	knh_println(ctx, w, STEXT(");"));
@@ -7669,9 +7661,9 @@ void KNH_KLR_MOVSYS(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	klr_movsys_t *op = (klr_movsys_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_MOVSYS(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -7686,7 +7678,7 @@ void KNH_KLR_XMOVs(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	knh_printf(ctx, w, "\tKLR_XMOVs(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -7747,7 +7739,7 @@ void KNH_KLR_XMOVSYS(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, 
 	knh_printf(ctx, w, "\tKLR_XMOVSYS(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -7760,7 +7752,7 @@ void KNH_KLR_MOVxi(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_MOVxi(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "x%d_2", step);
 	knh_println(ctx, w, STEXT(");"));
@@ -7777,7 +7769,7 @@ void KNH_KLR_XMOVsi(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	knh_printf(ctx, w, "\tKLR_XMOVsi(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -7855,7 +7847,7 @@ void KNH_KLR_MOVxf(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_MOVxf(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "x%d_2", step);
 	knh_println(ctx, w, STEXT(");"));
@@ -7872,7 +7864,7 @@ void KNH_KLR_XMOVsf(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	knh_printf(ctx, w, "\tKLR_XMOVsf(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -7950,7 +7942,7 @@ void KNH_KLR_MOVxb(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_MOVxb(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "x%d_2", step);
 	knh_println(ctx, w, STEXT(");"));
@@ -7967,7 +7959,7 @@ void KNH_KLR_XMOVsb(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	knh_printf(ctx, w, "\tKLR_XMOVsb(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8010,9 +8002,9 @@ void KNH_KLR_SWAP(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_swap_t *op = (klr_swap_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_SWAP(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8024,7 +8016,7 @@ void KNH_KLR_PINIo(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_pinio_t *op = (klr_pinio_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_PINIo(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "CONSTPOOL(ctx, delta + %d)", knh_Asm_constId(ctx, abr, op->a2));
 	knh_println(ctx, w, STEXT(");"));
@@ -8038,7 +8030,7 @@ void KNH_KLR_SETESP(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	klr_setesp_t *op = (klr_setesp_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_SETESP(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8050,7 +8042,7 @@ void KNH_KLR_CHECKESP(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start,
 	klr_checkesp_t *op = (klr_checkesp_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_CHECKESP(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8073,9 +8065,9 @@ void KNH_KLR_RETn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_retn_t *op = (klr_retn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_RETn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8087,9 +8079,9 @@ void KNH_KLR_RETa(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_reta_t *op = (klr_reta_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_RETa(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8101,7 +8093,7 @@ void KNH_KLR_RETo(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_reto_t *op = (klr_reto_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_RETo(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "CONSTPOOL(ctx, delta + %d)", knh_Asm_constId(ctx, abr, op->a2));
 	knh_println(ctx, w, STEXT(");"));
@@ -8116,7 +8108,7 @@ void KNH_KLR_RETx(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_RETx(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "x%d_2", step);
 	knh_println(ctx, w, STEXT(");"));
@@ -8130,7 +8122,7 @@ void KNH_KLR_BOX(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_
 	klr_box_t *op = (klr_box_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_BOX(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "_CLASS_%d /* %s */", knh_Asm_classId(ctx, abr, op->a2), CTXCLASSN(op->a2));
 	knh_println(ctx, w, STEXT(");"));
@@ -8144,7 +8136,7 @@ void KNH_KLR_BOXnc(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_boxnc_t *op = (klr_boxnc_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_BOXnc(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "_CLASS_%d /* %s */", knh_Asm_classId(ctx, abr, op->a2), CTXCLASSN(op->a2));
 	knh_println(ctx, w, STEXT(");"));
@@ -8158,7 +8150,7 @@ void KNH_KLR_NNBOX(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_nnbox_t *op = (klr_nnbox_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_NNBOX(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "_CLASS_%d /* %s */", knh_Asm_classId(ctx, abr, op->a2), CTXCLASSN(op->a2));
 	knh_println(ctx, w, STEXT(");"));
@@ -8172,7 +8164,7 @@ void KNH_KLR_NNBOXnc(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, 
 	klr_nnboxnc_t *op = (klr_nnboxnc_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_NNBOXnc(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "_CLASS_%d /* %s */", knh_Asm_classId(ctx, abr, op->a2), CTXCLASSN(op->a2));
 	knh_println(ctx, w, STEXT(");"));
@@ -8186,7 +8178,7 @@ void KNH_KLR_UNBOX(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_unbox_t *op = (klr_unbox_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_UNBOX(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8198,7 +8190,7 @@ void KNH_KLR_ISNULL(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	klr_isnull_t *op = (klr_isnull_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_ISNULL(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8223,7 +8215,7 @@ void KNH_KLR_ISTYPE(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	klr_istype_t *op = (klr_istype_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_ISTYPE(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "_CLASS_%d /* %s */", knh_Asm_classId(ctx, abr, op->a2), CTXCLASSN(op->a2));
 	knh_println(ctx, w, STEXT(");"));
@@ -8237,9 +8229,9 @@ void KNH_KLR_ISNNTYPE(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start,
 	klr_isnntype_t *op = (klr_isnntype_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_ISNNTYPE(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8251,11 +8243,11 @@ void KNH_KLR_FCALL(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_fcall_t *op = (klr_fcall_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_FCALL(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "CONSTPOOL(ctx, delta + %d)", knh_Asm_constId(ctx, abr, op->a4));
 	knh_println(ctx, w, STEXT(");"));
@@ -8269,9 +8261,9 @@ void KNH_KLR_SCALL(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_scall_t *op = (klr_scall_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_SCALL(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "CONSTPOOL(ctx, delta + %d)", knh_Asm_constId(ctx, abr, op->a3));
 	knh_println(ctx, w, STEXT(");"));
@@ -8285,9 +8277,9 @@ void KNH_KLR_AINVOKE(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, 
 	klr_ainvoke_t *op = (klr_ainvoke_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_AINVOKE(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "CONSTPOOL(ctx, delta + %d)", knh_Asm_constId(ctx, abr, op->a3));
 	knh_println(ctx, w, STEXT(");"));
@@ -8301,11 +8293,11 @@ void KNH_KLR_CALL(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_call_t *op = (klr_call_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_CALL(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8317,11 +8309,11 @@ void KNH_KLR_ACALL(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_acall_t *op = (klr_acall_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_ACALL(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8333,13 +8325,13 @@ void KNH_KLR_NEW(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_
 	klr_new_t *op = (klr_new_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_NEW(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "_CLASS_%d /* %s */", knh_Asm_classId(ctx, abr, op->a3), CTXCLASSN(op->a3));
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a4);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a4);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "CONSTPOOL(ctx, delta + %d)", knh_Asm_constId(ctx, abr, op->a5));
 	knh_println(ctx, w, STEXT(");"));
@@ -8353,9 +8345,9 @@ void KNH_KLR_TOSTR(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_tostr_t *op = (klr_tostr_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_TOSTR(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8367,9 +8359,9 @@ void KNH_KLR_TOSTRf(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	klr_tostrf_t *op = (klr_tostrf_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_TOSTRf(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "CONSTPOOL(ctx, delta + %d)", knh_Asm_constId(ctx, abr, op->a3));
 	knh_println(ctx, w, STEXT(");"));
@@ -8383,7 +8375,7 @@ void KNH_KLR_SMAP(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_smap_t *op = (klr_smap_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_SMAP(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "CONSTPOOL(ctx, delta + %d)", knh_Asm_constId(ctx, abr, op->a2));
 	knh_println(ctx, w, STEXT(");"));
@@ -8397,7 +8389,7 @@ void KNH_KLR_SMAPnc(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	klr_smapnc_t *op = (klr_smapnc_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_SMAPnc(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "CONSTPOOL(ctx, delta + %d)", knh_Asm_constId(ctx, abr, op->a2));
 	knh_println(ctx, w, STEXT(");"));
@@ -8411,7 +8403,7 @@ void KNH_KLR_MAP(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_
 	klr_map_t *op = (klr_map_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_MAP(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "_CLASS_%d /* %s */", knh_Asm_classId(ctx, abr, op->a2), CTXCLASSN(op->a2));
 	knh_println(ctx, w, STEXT(");"));
@@ -8425,7 +8417,7 @@ void KNH_KLR_MAPnc(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_mapnc_t *op = (klr_mapnc_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_MAPnc(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "_CLASS_%d /* %s */", knh_Asm_classId(ctx, abr, op->a2), CTXCLASSN(op->a2));
 	knh_println(ctx, w, STEXT(");"));
@@ -8439,7 +8431,7 @@ void KNH_KLR_AMAP(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_amap_t *op = (klr_amap_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_AMAP(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "_CLASS_%d /* %s */", knh_Asm_classId(ctx, abr, op->a2), CTXCLASSN(op->a2));
 	knh_println(ctx, w, STEXT(");"));
@@ -8453,7 +8445,7 @@ void KNH_KLR_NNMAP(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_nnmap_t *op = (klr_nnmap_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_NNMAP(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "_CLASS_%d /* %s */", knh_Asm_classId(ctx, abr, op->a2), CTXCLASSN(op->a2));
 	knh_println(ctx, w, STEXT(");"));
@@ -8493,7 +8485,7 @@ void KNH_KLR_bJIFT(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	knh_printf(ctx, w, "\tKLR_bJIFT(");
 	knh_printf(ctx, w, "NPC, L%p", op->jumppc);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8507,7 +8499,7 @@ void KNH_KLR_bJIFF(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	knh_printf(ctx, w, "\tKLR_bJIFF(");
 	knh_printf(ctx, w, "NPC, L%p", op->jumppc);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8521,7 +8513,7 @@ void KNH_KLR_bJIFF_LOOP(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_star
 	knh_printf(ctx, w, "\tKLR_bJIFF_LOOP(");
 	knh_printf(ctx, w, "NPC, L%p", op->jumppc);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8535,7 +8527,7 @@ void KNH_KLR_JIFNUL(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	knh_printf(ctx, w, "\tKLR_JIFNUL(");
 	knh_printf(ctx, w, "NPC, L%p", op->jumppc);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8549,7 +8541,7 @@ void KNH_KLR_JIFNN(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	knh_printf(ctx, w, "\tKLR_JIFNN(");
 	knh_printf(ctx, w, "NPC, L%p", op->jumppc);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8563,11 +8555,9 @@ void KNH_KLR_NEXT(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	knh_printf(ctx, w, "\tKLR_NEXT(");
 	knh_printf(ctx, w, "NPC, L%p", op->jumppc);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
-	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a4);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8583,11 +8573,9 @@ void KNH_KLR_INEXT(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "_CLASS_%d /* %s */", knh_Asm_classId(ctx, abr, op->a2), CTXCLASSN(op->a2));
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a4);
-	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a5);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a4);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8603,11 +8591,9 @@ void KNH_KLR_MAPNEXT(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, 
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "_CLASS_%d /* %s */", knh_Asm_classId(ctx, abr, op->a2), CTXCLASSN(op->a2));
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a4);
-	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a5);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a4);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8621,13 +8607,11 @@ void KNH_KLR_SMAPNEXT(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start,
 	knh_printf(ctx, w, "\tKLR_SMAPNEXT(");
 	knh_printf(ctx, w, "NPC, L%p", op->jumppc);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a4);
-	knh_write(ctx, w,  STEXT(", "));
-	knh_printf(ctx, w, "CONSTPOOL(ctx, delta + %d)", knh_Asm_constId(ctx, abr, op->a5));
+	knh_printf(ctx, w, "CONSTPOOL(ctx, delta + %d)", knh_Asm_constId(ctx, abr, op->a4));
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8641,7 +8625,7 @@ void KNH_KLR_TRY(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_
 	knh_printf(ctx, w, "\tKLR_TRY(");
 	knh_printf(ctx, w, "NPC, L%p", op->jumppc);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8653,7 +8637,7 @@ void KNH_KLR_TRYEND(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	klr_tryend_t *op = (klr_tryend_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_TRYEND(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8667,9 +8651,9 @@ void KNH_KLR_CATCH(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	knh_printf(ctx, w, "\tKLR_CATCH(");
 	knh_printf(ctx, w, "NPC, L%p", op->jumppc);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "CONSTPOOL(ctx, delta + %d)", knh_Asm_constId(ctx, abr, op->a4));
 	knh_println(ctx, w, STEXT(");"));
@@ -8683,7 +8667,7 @@ void KNH_KLR_THROW(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_throw_t *op = (klr_throw_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_THROW(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8707,7 +8691,7 @@ void KNH_KLR_THROW_AGAIN(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_sta
 	klr_throw_again_t *op = (klr_throw_again_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_THROW_AGAIN(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8719,11 +8703,11 @@ void KNH_KLR_P(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_co
 	klr_p_t *op = (klr_p_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_P(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8735,7 +8719,7 @@ void KNH_KLR_PMSG(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_pmsg_t *op = (klr_pmsg_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_PMSG(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "CONSTPOOL(ctx, delta + %d)", knh_Asm_constId(ctx, abr, op->a2));
 	knh_println(ctx, w, STEXT(");"));
@@ -8749,7 +8733,7 @@ void KNH_KLR_iCAST(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_icast_t *op = (klr_icast_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iCAST(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8761,7 +8745,7 @@ void KNH_KLR_inCAST(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	klr_incast_t *op = (klr_incast_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_inCAST(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8773,7 +8757,7 @@ void KNH_KLR_fCAST(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_fcast_t *op = (klr_fcast_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fCAST(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8785,7 +8769,7 @@ void KNH_KLR_fnCAST(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	klr_fncast_t *op = (klr_fncast_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fnCAST(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8797,9 +8781,9 @@ void KNH_KLR_bNOT(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_bnot_t *op = (klr_bnot_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_bNOT(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8811,9 +8795,9 @@ void KNH_KLR_iNEG(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_ineg_t *op = (klr_ineg_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iNEG(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8825,11 +8809,11 @@ void KNH_KLR_iADD(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_iadd_t *op = (klr_iadd_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iADD(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8841,9 +8825,9 @@ void KNH_KLR_iADDn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_iaddn_t *op = (klr_iaddn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iADDn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__integer(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -8857,11 +8841,11 @@ void KNH_KLR_iSUB(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_isub_t *op = (klr_isub_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iSUB(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8873,9 +8857,9 @@ void KNH_KLR_iSUBn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_isubn_t *op = (klr_isubn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iSUBn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__integer(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -8889,11 +8873,11 @@ void KNH_KLR_iMUL(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_imul_t *op = (klr_imul_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iMUL(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8905,9 +8889,9 @@ void KNH_KLR_iMULn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_imuln_t *op = (klr_imuln_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iMULn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__integer(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -8921,11 +8905,11 @@ void KNH_KLR_iDIV(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_idiv_t *op = (klr_idiv_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iDIV(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8937,9 +8921,9 @@ void KNH_KLR_iDIVn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_idivn_t *op = (klr_idivn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iDIVn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__integer(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -8953,11 +8937,11 @@ void KNH_KLR_iMOD(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_imod_t *op = (klr_imod_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iMOD(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8969,9 +8953,9 @@ void KNH_KLR_iMODn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_imodn_t *op = (klr_imodn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iMODn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__integer(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -8985,11 +8969,11 @@ void KNH_KLR_iEQ(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_
 	klr_ieq_t *op = (klr_ieq_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iEQ(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9001,9 +8985,9 @@ void KNH_KLR_iEQn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_ieqn_t *op = (klr_ieqn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iEQn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__integer(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -9017,11 +9001,11 @@ void KNH_KLR_iNEQ(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_ineq_t *op = (klr_ineq_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iNEQ(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9033,9 +9017,9 @@ void KNH_KLR_iNEQn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_ineqn_t *op = (klr_ineqn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iNEQn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__integer(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -9049,11 +9033,11 @@ void KNH_KLR_iLT(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_
 	klr_ilt_t *op = (klr_ilt_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iLT(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9065,9 +9049,9 @@ void KNH_KLR_iLTn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_iltn_t *op = (klr_iltn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iLTn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__integer(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -9081,11 +9065,11 @@ void KNH_KLR_iLTE(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_ilte_t *op = (klr_ilte_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iLTE(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9097,9 +9081,9 @@ void KNH_KLR_iLTEn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_ilten_t *op = (klr_ilten_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iLTEn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__integer(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -9113,11 +9097,11 @@ void KNH_KLR_iGT(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_
 	klr_igt_t *op = (klr_igt_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iGT(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9129,9 +9113,9 @@ void KNH_KLR_iGTn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_igtn_t *op = (klr_igtn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iGTn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__integer(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -9145,11 +9129,11 @@ void KNH_KLR_iGTE(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_igte_t *op = (klr_igte_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iGTE(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9161,9 +9145,9 @@ void KNH_KLR_iGTEn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_igten_t *op = (klr_igten_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_iGTEn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__integer(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -9177,9 +9161,9 @@ void KNH_KLR_fNEG(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_fneg_t *op = (klr_fneg_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fNEG(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9191,11 +9175,11 @@ void KNH_KLR_fADD(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_fadd_t *op = (klr_fadd_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fADD(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9207,9 +9191,9 @@ void KNH_KLR_fADDn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_faddn_t *op = (klr_faddn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fADDn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__float(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -9223,11 +9207,11 @@ void KNH_KLR_fSUB(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_fsub_t *op = (klr_fsub_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fSUB(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9239,9 +9223,9 @@ void KNH_KLR_fSUBn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_fsubn_t *op = (klr_fsubn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fSUBn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__float(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -9255,11 +9239,11 @@ void KNH_KLR_fMUL(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_fmul_t *op = (klr_fmul_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fMUL(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9271,9 +9255,9 @@ void KNH_KLR_fMULn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_fmuln_t *op = (klr_fmuln_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fMULn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__float(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -9287,11 +9271,11 @@ void KNH_KLR_fDIV(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_fdiv_t *op = (klr_fdiv_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fDIV(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9303,9 +9287,9 @@ void KNH_KLR_fDIVn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_fdivn_t *op = (klr_fdivn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fDIVn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__float(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -9319,11 +9303,11 @@ void KNH_KLR_fEQ(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_
 	klr_feq_t *op = (klr_feq_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fEQ(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9335,9 +9319,9 @@ void KNH_KLR_fEQn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_feqn_t *op = (klr_feqn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fEQn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__float(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -9351,11 +9335,11 @@ void KNH_KLR_fNEQ(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_fneq_t *op = (klr_fneq_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fNEQ(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9367,9 +9351,9 @@ void KNH_KLR_fNEQn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_fneqn_t *op = (klr_fneqn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fNEQn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__float(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -9383,11 +9367,11 @@ void KNH_KLR_fLT(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_
 	klr_flt_t *op = (klr_flt_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fLT(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9399,9 +9383,9 @@ void KNH_KLR_fLTn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_fltn_t *op = (klr_fltn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fLTn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__float(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -9415,11 +9399,11 @@ void KNH_KLR_fLTE(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_flte_t *op = (klr_flte_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fLTE(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9431,9 +9415,9 @@ void KNH_KLR_fLTEn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_flten_t *op = (klr_flten_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fLTEn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__float(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -9447,11 +9431,11 @@ void KNH_KLR_fGT(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_
 	klr_fgt_t *op = (klr_fgt_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fGT(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9463,9 +9447,9 @@ void KNH_KLR_fGTn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_fgtn_t *op = (klr_fgtn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fGTn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__float(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -9479,11 +9463,11 @@ void KNH_KLR_fGTE(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_fgte_t *op = (klr_fgte_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fGTE(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9495,9 +9479,9 @@ void KNH_KLR_fGTEn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_fgten_t *op = (klr_fgten_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_fGTEn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write__float(ctx, w, op->a3);
 	knh_println(ctx, w, STEXT(");"));
@@ -9511,11 +9495,11 @@ void KNH_KLR_AGET(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_aget_t *op = (klr_aget_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_AGET(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9527,11 +9511,11 @@ void KNH_KLR_AGETn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_agetn_t *op = (klr_agetn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_AGETn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9543,11 +9527,11 @@ void KNH_KLR_IAGET(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_iaget_t *op = (klr_iaget_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_IAGET(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9559,11 +9543,11 @@ void KNH_KLR_IAGETn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	klr_iagetn_t *op = (klr_iagetn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_IAGETn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9575,11 +9559,11 @@ void KNH_KLR_FAGET(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_faget_t *op = (klr_faget_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_FAGET(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9591,11 +9575,11 @@ void KNH_KLR_FAGETn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	klr_fagetn_t *op = (klr_fagetn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_FAGETn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9607,11 +9591,11 @@ void KNH_KLR_ASET(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 	klr_aset_t *op = (klr_aset_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_ASET(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9623,11 +9607,11 @@ void KNH_KLR_ASETn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_asetn_t *op = (klr_asetn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_ASETn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9639,11 +9623,11 @@ void KNH_KLR_IASET(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_iaset_t *op = (klr_iaset_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_IASET(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9655,11 +9639,11 @@ void KNH_KLR_IASETn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	klr_iasetn_t *op = (klr_iasetn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_IASETn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9671,11 +9655,11 @@ void KNH_KLR_FASET(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	klr_faset_t *op = (klr_faset_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_FASET(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9687,11 +9671,11 @@ void KNH_KLR_FASETn(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	klr_fasetn_t *op = (klr_fasetn_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_FASETn(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a2);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_write(ctx, w,  STEXT(", "));
-	knh_write__i(ctx, w, (knh_int_t)op->a3);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a3);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -9703,7 +9687,7 @@ void KNH_KLR_INITCODE(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start,
 	klr_initcode_t *op = (klr_initcode_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_INITCODE(");
-	knh_write__i(ctx, w, (knh_int_t)op->a1);
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_println(ctx, w, STEXT(");"));
 }
 

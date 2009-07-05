@@ -51,7 +51,7 @@ MAPPER knh_FArray_Iterator(Ctx *ctx, knh_sfp_t *sfp);
 Mapper *knh_tMapper_newIteratorArray(Ctx *ctx, knh_class_t icid, knh_class_t acid);
 Mapper *knh_tMapper_newArrayIterator(Ctx *ctx, knh_class_t acid, knh_class_t icid);
 void knh_array_dfree(Ctx *ctx, void *ptr, size_t capacity, size_t usize);
-void knh_Iterator__k(Ctx *ctx, Iterator *o, OutputStream *w, String *m);
+void knh_Iterator__k(Ctx *ctx, Iterator *it, OutputStream *w, String *m);
 /* ../src/api/dbapi.c */
 int knh_ResultSet_indexof_(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/api/hashapi.c */
@@ -380,11 +380,11 @@ char* knh_format_type(Ctx *ctx, char *buf, size_t bufsiz, knh_type_t type);
 char *TYPEQ(knh_type_t type);
 char *knh_TYPEN(Ctx *ctx, knh_type_t type);
 /* ../src/class/knh_write.c */
-void knh_write__s(Ctx *ctx, OutputStream *w, char *s);
+void knh_write_char(Ctx *ctx, OutputStream *w, char *s);
 void knh_write__p(Ctx *ctx, OutputStream *w, void *ptr);
-void knh_write__ifmt(Ctx *ctx, OutputStream *w, char *fmt, knh_intptr_t n);
-void knh_write__ffmt(Ctx *ctx, OutputStream *w, char *fmt, knh_float_t n);
-void knh_write_integerfmt(Ctx *ctx, OutputStream *w, char *fmt, knh_int_t n);
+void knh_write_dfmt(Ctx *ctx, OutputStream *w, char *fmt, knh_intptr_t n);
+void knh_write_ifmt(Ctx *ctx, OutputStream *w, char *fmt, knh_int_t n);
+void knh_write_ffmt(Ctx *ctx, OutputStream *w, char *fmt, knh_float_t n);
 void knh_write__flag(Ctx *ctx, OutputStream *w, knh_flag_t flag);
 void knh_write_cid(Ctx *ctx, OutputStream *w, knh_class_t cid);
 void knh_write_mn(Ctx *ctx, OutputStream *w, knh_methodn_t mn);

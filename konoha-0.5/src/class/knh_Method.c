@@ -772,7 +772,7 @@ Method *konoha_lookupFormatter(Ctx *ctx, knh_class_t cid, knh_methodn_t mn)
 		DBG2_({
 			char bufcm[CLASSNAME_BUFSIZ];
 			knh_format_cmethodn(ctx, bufcm, sizeof(bufcm), cid, mn);
-			DBG2_P("Cache missed. looking up %s", bufcm);
+			DBG2_P("Cache missed. looking up %s <%s>", bufcm, CLASSN(DP(mtd)->cid));
 		})
 	}
 	mtd = knh_Class_findMethod(ctx, cid, mn);

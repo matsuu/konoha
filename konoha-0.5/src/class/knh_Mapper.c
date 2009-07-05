@@ -204,7 +204,7 @@ MAPPER knh_fmapper_null(Ctx *ctx, knh_sfp_t *sfp)
 {
 	DBG2_(
 	Mapper *mpr = sfp[1].mpr;
-	DBG2_P("mpr: %s ==> %s", DP(mpr)->scid, DP(mpr)->tcid);
+	DBG2_P("mpr: %s ==> %s", CLASSN(DP(mpr)->scid), CLASSN(DP(mpr)->tcid));
 	);
 	KNH_THROWs(ctx, "ClassCast!!");
 }

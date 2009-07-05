@@ -91,7 +91,7 @@ void knh_regex_regfree__NOP(Ctx *ctx, knh_regex_t *reg)
 void knh_write_USING_REGEX(Ctx *ctx, OutputStream *w)
 {
 #ifdef KNH_USING_REGEX
-	knh_write__s(ctx, w, " regex");
+	knh_write_char(ctx, w, " regex");
 #endif
 }
 

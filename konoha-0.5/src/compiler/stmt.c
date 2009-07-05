@@ -246,7 +246,7 @@ void knh_Stmt__s(Ctx *ctx, Stmt *o, OutputStream *w, String *m)
 	knh_intptr_t i;
 	knh_putc(ctx, w, '(');
 	if(SP(o)->stt != STT_OP && SP(o)->stt != STT_NEW && SP(o)->stt != STT_CALL ) {
-		knh_write__s(ctx, w, knh_stmt_tochar(SP(o)->stt));
+		knh_write_char(ctx, w, knh_stmt_tochar(SP(o)->stt));
 		if(DP(o)->size > 0) {
 			knh_putc(ctx, w, ' ');
 		}

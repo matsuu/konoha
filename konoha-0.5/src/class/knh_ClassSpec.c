@@ -191,7 +191,7 @@ void knh_ClassSpec_initFloatRange(Ctx *ctx, ClassSpec *u, knh_float_t min, knh_f
 void knh_write_floatx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_float_t v)
 {
 	char *FMT = KNH_FLOAT_FMT;
-#ifndef KONOHA_ON_LKM
+#if !defined(KNH_USING_NOFLOT)
 	knh_float_t step = DP(u)->fstep;
 	if(0.1 <= step && step < 1.0) {
 		FMT = KNH_FLOAT_FMT1;
@@ -206,7 +206,7 @@ void knh_write_floatx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_float_t v)
 		FMT = KNH_FLOAT_FMT4;
 	}
 #endif
-	knh_write__ffmt(ctx, w, FMT, v);
+	knh_write_ffmt(ctx, w, FMT, v);
 	knh_bytes_t tag = knh_String_tobytes(DP(u)->tag);
 	if(tag.len > 0) {
 		knh_putc(ctx, w, '[');

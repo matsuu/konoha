@@ -1,20 +1,20 @@
 /****************************************************************************
- * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER  
- * 
+ * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
+ *
  * Copyright (c) 2005-2009, Kimio Kuramitsu <kimio at ynu.ac.jp>
- *           (c) 2008-      Konoha Software Foundation  
+ *           (c) 2008-      Konoha Software Foundation
  * All rights reserved.
- * 
- * You may choose one of the following two licenses when you use konoha. 
+ *
+ * You may choose one of the following two licenses when you use konoha.
  * See www.konohaware.org/license.html for further information.
- * 
+ *
  * (1) GNU General Public License 2.0      (with    KONOHA_UNDER_GPL2)
  * (2) Konoha Software Foundation License 1.0
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
  * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *  
+ *
  ****************************************************************************/
 
 #ifndef STRUCT__H
@@ -31,39 +31,39 @@
 #include<konoha/konoha_t.h>
 
 
-#ifdef __cplusplus 
+#ifdef __cplusplus
 extern "C" {
 #endif
 
 /* ======================================================================== */
 
 static knh_StringData_t StringData[] = {
-	{"", TSN_EMPTY}, 
-	{"\t", TSN_TAB}, 
-	{"\n", TSN_LF}, 
-	{" ", TSN_SPC}, 
-	{"EOL", TSN_EOL}, 
-	{"BEGIN", TSN_BEGIN}, 
-	{"END", TSN_END}, 
-	{"void", TSN_void}, 
-	{"true", TSN_true}, 
-	{"false", TSN_false}, 
-	{"null", TSN_null}, 
-	{"main", TSN_main}, 
-	{""KONOHA_ENCODING"", TSN_ENCODING}, 
-	{"/dev/null", TSN_DEVNULL}, 
-	{"/dev/stdin", TSN_DEVSTDIN}, 
-	{"/dev/stderr", TSN_DEVSTDERR}, 
-	{"/dev/stdout", TSN_DEVSTDOUT}, 
-	{"@label", TSN_ATlabel}, 
-	{"Security!!", TSN_SecurityException}, 
-	{"Assertion!!", TSN_AssertionException}, 
-	{"(", TSN_LP}, 
-	{")", TSN_RP}, 
-	{"{", TSN_LB}, 
-	{"}", TSN_RB}, 
-	{"[", TSN_LS}, 
-	{"]", TSN_RS}, 
+	{"", TSN_EMPTY},
+	{"\t", TSN_TAB},
+	{"\n", TSN_LF},
+	{" ", TSN_SPC},
+	{"EOL", TSN_EOL},
+	{"BEGIN", TSN_BEGIN},
+	{"END", TSN_END},
+	{"void", TSN_void},
+	{"true", TSN_true},
+	{"false", TSN_false},
+	{"null", TSN_null},
+	{"main", TSN_main},
+	{""KONOHA_ENCODING"", TSN_ENCODING},
+	{"/dev/null", TSN_DEVNULL},
+	{"/dev/stdin", TSN_DEVSTDIN},
+	{"/dev/stderr", TSN_DEVSTDERR},
+	{"/dev/stdout", TSN_DEVSTDOUT},
+	{"@label", TSN_ATlabel},
+	{"Security!!", TSN_SecurityException},
+	{"Assertion!!", TSN_AssertionException},
+	{"(", TSN_LP},
+	{")", TSN_RP},
+	{"{", TSN_LB},
+	{"}", TSN_RB},
+	{"[", TSN_LS},
+	{"]", TSN_RS},
 	{NULL}
 };
 
@@ -119,7 +119,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Object", STRUCT_Object, FLAG_Object, 0,
 		(knh_fstruct_init)knh_ObjectField_init,
-		(knh_fstruct_copy)knh_ObjectField_copy, 
+		(knh_fstruct_copy)knh_ObjectField_copy,
 		(knh_fstruct_traverse)knh_ObjectField_traverse,
 		(knh_fstruct_compareTo)knh_ObjectField_compareTo,
 		(knh_fstruct_hashCode)knh_ObjectField_hashCode,
@@ -129,7 +129,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Any", STRUCT_Any, FLAG_Any, 0,
 		(knh_fstruct_init)knh_Any_init,
-		(knh_fstruct_copy)knh_Any_copy, 
+		(knh_fstruct_copy)knh_Any_copy,
 		(knh_fstruct_traverse)knh_Any_traverse,
 		(knh_fstruct_compareTo)knh_Any_compareTo,
 		(knh_fstruct_hashCode)knh_Any_hashCode,
@@ -139,7 +139,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Boolean", STRUCT_Boolean, FLAG_Boolean, 0,
 		(knh_fstruct_init)knh_Boolean_init,
-		(knh_fstruct_copy)knh_Boolean_copy, 
+		(knh_fstruct_copy)knh_Boolean_copy,
 		(knh_fstruct_traverse)knh_Boolean_traverse,
 		(knh_fstruct_compareTo)knh_Boolean_compareTo,
 		(knh_fstruct_hashCode)knh_Boolean_hashCode,
@@ -149,7 +149,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Number", STRUCT_Number, FLAG_Number, 0,
 		(knh_fstruct_init)knh_Number_init,
-		(knh_fstruct_copy)knh_Number_copy, 
+		(knh_fstruct_copy)knh_Number_copy,
 		(knh_fstruct_traverse)knh_Number_traverse,
 		(knh_fstruct_compareTo)knh_Number_compareTo,
 		(knh_fstruct_hashCode)knh_Number_hashCode,
@@ -159,7 +159,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Int", STRUCT_Int, FLAG_Int, 0,
 		(knh_fstruct_init)knh_Int_init,
-		(knh_fstruct_copy)knh_Int_copy, 
+		(knh_fstruct_copy)knh_Int_copy,
 		(knh_fstruct_traverse)knh_Int_traverse,
 		(knh_fstruct_compareTo)knh_Int_compareTo,
 		(knh_fstruct_hashCode)knh_Int_hashCode,
@@ -169,7 +169,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Float", STRUCT_Float, FLAG_Float, 0,
 		(knh_fstruct_init)knh_Float_init,
-		(knh_fstruct_copy)knh_Float_copy, 
+		(knh_fstruct_copy)knh_Float_copy,
 		(knh_fstruct_traverse)knh_Float_traverse,
 		(knh_fstruct_compareTo)knh_Float_compareTo,
 		(knh_fstruct_hashCode)knh_Float_hashCode,
@@ -179,7 +179,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"String", STRUCT_String, FLAG_String, 0,
 		(knh_fstruct_init)knh_String_init,
-		(knh_fstruct_copy)knh_String_copy, 
+		(knh_fstruct_copy)knh_String_copy,
 		(knh_fstruct_traverse)knh_String_traverse,
 		(knh_fstruct_compareTo)knh_String_compareTo,
 		(knh_fstruct_hashCode)knh_String_hashCode,
@@ -189,7 +189,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Bytes", STRUCT_Bytes, FLAG_Bytes, 0,
 		(knh_fstruct_init)knh_Bytes_init,
-		(knh_fstruct_copy)knh_Bytes_copy, 
+		(knh_fstruct_copy)knh_Bytes_copy,
 		(knh_fstruct_traverse)knh_Bytes_traverse,
 		(knh_fstruct_compareTo)knh_Bytes_compareTo,
 		(knh_fstruct_hashCode)knh_Bytes_hashCode,
@@ -199,7 +199,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Tuple2", STRUCT_Tuple2, FLAG_Tuple2, 0,
 		(knh_fstruct_init)knh_Tuple2_init,
-		(knh_fstruct_copy)knh_Tuple2_copy, 
+		(knh_fstruct_copy)knh_Tuple2_copy,
 		(knh_fstruct_traverse)knh_Tuple2_traverse,
 		(knh_fstruct_compareTo)knh_Tuple2_compareTo,
 		(knh_fstruct_hashCode)knh_Tuple2_hashCode,
@@ -209,7 +209,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Range", STRUCT_Range, FLAG_Range, 0,
 		(knh_fstruct_init)knh_Range_init,
-		(knh_fstruct_copy)knh_Range_copy, 
+		(knh_fstruct_copy)knh_Range_copy,
 		(knh_fstruct_traverse)knh_Range_traverse,
 		(knh_fstruct_compareTo)knh_Range_compareTo,
 		(knh_fstruct_hashCode)knh_Range_hashCode,
@@ -219,7 +219,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Array", STRUCT_Array, FLAG_Array, 0,
 		(knh_fstruct_init)knh_Array_init,
-		(knh_fstruct_copy)knh_Array_copy, 
+		(knh_fstruct_copy)knh_Array_copy,
 		(knh_fstruct_traverse)knh_Array_traverse,
 		(knh_fstruct_compareTo)knh_Array_compareTo,
 		(knh_fstruct_hashCode)knh_Array_hashCode,
@@ -229,7 +229,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"IArray", STRUCT_IArray, FLAG_IArray, 0,
 		(knh_fstruct_init)knh_IArray_init,
-		(knh_fstruct_copy)knh_IArray_copy, 
+		(knh_fstruct_copy)knh_IArray_copy,
 		(knh_fstruct_traverse)knh_IArray_traverse,
 		(knh_fstruct_compareTo)knh_IArray_compareTo,
 		(knh_fstruct_hashCode)knh_IArray_hashCode,
@@ -239,7 +239,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"FArray", STRUCT_FArray, FLAG_FArray, 0,
 		(knh_fstruct_init)knh_FArray_init,
-		(knh_fstruct_copy)knh_FArray_copy, 
+		(knh_fstruct_copy)knh_FArray_copy,
 		(knh_fstruct_traverse)knh_FArray_traverse,
 		(knh_fstruct_compareTo)knh_FArray_compareTo,
 		(knh_fstruct_hashCode)knh_FArray_hashCode,
@@ -249,7 +249,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Iterator", STRUCT_Iterator, FLAG_Iterator, sizeof(knh_Iterator_struct),
 		(knh_fstruct_init)knh_Iterator_init,
-		(knh_fstruct_copy)knh_Iterator_copy, 
+		(knh_fstruct_copy)knh_Iterator_copy,
 		(knh_fstruct_traverse)knh_Iterator_traverse,
 		(knh_fstruct_compareTo)knh_Iterator_compareTo,
 		(knh_fstruct_hashCode)knh_Iterator_hashCode,
@@ -259,7 +259,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"DictMap", STRUCT_DictMap, FLAG_DictMap, 0,
 		(knh_fstruct_init)knh_DictMap_init,
-		(knh_fstruct_copy)knh_DictMap_copy, 
+		(knh_fstruct_copy)knh_DictMap_copy,
 		(knh_fstruct_traverse)knh_DictMap_traverse,
 		(knh_fstruct_compareTo)knh_DictMap_compareTo,
 		(knh_fstruct_hashCode)knh_DictMap_hashCode,
@@ -269,7 +269,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"DictSet", STRUCT_DictSet, FLAG_DictSet, 0,
 		(knh_fstruct_init)knh_DictSet_init,
-		(knh_fstruct_copy)knh_DictSet_copy, 
+		(knh_fstruct_copy)knh_DictSet_copy,
 		(knh_fstruct_traverse)knh_DictSet_traverse,
 		(knh_fstruct_compareTo)knh_DictSet_compareTo,
 		(knh_fstruct_hashCode)knh_DictSet_hashCode,
@@ -279,7 +279,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"HashMap", STRUCT_HashMap, FLAG_HashMap, sizeof(knh_HashMap_struct),
 		(knh_fstruct_init)knh_HashMap_init,
-		(knh_fstruct_copy)knh_HashMap_copy, 
+		(knh_fstruct_copy)knh_HashMap_copy,
 		(knh_fstruct_traverse)knh_HashMap_traverse,
 		(knh_fstruct_compareTo)knh_HashMap_compareTo,
 		(knh_fstruct_hashCode)knh_HashMap_hashCode,
@@ -289,7 +289,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"HashSet", STRUCT_HashSet, FLAG_HashSet, sizeof(knh_HashSet_struct),
 		(knh_fstruct_init)knh_HashSet_init,
-		(knh_fstruct_copy)knh_HashSet_copy, 
+		(knh_fstruct_copy)knh_HashSet_copy,
 		(knh_fstruct_traverse)knh_HashSet_traverse,
 		(knh_fstruct_compareTo)knh_HashSet_compareTo,
 		(knh_fstruct_hashCode)knh_HashSet_hashCode,
@@ -299,7 +299,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"DictIdx", STRUCT_DictIdx, FLAG_DictIdx, 0,
 		(knh_fstruct_init)knh_DictIdx_init,
-		(knh_fstruct_copy)knh_DictIdx_copy, 
+		(knh_fstruct_copy)knh_DictIdx_copy,
 		(knh_fstruct_traverse)knh_DictIdx_traverse,
 		(knh_fstruct_compareTo)knh_DictIdx_compareTo,
 		(knh_fstruct_hashCode)knh_DictIdx_hashCode,
@@ -309,7 +309,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Class", STRUCT_Class, FLAG_Class, 0,
 		(knh_fstruct_init)knh_Class_init,
-		(knh_fstruct_copy)knh_Class_copy, 
+		(knh_fstruct_copy)knh_Class_copy,
 		(knh_fstruct_traverse)knh_Class_traverse,
 		(knh_fstruct_compareTo)knh_Class_compareTo,
 		(knh_fstruct_hashCode)knh_Class_hashCode,
@@ -319,7 +319,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"ClassStruct", STRUCT_ClassStruct, FLAG_ClassStruct, 0,
 		(knh_fstruct_init)knh_ClassStruct_init,
-		(knh_fstruct_copy)knh_ClassStruct_copy, 
+		(knh_fstruct_copy)knh_ClassStruct_copy,
 		(knh_fstruct_traverse)knh_ClassStruct_traverse,
 		(knh_fstruct_compareTo)knh_ClassStruct_compareTo,
 		(knh_fstruct_hashCode)knh_ClassStruct_hashCode,
@@ -329,7 +329,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"MethodField", STRUCT_MethodField, FLAG_MethodField, 0,
 		(knh_fstruct_init)knh_MethodField_init,
-		(knh_fstruct_copy)knh_MethodField_copy, 
+		(knh_fstruct_copy)knh_MethodField_copy,
 		(knh_fstruct_traverse)knh_MethodField_traverse,
 		(knh_fstruct_compareTo)knh_MethodField_compareTo,
 		(knh_fstruct_hashCode)knh_MethodField_hashCode,
@@ -339,7 +339,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Method", STRUCT_Method, FLAG_Method, sizeof(knh_Method_struct),
 		(knh_fstruct_init)knh_Method_init,
-		(knh_fstruct_copy)knh_Method_copy, 
+		(knh_fstruct_copy)knh_Method_copy,
 		(knh_fstruct_traverse)knh_Method_traverse,
 		(knh_fstruct_compareTo)knh_Method_compareTo,
 		(knh_fstruct_hashCode)knh_Method_hashCode,
@@ -349,7 +349,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Mapper", STRUCT_Mapper, FLAG_Mapper, sizeof(knh_Mapper_struct),
 		(knh_fstruct_init)knh_Mapper_init,
-		(knh_fstruct_copy)knh_Mapper_copy, 
+		(knh_fstruct_copy)knh_Mapper_copy,
 		(knh_fstruct_traverse)knh_Mapper_traverse,
 		(knh_fstruct_compareTo)knh_Mapper_compareTo,
 		(knh_fstruct_hashCode)knh_Mapper_hashCode,
@@ -359,7 +359,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"ClassMap", STRUCT_ClassMap, FLAG_ClassMap, sizeof(knh_ClassMap_struct),
 		(knh_fstruct_init)knh_ClassMap_init,
-		(knh_fstruct_copy)knh_ClassMap_copy, 
+		(knh_fstruct_copy)knh_ClassMap_copy,
 		(knh_fstruct_traverse)knh_ClassMap_traverse,
 		(knh_fstruct_compareTo)knh_ClassMap_compareTo,
 		(knh_fstruct_hashCode)knh_ClassMap_hashCode,
@@ -369,7 +369,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Closure", STRUCT_Closure, FLAG_Closure, sizeof(knh_Closure_struct),
 		(knh_fstruct_init)knh_Closure_init,
-		(knh_fstruct_copy)knh_Closure_copy, 
+		(knh_fstruct_copy)knh_Closure_copy,
 		(knh_fstruct_traverse)knh_Closure_traverse,
 		(knh_fstruct_compareTo)knh_Closure_compareTo,
 		(knh_fstruct_hashCode)knh_Closure_hashCode,
@@ -379,7 +379,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"AffineConv", STRUCT_AffineConv, FLAG_AffineConv, 0,
 		(knh_fstruct_init)knh_AffineConv_init,
-		(knh_fstruct_copy)knh_AffineConv_copy, 
+		(knh_fstruct_copy)knh_AffineConv_copy,
 		(knh_fstruct_traverse)knh_AffineConv_traverse,
 		(knh_fstruct_compareTo)knh_AffineConv_compareTo,
 		(knh_fstruct_hashCode)knh_AffineConv_hashCode,
@@ -389,7 +389,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Regex", STRUCT_Regex, FLAG_Regex, 0,
 		(knh_fstruct_init)knh_Regex_init,
-		(knh_fstruct_copy)knh_Regex_copy, 
+		(knh_fstruct_copy)knh_Regex_copy,
 		(knh_fstruct_traverse)knh_Regex_traverse,
 		(knh_fstruct_compareTo)knh_Regex_compareTo,
 		(knh_fstruct_hashCode)knh_Regex_hashCode,
@@ -399,7 +399,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"BytesConv", STRUCT_BytesConv, FLAG_BytesConv, 0,
 		(knh_fstruct_init)knh_BytesConv_init,
-		(knh_fstruct_copy)knh_BytesConv_copy, 
+		(knh_fstruct_copy)knh_BytesConv_copy,
 		(knh_fstruct_traverse)knh_BytesConv_traverse,
 		(knh_fstruct_compareTo)knh_BytesConv_compareTo,
 		(knh_fstruct_hashCode)knh_BytesConv_hashCode,
@@ -409,7 +409,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"ClassSpec", STRUCT_ClassSpec, FLAG_ClassSpec, sizeof(knh_ClassSpec_struct),
 		(knh_fstruct_init)knh_ClassSpec_init,
-		(knh_fstruct_copy)knh_ClassSpec_copy, 
+		(knh_fstruct_copy)knh_ClassSpec_copy,
 		(knh_fstruct_traverse)knh_ClassSpec_traverse,
 		(knh_fstruct_compareTo)knh_ClassSpec_compareTo,
 		(knh_fstruct_hashCode)knh_ClassSpec_hashCode,
@@ -419,7 +419,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"InputStream", STRUCT_InputStream, FLAG_InputStream, sizeof(knh_InputStream_struct),
 		(knh_fstruct_init)knh_InputStream_init,
-		(knh_fstruct_copy)knh_InputStream_copy, 
+		(knh_fstruct_copy)knh_InputStream_copy,
 		(knh_fstruct_traverse)knh_InputStream_traverse,
 		(knh_fstruct_compareTo)knh_InputStream_compareTo,
 		(knh_fstruct_hashCode)knh_InputStream_hashCode,
@@ -429,7 +429,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"OutputStream", STRUCT_OutputStream, FLAG_OutputStream, sizeof(knh_OutputStream_struct),
 		(knh_fstruct_init)knh_OutputStream_init,
-		(knh_fstruct_copy)knh_OutputStream_copy, 
+		(knh_fstruct_copy)knh_OutputStream_copy,
 		(knh_fstruct_traverse)knh_OutputStream_traverse,
 		(knh_fstruct_compareTo)knh_OutputStream_compareTo,
 		(knh_fstruct_hashCode)knh_OutputStream_hashCode,
@@ -439,7 +439,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Socket", STRUCT_Socket, FLAG_Socket, sizeof(knh_Socket_struct),
 		(knh_fstruct_init)knh_Socket_init,
-		(knh_fstruct_copy)knh_Socket_copy, 
+		(knh_fstruct_copy)knh_Socket_copy,
 		(knh_fstruct_traverse)knh_Socket_traverse,
 		(knh_fstruct_compareTo)knh_Socket_compareTo,
 		(knh_fstruct_hashCode)knh_Socket_hashCode,
@@ -449,7 +449,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Connection", STRUCT_Connection, FLAG_Connection, sizeof(knh_Connection_struct),
 		(knh_fstruct_init)knh_Connection_init,
-		(knh_fstruct_copy)knh_Connection_copy, 
+		(knh_fstruct_copy)knh_Connection_copy,
 		(knh_fstruct_traverse)knh_Connection_traverse,
 		(knh_fstruct_compareTo)knh_Connection_compareTo,
 		(knh_fstruct_hashCode)knh_Connection_hashCode,
@@ -459,7 +459,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"ResultSet", STRUCT_ResultSet, FLAG_ResultSet, sizeof(knh_ResultSet_struct),
 		(knh_fstruct_init)knh_ResultSet_init,
-		(knh_fstruct_copy)knh_ResultSet_copy, 
+		(knh_fstruct_copy)knh_ResultSet_copy,
 		(knh_fstruct_traverse)knh_ResultSet_traverse,
 		(knh_fstruct_compareTo)knh_ResultSet_compareTo,
 		(knh_fstruct_hashCode)knh_ResultSet_hashCode,
@@ -469,7 +469,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Exception", STRUCT_Exception, FLAG_Exception, sizeof(knh_Exception_struct),
 		(knh_fstruct_init)knh_Exception_init,
-		(knh_fstruct_copy)knh_Exception_copy, 
+		(knh_fstruct_copy)knh_Exception_copy,
 		(knh_fstruct_traverse)knh_Exception_traverse,
 		(knh_fstruct_compareTo)knh_Exception_compareTo,
 		(knh_fstruct_hashCode)knh_Exception_hashCode,
@@ -479,7 +479,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"ExceptionHandler", STRUCT_ExceptionHandler, FLAG_ExceptionHandler, sizeof(knh_ExceptionHandler_struct),
 		(knh_fstruct_init)knh_ExceptionHandler_init,
-		(knh_fstruct_copy)knh_ExceptionHandler_copy, 
+		(knh_fstruct_copy)knh_ExceptionHandler_copy,
 		(knh_fstruct_traverse)knh_ExceptionHandler_traverse,
 		(knh_fstruct_compareTo)knh_ExceptionHandler_compareTo,
 		(knh_fstruct_hashCode)knh_ExceptionHandler_hashCode,
@@ -489,7 +489,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Script", STRUCT_Script, FLAG_Script, 0,
 		(knh_fstruct_init)knh_Script_init,
-		(knh_fstruct_copy)knh_Script_copy, 
+		(knh_fstruct_copy)knh_Script_copy,
 		(knh_fstruct_traverse)knh_Script_traverse,
 		(knh_fstruct_compareTo)knh_Script_compareTo,
 		(knh_fstruct_hashCode)knh_Script_hashCode,
@@ -499,7 +499,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"NameSpace", STRUCT_NameSpace, FLAG_NameSpace, sizeof(knh_NameSpace_struct),
 		(knh_fstruct_init)knh_NameSpace_init,
-		(knh_fstruct_copy)knh_NameSpace_copy, 
+		(knh_fstruct_copy)knh_NameSpace_copy,
 		(knh_fstruct_traverse)knh_NameSpace_traverse,
 		(knh_fstruct_compareTo)knh_NameSpace_compareTo,
 		(knh_fstruct_hashCode)knh_NameSpace_hashCode,
@@ -509,7 +509,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"System", STRUCT_System, FLAG_System, sizeof(knh_System_struct),
 		(knh_fstruct_init)knh_System_init,
-		(knh_fstruct_copy)knh_System_copy, 
+		(knh_fstruct_copy)knh_System_copy,
 		(knh_fstruct_traverse)knh_System_traverse,
 		(knh_fstruct_compareTo)knh_System_compareTo,
 		(knh_fstruct_hashCode)knh_System_hashCode,
@@ -519,7 +519,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Context", STRUCT_Context, FLAG_Context, 0,
 		(knh_fstruct_init)knh_Context_init,
-		(knh_fstruct_copy)knh_Context_copy, 
+		(knh_fstruct_copy)knh_Context_copy,
 		(knh_fstruct_traverse)knh_Context_traverse,
 		(knh_fstruct_compareTo)knh_Context_compareTo,
 		(knh_fstruct_hashCode)knh_Context_hashCode,
@@ -529,7 +529,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Token", STRUCT_Token, FLAG_Token, sizeof(knh_Token_struct),
 		(knh_fstruct_init)knh_Token_init,
-		(knh_fstruct_copy)knh_Token_copy, 
+		(knh_fstruct_copy)knh_Token_copy,
 		(knh_fstruct_traverse)knh_Token_traverse,
 		(knh_fstruct_compareTo)knh_Token_compareTo,
 		(knh_fstruct_hashCode)knh_Token_hashCode,
@@ -539,7 +539,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Stmt", STRUCT_Stmt, FLAG_Stmt, sizeof(knh_Stmt_struct),
 		(knh_fstruct_init)knh_Stmt_init,
-		(knh_fstruct_copy)knh_Stmt_copy, 
+		(knh_fstruct_copy)knh_Stmt_copy,
 		(knh_fstruct_traverse)knh_Stmt_traverse,
 		(knh_fstruct_compareTo)knh_Stmt_compareTo,
 		(knh_fstruct_hashCode)knh_Stmt_hashCode,
@@ -549,7 +549,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"Asm", STRUCT_Asm, FLAG_Asm, sizeof(knh_Asm_struct),
 		(knh_fstruct_init)knh_Asm_init,
-		(knh_fstruct_copy)knh_Asm_copy, 
+		(knh_fstruct_copy)knh_Asm_copy,
 		(knh_fstruct_traverse)knh_Asm_traverse,
 		(knh_fstruct_compareTo)knh_Asm_compareTo,
 		(knh_fstruct_hashCode)knh_Asm_hashCode,
@@ -559,7 +559,7 @@ static knh_StructData_t StructData[] = {
 	{
 		"KLRCode", STRUCT_KLRCode, FLAG_KLRCode, sizeof(knh_KLRCode_struct),
 		(knh_fstruct_init)knh_KLRCode_init,
-		(knh_fstruct_copy)knh_KLRCode_copy, 
+		(knh_fstruct_copy)knh_KLRCode_copy,
 		(knh_fstruct_traverse)knh_KLRCode_traverse,
 		(knh_fstruct_compareTo)knh_KLRCode_compareTo,
 		(knh_fstruct_hashCode)knh_KLRCode_hashCode,
@@ -1238,7 +1238,7 @@ static knh_MethodData_t MethodData[] = {
 	{knh_fmethod_movableText, 0, CLASS_Object, METHODN__k, 0, MFN_void_OutputStream_Any, (void*)knh_Object__k},
 	{knh_fmethod_movableText, 0, CLASS_Object, METHODN__dump, 0, MFN_void_OutputStream_Any, (void*)knh_Object__dump},
 	{knh_fmethod_movableText, 0, CLASS_Object, METHODN__empty, 0, MFN_void_OutputStream_Any, (void*)knh_Object__empty},
-	{knh_fmethod_movableText, 0, CLASS_Any, METHODN__k, 0, MFN_void_OutputStream_Any, (void*)knh_Any__k},
+//	{knh_fmethod_movableText, 0, CLASS_Any, METHODN__k, 0, MFN_void_OutputStream_Any, (void*)knh_Any__k},
 	{knh__Class_domain, 0, CLASS_Class, METHODN_domain, 0, MFN_nArray, (void*)NULL},
 	{knh_fmethod_movableText, 0, CLASS_Class, METHODN__s, 0, MFN_void_OutputStream_Any, (void*)knh_Class__s},
 	{knh_fmethod_movableText, 0, CLASS_Class, METHODN__k, 0, MFN_void_OutputStream_Any, (void*)knh_Class__k},

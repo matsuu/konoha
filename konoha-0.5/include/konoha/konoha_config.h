@@ -37,8 +37,9 @@
 /* ======================================================================== */
 /* configure */
 
-//#define KNH_USING_RCGC       1
-#define KNH_USING_UNBOXFIELD 1
+#define KNH_USING_RCGC         1
+#define KNH_USING_FASTMALLOC   1
+#define KNH_USING_UNBOXFIELD   1
 
 /* ======================================================================== */
 /* Manifesto */

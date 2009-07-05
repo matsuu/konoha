@@ -878,7 +878,7 @@ void knh_IArray__k(Ctx *ctx, IArray *o, OutputStream *w, String *m)
 		if(c > 0) {
 			knh_write_delim(ctx,w);
 		}
-		knh_write__i(ctx, w, o->ilist[c]);
+		knh_write_ifmt(ctx, w, KNH_INT_FMT, o->ilist[c]);
 	}
 	knh_putc(ctx, w, ']');
 }
@@ -894,7 +894,7 @@ void knh_FArray__k(Ctx *ctx, FArray *o, OutputStream *w, String *m)
 		if(c > 0) {
 			knh_write_delim(ctx,w);
 		}
-		knh_write__f(ctx, w, o->flist[c]);
+		knh_write_ffmt(ctx, w, KNH_FLOAT_FMT, o->flist[c]);
 	}
 	knh_putc(ctx, w, ']');
 }
@@ -916,7 +916,7 @@ MAPPER knh_Array_Iterator(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Array_opItr(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_MAPPED(ctx, sfp,
+	KNH_RETURN(ctx, sfp,
 		new_ArrayIterator(ctx, ctx->share->ClassTable[(sfp[0].o)->h.cid].p1, (Array*)sfp[0].o));
 }
 
@@ -927,11 +927,9 @@ MAPPER knh_Iterator_Array(Ctx *ctx, knh_sfp_t *sfp)
 {
 	Iterator *it = sfp[0].it;
 	Array *a = new_Array(ctx, ctx->share->ClassTable[it->h.cid].p1, 0);
-	it->fnext_1(ctx, sfp, 1);
-	while(HAS_ITRNEXT(sfp[1].o)) {
+	while(it->fnext_1(ctx, sfp, 1)) {
 		knh_sfp_boxing(ctx, sfp + 1);
 		knh_Array_add(ctx, a, sfp[1].o);
-		it->fnext_1(ctx, sfp, 1);
 	}
 	KNH_MAPPED(ctx, sfp, a);
 }
@@ -1368,14 +1366,13 @@ static METHOD knh__FArray_set3D(Ctx *ctx, knh_sfp_t *sfp)
 /* ------------------------------------------------------------------------ */
 /* @method void Iterator.%k(OutputStream w, String m) */
 
-void knh_Iterator__k(Ctx *ctx, Iterator *o, OutputStream *w, String *m)
+void knh_Iterator__k(Ctx *ctx, Iterator *it, OutputStream *w, String *m)
 {
 	size_t c = 0;
 	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
-	KNH_MOV(ctx, lsfp[0].o, o);
+	KNH_MOV(ctx, lsfp[0].o, it);
 	KNH_SHIFTESP(ctx, lsfp+3);
-	o->fnext_1(ctx, lsfp, 2);
-	while(HAS_ITRNEXT(lsfp[2].o)) {
+	while(it->fnext_1(ctx, lsfp, 2)) {
 		if(c > 0) {
 			knh_write_EOL(ctx,w);
 		}
@@ -1383,7 +1380,6 @@ void knh_Iterator__k(Ctx *ctx, Iterator *o, OutputStream *w, String *m)
 		knh_esp1_format(ctx, METHODN__k, w, KNH_NULL);
 		c++;
 		KNH_SHIFTESP(ctx, lsfp+3);
-		o->fnext_1(ctx, lsfp, 2);
 	}
 }
 

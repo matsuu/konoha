@@ -39,7 +39,7 @@ extern "C" {
 
 KNHAPI(void) knh_putc(Ctx *ctx, OutputStream *w, int ch)
 {
-	KNH_ASSERT(IS_OutputStream(w));
+	DBG2_ASSERT(IS_OutputStream(w));
 	knh_OutputStream_putc(ctx, w, ch);
 }
 
@@ -47,7 +47,7 @@ KNHAPI(void) knh_putc(Ctx *ctx, OutputStream *w, int ch)
 
 KNHAPI(void) knh_write(Ctx *ctx, OutputStream *w, knh_bytes_t s)
 {
-	KNH_ASSERT(IS_OutputStream(w));
+	DBG2_ASSERT(IS_OutputStream(w));
 	knh_OutputStream_write(ctx, w, s);
 }
 
@@ -55,7 +55,7 @@ KNHAPI(void) knh_write(Ctx *ctx, OutputStream *w, knh_bytes_t s)
 
 KNHAPI(void) knh_flush(Ctx *ctx, OutputStream *w)
 {
-	KNH_ASSERT(IS_OutputStream(w));
+	DBG2_ASSERT(IS_OutputStream(w));
 	knh_OutputStream_flush(ctx, w);
 }
 
@@ -63,7 +63,7 @@ KNHAPI(void) knh_flush(Ctx *ctx, OutputStream *w)
 
 KNHAPI(void) knh_print(Ctx *ctx, OutputStream *w, knh_bytes_t s)
 {
-	KNH_ASSERT(IS_OutputStream(w));
+	DBG2_ASSERT(IS_OutputStream(w));
 	knh_OutputStream_print_(ctx, w, s, 0);
 }
 
@@ -71,7 +71,7 @@ KNHAPI(void) knh_print(Ctx *ctx, OutputStream *w, knh_bytes_t s)
 
 KNHAPI(void) knh_println(Ctx *ctx, OutputStream *w, knh_bytes_t s)
 {
-	KNH_ASSERT(IS_OutputStream(w));
+	DBG2_ASSERT(IS_OutputStream(w));
 	knh_OutputStream_print_(ctx, w, s, 1);
 }
 
@@ -79,7 +79,7 @@ KNHAPI(void) knh_println(Ctx *ctx, OutputStream *w, knh_bytes_t s)
 
 KNHAPI(void) knh_write_EOL(Ctx *ctx, OutputStream *w)
 {
-	KNH_ASSERT(IS_OutputStream(w));
+	DBG2_ASSERT(IS_OutputStream(w));
 	knh_OutputStream_write(ctx, w, knh_String_tobytes(DP(w)->NEWLINE));
 	if(knh_OutputStream_isAutoFlush(w)) {
 		knh_OutputStream_flush(ctx, w);
@@ -91,7 +91,7 @@ KNHAPI(void) knh_write_EOL(Ctx *ctx, OutputStream *w)
 
 KNHAPI(void) knh_write_TAB(Ctx *ctx, OutputStream *w)
 {
-	KNH_ASSERT(IS_OutputStream(w));
+	DBG2_ASSERT(IS_OutputStream(w));
 	knh_OutputStream_write(ctx, w, knh_String_tobytes(DP(w)->TAB));
 }
 
@@ -110,7 +110,7 @@ KNHAPI(void) knh_write_BOL(Ctx *ctx, OutputStream *w)
 /* ======================================================================== */
 /* [datatype] */
 
-void knh_write__s(Ctx *ctx, OutputStream *w, char *s)
+void knh_write_char(Ctx *ctx, OutputStream *w, char *s)
 {
 	knh_write(ctx, w, B(s));
 }
@@ -126,37 +126,37 @@ void knh_write__p(Ctx *ctx, OutputStream *w, void *ptr)
 
 /* ------------------------------------------------------------------------ */
 
-void knh_write__ifmt(Ctx *ctx, OutputStream *w, char *fmt, knh_intptr_t n)
+void knh_write_dfmt(Ctx *ctx, OutputStream *w, char *fmt, knh_intptr_t n)
 {
 	char buf[KNH_INT_FMTSIZ];
 	knh_snprintf(buf, sizeof(buf), fmt, n);
 	knh_write(ctx, w, B(buf));
 }
 
-#define _knh_write__i(ctx, w, n)   knh_write__ifmt(ctx, w, KNH_INTPTR_FMT, n)
-#define _knh_write__u(ctx, w, n)   knh_write__ifmt(ctx, w, KNH_UINT_FMT, n)
-#define _knh_write__x(ctx, w, n)   knh_write__ifmt(ctx, w, KNH_INTPTR_FMTX, n)
+/* ------------------------------------------------------------------------ */
+
+void knh_write_ifmt(Ctx *ctx, OutputStream *w, char *fmt, knh_int_t n)
+{
+	char buf[KNH_INT_FMTSIZ];
+	knh_snprintf(buf, sizeof(buf), fmt, n);
+	knh_write(ctx, w, B(buf));
+}
+
+//#define _knh_write__i(ctx, w, n)   knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, n)
+//#define _knh_write__u(ctx, w, n)   knh_write_dfmt(ctx, w, KNH_UINT_FMT, n)
+//#define _knh_write__x(ctx, w, n)   knh_write_dfmt(ctx, w, KNH_INTPTR_FMTX, n)
 
 /* ------------------------------------------------------------------------ */
 
-void knh_write__ffmt(Ctx *ctx, OutputStream *w, char *fmt, knh_float_t n)
+void knh_write_ffmt(Ctx *ctx, OutputStream *w, char *fmt, knh_float_t n)
 {
 	char buf[KNH_FLOAT_FMTSIZ];
 	knh_snprintf(buf, sizeof(buf), fmt, n);
 	knh_write(ctx, w, B(buf));
 }
 
-#define _knh_write__f(ctx, w, f)  knh_write__ffmt(ctx, w, KNH_FLOAT_FMT, f)
-#define _knh_write__e(ctx, w, f)  knh_write__ffmt(ctx, w, KNH_FLOAT_FMTE, f)
-
-/* ------------------------------------------------------------------------ */
-
-void knh_write_integerfmt(Ctx *ctx, OutputStream *w, char *fmt, knh_int_t n)
-{
-	char buf[KNH_INT_FMTSIZ];
-	knh_snprintf(buf, sizeof(buf), fmt, n);
-	knh_write(ctx, w, B(buf));
-}
+//#define _knh_write__f(ctx, w, f)  knh_write_ffmt(ctx, w, KNH_FLOAT_FMT, f)
+//#define _knh_write__e(ctx, w, f)  knh_write_ffmt(ctx, w, KNH_FLOAT_FMTE, f)
 
 /* ------------------------------------------------------------------------ */
 /* [flag] */
@@ -187,7 +187,7 @@ void knh_write_cid(Ctx *ctx, OutputStream *w, knh_class_t cid)
 
 /* ------------------------------------------------------------------------ */
 
-#define _knh_write_fn(ctx, w, fn)   knh_write__s(ctx, w, FIELDN(fn))
+#define _knh_write_fn(ctx, w, fn)   knh_write(ctx, w, B(FIELDN(fn)))
 
 void knh_write_mn(Ctx *ctx, OutputStream *w, knh_methodn_t mn)
 {
@@ -207,17 +207,8 @@ void knh_write_mn(Ctx *ctx, OutputStream *w, knh_methodn_t mn)
 			knh_putc(ctx, w, toupper(name[0])); name++;
 		}
 	}
-	knh_write__s(ctx, w, name);
+	knh_write_char(ctx, w, name);
 }
-
-///* ------------------------------------------------------------------------ */
-//
-//void knh_write_cidmn(Ctx *ctx, OutputStream *w, knh_class_t cid, knh_methodn_t mn)
-//{
-//	knh_write_cid(ctx, w, cid);
-//	knh_putc(ctx, w, '.');
-//	knh_write_mn(ctx, w, mn);
-//}
 
 /* ------------------------------------------------------------------------ */
 
@@ -233,10 +224,10 @@ void knh_write_type(Ctx *ctx, OutputStream *w, knh_type_t type)
 	char *cname = CTXCLASSN(cid);
 	if(IS_ubxtype(type)) {
 		knh_putc(ctx, w, tolower(cname[0]));
-		knh_write__s(ctx, w, cname + 1);
+		knh_write_char(ctx, w, cname + 1);
 		return;
 	}
-	knh_write__s(ctx, w, cname);
+	knh_write_char(ctx, w, cname);
 	if(!IS_NNTYPE(type)) {
 		knh_putc(ctx, w, '?');
 	}
@@ -251,9 +242,9 @@ void knh_write_fline(Ctx *ctx, OutputStream *w, char *file, int line)
 	}
 	else {
 		knh_putc(ctx, w, '(');
-		knh_write__s(ctx, w, file);
+		knh_write_char(ctx, w, file);
 		knh_putc(ctx, w, ':');
-		knh_write__i(ctx, w, line);
+		knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, line);
 		knh_putc(ctx, w, ')');
 	}
 }
@@ -277,7 +268,6 @@ KNHAPI(void) knh_format(Ctx *ctx, OutputStream *w, knh_methodn_t mn, Object *o, 
 static char* knh_vprintf_parseindex(char *p, int *index)
 {
     char *ptr = p+1;
-
 	if(ptr[0] == '{' && isdigit(ptr[1]) && ptr[2] == '}') {
 		*index = ptr[1] - '0';
 		ptr += 3;
@@ -290,22 +280,24 @@ static char* knh_vprintf_parseindex(char *p, int *index)
 /* @data */
 
 #define VA_NOP                0
-#define VA_INT                1
-#define VA_FLOAT              2
-#define VA_CHAR               3
-#define VA_POINTER            4
-#define VA_OBJECT             5
-#define VA_FIELDN             6
-#define VA_CLASS              7
-#define VA_TYPE               8
-#define VA_METHODN            9
-#define VA_BYTES             10
+#define VA_DIGIT              1 /* intptr_t */
+#define VA_LONG               2 /* knh_int_t */
+#define VA_FLOAT              3
+#define VA_CHAR               4
+#define VA_POINTER            5
+#define VA_OBJECT             6
+#define VA_FIELDN             7
+#define VA_CLASS              8
+#define VA_TYPE               9
+#define VA_METHODN            10
+#define VA_BYTES              11
 
 typedef struct {
 	int atype;
 	union {
-		knh_intptr_t  ivalue;
+		knh_intptr_t  dvalue;
 		knh_uintptr_t uvalue;
+		knh_int_t     ivalue;
 		knh_float_t   fvalue;
 		knh_float_t   evalue;
 		void         *pvalue;
@@ -337,13 +329,14 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 			//DBG2_P("bindex=%d, index=%d", bindex, index);
 			switch(ch) {
 				case 'd': case 'u':
-					args[index].atype = VA_INT;
+					args[index].atype = VA_DIGIT;
 					break;
-#ifdef KONOHA_ON_LKM
+				case 'l': case 'i':
+					args[index].atype = VA_LONG;
+					break;
 				case 'f': case 'e':
 					args[index].atype = VA_FLOAT;
 					break;
-#endif
 				case 's':
 					args[index].atype = VA_CHAR;
 					break;
@@ -381,10 +374,17 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 
 	for(i = 0; i < 10; i++) {
 		switch(args[i].atype) {
-		case VA_INT:
+		case VA_DIGIT:
+			args[i].dvalue = (knh_intptr_t)va_arg(ap, knh_intptr_t);
+			break;
+		case VA_LONG:
 			args[i].ivalue = (knh_int_t)va_arg(ap, knh_int_t);
 			break;
-#ifndef KONOHA_ON_LKM
+#if defined(KNH_USING_NOFLOAT)
+		case VA_FLOAT:
+			args[i].fvalue = (knh_float_t)va_arg(ap, knh_float_t);
+			break;
+#else
 		case VA_FLOAT:
 			args[i].fvalue = (knh_float_t)va_arg(ap, double);
 			break;
@@ -454,26 +454,28 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 				switch(ch) {
 					case '\0' : return ;
 					case 'd':
-						KNH_ASSERT(args[index].atype == VA_INT);
-						knh_write__i(ctx, w, args[index].ivalue);
+						KNH_ASSERT(args[index].atype == VA_DIGIT);
+						knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, args[index].dvalue);
 						break;
 					case 'u':
-						KNH_ASSERT(args[index].atype == VA_INT);
-						knh_write__u(ctx, w, args[index].uvalue);
+						KNH_ASSERT(args[index].atype == VA_DIGIT);
+						knh_write_dfmt(ctx, w, KNH_INTPTR_UFMT, args[index].uvalue);
 						break;
-#ifndef KONOHA_ON_LKM
+					case 'l': case 'i' :
+						KNH_ASSERT(args[index].atype == VA_LONG);
+						knh_write_ifmt(ctx, w, KNH_INT_FMT, args[index].ivalue);
+						break;
 					case 'f':
 						KNH_ASSERT(args[index].atype == VA_FLOAT);
-						knh_write__f(ctx, w, args[index].fvalue);
+						knh_write_ffmt(ctx, w, KNH_FLOAT_FMT, args[index].fvalue);
 						break;
 					case 'e':
 						KNH_ASSERT(args[index].atype == VA_FLOAT);
-						knh_write__e(ctx, w, args[index].fvalue);
+						knh_write_ffmt(ctx, w, KNH_FLOAT_FMTE, args[index].fvalue);
 						break;
-#endif
 					case 's':
 						KNH_ASSERT(args[index].atype == VA_CHAR);
-						knh_write__s(ctx, w, args[index].svalue);
+						knh_write(ctx, w, B(args[index].svalue));
 						break;
 					case 'p':
 						KNH_ASSERT(args[index].atype == VA_POINTER);
@@ -489,7 +491,7 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap)
 						break;
 					case 'N': case 'F':
 						KNH_ASSERT(args[index].atype == VA_FIELDN);
-						knh_write__s(ctx, w, FIELDN(args[index].fn));
+						knh_write_char(ctx, w, FIELDN(args[index].fn));
 						break;
 					case 'M':
 						KNH_ASSERT(args[index].atype == VA_METHODN);

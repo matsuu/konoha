@@ -103,10 +103,10 @@ knh_code_t* KNH_ASM_bJIFF_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2);
 knh_code_t* KNH_ASM_bJIFF_LOOP_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2);
 knh_code_t* KNH_ASM_JIFNUL_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2);
 knh_code_t* KNH_ASM_JIFNN_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2);
-knh_code_t* KNH_ASM_NEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh_sfi_t a3,knh_sfi_t a4);
-knh_code_t* KNH_ASM_INEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_class_t a2,knh_sfi_t a3,knh_sfi_t a4,knh_sfi_t a5);
-knh_code_t* KNH_ASM_MAPNEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_class_t a2,knh_sfi_t a3,knh_sfi_t a4,knh_sfi_t a5);
-knh_code_t* KNH_ASM_SMAPNEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh_sfi_t a3,knh_sfi_t a4,Object* a5);
+knh_code_t* KNH_ASM_NEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh_sfi_t a3);
+knh_code_t* KNH_ASM_INEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_class_t a2,knh_sfi_t a3,knh_sfi_t a4);
+knh_code_t* KNH_ASM_MAPNEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_class_t a2,knh_sfi_t a3,knh_sfi_t a4);
+knh_code_t* KNH_ASM_SMAPNEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh_sfi_t a3,Object* a4);
 knh_code_t* KNH_ASM_TRY_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2);
 knh_code_t* KNH_ASM_TRYEND_(Ctx *ctx, Asm *o,knh_sfi_t a1);
 knh_code_t* KNH_ASM_CATCH_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh_sfi_t a3,Object* a4);
@@ -1112,7 +1112,6 @@ typedef struct {
 	};
 	knh_sfi_t a2;
 	knh_sfi_t a3;
-	knh_sfi_t a4;
 	void *nextaddr;
 } klr_next_t;
 
@@ -1134,7 +1133,6 @@ typedef struct {
 	knh_class_t a2;
 	knh_sfi_t a3;
 	knh_sfi_t a4;
-	knh_sfi_t a5;
 	void *nextaddr;
 } klr_inext_t;
 
@@ -1156,7 +1154,6 @@ typedef struct {
 	knh_class_t a2;
 	knh_sfi_t a3;
 	knh_sfi_t a4;
-	knh_sfi_t a5;
 	void *nextaddr;
 } klr_mapnext_t;
 
@@ -1177,8 +1174,7 @@ typedef struct {
 	};
 	knh_sfi_t a2;
 	knh_sfi_t a3;
-	knh_sfi_t a4;
-	Object* a5;
+	Object* a4;
 	void *nextaddr;
 } klr_smapnext_t;
 

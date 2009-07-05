@@ -57,9 +57,7 @@ static int canFree = 1;
 
 void *knh_malloc(Ctx *ctx, size_t size)
 {
-#ifdef KONOHA_ON_TB
-	if(size == 0) size=4;
-#endif
+	KNH_ASSERT(size>0);
 	void *block = malloc(size);
 	if (unlikely(block == NULL)) {
 		KNH_EXIT("OutOfMemory!!: %d bytes used", (int)ctx->stat->usedMemorySize);
@@ -120,13 +118,6 @@ void DBG2_free(Ctx *ctx, void *p, size_t size, char *func)
 	}\
 
 
-///* ------------------------------------------------------------------------ */
-//
-//static void* knh_pagetop(void *p)
-//{
-//	return (void*)((((knh_uint_t)p) / KONOHA_PAGESIZE) * KONOHA_PAGESIZE);
-//}
-
 /* ------------------------------------------------------------------------ */
 
 static
@@ -184,8 +175,6 @@ knh_Object_t *new_UnusedObject(Ctx *ctx)
 /* ------------------------------------------------------------------------ */
 /* [fastmalloc] */
 
-/* ------------------------------------------------------------------------ */
-
 static void knh_setFastMallocMemory(void *p)
 {
 	knh_uintptr_t *b = (knh_uintptr_t*)((((knh_uintptr_t)p) / KONOHA_PAGESIZE) * KONOHA_PAGESIZE);
@@ -233,13 +222,15 @@ void *knh_fastmalloc(Ctx *ctx, size_t size)
 		knh_setFastMallocMemory((void*)o);
 		return (void*)o;
 	}
-	void *block = malloc(size);
-	if (unlikely(block == NULL)) {
-		KNH_EXIT("OutOfMemory!!: %d bytes used", (int)ctx->stat->usedMemorySize);
-		//KNH_THROWs(ctx, "OutOfMemory!!");
+	else {
+		void *block = malloc(size);
+		if (unlikely(block == NULL)) {
+			KNH_EXIT("OutOfMemory!!: %d bytes used", (int)ctx->stat->usedMemorySize);
+			//KNH_THROWs(ctx, "OutOfMemory!!");
+		}
+		knh_stat_incUsedMemorySize(ctx, size);
+		return block;
 	}
-	knh_stat_incUsedMemorySize(ctx, size);
-	return block;
 }
 
 /* ------------------------------------------------------------------------ */
