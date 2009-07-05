@@ -400,7 +400,7 @@ void knh_System__dump(Ctx *ctx, System *o, OutputStream *w, String *m)
 {
 	knh_System__k(ctx, o, w, m);
 	knh_write_EOL(ctx, w);
-	knh_printf(ctx, w, "[%s] on %s (%d, %s)\n", KONOHA_CC_VERSION, KONOHA_PLATFORM, (knh_int_t)(sizeof(void*) * 8), konoha_encoding());
+	knh_printf(ctx, w, "[%s] on %s (%d, %s)\n", KONOHA_CC_VERSION, KONOHA_PLATFORM, (knh_intptr_t)(sizeof(void*) * 8), konoha_encoding());
 	knh_write_char(ctx, w, "Options:");
 
 #ifdef KNH_FASTMODE
