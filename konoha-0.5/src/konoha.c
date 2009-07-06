@@ -27,13 +27,20 @@
 
 #include<konoha.h>
 
+#ifdef KNH_USING_BTRON
+#include <basic.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
 int
+#ifdef KNH_USING_BTRON
+main_unix(int argc, char **argv)
+#else
 main(int argc, char **argv)
+#endif
 {
 	konoha_t konoha = konoha_open(4096);
 	int n = konoha_parseopt(konoha, argc, argv);
@@ -48,6 +55,31 @@ main(int argc, char **argv)
 	konoha_close(konoha);
 	return 0;
 }
+
+#ifdef KNH_USING_BTRON
+int main(int argc, TC** argv)
+{
+    char buf[4096];
+    char* argv_euc[256];
+    int i, pos, len;
+
+    pos = 0;
+    for (i = 0; i < argc; i++) {
+        argv_euc[i] = buf + pos;
+        len = tcstoeucs(argv_euc[i], argv[i]);
+        if (len >= 0) {
+            pos += (len + 1);
+        }
+        else {
+            buf[pos] = '\0';
+            pos++;
+        }
+    }
+    argv_euc[argc] = NULL;
+
+    return main_unix(argc, argv_euc);
+}
+#endif
 
 #ifdef __cplusplus
 }
