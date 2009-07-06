@@ -27,46 +27,20 @@
 
 #include<konoha.h>
 
-#ifdef KNH_USING_BTRON
-#include <basic.h>
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int
-#ifdef KNH_USING_BTRON
-main_unix(int argc, char **argv)
-#else
-main(int argc, char **argv)
-#endif
+int main(int argc, void **argv)
 {
-	konoha_t konoha = konoha_open(4096);
-	int n = konoha_parseopt(konoha, argc, argv);
-	if(argc - n == 0) {
-		//package_init(konoha.ctx);
-		konoha_shell(konoha);
-	}
-	else {
-		konoha_read(konoha, argv[n]);
-		konoha_main(konoha, argc - n, argv + n);
-	}
-	konoha_close(konoha);
-	return 0;
-}
-
-#ifdef KNH_USING_BTRON
-int main(int argc, TC** argv)
-{
+#if defined(KNH_USING_BTRON)
     char buf[4096];
-    char* argv_euc[256];
-    int i, pos, len;
+    char* args[256];
+    int i, pos = 0, len;
 
-    pos = 0;
     for (i = 0; i < argc; i++) {
-        argv_euc[i] = buf + pos;
-        len = tcstoeucs(argv_euc[i], argv[i]);
+        args[i] = buf + pos;
+        len = tcstoeucs(args[i], (TC*)argv[i]);
         if (len >= 0) {
             pos += (len + 1);
         }
@@ -75,11 +49,26 @@ int main(int argc, TC** argv)
             pos++;
         }
     }
-    argv_euc[argc] = NULL;
+    args[argc] = NULL;
 
-    return main_unix(argc, argv_euc);
-}
+#else
+    char** args = (char**) argv;
 #endif
+
+    konoha_t konoha = konoha_open(4096);
+    int n = konoha_parseopt(konoha, argc, args);
+    if(argc - n == 0) {
+        //package_init(konoha.ctx);
+        konoha_shell(konoha);
+    }
+    else {
+        konoha_read(konoha, args[n]);
+        konoha_main(konoha, argc - n, args + n);
+    }
+    konoha_close(konoha);
+    return 0;
+}
+
 
 #ifdef __cplusplus
 }
