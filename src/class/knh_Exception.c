@@ -61,7 +61,7 @@ extern "C" {
 /* [ExptTable] */
 
 static
-knh_class_t knh_ExptTable_newId(Ctx *ctx)
+knh_expt_t knh_ExptTable_newId(Ctx *ctx)
 {
 	knh_class_t newid;
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
@@ -77,24 +77,6 @@ knh_class_t knh_ExptTable_newId(Ctx *ctx)
 }
 
 #define _KNH_ASSERT_eid(eid)    KNH_ASSERT(eid < ctx->share->ExptTableSize + 1)
-
-///* ------------------------------------------------------------------------ */
-//
-//static
-//knh_flag_t knh_ExptTable_flag(Ctx *ctx, knh_expt_t eid)
-//{
-//	KNH_ASSERT_eid(eid);
-//	return ctx->share->ExptTable[eid-1].flag;
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//static
-//knh_expt_t knh_ExptTable_parent(Ctx *ctx, knh_expt_t eid)
-//{
-//	KNH_ASSERT_eid(eid);
-//	return ctx->share->ExptTable[eid-1].parent;
-//}
 
 /* ------------------------------------------------------------------------ */
 
@@ -234,8 +216,12 @@ Exception* knh_Exception_new__init(Ctx *ctx, Exception *o, String *e, String *ms
 int knh_Exception_isa(Ctx *ctx, Exception *o, String *msg)
 {
 	knh_expt_t eid = knh_texpt_forname(ctx, knh_String_tobytes(msg), EXPT_unknown);
-	if(eid == EXPT_unknown) return 0;
-	return knh_ExptTable_isa(ctx, DP(o)->eid, eid);
+	int res = 0;
+	DBG2_P("%s(%d) isa? %s(%d)", knh_String_tochar(DP(o)->message), DP(o)->eid, knh_String_tochar(msg), eid);
+	if(eid == EXPT_unknown) res = 0;
+	res = knh_ExptTable_isa(ctx, DP(o)->eid, eid);
+	DBG2_P("res=%d", res);
+	return res;
 }
 
 /* ------------------------------------------------------------------------ */

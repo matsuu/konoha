@@ -554,7 +554,7 @@ knh_uint64_t konoha_getTimeMilliSecond(void);
 knh_uint64_t konoha_getProfCount(void);
 knh_uint64_t konoha_getProfCountPerSecond(void);
 /* ../src/konoha.c */
-int main(int argc, char **argv);
+int main(int argc, void **argv);
 /* ../src/labs/b4.c */
 METHOD knh__Script_changeChannel(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_hook(Ctx *ctx, knh_sfp_t *sfp);

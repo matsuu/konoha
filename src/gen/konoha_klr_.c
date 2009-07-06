@@ -1331,13 +1331,14 @@ knh_code_t* KNH_ASM_CATCH_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh_sf
 
 /* ------------------------------------------------------------------------ */
 
-knh_code_t* KNH_ASM_THROW_(Ctx *ctx, Asm *o,knh_sfi_t a1)
+knh_code_t* KNH_ASM_THROW_(Ctx *ctx, Asm *o,knh_ushort_t a1,knh_sfi_t a2)
 {
 	klr_throw_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_throw_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_THROW);
 		op->opcode = 74;
-		op->a1 = /*(knh_sfi_t)*/a1;
+		op->a1 = /*(knh_ushort_t)*/a1;
+		op->a2 = /*(knh_sfi_t)*/a2;
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
 	return (knh_code_t*)op;
@@ -1345,14 +1346,15 @@ knh_code_t* KNH_ASM_THROW_(Ctx *ctx, Asm *o,knh_sfi_t a1)
 
 /* ------------------------------------------------------------------------ */
 
-knh_code_t* KNH_ASM_THROWs_(Ctx *ctx, Asm *o,Object* a1)
+knh_code_t* KNH_ASM_THROWs_(Ctx *ctx, Asm *o,knh_ushort_t a1,Object* a2)
 {
 	klr_throws_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_throws_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_THROWS);
 		op->opcode = 75;
-		op->a1 = /*(Object*)*/a1;
-		knh_Object_RCinc(op->a1);
+		op->a1 = /*(knh_ushort_t)*/a1;
+		op->a2 = /*(Object*)*/a2;
+		knh_Object_RCinc(op->a2);
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
 	return (knh_code_t*)op;
@@ -2641,7 +2643,7 @@ void knh_code_traverse(Ctx *ctx, knh_code_t *pc, knh_ftraverse ftr)
 			ftr(ctx, ((klr_catch_t*)pc)->a4);
 			break;
 		case OPCODE_THROWS :
-			ftr(ctx, ((klr_throws_t*)pc)->a1);
+			ftr(ctx, ((klr_throws_t*)pc)->a2);
 			break;
 		case OPCODE_PMSG :
 			ftr(ctx, ((klr_pmsg_t*)pc)->a2);
@@ -3587,7 +3589,8 @@ void KNH_DUMP_THROW(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Method 
 {
 	klr_throw_t *op = (klr_throw_t*)pc;
 	KNH_DUMP_OPCODE(ctx, pc, w, mtd, "THROW");
-	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a1));
+	knh_putc(ctx, w, ' '); knh_write__ushort(ctx, w, (op->a1));
+	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a2));
 	knh_write_EOL(ctx, w);
 }
 
@@ -3598,7 +3601,8 @@ void KNH_DUMP_THROWs(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Method
 {
 	klr_throws_t *op = (klr_throws_t*)pc;
 	KNH_DUMP_OPCODE(ctx, pc, w, mtd, "THROWs");
-	knh_putc(ctx, w, ' '); knh_write__OBJ(ctx, w, (op->a1));
+	knh_putc(ctx, w, ' '); knh_write__ushort(ctx, w, (op->a1));
+	knh_putc(ctx, w, ' '); knh_write__OBJ(ctx, w, (op->a2));
 	knh_write_EOL(ctx, w);
 }
 
@@ -5336,7 +5340,7 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		{
 			const klr_throw_t* op = (klr_throw_t*)pc;
 			DBG2_OPDUMP(ctx, pc);
-			KLR_THROW(ctx, op->a1);
+			KLR_THROW(ctx, op->a1, op->a2);
 			pc += OPSIZE_THROW;
 			goto L_HEAD;
 		}
@@ -5345,7 +5349,7 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		{
 			const klr_throws_t* op = (klr_throws_t*)pc;
 			DBG2_OPDUMP(ctx, pc);
-			KLR_THROWs(ctx, op->a1);
+			KLR_THROWs(ctx, op->a1, op->a2);
 			pc += OPSIZE_THROWS;
 			goto L_HEAD;
 		}
@@ -6776,7 +6780,7 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		const klr_throw_t *op = (klr_throw_t*)pc;
 		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
-		KLR_THROW(ctx, op->a1);
+		KLR_THROW(ctx, op->a1, op->a2);
 		pc += OPSIZE_THROW;
 		goto *(op->nextaddr);
 	}
@@ -6785,7 +6789,7 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		const klr_throws_t *op = (klr_throws_t*)pc;
 		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
-		KLR_THROWs(ctx, op->a1);
+		KLR_THROWs(ctx, op->a1, op->a2);
 		pc += OPSIZE_THROWS;
 		goto *(op->nextaddr);
 	}
@@ -8668,6 +8672,8 @@ void KNH_KLR_THROW(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_THROW(");
 	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
+	knh_write(ctx, w,  STEXT(", "));
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8679,7 +8685,9 @@ void KNH_KLR_THROWs(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 	klr_throws_t *op = (klr_throws_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
 	knh_printf(ctx, w, "\tKLR_THROWs(");
-	knh_printf(ctx, w, "CONSTPOOL(ctx, delta + %d)", knh_Asm_constId(ctx, abr, op->a1));
+	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
+	knh_write(ctx, w,  STEXT(", "));
+	knh_printf(ctx, w, "CONSTPOOL(ctx, delta + %d)", knh_Asm_constId(ctx, abr, op->a2));
 	knh_println(ctx, w, STEXT(");"));
 }
 

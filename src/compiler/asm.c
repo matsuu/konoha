@@ -35,6 +35,7 @@
 extern "C" {
 #endif
 
+static int knh_Asm_inTry(Asm *abr);
 void knh_code_traverse(Ctx *ctx, knh_code_t *pc, knh_ftraverse ftr);
 void knh_Asm_writeAddress(Ctx *ctx, Asm *o, knh_code_t *pc_start);
 
@@ -1124,12 +1125,13 @@ static
 void TERMs_ASM_THROW(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr)
 {
 	Token *tk = DP(stmt)->tokens[n];
+
 	if(IS_Token(tk) && SP(tk)->tt == TT_STACK /*TT_LOCAL ??*/) {
-		KNH_ASM_THROW_(ctx, abr, sfi_(DP(tk)->index));
+		KNH_ASM_THROW_(ctx, abr, knh_Asm_inTry(abr), sfi_(DP(tk)->index));
 	}
 	else {
 		TERMs_asm(ctx, stmt, n, abr, NNTYPE_Exception, DP(abr)->stack);
-		KNH_ASM_THROW_(ctx, abr, sfi_(DP(abr)->stack));
+		KNH_ASM_THROW_(ctx, abr, knh_Asm_inTry(abr), sfi_(DP(abr)->stack));
 	}
 }
 
@@ -2173,6 +2175,12 @@ void knh_StmtFOREACH_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 /* ======================================================================== */
 /* [TRY] */
 
+
+static int knh_Asm_inTry(Asm *abr)
+{
+	return IS_Stmt(DP(abr)->finallyStmt);
+}
+
 /* ------------------------------------------------------------------------ */
 
 static
@@ -2209,40 +2217,39 @@ void knh_StmtTRY_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 	knh_labelid_t lbcatch   = knh_Asm_newLabelId(ctx, abr, NULL);
 	knh_labelid_t lbfinally = knh_Asm_newLabelId(ctx, abr, NULL);
 
-	Token *tkhdr = DP(stmt)->tokens[TRY_finally + 1];
-	KNH_ASSERT(SP(tkhdr)->tt == TT_STACK);
+	Token *tkHDR = DP(stmt)->tokens[TRY_finally + 1];
+	KNH_ASSERT(SP(tkHDR)->tt == TT_STACK);
 
 	knh_Asm_setFinallyStmt(ctx, abr, StmtTRY_finally(stmt));
 
 	/* try { */
-	KNH_ASM_TRY_(ctx, abr, lbcatch, sfi_(DP(tkhdr)->index));
+	KNH_ASM_TRY_(ctx, abr, lbcatch, sfi_(DP(tkHDR)->index));
 	TERMs_asmBLOCK(ctx, stmt, TRY_try, abr);
-	KNH_ASM_TRYEND_(ctx, abr, sfi_(DP(tkhdr)->index));
+	KNH_ASM_TRYEND_(ctx, abr, sfi_(DP(tkHDR)->index));
 	KNH_ASM_JMP(ctx, abr, lbfinally);
 
 	/* catch */
 	KNH_ASM_GLABEL(ctx, abr, lbcatch);
-	Stmt *stmtcatch = DP(stmt)->stmts[TRY_catch];
-	while(IS_Stmt(stmtcatch)) {
-		if(SP(stmtcatch)->stt == STT_CATCH) {
-			Object *emsg = DP(DP(stmtcatch)->tokens[0])->data;
+	Stmt *stmtCATCH = DP(stmt)->stmts[TRY_catch];
+	KNH_ASSERT(IS_Stmt(stmtCATCH));
+	while(IS_Stmt(stmtCATCH)) {
+		if(SP(stmtCATCH)->stt == STT_CATCH) {
+			Object *emsg = DP(DP(stmtCATCH)->tokens[0])->data;
 			KNH_ASSERT(IS_String(emsg));
-			Token *tkn = DP(stmtcatch)->tokens[1];
+			Token *tkn = DP(stmtCATCH)->tokens[1];
 			KNH_ASSERT(SP(tkn)->tt == TT_STACK);
 			lbcatch = knh_Asm_newLabelId(ctx, abr, NULL);
-			KNH_ASM_CATCH_(ctx, abr, lbcatch, sfi_(DP(tkhdr)->index), sfi_(DP(tkn)->index), emsg);
-			TERMs_asmBLOCK(ctx, stmtcatch, 2, abr);
+			KNH_ASM_CATCH_(ctx, abr, lbcatch, sfi_(DP(tkHDR)->index), sfi_(DP(tkn)->index), emsg);
+			TERMs_asmBLOCK(ctx, stmtCATCH, 2, abr);
 			KNH_ASM_JMP(ctx, abr, lbfinally);  /* GOTO FINALLY */
 			KNH_ASM_GLABEL(ctx, abr, lbcatch); /* _CATCH_NEXT_ */
 		}
-		stmtcatch = DP(stmtcatch)->next;
+		stmtCATCH = DP(stmtCATCH)->next;
 	}
-
 	knh_Asm_setFinallyStmt(ctx, abr, (Stmt*)KNH_NULL);
-
 	KNH_ASM_GLABEL(ctx, abr, lbfinally); /* FINALLY */
 	TERMs_asmBLOCK(ctx, stmt, TRY_finally, abr);
-	KNH_ASM_THROW_AGAIN_(ctx, abr, sfi_(DP(tkhdr)->index));
+	KNH_ASM_THROW_AGAIN_(ctx, abr, sfi_(DP(tkHDR)->index));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2286,7 +2293,7 @@ void knh_StmtERR_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 		KNH_SETv(ctx, DP(stmt)->errMsg, new_String(ctx, B(buf), NULL));
 		KNH_SETv(ctx, DP(stmt)->next, KNH_NULL);
 	}
-	KNH_ASM_THROWs_(ctx, abr, (Object*)DP(stmt)->errMsg);
+	KNH_ASM_THROWs_(ctx, abr, knh_Asm_inTry(abr), (Object*)DP(stmt)->errMsg);
 }
 
 /* ======================================================================== */
@@ -2379,7 +2386,7 @@ void knh_StmtASSERT_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 	TERMs_ASM_JIFT(ctx, stmt, 0, abr, lbskip);
 	/*then*/
 	TERMs_asmBLOCK(ctx, stmt, 1, abr);
-	KNH_ASM_THROWs_(ctx, abr, UP(TS_AssertionException));
+	KNH_ASM_THROWs_(ctx, abr, knh_Asm_inTry(abr), UP(TS_AssertionException));
 	KNH_ASM_LLABEL(ctx, abr, lbskip);
 }
 

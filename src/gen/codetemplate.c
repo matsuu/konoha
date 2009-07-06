@@ -2418,7 +2418,7 @@ static
 METHOD jc0_THROW(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_THROW(ctx, (-1));
+	JIT_THROW(ctx, (-1), (-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -2427,7 +2427,16 @@ static
 METHOD jc1_THROW(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_THROW(ctx, (1));
+	JIT_THROW(ctx, (1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_THROW(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_THROW(ctx, (-1), (2));
 	__asm__ __volatile__("int3");
 }
 
@@ -2436,7 +2445,7 @@ static
 METHOD jc0_THROWS(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_THROWs(ctx, ((Object*)-1));
+	JIT_THROWs(ctx, (-1), ((Object*)-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -2445,7 +2454,16 @@ static
 METHOD jc1_THROWS(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_THROWs(ctx, ((Object*)1));
+	JIT_THROWs(ctx, (1), ((Object*)-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_THROWS(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_THROWs(ctx, (-1), ((Object*)2));
 	__asm__ __volatile__("int3");
 }
 
@@ -4703,8 +4721,8 @@ static knh_fmethod codeTempList[140][6] = {
 	{jc0_TRY,jc1_TRY,jc2_TRY},
 	{jc0_TRYEND,jc1_TRYEND},
 	{jc0_CATCH,jc1_CATCH,jc2_CATCH,jc3_CATCH,jc4_CATCH},
-	{jc0_THROW,jc1_THROW},
-	{jc0_THROWS,jc1_THROWS},
+	{jc0_THROW,jc1_THROW,jc2_THROW},
+	{jc0_THROWS,jc1_THROWS,jc2_THROWS},
 	{jc0_THROW_AGAIN,jc1_THROW_AGAIN},
 	{jc0_P,jc1_P,jc2_P,jc3_P},
 	{jc0_PMSG,jc1_PMSG,jc2_PMSG},
