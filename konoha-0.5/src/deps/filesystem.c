@@ -77,16 +77,15 @@ knh_boolean_t knh_isfile(Ctx *ctx, knh_bytes_t path)
     struct stat buf;
 	if(stat(dirname, &buf) == -1) return 0;
 	return S_ISREG(buf.st_mode);
-#elif defined(KONOHA_ON_TB)
+#elif defined(KNH_USING_BTRON)
 	char dirname[FILEPATH_BUFSIZ];
 	knh_format_ospath(ctx, dirname, sizeof(dirname), path);
 	FILE* fp = fopen(dirname,"r");
-	int ret = 1;
 	if(fp == NULL){
-	  ret = 0;
+            return 0;
 	}
 	fclose(fp);
-	return ret;
+	return 1;
 #else
 	return 0;
 #endif
