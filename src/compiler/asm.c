@@ -2227,6 +2227,7 @@ void knh_StmtTRY_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 	TERMs_asmBLOCK(ctx, stmt, TRY_try, abr);
 	KNH_ASM_TRYEND_(ctx, abr, sfi_(DP(tkHDR)->index));
 	KNH_ASM_JMP(ctx, abr, lbfinally);
+	knh_Asm_setFinallyStmt(ctx, abr, (Stmt*)KNH_NULL); // InTry
 
 	/* catch */
 	KNH_ASM_GLABEL(ctx, abr, lbcatch);
@@ -2246,7 +2247,6 @@ void knh_StmtTRY_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 		}
 		stmtCATCH = DP(stmtCATCH)->next;
 	}
-	knh_Asm_setFinallyStmt(ctx, abr, (Stmt*)KNH_NULL);
 	KNH_ASM_GLABEL(ctx, abr, lbfinally); /* FINALLY */
 	TERMs_asmBLOCK(ctx, stmt, TRY_finally, abr);
 	KNH_ASM_THROW_AGAIN_(ctx, abr, sfi_(DP(tkHDR)->index));
