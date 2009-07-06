@@ -25,10 +25,10 @@
  *
  ****************************************************************************/
 
-@Naitive class Curl;
+class Curl;
 Curl! Curl.new();
 void Curl.easySetOpt(Int! type, Any data);
-Any Curl.easyGetInfo(Int! type);
+String Curl.easyGetInfo(Int! type);
 boolean Curl.easyPerform();
 
 

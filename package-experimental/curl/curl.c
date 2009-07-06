@@ -34,6 +34,8 @@
 extern "C" {
 #endif
 
+#define MAX_STR 12
+
 /* ======================================================================== */
 
 static
@@ -230,23 +232,24 @@ METHOD Curl_easyPerform(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_Boolean(ctx, sfp, 1);
 }
 
-
 /* ------------------------------------------------------------------------ */
 /* @method Any Curl.easyGetInfo(Int! type) */
 
 METHOD Curl_easyGetInfo(Ctx *ctx, knh_sfp_t *sfp)
 {
 	CURL* curl = (CURL*)p_cptr(sfp[0]);
-	long* lngbuf = NULL;
-	double* dblbuf = NULL;
-	char* strbuf = NULL;
+	char *strptr = NULL;
+	long* lngptr = NULL;
+	double* dblptr = NULL;
+	char ret[MAX_STR];
     if(curl != NULL) {
         knh_int_t curlinfo = p_int(sfp[1]);
         switch(curlinfo) {
 		case CURLINFO_HEADER_SIZE:
 		case CURLINFO_REQUEST_SIZE:
-			curl_easy_getinfo(curl, curlinfo, &lngbuf);
-			KNH_RETURN_Int(ctx, sfp, (long)lngbuf);
+			curl_easy_getinfo(curl, curlinfo, &lngptr);
+			strptr = ret;
+			sprintf(strptr,"%ld",lngptr);
 			break;
 		case CURLINFO_REDIRECT_TIME:
 		case CURLINFO_TOTAL_TIME:
@@ -258,18 +261,19 @@ METHOD Curl_easyGetInfo(Ctx *ctx, knh_sfp_t *sfp)
 		case CURLINFO_SIZE_DOWNLOAD:
 		case CURLINFO_SPEED_DOWNLOAD:
 		case CURLINFO_SPEED_UPLOAD:
-			curl_easy_getinfo(curl, curlinfo, &dblbuf);
-			KNH_RETURN_Float(ctx, sfp, *dblbuf);
+			curl_easy_getinfo(curl, curlinfo, &dblptr);
+			strptr = ret;
+			sprintf(strptr,"%12f",dblptr);
 			break;
 		case CURLINFO_EFFECTIVE_URL:
 		case CURLINFO_CONTENT_TYPE:
-			curl_easy_getinfo(curl, curlinfo, &strbuf);
-			KNH_RETURN(ctx, sfp, new_String(ctx,B(strbuf),NULL));
+			curl_easy_getinfo(curl, curlinfo, &strptr);
 			break;
 		default:
 			KNH_WARNING(ctx, "curl_easy_getinfo: unknown info =%d", curlinfo);
 			break;
 		}
+		KNH_RETURN(ctx, sfp, new_String(ctx,B(strptr),NULL));				
 	}
 	KNH_RETURN(ctx, sfp, sfp[0].o);
 }
