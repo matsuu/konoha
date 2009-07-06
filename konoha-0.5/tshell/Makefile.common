@@ -1,8 +1,8 @@
-# ソースの依存関係ファイル (自動生成)
+# Platform-independent settings for T-Shell environments
+
 DEPS = Dependencies
 DEPENDENCIES_OUTPUT := $(DEPS)
 
-# 標準ルール
 include $(BD)/bappl/etc/makerules
 
 VPATH = "./ $(shell find ../../ -type d) ./"
@@ -17,7 +17,7 @@ library = lib$(program)
 .PHONY: all
 all: $(program) $(program).map
 
-# Shamelessly copied from 
+# Shamelessly copied from build/Makefile.am :-)
 libkonoha_la_SOURCES = 
 libkonoha_la_SOURCES += ../src/konohadev_main.c
 libkonoha_la_SOURCES += ../src/api/anyapi.c
