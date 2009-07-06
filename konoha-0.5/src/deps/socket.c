@@ -47,6 +47,10 @@
 #include <unistd.h>
 #endif
 
+#ifdef KNH_USING_BTRON
+#include <btron/bsocket.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -89,6 +93,35 @@ KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port, int i
 		return -1;
 	}
 	return sd;
+#elif defined(KNH_USING_BTRON)
+        char tmp[HBUFLEN];
+        struct hostent host;
+        struct sockaddr_in server = {0};
+        W err, sd;
+
+        err = so_gethostbyname(ip_or_host, &host, tmp);
+        if (err < 0) {
+            KNH_PERRNO(ctx, "Socket!!", "gethostbyname", isThrowable);
+            return -1;
+        }
+
+        server.sin_family = PF_INET;
+        memcpy(&(server.sin_addr), host.h_addr, host.h_length);
+        server.sin_port = htons(port);
+
+        err = so_socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+        if (err < 0) {
+            KNH_PERRNO(ctx, "Socket!!", "socket", isThrowable);
+            return -1;
+        }
+        sd = err;
+
+        err = so_connect(sd, (struct sockaddr*)&server, sizeof(server));
+        if (err < 0) {
+            KNH_PERRNO(ctx, "Socket!!", "connect", isThrowable);
+            return -1;
+        }
+        return (knh_intptr_t)sd;
 #else
 	return -1;
 #endif
@@ -103,6 +136,9 @@ KNHAPI(int) knh_socket_send(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz,
 	res = send((SOCKET)sd, buf, bufsiz, flags);
 #elif defined(KNH_USING_POSIX)
 	res = send(sd, buf, bufsiz, flags);
+#elif defined(KNH_USING_BTRON)
+        int err = so_send(sd, buf, bufsiz, flags);
+        if (err < 0) res = -1;        
 #endif
 	if(res == -1) {
 		KNH_PERRNO(ctx, "Socket!!", "send", knh_Context_isStrict(ctx));
@@ -118,6 +154,9 @@ KNHAPI(int) knh_socket_recv(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz,
 	res = recv((SOCKET)sd, buf, bufsiz, flags);
 #elif defined(KNH_USING_POSIX)
 	res = recv(sd, buf, bufsiz, flags);
+#elif defined(KNH_USING_BTRON)
+        int err = so_recv(sd, buf, bufsiz, flags);
+        if (err < 0) res = -1;
 #endif
 	if(res == -1) {
 		KNH_PERRNO(ctx, "Socket!!", "recv", knh_Context_isStrict(ctx));
@@ -133,6 +172,8 @@ KNHAPI(int) knh_socket_close(Ctx *ctx, knh_intptr_t sd)
 	return closesocket((SOCKET)sd);
 #elif defined(KNH_USING_POSIX)
 	return close((int)sd);
+#elif defined(KNH_USING_BTRON)
+        return so_close(sd);
 #else
 	return 0;  /* becuase, it wasn't opened. */
 #endif
