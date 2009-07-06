@@ -906,6 +906,7 @@ typedef struct knh_tokens_t {
 /* @class Stmt Object knh_Stmt_struct */
 /* @flag Stmt.Adposition STMTF SP(%s)->flag 'is:set:*:*' */
 /* @flag Stmt.NonNewLine STMTF SP(%s)->flag 'is:set:*:*' */
+/* @flag Stmt.Literal    STMTF SP(%s)->flag 'is:*:*:*' */
 /* @flag Stmt.Typed STMTF SP(%s)->flag 'is:set:*:*' */
 /* @flag Stmt.Memo1 STMTF SP(%s)->flag 'is:set:*:*' */
 
@@ -924,11 +925,6 @@ typedef struct knh_tokens_t {
 #define knh_Stmt_setTHISSUPER(s,b) knh_Stmt_setMemo1(s,b)
 
 /* ------------------------------------------------------------------------ */
-
-#define KNH_STT_RVALUE  0
-#define KNH_RVALUE      0
-#define KNH_STT_LVALUE  1
-#define KNH_LVALUE      1
 
 typedef struct knh_Stmt {
 	knh_type_t   type;

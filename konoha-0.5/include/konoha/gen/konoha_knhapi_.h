@@ -177,13 +177,14 @@ KNHAPI(knh_sfp_t*) knh_Closure_invokef(Ctx *ctx, Closure *c, const char *fmt, ..
 KNHAPI(Exception*) new_Exception(Ctx *ctx, String *msg);
 KNHAPI(Exception*) new_Exception__b(Ctx *ctx, knh_bytes_t msg);
 KNHAPI(void) knh_perrno(Ctx *ctx, char *emsg, char *func, char *file, int line, int isThrowable);
-KNHAPI(void) knh_throw_Unsupported(Ctx *ctx, const char *func, char *file, int line, int isThrowable);
+KNHAPI(void) knh_throw_Unsupported(Ctx *ctx,const char *func, char *file, int line, int isThrowable);
 KNHAPI(void) knh_throw_OutOfIndex(Ctx *ctx, knh_int_t n, size_t max, char *file, int line);
 KNHAPI(InputStream*) new_InputStream__io(Ctx *ctx, String *urn, knh_io_t fd, knh_iodrv_t *drv);
 KNHAPI(InputStream*) new_InputStream__FILE(Ctx *ctx, String *urn, FILE *fp, knh_iodrv_t *drv);
 KNHAPI(InputStream*) new_FileInputStream(Ctx *ctx, knh_bytes_t file, int isThrowable);
 KNHAPI(InputStream*) new_BytesInputStream(Ctx *ctx, Bytes *ba, size_t s, size_t e);
 KNHAPI(InputStream*) new_StringInputStream(Ctx *ctx, String *str, size_t s, size_t e);
+KNHAPI(Object*) knh_InputStream_readData(Ctx *ctx, InputStream *in, knh_class_t reqc);
 KNHAPI(Mapper*) new_Mapper(Ctx *ctx, knh_flag_t flag, knh_class_t scid, knh_class_t tcid, knh_fmapper fmap, Object *mapdata);
 KNHAPI(void) konoha_addMapper(Ctx *ctx, Mapper *mpr);
 KNHAPI(knh_class_t) konoha_findcid(Ctx *ctx, knh_bytes_t lname);

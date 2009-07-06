@@ -75,9 +75,9 @@ static knh_System_t *new_System(Ctx *ctx)
 /* ------------------------------------------------------------------------ */
 
 #ifdef KNH_DBGMODE
-#define FLAG_CTX(f)      (f|KNH_FLAG_CTXF_VERBOSE)
+#define FLAG_CTX(f)      (f|KNH_FLAG_CTXF_VERBOSE|KNH_FLAG_CTXF_STRICT)
 #else
-#define FLAG_CTX(f)      (f)
+#define FLAG_CTX(f)      (f|KNH_FLAG_CTXF_STRICT)
 #endif
 
 

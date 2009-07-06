@@ -175,22 +175,22 @@ knh_InputStream_read(Ctx *ctx, InputStream *o, char *buf, size_t bufsiz)
 /* ------------------------------------------------------------------------ */
 /* @method String InputStream.readLine() */
 
-String* knh_InputStream_readLine(Ctx *ctx, InputStream *o)
+String* knh_InputStream_readLine(Ctx *ctx, InputStream *in)
 {
 	int ch;
 	knh_cwb_t cwb = new_cwb(ctx);
-	while((ch = knh_InputStream_getc(ctx, o)) != EOF) {
+	while((ch = knh_InputStream_getc(ctx, in)) != EOF) {
 		if(ch == '\r') {
-			return new_String__cwbconv(ctx, cwb, DP(o)->bconv);
+			return new_String__cwbconv(ctx, cwb, DP(in)->bconv);
 		}
 		if(ch == '\n') {
-			if(DP(o)->prev == '\r') continue;
-			return new_String__cwbconv(ctx, cwb, DP(o)->bconv);
+			if(DP(in)->prev == '\r') continue;
+			return new_String__cwbconv(ctx, cwb, DP(in)->bconv);
 		}
 		knh_Bytes_putc(ctx, cwb.ba, ch);
 	}
 	if(knh_cwb_size(cwb) != 0) {
-		return new_String__cwbconv(ctx, cwb, DP(o)->bconv);
+		return new_String__cwbconv(ctx, cwb, DP(in)->bconv);
 	}
 	return (String*)KNH_NULL;
 }
@@ -251,7 +251,7 @@ MAPPER knh_Bytes_InputStream(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ======================================================================== */
-/* [Bytes] */
+/* [String] */
 
 KNHAPI(InputStream*) new_StringInputStream(Ctx *ctx, String *str, size_t s, size_t e)
 {
@@ -266,6 +266,73 @@ KNHAPI(InputStream*) new_StringInputStream(Ctx *ctx, String *str, size_t s, size
 	DP(o)->bufpos   = s;
 	DP(o)->bufend   = e;
 	return o;
+}
+
+/* ======================================================================== */
+/* [Data] */
+
+int knh_bytes_checkStmtLine(knh_bytes_t line)
+{
+	char *ln = (char*)line.buf;
+	size_t i = 0, len = line.len;
+	int ch, quote = 0, nest =0;
+	L_NORMAL:
+	for(; i < len; i++) {
+		ch = ln[i];
+		if(ch == '{' || ch == '[' || ch == '(') nest++;
+		if(ch == '}' || ch == ']' || ch == ')') nest--;
+		if(ch == '\'' || ch == '"' || ch == '`') {
+			quote = ch; i++;
+			goto L_QUOTE;
+		}
+	}
+	return nest;
+
+	L_QUOTE:
+	KNH_ASSERT(i > 0);
+	for(; i < len; i++) {
+		ch = ln[i];
+		if(ln[i-1] != '\\' && ch == quote) {
+			i++;
+			goto L_NORMAL;
+		}
+	}
+	return 1;
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(Object*) knh_InputStream_readData(Ctx *ctx, InputStream *in, knh_class_t reqc)
+{
+	int ch, linenum = DP(in)->line;
+	knh_cwb_t cwb = new_cwb(ctx);
+	L_AGAIN:;
+	while((ch = knh_InputStream_getc(ctx, in)) != EOF) {
+		if(ch == '\r' || ch == '`') {
+			int prev = DP(in)->prev;
+			if(prev == '\r' || prev == '\n') continue;
+			if(prev == ']' || prev == '}' || knh_bytes_checkStmtLine(knh_cwb_tobytes(cwb)) == 0) {
+				break;
+			}
+		}
+		knh_Bytes_putc(ctx, cwb.ba, ch);
+	}
+	if(knh_cwb_size(cwb) == 0) {
+		if(ch == EOF) return KNH_NULL;
+		goto L_AGAIN;
+	}
+
+	{
+		InputStream *bin = new_BytesInputStream(ctx, cwb.ba, cwb.pos, knh_Bytes_size(cwb.ba));
+		Object *value = NULL;
+		DP(bin)->fileid = konoha_getFileId(ctx, STEXT("(data)"));
+		DP(bin)->line = linenum;
+		knh_InputStream_setEncoding(ctx, bin, DP(in)->enc);
+		value = konohac_data(ctx, bin, reqc);
+		knh_cwb_clear(cwb);
+		if(IS_NULL(value)) goto L_AGAIN;
+		return value;
+	}
 }
 
 /* ------------------------------------------------------------------------ */
