@@ -381,38 +381,6 @@ int knh_readline_askYesNo(char *prompt, int def)
 /* ======================================================================== */
 /* [shell] */
 
-static
-int konoha_shell_checkline(knh_bytes_t line)
-{
-	char *ln = (char*)line.buf;
-	size_t i = 0, len = line.len;
-	int ch, quote = 0, nest =0;
-	L_NORMAL:
-	for(; i < len; i++) {
-		ch = ln[i];
-		if(ch == '{' || ch == '[' || ch == '(') nest++;
-		if(ch == '}' || ch == ']' || ch == ')') nest--;
-		if(ch == '\'' || ch == '"') {
-			quote = ch; i++;
-			goto L_QUOTE;
-		}
-	}
-	return nest;
-
-	L_QUOTE:
-	KNH_ASSERT(i > 0);
-	for(; i < len; i++) {
-		ch = ln[i];
-		if(ln[i-1] != '\\' && ch == quote) {
-			i++;
-			goto L_NORMAL;
-		}
-	}
-	return 1;
-}
-
-/* ------------------------------------------------------------------------ */
-
 KNHAPI(void) konoha_shell(konoha_t konoha)
 {
 	KONOHA_CHECK_(konoha);
@@ -446,7 +414,7 @@ KNHAPI(void) konoha_shell(konoha_t konoha)
 				return;
 			}
 			knh_Bytes_write(ctx, cwb.ba, B(ln));
-			nest = konoha_shell_checkline(knh_cwb_tobytes(cwb));
+			nest = knh_bytes_checkStmtLine(knh_cwb_tobytes(cwb));
 			if(nest == 0) break;
 			if(nest < 0) {
 				knh_println(ctx, KNH_STDOUT, STEXT("(Canceled)"));
@@ -543,7 +511,7 @@ METHOD knh__Script_eval(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD knh__Script_isStatement(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Boolean(ctx, sfp, !(konoha_shell_checkline(knh_String_tobytes(sfp[1].s))));
+	KNH_RETURN_Boolean(ctx, sfp, !(knh_bytes_checkStmtLine(knh_String_tobytes(sfp[1].s))));
 }
 
 /* ------------------------------------------------------------------------ */

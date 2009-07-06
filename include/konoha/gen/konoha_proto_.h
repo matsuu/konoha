@@ -1,20 +1,20 @@
 /****************************************************************************
- * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
- *
+ * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER  
+ * 
  * Copyright (c) 2005-2009, Kimio Kuramitsu <kimio at ynu.ac.jp>
- *           (c) 2008-      Konoha Software Foundation
+ *           (c) 2008-      Konoha Software Foundation  
  * All rights reserved.
- *
- * You may choose one of the following two licenses when you use konoha.
+ * 
+ * You may choose one of the following two licenses when you use konoha. 
  * See www.konohaware.org/license.html for further information.
- *
+ * 
  * (1) GNU General Public License 2.0      (with    KONOHA_UNDER_GPL2)
  * (2) Konoha Software Foundation License 1.0
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
  * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ *  
  ****************************************************************************/
 
 #ifndef KONOHA_PROTO__H
@@ -31,7 +31,7 @@
 #include<konoha/gen/konoha_class_.h>
 
 
-#ifdef __cplusplus
+#ifdef __cplusplus 
 extern "C" {
 #endif
 
@@ -241,10 +241,11 @@ void knh_HashSet_set__hcode(Ctx *ctx, HashSet *o, knh_hcode_t hcode, knh_uintptr
 Object *knh_InputStream_open(Ctx *ctx, InputStream *o, String *urn, String *m);
 int knh_InputStream_getc(Ctx *ctx, InputStream *o);
 size_t knh_InputStream_read(Ctx *ctx, InputStream *o, char *buf, size_t bufsiz);
-String* knh_InputStream_readLine(Ctx *ctx, InputStream *o);
+String* knh_InputStream_readLine(Ctx *ctx, InputStream *in);
 void knh_InputStream_close(Ctx *ctx, InputStream *o);
 int knh_InputStream_isClosed(InputStream *o);
 MAPPER knh_Bytes_InputStream(Ctx *ctx, knh_sfp_t *sfp);
+int knh_bytes_checkStmtLine(knh_bytes_t line);
 /* ../src/class/knh_Iterator.c */
 void knh_Iterator_close(Ctx *ctx, Iterator *it);
 Iterator* new_Iterator(Ctx *ctx, knh_class_t p1, Any *source, knh_fitrnext fnext);
@@ -434,8 +435,10 @@ void knh_Asm_loadCompiledMethod(Ctx *ctx, Asm *abr);
 knh_fmethod knh_Asm_getCompiledMethod(Ctx *ctx, Asm *abr, knh_bytes_t cname, knh_bytes_t mname);
 /* ../src/compiler/konohac.c */
 int knh_Stmt_compile(Ctx *ctx, Stmt *stmt, String *nsname, int isEval);
+Object *knh_Stmt_toData(Ctx *ctx, Stmt *stmt, knh_class_t reqc);
 Stmt *knh_bytes_parseStmt(Ctx *ctx, knh_bytes_t kscript, int fileid, int line);
 void konohac_eval(Ctx *ctx, String *nsname, InputStream *in);
+Object *konohac_data(Ctx *ctx, InputStream *in, knh_class_t reqc);
 void knh_Asm_openlib(Ctx *ctx, Asm *abr, knh_bytes_t fpath);
 int knh_NameSpace_loadScript(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isEval);
 void konoha_compile(Ctx *ctx, String *nsname, knh_bytes_t fpath);
@@ -478,7 +481,6 @@ void knh_Token__s(Ctx *ctx, Token *o, OutputStream *w, String *m);
 void knh_Token__k(Ctx *ctx, Token *o, OutputStream *w, String *m);
 void knh_Token__dump(Ctx *ctx, Token *o, OutputStream *w, String *m);
 /* ../src/compiler/tokenizer.c */
-//String *new_String__NAME(Ctx *ctx, knh_bytes_t tname);
 Token *new_Token__NAME(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t);
 knh_token_t knh_char_totoken(int ch);
 void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in);

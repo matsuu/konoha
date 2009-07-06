@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-#define KONOHA_BUILDID                  595
+#define KONOHA_BUILDID                  596
 
 /* ======================================================================== */
 
@@ -774,7 +774,11 @@ extern "C" {
 #define knh_Stmt_setNonNewLine(o,b)  \
 	if(b) SP(o)->flag |= KNH_FLAG_STMTF_NONNEWLINE; else SP(o)->flag &= ~(KNH_FLAG_STMTF_NONNEWLINE);
 
-#define KNH_FLAG_STMTF_TYPED            KNH_FLAG_T2
+#define KNH_FLAG_STMTF_LITERAL          KNH_FLAG_T2
+
+#define knh_Stmt_isLiteral(o)  \
+	((SP(o)->flag & KNH_FLAG_STMTF_LITERAL) == KNH_FLAG_STMTF_LITERAL)
+#define KNH_FLAG_STMTF_TYPED            KNH_FLAG_T3
 
 #define knh_Stmt_isTyped(o)  \
 	((SP(o)->flag & KNH_FLAG_STMTF_TYPED) == KNH_FLAG_STMTF_TYPED)
@@ -782,7 +786,7 @@ extern "C" {
 #define knh_Stmt_setTyped(o,b)  \
 	if(b) SP(o)->flag |= KNH_FLAG_STMTF_TYPED; else SP(o)->flag &= ~(KNH_FLAG_STMTF_TYPED);
 
-#define KNH_FLAG_STMTF_MEMO1            KNH_FLAG_T3
+#define KNH_FLAG_STMTF_MEMO1            KNH_FLAG_T4
 
 #define knh_Stmt_isMemo1(o)  \
 	((SP(o)->flag & KNH_FLAG_STMTF_MEMO1) == KNH_FLAG_STMTF_MEMO1)

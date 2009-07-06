@@ -655,6 +655,27 @@ int knh_Stmt_compile(Ctx *ctx, Stmt *stmt, String *nsname, int isEval)
 	return 0;
 }
 
+/* ------------------------------------------------------------------------ */
+
+Object *knh_Stmt_toData(Ctx *ctx, Stmt *stmt, knh_class_t reqc)
+{
+//	Asm *abr = knh_Context_getAsm(ctx);
+//	DP(abr)->level = 0;
+//	NameSpace *ns = ctx->ns;
+//	if(IS_Stmt(stmt)) {
+//		KNH_ASM_SETLINE(ctx, abr, SP(stmt)->line);
+//		if(knh_stmt_isExpr(SP(stmt)->stt)) {
+//			Token *tk = knh_StmtEXPR_typing(ctx, stmt, abr, ns, reqc);
+//			if(tk == NULL || IS_Stmt(tk)) return KNH_NULL;
+//		}
+//		else {
+//			knh_Stmt_done(ctx, stmt);
+//		}
+//	}
+	TODO();
+	return KNH_NULL;
+}
+
 /* ======================================================================== */
 /* [main] */
 
@@ -705,6 +726,26 @@ void konohac_eval(Ctx *ctx, String *nsname, InputStream *in)
 	L_CATCH:;
 	KNH_PRINT_STACKTRACE(ctx, lsfp, 0);
 	return;
+}
+
+/* ------------------------------------------------------------------------ */
+
+Object *konohac_data(Ctx *ctx, InputStream *in, knh_class_t reqc)
+{
+	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
+	KNH_LPUSH(ctx, in);
+	KNH_LPUSH(ctx, new_ExceptionHandler(ctx));
+	KNH_TRY(ctx, L_CATCH, lsfp, 1);
+	{
+		Stmt *stmt = knh_InputStream_parseStmt(ctx, in);
+		KNH_LPUSH(ctx, stmt);
+		return knh_Stmt_toData(ctx, stmt, reqc);
+	}
+	/* catch */
+	L_CATCH:;
+	KNH_LOCALBACK(ctx, lsfp);
+	//KNH_PRINT_STACKTRACE(ctx, lsfp, 1);
+	return KNH_NULL;
 }
 
 /* ------------------------------------------------------------------------ */
