@@ -31,7 +31,7 @@
 extern "C" {
 #endif
 
-int main(int argc, void **argv)
+int main(int argc, char **argv)
 {
 #if defined(KNH_USING_BTRON)
     char buf[4096];

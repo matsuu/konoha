@@ -828,30 +828,8 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		knh_ExceptionHandler_setCatching(_hdr, 1); \
 	} \
 
-#define JIT_TRY(ctx, PC, JUMP, hn)  {\
-		ExceptionHandler* _hdr = sfp[hn].hdr; \
-		if(!IS_ExceptionHandler(_hdr)) { \
-			_hdr = new_ExceptionHandler(ctx); \
-			KLR_MOV(ctx, sfp[hn].o, _hdr); \
-		} \
-		if(!knh_ExceptionHandler_isJumpable(_hdr)) { \
-			knh_ExceptionHandler_setJumpable(_hdr, 1); \
-			int jump = KNH_SETJUMP(_hdr); \
-			if(jump != 0) { \
-				((Context*)ctx)->esp = DP(_hdr)->esp; \
-				KLR_JMP(ctx, PC, JUMP); \
-			} \
-			DP(_hdr)->esp = ctx->esp; \
-		} \
-		knh_ExceptionHandler_setCatching(_hdr, 1); \
-	} \
-
 #define KLR_TRYEND(ctx, hn)  {\
 		KNH_ASSERT(IS_ExceptionHandler(sfp[hn].o)); \
-		knh_ExceptionHandler_setCatching(sfp[hn].hdr, 0); \
-	} \
-
-#define JIT_TRYEND(ctx, hn)  {\
 		knh_ExceptionHandler_setCatching(sfp[hn].hdr, 0); \
 	} \
 
@@ -861,68 +839,32 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 			KLR_JMP(ctx, PC, JUMP); \
 		} \
 		else { \
-			KLR_MOV(ctx, sfp[en].o, _e); \
-		} \
-	} \
-
-#define JIT_CATCH(ctx, PC, JUMP, hn, en, emsg) { \
-		Exception* _e = DP(sfp[hn].hdr)->caught; \
-		if(!knh_Exception_isa(ctx, _e, (String*)emsg)) { \
-			KLR_JMP(ctx, PC, JUMP); \
-		} \
-		else { \
+			knh_ExceptionHandler_setCatching(sfp[hn].hdr, 0); \
 			KLR_MOV(ctx, sfp[en].o, _e); \
 		} \
 	} \
 
 #define KLR_THROW_AGAIN(ctx, hn) { \
-		KNH_ASSERT(IS_ExceptionHandler(sfp[hn].o)); \
-		Exception *_e = DP(sfp[hn].hdr)->caught; \
-		if(IS_Exception(_e)) {\
+		DBG2_ASSERT(IS_ExceptionHandler(sfp[hn].o)); \
+		if(knh_ExceptionHandler_isCatching(sfp[hn].hdr)) {\
+			Exception *_e = DP(sfp[hn].hdr)->caught; \
 			DBG2_P("THROW AGAIN .. %s", knh_String_tochar(DP(_e)->message)); \
+			((Context*)ctx)->esp = sfp; \
 			knh_throwException(ctx, _e, NULL, 0); \
 		} \
 	} \
 
-#define JIT_THROW_AGAIN(ctx, hn) { \
-		KNH_ASSERT(IS_ExceptionHandler(sfp[hn].o)); \
-		Exception *_e = DP(sfp[hn].hdr)->caught; \
-		if(IS_Exception(_e)) {\
-			knh_throwException(ctx, _e, NULL, 0); \
-		} \
-	} \
-
-#define KLR_THROW(ctx, n) \
-	if(IS_bString((sfp[n].o))) { \
-		knh_throwException(ctx, new_Exception(ctx, sfp[n].s), _HERE_); \
-	}else { \
+#define KLR_THROW(ctx, inTry, n) { \
 		KNH_ASSERT(IS_Exception(sfp[n].e)); \
+		if(!(inTry)) ((Context*)ctx)->esp = sfp; \
 		knh_throwException(ctx, sfp[n].e, _HERE_); \
 	}\
 
-#define JIT_THROW(ctx, n) \
-	if(IS_bString((sfp[n].o))) { \
-		knh_throwException(ctx, new_Exception(ctx, sfp[n].s), NULL, 0); \
-	}else { \
-		KNH_ASSERT(IS_Exception(sfp[n].e)); \
-		knh_throwException(ctx, sfp[n].e, NULL, 0); \
-	}\
-
-#define KLR_THROWs(ctx, v) \
-	if(IS_bString((Object*)v)) { \
-		knh_throwException(ctx, new_Exception(ctx, (String*)v), _HERE_); \
-	}else { \
-		KNH_ASSERT(IS_Exception((Object*)v)); \
-		knh_throwException(ctx, (Exception*)v, _HERE_); \
-	}\
-
-#define JIT_THROWs(ctx, v) \
-	if(IS_bString((Object*)v)) { \
-		knh_throwException(ctx, new_Exception(ctx, (String*)v), NULL, 0); \
-	}else { \
-		KNH_ASSERT(IS_Exception((Object*)v)); \
-		knh_throwException(ctx, (Exception*)v, NULL, 0); \
-	}\
+#define KLR_THROWs(ctx, inTry, msg) {\
+		KNH_ASSERT(IS_bString(msg)); \
+		if(!(inTry)) ((Context*)ctx)->esp = sfp; \
+		knh_throwException(ctx, new_Exception(ctx, (String*)msg), _HERE_); \
+	}
 
 /* ------------------------------------------------------------------------ */
 

@@ -110,8 +110,8 @@ knh_code_t* KNH_ASM_SMAPNEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh
 knh_code_t* KNH_ASM_TRY_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2);
 knh_code_t* KNH_ASM_TRYEND_(Ctx *ctx, Asm *o,knh_sfi_t a1);
 knh_code_t* KNH_ASM_CATCH_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh_sfi_t a3,Object* a4);
-knh_code_t* KNH_ASM_THROW_(Ctx *ctx, Asm *o,knh_sfi_t a1);
-knh_code_t* KNH_ASM_THROWs_(Ctx *ctx, Asm *o,Object* a1);
+knh_code_t* KNH_ASM_THROW_(Ctx *ctx, Asm *o,knh_ushort_t a1,knh_sfi_t a2);
+knh_code_t* KNH_ASM_THROWs_(Ctx *ctx, Asm *o,knh_ushort_t a1,Object* a2);
 knh_code_t* KNH_ASM_THROW_AGAIN_(Ctx *ctx, Asm *o,knh_sfi_t a1);
 knh_code_t* KNH_ASM_P_(Ctx *ctx, Asm *o,knh_flag_t a1,knh_methodn_t a2,knh_sfi_t a3);
 knh_code_t* KNH_ASM_PMSG_(Ctx *ctx, Asm *o,knh_flag_t a1,Object* a2);
@@ -1238,7 +1238,8 @@ typedef struct {
 	void *codeaddr;
 #endif/*KNH_USING_THREADEDCODE*/
 	knh_opcode_t opcode;
-	knh_sfi_t a1;
+	knh_ushort_t a1;
+	knh_sfi_t a2;
 	void *nextaddr;
 } klr_throw_t;
 
@@ -1250,7 +1251,8 @@ typedef struct {
 	void *codeaddr;
 #endif/*KNH_USING_THREADEDCODE*/
 	knh_opcode_t opcode;
-	Object* a1;
+	knh_ushort_t a1;
+	Object* a2;
 	void *nextaddr;
 } klr_throws_t;
 
