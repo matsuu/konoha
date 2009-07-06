@@ -1,0 +1,133 @@
+///
+/// parsing data to json
+///
+/*-----class Parser Form-----*/
+class Parser extends Form
+{
+	/*-----constructor-----*/
+	Parser(String name, String file)
+	{
+		String filetype = file.split(".",0).pop();
+		if( filetype == "json" ) {
+			ParserJson pj = new ParserJson(name,file);
+			json2Package(pj);
+		} else if ( filetype == "xml" ) {
+			ParserXml px = new ParserXml(name,file);
+			xml2Package(px);
+		}
+ 	}
+
+	void json2Package(ParserJson pars)
+	{
+		this.name = pars.name;
+		this.version = pars.getElement("version");
+		this.url = pars.getElement("url");
+		this.depend = pars.getElement("depend").split("&",0);
+	}
+
+	void xml2Package(ParserXml pars)
+	{
+		this.name = pars.name;
+		this.version = pars.getElement("version");
+		this.url = pars.getElement("url");
+		this.depend = pars.getElement("depend").split("&",0);
+	}
+}
+
+/*-----class Parser for Json-----*/
+class ParserJson extends Form
+{
+	String file;
+
+	/*-----constructor-----*/
+	ParserJson(String name,String jsonfile)
+	{
+		this.name = name;
+		this.file = jsonfile;
+	}
+
+	String rawjs()
+	{
+		String ret;
+		ins = new InputStream(this.file,"r");
+		foreach( String txt from ins ) {
+			ret += txt;
+		}
+		ins.close();
+		return ret - "\t";
+	}
+
+	String succRaw (String raw)	{ return raw % ","; }
+
+	String getElement(String elemname)
+	{
+		String ret;
+		String raw = rawjs();
+		String check = %('"name":"%s{0}"',this.name);
+		while( true ) {
+			if ( raw == "" ) { break; }
+			else if ( check in? ( raw / "," ) ) {
+				ret = parseThisTree(raw,elemname); 
+				break;
+			}
+			raw = succRaw(raw);
+		}
+		return ret;
+	}
+
+	String parseThisTree(String raw,String elemname)
+	{
+		String ret;
+		String check = %('"%s{0}":"',elemname);
+		while(true) {
+			if ( raw == "" ) { break; }
+			String pic = raw / ",";
+			if ( check in? pic ) { 
+				if ( elemname != "depend" ) { return pic % check / '"'; }
+				else { return getDependencies(raw); }
+			} else if ( "}" in? pic && !("{0}" in? pic) ) { break; }			
+			raw = succRaw(raw);
+		}
+		return ret;
+	}
+
+	String getDependencies(String raw)
+	{
+		String ret;
+		String base = ( raw / "]" ) % '"depend":["';
+		while( base != "") {
+			ret += base / '"' + "&";
+ 			base %= '","'; 
+		}
+		return ret;
+	}
+
+	/*-----Generate Json-----*/
+	String generateJson()
+	{
+		String ret;
+		if ( this.url == "" ) { return ret; }
+		ret += "{\n";
+		ret += setNode("name",this.name) + ",\n";
+		ret += setNode("version",this.version) + ",\n";
+		ret += setNode("url",this.url);
+		if ( this.depend[0] != "" ) { ret += ",\n" + arrayNode("depend",this.depend); }
+		return ret + "\n}\n";
+	}
+
+	String setNode(String name,String data)
+	{
+		return %('"%s{0}":"%s{1}"',name,data );
+	}
+
+	String arrayNode(String name,String[] data)
+	{
+		String ret;
+		ret += %('"%s{0}":[',name);
+		foreach ( String cell from data) {
+			OUT << cell << EOL;
+			ret += %('"%s{0}",',cell);
+		}
+		return ret[..|ret|-2] + "]";
+	}
+}

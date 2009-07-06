@@ -3,7 +3,8 @@ KLIP (Konoha LIbrary Provider)
 
 *USING PACKAGES OF Konoha
  - posix.*;
- - libxml2.*;
+ - curl.*;
+// - libxml2.*;  (if you use klip.xml : not default) 
 
 
 *USAGE
