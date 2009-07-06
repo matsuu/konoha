@@ -8,11 +8,15 @@
 
 #include <linux/module.h>
 #include <linux/kernel.h>
+#include <linux/version.h>
 #include <linux/fs.h>
 #include <linux/cdev.h>
 #include <linux/init.h>
 #include <asm/uaccess.h>
-//#include <linux/semaphore.h>
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
+#include <linux/semaphore.h>
+#endif
+
 #include <konoha.h>
 
 
@@ -48,7 +52,7 @@ double __gtdf2(double a,double b) { return (a > b); }
 float __eqsf2(float a,float b) { return !(a == b); }
 float __eqdf2(float a,float b) { return !(a == b); }
 double __extendsfdf2(float a) {return a;}
-*/
+ */
 
 //#endif
 
@@ -58,10 +62,12 @@ enum {
 
 struct konohadev_t {
     dev_t id;
-  //    struct semaphore sem;
     struct cdev cdev;
     konoha_t  konoha;
     char* buffer;
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
+    struct semaphore sem;
+#endif
 };
 
 static const char *msg = "konohadev";
@@ -71,9 +77,9 @@ static int knh_dev_open (struct inode *inode , struct file *filp);
 static ssize_t knh_dev_read(struct file *filp, char __user *user_buf,
         size_t count, loff_t *offset);
 /*
-static int knh_dev_ioctl (struct inode *inode, struct file *filp,
-        unsigned int cmd, unsigned long arg);
-*/
+   static int knh_dev_ioctl (struct inode *inode, struct file *filp,
+   unsigned int cmd, unsigned long arg);
+ */
 
 static ssize_t knh_dev_write(struct file *file,const char __user *buf,
         size_t count,loff_t *offp) ;
@@ -102,19 +108,25 @@ static ssize_t knh_dev_read (struct file* filp, char __user *user_buf,
 
     if(*offset > 0) return 0;
 
-    //    if(down_interruptible(&dev->sem)){
-    //        return -ERESTARTSYS;
-    //    }
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
+    if(down_interruptible(&dev->sem)){
+        return -ERESTARTSYS;
+    }
+#endif
 
     len = snprintf(buf,MAXCOPYBUF,"%s\n",dev->buffer);
 
     if(copy_to_user(user_buf,buf,len)){
-      //        up(&dev->sem);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
+        up(&dev->sem);
+#endif
         printk(KERN_ALERT "%s: copy_to_user failed\n",msg);
         return -EFAULT;
     }
 
-    //    up(&dev->sem);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
+    up(&dev->sem);
+#endif
     *offset += len;
 
     return len;
@@ -127,23 +139,28 @@ static ssize_t knh_dev_write(struct file *filp,const char __user *user_buf,
     struct konohadev_t *dev = filp->private_data;
     long len;
 
-    //    if(down_interruptible(&dev->sem)){
-    //        return -ERESTARTSYS;
-    //    }
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
+    if(down_interruptible(&dev->sem)){
+        return -ERESTARTSYS;
+    }
+#endif
 
     len = copy_from_user(buf,user_buf,count);
     memset(dev->buffer,0,sizeof(char)*MAXCOPYBUF);
     buf[count] = '\0';
-    printk("write:line=%d,%lu %lu [%s]\n", __LINE__,len, count,buf);
+    printk("write:line=%d,%ld %ld [%s]\n", __LINE__,len, count,buf);
     //printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "int fib(int n) { if (n==3) { return 1;}}"));
     //printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "fib(10);"));
     konoha_ret = konoha_eval(dev->konoha,buf);
-    printk(KERN_DEBUG "[%lu,%s]\n",strlen(konoha_ret),konoha_ret);
+    printk(KERN_DEBUG "[%u,%s]\n",strlen(konoha_ret),konoha_ret);
 
     snprintf(dev->buffer,MAXCOPYBUF,"%s",konoha_eval(dev->konoha,buf));
     printk(KERN_DEBUG "%d[%s]\n",__LINE__,konoha_eval(dev->konoha,buf));
     printk(KERN_DEBUG "[%s]\n",dev->buffer);
-    //    up(&dev->sem);
+
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
+    up(&dev->sem);
+#endif
     *offset += count - len;
     return count -len;
     //*offset = 0;
@@ -162,7 +179,9 @@ static void knh_dev_setup(struct konohadev_t *dev){
     dev->konoha = konoha_open(128);
     dev->buffer = kmalloc(sizeof(char)*MAXCOPYBUF,GFP_KERNEL);
     memset(dev->buffer,0,sizeof(char)*MAXCOPYBUF);
-    //    init_MUTEX(&dev->sem);
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
+    init_MUTEX(&dev->sem);
+#endif
 
     err = cdev_add(&dev->cdev, dev->id, 1);
     if(err){

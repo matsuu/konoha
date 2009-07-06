@@ -52,7 +52,7 @@
 
 #define DBG2_ABORT()    abort()
 
-#else/*KNH_DBGMODE2*/
+#elif /*KNH_DBGMODE2*/ !defined(KONOHA_ON_LKM)
 
 #define DBG2_(stmt)
 #define DBG2_P(fmt, ...)
