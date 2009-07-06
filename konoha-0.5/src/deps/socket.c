@@ -119,6 +119,7 @@ KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port, int i
         err = so_connect(sd, (struct sockaddr*)&server, sizeof(server));
         if (err < 0) {
             KNH_PERRNO(ctx, "Socket!!", "connect", isThrowable);
+            so_close(sd);
             return -1;
         }
         return (knh_intptr_t)sd;
