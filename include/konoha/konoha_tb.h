@@ -2,6 +2,7 @@
 #define KONOHA_TB_H
 
 #define PRIdPTR "d"
+#define PRIuPTR "u"
 #undef Asm
 char* ALT_getenv(const char* name);
 
