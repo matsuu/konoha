@@ -122,10 +122,11 @@
 #endif
 
 /* ======================================================================== */
-/* [WINDOWS] */
+/* [TEABOARD] */
 
 #ifdef KONOHA_ON_TB
 #define 	KNH_USING_BTRON    1
+#define 	KNH_USING_TKAPI    1
 #define 	KONOHA_OS_ENCODING KONOHA_ENCODING
 #define 	KONOHA_OS_LINEFEED "\n"
 #define 	KONOHA_OS_DLLEXT ".so"

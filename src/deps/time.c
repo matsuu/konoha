@@ -54,6 +54,11 @@
 #include <time.h>
 #endif
 
+#ifdef KNH_USING_BTRON
+#include <btron/datetime.h>
+#include <btron/event.h>
+#endif
+
 /* ************************************************************************ */
 
 #ifdef __cplusplus
@@ -69,6 +74,10 @@ knh_uint_t knh_initseed(void)
 	return (knh_uint_t)time(NULL);
 #elif defined(KNH_USING_POSIX)
 	return (knh_uint_t)time(NULL) + getpid();
+#elif defined(KNH_USING_BTRON)
+        STIME st;
+        get_tim(&st, NULL);
+        return (knh_uint_t)st;
 #else
 	return 0;
 #endif
@@ -85,6 +94,17 @@ knh_uint64_t konoha_getTimeMilliSecond(void)
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
 	return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+#elif defined(KNH_USING_BTRON)
+        /* FIXME: thread safety */
+        static volatile int first = 1;
+        static UW start = 0;
+        UW current;
+        if (first) {
+            get_etm(&start);
+            first = 0;
+        }
+        get_etm(&current);
+        return (knh_uint64_t)((current - start) & 0x7fffffff);
 #else
 	return 0;
 #endif
