@@ -36,19 +36,6 @@ extern "C" {
 #endif
 
 
-/* ------------------------------------------------------------------------ */
-/* [Delegate] */
-
-static
-METHOD knh__Delegate_scall(Ctx *ctx, knh_sfp_t *sfp)
-{
-	Closure* c = (Closure*)sfp[0].o;
-	int argc = ctx->esp - sfp - 1;
-	DBG2_P("argc=%d", argc);
-	KNH_MOV(ctx, sfp[0].o, DP(c)->base);
-	KNH_SCALL(ctx, sfp, -1, DP(c)->mtd, argc);
-}
-
 /* ======================================================================== */
 /* [constructors] */
 
@@ -57,9 +44,9 @@ METHOD knh__Delegate_scall(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_SETv(ctx, DP(sfp[0].cc)->base, sfp[1].o);
-	KNH_SETv(ctx, DP(sfp[0].cc)->mtd, sfp[2].mtd);
-	(sfp[0].cc)->finvoke_1 = knh__Delegate_scall;
+	KNH_SETv(ctx, (sfp[0].cc)->base, sfp[1].o);
+	KNH_SETv(ctx, (sfp[0].cc)->mtd, sfp[2].mtd);
+	(sfp[0].cc)->envsfp = NULL;
 	KNH_RETURN(ctx, sfp, sfp[0].o);
 }
 
@@ -68,17 +55,8 @@ METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD knh__Closure_invoke(Ctx *ctx, knh_sfp_t *sfp)
 {
-	DBG2_ASSERT(IS_bClosure(sfp[0].cc));
-	(sfp[0].cc)->finvoke_1(ctx, sfp);
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method Any0 Closure.callcc(Any1 x, Any2 y, Any3 z) */
-
-METHOD knh__Closure_callcc(Ctx *ctx, knh_sfp_t *sfp)
-{
-	DBG2_ASSERT(IS_bClosure(sfp[0].cc));
-	(sfp[0].cc)->fcallcc_2(ctx, sfp);
+	//DBG2_ASSERT(IS_bClosure(sfp[0].cc));
+	KNH_INVOKE(ctx, sfp);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -91,14 +69,10 @@ KNHAPI(void) knh_putsfp(Ctx *ctx, knh_sfp_t *lsfp, int n, Object *obj)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) knh_Closure_invokesfp(Ctx *ctx, Closure *c, knh_sfp_t *lsfp, int argc)
+KNHAPI(void) knh_Closure_invokesfp(Ctx *ctx, Closure *cc, knh_sfp_t *lsfp, int argc)
 {
-	if((c)->finvoke_1 != knh__Delegate_scall) {
-		TODO();
-		KNH_ABORT();
-	}
-	KNH_MOV(ctx, lsfp[1].o, DP(c)->base);
-	KNH_SCALL(ctx, lsfp, 0, DP(c)->mtd, argc);
+	KNH_MOV(ctx, lsfp[1].o, (cc)->base);
+	KNH_SCALL(ctx, lsfp, 0, (cc)->mtd, argc);
 	KNH_LOCALBACK(ctx, lsfp);
 }
 
@@ -156,172 +130,6 @@ KNHAPI(knh_sfp_t*) knh_Closure_invokef(Ctx *ctx, Closure *c, const char *fmt, ..
 	return lsfp;
 }
 
-///* ------------------------------------------------------------------------ */
-//
-//static
-//void knh_sfp_copy(Ctx *ctx, knh_sfp_t *dst, knh_sfp_t *src, size_t size)
-//{
-//	size_t i;
-//	for(i = 0; i < size; i++) {
-//		dst[i].data = src[i].data;
-//		KNH_MOV(ctx, dst[i].o, src[i].o);
-//	}
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//void knh_Closure_shareStack(Ctx *ctx, Closure *o, knh_sfp_t *sfp)
-//{
-//	KNH_ASSERT(!knh_Closure_isSharedStack(o));
-//	knh_Closure_setSharedStack(o, 1);
-//	DP(o)->stack = sfp;
-//	DP(o)->stacksize = KNH_LOCAL(ctx) - sfp;
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//void knh_Closure_copyStack(Ctx *ctx, Closure *o)
-//{
-//	KNH_ASSERT(knh_Closure_isSharedStack(o));
-//	knh_Closure_setCopiedStack(o, 1);
-//	knh_sfp_t *lsfp = (knh_sfp_t*)KNH_MALLOC(ctx, sizeof(knh_sfp_t) * DP(o)->stacksize);
-//	knh_sfp_copy(ctx, lsfp, DP(o)->stack, DP(o)->stacksize);
-//	DP(o)->stack = lsfp;
-//	knh_Closure_setSharedStack(o, 0);
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//void knh_Closure_copybackStack(Ctx *ctx, Closure *o, knh_sfp_t *sfp)
-//{
-//	KNH_ASSERT(DP(o)->stacksize > 0 && !knh_Closure_isSharedStack(o));
-//	knh_sfp_copy(ctx, sfp, DP(o)->stack, DP(o)->stacksize);
-//}
-//
-///* ------------------------------------------------------------------------ */
-///* @method Any0 Closure.invoke(Any1 x, Any2 y, Any3 z) */
-//
-//METHOD knh__Closure_scall(Ctx *ctx, knh_sfp_t *sfp)
-//{
-//	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
-//	Closure* c = (Closure*)sfp[0].o;
-//	int argc = lsfp - sfp - 1;
-//	DBG_P("argc=%d", argc);
-//	if(DP(c)->stacksize == 0) {
-//		KNH_MOV(ctx, sfp[0].o, DP(c)->base);
-//		KNH_SCALL(ctx, sfp, -1, DP(c)->mtd, argc);
-//		return;
-//	}
-//	knh_sfp_copy(ctx, lsfp, DP(c)->stack, DP(c)->stacksize);
-//	lsfp += DP(c)->stacksize;
-//	KNH_SETv(ctx, lsfp[1].o, DP(c)->base);
-//	knh_sfp_copy(ctx, lsfp+2, sfp+1, argc);
-//	KNH_SCALL(ctx, lsfp, 0, DP(c)->mtd, argc);
-//	KNH_MOV(ctx, sfp[-1].o, lsfp[0].o); /* return */
-//	sfp[-1].data = lsfp[-1].data;
-//	lsfp -= DP(c)->stacksize;
-//	knh_sfp_copy(ctx, DP(c)->stack, lsfp, DP(c)->stacksize);
-//}
-//
-///* ------------------------------------------------------------------------ */
-///* @method Any Closure.call(Any x) @VarArgs */
-//
-//METHOD knh__Closure_call(Ctx *ctx, knh_sfp_t *sfp)
-//{
-//	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
-//	Closure* c = (Closure*)sfp[0].o;
-//	int argc = lsfp - sfp - 1;
-//	DBG_P("argc=%d", argc);
-//	if(DP(c)->stacksize == 0) {
-//		KNH_MOV(ctx, sfp[0].o, DP(c)->base);
-//		KNH_ACALL(ctx, sfp, -1, DP(c)->mtd, argc);
-//		return;
-//	}
-//	knh_sfp_copy(ctx, lsfp, DP(c)->stack, DP(c)->stacksize);
-//	lsfp += DP(c)->stacksize;
-//	KNH_SETv(ctx, lsfp[1].o, DP(c)->base);
-//	knh_sfp_copy(ctx, lsfp+2, sfp+1, argc);
-//	KNH_ACALL(ctx, lsfp, 0, DP(c)->mtd, argc);
-//	KNH_MOV(ctx, sfp[-1].o, lsfp[0].o); /* return */
-//	sfp[-1].data = lsfp[-1].data;
-//	lsfp -= DP(c)->stacksize;
-//	knh_sfp_copy(ctx, DP(c)->stack, lsfp, DP(c)->stacksize);
-//}
-//
-///* ------------------------------------------------------------------------ */
-///* [Generator] */
-///* ------------------------------------------------------------------------ */
-//
-//knh_class_t knh_Method_gencid(Ctx *ctx, Method *mtd, knh_class_t cid)
-//{
-//	knh_type_t rtype = knh_pmztype_totype(ctx, knh_Method_rztype(mtd), cid);
-//	cid = CLASS_type(rtype);
-//	KNH_ASSERT_cid(cid);
-//	KNH_ASSERT(ctx->share->ClassTable[cid].bcid == CLASS_Iterator);
-//	return ctx->share->ClassTable[cid].p1;
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//static
-//ITRNEXT knh_Generator_fnext(Ctx *ctx, knh_sfp_t *sfp, int n)
-//{
-//	Iterator *it = sfp[0].it;
-//	if(IS_NOTNULL(DP(it)->prefetch)) {
-//		Object *o = DP(it)->prefetch;
-//		KNH_SETv(ctx, DP(it)->prefetch, KNH_NULL);
-//		KNH_ITRNEXT(ctx, sfp, n, o);
-//	}
-//
-//	/* CALL/CC */
-//	Closure *c = (Closure*)DP(it)->source;
-//	knh_sfp_copy(ctx, sfp + 1, DP(c)->stack, DP(c)->stacksize);
-//	((Context*)ctx)->esp = sfp + 1 + DP(c)->stacksize;
-//	((Context*)ctx)->esp[0].pc = DP(it)->pc;
-//	KNH_ASSERT(IS_Method(sfp[1].mtd));
-//	DP(sfp[1].mtd)->fproceed(ctx, sfp);   /* proceed */
-//	knh_sfp_t *esp = ((Context*)ctx)->esp;
-//	int opcode = ((knh_kode_t*)(esp[0].pc))->opcode;
-//	if(IS_RETURN(opcode)) {
-//		KNH_ITREND(ctx, sfp, n);
-//	}
-//	DP(it)->pc = esp[0].pc;
-//	knh_sfp_copy(ctx, DP(c)->stack, sfp + 1, DP(c)->stacksize);
-//	sfp[n].data = sfp[1].data;
-//	KNH_MOV(ctx, sfp[n].o, sfp[1].o);
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//static
-//Iterator* new_Generator(Ctx *ctx, Method *mtd, knh_sfp_t *sfp, knh_sfp_t *esp)
-//{
-//	Closure *c = new_Closure(ctx, sfp[0].o, sfp[-1].mtd);
-//	knh_Closure_shareStack(ctx, c, sfp - 1);
-//	knh_Closure_copyStack(ctx, c);
-//	knh_class_t cid = knh_Method_gencid(ctx, mtd, knh_Object_cid(sfp[0].o));
-//	Iterator *it = new_Iterator(ctx, cid, UP(c), knh_Generator_fnext);
-//	DP(it)->pc = esp[0].pc;
-//	knh_sfp_boxingTODO(ctx, sfp-1);
-//	KNH_SET(ctx, DP(it)->prefetch, sfp[-1].o);
-//	return it;
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//METHOD knh_fmethod_generator(Ctx *ctx, knh_sfp_t *sfp)
-//{
-//	Method *mtd = sfp[-1].mtd;
-//	DP(sfp[-1].mtd)->fproceed(ctx, sfp);   /* proceed */
-//	knh_sfp_t *esp = ((Context*)ctx)->esp;
-//	int opcode = ((knh_kode_t*)(esp[0].pc))->opcode;
-//	if(IS_RETURN(opcode)) {
-//		knh_class_t cid = knh_Method_gencid(ctx, mtd, knh_Object_cid(sfp[0].o));
-//		KNH_RETURN(ctx, sfp, new_Iterator(ctx, cid, KNH_VOID, NULL));
-//	}
-//	KNH_RETURN(ctx, sfp, new_Generator(ctx, mtd, sfp, esp));
-//}
-
 /* ------------------------------------------------------------------------ */
 /* class */
 /* ------------------------------------------------------------------------ */
@@ -341,15 +149,14 @@ METHOD knh_fmethod_closureDEFAULT(Ctx *ctx, knh_sfp_t *sfp)
 static
 Closure* new_ClosureDEFAULT(Ctx *ctx, knh_type_t rtype, knh_class_t cid)
 {
-	Closure *c = (Closure*)new_Object_init(ctx, FLAG_Closure, cid, 0);
+	Closure *cc = (Closure*)new_Object_init(ctx, FLAG_Closure, cid, 0);
 	Method *mtd = new_Method(ctx, 0, cid, METHODN_lambda, knh_fmethod_closureDEFAULT);
-	KNH_SETv(ctx, DP(c)->mtd, mtd);
+	KNH_SETv(ctx, (cc)->mtd, mtd);
 	KNH_SETv(ctx, DP(mtd)->mf, konoha_findMethodField0(ctx, rtype));
 	knh_Method_setVarArgs(mtd, 1);
-	KNH_SETv(ctx, DP(c)->base, KNH_NULL);
-	(c)->finvoke_1 = knh__Delegate_scall;
-	(c)->fcallcc_2 = knh__Delegate_scall;
-	return c;
+	KNH_SETv(ctx, (cc)->base, KNH_NULL);
+	(cc)->envsfp = NULL;
+	return cc;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -434,6 +241,119 @@ knh_class_t knh_class_MethodClosure(Ctx *ctx, knh_class_t cid, Method *mtd)
 }
 
 /* ------------------------------------------------------------------------ */
+/* [Closure] */
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_sfp_copy(Ctx *ctx, knh_sfp_t *dst, knh_sfp_t *src, size_t size)
+{
+	size_t i;
+	for(i = 0; i < size; i++) {
+		dst[i].data = src[i].data;
+		KNH_MOV(ctx, dst[i].o, src[i].o);
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+Closure* new_Closure(Ctx *ctx, knh_sfp_t *sfp, Method *mtd)
+{
+	knh_class_t cid = knh_class_MethodClosure(ctx, knh_Object_cid(sfp[0].o), mtd);
+	Closure *cc = (Closure*)new_Object_init(ctx, FLAG_Closure, cid, 0);
+	KNH_SETv(ctx, (cc)->mtd, mtd);
+	KNH_FINALv(ctx, (cc)->base);
+	cc->self = cc;   // TO AVOID CYCLIC REFERENCE
+	(cc)->envsfp = sfp;
+	return cc;
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_Closure_storeEnv(Ctx *ctx, Closure *cc, knh_sfp_t *sfp)
+{
+	size_t stacksize = ctx->esp - (cc)->envsfp;
+	size_t* hstack = (size_t*)KNH_MALLOC(ctx, (sizeof(knh_sfp_t) * stacksize) + sizeof(size_t));
+	knh_sfp_t *envsfp = (knh_sfp_t*)(&hstack[1]);
+	KNH_ASSERT(cc->envsfp == sfp);
+	hstack[0] = stacksize;
+	knh_sfp_copy(ctx, (cc)->envsfp, envsfp, stacksize);
+	(cc)->envsfp = envsfp;
+	knh_Closure_setStoredEnv(cc, 1);
+	DBG2_P("STORED %d", (int)stacksize);
+}
+
+///* ------------------------------------------------------------------------ */
+///* [Generator] */
+///* ------------------------------------------------------------------------ */
+//
+//knh_class_t knh_Method_gencid(Ctx *ctx, Method *mtd, knh_class_t cid)
+//{
+//	knh_type_t rtype = knh_pmztype_totype(ctx, knh_Method_rztype(mtd), cid);
+//	cid = CLASS_type(rtype);
+//	KNH_ASSERT_cid(cid);
+//	KNH_ASSERT(ctx->share->ClassTable[cid].bcid == CLASS_Iterator);
+//	return ctx->share->ClassTable[cid].p1;
+//}
+//
+///* ------------------------------------------------------------------------ */
+//
+//static
+//ITRNEXT knh_Generator_fnext(Ctx *ctx, knh_sfp_t *sfp, int n)
+//{
+//	Iterator *it = sfp[0].it;
+//	/* CALL/CC */
+//	Closure *c = (Closure*)DP(it)->source;
+//	knh_vmcode_t *pc = knh_KLRCode_yeildNext(DP(it)->pc);
+//	if(pc != NULL) {
+//		KNH_SCALL_CC(ctx, sfp, 1, (c)->stack, (cc)->stacksize);
+//		DP(it)->pc = esp[0].pc;
+//	}
+//	knh_sfp_t *esp = ((Context*)ctx)->esp;
+//	int opcode = ((knh_kode_t*)(esp[0].pc))->opcode;
+//	if(IS_RETURN(opcode)) {
+//		KNH_ITREND(ctx, sfp, n);
+//	}
+//	DP(it)->pc = esp[0].pc;
+//	knh_sfp_copy(ctx, (cc)->stack, sfp + 1, (cc)->stacksize);
+//	sfp[n].data = sfp[1].data;
+//	KNH_MOV(ctx, sfp[n].o, sfp[1].o);
+//}
+//
+///* ------------------------------------------------------------------------ */
+//
+//static
+//Iterator* new_Generator(Ctx *ctx, Method *mtd, knh_sfp_t *lsfp, int args)
+//{
+//	KNH_SCALL_WENV(ctx, lsfp, 0, mtd, args);
+//	{
+//		Closure *c = new_Closure__newstack(ctx, sfp[1].o, mtd, lsfp, ctx->esp);
+//		knh_class_t cid = knh_Method_gencid(ctx, mtd, knh_Object_cid(sfp[0].o));
+//		Iterator *it = new_Iterator(ctx, cid, UP(c), knh_Generator_fnext);
+//		DP(it)->pc = esp[0].pc;
+//		KNH_SETv(ctx, DP(it)->psfp[0].o, sfp[-1].o);
+//		DP(it)->presfp[0].data = sfp[-1].data;
+//	}
+//	return it;
+//}
+//
+///* ------------------------------------------------------------------------ */
+//
+//METHOD knh_fmethod_generator(Ctx *ctx, knh_sfp_t *sfp)
+//{
+//	Method *mtd = sfp[-1].mtd;
+//	DP(sfp[-1].mtd)->fproceed(ctx, sfp);   /* proceed */
+//	knh_sfp_t *esp = ((Context*)ctx)->esp;
+//	int opcode = ((knh_kode_t*)(esp[0].pc))->opcode;
+//	if(IS_RETURN(opcode)) {
+//		knh_class_t cid = knh_Method_gencid(ctx, mtd, knh_Object_cid(sfp[0].o));
+//		KNH_RETURN(ctx, sfp, new_Iterator(ctx, cid, KNH_VOID, NULL));
+//	}
+//	KNH_RETURN(ctx, sfp, new_Generator(ctx, mtd, sfp, esp));
+//}
+
+/* ------------------------------------------------------------------------ */
+
 
 #ifdef __cplusplus
 }

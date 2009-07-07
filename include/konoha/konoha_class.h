@@ -511,16 +511,28 @@ typedef struct knh_ClassMap {
 } knh_ClassMap_struct ;
 
 /* ------------------------------------------------------------------------ */
-/* @class Closure Object knh_Closure_struct @Param2 */
-/* @flag Closure.SharedStack CCF:1 (%s)->h.flag 'is:set:*:*' */
-/* @flag Closure.CopiedStack CCF:2 (%s)->h.flag 'is:set:*:*' */
+/* @class Closure Object knh_Closure_t @Param2 */
+/* @flag Closure.StoredEnv CCF:1 (%s)->h.flag 'is:set:*:*' */
 
-typedef struct knh_Closure {
-	Object* base;
+typedef struct knh_Closure_t {
+	knh_hObject_t h;
+	union {
+		Object* base;
+		struct knh_Closure_t *self;
+	};
 	struct knh_Method_t* mtd;
-	size_t stacksize;
-	knh_sfp_t *stack;
-} knh_Closure_struct ;
+	union {
+		knh_sfp_t *envsfp;
+		size_t *hstacksize;
+	};
+} knh_Closure_t ;
+
+#define KNH_INVOKE(ctx, lsfp) {\
+		Closure* cc_ = sfp[0].cc;\
+		int argc_ = (ctx->esp - sfp) - 1; \
+		KNH_MOV(ctx, sfp[0].o, (cc_)->base);\
+		KNH_SCALL(ctx, sfp, -1, (cc_)->mtd, argc_);\
+	}\
 
 /* ------------------------------------------------------------------------ */
 /* @class AffineConv Object knh_AffineConv_t @Private */
@@ -957,6 +969,7 @@ typedef struct knh_Stmt {
 typedef unsigned char          knh_opcode_t;
 typedef int                    knh_labelid_t;
 typedef knh_short_t            knh_sfi_t;
+typedef knh_short_t            knh_sfe_t;
 
 typedef struct {
 	knh_sfi_t i;
