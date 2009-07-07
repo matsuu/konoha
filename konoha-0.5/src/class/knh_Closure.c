@@ -44,8 +44,8 @@ extern "C" {
 
 METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_SETv(ctx, (sfp[0].cc)->base, sfp[1].o);
-	KNH_SETv(ctx, (sfp[0].cc)->mtd, sfp[2].mtd);
+	KNH_INITv((sfp[0].cc)->base, sfp[1].o);
+	KNH_INITv((sfp[0].cc)->mtd, sfp[2].mtd);
 	(sfp[0].cc)->envsfp = NULL;
 	KNH_RETURN(ctx, sfp, sfp[0].o);
 }
@@ -151,10 +151,10 @@ Closure* new_ClosureDEFAULT(Ctx *ctx, knh_type_t rtype, knh_class_t cid)
 {
 	Closure *cc = (Closure*)new_Object_init(ctx, FLAG_Closure, cid, 0);
 	Method *mtd = new_Method(ctx, 0, cid, METHODN_lambda, knh_fmethod_closureDEFAULT);
-	KNH_SETv(ctx, (cc)->mtd, mtd);
+	KNH_INITv((cc)->mtd, mtd);
 	KNH_SETv(ctx, DP(mtd)->mf, konoha_findMethodField0(ctx, rtype));
 	knh_Method_setVarArgs(mtd, 1);
-	KNH_SETv(ctx, (cc)->base, KNH_NULL);
+	KNH_INITv((cc)->base, KNH_NULL);
 	(cc)->envsfp = NULL;
 	return cc;
 }
@@ -242,7 +242,6 @@ knh_class_t knh_class_MethodClosure(Ctx *ctx, knh_class_t cid, Method *mtd)
 
 /* ------------------------------------------------------------------------ */
 /* [Closure] */
-
 /* ------------------------------------------------------------------------ */
 
 static
@@ -261,9 +260,8 @@ Closure* new_Closure(Ctx *ctx, knh_sfp_t *sfp, Method *mtd)
 {
 	knh_class_t cid = knh_class_MethodClosure(ctx, knh_Object_cid(sfp[0].o), mtd);
 	Closure *cc = (Closure*)new_Object_init(ctx, FLAG_Closure, cid, 0);
-	KNH_SETv(ctx, (cc)->mtd, mtd);
-	KNH_FINALv(ctx, (cc)->base);
-	cc->self = cc;   // TO AVOID CYCLIC REFERENCE
+	KNH_INITv((cc)->mtd, mtd);
+	(cc)->self = cc;   // TO AVOID CYCLIC REFERENCE
 	(cc)->envsfp = sfp;
 	return cc;
 }
@@ -331,7 +329,7 @@ void knh_Closure_storeEnv(Ctx *ctx, Closure *cc, knh_sfp_t *sfp)
 //		knh_class_t cid = knh_Method_gencid(ctx, mtd, knh_Object_cid(sfp[0].o));
 //		Iterator *it = new_Iterator(ctx, cid, UP(c), knh_Generator_fnext);
 //		DP(it)->pc = esp[0].pc;
-//		KNH_SETv(ctx, DP(it)->psfp[0].o, sfp[-1].o);
+//		KNH_INITv(ctx, DP(it)->psfp[0].o, sfp[-1].o);
 //		DP(it)->presfp[0].data = sfp[-1].data;
 //	}
 //	return it;
