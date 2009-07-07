@@ -1319,32 +1319,31 @@ void knh_ClassMap_traverse(Ctx *ctx, ClassMap *cm, knh_ftraverse gc)
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_Closure_init(Ctx *ctx, Closure *c, int init)
+void knh_Closure_init(Ctx *ctx, Closure *cc, int init)
 {
-	knh_Closure_struct *b = DP(c);
-	KNH_INITv(b->base, KNH_NULL);
-	KNH_INITv(b->mtd, KNH_NULL);
-	b->stack = NULL;
-	b->stacksize = 0;
+	cc->base = NULL;
+	cc->mtd  = NULL;
+	cc->envsfp = NULL;
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_Closure_traverse(Ctx *ctx, Closure *c, knh_ftraverse ftr)
+void knh_Closure_traverse(Ctx *ctx, Closure *cc, knh_ftraverse ftr)
 {
-	knh_Closure_struct *b = DP(c);
-	ftr(ctx, UP(b->base));
-	ftr(ctx, UP(b->mtd));
-	if(b->stacksize > 0 && knh_Closure_isCopiedStack(c)) {
-		size_t i;
-		for(i = 0; i < b->stacksize; i++) {
-			ftr(ctx, b->stack[i].o);
+	ftr(ctx, UP(cc->mtd));
+	if(cc->self != cc) {
+		ftr(ctx, UP(cc->base));
+	}
+	if(knh_Closure_isStoredEnv(cc)) {
+		size_t i, stacksize = (cc)->hstacksize[-1];
+		for(i = 0; i < stacksize; i++) {
+			ftr(ctx, (cc)->envsfp[i].o);
 		}
 		if(IS_SWEEP(ftr)) {
-			KNH_FREE(ctx, b->stack, sizeof(knh_sfp_t) * b->stacksize);
-			b->stack = NULL;
-			b->stacksize = 0;
+			KNH_FREE(ctx, (cc)->envsfp, (sizeof(knh_sfp_t) * stacksize) + sizeof(size_t));
+			(cc)->envsfp = NULL;
+			knh_Closure_setStoredEnv(cc, 0);
 		}
 	}
 }

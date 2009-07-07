@@ -100,8 +100,6 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		sfp[(b)] = temp;\
 	}\
 
-#define JIT_SWAP(ctx, a, b)  KLR_SWAP(ctx, a, b)
-
 #define KNH_SWAP(ctx, sfp, n, n2) {\
 		knh_sfp_t temp = sfp[(n)];\
 		sfp[(n)] = sfp[(n2)];\
@@ -119,12 +117,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 #define KLR_HALT(ctx) KNH_THROWs(ctx, "Halt!!")
 #define KLR_RET(ctx)  return
 
-#define JIT_HALT(ctx) knh_throw__s(ctx, "Halt!!", NULL, 0)
-#define JIT_RET(ctx)  KLR_RET(ctx)
-
 /* ------------------------------------------------------------------------ */
-#define SFX(x)   KNH_FIELDn(sfp[x.i].o, x.n)
-#define JITSFX(a, b) KNH_FIELDn(sfp[a].o, b)
 
 #define KLR_MOVn(ctx, a, b) {\
 		sfp[a].data = sfp[b].data;\
@@ -140,12 +133,6 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		sfp[a].data = ((Int*)v)->n.data;\
 	}\
 
-#define KLR_MOVx(ctx, a, b) {\
-		Int *v_ = (Int*)SFX(b);\
-		KLR_MOV(ctx, sfp[a].o, v_);\
-		sfp[a].data = (v_)->n.data;\
-	}\
-
 #define KLR_MOVDEF(ctx, a, cid) {\
 		Int *v_ = (Int*)KNH_DEF(ctx, cid);\
 		KLR_MOV(ctx, sfp[a].o, v_);\
@@ -155,61 +142,78 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 #define KLR_MOVSYS(ctx, a, cid)  KLR_MOV(ctx, sfp[a].o, KNH_SYS(ctx, cid))
 
 
-#define JITSFX(a, b) KNH_FIELDn(sfp[a].o, b)
+/* ------------------------------------------------------------------------ */
+#define SFXo(x)   KNH_FIELDn(sfp[x.i].o, x.n)
+#define SFXi(x)   (*((knh_int_t*)(&KNH_FIELDn(sfp[x.i].o, x.n))))
+#define SFXf(x)   (*((knh_float_t*)(&KNH_FIELDn(sfp[x.i].o, x.n))))
+#define SFXb(x)   (*((knh_bool_t*)(&KNH_FIELDn(sfp[x.i].o, x.n))))
 
-#define JIT_MOVn(ctx, a, b) KLR_MOVn(ctx, a, b)
-
-#define JIT_MOVa(ctx, a, b) { \
-		KNH_SETv(ctx, sfp[a].o, sfp[b].o);\
-		sfp[a].data = sfp[b].data;\
-	}\
-
-#define JIT_MOVo(ctx, a, v) KLR_MOVo(ctx, a, v)
-
-#define JIT_MOVx(ctx, a, b, y) {\
-		Int *v_ = (Int*)JITSFX(b, y);\
+#define KLR_MOVx(ctx, a, b) {\
+		Int *v_ = (Int*)SFXo(b);\
 		KLR_MOV(ctx, sfp[a].o, v_);\
 		sfp[a].data = (v_)->n.data;\
 	}\
 
-#define JIT_MOVDEF(ctx, a, cid) KLR_MOVDEF(ctx, a, cid)
-#define JIT_MOVSYS(ctx, a, cid) KLR_MOVSYS(ctx, a, cid)
+#define KLR_XMOVs(ctx, a, b) KLR_MOV(ctx, SFXo(a), sfp[b].o)
+#define KLR_XMOVo(ctx, a, b) KLR_MOV(ctx, SFXo(a), b)
+#define KLR_XMOVx(ctx, a, b) KLR_MOV(ctx, SFXo(a), SFXo(b))
+#define KLR_XMOVDEF(ctx, a, cid)  KLR_MOV(ctx, SFXo(a), KNH_DEF(ctx, cid))
+#define KLR_XMOVSYS(ctx, a, cid)  KLR_MOV(ctx, SFXo(a), KNH_SYS(ctx, cid))
 
-/* ------------------------------------------------------------------------ */
-
-#define KLR_XMOVs(ctx, a, b) KLR_MOV(ctx, SFX(a), sfp[b].o)
-#define KLR_XMOVo(ctx, a, b) KLR_MOV(ctx, SFX(a), b)
-#define KLR_XMOVx(ctx, a, b) KLR_MOV(ctx, SFX(a), SFX(b))
-#define KLR_XMOVDEF(ctx, a, cid)  KLR_MOV(ctx, SFX(a), KNH_DEF(ctx, cid))
-#define KLR_XMOVSYS(ctx, a, cid)  KLR_MOV(ctx, SFX(a), KNH_SYS(ctx, cid))
-
-#define JIT_XMOVs(ctx, a, x, b) KLR_MOV(ctx, JITSFX(a, x), sfp[b].o)
-#define JIT_XMOVo(ctx, a, x, b) KLR_MOV(ctx, JITSFX(a, x), b)
-#define JIT_XMOVx(ctx, a, x, b, y) KLR_MOV(ctx, JITSFX(a, x), JITSFX(b, y))
-#define JIT_XMOVDEF(ctx, a, x, cid)  KLR_MOV(ctx, JITSFX(a, x), KNH_DEF(ctx, cid))
-#define JIT_XMOVSYS(ctx, a, x, cid)  KLR_MOV(ctx, JITSFX(a, x), KNH_SYS(ctx, cid))
-
-#define SFXi(x)   (*((knh_int_t*)(&KNH_FIELDn(sfp[x.i].o, x.n))))
 #define KLR_MOVxi(ctx, a, b)    sfp[a].ivalue = SFXi(b)
 #define KLR_XMOVsi(ctx, a, b)   SFXi(a) = sfp[b].ivalue
 #define KLR_XMOVoi(ctx, a, o)   SFXi(a) = ((knh_Int_t*)o)->n.ivalue
 #define KLR_XMOVxi(ctx, a, b)   SFXi(a) = SFXi(b)
-#define KLR_XMOVxio(ctx, a, b)  SFXi(a) = ((knh_Int_t*)SFX(b))->n.ivalue
-#define KLR_XMOVxBXi(ctx, a, b, cid) KLR_MOV(ctx, SFX(a), new_IntX(ctx, cid, SFXi(b)))
+#define KLR_XMOVxio(ctx, a, b)  SFXi(a) = ((knh_Int_t*)SFXo(b))->n.ivalue
+#define KLR_XMOVxBXi(ctx, a, b, cid) KLR_MOV(ctx, SFXo(a), new_IntX(ctx, cid, SFXi(b)))
 
-#define SFXf(x)   (*((knh_float_t*)(&KNH_FIELDn(sfp[x.i].o, x.n))))
 #define KLR_MOVxf(ctx, a, b)    sfp[a].fvalue = SFXf(b)
 #define KLR_XMOVsf(ctx, a, b)   SFXf(a) = sfp[b].fvalue
 #define KLR_XMOVof(ctx, a, o)   SFXf(a) = ((knh_Float_t*)o)->n.fvalue
 #define KLR_XMOVxf(ctx, a, b)   SFXf(a) = SFXf(b)
-#define KLR_XMOVxfo(ctx, a, b)  SFXf(a) = ((knh_Float_t*)SFX(b))->n.fvalue
-#define KLR_XMOVxBXf(ctx, a, b, cid) KLR_MOV(ctx, SFX(a), new_FloatX(ctx, cid, SFXf(b)))
+#define KLR_XMOVxfo(ctx, a, b)  SFXf(a) = ((knh_Float_t*)SFXo(b))->n.fvalue
+#define KLR_XMOVxBXf(ctx, a, b, cid) KLR_MOV(ctx, SFXo(a), new_FloatX(ctx, cid, SFXf(b)))
 
-#define SFXb(x)   (*((knh_bool_t*)(&KNH_FIELDn(sfp[x.i].o, x.n))))
 #define KLR_MOVxb(ctx, a, b)    sfp[a].bvalue = SFXb(b)
 #define KLR_XMOVsb(ctx, a, b)   SFXb(a) = sfp[b].bvalue
 #define KLR_XMOVob(ctx, a, o)   SFXb(a) = ((knh_Int_t*)o)->n.bvalue
 #define KLR_XMOVxb(ctx, a, b)   SFXb(a) = SFXb(b)
+
+/* ------------------------------------------------------------------------ */
+#define ENVo(x)   (sfp[0].cc)->envsfp[x].o
+#define ENVi(x)   (sfp[0].cc)->envsfp[x].ivalue
+#define ENVf(x)   (sfp[0].cc)->envsfp[x].fvalue
+#define ENVb(x)   (sfp[0].cc)->envsfp[x].bvalue
+
+#define KLR_MOVe(ctx, a, b) {\
+		KLR_MOV(ctx, sfp[a].o, sfp[b].o);\
+		sfp[a].data = sfp[b].data;\
+	}\
+
+#define KLR_EMOVs(ctx, a, b) KLR_MOV(ctx, ENVo(a), sfp[b].o)
+#define KLR_EMOVo(ctx, a, b) KLR_MOV(ctx, ENVo(a), b)
+#define KLR_EMOVe(ctx, a, b) KLR_MOV(ctx, ENVo(a), ENVo(b))
+#define KLR_EMOVDEF(ctx, a, cid)  KLR_MOV(ctx, ENVo(a), KNH_DEF(ctx, cid))
+#define KLR_EMOVSYS(ctx, a, cid)  KLR_MOV(ctx, ENVo(a), KNH_SYS(ctx, cid))
+
+//#define KLR_MOVei(ctx, a, b)    sfp[a].ivalue = ENVi(b)
+//#define KLR_EMOVsi(ctx, a, b)   ENVi(a) = sfp[b].ivalue
+//#define KLR_EMOVoi(ctx, a, o)   ENVi(a) = ((knh_Int_t*)o)->n.ivalue
+//#define KLR_EMOVei(ctx, a, b)   ENVi(a) = ENVi(b)
+//#define KLR_EMOVeio(ctx, a, b)  ENVi(a) = ((knh_Int_t*)ENVo(b))->n.ivalue
+//#define KLR_EMOVeBXi(ctx, a, b, cid) KLR_MOV(ctx, ENVo(a), new_IntX(ctx, cid, ENVi(b)))
+//
+//#define KLR_MOVef(ctx, a, b)    sfp[a].fvalue = ENVf(b)
+//#define KLR_EMOVsf(ctx, a, b)   ENVf(a) = sfp[b].fvalue
+//#define KLR_EMOVof(ctx, a, o)   ENVf(a) = ((knh_Float_t*)o)->n.fvalue
+//#define KLR_EMOVef(ctx, a, b)   ENVf(a) = ENVf(b)
+//#define KLR_EMOVefo(ctx, a, b)  ENVf(a) = ((knh_Float_t*)ENVo(b))->n.fvalue
+//#define KLR_EMOVeBXf(ctx, a, b, cid) KLR_MOV(ctx, ENVo(a), new_FloatX(ctx, cid, ENVf(b)))
+//
+//#define KLR_MOVeb(ctx, a, b)    sfp[a].bvalue = ENVb(b)
+//#define KLR_EMOVsb(ctx, a, b)   ENVb(a) = sfp[b].bvalue
+//#define KLR_EMOVob(ctx, a, o)   ENVb(a) = ((knh_Int_t*)o)->n.bvalue
+//#define KLR_EMOVeb(ctx, a, b)   ENVb(a) = ENVb(b)
 
 /* ------------------------------------------------------------------------ */
 
@@ -331,28 +335,12 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 	}\
 
 #define KLR_RETx(ctx, dummy, b) {\
-		Int *v_ = (Int*)SFX(b);\
+		Int *v_ = (Int*)SFXo(b);\
 		sfp[-1].data = (v_)->n.data;\
 		KLR_MOV__wogc(ctx, sfp[-1].o, v_);\
 		KLR_RET(ctx);\
 	}\
 
-#define JIT_INITCODE(ctx, n) KLR_INITCODE(ctx, n)
-#define JIT_SETESP(ctx, n) KLR_SETESP(ctx, n)
-#define JIT_CHECKESP(ctx, n) KLR_CHECKESP(ctx, n)
-#define JIT_PINIo(ctx, a, v) KLR_PINIo(ctx, a, v)
-#define JIT_RETn(ctx, dummy, b) KLR_RETn(ctx, dummy, b)
-#define JIT_RETa(ctx, dummy, b) KLR_RETa(ctx, dummy, b)
-#define JIT_RETo(ctx, dummy, v) KLR_RETo(ctx, dummy, v)
-
-#define JIT_RETx(ctx, dummy, b, y) {\
-		Int *v_ = (Int*)JITSFX(b, y);\
-		sfp[-1].data = (v_)->n.data;\
-		KLR_MOV__wogc(ctx, sfp[-1].o, v_);\
-		KLR_RET(ctx);\
-	}\
-
-/* ------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------ */
 
 #define KLR_BOX(ctx, n, cid) {\
@@ -377,14 +365,6 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		sfp[a].data = (sfp[a].i)->n.data;\
 	}\
 
-/* ------------------------------------------------------------------------ */
-
-#define JIT_BOX(ctx, n, cid)  KLR_BOX(ctx, n, cid)
-#define JIT_BOXnc(ctx, n, cid)  KLR_BOXnc(ctx, n, cid)
-#define JIT_NNBOX(ctx, n, cid)  KLR_NNBOX(ctx, n, cid)
-#define JIT_NNBOXnc(ctx, n, cid)  KLR_NNBOXnc(ctx, n, cid)
-#define JIT_UNBOX(ctx, a) KLR_UNBOX(ctx, a)
-
 /* ======================================================================== */
 
 #define KLR_ISNULL(ctx, n) \
@@ -393,8 +373,8 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 	} \
 
 #define KLR_ISNULLx(ctx, n) \
-	if(IS_NULL(SFX(n))) { \
-		knh_throwException(ctx, new_NullException (ctx, SFX(n)), _HERE_); \
+	if(IS_NULL(SFXo(n))) { \
+		knh_throwException(ctx, new_NullException (ctx, SFXo(n)), _HERE_); \
 	} \
 
 #define KLR_ISTYPE(ctx, n, cid) \
@@ -406,15 +386,6 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		KLR_ISTYPE(ctx, n, cid);\
 		KLR_ISNULL(ctx, n);\
 	}\
-
-#define JIT_ISNULL(ctx, n)  KLR_ISNULL(ctx, n)
-#define JIT_ISTYPE(ctx, n, cid)   KLR_ISTYPE(ctx, n, cid)
-#define JIT_ISNNTYPE(ctx, n, cid)  KLR_ISNNTYPE(ctx, n, cid)
-
-#define JIT_ISNULLx(ctx, a, x) \
-	if(IS_NULL(JITSFX(a, x))) { \
-		knh_throwException(ctx, new_NullException (ctx, JITSFX(a, x)), _HERE_); \
-	} \
 
 /* ======================================================================== */
 
@@ -437,6 +408,23 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		(lsfp[n].mtd)->fcall_1(ctx, lsfp + (n + 1)); \
 		((Context*)ctx)->esp = &(lsfp[n]); \
 	} \
+
+#define KNH_SCALL_WENV(ctx, lsfp, n, m, args) { \
+		KLR_MOV(ctx, lsfp[n].o, m); \
+		((Context*)ctx)->esp = &(lsfp[n+args+2]); \
+		lsfp[n].pc = (lsfp[n].mtd)->pc_start; \
+		(lsfp[n].mtd)->fcall_1(ctx, lsfp + (n + 1)); \
+	} \
+
+#define KNH_SCALL_CC(ctx, lsfp, n, envsfp, envsize) { \
+		knh_sfp_copy(ctx, envsfp, lsfp+n, envsize); \
+		((Context*)ctx)->esp = &(lsfp[n+args+2]); \
+		lsfp[n].pc = (lsfp[n].mtd)->pc_start; \
+		(lsfp[n].mtd)->fcall_1(ctx, lsfp + (n + 1)); \
+		knh_sfp_copy(ctx, lsfp+n, envsfp, envsize); \
+		((Context*)ctx)->esp = &(lsfp[n]); \
+	} \
+
 
 #define KLR_FCALL(ctx, n, shift, self, m) { \
 		int n1_ = n + 1;\
@@ -493,64 +481,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		((Context*)ctx)->esp = &(sfp[n]); \
 	} \
 
-
-#define JIT_SCALL(ctx, n, shift, m) { \
-		KLR_MOV(ctx, sfp[n].o, m); \
-		((Context*)ctx)->esp = &(sfp[n + shift]); \
-		sfp[n].pc = (sfp[n].mtd)->pc_start; \
-		(sfp[n].mtd)->fcall_1(ctx, sfp + n + 1); \
-		((Context*)ctx)->esp = &(sfp[n]); \
-	} \
-
-#define JIT_FCALL(ctx, n, shift, self, m) { \
-		int n1_ = n + 1;\
-		KLR_MOVa(ctx, n1_, self); \
-		KLR_MOV(ctx, sfp[n].o, m); \
-		((Context*)ctx)->esp = &(sfp[n + shift]); \
-		sfp[n].pc = (sfp[n].mtd)->pc_start; \
-		(sfp[n].mtd)->fcall_1(ctx, sfp + n1_); \
-		((Context*)ctx)->esp = &(sfp[n]); \
-	} \
-
-#define JIT_CALL(ctx, n, shift, mn) { \
-		KLR_MOV(ctx, sfp[n].o, konoha_lookupMethod(ctx, knh_Object_cid(sfp[n+1].o), mn)); \
-		DBG2_ASSERT(IS_Method(sfp[n].o)); \
-		((Context*)ctx)->esp = &(sfp[n + shift]); \
-		sfp[n].pc = (sfp[n].mtd)->pc_start; \
-		(sfp[n].mtd)->fcall_1(ctx, sfp + n + 1); \
-		((Context*)ctx)->esp = &(sfp[n]); \
-	} \
-
-#define JIT_ACALL(ctx, n, shift, mn) { \
-		Method *mtd_ = konoha_lookupMethod(ctx, knh_Object_cid(sfp[n+1].o), mn);\
-		KLR_MOV(ctx, sfp[n].o, mtd_); \
-		((Context*)ctx)->esp = &(sfp[n + shift]); \
-		knh_sfp_typecheck(ctx, sfp + n + 1, mtd_, NULL); \
-		sfp[n].pc = (sfp[n].mtd)->pc_start; \
-		(mtd_)->fcall_1(ctx, sfp + n + 1); \
-		((Context*)ctx)->esp = &(sfp[n]); \
-	} \
-
 /* this is used only for Closure.invoke */
-
-#define JIT_AINVOKE(ctx, n, shift, m) { \
-		KLR_MOV(ctx, sfp[n].o, m); \
-		((Context*)ctx)->esp = &(sfp[n + shift]); \
-		DBG2_ASSERT(IS_Closure(sfp[n+1].o));\
-		knh_sfp_typecheck(ctx, sfp + n + 1, DP(sfp[n+1].cc)->mtd, NULL); \
-		sfp[n].pc = (sfp[n].mtd)->pc_start; \
-		(sfp[n].mtd)->fcall_1(ctx, sfp + n + 1); \
-		((Context*)ctx)->esp = &(sfp[n]); \
-	} \
-
-#define JIT_NEW(ctx, n, flag, cid, shift, m) { \
-		KLR_MOV(ctx, sfp[n].o, m); \
-		KLR_MOV(ctx, sfp[n+1].o, new_Object_init(ctx, flag, cid, 0)); \
-		((Context*)ctx)->esp = &(sfp[n + shift]); \
-		sfp[n].pc = (sfp[n].mtd)->pc_start; \
-		(sfp[n].mtd)->fcall_1(ctx, sfp + n + 1); \
-		((Context*)ctx)->esp = &(sfp[n]); \
-	} \
 
 /* ------------------------------------------------------------------------- */
 
@@ -567,17 +498,6 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 
 #define KLR_TOSTR(ctx, n, mn)  KLR_TOSTRf(ctx, n, mn, KNH_NULL)
 
-#define JIT_TOSTRf(ctx, n, mn, fmt) { \
-		KLR_SWAP(ctx, n, n+1); \
-		knh_cwb_t cwb = new_cwb(ctx);\
-		KLR_MOV(ctx, sfp[n+2].o, cwb.w);\
-		KLR_MOV(ctx, sfp[n+3].o, fmt);\
-		Method *mtd_ = konoha_lookupFormatter(ctx, knh_Object_cid(sfp[n+1].o), mn);\
-		JIT_SCALL(ctx, n, 4, mtd_);\
-		KLR_MOV(ctx, sfp[n].o, new_String__cwb(ctx, cwb)); \
-	}\
-
-#define JIT_TOSTR(ctx, n, mn)       JIT_TOSTRf(ctx, n, mn, KNH_NULL)
 /* ------------------------------------------------------------------------- */
 
 #define KLR_SMAP(ctx, n, m)  { \
@@ -620,13 +540,6 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		} \
 	}\
 
-#define JIT_SMAP(ctx, n, m) KLR_SMAP(ctx, n, m)
-#define JIT_SMAPnc(ctx, n, m) KLR_SMAPnc(ctx, n, m)
-#define JIT_MAP(ctx, n, tcid) KLR_MAP(ctx, n, tcid)
-#define JIT_MAPnc(ctx, n, tcid) KLR_MAPnc(ctx, n, tcid)
-#define JIT_AMAP(ctx, n, tcid) KLR_AMAP(ctx, n, tcid)
-#define JIT_NNMAP(ctx, a, tcid) KLR_NNMAP(ctx, a, tcid)
-
 /* ======================================================================== */
 
 #define KLR_JMP(ctx, PC, JUMP) {\
@@ -663,14 +576,6 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 	if(IS_NOTNULL(sfp[n].o)) { \
 		KLR_JMP(ctx, PC, JUMP); \
 	} \
-
-#define JIT_JMP(ctx, PC, JUMP) KLR_JMP(ctx, PC, JUMP)
-#define JIT_SKIP(ctx, PC, JUMP) KLR_SKIP(ctx, PC, JUMP)
-#define JIT_bJIFT(ctx, PC, JUMP, n) KLR_bJIFT(ctx, PC, JUMP, n)
-#define JIT_bJIFF(ctx, PC, JUMP, n) KLR_bJIFF(ctx, PC, JUMP, n)
-#define JIT_bJIFF_LOOP(ctx, PC, JUMP, n) KLR_bJIFF_LOOP(ctx, PC, JUMP, n)
-#define JIT_JIFNUL(ctx, PC, JUMP, n) KLR_JIFNUL(ctx, PC, JUMP, n)
-#define JIT_JIFNN(ctx, PC, JUMP, n) KLR_JIFNN(ctx, PC, JUMP, n)
 
 /* ------------------------------------------------------------------------- */
 
@@ -735,59 +640,6 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 	}while(IS_NOTNULL(sfp[na].o));\
 } \
 
-
-#define JIT_NEXT(ctx, PC, JUMP, na, ib, sc) { \
-		knh_sfp_t *itrsfp_ = sfp + ib; \
-		(itrsfp_[0].it)->fnext_1(ctx, itrsfp_, sc - ib); \
-		if(!HAS_ITRNEXT(sfp[sc].o)) { \
-			KLR_JMP(ctx, PC, JUMP); \
-		} \
-		KLR_MOV(ctx, sfp[na].o, sfp[sc].o); sfp[na].data = sfp[sc].data;\
-	} \
-
-#define JIT_INEXT(ctx, PC, JUMP, reqc, na, ib, sc) { \
-		knh_sfp_t *itrsfp_ = sfp + ib; \
-		knh_class_t ncid_;\
-		do {\
-			(itrsfp_[0].it)->fnext_1(ctx, itrsfp_, sc - ib); \
-			if(!HAS_ITRNEXT(sfp[sc].o)) { \
-				KLR_JMP(ctx, PC, JUMP); \
-			} \
-			ncid_ = knh_Object_cid(sfp[sc].o);\
-		}while(ncid_ != ((knh_class_t)reqc) && !knh_class_instanceof(ctx, reqc, ncid_));\
-		KLR_MOV(ctx, sfp[na].o, sfp[sc].o); sfp[na].data = sfp[sc].data;\
-	} \
-
-#define JIT_MAPNEXT(ctx, PC, JUMP, reqc, na, ib, sc) { \
-		knh_sfp_t *itrsfp_ = sfp + ib; \
-		knh_class_t ncid_;\
-		do {\
-			(itrsfp_[0].it)->fnext_1(ctx, itrsfp_, sc - ib); \
-			if(!HAS_ITRNEXT(sfp[sc].o)) { \
-				KLR_JMP(ctx, PC, JUMP); \
-			} \
-			ncid_ = knh_Object_cid(sfp[sc].o);\
-			if(ncid_ == ((knh_class_t)reqc) || knh_class_instanceof(ctx, reqc, ncid_)) break;\
-			KLR_MOV(ctx, sfp[sc+1].o, konoha_findMapper(ctx, ncid_, reqc));\
-			(sfp[sc+1].mpr)->fmap_1(ctx, sfp + sc); \
-		}while(IS_NOTNULL(sfp[sc].o));\
-		KLR_MOV(ctx, sfp[na].o, sfp[sc].o); sfp[na].data = sfp[sc].data;\
-	} \
-
-#define JIT_SMAPNEXT(ctx, PC, JUMP, na, ib, sc, mm) { \
-		knh_sfp_t *itrsfp_ = sfp + ib; \
-		KLR_MOV(ctx, sfp[sc+1].o, mm); \
-		do {\
-			(itrsfp_[0].it)->fnext_1(ctx, itrsfp_, sc - ib); \
-			if(!HAS_ITRNEXT(sfp[sc].o)) { \
-				KLR_JMP(ctx, PC, JUMP); \
-			} \
-			(sfp[sc+1].mpr)->fmap_1(ctx, sfp + sc); \
-		}while(IS_NOTNULL(sfp[sc].o));\
-		KLR_MOV(ctx, sfp[na].o, sfp[sc].o); sfp[na].data = sfp[sc].data;\
-	} \
-
-/* ------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------- */
 
 #define NPC  /* for KNH_TRY */
@@ -876,9 +728,6 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 #define KLR_P(ctx, flag, mn, n) knh_stack_p(ctx, sfp, flag, mn, n)
 #define KLR_PMSG(ctx, flag, v) knh_stack_pmsg(ctx, sfp, flag, (String*)v)
 
-#define JIT_P(ctx, flag, mn, n) KLR_P(ctx, flag, mn, n)
-#define JIT_PMSG(ctx, flag, v)  KLR_PMSG(ctx, flag, v)
-
 /* ------------------------------------------------------------------------ */
 
 #define KLR_iCAST(ctx, a) {\
@@ -908,11 +757,6 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 			sfp[a].fvalue = n_; \
 		}\
 	}\
-
-#define JIT_iCAST(ctx, a) KLR_iCAST(ctx, a)
-#define JIT_inCAST(ctx, a) KLR_inCAST(ctx, a)
-#define JIT_fCAST(ctx, a) KLR_fCAST(ctx, a)
-#define JIT_fnCAST(ctx, a) KLR_fnCAST(ctx, a)
 
 /* ------------------------------------------------------------------------ */
 
@@ -987,74 +831,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 
 /* ------------------------------------------------------------------------ */
 
-#define JIT_bNOT(ctx, c, a)     SFb(c) = !(SFb(a))
-
-#define JIT_iNEG(ctx, c, a)     SFi(c) = -(SFi(a))
-#define JIT_iADD(ctx, c, a, b)  SFi(c) = (SFi(a) + SFi(b))
-#define JIT_iADDn(ctx, c, a, n) SFi(c) = (SFi(a) + n)
-#define JIT_iSUB(ctx, c, a, b)  SFi(c) = (SFi(a) - SFi(b))
-#define JIT_iSUBn(ctx, c, a, n) SFi(c) = (SFi(a) - n)
-#define JIT_iMUL(ctx, c, a, b)  SFi(c) = (SFi(a) * SFi(b))
-#define JIT_iMULn(ctx, c, a, n) SFi(c) = (SFi(a) * n)
-#define JIT_iDIV(ctx, c, a, b)  { \
-		KNH_THROW_iZERODIV(SFi(b)); \
-		SFi(c) = (SFi(a) / SFi(b)); \
-	} \
-
-#define JIT_iDIVn(ctx, c, a, n)  SFi(c) = (SFi(a) / n)
-#define JIT_iMOD(ctx, c, a, b) { \
-		KNH_THROW_iZERO(SFi(b)); \
-		SFi(c) = (SFi(a) % SFi(b)); \
-	} \
-
-#define JIT_iMODn(ctx, c, a, n)  SFi(c) = (SFi(a) % n)
-
-
-#define JIT_iEQ(ctx, c, a, b)  SFi(c) = (SFi(a) == SFi(b))
-#define JIT_iEQn(ctx, c, a, n)  SFi(c) = (SFi(a) == n)
-#define JIT_iNEQ(ctx, c, a, b)  SFi(c) = (SFi(a) != SFi(b))
-#define JIT_iNEQn(ctx, c, a, n)  SFi(c) = (SFi(a) != n)
-
-#define JIT_iLT(ctx, c, a, b)  SFb(c) = (SFi(a) < SFi(b))
-#define JIT_iLTn(ctx, c, a, n)  SFb(c) = (SFi(a) < n)
-#define JIT_iLTE(ctx, c, a, b)  SFb(c) = (SFi(a) <= SFi(b))
-#define JIT_iLTEn(ctx, c, a, n)  SFb(c) = (SFi(a) <= n)
-#define JIT_iGT(ctx, c, a, b)  SFb(c) = (SFi(a) > SFi(b))
-#define JIT_iGTn(ctx, c, a, n)  SFb(c) = (SFi(a) > n)
-#define JIT_iGTE(ctx, c, a, b)  SFb(c) = (SFi(a) >= SFi(b))
-#define JIT_iGTEn(ctx, c, a, n)  SFb(c) = (SFi(a) >= n)
-
-#define JIT_fNEG(ctx, c, a)     SFf(c) = -(SFf(a))
-#define JIT_fADD(ctx, c, a, b)  SFf(c) = (SFf(a) + SFf(b))
-#define JIT_fADDn(ctx, c, a, n) SFf(c) = (SFf(a) + n)
-#define JIT_fSUB(ctx, c, a, b)  SFf(c) = (SFf(a) - SFf(b))
-#define JIT_fSUBn(ctx, c, a, n) SFf(c) = (SFf(a) - n)
-#define JIT_fMUL(ctx, c, a, b)  SFf(c) = (SFf(a) * SFf(b))
-#define JIT_fMULn(ctx, c, a, n) SFf(c) = (SFf(a) * n)
-#define JIT_fDIV(ctx, c, a, b)  { \
-		KNH_THROW_fZERODIV(SFf(b)); \
-		SFf(c) = (SFf(a) / SFf(b)); \
-	} \
-
-#define JIT_fDIVn(ctx, c, a, n)  SFf(c) = (SFf(a) / n)
-
-#define JIT_fEQ(ctx, c, a, b)  SFb(c) = (SFf(a) == SFf(b))
-#define JIT_fEQn(ctx, c, a, n)  SFb(c) = (SFf(a) == n)
-#define JIT_fNEQ(ctx, c, a, b)  SFb(c) = (SFf(a) != SFf(b))
-#define JIT_fNEQn(ctx, c, a, n)  SFb(c) = (SFf(a) != n)
-#define JIT_fLT(ctx, c, a, b)  SFb(c) = (SFf(a) < SFf(b))
-#define JIT_fLTn(ctx, c, a, n)  SFb(c) = (SFf(a) < n)
-#define JIT_fLTE(ctx, c, a, b)  SFb(c) = (SFf(a) <= SFf(b))
-#define JIT_fLTEn(ctx, c, a, n)  SFb(c) = (SFf(a) <= n)
-#define JIT_fGT(ctx, c, a, b)  SFb(c) = (SFf(a) > SFf(b))
-#define JIT_fGTn(ctx, c, a, n)  SFb(c) = (SFf(a) > n)
-#define JIT_fGTE(ctx, c, a, b)  SFb(c) = (SFf(a) >= SFf(b))
-#define JIT_fGTEn(ctx, c, a, n)  SFb(c) = (SFf(a) >= n)
-
-/* ------------------------------------------------------------------------ */
-
 #define KLR_NOP(ctx)
-#define JIT_NOP(ctx)
 
 /* ------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------ */
@@ -1074,7 +851,6 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		(lsfp[n+1].mpr)->fmap_1(ctx, lsfp + n); \
 	} \
 
-
 #define KNH_PRINT_STACKTRACE(ctx, lsfp, hn) {\
 		KNH_ASSERT(IS_ExceptionHandler(lsfp[hn].hdr));\
 		knh_format(ctx, KNH_STDERR, METHODN__dump, UP(DP(lsfp[hn].hdr)->caught), KNH_NULL);\
@@ -1083,14 +859,12 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 
 /* ------------------------------------------------------------------------ */
 
-
 #define KNH_SECURE(ctx) \
 	if(((ctx)->flag & KNH_FLAG_CTXF_TRUSTED) != KNH_FLAG_CTXF_TRUSTED) { \
 		knh_throwException(ctx, new_Exception(ctx, TS_SecurityException), KNH_SAFEFILE(__FILE__), __LINE__); \
 	} \
 
 /* ------------------------------------------------------------------------ */
-
 
 #ifdef __cplusplus
 }

@@ -1,20 +1,20 @@
 /****************************************************************************
- * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER  
- * 
+ * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
+ *
  * Copyright (c) 2005-2009, Kimio Kuramitsu <kimio at ynu.ac.jp>
- *           (c) 2008-      Konoha Software Foundation  
+ *           (c) 2008-      Konoha Software Foundation
  * All rights reserved.
- * 
- * You may choose one of the following two licenses when you use konoha. 
+ *
+ * You may choose one of the following two licenses when you use konoha.
  * See www.konohaware.org/license.html for further information.
- * 
+ *
  * (1) GNU General Public License 2.0      (with    KONOHA_UNDER_GPL2)
  * (2) Konoha Software Foundation License 1.0
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
  * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
@@ -22,7 +22,7 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *  
+ *
  ****************************************************************************/
 
 #ifndef KONOHA_PROTO__H
@@ -31,7 +31,7 @@
 #include<konoha/gen/konoha_class_.h>
 
 
-#ifdef __cplusplus 
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -150,10 +150,10 @@ knh_class_t konoha_findcidx(Ctx *ctx, knh_bytes_t lname);
 /* ../src/class/knh_Closure.c */
 METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Closure_invoke(Ctx *ctx, knh_sfp_t *sfp);
-METHOD knh__Closure_callcc(Ctx *ctx, knh_sfp_t *sfp);
 knh_class_t konoha_addClosureClass(Ctx *ctx, knh_class_t cid, String *name, knh_type_t r0, knh_type_t p1, knh_type_t p2, knh_type_t p3);
 knh_class_t knh_class_Closure(Ctx *ctx, knh_type_t r0, knh_type_t p1, knh_type_t p2, knh_type_t p3);
-knh_class_t knh_class_MethodClosure(Ctx *ctx, knh_class_t cid, Method *mtd);
+Closure* new_Closure(Ctx *ctx, knh_sfp_t *sfp, Method *mtd);
+void knh_Closure_storeEnv(Ctx *ctx, Closure *cc, knh_sfp_t *sfp);
 /* ../src/class/knh_Connection.c */
 void knh_Connection_open(Ctx *ctx, Connection *o, String *urn);
 Connection* new_Connection(Ctx *ctx, String *urn);
@@ -554,7 +554,7 @@ knh_uint64_t konoha_getTimeMilliSecond(void);
 knh_uint64_t konoha_getProfCount(void);
 knh_uint64_t konoha_getProfCountPerSecond(void);
 /* ../src/konoha.c */
-int main(int argc, void **argv);
+int main(int argc, char **argv);
 /* ../src/labs/b4.c */
 METHOD knh__Script_changeChannel(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_hook(Ctx *ctx, knh_sfp_t *sfp);

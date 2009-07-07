@@ -1074,6 +1074,141 @@ METHOD jc4_XMOVXB(Ctx *ctx, knh_sfp_t *sfp)
 
 
 static
+METHOD jc0_EMOVS(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_EMOVs(ctx, (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_EMOVS(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_EMOVs(ctx, (1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_EMOVS(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_EMOVs(ctx, (-1), (2));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_EMOVO(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_EMOVo(ctx, (-1), ((Object*)-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_EMOVO(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_EMOVo(ctx, (1), ((Object*)-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_EMOVO(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_EMOVo(ctx, (-1), ((Object*)2));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_EMOVE(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_EMOVe(ctx, (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_EMOVE(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_EMOVe(ctx, (1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_EMOVE(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_EMOVe(ctx, (-1), (2));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_EMOVDEF(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_EMOVDEF(ctx, (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_EMOVDEF(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_EMOVDEF(ctx, (1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_EMOVDEF(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_EMOVDEF(ctx, (-1), (2));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc0_EMOVSYS(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_EMOVSYS(ctx, (-1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc1_EMOVSYS(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_EMOVSYS(ctx, (1), (-1));
+	__asm__ __volatile__("int3");
+}
+
+
+static
+METHOD jc2_EMOVSYS(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_EMOVSYS(ctx, (-1), (2));
+	__asm__ __volatile__("int3");
+}
+
+
+static
 METHOD jc0_SWAP(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
@@ -4646,7 +4781,7 @@ METHOD jc3_FASETN(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 
-static knh_fmethod codeTempList[140][6] = {
+static knh_fmethod codeTempList[145][6] = {
 	{jc0_HALT},
 	{jc0_MOVA,jc1_MOVA,jc2_MOVA},
 	{jc0_MOVN,jc1_MOVN,jc2_MOVN},
@@ -4675,6 +4810,11 @@ static knh_fmethod codeTempList[140][6] = {
 	{jc0_XMOVSB,jc1_XMOVSB,jc2_XMOVSB,jc3_XMOVSB},
 	{jc0_XMOVOB,jc1_XMOVOB,jc2_XMOVOB,jc3_XMOVOB},
 	{jc0_XMOVXB,jc1_XMOVXB,jc2_XMOVXB,jc3_XMOVXB,jc4_XMOVXB},
+	{jc0_EMOVS,jc1_EMOVS,jc2_EMOVS},
+	{jc0_EMOVO,jc1_EMOVO,jc2_EMOVO},
+	{jc0_EMOVE,jc1_EMOVE,jc2_EMOVE},
+	{jc0_EMOVDEF,jc1_EMOVDEF,jc2_EMOVDEF},
+	{jc0_EMOVSYS,jc1_EMOVSYS,jc2_EMOVSYS},
 	{jc0_SWAP,jc1_SWAP,jc2_SWAP},
 	{jc0_PINIO,jc1_PINIO,jc2_PINIO},
 	{jc0_SETESP,jc1_SETESP},

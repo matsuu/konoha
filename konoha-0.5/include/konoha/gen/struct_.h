@@ -367,7 +367,7 @@ static knh_StructData_t StructData[] = {
 		knh_ClassMap_getkey
 	},
 	{
-		"Closure", STRUCT_Closure, FLAG_Closure, sizeof(knh_Closure_struct),
+		"Closure", STRUCT_Closure, FLAG_Closure, 0,
 		(knh_fstruct_init)knh_Closure_init,
 		(knh_fstruct_copy)knh_Closure_copy, 
 		(knh_fstruct_traverse)knh_Closure_traverse,
@@ -601,7 +601,7 @@ static knh_ClassData_t ClassData[] = {
 	{"konoha.Method", CLASS_Method, CFLAG_Method, STRUCT_Method, CLASS_Object, 0, 16, 0, knh_Method_fdefault},
 	{"konoha.Mapper", CLASS_Mapper, CFLAG_Mapper, STRUCT_Mapper, CLASS_Object, 0, 13, 0, knh_Mapper_fdefault},
 	{"konoha.ClassMap", CLASS_ClassMap, CFLAG_ClassMap, STRUCT_ClassMap, CLASS_Object, 0, 1, 0, knh_ClassMap_fdefault},
-	{"konoha.Closure", CLASS_Closure, CFLAG_Closure, STRUCT_Closure, CLASS_Object, 0, 3, 0, knh_Closure_fdefault},
+	{"konoha.Closure", CLASS_Closure, CFLAG_Closure, STRUCT_Closure, CLASS_Object, 0, 2, 0, knh_Closure_fdefault},
 	{"konoha.AffineConv", CLASS_AffineConv, CFLAG_AffineConv, STRUCT_AffineConv, CLASS_Object, 0, 0, 0, knh_AffineConv_fdefault},
 	{"konoha.Regex", CLASS_Regex, CFLAG_Regex, STRUCT_Regex, CLASS_Object, 0, 3, 0, knh_Regex_fdefault},
 	{"konoha.BytesConv", CLASS_BytesConv, CFLAG_BytesConv, STRUCT_BytesConv, CLASS_Object, 0, 0, 0, knh_BytesConv_fdefault},
@@ -677,7 +677,6 @@ static knh_FieldNameData_t FieldNameData[] = {
 	{"byte", FIELDN_byte},
 	{"bytes", FIELDN_bytes},
 	{"c", FIELDN_c},
-	{"callcc", FIELDN_callcc},
 	{"ch", FIELDN_ch},
 	{"changeChannel", FIELDN_changeChannel},
 	{"char", FIELDN_char},
@@ -1339,7 +1338,6 @@ static knh_MethodData_t MethodData[] = {
 	{knh_fmethod_movableText, 0, CLASS_ClassMap, METHODN__dump, 0, MFN_void_OutputStream_Any, (void*)knh_ClassMap__dump},
 	{knh__Closure_new, 0, CLASS_Closure, METHODN_new, 0, MFN_nThis_nAny_nMethod, (void*)NULL},
 	{knh__Closure_invoke, 0, CLASS_Closure, METHODN_invoke, 0, MFN_Any0_Any1_Any2_Any3, (void*)NULL},
-	{knh__Closure_callcc, 0, CLASS_Closure, METHODN_callcc, 0, MFN_Any0_Any1_Any2_Any3, (void*)NULL},
 	{knh__Connection_close, 0, CLASS_Connection, METHODN_close, 0, MFN_void, (void*)NULL},
 	{knh__DictIdx_size, 0, CLASS_DictIdx, METHODN_size, 0, MFN_nInt, (void*)NULL},
 	{knh__DictIdx_index, 0, CLASS_DictIdx, METHODN_index, 0, MFN_nInt_nString, (void*)NULL},

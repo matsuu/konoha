@@ -64,6 +64,11 @@ knh_code_t* KNH_ASM_MOVxb_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfx_t a2);
 knh_code_t* KNH_ASM_XMOVsb_(Ctx *ctx, Asm *o,knh_sfx_t a1,knh_sfi_t a2);
 knh_code_t* KNH_ASM_XMOVob_(Ctx *ctx, Asm *o,knh_sfx_t a1,Object* a2);
 knh_code_t* KNH_ASM_XMOVxb_(Ctx *ctx, Asm *o,knh_sfx_t a1,knh_sfx_t a2);
+knh_code_t* KNH_ASM_EMOVs_(Ctx *ctx, Asm *o,knh_sfe_t a1,knh_sfe_t a2);
+knh_code_t* KNH_ASM_EMOVo_(Ctx *ctx, Asm *o,knh_sfe_t a1,Object* a2);
+knh_code_t* KNH_ASM_EMOVe_(Ctx *ctx, Asm *o,knh_sfe_t a1,knh_sfe_t a2);
+knh_code_t* KNH_ASM_EMOVDEF_(Ctx *ctx, Asm *o,knh_sfe_t a1,knh_class_t a2);
+knh_code_t* KNH_ASM_EMOVSYS_(Ctx *ctx, Asm *o,knh_sfe_t a1,knh_ushort_t a2);
 knh_code_t* KNH_ASM_SWAP_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2);
 knh_code_t* KNH_ASM_PINIo_(Ctx *ctx, Asm *o,knh_sfi_t a1,Object* a2);
 knh_code_t* KNH_ASM_SETESP_(Ctx *ctx, Asm *o,knh_sfi_t a1);
@@ -547,7 +552,72 @@ typedef struct {
 
 #define OPSIZE_XMOVXB  (sizeof(klr_xmovxb_t)-sizeof(void*))
 
-#define OPCODE_SWAP ((knh_opcode_t)28)
+#define OPCODE_EMOVS ((knh_opcode_t)28)
+typedef struct {
+#ifdef KNH_USING_THREADEDCODE
+	void *codeaddr;
+#endif/*KNH_USING_THREADEDCODE*/
+	knh_opcode_t opcode;
+	knh_sfe_t a1;
+	knh_sfe_t a2;
+	void *nextaddr;
+} klr_emovs_t;
+
+#define OPSIZE_EMOVS  (sizeof(klr_emovs_t)-sizeof(void*))
+
+#define OPCODE_EMOVO ((knh_opcode_t)29)
+typedef struct {
+#ifdef KNH_USING_THREADEDCODE
+	void *codeaddr;
+#endif/*KNH_USING_THREADEDCODE*/
+	knh_opcode_t opcode;
+	knh_sfe_t a1;
+	Object* a2;
+	void *nextaddr;
+} klr_emovo_t;
+
+#define OPSIZE_EMOVO  (sizeof(klr_emovo_t)-sizeof(void*))
+
+#define OPCODE_EMOVE ((knh_opcode_t)30)
+typedef struct {
+#ifdef KNH_USING_THREADEDCODE
+	void *codeaddr;
+#endif/*KNH_USING_THREADEDCODE*/
+	knh_opcode_t opcode;
+	knh_sfe_t a1;
+	knh_sfe_t a2;
+	void *nextaddr;
+} klr_emove_t;
+
+#define OPSIZE_EMOVE  (sizeof(klr_emove_t)-sizeof(void*))
+
+#define OPCODE_EMOVDEF ((knh_opcode_t)31)
+typedef struct {
+#ifdef KNH_USING_THREADEDCODE
+	void *codeaddr;
+#endif/*KNH_USING_THREADEDCODE*/
+	knh_opcode_t opcode;
+	knh_sfe_t a1;
+	knh_class_t a2;
+	void *nextaddr;
+} klr_emovdef_t;
+
+#define OPSIZE_EMOVDEF  (sizeof(klr_emovdef_t)-sizeof(void*))
+
+#define OPCODE_EMOVSYS ((knh_opcode_t)32)
+typedef struct {
+#ifdef KNH_USING_THREADEDCODE
+	void *codeaddr;
+#endif/*KNH_USING_THREADEDCODE*/
+	knh_opcode_t opcode;
+	knh_sfe_t a1;
+	knh_ushort_t a2;
+	void *nextaddr;
+} klr_emovsys_t;
+
+#define OPSIZE_EMOVSYS  (sizeof(klr_emovsys_t)-sizeof(void*))
+
+#define OPCODE_SWAP ((knh_opcode_t)33)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -560,7 +630,7 @@ typedef struct {
 
 #define OPSIZE_SWAP  (sizeof(klr_swap_t)-sizeof(void*))
 
-#define OPCODE_PINIO ((knh_opcode_t)29)
+#define OPCODE_PINIO ((knh_opcode_t)34)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -573,7 +643,7 @@ typedef struct {
 
 #define OPSIZE_PINIO  (sizeof(klr_pinio_t)-sizeof(void*))
 
-#define OPCODE_SETESP ((knh_opcode_t)30)
+#define OPCODE_SETESP ((knh_opcode_t)35)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -585,7 +655,7 @@ typedef struct {
 
 #define OPSIZE_SETESP  (sizeof(klr_setesp_t)-sizeof(void*))
 
-#define OPCODE_CHECKESP ((knh_opcode_t)31)
+#define OPCODE_CHECKESP ((knh_opcode_t)36)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -597,7 +667,7 @@ typedef struct {
 
 #define OPSIZE_CHECKESP  (sizeof(klr_checkesp_t)-sizeof(void*))
 
-#define OPCODE_RET ((knh_opcode_t)32)
+#define OPCODE_RET ((knh_opcode_t)37)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -608,7 +678,7 @@ typedef struct {
 
 #define OPSIZE_RET  (sizeof(klr_ret_t)-sizeof(void*))
 
-#define OPCODE_RETN ((knh_opcode_t)33)
+#define OPCODE_RETN ((knh_opcode_t)38)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -621,7 +691,7 @@ typedef struct {
 
 #define OPSIZE_RETN  (sizeof(klr_retn_t)-sizeof(void*))
 
-#define OPCODE_RETA ((knh_opcode_t)34)
+#define OPCODE_RETA ((knh_opcode_t)39)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -634,7 +704,7 @@ typedef struct {
 
 #define OPSIZE_RETA  (sizeof(klr_reta_t)-sizeof(void*))
 
-#define OPCODE_RETO ((knh_opcode_t)35)
+#define OPCODE_RETO ((knh_opcode_t)40)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -647,7 +717,7 @@ typedef struct {
 
 #define OPSIZE_RETO  (sizeof(klr_reto_t)-sizeof(void*))
 
-#define OPCODE_RETX ((knh_opcode_t)36)
+#define OPCODE_RETX ((knh_opcode_t)41)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -660,7 +730,7 @@ typedef struct {
 
 #define OPSIZE_RETX  (sizeof(klr_retx_t)-sizeof(void*))
 
-#define OPCODE_BOX ((knh_opcode_t)37)
+#define OPCODE_BOX ((knh_opcode_t)42)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -673,7 +743,7 @@ typedef struct {
 
 #define OPSIZE_BOX  (sizeof(klr_box_t)-sizeof(void*))
 
-#define OPCODE_BOXNC ((knh_opcode_t)38)
+#define OPCODE_BOXNC ((knh_opcode_t)43)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -686,7 +756,7 @@ typedef struct {
 
 #define OPSIZE_BOXNC  (sizeof(klr_boxnc_t)-sizeof(void*))
 
-#define OPCODE_NNBOX ((knh_opcode_t)39)
+#define OPCODE_NNBOX ((knh_opcode_t)44)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -699,7 +769,7 @@ typedef struct {
 
 #define OPSIZE_NNBOX  (sizeof(klr_nnbox_t)-sizeof(void*))
 
-#define OPCODE_NNBOXNC ((knh_opcode_t)40)
+#define OPCODE_NNBOXNC ((knh_opcode_t)45)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -712,7 +782,7 @@ typedef struct {
 
 #define OPSIZE_NNBOXNC  (sizeof(klr_nnboxnc_t)-sizeof(void*))
 
-#define OPCODE_UNBOX ((knh_opcode_t)41)
+#define OPCODE_UNBOX ((knh_opcode_t)46)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -724,7 +794,7 @@ typedef struct {
 
 #define OPSIZE_UNBOX  (sizeof(klr_unbox_t)-sizeof(void*))
 
-#define OPCODE_ISNULL ((knh_opcode_t)42)
+#define OPCODE_ISNULL ((knh_opcode_t)47)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -736,7 +806,7 @@ typedef struct {
 
 #define OPSIZE_ISNULL  (sizeof(klr_isnull_t)-sizeof(void*))
 
-#define OPCODE_ISNULLX ((knh_opcode_t)43)
+#define OPCODE_ISNULLX ((knh_opcode_t)48)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -748,7 +818,7 @@ typedef struct {
 
 #define OPSIZE_ISNULLX  (sizeof(klr_isnullx_t)-sizeof(void*))
 
-#define OPCODE_ISTYPE ((knh_opcode_t)44)
+#define OPCODE_ISTYPE ((knh_opcode_t)49)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -761,7 +831,7 @@ typedef struct {
 
 #define OPSIZE_ISTYPE  (sizeof(klr_istype_t)-sizeof(void*))
 
-#define OPCODE_ISNNTYPE ((knh_opcode_t)45)
+#define OPCODE_ISNNTYPE ((knh_opcode_t)50)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -774,7 +844,7 @@ typedef struct {
 
 #define OPSIZE_ISNNTYPE  (sizeof(klr_isnntype_t)-sizeof(void*))
 
-#define OPCODE_FCALL ((knh_opcode_t)46)
+#define OPCODE_FCALL ((knh_opcode_t)51)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -789,7 +859,7 @@ typedef struct {
 
 #define OPSIZE_FCALL  (sizeof(klr_fcall_t)-sizeof(void*))
 
-#define OPCODE_SCALL ((knh_opcode_t)47)
+#define OPCODE_SCALL ((knh_opcode_t)52)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -803,7 +873,7 @@ typedef struct {
 
 #define OPSIZE_SCALL  (sizeof(klr_scall_t)-sizeof(void*))
 
-#define OPCODE_AINVOKE ((knh_opcode_t)48)
+#define OPCODE_AINVOKE ((knh_opcode_t)53)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -817,7 +887,7 @@ typedef struct {
 
 #define OPSIZE_AINVOKE  (sizeof(klr_ainvoke_t)-sizeof(void*))
 
-#define OPCODE_CALL ((knh_opcode_t)49)
+#define OPCODE_CALL ((knh_opcode_t)54)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -831,7 +901,7 @@ typedef struct {
 
 #define OPSIZE_CALL  (sizeof(klr_call_t)-sizeof(void*))
 
-#define OPCODE_ACALL ((knh_opcode_t)50)
+#define OPCODE_ACALL ((knh_opcode_t)55)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -845,7 +915,7 @@ typedef struct {
 
 #define OPSIZE_ACALL  (sizeof(klr_acall_t)-sizeof(void*))
 
-#define OPCODE_NEW ((knh_opcode_t)51)
+#define OPCODE_NEW ((knh_opcode_t)56)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -861,7 +931,7 @@ typedef struct {
 
 #define OPSIZE_NEW  (sizeof(klr_new_t)-sizeof(void*))
 
-#define OPCODE_TOSTR ((knh_opcode_t)52)
+#define OPCODE_TOSTR ((knh_opcode_t)57)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -874,7 +944,7 @@ typedef struct {
 
 #define OPSIZE_TOSTR  (sizeof(klr_tostr_t)-sizeof(void*))
 
-#define OPCODE_TOSTRF ((knh_opcode_t)53)
+#define OPCODE_TOSTRF ((knh_opcode_t)58)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -888,7 +958,7 @@ typedef struct {
 
 #define OPSIZE_TOSTRF  (sizeof(klr_tostrf_t)-sizeof(void*))
 
-#define OPCODE_SMAP ((knh_opcode_t)54)
+#define OPCODE_SMAP ((knh_opcode_t)59)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -901,7 +971,7 @@ typedef struct {
 
 #define OPSIZE_SMAP  (sizeof(klr_smap_t)-sizeof(void*))
 
-#define OPCODE_SMAPNC ((knh_opcode_t)55)
+#define OPCODE_SMAPNC ((knh_opcode_t)60)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -914,7 +984,7 @@ typedef struct {
 
 #define OPSIZE_SMAPNC  (sizeof(klr_smapnc_t)-sizeof(void*))
 
-#define OPCODE_MAP ((knh_opcode_t)56)
+#define OPCODE_MAP ((knh_opcode_t)61)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -927,7 +997,7 @@ typedef struct {
 
 #define OPSIZE_MAP  (sizeof(klr_map_t)-sizeof(void*))
 
-#define OPCODE_MAPNC ((knh_opcode_t)57)
+#define OPCODE_MAPNC ((knh_opcode_t)62)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -940,7 +1010,7 @@ typedef struct {
 
 #define OPSIZE_MAPNC  (sizeof(klr_mapnc_t)-sizeof(void*))
 
-#define OPCODE_AMAP ((knh_opcode_t)58)
+#define OPCODE_AMAP ((knh_opcode_t)63)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -953,7 +1023,7 @@ typedef struct {
 
 #define OPSIZE_AMAP  (sizeof(klr_amap_t)-sizeof(void*))
 
-#define OPCODE_NNMAP ((knh_opcode_t)59)
+#define OPCODE_NNMAP ((knh_opcode_t)64)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -966,7 +1036,7 @@ typedef struct {
 
 #define OPSIZE_NNMAP  (sizeof(klr_nnmap_t)-sizeof(void*))
 
-#define OPCODE_JMP ((knh_opcode_t)60)
+#define OPCODE_JMP ((knh_opcode_t)65)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -984,7 +1054,7 @@ typedef struct {
 
 #define OPSIZE_JMP  (sizeof(klr_jmp_t)-sizeof(void*))
 
-#define OPCODE_SKIP ((knh_opcode_t)61)
+#define OPCODE_SKIP ((knh_opcode_t)66)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1002,7 +1072,7 @@ typedef struct {
 
 #define OPSIZE_SKIP  (sizeof(klr_skip_t)-sizeof(void*))
 
-#define OPCODE_BJIFT ((knh_opcode_t)62)
+#define OPCODE_BJIFT ((knh_opcode_t)67)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1021,7 +1091,7 @@ typedef struct {
 
 #define OPSIZE_BJIFT  (sizeof(klr_bjift_t)-sizeof(void*))
 
-#define OPCODE_BJIFF ((knh_opcode_t)63)
+#define OPCODE_BJIFF ((knh_opcode_t)68)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1040,7 +1110,7 @@ typedef struct {
 
 #define OPSIZE_BJIFF  (sizeof(klr_bjiff_t)-sizeof(void*))
 
-#define OPCODE_BJIFF_LOOP ((knh_opcode_t)64)
+#define OPCODE_BJIFF_LOOP ((knh_opcode_t)69)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1059,7 +1129,7 @@ typedef struct {
 
 #define OPSIZE_BJIFF_LOOP  (sizeof(klr_bjiff_loop_t)-sizeof(void*))
 
-#define OPCODE_JIFNUL ((knh_opcode_t)65)
+#define OPCODE_JIFNUL ((knh_opcode_t)70)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1078,7 +1148,7 @@ typedef struct {
 
 #define OPSIZE_JIFNUL  (sizeof(klr_jifnul_t)-sizeof(void*))
 
-#define OPCODE_JIFNN ((knh_opcode_t)66)
+#define OPCODE_JIFNN ((knh_opcode_t)71)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1097,7 +1167,7 @@ typedef struct {
 
 #define OPSIZE_JIFNN  (sizeof(klr_jifnn_t)-sizeof(void*))
 
-#define OPCODE_NEXT ((knh_opcode_t)67)
+#define OPCODE_NEXT ((knh_opcode_t)72)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1117,7 +1187,7 @@ typedef struct {
 
 #define OPSIZE_NEXT  (sizeof(klr_next_t)-sizeof(void*))
 
-#define OPCODE_INEXT ((knh_opcode_t)68)
+#define OPCODE_INEXT ((knh_opcode_t)73)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1138,7 +1208,7 @@ typedef struct {
 
 #define OPSIZE_INEXT  (sizeof(klr_inext_t)-sizeof(void*))
 
-#define OPCODE_MAPNEXT ((knh_opcode_t)69)
+#define OPCODE_MAPNEXT ((knh_opcode_t)74)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1159,7 +1229,7 @@ typedef struct {
 
 #define OPSIZE_MAPNEXT  (sizeof(klr_mapnext_t)-sizeof(void*))
 
-#define OPCODE_SMAPNEXT ((knh_opcode_t)70)
+#define OPCODE_SMAPNEXT ((knh_opcode_t)75)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1180,7 +1250,7 @@ typedef struct {
 
 #define OPSIZE_SMAPNEXT  (sizeof(klr_smapnext_t)-sizeof(void*))
 
-#define OPCODE_TRY ((knh_opcode_t)71)
+#define OPCODE_TRY ((knh_opcode_t)76)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1199,7 +1269,7 @@ typedef struct {
 
 #define OPSIZE_TRY  (sizeof(klr_try_t)-sizeof(void*))
 
-#define OPCODE_TRYEND ((knh_opcode_t)72)
+#define OPCODE_TRYEND ((knh_opcode_t)77)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1211,7 +1281,7 @@ typedef struct {
 
 #define OPSIZE_TRYEND  (sizeof(klr_tryend_t)-sizeof(void*))
 
-#define OPCODE_CATCH ((knh_opcode_t)73)
+#define OPCODE_CATCH ((knh_opcode_t)78)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1232,7 +1302,7 @@ typedef struct {
 
 #define OPSIZE_CATCH  (sizeof(klr_catch_t)-sizeof(void*))
 
-#define OPCODE_THROW ((knh_opcode_t)74)
+#define OPCODE_THROW ((knh_opcode_t)79)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1245,7 +1315,7 @@ typedef struct {
 
 #define OPSIZE_THROW  (sizeof(klr_throw_t)-sizeof(void*))
 
-#define OPCODE_THROWS ((knh_opcode_t)75)
+#define OPCODE_THROWS ((knh_opcode_t)80)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1258,7 +1328,7 @@ typedef struct {
 
 #define OPSIZE_THROWS  (sizeof(klr_throws_t)-sizeof(void*))
 
-#define OPCODE_THROW_AGAIN ((knh_opcode_t)76)
+#define OPCODE_THROW_AGAIN ((knh_opcode_t)81)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1270,7 +1340,7 @@ typedef struct {
 
 #define OPSIZE_THROW_AGAIN  (sizeof(klr_throw_again_t)-sizeof(void*))
 
-#define OPCODE_P ((knh_opcode_t)77)
+#define OPCODE_P ((knh_opcode_t)82)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1284,7 +1354,7 @@ typedef struct {
 
 #define OPSIZE_P  (sizeof(klr_p_t)-sizeof(void*))
 
-#define OPCODE_PMSG ((knh_opcode_t)78)
+#define OPCODE_PMSG ((knh_opcode_t)83)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1297,7 +1367,7 @@ typedef struct {
 
 #define OPSIZE_PMSG  (sizeof(klr_pmsg_t)-sizeof(void*))
 
-#define OPCODE_ICAST ((knh_opcode_t)79)
+#define OPCODE_ICAST ((knh_opcode_t)84)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1309,7 +1379,7 @@ typedef struct {
 
 #define OPSIZE_ICAST  (sizeof(klr_icast_t)-sizeof(void*))
 
-#define OPCODE_INCAST ((knh_opcode_t)80)
+#define OPCODE_INCAST ((knh_opcode_t)85)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1321,7 +1391,7 @@ typedef struct {
 
 #define OPSIZE_INCAST  (sizeof(klr_incast_t)-sizeof(void*))
 
-#define OPCODE_FCAST ((knh_opcode_t)81)
+#define OPCODE_FCAST ((knh_opcode_t)86)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1333,7 +1403,7 @@ typedef struct {
 
 #define OPSIZE_FCAST  (sizeof(klr_fcast_t)-sizeof(void*))
 
-#define OPCODE_FNCAST ((knh_opcode_t)82)
+#define OPCODE_FNCAST ((knh_opcode_t)87)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1345,7 +1415,7 @@ typedef struct {
 
 #define OPSIZE_FNCAST  (sizeof(klr_fncast_t)-sizeof(void*))
 
-#define OPCODE_BNOT ((knh_opcode_t)83)
+#define OPCODE_BNOT ((knh_opcode_t)88)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1358,7 +1428,7 @@ typedef struct {
 
 #define OPSIZE_BNOT  (sizeof(klr_bnot_t)-sizeof(void*))
 
-#define OPCODE_INEG ((knh_opcode_t)84)
+#define OPCODE_INEG ((knh_opcode_t)89)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1371,7 +1441,7 @@ typedef struct {
 
 #define OPSIZE_INEG  (sizeof(klr_ineg_t)-sizeof(void*))
 
-#define OPCODE_IADD ((knh_opcode_t)85)
+#define OPCODE_IADD ((knh_opcode_t)90)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1385,7 +1455,7 @@ typedef struct {
 
 #define OPSIZE_IADD  (sizeof(klr_iadd_t)-sizeof(void*))
 
-#define OPCODE_IADDN ((knh_opcode_t)86)
+#define OPCODE_IADDN ((knh_opcode_t)91)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1399,7 +1469,7 @@ typedef struct {
 
 #define OPSIZE_IADDN  (sizeof(klr_iaddn_t)-sizeof(void*))
 
-#define OPCODE_ISUB ((knh_opcode_t)87)
+#define OPCODE_ISUB ((knh_opcode_t)92)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1413,7 +1483,7 @@ typedef struct {
 
 #define OPSIZE_ISUB  (sizeof(klr_isub_t)-sizeof(void*))
 
-#define OPCODE_ISUBN ((knh_opcode_t)88)
+#define OPCODE_ISUBN ((knh_opcode_t)93)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1427,7 +1497,7 @@ typedef struct {
 
 #define OPSIZE_ISUBN  (sizeof(klr_isubn_t)-sizeof(void*))
 
-#define OPCODE_IMUL ((knh_opcode_t)89)
+#define OPCODE_IMUL ((knh_opcode_t)94)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1441,7 +1511,7 @@ typedef struct {
 
 #define OPSIZE_IMUL  (sizeof(klr_imul_t)-sizeof(void*))
 
-#define OPCODE_IMULN ((knh_opcode_t)90)
+#define OPCODE_IMULN ((knh_opcode_t)95)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1455,7 +1525,7 @@ typedef struct {
 
 #define OPSIZE_IMULN  (sizeof(klr_imuln_t)-sizeof(void*))
 
-#define OPCODE_IDIV ((knh_opcode_t)91)
+#define OPCODE_IDIV ((knh_opcode_t)96)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1469,7 +1539,7 @@ typedef struct {
 
 #define OPSIZE_IDIV  (sizeof(klr_idiv_t)-sizeof(void*))
 
-#define OPCODE_IDIVN ((knh_opcode_t)92)
+#define OPCODE_IDIVN ((knh_opcode_t)97)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1483,7 +1553,7 @@ typedef struct {
 
 #define OPSIZE_IDIVN  (sizeof(klr_idivn_t)-sizeof(void*))
 
-#define OPCODE_IMOD ((knh_opcode_t)93)
+#define OPCODE_IMOD ((knh_opcode_t)98)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1497,7 +1567,7 @@ typedef struct {
 
 #define OPSIZE_IMOD  (sizeof(klr_imod_t)-sizeof(void*))
 
-#define OPCODE_IMODN ((knh_opcode_t)94)
+#define OPCODE_IMODN ((knh_opcode_t)99)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1511,7 +1581,7 @@ typedef struct {
 
 #define OPSIZE_IMODN  (sizeof(klr_imodn_t)-sizeof(void*))
 
-#define OPCODE_IEQ ((knh_opcode_t)95)
+#define OPCODE_IEQ ((knh_opcode_t)100)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1525,7 +1595,7 @@ typedef struct {
 
 #define OPSIZE_IEQ  (sizeof(klr_ieq_t)-sizeof(void*))
 
-#define OPCODE_IEQN ((knh_opcode_t)96)
+#define OPCODE_IEQN ((knh_opcode_t)101)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1539,7 +1609,7 @@ typedef struct {
 
 #define OPSIZE_IEQN  (sizeof(klr_ieqn_t)-sizeof(void*))
 
-#define OPCODE_INEQ ((knh_opcode_t)97)
+#define OPCODE_INEQ ((knh_opcode_t)102)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1553,7 +1623,7 @@ typedef struct {
 
 #define OPSIZE_INEQ  (sizeof(klr_ineq_t)-sizeof(void*))
 
-#define OPCODE_INEQN ((knh_opcode_t)98)
+#define OPCODE_INEQN ((knh_opcode_t)103)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1567,7 +1637,7 @@ typedef struct {
 
 #define OPSIZE_INEQN  (sizeof(klr_ineqn_t)-sizeof(void*))
 
-#define OPCODE_ILT ((knh_opcode_t)99)
+#define OPCODE_ILT ((knh_opcode_t)104)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1581,7 +1651,7 @@ typedef struct {
 
 #define OPSIZE_ILT  (sizeof(klr_ilt_t)-sizeof(void*))
 
-#define OPCODE_ILTN ((knh_opcode_t)100)
+#define OPCODE_ILTN ((knh_opcode_t)105)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1595,7 +1665,7 @@ typedef struct {
 
 #define OPSIZE_ILTN  (sizeof(klr_iltn_t)-sizeof(void*))
 
-#define OPCODE_ILTE ((knh_opcode_t)101)
+#define OPCODE_ILTE ((knh_opcode_t)106)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1609,7 +1679,7 @@ typedef struct {
 
 #define OPSIZE_ILTE  (sizeof(klr_ilte_t)-sizeof(void*))
 
-#define OPCODE_ILTEN ((knh_opcode_t)102)
+#define OPCODE_ILTEN ((knh_opcode_t)107)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1623,7 +1693,7 @@ typedef struct {
 
 #define OPSIZE_ILTEN  (sizeof(klr_ilten_t)-sizeof(void*))
 
-#define OPCODE_IGT ((knh_opcode_t)103)
+#define OPCODE_IGT ((knh_opcode_t)108)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1637,7 +1707,7 @@ typedef struct {
 
 #define OPSIZE_IGT  (sizeof(klr_igt_t)-sizeof(void*))
 
-#define OPCODE_IGTN ((knh_opcode_t)104)
+#define OPCODE_IGTN ((knh_opcode_t)109)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1651,7 +1721,7 @@ typedef struct {
 
 #define OPSIZE_IGTN  (sizeof(klr_igtn_t)-sizeof(void*))
 
-#define OPCODE_IGTE ((knh_opcode_t)105)
+#define OPCODE_IGTE ((knh_opcode_t)110)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1665,7 +1735,7 @@ typedef struct {
 
 #define OPSIZE_IGTE  (sizeof(klr_igte_t)-sizeof(void*))
 
-#define OPCODE_IGTEN ((knh_opcode_t)106)
+#define OPCODE_IGTEN ((knh_opcode_t)111)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1679,7 +1749,7 @@ typedef struct {
 
 #define OPSIZE_IGTEN  (sizeof(klr_igten_t)-sizeof(void*))
 
-#define OPCODE_FNEG ((knh_opcode_t)107)
+#define OPCODE_FNEG ((knh_opcode_t)112)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1692,7 +1762,7 @@ typedef struct {
 
 #define OPSIZE_FNEG  (sizeof(klr_fneg_t)-sizeof(void*))
 
-#define OPCODE_FADD ((knh_opcode_t)108)
+#define OPCODE_FADD ((knh_opcode_t)113)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1706,7 +1776,7 @@ typedef struct {
 
 #define OPSIZE_FADD  (sizeof(klr_fadd_t)-sizeof(void*))
 
-#define OPCODE_FADDN ((knh_opcode_t)109)
+#define OPCODE_FADDN ((knh_opcode_t)114)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1720,7 +1790,7 @@ typedef struct {
 
 #define OPSIZE_FADDN  (sizeof(klr_faddn_t)-sizeof(void*))
 
-#define OPCODE_FSUB ((knh_opcode_t)110)
+#define OPCODE_FSUB ((knh_opcode_t)115)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1734,7 +1804,7 @@ typedef struct {
 
 #define OPSIZE_FSUB  (sizeof(klr_fsub_t)-sizeof(void*))
 
-#define OPCODE_FSUBN ((knh_opcode_t)111)
+#define OPCODE_FSUBN ((knh_opcode_t)116)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1748,7 +1818,7 @@ typedef struct {
 
 #define OPSIZE_FSUBN  (sizeof(klr_fsubn_t)-sizeof(void*))
 
-#define OPCODE_FMUL ((knh_opcode_t)112)
+#define OPCODE_FMUL ((knh_opcode_t)117)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1762,7 +1832,7 @@ typedef struct {
 
 #define OPSIZE_FMUL  (sizeof(klr_fmul_t)-sizeof(void*))
 
-#define OPCODE_FMULN ((knh_opcode_t)113)
+#define OPCODE_FMULN ((knh_opcode_t)118)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1776,7 +1846,7 @@ typedef struct {
 
 #define OPSIZE_FMULN  (sizeof(klr_fmuln_t)-sizeof(void*))
 
-#define OPCODE_FDIV ((knh_opcode_t)114)
+#define OPCODE_FDIV ((knh_opcode_t)119)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1790,7 +1860,7 @@ typedef struct {
 
 #define OPSIZE_FDIV  (sizeof(klr_fdiv_t)-sizeof(void*))
 
-#define OPCODE_FDIVN ((knh_opcode_t)115)
+#define OPCODE_FDIVN ((knh_opcode_t)120)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1804,7 +1874,7 @@ typedef struct {
 
 #define OPSIZE_FDIVN  (sizeof(klr_fdivn_t)-sizeof(void*))
 
-#define OPCODE_FEQ ((knh_opcode_t)116)
+#define OPCODE_FEQ ((knh_opcode_t)121)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1818,7 +1888,7 @@ typedef struct {
 
 #define OPSIZE_FEQ  (sizeof(klr_feq_t)-sizeof(void*))
 
-#define OPCODE_FEQN ((knh_opcode_t)117)
+#define OPCODE_FEQN ((knh_opcode_t)122)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1832,7 +1902,7 @@ typedef struct {
 
 #define OPSIZE_FEQN  (sizeof(klr_feqn_t)-sizeof(void*))
 
-#define OPCODE_FNEQ ((knh_opcode_t)118)
+#define OPCODE_FNEQ ((knh_opcode_t)123)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1846,7 +1916,7 @@ typedef struct {
 
 #define OPSIZE_FNEQ  (sizeof(klr_fneq_t)-sizeof(void*))
 
-#define OPCODE_FNEQN ((knh_opcode_t)119)
+#define OPCODE_FNEQN ((knh_opcode_t)124)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1860,7 +1930,7 @@ typedef struct {
 
 #define OPSIZE_FNEQN  (sizeof(klr_fneqn_t)-sizeof(void*))
 
-#define OPCODE_FLT ((knh_opcode_t)120)
+#define OPCODE_FLT ((knh_opcode_t)125)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1874,7 +1944,7 @@ typedef struct {
 
 #define OPSIZE_FLT  (sizeof(klr_flt_t)-sizeof(void*))
 
-#define OPCODE_FLTN ((knh_opcode_t)121)
+#define OPCODE_FLTN ((knh_opcode_t)126)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1888,7 +1958,7 @@ typedef struct {
 
 #define OPSIZE_FLTN  (sizeof(klr_fltn_t)-sizeof(void*))
 
-#define OPCODE_FLTE ((knh_opcode_t)122)
+#define OPCODE_FLTE ((knh_opcode_t)127)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1902,7 +1972,7 @@ typedef struct {
 
 #define OPSIZE_FLTE  (sizeof(klr_flte_t)-sizeof(void*))
 
-#define OPCODE_FLTEN ((knh_opcode_t)123)
+#define OPCODE_FLTEN ((knh_opcode_t)128)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1916,7 +1986,7 @@ typedef struct {
 
 #define OPSIZE_FLTEN  (sizeof(klr_flten_t)-sizeof(void*))
 
-#define OPCODE_FGT ((knh_opcode_t)124)
+#define OPCODE_FGT ((knh_opcode_t)129)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1930,7 +2000,7 @@ typedef struct {
 
 #define OPSIZE_FGT  (sizeof(klr_fgt_t)-sizeof(void*))
 
-#define OPCODE_FGTN ((knh_opcode_t)125)
+#define OPCODE_FGTN ((knh_opcode_t)130)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1944,7 +2014,7 @@ typedef struct {
 
 #define OPSIZE_FGTN  (sizeof(klr_fgtn_t)-sizeof(void*))
 
-#define OPCODE_FGTE ((knh_opcode_t)126)
+#define OPCODE_FGTE ((knh_opcode_t)131)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1958,7 +2028,7 @@ typedef struct {
 
 #define OPSIZE_FGTE  (sizeof(klr_fgte_t)-sizeof(void*))
 
-#define OPCODE_FGTEN ((knh_opcode_t)127)
+#define OPCODE_FGTEN ((knh_opcode_t)132)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1972,7 +2042,7 @@ typedef struct {
 
 #define OPSIZE_FGTEN  (sizeof(klr_fgten_t)-sizeof(void*))
 
-#define OPCODE_AGET ((knh_opcode_t)128)
+#define OPCODE_AGET ((knh_opcode_t)133)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -1986,7 +2056,7 @@ typedef struct {
 
 #define OPSIZE_AGET  (sizeof(klr_aget_t)-sizeof(void*))
 
-#define OPCODE_AGETN ((knh_opcode_t)129)
+#define OPCODE_AGETN ((knh_opcode_t)134)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -2000,7 +2070,7 @@ typedef struct {
 
 #define OPSIZE_AGETN  (sizeof(klr_agetn_t)-sizeof(void*))
 
-#define OPCODE_IAGET ((knh_opcode_t)130)
+#define OPCODE_IAGET ((knh_opcode_t)135)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -2014,7 +2084,7 @@ typedef struct {
 
 #define OPSIZE_IAGET  (sizeof(klr_iaget_t)-sizeof(void*))
 
-#define OPCODE_IAGETN ((knh_opcode_t)131)
+#define OPCODE_IAGETN ((knh_opcode_t)136)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -2028,7 +2098,7 @@ typedef struct {
 
 #define OPSIZE_IAGETN  (sizeof(klr_iagetn_t)-sizeof(void*))
 
-#define OPCODE_FAGET ((knh_opcode_t)132)
+#define OPCODE_FAGET ((knh_opcode_t)137)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -2042,7 +2112,7 @@ typedef struct {
 
 #define OPSIZE_FAGET  (sizeof(klr_faget_t)-sizeof(void*))
 
-#define OPCODE_FAGETN ((knh_opcode_t)133)
+#define OPCODE_FAGETN ((knh_opcode_t)138)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -2056,7 +2126,7 @@ typedef struct {
 
 #define OPSIZE_FAGETN  (sizeof(klr_fagetn_t)-sizeof(void*))
 
-#define OPCODE_ASET ((knh_opcode_t)134)
+#define OPCODE_ASET ((knh_opcode_t)139)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -2070,7 +2140,7 @@ typedef struct {
 
 #define OPSIZE_ASET  (sizeof(klr_aset_t)-sizeof(void*))
 
-#define OPCODE_ASETN ((knh_opcode_t)135)
+#define OPCODE_ASETN ((knh_opcode_t)140)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -2084,7 +2154,7 @@ typedef struct {
 
 #define OPSIZE_ASETN  (sizeof(klr_asetn_t)-sizeof(void*))
 
-#define OPCODE_IASET ((knh_opcode_t)136)
+#define OPCODE_IASET ((knh_opcode_t)141)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -2098,7 +2168,7 @@ typedef struct {
 
 #define OPSIZE_IASET  (sizeof(klr_iaset_t)-sizeof(void*))
 
-#define OPCODE_IASETN ((knh_opcode_t)137)
+#define OPCODE_IASETN ((knh_opcode_t)142)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -2112,7 +2182,7 @@ typedef struct {
 
 #define OPSIZE_IASETN  (sizeof(klr_iasetn_t)-sizeof(void*))
 
-#define OPCODE_FASET ((knh_opcode_t)138)
+#define OPCODE_FASET ((knh_opcode_t)143)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -2126,7 +2196,7 @@ typedef struct {
 
 #define OPSIZE_FASET  (sizeof(klr_faset_t)-sizeof(void*))
 
-#define OPCODE_FASETN ((knh_opcode_t)139)
+#define OPCODE_FASETN ((knh_opcode_t)144)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -2140,7 +2210,7 @@ typedef struct {
 
 #define OPSIZE_FASETN  (sizeof(klr_fasetn_t)-sizeof(void*))
 
-#define OPCODE_INITCODE ((knh_opcode_t)140)
+#define OPCODE_INITCODE ((knh_opcode_t)145)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -2152,7 +2222,7 @@ typedef struct {
 
 #define OPSIZE_INITCODE  (sizeof(klr_initcode_t)-sizeof(void*))
 
-#define OPCODE_NOP ((knh_opcode_t)141)
+#define OPCODE_NOP ((knh_opcode_t)146)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
