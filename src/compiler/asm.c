@@ -1517,7 +1517,7 @@ void knh_StmtCALL_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpid
 		for(i = 1; i < DP(stmt)->size; i++) {
 			TERMs_asm(ctx, stmt, i, abr, TYPE_Any, local + i);
 		}
-		KNH_ASM_AINVOKE_(ctx, abr, sfi_(local), (knh_ushort_t)DP(stmt)->size, UP(mtd));
+		KNH_ASM_AINVOKE_(ctx, abr, sfi_(local), (knh_ushort_t)DP(stmt)->size/*, UP(mtd)*/);
 		goto L_RTYPE;
 	}
 	/* INSTRUCTION */

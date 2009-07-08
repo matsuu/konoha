@@ -116,6 +116,12 @@ extern "C" {
 /* --------------------------------------------------------------------------- */
 /* [Iterator] */
 
+#define KNH_ITREND(ctx, sfp, n) {\
+		knh_Iterator_close(ctx, sfp[0].it);\
+		/*KNH_MOV(ctx, sfp[n].o, KNH_VOID); */\
+		return 0; \
+	}\
+
 #define KNH_ITRNEXT(ctx, sfp, i, v) {\
 		KNH_MOV(ctx, sfp[i].o, v);\
 		sfp[i].data = ((Int*)v)->n.data;\
@@ -131,6 +137,12 @@ extern "C" {
 #define KNH_ITRNEXT_Float(ctx, sfp, i, n) {\
 		KNH_MOV(ctx, sfp[i].o, KNH_FLOAT0);\
 		sfp[i].fvalue = n;\
+		return 1; \
+	}\
+
+#define KNH_ITRNEXT_envsfp(ctx, sfp, i, envsfp) {\
+		KNH_MOV(ctx, sfp[i].o, envsfp[0].o);\
+		sfp[i].data = envsfp[0].data;\
 		return 1; \
 	}\
 
@@ -155,11 +167,6 @@ extern "C" {
 #define KNH_ITRNEXT_FloatX(ctx, sfp, i, cid, n)  KNH_ITRNEXT_Float(ctx, sfp, i, n)
 #endif/*KNH_USING_KONOHA_CLASSX*/
 
-#define KNH_ITREND(ctx, sfp, n) {\
-		knh_Iterator_close(ctx, sfp[0].it);\
-		/*KNH_MOV(ctx, sfp[n].o, KNH_VOID); */\
-		return 0; \
-	}\
 
 //#define HAS_ITRNEXT(v)   IS_NOTNULL(v)
 

@@ -172,7 +172,7 @@ KNHAPI(ClassSpec*) new_Vocab(Ctx *ctx, char *tag, knh_bytes_t urn, int base, cha
 KNHAPI(void) konoha_loadURNAliasData(Ctx *ctx, knh_StringConstData_t *data);
 KNHAPI(void) konoha_loadClassSpecFuncData(Ctx *ctx, knh_NamedPointerData_t *data);
 KNHAPI(void) knh_putsfp(Ctx *ctx, knh_sfp_t *lsfp, int n, Object *obj);
-KNHAPI(void) knh_Closure_invokesfp(Ctx *ctx, Closure *c, knh_sfp_t *lsfp, int argc);
+KNHAPI(void) knh_Closure_invokesfp(Ctx *ctx, Closure *cc, knh_sfp_t *lsfp, int argc);
 KNHAPI(knh_sfp_t*) knh_Closure_invokef(Ctx *ctx, Closure *c, const char *fmt, ...);
 KNHAPI(Exception*) new_Exception(Ctx *ctx, String *msg);
 KNHAPI(Exception*) new_Exception__b(Ctx *ctx, knh_bytes_t msg);
