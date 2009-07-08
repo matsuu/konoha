@@ -115,7 +115,12 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 /* ======================================================================== */
 
 #define KLR_HALT(ctx) KNH_THROWs(ctx, "Halt!!")
-#define KLR_RET(ctx)  return
+#define KLR_RET(ctx)  {\
+		sfp[0].pc = pc; \
+		return; \
+	}
+
+#define KLR_YEILDBREAK(ctx)  return
 
 /* ------------------------------------------------------------------------ */
 
@@ -409,22 +414,14 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		((Context*)ctx)->esp = &(lsfp[n]); \
 	} \
 
-#define KNH_SCALL_WENV(ctx, lsfp, n, m, args) { \
-		KLR_MOV(ctx, lsfp[n].o, m); \
-		((Context*)ctx)->esp = &(lsfp[n+args+2]); \
-		lsfp[n].pc = (lsfp[n].mtd)->pc_start; \
-		(lsfp[n].mtd)->fcall_1(ctx, lsfp + (n + 1)); \
-	} \
-
-#define KNH_SCALL_CC(ctx, lsfp, n, envsfp, envsize) { \
-		knh_sfp_copy(ctx, envsfp, lsfp+n, envsize); \
-		((Context*)ctx)->esp = &(lsfp[n+args+2]); \
-		lsfp[n].pc = (lsfp[n].mtd)->pc_start; \
-		(lsfp[n].mtd)->fcall_1(ctx, lsfp + (n + 1)); \
-		knh_sfp_copy(ctx, lsfp+n, envsfp, envsize); \
+#define KNH_CALLGEN(ctx, lsfp, n, m, pc, stacksize) { \
+		((Context*)ctx)->esp = lsfp + n + stacksize; \
+		lsfp[n].pc = pc; \
+		DP(sfp[n].mtd)->fproceed(ctx, lsfp + (n+1)); \
+		stacksize = ctx->esp - &(lsfp[n]); \
+		pc = lsfp[n+1].pc; \
 		((Context*)ctx)->esp = &(lsfp[n]); \
 	} \
-
 
 #define KLR_FCALL(ctx, n, shift, self, m) { \
 		int n1_ = n + 1;\
@@ -460,11 +457,12 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 
 /* this is used only for Closure.invoke */
 
-#define KLR_AINVOKE(ctx, n, shift, m) { \
-		KLR_MOV(ctx, sfp[n].o, m); \
+#define KLR_AINVOKE(ctx, n, shift) { \
+		KNH_ASSERT(IS_Closure(sfp[n+1].o));\
+		knh_sfp_typecheck(ctx, sfp + n + 1, (sfp[n+1].cc)->mtd, pc); \
+		KLR_MOV(ctx, sfp[n].o, (sfp[n+1].cc)->mtd); \
+		KLR_MOV(ctx, sfp[n+1].o, (sfp[n+1].cc)->base); \
 		((Context*)ctx)->esp = &(sfp[n + shift]); \
-		DBG2_ASSERT(IS_Closure(sfp[n+1].o));\
-		knh_sfp_typecheck(ctx, sfp + n + 1, DP(sfp[n+1].cc)->mtd, pc); \
 		sfp[-1].pc = pc; \
 		sfp[n].pc = (sfp[n].mtd)->pc_start; \
 		(sfp[n].mtd)->fcall_1(ctx, sfp + n + 1); \

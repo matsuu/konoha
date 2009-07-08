@@ -28,13 +28,15 @@
 /* ************************************************************************ */
 
 #include"commons.h"
+#include"../../include/konoha/gen/konohac_klr_.h"
+
+size_t knh_code_opsize(int opcode);
 
 /* ************************************************************************ */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 /* ======================================================================== */
 /* [constructors] */
@@ -281,77 +283,104 @@ void knh_Closure_storeEnv(Ctx *ctx, Closure *cc, knh_sfp_t *sfp)
 	DBG2_P("STORED %d", (int)stacksize);
 }
 
-///* ------------------------------------------------------------------------ */
-///* [Generator] */
+/* ------------------------------------------------------------------------ */
+/* [Generator] */
+/* ------------------------------------------------------------------------ */
+
+knh_class_t knh_Method_gencid(Ctx *ctx, Method *mtd, knh_class_t cid)
+{
+	knh_type_t rtype = knh_pmztype_totype(ctx, knh_Method_rztype(mtd), cid);
+	cid = CLASS_type(rtype);
+	KNH_ASSERT_cid(cid);
+	KNH_ASSERT(ctx->share->ClassTable[cid].bcid == CLASS_Iterator);
+	return ctx->share->ClassTable[cid].p1;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+knh_code_t *knh_KLRCode_yeildingNext(knh_code_t *pc)
+{
+	knh_kode_t *op = (knh_kode_t*)pc;
+	if(op->opcode != OPCODE_NOP) return NULL;
+	pc += knh_code_opsize(op->opcode);
+	return pc;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+ITRNEXT knh_Generator_fnext(Ctx *ctx, knh_sfp_t *sfp, int n)
+{
+	Iterator *it = sfp[0].it;
+	Closure *cc = (Closure*)DP(it)->source;
+	knh_code_t *pc = knh_KLRCode_yeildingNext(DP(it)->pc);
+	if(pc == NULL) {
+		KNH_ITREND(ctx, sfp, n);
+	}
+	else {
+		size_t stacksize = (cc)->hstacksize[-1];
+		knh_sfp_copy(ctx, (cc)->envsfp, sfp+1, stacksize);
+		KNH_CALLGEN(ctx, sfp, 1, mtd, pc, stacksize);  /* args is reset to esp size */
+		if(((knh_kode_t*)pc)->opcode == OPCODE_YEILDBREAK) {
+			KNH_ITREND(ctx, sfp, n);
+		}
+		DBG2_P("stacksize=%d, %d", (int)stacksize, (int)(cc)->hstacksize[-1]);
+		knh_sfp_copy(ctx, sfp+1, (cc)->envsfp, (cc)->hstacksize[-1]);
+		DP(it)->pc = pc;
+		KNH_ITRNEXT_envsfp(ctx, sfp, n, (cc)->envsfp);
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+Iterator* new_Generator(Ctx *ctx, knh_sfp_t *sfp)
+{
+	Closure *cc = (Closure*)new_Object_init(ctx, FLAG_Closure, CLASS_Closure, 0);
+	KNH_INITv((cc)->mtd, sfp[-1].mtd);
+	KNH_INITv((cc)->base, sfp[0].o);
+	{
+		knh_class_t cid = knh_Method_gencid(ctx, sfp[-1].mtd, knh_Object_cid(sfp[0].o));
+		Iterator *it = new_Iterator(ctx, cid, UP(cc), knh_Generator_fnext);
+		knh_code_t *pc = (sfp[-1].mtd)->pc_start;
+		KNH_ASSERT(((klr_setesp_t*)pc)->opcode == OPCODE_SETESP);
+		size_t stacksize = 1 + ((klr_setesp_t*)pc)->a1;
+		size_t* hstack = (size_t*)KNH_MALLOC(ctx, (sizeof(knh_sfp_t) * stacksize) + sizeof(size_t));
+		knh_sfp_t *envsfp = (knh_sfp_t*)(&hstack[1]);
+		hstack[0] = stacksize;
+		knh_sfp_copy(ctx, sfp - 1, envsfp, stacksize);
+		(cc)->envsfp = envsfp;
+		knh_Closure_setStoredEnv(cc, 1);
+		DBG2_P("STORED %d", (int)stacksize);
+		DP(it)->pc = pc;
+		return it;
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+METHOD knh_fmethod_generator(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN(ctx, sfp, new_Generator(ctx, sfp));
+}
+
 ///* ------------------------------------------------------------------------ */
 //
-//knh_class_t knh_Method_gencid(Ctx *ctx, Method *mtd, knh_class_t cid)
+//int knh_Method_isGenerator(Method *mtd)
 //{
-//	knh_type_t rtype = knh_pmztype_totype(ctx, knh_Method_rztype(mtd), cid);
-//	cid = CLASS_type(rtype);
-//	KNH_ASSERT_cid(cid);
-//	KNH_ASSERT(ctx->share->ClassTable[cid].bcid == CLASS_Iterator);
-//	return ctx->share->ClassTable[cid].p1;
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//static
-//ITRNEXT knh_Generator_fnext(Ctx *ctx, knh_sfp_t *sfp, int n)
-//{
-//	Iterator *it = sfp[0].it;
-//	/* CALL/CC */
-//	Closure *c = (Closure*)DP(it)->source;
-//	knh_vmcode_t *pc = knh_KLRCode_yeildNext(DP(it)->pc);
-//	if(pc != NULL) {
-//		KNH_SCALL_CC(ctx, sfp, 1, (c)->stack, (cc)->stacksize);
-//		DP(it)->pc = esp[0].pc;
-//	}
-//	knh_sfp_t *esp = ((Context*)ctx)->esp;
-//	int opcode = ((knh_kode_t*)(esp[0].pc))->opcode;
-//	if(IS_RETURN(opcode)) {
-//		KNH_ITREND(ctx, sfp, n);
-//	}
-//	DP(it)->pc = esp[0].pc;
-//	knh_sfp_copy(ctx, (cc)->stack, sfp + 1, (cc)->stacksize);
-//	sfp[n].data = sfp[1].data;
-//	KNH_MOV(ctx, sfp[n].o, sfp[1].o);
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//static
-//Iterator* new_Generator(Ctx *ctx, Method *mtd, knh_sfp_t *lsfp, int args)
-//{
-//	KNH_SCALL_WENV(ctx, lsfp, 0, mtd, args);
-//	{
-//		Closure *c = new_Closure__newstack(ctx, sfp[1].o, mtd, lsfp, ctx->esp);
-//		knh_class_t cid = knh_Method_gencid(ctx, mtd, knh_Object_cid(sfp[0].o));
-//		Iterator *it = new_Iterator(ctx, cid, UP(c), knh_Generator_fnext);
-//		DP(it)->pc = esp[0].pc;
-//		KNH_INITv(ctx, DP(it)->psfp[0].o, sfp[-1].o);
-//		DP(it)->presfp[0].data = sfp[-1].data;
-//	}
-//	return it;
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//METHOD knh_fmethod_generator(Ctx *ctx, knh_sfp_t *sfp)
-//{
-//	Method *mtd = sfp[-1].mtd;
-//	DP(sfp[-1].mtd)->fproceed(ctx, sfp);   /* proceed */
-//	knh_sfp_t *esp = ((Context*)ctx)->esp;
-//	int opcode = ((knh_kode_t*)(esp[0].pc))->opcode;
-//	if(IS_RETURN(opcode)) {
-//		knh_class_t cid = knh_Method_gencid(ctx, mtd, knh_Object_cid(sfp[0].o));
-//		KNH_RETURN(ctx, sfp, new_Iterator(ctx, cid, KNH_VOID, NULL));
-//	}
-//	KNH_RETURN(ctx, sfp, new_Generator(ctx, mtd, sfp, esp));
+//	return (mtd->fcall_1 == knh_fmethod_generator);
 //}
 
 /* ------------------------------------------------------------------------ */
 
+void knh_Method_toGenerator(Method *mtd)
+{
+	mtd->fcall_1 = knh_fmethod_generator;
+}
+
+/* ------------------------------------------------------------------------ */
 
 #ifdef __cplusplus
 }

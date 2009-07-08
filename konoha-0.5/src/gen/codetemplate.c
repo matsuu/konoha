@@ -1425,6 +1425,15 @@ METHOD jc3_RETX(Ctx *ctx, knh_sfp_t *sfp)
 
 
 static
+METHOD jc0_YEILDBREAK(Ctx *ctx, knh_sfp_t *sfp)
+{
+	__asm__ __volatile__("int3");
+	JIT_YEILDBREAK(ctx);
+	__asm__ __volatile__("int3");
+}
+
+
+static
 METHOD jc0_BOX(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
@@ -1734,7 +1743,7 @@ static
 METHOD jc0_AINVOKE(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_AINVOKE(ctx, (-1), (-1), (-1));
+	JIT_AINVOKE(ctx, (-1), (-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -1743,7 +1752,7 @@ static
 METHOD jc1_AINVOKE(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_AINVOKE(ctx, (1), (-1), (-1));
+	JIT_AINVOKE(ctx, (1), (-1));
 	__asm__ __volatile__("int3");
 }
 
@@ -1752,16 +1761,7 @@ static
 METHOD jc2_AINVOKE(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_AINVOKE(ctx, (-1), (2), (-1));
-	__asm__ __volatile__("int3");
-}
-
-
-static
-METHOD jc3_AINVOKE(Ctx *ctx, knh_sfp_t *sfp)
-{
-	__asm__ __volatile__("int3");
-	JIT_AINVOKE(ctx, (-1), (-1), (3));
+	JIT_AINVOKE(ctx, (-1), (2));
 	__asm__ __volatile__("int3");
 }
 
@@ -4781,7 +4781,7 @@ METHOD jc3_FASETN(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 
-static knh_fmethod codeTempList[145][6] = {
+static knh_fmethod codeTempList[146][6] = {
 	{jc0_HALT},
 	{jc0_MOVA,jc1_MOVA,jc2_MOVA},
 	{jc0_MOVN,jc1_MOVN,jc2_MOVN},
@@ -4824,6 +4824,7 @@ static knh_fmethod codeTempList[145][6] = {
 	{jc0_RETA,jc1_RETA,jc2_RETA},
 	{jc0_RETO,jc1_RETO,jc2_RETO},
 	{jc0_RETX,jc1_RETX,jc2_RETX,jc3_RETX},
+	{jc0_YEILDBREAK},
 	{jc0_BOX,jc1_BOX,jc2_BOX},
 	{jc0_BOXNC,jc1_BOXNC,jc2_BOXNC},
 	{jc0_NNBOX,jc1_NNBOX,jc2_NNBOX},
@@ -4835,7 +4836,7 @@ static knh_fmethod codeTempList[145][6] = {
 	{jc0_ISNNTYPE,jc1_ISNNTYPE,jc2_ISNNTYPE},
 	{jc0_FCALL,jc1_FCALL,jc2_FCALL,jc3_FCALL,jc4_FCALL},
 	{jc0_SCALL,jc1_SCALL,jc2_SCALL,jc3_SCALL},
-	{jc0_AINVOKE,jc1_AINVOKE,jc2_AINVOKE,jc3_AINVOKE},
+	{jc0_AINVOKE,jc1_AINVOKE,jc2_AINVOKE},
 	{jc0_CALL,jc1_CALL,jc2_CALL,jc3_CALL},
 	{jc0_ACALL,jc1_ACALL,jc2_ACALL,jc3_ACALL},
 	{jc0_NEW,jc1_NEW,jc2_NEW,jc3_NEW,jc4_NEW,jc5_NEW},

@@ -1,20 +1,20 @@
 /****************************************************************************
- * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
- *
+ * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER  
+ * 
  * Copyright (c) 2005-2008, Kimio Kuramitsu <kimio at ynu.ac.jp>
- *           (c) 2008-      Konoha Software Foundation
+ *           (c) 2008-      Konoha Software Foundation  
  * All rights reserved.
- *
- * You may choose one of the following two licenses when you use konoha.
+ * 
+ * You may choose one of the following two licenses when you use konoha. 
  * See www.konohaware.org/license.html for further information.
- *
+ * 
  * (1) GNU General Public License 2.0      (with    KONOHA_UNDER_GPL2)
  * (2) Konoha Software Foundation License 1.0
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
  * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
@@ -22,14 +22,14 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ *  
  ****************************************************************************/
 
 #include<konoha/konoha_dev.h>
 #include<konoha/gen/konohac_klr_.h>
 
 
-#ifdef __cplusplus
+#ifdef __cplusplus 
 extern "C" {
 #endif
 
@@ -78,6 +78,7 @@ static size_t OPSIZE[] = {
 	OPSIZE_RETA,
 	OPSIZE_RETO,
 	OPSIZE_RETX,
+	OPSIZE_YEILDBREAK,
 	OPSIZE_BOX,
 	OPSIZE_BOXNC,
 	OPSIZE_NNBOX,
@@ -184,6 +185,12 @@ static size_t OPSIZE[] = {
 	OPSIZE_INITCODE,
 	OPSIZE_NOP,
 };
+
+size_t knh_code_opsize(int opcode)
+{
+	return OPSIZE[opcode];
+}
+
 
 knh_code_t* KNH_ASM_HALT_(Ctx *ctx, Asm *o)
 {
@@ -824,12 +831,25 @@ knh_code_t* KNH_ASM_RETx_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfx_t a2)
 
 /* ------------------------------------------------------------------------ */
 
+knh_code_t* KNH_ASM_YEILDBREAK_(Ctx *ctx, Asm *o)
+{
+	klr_yeildbreak_t *op = NULL;
+	if(!knh_Asm_isCancelled(o)) {
+		op = (klr_yeildbreak_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_YEILDBREAK);
+		op->opcode = 42;
+		DP(o)->prev_op = (knh_kode_t*)op;
+	}
+	return (knh_code_t*)op;
+}
+
+/* ------------------------------------------------------------------------ */
+
 knh_code_t* KNH_ASM_BOX_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_class_t a2)
 {
 	klr_box_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_box_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_BOX);
-		op->opcode = 42;
+		op->opcode = 43;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		KNH_ASSERT_cid(a2);
 		op->a2 = /*(knh_class_t)*/a2;
@@ -845,7 +865,7 @@ knh_code_t* KNH_ASM_BOXnc_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_class_t a2)
 	klr_boxnc_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_boxnc_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_BOXNC);
-		op->opcode = 43;
+		op->opcode = 44;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		KNH_ASSERT_cid(a2);
 		op->a2 = /*(knh_class_t)*/a2;
@@ -861,7 +881,7 @@ knh_code_t* KNH_ASM_NNBOX_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_class_t a2)
 	klr_nnbox_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_nnbox_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_NNBOX);
-		op->opcode = 44;
+		op->opcode = 45;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		KNH_ASSERT_cid(a2);
 		op->a2 = /*(knh_class_t)*/a2;
@@ -877,7 +897,7 @@ knh_code_t* KNH_ASM_NNBOXnc_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_class_t a2)
 	klr_nnboxnc_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_nnboxnc_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_NNBOXNC);
-		op->opcode = 45;
+		op->opcode = 46;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		KNH_ASSERT_cid(a2);
 		op->a2 = /*(knh_class_t)*/a2;
@@ -893,7 +913,7 @@ knh_code_t* KNH_ASM_UNBOX_(Ctx *ctx, Asm *o,knh_sfi_t a1)
 	klr_unbox_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_unbox_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_UNBOX);
-		op->opcode = 46;
+		op->opcode = 47;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
@@ -907,7 +927,7 @@ knh_code_t* KNH_ASM_ISNULL_(Ctx *ctx, Asm *o,knh_sfi_t a1)
 	klr_isnull_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_isnull_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ISNULL);
-		op->opcode = 47;
+		op->opcode = 48;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
@@ -921,7 +941,7 @@ knh_code_t* KNH_ASM_ISNULLx_(Ctx *ctx, Asm *o,knh_sfx_t a1)
 	klr_isnullx_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_isnullx_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ISNULLX);
-		op->opcode = 48;
+		op->opcode = 49;
 		op->a1 = /*(knh_sfx_t)*/a1;
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
@@ -935,7 +955,7 @@ knh_code_t* KNH_ASM_ISTYPE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_class_t a2)
 	klr_istype_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_istype_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ISTYPE);
-		op->opcode = 49;
+		op->opcode = 50;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		KNH_ASSERT_cid(a2);
 		op->a2 = /*(knh_class_t)*/a2;
@@ -951,7 +971,7 @@ knh_code_t* KNH_ASM_ISNNTYPE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_type_t a2)
 	klr_isnntype_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_isnntype_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ISNNTYPE);
-		op->opcode = 50;
+		op->opcode = 51;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_type_t)*/a2;
 		DP(o)->prev_op = (knh_kode_t*)op;
@@ -966,7 +986,7 @@ knh_code_t* KNH_ASM_FCALL_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_ushort_t a2,knh_sfi
 	klr_fcall_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fcall_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FCALL);
-		op->opcode = 51;
+		op->opcode = 52;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_ushort_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -984,23 +1004,6 @@ knh_code_t* KNH_ASM_SCALL_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_ushort_t a2,Object*
 	klr_scall_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_scall_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_SCALL);
-		op->opcode = 52;
-		op->a1 = /*(knh_sfi_t)*/a1;
-		op->a2 = /*(knh_ushort_t)*/a2;
-		op->a3 = /*(Object*)*/a3;
-		knh_Object_RCinc(op->a3);
-		DP(o)->prev_op = (knh_kode_t*)op;
-	}
-	return (knh_code_t*)op;
-}
-
-/* ------------------------------------------------------------------------ */
-
-knh_code_t* KNH_ASM_AINVOKE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_ushort_t a2,Object* a3)
-{
-	klr_ainvoke_t *op = NULL;
-	if(!knh_Asm_isCancelled(o)) {
-		op = (klr_ainvoke_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_AINVOKE);
 		op->opcode = 53;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_ushort_t)*/a2;
@@ -1013,12 +1016,27 @@ knh_code_t* KNH_ASM_AINVOKE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_ushort_t a2,Objec
 
 /* ------------------------------------------------------------------------ */
 
+knh_code_t* KNH_ASM_AINVOKE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_ushort_t a2)
+{
+	klr_ainvoke_t *op = NULL;
+	if(!knh_Asm_isCancelled(o)) {
+		op = (klr_ainvoke_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_AINVOKE);
+		op->opcode = 54;
+		op->a1 = /*(knh_sfi_t)*/a1;
+		op->a2 = /*(knh_ushort_t)*/a2;
+		DP(o)->prev_op = (knh_kode_t*)op;
+	}
+	return (knh_code_t*)op;
+}
+
+/* ------------------------------------------------------------------------ */
+
 knh_code_t* KNH_ASM_CALL_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_ushort_t a2,knh_methodn_t a3)
 {
 	klr_call_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_call_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_CALL);
-		op->opcode = 54;
+		op->opcode = 55;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_ushort_t)*/a2;
 		op->a3 = /*(knh_methodn_t)*/a3;
@@ -1034,7 +1052,7 @@ knh_code_t* KNH_ASM_ACALL_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_ushort_t a2,knh_met
 	klr_acall_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_acall_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ACALL);
-		op->opcode = 55;
+		op->opcode = 56;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_ushort_t)*/a2;
 		op->a3 = /*(knh_methodn_t)*/a3;
@@ -1050,7 +1068,7 @@ knh_code_t* KNH_ASM_NEW_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_flag_t a2,knh_class_t
 	klr_new_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_new_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_NEW);
-		op->opcode = 56;
+		op->opcode = 57;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_flag_t)*/a2;
 		KNH_ASSERT_cid(a3);
@@ -1070,7 +1088,7 @@ knh_code_t* KNH_ASM_TOSTR_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_methodn_t a2)
 	klr_tostr_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_tostr_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_TOSTR);
-		op->opcode = 57;
+		op->opcode = 58;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_methodn_t)*/a2;
 		DP(o)->prev_op = (knh_kode_t*)op;
@@ -1085,7 +1103,7 @@ knh_code_t* KNH_ASM_TOSTRf_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_methodn_t a2,Objec
 	klr_tostrf_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_tostrf_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_TOSTRF);
-		op->opcode = 58;
+		op->opcode = 59;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_methodn_t)*/a2;
 		op->a3 = /*(Object*)*/a3;
@@ -1102,7 +1120,7 @@ knh_code_t* KNH_ASM_SMAP_(Ctx *ctx, Asm *o,knh_sfi_t a1,Object* a2)
 	klr_smap_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_smap_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_SMAP);
-		op->opcode = 59;
+		op->opcode = 60;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(Object*)*/a2;
 		knh_Object_RCinc(op->a2);
@@ -1118,7 +1136,7 @@ knh_code_t* KNH_ASM_SMAPnc_(Ctx *ctx, Asm *o,knh_sfi_t a1,Object* a2)
 	klr_smapnc_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_smapnc_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_SMAPNC);
-		op->opcode = 60;
+		op->opcode = 61;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(Object*)*/a2;
 		knh_Object_RCinc(op->a2);
@@ -1134,7 +1152,7 @@ knh_code_t* KNH_ASM_MAP_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_class_t a2)
 	klr_map_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_map_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_MAP);
-		op->opcode = 61;
+		op->opcode = 62;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		KNH_ASSERT_cid(a2);
 		op->a2 = /*(knh_class_t)*/a2;
@@ -1150,7 +1168,7 @@ knh_code_t* KNH_ASM_MAPnc_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_class_t a2)
 	klr_mapnc_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_mapnc_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_MAPNC);
-		op->opcode = 62;
+		op->opcode = 63;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		KNH_ASSERT_cid(a2);
 		op->a2 = /*(knh_class_t)*/a2;
@@ -1166,7 +1184,7 @@ knh_code_t* KNH_ASM_AMAP_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_class_t a2)
 	klr_amap_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_amap_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_AMAP);
-		op->opcode = 63;
+		op->opcode = 64;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		KNH_ASSERT_cid(a2);
 		op->a2 = /*(knh_class_t)*/a2;
@@ -1182,7 +1200,7 @@ knh_code_t* KNH_ASM_NNMAP_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_class_t a2)
 	klr_nnmap_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_nnmap_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_NNMAP);
-		op->opcode = 64;
+		op->opcode = 65;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		KNH_ASSERT_cid(a2);
 		op->a2 = /*(knh_class_t)*/a2;
@@ -1198,7 +1216,7 @@ knh_code_t* KNH_ASM_JMP_(Ctx *ctx, Asm *o,knh_labelid_t a1)
 	klr_jmp_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_jmp_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_JMP);
-		op->opcode = 65;
+		op->opcode = 66;
 		op->a1 = /*(knh_labelid_t)*/a1;
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
@@ -1212,7 +1230,7 @@ knh_code_t* KNH_ASM_SKIP_(Ctx *ctx, Asm *o,knh_labelid_t a1)
 	klr_skip_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_skip_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_SKIP);
-		op->opcode = 66;
+		op->opcode = 67;
 		op->a1 = /*(knh_labelid_t)*/a1;
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
@@ -1226,7 +1244,7 @@ knh_code_t* KNH_ASM_bJIFT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2)
 	klr_bjift_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_bjift_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_BJIFT);
-		op->opcode = 67;
+		op->opcode = 68;
 		op->a1 = /*(knh_labelid_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		DP(o)->prev_op = (knh_kode_t*)op;
@@ -1241,7 +1259,7 @@ knh_code_t* KNH_ASM_bJIFF_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2)
 	klr_bjiff_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_bjiff_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_BJIFF);
-		op->opcode = 68;
+		op->opcode = 69;
 		op->a1 = /*(knh_labelid_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		DP(o)->prev_op = (knh_kode_t*)op;
@@ -1256,7 +1274,7 @@ knh_code_t* KNH_ASM_bJIFF_LOOP_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2)
 	klr_bjiff_loop_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_bjiff_loop_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_BJIFF_LOOP);
-		op->opcode = 69;
+		op->opcode = 70;
 		op->a1 = /*(knh_labelid_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		DP(o)->prev_op = (knh_kode_t*)op;
@@ -1271,7 +1289,7 @@ knh_code_t* KNH_ASM_JIFNUL_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2)
 	klr_jifnul_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_jifnul_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_JIFNUL);
-		op->opcode = 70;
+		op->opcode = 71;
 		op->a1 = /*(knh_labelid_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		DP(o)->prev_op = (knh_kode_t*)op;
@@ -1286,7 +1304,7 @@ knh_code_t* KNH_ASM_JIFNN_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2)
 	klr_jifnn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_jifnn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_JIFNN);
-		op->opcode = 71;
+		op->opcode = 72;
 		op->a1 = /*(knh_labelid_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		DP(o)->prev_op = (knh_kode_t*)op;
@@ -1301,7 +1319,7 @@ knh_code_t* KNH_ASM_NEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh_sfi
 	klr_next_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_next_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_NEXT);
-		op->opcode = 72;
+		op->opcode = 73;
 		op->a1 = /*(knh_labelid_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -1317,7 +1335,7 @@ knh_code_t* KNH_ASM_INEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_class_t a2,knh_
 	klr_inext_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_inext_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_INEXT);
-		op->opcode = 73;
+		op->opcode = 74;
 		op->a1 = /*(knh_labelid_t)*/a1;
 		KNH_ASSERT_cid(a2);
 		op->a2 = /*(knh_class_t)*/a2;
@@ -1335,7 +1353,7 @@ knh_code_t* KNH_ASM_MAPNEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_class_t a2,kn
 	klr_mapnext_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_mapnext_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_MAPNEXT);
-		op->opcode = 74;
+		op->opcode = 75;
 		op->a1 = /*(knh_labelid_t)*/a1;
 		KNH_ASSERT_cid(a2);
 		op->a2 = /*(knh_class_t)*/a2;
@@ -1353,7 +1371,7 @@ knh_code_t* KNH_ASM_SMAPNEXT_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh
 	klr_smapnext_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_smapnext_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_SMAPNEXT);
-		op->opcode = 75;
+		op->opcode = 76;
 		op->a1 = /*(knh_labelid_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -1371,7 +1389,7 @@ knh_code_t* KNH_ASM_TRY_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2)
 	klr_try_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_try_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_TRY);
-		op->opcode = 76;
+		op->opcode = 77;
 		op->a1 = /*(knh_labelid_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		DP(o)->prev_op = (knh_kode_t*)op;
@@ -1386,7 +1404,7 @@ knh_code_t* KNH_ASM_TRYEND_(Ctx *ctx, Asm *o,knh_sfi_t a1)
 	klr_tryend_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_tryend_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_TRYEND);
-		op->opcode = 77;
+		op->opcode = 78;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
@@ -1400,7 +1418,7 @@ knh_code_t* KNH_ASM_CATCH_(Ctx *ctx, Asm *o,knh_labelid_t a1,knh_sfi_t a2,knh_sf
 	klr_catch_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_catch_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_CATCH);
-		op->opcode = 78;
+		op->opcode = 79;
 		op->a1 = /*(knh_labelid_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -1418,7 +1436,7 @@ knh_code_t* KNH_ASM_THROW_(Ctx *ctx, Asm *o,knh_ushort_t a1,knh_sfi_t a2)
 	klr_throw_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_throw_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_THROW);
-		op->opcode = 79;
+		op->opcode = 80;
 		op->a1 = /*(knh_ushort_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		DP(o)->prev_op = (knh_kode_t*)op;
@@ -1433,7 +1451,7 @@ knh_code_t* KNH_ASM_THROWs_(Ctx *ctx, Asm *o,knh_ushort_t a1,Object* a2)
 	klr_throws_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_throws_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_THROWS);
-		op->opcode = 80;
+		op->opcode = 81;
 		op->a1 = /*(knh_ushort_t)*/a1;
 		op->a2 = /*(Object*)*/a2;
 		knh_Object_RCinc(op->a2);
@@ -1449,7 +1467,7 @@ knh_code_t* KNH_ASM_THROW_AGAIN_(Ctx *ctx, Asm *o,knh_sfi_t a1)
 	klr_throw_again_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_throw_again_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_THROW_AGAIN);
-		op->opcode = 81;
+		op->opcode = 82;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
@@ -1463,7 +1481,7 @@ knh_code_t* KNH_ASM_P_(Ctx *ctx, Asm *o,knh_flag_t a1,knh_methodn_t a2,knh_sfi_t
 	klr_p_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_p_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_P);
-		op->opcode = 82;
+		op->opcode = 83;
 		op->a1 = /*(knh_flag_t)*/a1;
 		op->a2 = /*(knh_methodn_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -1479,7 +1497,7 @@ knh_code_t* KNH_ASM_PMSG_(Ctx *ctx, Asm *o,knh_flag_t a1,Object* a2)
 	klr_pmsg_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_pmsg_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_PMSG);
-		op->opcode = 83;
+		op->opcode = 84;
 		op->a1 = /*(knh_flag_t)*/a1;
 		op->a2 = /*(Object*)*/a2;
 		knh_Object_RCinc(op->a2);
@@ -1495,7 +1513,7 @@ knh_code_t* KNH_ASM_iCAST_(Ctx *ctx, Asm *o,knh_sfi_t a1)
 	klr_icast_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_icast_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ICAST);
-		op->opcode = 84;
+		op->opcode = 85;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
@@ -1509,7 +1527,7 @@ knh_code_t* KNH_ASM_inCAST_(Ctx *ctx, Asm *o,knh_sfi_t a1)
 	klr_incast_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_incast_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_INCAST);
-		op->opcode = 85;
+		op->opcode = 86;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
@@ -1523,7 +1541,7 @@ knh_code_t* KNH_ASM_fCAST_(Ctx *ctx, Asm *o,knh_sfi_t a1)
 	klr_fcast_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fcast_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FCAST);
-		op->opcode = 86;
+		op->opcode = 87;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
@@ -1537,7 +1555,7 @@ knh_code_t* KNH_ASM_fnCAST_(Ctx *ctx, Asm *o,knh_sfi_t a1)
 	klr_fncast_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fncast_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FNCAST);
-		op->opcode = 87;
+		op->opcode = 88;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
@@ -1551,7 +1569,7 @@ knh_code_t* KNH_ASM_bNOT_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2)
 	klr_bnot_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_bnot_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_BNOT);
-		op->opcode = 88;
+		op->opcode = 89;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		DP(o)->prev_op = (knh_kode_t*)op;
@@ -1566,7 +1584,7 @@ knh_code_t* KNH_ASM_iNEG_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2)
 	klr_ineg_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_ineg_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_INEG);
-		op->opcode = 89;
+		op->opcode = 90;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		DP(o)->prev_op = (knh_kode_t*)op;
@@ -1581,7 +1599,7 @@ knh_code_t* KNH_ASM_iADD_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a
 	klr_iadd_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_iadd_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IADD);
-		op->opcode = 90;
+		op->opcode = 91;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -1597,7 +1615,7 @@ knh_code_t* KNH_ASM_iADDn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_int_t 
 	klr_iaddn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_iaddn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IADDN);
-		op->opcode = 91;
+		op->opcode = 92;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_int_t)*/a3;
@@ -1613,7 +1631,7 @@ knh_code_t* KNH_ASM_iSUB_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a
 	klr_isub_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_isub_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ISUB);
-		op->opcode = 92;
+		op->opcode = 93;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -1629,7 +1647,7 @@ knh_code_t* KNH_ASM_iSUBn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_int_t 
 	klr_isubn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_isubn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ISUBN);
-		op->opcode = 93;
+		op->opcode = 94;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_int_t)*/a3;
@@ -1645,7 +1663,7 @@ knh_code_t* KNH_ASM_iMUL_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a
 	klr_imul_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_imul_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IMUL);
-		op->opcode = 94;
+		op->opcode = 95;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -1661,7 +1679,7 @@ knh_code_t* KNH_ASM_iMULn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_int_t 
 	klr_imuln_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_imuln_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IMULN);
-		op->opcode = 95;
+		op->opcode = 96;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_int_t)*/a3;
@@ -1677,7 +1695,7 @@ knh_code_t* KNH_ASM_iDIV_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a
 	klr_idiv_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_idiv_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IDIV);
-		op->opcode = 96;
+		op->opcode = 97;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -1693,7 +1711,7 @@ knh_code_t* KNH_ASM_iDIVn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_int_t 
 	klr_idivn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_idivn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IDIVN);
-		op->opcode = 97;
+		op->opcode = 98;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_int_t)*/a3;
@@ -1709,7 +1727,7 @@ knh_code_t* KNH_ASM_iMOD_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a
 	klr_imod_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_imod_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IMOD);
-		op->opcode = 98;
+		op->opcode = 99;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -1725,7 +1743,7 @@ knh_code_t* KNH_ASM_iMODn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_int_t 
 	klr_imodn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_imodn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IMODN);
-		op->opcode = 99;
+		op->opcode = 100;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_int_t)*/a3;
@@ -1741,7 +1759,7 @@ knh_code_t* KNH_ASM_iEQ_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a3
 	klr_ieq_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_ieq_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IEQ);
-		op->opcode = 100;
+		op->opcode = 101;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -1757,7 +1775,7 @@ knh_code_t* KNH_ASM_iEQn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_int_t a
 	klr_ieqn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_ieqn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IEQN);
-		op->opcode = 101;
+		op->opcode = 102;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_int_t)*/a3;
@@ -1773,7 +1791,7 @@ knh_code_t* KNH_ASM_iNEQ_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a
 	klr_ineq_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_ineq_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_INEQ);
-		op->opcode = 102;
+		op->opcode = 103;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -1789,7 +1807,7 @@ knh_code_t* KNH_ASM_iNEQn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_int_t 
 	klr_ineqn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_ineqn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_INEQN);
-		op->opcode = 103;
+		op->opcode = 104;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_int_t)*/a3;
@@ -1805,7 +1823,7 @@ knh_code_t* KNH_ASM_iLT_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a3
 	klr_ilt_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_ilt_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ILT);
-		op->opcode = 104;
+		op->opcode = 105;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -1821,7 +1839,7 @@ knh_code_t* KNH_ASM_iLTn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_int_t a
 	klr_iltn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_iltn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ILTN);
-		op->opcode = 105;
+		op->opcode = 106;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_int_t)*/a3;
@@ -1837,7 +1855,7 @@ knh_code_t* KNH_ASM_iLTE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a
 	klr_ilte_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_ilte_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ILTE);
-		op->opcode = 106;
+		op->opcode = 107;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -1853,7 +1871,7 @@ knh_code_t* KNH_ASM_iLTEn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_int_t 
 	klr_ilten_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_ilten_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ILTEN);
-		op->opcode = 107;
+		op->opcode = 108;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_int_t)*/a3;
@@ -1869,7 +1887,7 @@ knh_code_t* KNH_ASM_iGT_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a3
 	klr_igt_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_igt_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IGT);
-		op->opcode = 108;
+		op->opcode = 109;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -1885,7 +1903,7 @@ knh_code_t* KNH_ASM_iGTn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_int_t a
 	klr_igtn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_igtn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IGTN);
-		op->opcode = 109;
+		op->opcode = 110;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_int_t)*/a3;
@@ -1901,7 +1919,7 @@ knh_code_t* KNH_ASM_iGTE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a
 	klr_igte_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_igte_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IGTE);
-		op->opcode = 110;
+		op->opcode = 111;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -1917,7 +1935,7 @@ knh_code_t* KNH_ASM_iGTEn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_int_t 
 	klr_igten_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_igten_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IGTEN);
-		op->opcode = 111;
+		op->opcode = 112;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_int_t)*/a3;
@@ -1933,7 +1951,7 @@ knh_code_t* KNH_ASM_fNEG_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2)
 	klr_fneg_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fneg_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FNEG);
-		op->opcode = 112;
+		op->opcode = 113;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		DP(o)->prev_op = (knh_kode_t*)op;
@@ -1948,7 +1966,7 @@ knh_code_t* KNH_ASM_fADD_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a
 	klr_fadd_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fadd_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FADD);
-		op->opcode = 113;
+		op->opcode = 114;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -1964,7 +1982,7 @@ knh_code_t* KNH_ASM_fADDn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_float_
 	klr_faddn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_faddn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FADDN);
-		op->opcode = 114;
+		op->opcode = 115;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_float_t)*/a3;
@@ -1980,7 +1998,7 @@ knh_code_t* KNH_ASM_fSUB_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a
 	klr_fsub_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fsub_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FSUB);
-		op->opcode = 115;
+		op->opcode = 116;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -1996,7 +2014,7 @@ knh_code_t* KNH_ASM_fSUBn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_float_
 	klr_fsubn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fsubn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FSUBN);
-		op->opcode = 116;
+		op->opcode = 117;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_float_t)*/a3;
@@ -2012,7 +2030,7 @@ knh_code_t* KNH_ASM_fMUL_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a
 	klr_fmul_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fmul_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FMUL);
-		op->opcode = 117;
+		op->opcode = 118;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -2028,7 +2046,7 @@ knh_code_t* KNH_ASM_fMULn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_float_
 	klr_fmuln_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fmuln_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FMULN);
-		op->opcode = 118;
+		op->opcode = 119;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_float_t)*/a3;
@@ -2044,7 +2062,7 @@ knh_code_t* KNH_ASM_fDIV_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a
 	klr_fdiv_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fdiv_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FDIV);
-		op->opcode = 119;
+		op->opcode = 120;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -2060,7 +2078,7 @@ knh_code_t* KNH_ASM_fDIVn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_float_
 	klr_fdivn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fdivn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FDIVN);
-		op->opcode = 120;
+		op->opcode = 121;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_float_t)*/a3;
@@ -2076,7 +2094,7 @@ knh_code_t* KNH_ASM_fEQ_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a3
 	klr_feq_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_feq_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FEQ);
-		op->opcode = 121;
+		op->opcode = 122;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -2092,7 +2110,7 @@ knh_code_t* KNH_ASM_fEQn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_float_t
 	klr_feqn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_feqn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FEQN);
-		op->opcode = 122;
+		op->opcode = 123;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_float_t)*/a3;
@@ -2108,7 +2126,7 @@ knh_code_t* KNH_ASM_fNEQ_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a
 	klr_fneq_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fneq_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FNEQ);
-		op->opcode = 123;
+		op->opcode = 124;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -2124,7 +2142,7 @@ knh_code_t* KNH_ASM_fNEQn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_float_
 	klr_fneqn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fneqn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FNEQN);
-		op->opcode = 124;
+		op->opcode = 125;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_float_t)*/a3;
@@ -2140,7 +2158,7 @@ knh_code_t* KNH_ASM_fLT_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a3
 	klr_flt_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_flt_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FLT);
-		op->opcode = 125;
+		op->opcode = 126;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -2156,7 +2174,7 @@ knh_code_t* KNH_ASM_fLTn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_float_t
 	klr_fltn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fltn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FLTN);
-		op->opcode = 126;
+		op->opcode = 127;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_float_t)*/a3;
@@ -2172,7 +2190,7 @@ knh_code_t* KNH_ASM_fLTE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a
 	klr_flte_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_flte_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FLTE);
-		op->opcode = 127;
+		op->opcode = 128;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -2188,7 +2206,7 @@ knh_code_t* KNH_ASM_fLTEn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_float_
 	klr_flten_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_flten_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FLTEN);
-		op->opcode = 128;
+		op->opcode = 129;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_float_t)*/a3;
@@ -2204,7 +2222,7 @@ knh_code_t* KNH_ASM_fGT_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a3
 	klr_fgt_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fgt_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FGT);
-		op->opcode = 129;
+		op->opcode = 130;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -2220,7 +2238,7 @@ knh_code_t* KNH_ASM_fGTn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_float_t
 	klr_fgtn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fgtn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FGTN);
-		op->opcode = 130;
+		op->opcode = 131;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_float_t)*/a3;
@@ -2236,7 +2254,7 @@ knh_code_t* KNH_ASM_fGTE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a
 	klr_fgte_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fgte_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FGTE);
-		op->opcode = 131;
+		op->opcode = 132;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -2252,7 +2270,7 @@ knh_code_t* KNH_ASM_fGTEn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_float_
 	klr_fgten_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fgten_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FGTEN);
-		op->opcode = 132;
+		op->opcode = 133;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_float_t)*/a3;
@@ -2268,7 +2286,7 @@ knh_code_t* KNH_ASM_AGET_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a
 	klr_aget_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_aget_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_AGET);
-		op->opcode = 133;
+		op->opcode = 134;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -2284,7 +2302,7 @@ knh_code_t* KNH_ASM_AGETn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_intptr
 	klr_agetn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_agetn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_AGETN);
-		op->opcode = 134;
+		op->opcode = 135;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_intptr_t)*/a3;
@@ -2300,7 +2318,7 @@ knh_code_t* KNH_ASM_IAGET_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t 
 	klr_iaget_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_iaget_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IAGET);
-		op->opcode = 135;
+		op->opcode = 136;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -2316,7 +2334,7 @@ knh_code_t* KNH_ASM_IAGETn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_intpt
 	klr_iagetn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_iagetn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IAGETN);
-		op->opcode = 136;
+		op->opcode = 137;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_intptr_t)*/a3;
@@ -2332,7 +2350,7 @@ knh_code_t* KNH_ASM_FAGET_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t 
 	klr_faget_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_faget_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FAGET);
-		op->opcode = 137;
+		op->opcode = 138;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -2348,7 +2366,7 @@ knh_code_t* KNH_ASM_FAGETn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_intpt
 	klr_fagetn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fagetn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FAGETN);
-		op->opcode = 138;
+		op->opcode = 139;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_intptr_t)*/a3;
@@ -2364,7 +2382,7 @@ knh_code_t* KNH_ASM_ASET_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t a
 	klr_aset_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_aset_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ASET);
-		op->opcode = 139;
+		op->opcode = 140;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -2380,7 +2398,7 @@ knh_code_t* KNH_ASM_ASETn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_intptr
 	klr_asetn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_asetn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ASETN);
-		op->opcode = 140;
+		op->opcode = 141;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_intptr_t)*/a3;
@@ -2396,7 +2414,7 @@ knh_code_t* KNH_ASM_IASET_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t 
 	klr_iaset_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_iaset_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IASET);
-		op->opcode = 141;
+		op->opcode = 142;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -2412,7 +2430,7 @@ knh_code_t* KNH_ASM_IASETn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_intpt
 	klr_iasetn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_iasetn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_IASETN);
-		op->opcode = 142;
+		op->opcode = 143;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_intptr_t)*/a3;
@@ -2428,7 +2446,7 @@ knh_code_t* KNH_ASM_FASET_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_sfi_t 
 	klr_faset_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_faset_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FASET);
-		op->opcode = 143;
+		op->opcode = 144;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_sfi_t)*/a3;
@@ -2444,7 +2462,7 @@ knh_code_t* KNH_ASM_FASETn_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_sfi_t a2,knh_intpt
 	klr_fasetn_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_fasetn_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_FASETN);
-		op->opcode = 144;
+		op->opcode = 145;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_sfi_t)*/a2;
 		op->a3 = /*(knh_intptr_t)*/a3;
@@ -2460,7 +2478,7 @@ knh_code_t* KNH_ASM_INITCODE_(Ctx *ctx, Asm *o,knh_sfi_t a1)
 	klr_initcode_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_initcode_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_INITCODE);
-		op->opcode = 145;
+		op->opcode = 146;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
@@ -2474,7 +2492,7 @@ knh_code_t* KNH_ASM_NOP_(Ctx *ctx, Asm *o)
 	klr_nop_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
 		op = (klr_nop_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_NOP);
-		op->opcode = 146;
+		op->opcode = 147;
 		DP(o)->prev_op = (knh_kode_t*)op;
 	}
 	return (knh_code_t*)op;
@@ -2552,6 +2570,7 @@ static frewrite OPREWRITE[] = {
 	knh_rewrite_NOP, /* RETa */
 	knh_rewrite_NOP, /* RETo */
 	knh_rewrite_NOP, /* RETx */
+	knh_rewrite_NOP, /* YEILDBREAK */
 	knh_rewrite_NOP, /* BOX */
 	knh_rewrite_NOP, /* BOXnc */
 	knh_rewrite_NOP, /* NNBOX */
@@ -2666,7 +2685,7 @@ void knh_Asm_writeAddress(Ctx *ctx, Asm *o, knh_code_t *pc_start)
 	knh_code_t *pc = pc_start;
 	while(1) {
 		int opcode = KNH_OPCODE(pc);
-		if(opcode == OPCODE_HALT) return ;
+		if(opcode == OPCODE_HALT) return ; 
 		OPREWRITE[opcode](ctx, o, pc_start, (knh_kode_t*)pc);
 		pc += OPSIZE[opcode];
 	}
@@ -2710,9 +2729,6 @@ void knh_code_traverse(Ctx *ctx, knh_code_t *pc, knh_ftraverse ftr)
 			break;
 		case OPCODE_SCALL :
 			ftr(ctx, ((klr_scall_t*)pc)->a3);
-			break;
-		case OPCODE_AINVOKE :
-			ftr(ctx, ((klr_ainvoke_t*)pc)->a3);
 			break;
 		case OPCODE_NEW :
 			ftr(ctx, ((klr_new_t*)pc)->a5);
@@ -3279,6 +3295,16 @@ void KNH_DUMP_RETx(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Method *
 /* ------------------------------------------------------------------------ */
 
 static
+void KNH_DUMP_YEILDBREAK(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Method *mtd)
+{
+	//klr_yeildbreak_t *op = (klr_yeildbreak_t*)pc;
+	KNH_DUMP_OPCODE(ctx, pc, w, mtd, "YEILDBREAK");
+	knh_write_EOL(ctx, w);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
 void KNH_DUMP_BOX(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Method *mtd)
 {
 	klr_box_t *op = (klr_box_t*)pc;
@@ -3417,7 +3443,6 @@ void KNH_DUMP_AINVOKE(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Metho
 	KNH_DUMP_OPCODE(ctx, pc, w, mtd, "AINVOKE");
 	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a1));
 	knh_putc(ctx, w, ' '); knh_write__ushort(ctx, w, (op->a2));
-	knh_putc(ctx, w, ' '); knh_write__OBJ(ctx, w, (op->a3));
 	knh_write_EOL(ctx, w);
 }
 
@@ -4645,6 +4670,7 @@ static fdump OPDUMP[] = {
 	KNH_DUMP_RETa,
 	KNH_DUMP_RETo,
 	KNH_DUMP_RETx,
+	KNH_DUMP_YEILDBREAK,
 	KNH_DUMP_BOX,
 	KNH_DUMP_BOXnc,
 	KNH_DUMP_NNBOX,
@@ -4792,19 +4818,19 @@ void knh_code_thread(Ctx *ctx, knh_code_t *pc, void **codeaddr)
 			return;
 		}
 		switch(op->opcode) {
-		case OPCODE_JMP :
-		case OPCODE_SKIP :
-		case OPCODE_BJIFT :
-		case OPCODE_BJIFF :
-		case OPCODE_BJIFF_LOOP :
-		case OPCODE_JIFNUL :
-		case OPCODE_JIFNN :
-		case OPCODE_NEXT :
-		case OPCODE_INEXT :
-		case OPCODE_MAPNEXT :
-		case OPCODE_SMAPNEXT :
-		case OPCODE_TRY :
-		case OPCODE_CATCH :
+		case OPCODE_JMP : 
+		case OPCODE_SKIP : 
+		case OPCODE_BJIFT : 
+		case OPCODE_BJIFF : 
+		case OPCODE_BJIFF_LOOP : 
+		case OPCODE_JIFNUL : 
+		case OPCODE_JIFNN : 
+		case OPCODE_NEXT : 
+		case OPCODE_INEXT : 
+		case OPCODE_MAPNEXT : 
+		case OPCODE_SMAPNEXT : 
+		case OPCODE_TRY : 
+		case OPCODE_CATCH : 
 			DBG2_P("%p GOTO %p", op, op->jumppc);
 			op->jumpaddr = codeaddr[((knh_kode_t*)(op->jumppc))->opcode];
 			break;
@@ -5204,6 +5230,15 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 			goto L_HEAD;
 		}
 
+	case OPCODE_YEILDBREAK :
+		{
+			//const klr_yeildbreak_t* op = (klr_yeildbreak_t*)pc;
+			DBG2_OPDUMP(ctx, pc);
+			KLR_YEILDBREAK(ctx);
+			pc += OPSIZE_YEILDBREAK;
+			goto L_HEAD;
+		}
+
 	case OPCODE_BOX :
 		{
 			const klr_box_t* op = (klr_box_t*)pc;
@@ -5307,7 +5342,7 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		{
 			const klr_ainvoke_t* op = (klr_ainvoke_t*)pc;
 			DBG2_OPDUMP(ctx, pc);
-			KLR_AINVOKE(ctx, op->a1, op->a2, op->a3);
+			KLR_AINVOKE(ctx, op->a1, op->a2);
 			pc += OPSIZE_AINVOKE;
 			goto L_HEAD;
 		}
@@ -6203,6 +6238,7 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		&&L_RETA,
 		&&L_RETO,
 		&&L_RETX,
+		&&L_YEILDBREAK,
 		&&L_BOX,
 		&&L_BOXNC,
 		&&L_NNBOX,
@@ -6309,7 +6345,7 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		&&L_INITCODE,
 		&&L_NOP,
 	};
-
+	
 	register knh_code_t *pc = sfp[-1].pc;
 	DBG2_ASSERT(pc == DP((KLRCode*)DP(sfp[-1].mtd)->code)->code);
 	//register knh_code_t *pc =  DP((KLRCode*)DP(sfp[-1].mtd)->code)->code;
@@ -6694,6 +6730,15 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		goto *(op->nextaddr);
 	}
 
+	L_YEILDBREAK:; {
+		const klr_yeildbreak_t *op = (klr_yeildbreak_t*)pc;
+		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
+		DBG2_OPDUMP(ctx, pc);
+		KLR_YEILDBREAK(ctx);
+		pc += OPSIZE_YEILDBREAK;
+		goto *(op->nextaddr);
+	}
+
 	L_BOX:; {
 		const klr_box_t *op = (klr_box_t*)pc;
 		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
@@ -6794,12 +6839,12 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 	}
 
 	L_AINVOKE:; {
-//		const klr_ainvoke_t *op = (klr_ainvoke_t*)pc;
-//		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
-//		DBG2_OPDUMP(ctx, pc);
-//		KLR_AINVOKE(ctx, op->a1, op->a2, op->a3);
-//		pc += OPSIZE_AINVOKE;
-//		goto *(op->nextaddr);
+		const klr_ainvoke_t *op = (klr_ainvoke_t*)pc;
+		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
+		DBG2_OPDUMP(ctx, pc);
+		KLR_AINVOKE(ctx, op->a1, op->a2);
+		pc += OPSIZE_AINVOKE;
+		goto *(op->nextaddr);
 	}
 
 	L_CALL:; {
@@ -7708,6 +7753,7 @@ static fhaslabel OPHASLABEL[] = {
 	knh_hasLabel_NOP, /* RETa */
 	knh_hasLabel_NOP, /* RETo */
 	knh_hasLabel_NOP, /* RETx */
+	knh_hasLabel_NOP, /* YEILDBREAK */
 	knh_hasLabel_NOP, /* BOX */
 	knh_hasLabel_NOP, /* BOXnc */
 	knh_hasLabel_NOP, /* NNBOX */
@@ -7824,7 +7870,7 @@ int knh_hasLabel(knh_code_t *pc_start, knh_code_t *jumppc)
 	knh_code_t *pc = pc_start;
 	while(res == 0) {
 		knh_kode_t *op = (knh_kode_t*)pc;
-		if(op->opcode == OPCODE_HALT) return 0;
+		if(op->opcode == OPCODE_HALT) return 0; 
 		res = OPHASLABEL[op->opcode](op, jumppc);
 		pc += OPSIZE[KNH_OPCODE(pc)];
 	}
@@ -7891,7 +7937,7 @@ void KNH_KLR_MOVx(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 {
 	klr_movx_t *op = (klr_movx_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_MOVx(");
 	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
@@ -7934,7 +7980,7 @@ void KNH_KLR_XMOVs(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 {
 	klr_xmovs_t *op = (klr_xmovs_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVs(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -7949,7 +7995,7 @@ void KNH_KLR_XMOVo(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 {
 	klr_xmovo_t *op = (klr_xmovo_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVo(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -7964,8 +8010,8 @@ void KNH_KLR_XMOVx(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 {
 	klr_xmovx_t *op = (klr_xmovx_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVx(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -7980,7 +8026,7 @@ void KNH_KLR_XMOVDEF(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, 
 {
 	klr_xmovdef_t *op = (klr_xmovdef_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVDEF(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -7995,7 +8041,7 @@ void KNH_KLR_XMOVSYS(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, 
 {
 	klr_xmovsys_t *op = (klr_xmovsys_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVSYS(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8010,7 +8056,7 @@ void KNH_KLR_MOVxi(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 {
 	klr_movxi_t *op = (klr_movxi_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_MOVxi(");
 	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8025,7 +8071,7 @@ void KNH_KLR_XMOVsi(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovsi_t *op = (klr_xmovsi_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVsi(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8040,7 +8086,7 @@ void KNH_KLR_XMOVoi(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovoi_t *op = (klr_xmovoi_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVoi(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8055,8 +8101,8 @@ void KNH_KLR_XMOVxi(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovxi_t *op = (klr_xmovxi_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVxi(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8071,8 +8117,8 @@ void KNH_KLR_XMOVxio(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, 
 {
 	klr_xmovxio_t *op = (klr_xmovxio_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVxio(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8087,8 +8133,8 @@ void KNH_KLR_XMOVxBXi(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start,
 {
 	klr_xmovxbxi_t *op = (klr_xmovxbxi_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVxBXi(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8105,7 +8151,7 @@ void KNH_KLR_MOVxf(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 {
 	klr_movxf_t *op = (klr_movxf_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_MOVxf(");
 	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8120,7 +8166,7 @@ void KNH_KLR_XMOVsf(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovsf_t *op = (klr_xmovsf_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVsf(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8135,7 +8181,7 @@ void KNH_KLR_XMOVof(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovof_t *op = (klr_xmovof_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVof(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8150,8 +8196,8 @@ void KNH_KLR_XMOVxf(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovxf_t *op = (klr_xmovxf_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVxf(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8166,8 +8212,8 @@ void KNH_KLR_XMOVxfo(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, 
 {
 	klr_xmovxfo_t *op = (klr_xmovxfo_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVxfo(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8182,8 +8228,8 @@ void KNH_KLR_XMOVxBXf(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start,
 {
 	klr_xmovxbxf_t *op = (klr_xmovxbxf_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVxBXf(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8200,7 +8246,7 @@ void KNH_KLR_MOVxb(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 {
 	klr_movxb_t *op = (klr_movxb_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_MOVxb(");
 	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8215,7 +8261,7 @@ void KNH_KLR_XMOVsb(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovsb_t *op = (klr_xmovsb_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVsb(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8230,7 +8276,7 @@ void KNH_KLR_XMOVob(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovob_t *op = (klr_xmovob_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVob(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8245,8 +8291,8 @@ void KNH_KLR_XMOVxb(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovxb_t *op = (klr_xmovxb_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVxb(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8436,11 +8482,22 @@ void KNH_KLR_RETx(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 {
 	klr_retx_t *op = (klr_retx_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_RETx(");
 	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "x%d_2", step);
+	knh_println(ctx, w, STEXT(");"));
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+void KNH_KLR_YEILDBREAK(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_code_t *pc, int step)
+{
+	//klr_yeildbreak_t *op = (klr_yeildbreak_t*)pc;
+	KNH_KLR_LABEL(ctx, w, pc_start, pc);
+	knh_printf(ctx, w, "\tKLR_YEILDBREAK(");
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -8531,7 +8588,7 @@ void KNH_KLR_ISNULLx(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, 
 {
 	klr_isnullx_t *op = (klr_isnullx_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_ISNULLx(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_println(ctx, w, STEXT(");"));
@@ -8610,8 +8667,6 @@ void KNH_KLR_AINVOKE(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, 
 	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
-	knh_write(ctx, w,  STEXT(", "));
-	knh_printf(ctx, w, "CONSTPOOL(ctx, delta + %d)", knh_Asm_constId(ctx, abr, op->a3));
 	knh_println(ctx, w, STEXT(");"));
 }
 
@@ -10172,6 +10227,9 @@ void knh_code_generate(Ctx *ctx, Asm *abr, knh_code_t *pc_start, OutputStream *w
 			break;
 		case OPCODE_RETX :
 			KNH_KLR_RETx(ctx, w, abr, pc_start, pc, step);
+			break;
+		case OPCODE_YEILDBREAK :
+			KNH_KLR_YEILDBREAK(ctx, w, abr, pc_start, pc, step);
 			break;
 		case OPCODE_BOX :
 			KNH_KLR_BOX(ctx, w, abr, pc_start, pc, step);
