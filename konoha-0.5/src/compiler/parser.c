@@ -132,6 +132,25 @@ knh_tokens_t knh_tokens_splitEXPR(Ctx *ctx, knh_tokens_t *tc, knh_token_t tt)
 }
 
 /* ------------------------------------------------------------------------ */
+static
+void knh_tokens_splitEXPR2(Ctx *ctx, knh_tokens_t *tc, knh_token_t tt, knh_tokens_t *sub)
+{
+	*sub = *tc;
+	int i;
+	for(i = tc->c; i < tc->e; i++) {
+		if(SP(sub->ts[i])->tt == tt) {
+			sub->e =i;
+			tc->c = i + 1;
+			return ;
+		}
+	}
+	sub->e = i;
+	tc->c = tc->e;
+	return ;
+}
+
+/* ------------------------------------------------------------------------ */
+
 
 static
 void knh_tokens_ignore(Ctx *ctx, knh_tokens_t *tc)
@@ -436,7 +455,8 @@ void knh_Stmt_add_EXPRs(Ctx *ctx, Stmt *stmt_b, knh_tokens_t *tc, int level)
 {
 	knh_tokens_t expr_tc = knh_tokens_splitSTMT(ctx, tc);
 	while(expr_tc.c < expr_tc.e) {
-		knh_tokens_t sub_tc = knh_tokens_splitEXPR(ctx, &expr_tc, TT_COMMA);
+		knh_tokens_t sub_tc;
+		knh_tokens_splitEXPR2(ctx, &expr_tc, TT_COMMA, &sub_tc);
 		if(sub_tc.c < sub_tc.e) {
 			knh_Stmt_add(ctx, stmt_b, new_TermEXPR(ctx, &sub_tc, level));
 		}
@@ -1595,10 +1615,12 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int isData)
 	{
 		knh_tokens_t ptc;
 		knh_Token_tc(ctx, ts[pc], &ptc);
+        DBG2_P("size=%d, ptc=%d", DP(stmt)->size, ptc.e);
 		knh_Stmt_add_EXPRs(ctx, stmt, &ptc, isData);
 	}
 	if(DP(stmt)->size == 1) {
-		knh_perror(ctx, SP(ts[pc])->fileid, SP(ts[pc])->line, KERR_ERRATA, _("empty: () == > (null)"));
+        DBG2_P("size=%d", DP(stmt)->size);
+		knh_perror(ctx, SP(ts[pc])->fileid, SP(ts[pc])->line, KERR_ERRATA, _("empty: () == > (void)"));
 		knh_Stmt_add(ctx, stmt, TM(new_TokenCONST(ctx, FL(ts[oc]), KNH_NULL)));
 	}
 	fc = pc + 1; pc = 0;
