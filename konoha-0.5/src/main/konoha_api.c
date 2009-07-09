@@ -68,8 +68,7 @@ void konoha_init(void)
 
 /* ------------------------------------------------------------------------ */
 
-static
-void konoha_setCurrenContext(Ctx *ctx)
+KNHAPI(void) konoha_setCurrenContext(Ctx *ctx)
 {
 #ifdef KNH_USING_NOTHREAD
 	curctx = ctx;
