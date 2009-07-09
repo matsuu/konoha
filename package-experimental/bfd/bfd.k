@@ -1,0 +1,15 @@
+class Bfd;
+class Asymbol;
+class Minisyms;
+Bfd! Bfd.new(String! filename, String target);
+Boolean Bfd.checkformat(int form);
+Asymbol! Bfd.make_empty_symbol(Bfd abfd);
+Minisyms Minisyms.new();
+int Bfd.read_minisymbols(int dyn,Minisyms mini);
+Asymbol! Bfd.minisymbol_to_symbol(int dyn,Minisyms mini,Asymbol store);
+String Asymbol.get_name();
+int Asymbol.get_value();
+void Minisyms.copy_pointer(Minisyms mini);
+void Minisyms.next_symbol();
+void Bfd.print_all_symbols(int dyn);
+int Bfd.get_symbol_size(int dyn,String funcname);
