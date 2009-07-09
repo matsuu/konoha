@@ -240,6 +240,7 @@ KNHAPI(void) konoha_addDBDriver(Ctx *ctx, char *alias, knh_db_drvapi_t *d);
 KNHAPI(void) konoha_SETv(Ctx *ctx, Object **v, Object *o);
 KNHAPI(void) konoha_FINALv(Ctx *ctx, Object **v);
 KNHAPI(char*) knh_format_ospath(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t path);
+KNHAPI(void) konoha_setCurrenContext(Ctx *ctx);
 KNHAPI(Ctx*) konoha_getCurrentContext(void);
 KNHAPI(Ctx*) konoha_getThreadContext(Ctx *ctx);
 KNHAPI(int) konoha_debugLevel(void);
