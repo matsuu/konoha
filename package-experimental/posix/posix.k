@@ -26,6 +26,8 @@
  ****************************************************************************/
 
 String! System.getHostName();
+String System.getLogin();
+int System.getUid();
 int System.getPid();
 int System.getPPid();
 void System.kill(int pid, int signal);

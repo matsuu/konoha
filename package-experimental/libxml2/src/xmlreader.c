@@ -178,6 +178,9 @@ METHOD XmlReader_constValue(Ctx *ctx, knh_sfp_t *sfp)
 {
     xmlTextReaderPtr reader = (xmlTextReaderPtr) p_cptr(sfp[0]);
     char* ret = (char*) xmlTextReaderConstValue(reader);
+    if(ret == NULL){
+        ret = "";
+    }
     KNH_RETURN(ctx,sfp,new_String(ctx,B(ret),NULL));
 }
 

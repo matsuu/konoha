@@ -70,7 +70,7 @@ knh_StringConstData_t StringConstData[] = {
 /* [API] */
 
 /* ------------------------------------------------------------------------ */
-// >>> String! System.getHostName();
+// String! System.getHostName();
 
 METHOD System_getHostName(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -82,7 +82,23 @@ METHOD System_getHostName(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-// >>> int System.getPid();
+// String System.getLogin();
+
+METHOD System_getLogin(Ctx *ctx, knh_sfp_t *sfp)
+{
+    KNH_RETURN(ctx, sfp, new_String(ctx, B(getlogin()),NULL));
+}
+
+/* ------------------------------------------------------------------------ */
+// int System.getUid();
+
+METHOD System_getUid(Ctx *ctx, knh_sfp_t *sfp)
+{
+    KNH_RETURN_Int(ctx, sfp, getuid());
+}
+
+/* ------------------------------------------------------------------------ */
+// int System.getPid();
 
 METHOD System_getPid(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -90,7 +106,7 @@ METHOD System_getPid(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-// >>> int System.getPPid();
+// int System.getPPid();
 
 METHOD System_getPPid(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -98,7 +114,7 @@ METHOD System_getPPid(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-// >>> void System.kill(int pid, int signal);
+// void System.kill(int pid, int signal);
 
 METHOD System_kill(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -110,7 +126,7 @@ METHOD System_kill(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-// >>> int System.system(String! cmd);
+// int System.system(String! cmd);
 
 METHOD System_system(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -124,7 +140,7 @@ METHOD System_system(Ctx *ctx, knh_sfp_t *sfp)
 
 
 /* ------------------------------------------------------------------------ */
-// >>> void System.sleep(int sec);
+// void System.sleep(int sec);
 
 METHOD System_sleep(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -235,7 +251,9 @@ METHOD System_listDir(Ctx *ctx, knh_sfp_t *sfp)
     DIR *dirptr;
     struct dirent *direntp;
     char dirname[FILEPATH_BUFSIZ];
-    //knh_format_ospath(ctx, dirname, sizeof(dirname), knh_StringNULL_tobytes(sfp[1].s, STEXT(".")));
+    knh_bytes_t t = (IS_NULL(sfp[1].s)) ? STEXT(".") : knh_String_tobytes(sfp[1].s);
+
+    knh_format_ospath(ctx, dirname, sizeof(dirname), t);
     String* str = (String *) sfp[1].s;
     knh_bytes_t bt = {str->str, str->size};
     knh_format_ospath(ctx, dirname, sizeof(dirname), bt);
@@ -255,7 +273,7 @@ METHOD System_listDir(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-// >>> String! System.getCwd();
+// String! System.getCwd();
 
 METHOD System_getCwd(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -277,7 +295,9 @@ METHOD System_getCwd(Ctx *ctx, knh_sfp_t *sfp)
 METHOD System_chDir(Ctx *ctx, knh_sfp_t *sfp)
 {
     char dirname[FILEPATH_BUFSIZ];
-    //knh_format_ospath(ctx, dirname, sizeof(dirname), knh_StringNULL_tobytes(sfp[1].s, STEXT(".")));
+    knh_bytes_t t = (IS_NULL(sfp[1].s)) ? STEXT(".") : knh_String_tobytes(sfp[1].s);
+
+    knh_format_ospath(ctx, dirname, sizeof(dirname), t);
     String* str = (String *) sfp[1].s;
     knh_bytes_t bt = {str->str, str->size};
     knh_format_ospath(ctx, dirname, sizeof(dirname), bt);
