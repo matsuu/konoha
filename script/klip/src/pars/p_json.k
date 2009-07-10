@@ -1,39 +1,6 @@
 ///
 /// parsing data to json
 ///
-/*-----class Parser Form-----*/
-class Parser extends Form
-{
-	/*-----constructor-----*/
-	Parser(String name, String file)
-	{
-		String filetype = file.split(".",0).pop();
-		if( filetype == "json" ) {
-			ParserJson pj = new ParserJson(name,file);
-			json2Package(pj);
-		} else if ( filetype == "xml" ) {
-			ParserXml px = new ParserXml(name,file);
-			xml2Package(px);
-		}
- 	}
-
-	void json2Package(ParserJson pars)
-	{
-		this.name = pars.name;
-		this.version = pars.getElement("version");
-		this.url = pars.getElement("url");
-		this.depend = pars.getElement("depend").split("&",0);
-	}
-
-	void xml2Package(ParserXml pars)
-	{
-		this.name = pars.name;
-		this.version = pars.getElement("version");
-		this.url = pars.getElement("url");
-		this.depend = pars.getElement("depend").split("&",0);
-	}
-}
-
 /*-----class Parser for Json-----*/
 class ParserJson extends Form
 {
@@ -130,4 +97,14 @@ class ParserJson extends Form
 		}
 		return ret[..|ret|-2] + "]";
 	}
+}
+
+/*-----Json2Package-----*/
+void Parser.setMember()
+{
+	ParserJson pars = new ParserJson(this.name,this.file);
+	this.name = pars.name;
+	this.version = pars.getElement("version");
+	this.url = pars.getElement("url");
+	this.depend = pars.getElement("depend").split("&",0);
 }

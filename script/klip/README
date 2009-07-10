@@ -1,9 +1,19 @@
-KLIP (Konoha LIbrary Provider)
+**************************************************
+*                                                *
+*   klip (Konoha LIbrary Provider)               *
+*                                                *
+*    Version 0.1.0 (09/07/11)   (c)utrhira 2009  *
+**************************************************
+
+*INTRODUCTION
+ "klip" is a package manegement script of Konoha.
+ This script provides your Konoha some library packages,
+ then you'll be able to use Konoha more comfortably.
 
 
-*USING PACKAGES OF Konoha
- - posix.*;
- - curl.*;
+*USING DEFAULT PACKAGE ( of Konoha )
+ - posix // or [ zlib + libtar ] (not commit yet)
+ - curl // or not ( maybe socket? )
 // - libxml2.*;  (if you use klip.xml : not default) 
 
 
@@ -15,3 +25,11 @@ KLIP (Konoha LIbrary Provider)
  $ ./klip remove package_name
 
  $ ./klip undo
+
+
+*CONTACT
+ If you find some problem,please send e-mail to
+
+   utrhira@users.sourceforge.jp
+
+//EOF

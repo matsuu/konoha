@@ -2,6 +2,7 @@
 /// parsing data to Xml
 ///
 using libxml2.*;
+import "form.k";
 
 /*-----class Parser for Xml-----*/
 class ParserXml extends Form
@@ -111,3 +112,12 @@ class ParserXml extends Form
 	}
 }
 
+/*-----Xml2Package-----*/
+void Parser.setMember()
+{
+	ParserXml pars = new ParserXml(this.name,this.file);
+	this.name = pars.name;
+	this.version = pars.getElement("version");
+	this.url = pars.getElement("url");
+	this.depend = pars.getElement("depend").split("&",0);
+}

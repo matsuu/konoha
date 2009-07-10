@@ -1,5 +1,5 @@
 //
-//define system function
+//define general function
 //
 /*-----for ERROR message-----*/
 void dispError(String code,int level)
@@ -13,18 +13,48 @@ void dispError(String code,int level)
 		txt += "USAGE: operation = [ search , install , remove , undo ]";
 	} else if ( code == "arg_ver" ){
 		txt = "!ERR : please set Float value @ args.version ";
-	} else if ( code == "klipd" ) {
-		txt = "!ERR : failed to get klipDATA";
-	} else if ( code == "klip" ) {
-		txt = "!ERR : can't find this package @ klipdata";
-	} else{
+	} else {
 		txt = "!ERR : " + code + " failed";
 	}
 	if( level == HIDE ) { print txt; }
 	else if ( level == SHOW ) { OUT << txt << EOL; }
 }
 
-/*-----Text------*/
+/*-----exit process-----*/
+int errorExit(String opr)
+{
+	String[] touched = ["install","dinstall","remove"]
+	dispError(opr,SHOW);
+	if ( opr in? touched) { touchText( BUFDATA, CURDATA, RENAME); }
+	return EXIT_ERROR;
+}
+
+/*-----remove dir to tmp-----*/
+String rmtmp(String name)
+{
+	String tmpdir = "/tmp/" + name;
+	while ( os.hasDir(tmpdir) ) {
+		tmpdir = "/tmp/" + (String)Int.random(1024) + "." + name;
+	}
+	return tmpdir;
+}
+
+/*-----touch install list-----*/
+boolean touchList(String pack,String[] list,int mode)
+{
+	String name = pack / "=";
+	String version = pack % "=";
+	foreach ( String pic from list ) {
+		if( name == (pic / "=") ) {
+			if ( version <= (pic % "=") ) { dispError("depend_ver",HIDE); return false; }
+			else if ( mode == ADD ) { pic = pack; return true; }
+		}
+	}
+	if( mode == ADD ) { list << pack; }
+	return true;
+}
+
+/*-----touch general text------*/
 void touchText(String fromfile,String tofile,int mode)
 {
 	if ( mode != 0 ) {
@@ -82,7 +112,6 @@ boolean getKlipData(String filename)
 	if ( checkLatest("Last-Modified:",%(KLIPURL,filename.split("/",0).pop() ) ) ) {
 		if ( os.hasFile(filename) ) { os.unlink(filename); }
 	} else { return true; }
-	boolean check = false;
 	boolean write = false;
 	ins = new InputStream(%(KLIPURL,filename.split("/",0).pop() ),"r");
 	ous = new OutputStream(filename,"a");
@@ -130,12 +159,12 @@ void modCurData(String name,String version,String url,int mode)
 		if ( base != "" ) { ous << base << EOL; }
 		ous << endw << EOL;
 	} else if (mode == DELETE || mode == REPLACE) {
-		String base =  %('"{"name":"%s{0}"',name );
+		String base =  %('"name":"%s{0}"',name );
 		foreach ( String txt from ins ) {
-			if ( txt.startsWith(base) ) {
+			if ( base in? txt ) {
 				if( mode == REPLACE ) {
 					ous << %(CURFORM,name,version,url) << EOL;
-				} else if ( mode == DELETE ) {	}
+				}
 			} else { ous << txt << EOL;	}
 		}
 	}
@@ -144,29 +173,5 @@ void modCurData(String name,String version,String url,int mode)
 	ous.close();
 }
 
-
 //*-----getting package from server-----*/
-boolean getPackage(String url)
-{
-	String pkgurl = %(url,sites[Int.random(|sites|)]);
-	String filename = pkgurl.split("/",0).pop();
-	ous = new OutputStream(filename,"wb");
-	Curl c = new Curl();
-	c.easySetOpt(Curl.CURLOPT_URL,pkgurl);
-	c.easySetOpt(Curl.CURLOPT_FILE,ous);
-	c.easyPerform();
-	ous.close();
-	if ( !os.hasFile(filename) ) { return false; }
-	return true;
-}
-
-/*-----class Basic Form of Package------*/
-class Form
-{
-	String name;
-	String version;
-	String url;
-	String[] depend;
-}
-
-
+boolean getPackage(String url){ }

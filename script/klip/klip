@@ -1,29 +1,58 @@
 #!/usr/local/bin/konoha
 
-/*-----using *.*-----*/
-using posix.*;   //System.system("tar");
-using curl.*;   //Curl.easyperform();
-
-/*-----import *.k-----*/
-import "./src/const.k";
-import "./src/system.k";
-import "./src/parserjson.k";
-//import "./src/parserxml.k";
-import "./src/package.k";
-import "./src/inmain.k";
-
-print usermode;  //ROOT or USER
-
-/*-----main-----*/
-int  main (String[] args)
+//*-----system flag-----*
+boolean system = true;
+void fatal(String msg;)
 {
-    int ret;
-    if ( |args| >= 2 && |args| <= 4 ){
-        ret = klipOperation(args);
-    } else {
-        dispError("usage",SHOW);
-        return EXIT_ERROR;
-    }
-    return endOfKlip(ret);
+	OUT << "!ERR : fatal error : " + msg << EOL;
+	system = false;
 }
 
+boolean use_curl;
+boolean use_zl_lt;
+boolean use_posix;
+
+//*-----using package-----*/
+using curl.*;   /*Curl.easyperform(); @general.k*/
+if ( defined(Curl) ) { use_curl = true; }
+
+using zlib.*;   /*Zlib.decompGZ("tar.gz");*/
+using libtar.*;/*Tar.decompTar("tar");*/
+if ( defined(Zlib.decompGZ) && defined(Tar.decompTar) ) { use_zl_lt = true; }
+else {
+	using posix.*;   /*System.system("tar.gz"); @package.k*/
+	if ( defined(System.system) ) { use_posix = true; }
+	else { fatal("using decomp"); }
+}
+
+//*-----import const & general function-----
+import "./src/const.k";
+import "./src/general.k";
+if ( use_curl ) { eval('import "./src/ins/u_curl.k";'); }
+//else { eval('import "./src/ins/u_socket.k";'); }
+
+
+//*-----import parser-----
+import "./src/form.k";
+import "./src/parser.k";
+if ( klip_TYPE == "json" ) { eval('import "./src/pars/p_json.k";'); }
+else if ( klip_TYPE == "xml" ) { eval('import "./src/pars/p_xml.k";'); }
+else { fatal("import parser"); }
+
+//*-----import operations-----
+import "./src/package.k";
+if ( use_posix ) { eval('import "./src/ins/u_posix.k";'); }
+else if ( use_zl_lt ) { eval('import "./src/ins/u_zl_lt.k";'); }
+else { fatal("import decomp"); }
+
+import "./src/inmain.k";
+
+//*-----main-----
+int  main (String[] args)
+{
+	if ( !system ) { return errorExit("fatal"); }
+	int ret;
+	if ( |args| >= 2 && |args| <= 4 ){ ret = klipOperation(args); }
+	else { return errorExit("usage"); }
+	return endofKlip(ret);
+}
