@@ -146,7 +146,11 @@
 #endif
 
 #ifndef KNHAPI
+#ifdef  KONOHA_ON_WINDOWS
+#define KNHAPI(T)         T __declspec(dllexport)
+#else
 #define KNHAPI(T)         T
+#endif
 #define KNH_EXPORTS(T)    T
 #endif
 
