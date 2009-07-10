@@ -1,6 +1,6 @@
 #!/usr/local/bin/konoha
 
-//*-----system flag-----*
+//*-----system flag-----*/
 boolean system = true;
 void fatal(String msg;)
 {
@@ -8,46 +8,70 @@ void fatal(String msg;)
 	system = false;
 }
 
-boolean use_curl;
-boolean use_zl_lt;
-boolean use_posix;
+//*-----user check-----*/
+boolean root;
+String klip_INST = "./";
 
-//*-----using package-----*/
-using curl.*;   /*Curl.easyperform(); @general.k*/
-if ( defined(Curl) ) { use_curl = true; }
-
-using zlib.*;   /*Zlib.decompGZ("tar.gz");*/
-using libtar.*;/*Tar.decompTar("tar");*/
-if ( defined(Zlib.decompGZ) && defined(Tar.decompTar) ) { use_zl_lt = true; }
-else {
-	using posix.*;   /*System.system("tar.gz"); @package.k*/
-	if ( defined(System.system) ) { use_posix = true; }
-	else { fatal("using decomp"); }
+if ( !os.mkdir($konoha.path.package) ){
+	if ( !os.hasDir($konoha.path.user.package)  ) {
+		if ( !os.mkdir($konoha.path.user.package) ) { fatal("instDir"); }
+	} else {
+		root = false; //user
+	}
+} else { 
+	root = true; //root
 }
 
-//*-----import const & general function-----
+//*-----using package-----*/
+boolean use_curl = false;
+boolean use_socket = false;
+boolean use_zl_lt = false;
+boolean use_posix = false;
+
+//*-----for Script.getPackage() @gengeral.k-----*/
+eval( "using curl.*;" );
+if ( defined(Curl) ) { use_curl = true; }
+//else if {
+//   eval("using socket.*;");
+//   if ( defined() ) { use_socket = true; }
+//}
+if ( !use_curl && !use_socket ) { fatal("using [ curl ]"); }
+
+//*-----for Package.decompPackage() @package.k-----*/
+eval("using zlib.*;");
+eval("using libtar.*;");
+if ( defined(Zlib.decompGZ) && defined(Tar.decompTar) ) { use_zl_lt = true; }
+else {
+	eval("using posix.*;");
+	if ( defined(System.system) ) { use_posix = true; }
+}
+if ( !use_zl_lt && !use_posix ) { fatal("using [ zlib+libtar / posix ]"); }
+
+
+//*-----import const & general function-----*/
 import "./src/const.k";
 import "./src/general.k";
+if ( root ) { klip_INST = $konoha.path.package; }
+else { klip_INST = $konoha.path.user.package; }
 if ( use_curl ) { eval('import "./src/ins/u_curl.k";'); }
 //else { eval('import "./src/ins/u_socket.k";'); }
 
 
-//*-----import parser-----
+//*-----import parser-----*/
 import "./src/form.k";
 import "./src/parser.k";
 if ( klip_TYPE == "json" ) { eval('import "./src/pars/p_json.k";'); }
 else if ( klip_TYPE == "xml" ) { eval('import "./src/pars/p_xml.k";'); }
-else { fatal("import parser"); }
+else { fatal("import [ json / xml ]"); }
 
-//*-----import operations-----
+//*-----import operations-----*/
 import "./src/package.k";
 if ( use_posix ) { eval('import "./src/ins/u_posix.k";'); }
 else if ( use_zl_lt ) { eval('import "./src/ins/u_zl_lt.k";'); }
-else { fatal("import decomp"); }
-
 import "./src/inmain.k";
 
-//*-----main-----
+
+//*-----main-----*/
 int  main (String[] args)
 {
 	if ( !system ) { return errorExit("fatal"); }

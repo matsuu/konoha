@@ -2,7 +2,7 @@
 *                                                *
 *   klip (Konoha LIbrary Provider)               *
 *                                                *
-*    Version 0.1.0 (09/07/11)   (c)utrhira 2009  *
+*    Version 0.1.2 (09/07/11)   (c)utrhira 2009  *
 **************************************************
 
 *INTRODUCTION
@@ -12,9 +12,8 @@
 
 
 *USING DEFAULT PACKAGE ( of Konoha )
- - posix // or [ zlib + libtar ] (not commit yet)
+ - posix or [ zlib + libtar ]
  - curl // or not ( maybe socket? )
-// - libxml2.*;  (if you use klip.xml : not default) 
 
 
 *USAGE

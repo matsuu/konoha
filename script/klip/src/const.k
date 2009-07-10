@@ -29,20 +29,9 @@ TMPDATA = "./sys/tmp.json";
 BUFDATA = "./sys/buffer.json";
 EMPTY = "./sys/empty.json";
 
-/*-----klip_INST-----*/
-int klip_USER = USER;
-klip_INST =  $konoha.path.package;
-String testdir = klip_INST + "/klip.tmp";
-if ( !os.mkdir(testdir) ) {
-	klip_USER = USER;
-	klip_INST = $konoha.path.user.package; 
-} else { 
-	klip_USER = ROOT; 
-	String tmpdir;
-	while(os.hasDir("/tmp/"+tmpdir)){ tmpdir = Int.random(); }
-	os.rename(testdir,"/tmp/"+tmpdir);
-}
-
 /*-----KLIPDATA-----*/
 KLIPDATA = "./sys/klip.json";
 klip_TYPE = KLIPDATA.split(".",0).pop(); 
+
+/*-----KLIPINST-----*/
+String klip_INST;
