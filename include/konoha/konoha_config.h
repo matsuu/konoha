@@ -129,7 +129,7 @@
 				#define KNH_CC_FASTCALL   __attribute__((fastcall))
 			#endif
 		#else
-			#define KNH_CC_FASTCALL  __attribute__((fastcall))
+			#define KNH_CC_FASTCALL   __attribute__((fastcall))
 		#endif
 		#define likely(x)       __builtin_expect(!!(x), 1)
 		#define unlikely(x)     __builtin_expect(!!(x), 0)
