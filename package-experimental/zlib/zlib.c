@@ -18,13 +18,16 @@ extern "C" {
 #define ZLIB_BUFSIZE 1024
 
 enum result {
-    S_OK,E_FAIL,E_INIT,E_HEAD,E_READ,E_DECOMP,E_OUT,E_WRITE,E_FREE,E_REMOV
+    S_OK,E_FAIL,E_INIT,E_HEAD,E_READ,E_COMP,E_DECOMP,E_OUT,E_WRITE,E_FREE,E_REMOV
 };
 
 char* message[] = {
-    "ok","fail","init","head","read","decomp","out","write","free","remov"
+    "ok","fail","init","head","read","comp","decomp","out","write","free","remov"
 };
 
+/* ************************************************************************ */
+static int knh_get_gzheader(char*);
+static int knh_decompress_gzfile(FILE*,FILE*,int);
 /* ************************************************************************ */
 
 METHOD Zlib_new(Ctx *ctx, knh_sfp_t *sfp)
@@ -42,10 +45,9 @@ METHOD Zlib_new(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD Zlib_compress(Ctx *ctx, knh_sfp_t *sfp)
 {
-    knh_Glue_t *glue = sfp[0].glue;
     String *str = sfp[1].s;
     unsigned char out[ZLIB_BUFSIZE];
-    z_stream *z = (z_stream*)glue->ptr;
+    z_stream *z = (z_stream*)sfp[0].glue->ptr;
     int flush, status;
 
     /* initiation for deflate */
@@ -80,8 +82,7 @@ METHOD Zlib_compress(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD Zlib_decompress(Ctx *ctx, knh_sfp_t *sfp)
 {
-    knh_Glue_t *glue = sfp[0].glue;
-    z_stream *z = (z_stream*)glue->ptr;
+    z_stream *z = (z_stream*)sfp[0].glue->ptr;
     String *str = sfp[1].s;
     unsigned char out[ZLIB_BUFSIZE];
     int status;
@@ -119,9 +120,44 @@ METHOD Zlib_decompress(Ctx *ctx, knh_sfp_t *sfp)
     KNH_RETURN(ctx, sfp, ret);
 }
 
+/* Boolean! Zlib.decompGZ(String gzfile) */
+METHOD Zlib_decompGZ(Ctx *ctx, knh_sfp_t *sfp)
+{
+    if(IS_String(sfp[1].o)) {
+        char * fi = p_char(sfp[1]);
+        int head = knh_get_gzheader(fi);
+        if ( head > 0 ) {
+            char * pt = strrchr(fi,'.');
+            int olen = (int)(pt - fi);
+            char fo[olen+1];
+            strncpy(fo,fi,olen);
+            fo[olen]='\0';
+            FILE* fin  = fopen(fi,"rb");
+            FILE* fout = fopen(fo,"wb");  
+            int ret = knh_decompress_gzfile(fin,fout,head);
+            fclose(fout);
+            fclose(fin);
+            if ( ret == S_OK ) {
+                KNH_RETURN_Boolean(ctx, sfp, 1);
+            } else {
+                char * msg = "[zlib] decompress_gz";
+                strcat(msg,message[ret]);
+                KNH_THROW(ctx, msg);
+                remove(fo);
+            }
+        } else if ( head == 0 ){
+            KNH_THROWs(ctx, "this file isn't gzfile");
+        } else {
+            KNH_THROWs(ctx, "cannot open this file");
+        }
+    } else {
+        KNH_THROWs(ctx, "Type!!: data must be String");
+    }
+    KNH_RETURN_Boolean(ctx, sfp, 0);
+}
+
 /* ************************************************************************ */
-    static
-int decompress_gz(FILE* fin,FILE* fout,int head)
+static int knh_decompress_gzfile(FILE* fin,FILE* fout,int head)
 {
     z_stream z; 
     z.zalloc = Z_NULL;
@@ -158,13 +194,12 @@ int decompress_gz(FILE* fin,FILE* fout,int head)
     return S_OK;
 }
 
-    static
-int get_gzheader(char* fn)
+static int knh_get_gzheader(char* fn)
 {
-    size_t          headLen = 10;
-    unsigned short  xLen = 0;
-    size_t          nameLen = 0;
-    size_t          commentLen = 0;
+    size_t headLen = 10;
+    unsigned short xLen = 0;
+    size_t nameLen = 0;
+    size_t commentLen = 0;
     unsigned char chk[ZLIB_HDRBUF];
     unsigned char* check = chk;
     FILE* infile;
@@ -179,10 +214,10 @@ int get_gzheader(char* fn)
         memcpy(&xLen, &check[headLen], 2);
         headLen += 2 + xLen;
     } else if( check[3] & FNAME ) {
-        nameLen = strlen( check + headLen );
+		nameLen = strlen( (char*)(check + headLen) );
         headLen += nameLen + 1;
     } else if( check[3] & FCOMMENT ) {
-        commentLen = strlen( check + headLen );
+		commentLen = strlen( (char*)(check + headLen) );
         headLen += commentLen + 1;
     } else if( check[3] & FENCODE ) {
         headLen += 12;
@@ -190,42 +225,10 @@ int get_gzheader(char* fn)
     return headLen;
 }
 
-/* Boolean! Zlib.decompGZ(String gzfile) */
-METHOD Zlib_decompGZ(Ctx *ctx, knh_sfp_t *sfp)
-{
-    if(IS_String(sfp[1].o)) {
-        char * fi = p_char(sfp[1]);
-        int head = get_gzheader(fi);
-        if ( head > 0 ) {
-            char * pt = strrchr(fi,'.');
-            int olen = (int)(pt - fi);
-            char fo[olen+1];
-            strncpy(fo,fi,olen);
-            fo[olen]='\0';
-            FILE* fin  = fopen(fi,"rb");
-            FILE* fout = fopen(fo,"wb");  
-            int ret = decompress_gz(fin,fout,head);
-            fclose(fout);
-            fclose(fin);
-            if ( ret == S_OK ) {
-                KNH_RETURN_Boolean(ctx, sfp, 1);
-            } else {
-                char * msg = "[zlib] decompress_gz";
-                strcat(msg,message[ret]);
-                KNH_THROW(ctx, msg);
-                remove(fo);
-            }
-        } else if ( head == 0 ){
-            KNH_THROW(ctx, "this file isn't gzfile");
-        } else {
-            KNH_THROW(ctx, "cannot open this file");
-        }
-    } else {
-        KNH_THROWs(ctx, "Type!!: data must be String");
-    }
-    KNH_RETURN_Boolean(ctx, sfp, 0);
-}
+/* ************************************************************************ */
+
 
 #ifdef __cplusplus
 }
 #endif
+

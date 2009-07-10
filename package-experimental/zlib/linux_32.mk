@@ -1,7 +1,7 @@
 # modified by u.hira@users.sourceforge.jp
 
 CC = gcc
-CFLAGS = -O2 -Wall -fmessage-length=0 -fpic -g3
+CFLAGS = -O2 -Wall -fmessage-length=0 -fPIC -g3
 
 LDLIBS = -lz -lkonoha
 
