@@ -26,7 +26,6 @@ METHOD Tar_extractTar(Ctx * ctx,knh_sfp_t * sfp)
 			if ( pn == 2) { strncpy(rdir,"./",2); }
 			else { strncpy(rdir,tarf,pn); }
 			rdir[pn] = '\0';
-			fprintf(stderr,"%s\n",rdir);
 			ret = tar_extract_all(t,rdir);
 			tar_close(t);
 			if ( ret == 0 ) {
