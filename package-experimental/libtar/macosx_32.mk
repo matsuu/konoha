@@ -4,10 +4,10 @@ CC = gcc
 CFLAGS = -O2 -Wall -fmessage-length=0 -fPIC -g3
 LDLIBS = -ltar -lkonoha
 
-target = linux_32
+target = macosx_32
 pkgname = libtar
 
-library = "$(pkgname)_$(target).so"
+library = "$(pkgname)_$(target).dylib"
 
 .PHONY: all
 all: $(library)
@@ -19,7 +19,7 @@ tar.o: tar.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 $(library): $(objs)
-	$(CC) -shared -Wl -o $@ $^ $(LDLIBS)
+	$(CC) -dynamiclib -Wl -o $@ $^ $(LDLIBS)
 
 .PHONY: clean
 clean:
