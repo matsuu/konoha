@@ -52,7 +52,12 @@ extern "C" {
 
 /* ------------------------------------------------------------------------ */
 
+#ifdef KONOHA_ON_WINDOWS
+#define METHOD             void __declspec(dllexport)
+#else
 #define METHOD             void  KNH_CC_FASTCALL
+#endif
+
 #define MAPPER             METHOD
 #define ITRNEXT            int   KNH_CC_FASTCALL
 
