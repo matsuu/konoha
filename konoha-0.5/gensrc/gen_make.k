@@ -52,7 +52,7 @@ install-lkm:
 
 install:install-lkm
 	rm -f /dev/konoha
-	mmknod /dev/konoha c $(shell awk "\$$2==\"konohadev\" {print \$$1}" /proc/devices) 0
+	mknod /dev/konoha c $(shell awk "\$$2==\\"konohadev\\" {print \$$1}" /proc/devices) 0
 	chgrp wheel /dev/konoha
 	chmod 666   /dev/konoha
 
