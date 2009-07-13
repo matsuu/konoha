@@ -6354,1332 +6354,1480 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 
 	L_HALT:; {
 		const klr_halt_t *op = (klr_halt_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_HALT(ctx);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_HALT;
 		goto *(op->nextaddr);
 	}
 
 	L_MOVA:; {
 		const klr_mova_t *op = (klr_mova_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_MOVa(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_MOVA;
 		goto *(op->nextaddr);
 	}
 
 	L_MOVN:; {
 		const klr_movn_t *op = (klr_movn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_MOVn(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_MOVN;
 		goto *(op->nextaddr);
 	}
 
 	L_MOVO:; {
 		const klr_movo_t *op = (klr_movo_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_MOVo(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_MOVO;
 		goto *(op->nextaddr);
 	}
 
 	L_MOVX:; {
 		const klr_movx_t *op = (klr_movx_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_MOVx(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_MOVX;
 		goto *(op->nextaddr);
 	}
 
 	L_MOVDEF:; {
 		const klr_movdef_t *op = (klr_movdef_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_MOVDEF(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_MOVDEF;
 		goto *(op->nextaddr);
 	}
 
 	L_MOVSYS:; {
 		const klr_movsys_t *op = (klr_movsys_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_MOVSYS(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_MOVSYS;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVS:; {
 		const klr_xmovs_t *op = (klr_xmovs_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVs(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVS;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVO:; {
 		const klr_xmovo_t *op = (klr_xmovo_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVo(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVO;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVX:; {
 		const klr_xmovx_t *op = (klr_xmovx_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVx(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVX;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVDEF:; {
 		const klr_xmovdef_t *op = (klr_xmovdef_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVDEF(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVDEF;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVSYS:; {
 		const klr_xmovsys_t *op = (klr_xmovsys_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVSYS(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVSYS;
 		goto *(op->nextaddr);
 	}
 
 	L_MOVXI:; {
 		const klr_movxi_t *op = (klr_movxi_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_MOVxi(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_MOVXI;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVSI:; {
 		const klr_xmovsi_t *op = (klr_xmovsi_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVsi(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVSI;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVOI:; {
 		const klr_xmovoi_t *op = (klr_xmovoi_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVoi(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVOI;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVXI:; {
 		const klr_xmovxi_t *op = (klr_xmovxi_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVxi(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVXI;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVXIO:; {
 		const klr_xmovxio_t *op = (klr_xmovxio_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVxio(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVXIO;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVXBXI:; {
 		const klr_xmovxbxi_t *op = (klr_xmovxbxi_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVxBXi(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVXBXI;
 		goto *(op->nextaddr);
 	}
 
 	L_MOVXF:; {
 		const klr_movxf_t *op = (klr_movxf_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_MOVxf(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_MOVXF;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVSF:; {
 		const klr_xmovsf_t *op = (klr_xmovsf_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVsf(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVSF;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVOF:; {
 		const klr_xmovof_t *op = (klr_xmovof_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVof(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVOF;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVXF:; {
 		const klr_xmovxf_t *op = (klr_xmovxf_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVxf(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVXF;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVXFO:; {
 		const klr_xmovxfo_t *op = (klr_xmovxfo_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVxfo(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVXFO;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVXBXF:; {
 		const klr_xmovxbxf_t *op = (klr_xmovxbxf_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVxBXf(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVXBXF;
 		goto *(op->nextaddr);
 	}
 
 	L_MOVXB:; {
 		const klr_movxb_t *op = (klr_movxb_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_MOVxb(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_MOVXB;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVSB:; {
 		const klr_xmovsb_t *op = (klr_xmovsb_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVsb(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVSB;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVOB:; {
 		const klr_xmovob_t *op = (klr_xmovob_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVob(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVOB;
 		goto *(op->nextaddr);
 	}
 
 	L_XMOVXB:; {
 		const klr_xmovxb_t *op = (klr_xmovxb_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_XMOVxb(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_XMOVXB;
 		goto *(op->nextaddr);
 	}
 
 	L_EMOVS:; {
 		const klr_emovs_t *op = (klr_emovs_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_EMOVs(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_EMOVS;
 		goto *(op->nextaddr);
 	}
 
 	L_EMOVO:; {
 		const klr_emovo_t *op = (klr_emovo_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_EMOVo(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_EMOVO;
 		goto *(op->nextaddr);
 	}
 
 	L_EMOVE:; {
 		const klr_emove_t *op = (klr_emove_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_EMOVe(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_EMOVE;
 		goto *(op->nextaddr);
 	}
 
 	L_EMOVDEF:; {
 		const klr_emovdef_t *op = (klr_emovdef_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_EMOVDEF(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_EMOVDEF;
 		goto *(op->nextaddr);
 	}
 
 	L_EMOVSYS:; {
 		const klr_emovsys_t *op = (klr_emovsys_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_EMOVSYS(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_EMOVSYS;
 		goto *(op->nextaddr);
 	}
 
 	L_SWAP:; {
 		const klr_swap_t *op = (klr_swap_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_SWAP(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_SWAP;
 		goto *(op->nextaddr);
 	}
 
 	L_PINIO:; {
 		const klr_pinio_t *op = (klr_pinio_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_PINIo(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_PINIO;
 		goto *(op->nextaddr);
 	}
 
 	L_SETESP:; {
 		const klr_setesp_t *op = (klr_setesp_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_SETESP(ctx, op->a1);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_SETESP;
 		goto *(op->nextaddr);
 	}
 
 	L_CHECKESP:; {
 		const klr_checkesp_t *op = (klr_checkesp_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_CHECKESP(ctx, op->a1);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_CHECKESP;
 		goto *(op->nextaddr);
 	}
 
 	L_RET:; {
 		const klr_ret_t *op = (klr_ret_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_RET(ctx);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_RET;
 		goto *(op->nextaddr);
 	}
 
 	L_RETN:; {
 		const klr_retn_t *op = (klr_retn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_RETn(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_RETN;
 		goto *(op->nextaddr);
 	}
 
 	L_RETA:; {
 		const klr_reta_t *op = (klr_reta_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_RETa(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_RETA;
 		goto *(op->nextaddr);
 	}
 
 	L_RETO:; {
 		const klr_reto_t *op = (klr_reto_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_RETo(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_RETO;
 		goto *(op->nextaddr);
 	}
 
 	L_RETX:; {
 		const klr_retx_t *op = (klr_retx_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_RETx(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_RETX;
 		goto *(op->nextaddr);
 	}
 
 	L_YEILDBREAK:; {
 		const klr_yeildbreak_t *op = (klr_yeildbreak_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_YEILDBREAK(ctx);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_YEILDBREAK;
 		goto *(op->nextaddr);
 	}
 
 	L_BOX:; {
 		const klr_box_t *op = (klr_box_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_BOX(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_BOX;
 		goto *(op->nextaddr);
 	}
 
 	L_BOXNC:; {
 		const klr_boxnc_t *op = (klr_boxnc_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_BOXnc(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_BOXNC;
 		goto *(op->nextaddr);
 	}
 
 	L_NNBOX:; {
 		const klr_nnbox_t *op = (klr_nnbox_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_NNBOX(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_NNBOX;
 		goto *(op->nextaddr);
 	}
 
 	L_NNBOXNC:; {
 		const klr_nnboxnc_t *op = (klr_nnboxnc_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_NNBOXnc(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_NNBOXNC;
 		goto *(op->nextaddr);
 	}
 
 	L_UNBOX:; {
 		const klr_unbox_t *op = (klr_unbox_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_UNBOX(ctx, op->a1);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_UNBOX;
 		goto *(op->nextaddr);
 	}
 
 	L_ISNULL:; {
 		const klr_isnull_t *op = (klr_isnull_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_ISNULL(ctx, op->a1);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_ISNULL;
 		goto *(op->nextaddr);
 	}
 
 	L_ISNULLX:; {
 		const klr_isnullx_t *op = (klr_isnullx_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_ISNULLx(ctx, op->a1);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_ISNULLX;
 		goto *(op->nextaddr);
 	}
 
 	L_ISTYPE:; {
 		const klr_istype_t *op = (klr_istype_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_ISTYPE(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_ISTYPE;
 		goto *(op->nextaddr);
 	}
 
 	L_ISNNTYPE:; {
 		const klr_isnntype_t *op = (klr_isnntype_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_ISNNTYPE(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_ISNNTYPE;
 		goto *(op->nextaddr);
 	}
 
 	L_FCALL:; {
 		const klr_fcall_t *op = (klr_fcall_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_FCALL(ctx, op->a1, op->a2, op->a3, op->a4);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FCALL;
 		goto *(op->nextaddr);
 	}
 
 	L_SCALL:; {
 		const klr_scall_t *op = (klr_scall_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_SCALL(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_SCALL;
 		goto *(op->nextaddr);
 	}
 
 	L_AINVOKE:; {
 		const klr_ainvoke_t *op = (klr_ainvoke_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_AINVOKE(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_AINVOKE;
 		goto *(op->nextaddr);
 	}
 
 	L_CALL:; {
 		const klr_call_t *op = (klr_call_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_CALL(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_CALL;
 		goto *(op->nextaddr);
 	}
 
 	L_ACALL:; {
 		const klr_acall_t *op = (klr_acall_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_ACALL(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_ACALL;
 		goto *(op->nextaddr);
 	}
 
 	L_NEW:; {
 		const klr_new_t *op = (klr_new_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_NEW(ctx, op->a1, op->a2, op->a3, op->a4, op->a5);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_NEW;
 		goto *(op->nextaddr);
 	}
 
 	L_TOSTR:; {
 		const klr_tostr_t *op = (klr_tostr_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_TOSTR(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_TOSTR;
 		goto *(op->nextaddr);
 	}
 
 	L_TOSTRF:; {
 		const klr_tostrf_t *op = (klr_tostrf_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_TOSTRf(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_TOSTRF;
 		goto *(op->nextaddr);
 	}
 
 	L_SMAP:; {
 		const klr_smap_t *op = (klr_smap_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_SMAP(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_SMAP;
 		goto *(op->nextaddr);
 	}
 
 	L_SMAPNC:; {
 		const klr_smapnc_t *op = (klr_smapnc_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_SMAPnc(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_SMAPNC;
 		goto *(op->nextaddr);
 	}
 
 	L_MAP:; {
 		const klr_map_t *op = (klr_map_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_MAP(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_MAP;
 		goto *(op->nextaddr);
 	}
 
 	L_MAPNC:; {
 		const klr_mapnc_t *op = (klr_mapnc_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_MAPnc(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_MAPNC;
 		goto *(op->nextaddr);
 	}
 
 	L_AMAP:; {
 		const klr_amap_t *op = (klr_amap_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_AMAP(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_AMAP;
 		goto *(op->nextaddr);
 	}
 
 	L_NNMAP:; {
 		const klr_nnmap_t *op = (klr_nnmap_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_NNMAP(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_NNMAP;
 		goto *(op->nextaddr);
 	}
 
 	L_JMP:; {
 		const klr_jmp_t *op = (klr_jmp_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_JMP(ctx, pc = op->jumppc, *(op->jumpaddr));
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_JMP;
 		goto *(op->nextaddr);
 	}
 
 	L_SKIP:; {
 		const klr_skip_t *op = (klr_skip_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_SKIP(ctx, pc = op->jumppc, *(op->jumpaddr));
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_SKIP;
 		goto *(op->nextaddr);
 	}
 
 	L_BJIFT:; {
 		const klr_bjift_t *op = (klr_bjift_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_bJIFT(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_BJIFT;
 		goto *(op->nextaddr);
 	}
 
 	L_BJIFF:; {
 		const klr_bjiff_t *op = (klr_bjiff_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_bJIFF(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_BJIFF;
 		goto *(op->nextaddr);
 	}
 
 	L_BJIFF_LOOP:; {
 		const klr_bjiff_loop_t *op = (klr_bjiff_loop_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_bJIFF_LOOP(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_BJIFF_LOOP;
 		goto *(op->nextaddr);
 	}
 
 	L_JIFNUL:; {
 		const klr_jifnul_t *op = (klr_jifnul_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_JIFNUL(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_JIFNUL;
 		goto *(op->nextaddr);
 	}
 
 	L_JIFNN:; {
 		const klr_jifnn_t *op = (klr_jifnn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_JIFNN(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_JIFNN;
 		goto *(op->nextaddr);
 	}
 
 	L_NEXT:; {
 		const klr_next_t *op = (klr_next_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_NEXT(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_NEXT;
 		goto *(op->nextaddr);
 	}
 
 	L_INEXT:; {
 		const klr_inext_t *op = (klr_inext_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_INEXT(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2, op->a3, op->a4);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_INEXT;
 		goto *(op->nextaddr);
 	}
 
 	L_MAPNEXT:; {
 		const klr_mapnext_t *op = (klr_mapnext_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_MAPNEXT(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2, op->a3, op->a4);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_MAPNEXT;
 		goto *(op->nextaddr);
 	}
 
 	L_SMAPNEXT:; {
 		const klr_smapnext_t *op = (klr_smapnext_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_SMAPNEXT(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2, op->a3, op->a4);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_SMAPNEXT;
 		goto *(op->nextaddr);
 	}
 
 	L_TRY:; {
 		const klr_try_t *op = (klr_try_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_TRY(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_TRY;
 		goto *(op->nextaddr);
 	}
 
 	L_TRYEND:; {
 		const klr_tryend_t *op = (klr_tryend_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_TRYEND(ctx, op->a1);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_TRYEND;
 		goto *(op->nextaddr);
 	}
 
 	L_CATCH:; {
 		const klr_catch_t *op = (klr_catch_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_CATCH(ctx, pc = op->jumppc, *(op->jumpaddr), op->a2, op->a3, op->a4);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_CATCH;
 		goto *(op->nextaddr);
 	}
 
 	L_THROW:; {
 		const klr_throw_t *op = (klr_throw_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_THROW(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_THROW;
 		goto *(op->nextaddr);
 	}
 
 	L_THROWS:; {
 		const klr_throws_t *op = (klr_throws_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_THROWs(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_THROWS;
 		goto *(op->nextaddr);
 	}
 
 	L_THROW_AGAIN:; {
 		const klr_throw_again_t *op = (klr_throw_again_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_THROW_AGAIN(ctx, op->a1);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_THROW_AGAIN;
 		goto *(op->nextaddr);
 	}
 
 	L_P:; {
 		const klr_p_t *op = (klr_p_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_P(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_P;
 		goto *(op->nextaddr);
 	}
 
 	L_PMSG:; {
 		const klr_pmsg_t *op = (klr_pmsg_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_PMSG(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_PMSG;
 		goto *(op->nextaddr);
 	}
 
 	L_ICAST:; {
 		const klr_icast_t *op = (klr_icast_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iCAST(ctx, op->a1);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_ICAST;
 		goto *(op->nextaddr);
 	}
 
 	L_INCAST:; {
 		const klr_incast_t *op = (klr_incast_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_inCAST(ctx, op->a1);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_INCAST;
 		goto *(op->nextaddr);
 	}
 
 	L_FCAST:; {
 		const klr_fcast_t *op = (klr_fcast_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fCAST(ctx, op->a1);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FCAST;
 		goto *(op->nextaddr);
 	}
 
 	L_FNCAST:; {
 		const klr_fncast_t *op = (klr_fncast_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fnCAST(ctx, op->a1);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FNCAST;
 		goto *(op->nextaddr);
 	}
 
 	L_BNOT:; {
 		const klr_bnot_t *op = (klr_bnot_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_bNOT(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_BNOT;
 		goto *(op->nextaddr);
 	}
 
 	L_INEG:; {
 		const klr_ineg_t *op = (klr_ineg_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iNEG(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_INEG;
 		goto *(op->nextaddr);
 	}
 
 	L_IADD:; {
 		const klr_iadd_t *op = (klr_iadd_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iADD(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IADD;
 		goto *(op->nextaddr);
 	}
 
 	L_IADDN:; {
 		const klr_iaddn_t *op = (klr_iaddn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iADDn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IADDN;
 		goto *(op->nextaddr);
 	}
 
 	L_ISUB:; {
 		const klr_isub_t *op = (klr_isub_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iSUB(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_ISUB;
 		goto *(op->nextaddr);
 	}
 
 	L_ISUBN:; {
 		const klr_isubn_t *op = (klr_isubn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iSUBn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_ISUBN;
 		goto *(op->nextaddr);
 	}
 
 	L_IMUL:; {
 		const klr_imul_t *op = (klr_imul_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iMUL(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IMUL;
 		goto *(op->nextaddr);
 	}
 
 	L_IMULN:; {
 		const klr_imuln_t *op = (klr_imuln_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iMULn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IMULN;
 		goto *(op->nextaddr);
 	}
 
 	L_IDIV:; {
 		const klr_idiv_t *op = (klr_idiv_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iDIV(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IDIV;
 		goto *(op->nextaddr);
 	}
 
 	L_IDIVN:; {
 		const klr_idivn_t *op = (klr_idivn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iDIVn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IDIVN;
 		goto *(op->nextaddr);
 	}
 
 	L_IMOD:; {
 		const klr_imod_t *op = (klr_imod_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iMOD(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IMOD;
 		goto *(op->nextaddr);
 	}
 
 	L_IMODN:; {
 		const klr_imodn_t *op = (klr_imodn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iMODn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IMODN;
 		goto *(op->nextaddr);
 	}
 
 	L_IEQ:; {
 		const klr_ieq_t *op = (klr_ieq_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iEQ(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IEQ;
 		goto *(op->nextaddr);
 	}
 
 	L_IEQN:; {
 		const klr_ieqn_t *op = (klr_ieqn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iEQn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IEQN;
 		goto *(op->nextaddr);
 	}
 
 	L_INEQ:; {
 		const klr_ineq_t *op = (klr_ineq_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iNEQ(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_INEQ;
 		goto *(op->nextaddr);
 	}
 
 	L_INEQN:; {
 		const klr_ineqn_t *op = (klr_ineqn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iNEQn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_INEQN;
 		goto *(op->nextaddr);
 	}
 
 	L_ILT:; {
 		const klr_ilt_t *op = (klr_ilt_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iLT(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_ILT;
 		goto *(op->nextaddr);
 	}
 
 	L_ILTN:; {
 		const klr_iltn_t *op = (klr_iltn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iLTn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_ILTN;
 		goto *(op->nextaddr);
 	}
 
 	L_ILTE:; {
 		const klr_ilte_t *op = (klr_ilte_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iLTE(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_ILTE;
 		goto *(op->nextaddr);
 	}
 
 	L_ILTEN:; {
 		const klr_ilten_t *op = (klr_ilten_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iLTEn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_ILTEN;
 		goto *(op->nextaddr);
 	}
 
 	L_IGT:; {
 		const klr_igt_t *op = (klr_igt_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iGT(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IGT;
 		goto *(op->nextaddr);
 	}
 
 	L_IGTN:; {
 		const klr_igtn_t *op = (klr_igtn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iGTn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IGTN;
 		goto *(op->nextaddr);
 	}
 
 	L_IGTE:; {
 		const klr_igte_t *op = (klr_igte_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iGTE(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IGTE;
 		goto *(op->nextaddr);
 	}
 
 	L_IGTEN:; {
 		const klr_igten_t *op = (klr_igten_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_iGTEn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IGTEN;
 		goto *(op->nextaddr);
 	}
 
 	L_FNEG:; {
 		const klr_fneg_t *op = (klr_fneg_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fNEG(ctx, op->a1, op->a2);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FNEG;
 		goto *(op->nextaddr);
 	}
 
 	L_FADD:; {
 		const klr_fadd_t *op = (klr_fadd_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fADD(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FADD;
 		goto *(op->nextaddr);
 	}
 
 	L_FADDN:; {
 		const klr_faddn_t *op = (klr_faddn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fADDn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FADDN;
 		goto *(op->nextaddr);
 	}
 
 	L_FSUB:; {
 		const klr_fsub_t *op = (klr_fsub_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fSUB(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FSUB;
 		goto *(op->nextaddr);
 	}
 
 	L_FSUBN:; {
 		const klr_fsubn_t *op = (klr_fsubn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fSUBn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FSUBN;
 		goto *(op->nextaddr);
 	}
 
 	L_FMUL:; {
 		const klr_fmul_t *op = (klr_fmul_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fMUL(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FMUL;
 		goto *(op->nextaddr);
 	}
 
 	L_FMULN:; {
 		const klr_fmuln_t *op = (klr_fmuln_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fMULn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FMULN;
 		goto *(op->nextaddr);
 	}
 
 	L_FDIV:; {
 		const klr_fdiv_t *op = (klr_fdiv_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fDIV(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FDIV;
 		goto *(op->nextaddr);
 	}
 
 	L_FDIVN:; {
 		const klr_fdivn_t *op = (klr_fdivn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fDIVn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FDIVN;
 		goto *(op->nextaddr);
 	}
 
 	L_FEQ:; {
 		const klr_feq_t *op = (klr_feq_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fEQ(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FEQ;
 		goto *(op->nextaddr);
 	}
 
 	L_FEQN:; {
 		const klr_feqn_t *op = (klr_feqn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fEQn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FEQN;
 		goto *(op->nextaddr);
 	}
 
 	L_FNEQ:; {
 		const klr_fneq_t *op = (klr_fneq_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fNEQ(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FNEQ;
 		goto *(op->nextaddr);
 	}
 
 	L_FNEQN:; {
 		const klr_fneqn_t *op = (klr_fneqn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fNEQn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FNEQN;
 		goto *(op->nextaddr);
 	}
 
 	L_FLT:; {
 		const klr_flt_t *op = (klr_flt_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fLT(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FLT;
 		goto *(op->nextaddr);
 	}
 
 	L_FLTN:; {
 		const klr_fltn_t *op = (klr_fltn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fLTn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FLTN;
 		goto *(op->nextaddr);
 	}
 
 	L_FLTE:; {
 		const klr_flte_t *op = (klr_flte_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fLTE(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FLTE;
 		goto *(op->nextaddr);
 	}
 
 	L_FLTEN:; {
 		const klr_flten_t *op = (klr_flten_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fLTEn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FLTEN;
 		goto *(op->nextaddr);
 	}
 
 	L_FGT:; {
 		const klr_fgt_t *op = (klr_fgt_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fGT(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FGT;
 		goto *(op->nextaddr);
 	}
 
 	L_FGTN:; {
 		const klr_fgtn_t *op = (klr_fgtn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fGTn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FGTN;
 		goto *(op->nextaddr);
 	}
 
 	L_FGTE:; {
 		const klr_fgte_t *op = (klr_fgte_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fGTE(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FGTE;
 		goto *(op->nextaddr);
 	}
 
 	L_FGTEN:; {
 		const klr_fgten_t *op = (klr_fgten_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_fGTEn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FGTEN;
 		goto *(op->nextaddr);
 	}
 
 	L_AGET:; {
 		const klr_aget_t *op = (klr_aget_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_AGET(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_AGET;
 		goto *(op->nextaddr);
 	}
 
 	L_AGETN:; {
 		const klr_agetn_t *op = (klr_agetn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_AGETn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_AGETN;
 		goto *(op->nextaddr);
 	}
 
 	L_IAGET:; {
 		const klr_iaget_t *op = (klr_iaget_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_IAGET(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IAGET;
 		goto *(op->nextaddr);
 	}
 
 	L_IAGETN:; {
 		const klr_iagetn_t *op = (klr_iagetn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_IAGETn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IAGETN;
 		goto *(op->nextaddr);
 	}
 
 	L_FAGET:; {
 		const klr_faget_t *op = (klr_faget_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_FAGET(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FAGET;
 		goto *(op->nextaddr);
 	}
 
 	L_FAGETN:; {
 		const klr_fagetn_t *op = (klr_fagetn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_FAGETn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FAGETN;
 		goto *(op->nextaddr);
 	}
 
 	L_ASET:; {
 		const klr_aset_t *op = (klr_aset_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_ASET(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_ASET;
 		goto *(op->nextaddr);
 	}
 
 	L_ASETN:; {
 		const klr_asetn_t *op = (klr_asetn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_ASETn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_ASETN;
 		goto *(op->nextaddr);
 	}
 
 	L_IASET:; {
 		const klr_iaset_t *op = (klr_iaset_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_IASET(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IASET;
 		goto *(op->nextaddr);
 	}
 
 	L_IASETN:; {
 		const klr_iasetn_t *op = (klr_iasetn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_IASETn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_IASETN;
 		goto *(op->nextaddr);
 	}
 
 	L_FASET:; {
 		const klr_faset_t *op = (klr_faset_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_FASET(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FASET;
 		goto *(op->nextaddr);
 	}
 
 	L_FASETN:; {
 		const klr_fasetn_t *op = (klr_fasetn_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_FASETn(ctx, op->a1, op->a2, op->a3);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_FASETN;
 		goto *(op->nextaddr);
 	}
 
 	L_INITCODE:; {
 		const klr_initcode_t *op = (klr_initcode_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_INITCODE(ctx, op->a1);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_INITCODE;
 		goto *(op->nextaddr);
 	}
 
 	L_NOP:; {
 		const klr_nop_t *op = (klr_nop_t*)pc;
-		//DBG2_P("%p sfp[1]=%d", pc, (int)sfp[1].ivalue);
 		DBG2_OPDUMP(ctx, pc);
+		DBG2_P("S opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		KLR_NOP(ctx);
+		DBG2_P("E opcode=%d, esp=%d", op->opcode, ctx->esp -sfp);
 		pc += OPSIZE_NOP;
 		goto *(op->nextaddr);
 	}

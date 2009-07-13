@@ -680,15 +680,14 @@ Object *knh_Stmt_toData(Ctx *ctx, Stmt *stmt, knh_class_t reqc)
 /* [main] */
 
 static
-Stmt *knh_InputStream_parseStmt(Ctx *ctx, InputStream *in)
+Stmt *knh_InputStream_parseStmt(Ctx *ctx, InputStream *in, int isData)
 {
 	Token *tk = new_Token(ctx, 0, DP(in)->fileid, 0, knh_char_totoken('{'));
 	KNH_LPUSH(ctx, tk);
 	KNH_LPUSH(ctx, in);
 	knh_Token_parse(ctx, tk, in);
 	DBG2_DUMP(ctx, tk, KNH_NULL, "tokens");
-	Stmt *stmt = new_StmtINSTMT(ctx, tk); // new_Stmt(ctx, 0, STT_DONE)(ctx);
-	return stmt;
+	return new_StmtINSTMT(ctx, tk, isData);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -701,7 +700,7 @@ Stmt *knh_bytes_parseStmt(Ctx *ctx, knh_bytes_t kscript, int fileid, int line)
 	InputStream *in = new_BytesInputStream(ctx, cwb.ba, cwb.pos, knh_Bytes_size(cwb.ba));
 	DP(in)->fileid = (knh_fileid_t)fileid;
 	DP(in)->line = line;
-	Stmt *stmt = knh_InputStream_parseStmt(ctx, in);
+	Stmt *stmt = knh_InputStream_parseStmt(ctx, in, 0/*isData*/);
 	knh_cwb_clear(cwb);
 	return stmt;
 }
@@ -714,7 +713,7 @@ void konohac_eval(Ctx *ctx, String *nsname, InputStream *in)
 	KNH_LPUSH(ctx, new_ExceptionHandler(ctx));
 	KNH_TRY(ctx, L_CATCH, lsfp, 0);
 	{
-		Stmt *stmt = knh_InputStream_parseStmt(ctx, in);
+		Stmt *stmt = knh_InputStream_parseStmt(ctx, in, 0/*isData*/);
 		KNH_LPUSH(ctx, stmt);
 		DBG_DUMP(ctx, stmt, KNH_NULL, "stmt");
 		knh_Stmt_compile(ctx, stmt, nsname, !knh_Context_isCompiling(ctx) /* isrun 1 */);
@@ -737,7 +736,7 @@ Object *konohac_data(Ctx *ctx, InputStream *in, knh_class_t reqc)
 	KNH_LPUSH(ctx, new_ExceptionHandler(ctx));
 	KNH_TRY(ctx, L_CATCH, lsfp, 1);
 	{
-		Stmt *stmt = knh_InputStream_parseStmt(ctx, in);
+		Stmt *stmt = knh_InputStream_parseStmt(ctx, in, 1/*isData*/);
 		KNH_LPUSH(ctx, stmt);
 		return knh_Stmt_toData(ctx, stmt, reqc);
 	}
@@ -821,7 +820,7 @@ int knh_NameSpace_loadScript(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isE
 	KNH_LPUSH(ctx, in);
 	DP(in)->fileid = fileid;
 	knh_InputStream_setEncoding(ctx, in, knh_systemEncoding);
-	Stmt *stmt = knh_InputStream_parseStmt(ctx, in);
+	Stmt *stmt = knh_InputStream_parseStmt(ctx, in, 0/*isData*/);
 	KNH_LPUSH(ctx, stmt);
 	if(isEval) {
 		knh_Asm_openlib(ctx, knh_Context_getAsm(ctx), fpath);

@@ -41,7 +41,7 @@ extern "C" {
 #undef  KNH_LVALUE
 #undef	KNH_RVALUE
 
-static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc);
+static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc, int isData);
 static Stmt *new_StmtDECL(Ctx *ctx, Token *tkT, knh_tokens_t *tc);
 static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int level);
 static Stmt *new_StmtMETA(Ctx *ctx,  knh_tokens_t *tc, knh_stmt_t stt);
@@ -1091,7 +1091,7 @@ Term *new_TermVALUE(Ctx *ctx, Token *tk, int isData)
 /* ======================================================================== */
 /* [STMT] */
 
-Stmt *new_StmtINSTMT(Ctx *ctx, Token *tk)
+Stmt *new_StmtINSTMT(Ctx *ctx, Token *tk, int isData)
 {
 	DBG2_ASSERT(SP(tk)->tt == TT_BRACE);
 
@@ -1108,16 +1108,16 @@ Stmt *new_StmtINSTMT(Ctx *ctx, Token *tk)
 		}
 		prev = tc.c;
 		if(first_stmt == NULL) {
-			first_stmt = new_StmtSTMT1(ctx, &tc);
+			first_stmt = new_StmtSTMT1(ctx, &tc, isData);
 			last_stmt = knh_Stmt_tail(ctx, first_stmt);
 		}
 		else {
-			KNH_SETv(ctx, DP(last_stmt)->next, new_StmtSTMT1(ctx, &tc));
+			KNH_SETv(ctx, DP(last_stmt)->next, new_StmtSTMT1(ctx, &tc, isData));
 			last_stmt = knh_Stmt_tail(ctx, DP(last_stmt)->next);
 		}
 		if(prev == tc.c) { /* infinate loop */
 			DBG_P("Infinate loop? prev = %d, c = %d, e = %d", prev, tc.c, tc.e);
-			KNH_ABORT();
+			DBG2_ABORT();
 			break;
 		}
 	}
@@ -1980,11 +1980,11 @@ static void knh_Stmt_add_STMT1(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 {
 	if(SP(o)->stt == STT_ERR) return;
 	if(tc->c < tc->e && SP(tc->ts[tc->c])->tt == TT_BRACE) {
-		knh_Stmt_add(ctx, o, TM(new_StmtINSTMT(ctx, tc->ts[tc->c])));
+		knh_Stmt_add(ctx, o, TM(new_StmtINSTMT(ctx, tc->ts[tc->c], 0/*isData*/)));
 		tc->c += 1;
 	}
 	else {
-		knh_Stmt_add(ctx, o, TM(new_StmtSTMT1(ctx, tc)));
+		knh_Stmt_add(ctx, o, TM(new_StmtSTMT1(ctx, tc, 0/*isData*/)));
 	}
 }
 
@@ -2913,7 +2913,7 @@ Stmt *new_StmtDECL(Ctx *ctx, Token *tkT, knh_tokens_t *tc)
 /* ------------------------------------------------------------------------ */
 
 static
-Stmt* new_StmtFUNCEXPR(Ctx *ctx, knh_tokens_t *tc)
+Stmt* new_StmtFUNCEXPR(Ctx *ctx, knh_tokens_t *tc, int isData)
 {
 	tc->c -= 1;  /* rollback @see(new_StmtSTMT1) */
 	Token** ts = tc->ts;
@@ -2971,7 +2971,88 @@ static int knh_Token_isDEBUG(Token *tk)
 /* ------------------------------------------------------------------------ */
 /* [STMT1] */
 
-static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
+static Stmt *new_StmtDATA(Ctx *ctx, knh_tokens_t *tc, int isData)
+{
+	Token *tkc = NULL;
+	int c = tc->c;
+
+	tc->meta = -1;
+	L_TAIL:;
+	if(!(tc->c < tc->e)) {
+		DBG2_P("c = %d, e = %d", tc->c, tc->e);
+		return new_StmtNullData(ctx, tc->ts[c]);
+	}
+
+	tkc = tc->ts[tc->c];
+
+	switch(SP(tkc)->tt) {
+	case TT_LABEL:
+	{
+		if(tc->meta == -1) tc->meta = tc->c - 1;
+		goto L_TAIL;
+	}
+	case TT_METAN:
+	{
+		if(tc->meta == -1) tc->meta = tc->c - 1;
+		//DBG2_P("Found METAN '@%s', tc->meta=%d", sToken(tkc), tc->meta);
+		if(DP(tkc)->tt_next == TT_PARENTHESIS) {
+			tc->c += 1;
+		}
+		if(DP(tkc)->tt_next == TT_BRACE) {
+			//DBG2_P("Found DATA '@%s', tc->meta=%d", sToken(tkc), tc->meta);
+			tc->c += 1;
+		}
+		if(DP(tkc)->tt_next == TT_TYPEN) {
+			DBG2_ASSERT(IS_String(DP(tc->ts[tc->c])->text));
+			if(knh_String_equals(DP(tc->ts[tc->c])->text, STEXT("Unsafe"))) {
+				knh_Token_setUnsafeType(tc->ts[tc->c], 1);
+			}
+		}
+		goto L_TAIL;
+	}
+
+	case TT_SEMICOLON:
+		knh_tokens_nextStmt(tc);
+		goto L_TAIL;
+
+	case TT_BRACE:  /* BRACE */
+	case TT_PARENTHESIS:  /* PARENTHESIS */
+	case TT_BRANCET:  /* BRANCET */
+	case TT_DOTS:  /* DOTS */
+	case TT_NOT:  /* Not */
+	case TT_LOR:  /* Lor */
+	case TT_ADD:  /* Add */
+	case TT_SUB:  /* Sub */
+	case TT_LAND:  /* Land */
+	case TT_LNOT:  /* Lnot */
+	case TT_XOR:  /* Xor */
+	case TT_NEXT:  /* Next */
+	case TT_PREV:  /* Prev */
+	case TT_NEG:  /* Neg */
+	case TT_NUM:  /* NUM */
+	case TT_STR:  /* STR */
+	case TT_TSTR:  /* TSTR */
+	case TT_ESTR:  /* EVAL */
+	case TT_PROPN:  /* PROPN */
+	case TT_URN:  /* URN */
+	case TT_MT:  /* MT */
+	case TT_CONSTN:  /* CONSTN */
+	case TT_TYPEN:  /* TYPEN */
+	case TT_CMETHODN:  /* CMETHODN */
+	case TT_NAME:  /* NAME */
+	case TT_MN:  /* MN */
+	case TT_FN:  /* FN */
+	case TT_CID:  /* CID */
+	case TT_MPR:  /* MPR */
+		return new_StmtFUNCEXPR(ctx, tc, isData);
+	}
+	return new_StmtNullData(ctx, tc->ts[c]);
+}
+
+/* ------------------------------------------------------------------------ */
+/* [STMT1] */
+
+static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc, int isData)
 {
 	Token *tkc = NULL;
 	tc->meta = -1;
@@ -2991,7 +3072,6 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 	}
 
 	switch(SP(tkc)->tt) {
-
 	case TT_LABEL:
 	{
 		if(tc->meta == -1) tc->meta = tc->c - 1;
@@ -3123,7 +3203,7 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 	case TT_FN:  /* FN */
 	case TT_CID:  /* CID */
 	case TT_MPR:  /* MPR */
-		return new_StmtFUNCEXPR(ctx, tc);
+		return new_StmtFUNCEXPR(ctx, tc, isData);
 
 	case TT_COMMA:
 	case TT_LET:
@@ -3188,6 +3268,8 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc)
 	knh_Token_perror(ctx, tk, KERR_ERROR, "syntax error: don't use '%s' HERE", sToken(tk));
 	return new_StmtERR(ctx, tc);
 }
+
+
 
 /* ------------------------------------------------------------------------ */
 
