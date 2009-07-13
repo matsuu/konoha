@@ -124,7 +124,9 @@ libkonoha_la_includegen_HEADERS += ../include/konoha/gen/konohac_klr_.h
 libkonoha_la_includegen_HEADERS += ../include/konoha/gen/konohac_stmt_.h
 libkonoha_la_includegen_HEADERS += ../include/konoha/gen/struct_.h
 bin_PROGRAMS = konoha
-
 konoha_SOURCES = ../src/konoha.c
 konoha_INCLUDES = ../include
 konoha_LDADD = libkonoha.la
+pkgdatadir = /usr/local/konoha
+dist_pkgdata_SCRIPTS = ../dist/sample/fib.k
+
