@@ -1037,38 +1037,38 @@ Term *knh_TokenESTR_toTerm(Ctx *ctx, Token *tk, Asm *abr)
 	else {
 		knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 		KNH_LPUSH(ctx, KNH_NULL);   // lsfp[0]
-		                                    Stmt *stmt = new_Stmt(ctx, 0, STT_OP);
-		                                    Token *tkop = new_Token(ctx, 0, SP(tk)->fileid, SP(tk)->line, TT_ADD);
-		                                    knh_Stmt_add(ctx, stmt, TM(tkop));
-		                                    while(res) {
-		                                    	//DBG2_P("mt='%s', len=%d", mt.buf, mt.len);
-		                                    	//DBG2_P("expr='%s', len=%d", expr.buf, expr.len);
-		                                    	//DBG2_P("next='%s', len=%d", next.buf, next.len);
-		                                    	text.len = (mt.buf - text.buf) - 1;
-		                                    	if(text.len > 0) {
-		                                    		knh_Stmt_add(ctx, stmt, new_TermCONST(ctx, FL(tk), UP(new_String(ctx, text, NULL))));
-		                                    	}
-		                                    	Stmt *stmt_expr = knh_bytes_parseStmt(ctx, expr, SP(tk)->fileid, SP(tk)->line);
-		                                    	KNH_SETv(ctx, lsfp[0].o, stmt_expr);
-		                                    	if(knh_stmt_isExpr(SP(stmt_expr)->stt)) {
-		                                    		Stmt *stmt_mt = new_Stmt(ctx, 0, STT_MT);
-		                                    		knh_Stmt_add(ctx, stmt, TM(stmt_mt));
-		                                    		tkop = new_Token(ctx, 0, SP(tk)->fileid, SP(tk)->line, TT_MT);
-		                                    		KNH_SETv(ctx, DP(tkop)->data, new_String(ctx, mt, NULL));
-		                                    		knh_Stmt_add(ctx, stmt_mt, TM(tkop));
-		                                    		knh_Stmt_add(ctx, stmt_mt, TM(stmt_expr));
-		                                    	}
-		                                    	else {
-		                                    		knh_Asm_perror(ctx, abr, KERR_ERROR, _("some expression is needed: {%B}"), expr);
-		                                    	}
-		                                    	text = next;
-		                                    	res = knh_bytes_findMT(ctx, text, &mt, &expr, &next);
-		                                    }
-		                                    if(text.len > 0) {
-		                                    	knh_Stmt_add(ctx, stmt, new_TermCONST(ctx, FL(tk), UP(new_String(ctx, text, NULL))));
-		                                    }
-		                                    KNH_LOCALBACK(ctx, lsfp);
-		                                    return TM(stmt);
+		Stmt *stmt = new_Stmt(ctx, 0, STT_OP);
+		Token *tkop = new_Token(ctx, 0, SP(tk)->fileid, SP(tk)->line, TT_ADD);
+		knh_Stmt_add(ctx, stmt, TM(tkop));
+		while(res) {
+			//DBG2_P("mt='%s', len=%d", mt.buf, mt.len);
+			//DBG2_P("expr='%s', len=%d", expr.buf, expr.len);
+			//DBG2_P("next='%s', len=%d", next.buf, next.len);
+			text.len = (mt.buf - text.buf) - 1;
+			if(text.len > 0) {
+				knh_Stmt_add(ctx, stmt, new_TermCONST(ctx, FL(tk), UP(new_String(ctx, text, NULL))));
+			}
+			Stmt *stmt_expr = knh_bytes_parseStmt(ctx, expr, SP(tk)->fileid, SP(tk)->line);
+			KNH_SETv(ctx, lsfp[0].o, stmt_expr);
+			if(knh_stmt_isExpr(SP(stmt_expr)->stt)) {
+				Stmt *stmt_mt = new_Stmt(ctx, 0, STT_MT);
+				knh_Stmt_add(ctx, stmt, TM(stmt_mt));
+				tkop = new_Token(ctx, 0, SP(tk)->fileid, SP(tk)->line, TT_MT);
+				KNH_SETv(ctx, DP(tkop)->data, new_String(ctx, mt, NULL));
+				knh_Stmt_add(ctx, stmt_mt, TM(tkop));
+				knh_Stmt_add(ctx, stmt_mt, TM(stmt_expr));
+			}
+			else {
+				knh_Asm_perror(ctx, abr, KERR_ERROR, _("some expression is needed: {%B}"), expr);
+			}
+			text = next;
+			res = knh_bytes_findMT(ctx, text, &mt, &expr, &next);
+		}
+		if(text.len > 0) {
+			knh_Stmt_add(ctx, stmt, new_TermCONST(ctx, FL(tk), UP(new_String(ctx, text, NULL))));
+		}
+		KNH_LOCALBACK(ctx, lsfp);
+		return TM(stmt);
 	}
 }
 

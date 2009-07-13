@@ -446,7 +446,7 @@ void knh_Asm_openlib(Ctx *ctx, Asm *abr, knh_bytes_t fpath);
 int knh_NameSpace_loadScript(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isEval);
 void konoha_compile(Ctx *ctx, String *nsname, knh_bytes_t fpath);
 /* ../src/compiler/parser.c */
-Stmt *new_StmtINSTMT(Ctx *ctx, Token *tk);
+Stmt *new_StmtINSTMT(Ctx *ctx, Token *tk, int isData);
 void knh_Stmt_add_PEACH(Ctx *ctx, Stmt *o, knh_tokens_t *tc);
 /* ../src/compiler/perror.c */
 void knh_vperror(Ctx *ctx, knh_fileid_t fileid, int line, int pe, char *fmt, va_list ap);

@@ -484,7 +484,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 /* ------------------------------------------------------------------------- */
 
 #define KLR_TOSTRf(ctx, n, mn, fmt) { \
-		KNH_ASSERT(ctx->esp <= (sfp + n));\
+		DBG2_ASSERT(ctx->esp <= (sfp + n));\
 		KLR_SWAP(ctx, n, n+1); \
 		knh_cwb_t cwb = new_cwb(ctx);\
 		KLR_MOV(ctx, sfp[n+2].o, cwb.w);\
