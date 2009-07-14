@@ -15,3 +15,11 @@ class Parser extends Form
 	/*-----Data2Package-----*/
 	void setMember(){}
 }
+
+//*-----get current version from curdata-----*/
+String getCurVer(String name)
+{
+	Parser p = new Parser(name,CURDATA);
+	p.setMember();
+	return p.version;
+}

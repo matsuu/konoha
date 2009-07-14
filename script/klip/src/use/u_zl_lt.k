@@ -11,6 +11,10 @@ boolean Package.decomPackage(){
 	if ( !res ) { return false; }
 	if ( !os.hasDir(this.name) ) { return false; }
 	String path = klip_INST + "/" + this.name;
+	if ( os.hasDir(path) ) {
+		String trash = rmtmp(this.name);
+		os.rename(path,trash);
+	}
 	if ( !os.rename(this.name,path) ) {
 		String trash = rmtmp(this.name);
 		os.rename(this.name,trash);

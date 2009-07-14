@@ -2,7 +2,7 @@
 *                                                *
 *   klip (Konoha LIbrary Provider)               *
 *                                                *
-*    Version 0.1.2 (09/07/11)   (c)utrhira 2009  *
+*    Version 0.1.3 (09/07/14)   (c)utrhira 2009  *
 **************************************************
 
 *INTRODUCTION
@@ -13,15 +13,17 @@
 
 *USING DEFAULT PACKAGE ( of Konoha )
  - posix or [ zlib + libtar ]
- - curl // or not ( maybe socket? )
+ - curl or not ( using_curl is better )
 
 
 *USAGE
- $ ./klip search package_name
+ $ ./klip search  package_name
 
  $ ./klip install package_name
 
- $ ./klip remove package_name
+ $ ./klip update  package_name
+
+ $ ./klip remove  package_name
 
  $ ./klip undo
 
@@ -31,4 +33,3 @@
 
    utrhira@users.sourceforge.jp
 
-//EOF

@@ -16,16 +16,17 @@ void dispError(String code,int level)
 	} else {
 		txt = "!ERR : " + code + " failed";
 	}
-	if( level == HIDE ) { print txt; }
-	else if ( level == SHOW ) { OUT << txt << EOL; }
+	if( level == 0 ) {
+		print txt;
+	} else if ( level == 1 ) {
+		OUT.println(txt);
+	}
 }
 
 /*-----exit process-----*/
 int errorExit(String opr)
 {
-	String[] touched = ["install","dinstall","remove"]
-	dispError(opr,SHOW);
-	if ( opr in? touched) { touchText( BUFDATA, CURDATA, RENAME); }
+	dispError(opr,1);
 	return EXIT_ERROR;
 }
 
@@ -39,6 +40,31 @@ String rmtmp(String name)
 	return tmpdir;
 }
 
+/*-----copy txt file-----*/
+void copyText(String infile ,String outfile)
+{
+	os.unlink(outfile);
+	ins = new InputStream(infile,"r");
+	ous = new OutputStream(outfile,"w");
+	foreach(String txt from ins) {
+		ous.println(txt);
+	}
+	ous.close();
+	ins.close();
+}
+
+/*-----reset txt to empty-----*/
+void resetText2Js(String filename)
+{
+	os.unlink(filename);
+	ous = new OutputStream(filename,"w");
+	String[] form = ["{","}"];
+	foreach( String txt from form) {
+		ous.println(txt);
+	}
+	ous.close();
+}
+
 /*-----touch install list-----*/
 boolean touchList(String pack,String[] list,int mode)
 {
@@ -46,26 +72,19 @@ boolean touchList(String pack,String[] list,int mode)
 	String version = pack % "=";
 	foreach ( String pic from list ) {
 		if( name == (pic / "=") ) {
-			if ( version <= (pic % "=") ) { dispError("depend_ver",HIDE); return false; }
-			else if ( mode == ADD ) { pic = pack; return true; }
+			if ( version <= (pic % "=") ) {
+				dispError("depend_ver",0);
+				return false; 
+			} else if ( mode == 1 ) {
+				pic = pack;
+				return true;
+			}
 		}
 	}
-	if( mode == ADD ) { list << pack; }
-	return true;
-}
-
-/*-----touch general text------*/
-void touchText(String fromfile,String tofile,int mode)
-{
-	if ( mode != 0 ) {
-		if( os.hasFile(tofile) ) { os.unlink(tofile); }
-		ins = new InputStream(fromfile,"r");
-		ous = new OutputStream(tofile,"a");
-		foreach( String txt from ins ) { ous << txt << EOL; }
-		ins.close();
-		ous.close();
-		if ( mode == RENAME ) { os.unlink(fromfile); }
+	if( mode == 1 ) {
+		list << pack;
 	}
+	return true;
 }
 
 /*-----update latest install------*/
@@ -75,13 +94,18 @@ void updateLatest(String section, String diff)
 	ins = new InputStream(LATEST,"r");
 	ous = new OutputStream(LATEST + "~","a");
 	foreach( String txt from ins ) {
-		if ( txt.startsWith(section) ) { flag = true; ous << section + diff << EOL; }
-		else { ous << txt << EOL; }
+		if ( txt.startsWith(section) ) {
+			flag = true;
+			txt = section + diff;
+		}
+		ous.println(txt);
 	}
-	if ( !flag ) { ous << section + diff << EOL; }
+	if ( !flag ) {
+		ous.println(section + diff);
+	}
 	ous.close();
-	ins.close();	
-	touchText(LATEST + "~",LATEST,RENAME);
+	ins.close();
+	os.rename(LATEST + "~",LATEST);
 }
 
 /*-----check Modified section of latest.klip-----*/
@@ -90,18 +114,24 @@ boolean checkLatest(String seciton, String input)
 	boolean flag = false;
 	g_ins = new InputStream(input,"r");
 	foreach ( String gettxt from g_ins ) {
-		if ( gettxt.startsWith(seciton) ) { break; }
+		if ( gettxt.startsWith(seciton) ) {
+			break; 
+		}
 	}
 	g_ins.close();
 	ins = new InputStream(LATEST,"r");
 	foreach( String txt from ins ) {
 		if ( txt.startsWith(seciton) ) { 
-			if ( txt == gettxt ) { return true; }	
+			if ( txt == gettxt ) {
+				return true; 
+			}	
 			flag = true;
 		}
 	}
 	ins.close();
-	if ( !flag ) { return false; }
+	if ( !flag ) {
+		return false; 
+	}
 	updateLatest(seciton,gettxt % seciton); 
 	return true; 
 }
@@ -110,68 +140,105 @@ boolean checkLatest(String seciton, String input)
 boolean getKlipData(String filename)
 {
 	if ( checkLatest("Last-Modified:",%(KLIPURL,filename.split("/",0).pop() ) ) ) {
-		if ( os.hasFile(filename) ) { os.unlink(filename); }
-	} else { return true; }
+		if ( os.hasFile(filename) ) {
+			os.unlink(filename); 
+		}
+	} else {
+		return true;
+	}
 	boolean write = false;
 	ins = new InputStream(%(KLIPURL,filename.split("/",0).pop() ),"r");
 	ous = new OutputStream(filename,"a");
 	foreach ( String txt from ins ) {
-		if ( write == false && txt == "" ) { write = true; }
-		else if ( write == true ) { ous << txt << EOL; }
+		if ( "{" == txt || write ) {
+			write = true;
+			ous.println(txt);
+			if ( txt == "}" ) { break;}
+		}
 	}
 	ins.close();
 	ous.close();
-	if ( !os.hasFile(filename) ) { return false; }
-	return true;
+	if ( !os.hasFile(filename) ) {
+		return false;
+	} else {
+		return true;
+	}
 }
 
 //*-----check before install [installed or not]-----*/
 boolean selectYorN(String message)
 {
 	boolean ret;
-	OUT << %("!ASK : %s{0} [y/n] : ",message);
+	OUT.print(%("!ASK : %s{0} [y/n] : ",message));
 	while( true ){
 		input = IN.readLine();
-		if ( input == "y" ) { ret = true; break; }
-		else if ( input == "n" ) { ret = false; break; }
-		else { OUT << "!ASK : please input [y/n] : " ; }
+		if ( input == "y" ) {
+			ret = true;
+			break;
+		} else if ( input == "n" ) {
+			ret = false;
+			break;
+		} else {
+			OUT.print("!ASK : please input [y/n] : "); 
+		}
 	}
 	return ret;
 }
 
 //*-----modification of current [use TMPDATA]-----*/
-void modCurData(String name,String version,String url,int mode)
+void modCurData(String[] data,int mode)
 {
-	String endw = "}";  //for json
 	InputStream ins = new InputStream(CURDATA,"r");
-	OutputStream ous = new OutputStream(TMPDATA,"a");
+	OutputStream ous = new OutputStream(CURDATA + "#","a");
 	if (mode == ADD ){
-		String base = %(CURFORM,name,version,url);
+		String base = %(CURFORM,data[0],data[1],data[2]);
 		foreach( String txt from ins ) {
-			if (txt == endw) { break; }
+			if (txt == "}") {
+				break;
+			}
 			String txtname = txt % '"name":' / '"';
-			if ( txtname > name && base != "" ) {
-				ous << base << EOL;
+			if ( txtname > data[0] && base != "" ) {
+				ous.println(base);
 				base = "";
 			}
-			ous << txt << EOL;
+			ous.println(txt);
 		}
-		if ( base != "" ) { ous << base << EOL; }
-		ous << endw << EOL;
+		if ( base != "" ) {
+			ous.println(base);
+		}
+		ous.println("}");
 	} else if (mode == DELETE || mode == REPLACE) {
-		String base =  %('"name":"%s{0}"',name );
+		String base =  %('"name":"%s{0}"',data[0] );
 		foreach ( String txt from ins ) {
 			if ( base in? txt ) {
 				if( mode == REPLACE ) {
-					ous << %(CURFORM,name,version,url) << EOL;
+					txt = %(CURFORM,data[0],data[1],data[2]);
+					ous.println(txt);
 				}
-			} else { ous << txt << EOL;	}
+			} else {
+				ous.println(txt);
+			}
 		}
 	}
-	touchText( TMPDATA, CURDATA, RENAME );
 	ins.close();
 	ous.close();
+	os.rename(CURDATA + "#",CURDATA);
 }
 
-//*-----getting package from server-----*/
-boolean getPackage(String url){ }
+void endofOpration(int code,String opr,String[] data)
+{
+	int mode;
+	if ( code == EXIT_SUCCESS ) {
+		if ( "install" in? opr ) {
+			mode = ADD;
+		} else if ( opr == "update" ) {
+			mode = REPLACE;
+		} else if ( "remove" in? opr ) {
+			mode = DELETE;
+		}
+        modCurData(data,mode);
+		if ( !("_" in? opr) ) {
+			copyText(CURDATA + "~",PREVDATA);
+		}
+	}
+}

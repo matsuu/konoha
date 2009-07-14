@@ -45,12 +45,15 @@ class ParserJson extends Form
 	String parseThisTree(String raw,String elemname)
 	{
 		String ret;
-		String check = %('"%s{0}":"',elemname);
 		while(true) {
 			if ( raw == "" ) { break; }
 			String pic = raw / ",";
-			if ( check in? pic ) { 
-				if ( elemname != "depend" ) { return pic % check / '"'; }
+			if ( elemname in? pic ) { 
+				if ( elemname != "depend" ) {
+					ret = pic.split('":"',0).pop();
+					ret = ret.split('"',0)[0];
+					return ret;
+				}
 				else { return getDependencies(raw); }
 			} else if ( "}" in? pic && !("{0}" in? pic) ) { break; }			
 			raw = succRaw(raw);
@@ -61,10 +64,10 @@ class ParserJson extends Form
 	String getDependencies(String raw)
 	{
 		String ret;
-		String base = ( raw / "]" ) % '"depend":["';
+		String base = ( raw - "]" ) % '"depend":["';
 		while( base != "") {
-			ret += base / '"' + "&";
- 			base %= '","'; 
+			ret += base.split('"',0)[0] + "&";
+ 			base %= '","';
 		}
 		return ret;
 	}
@@ -92,7 +95,6 @@ class ParserJson extends Form
 		String ret;
 		ret += %('"%s{0}":[',name);
 		foreach ( String cell from data) {
-			OUT << cell << EOL;
 			ret += %('"%s{0}",',cell);
 		}
 		return ret[..|ret|-2] + "]";
@@ -102,6 +104,7 @@ class ParserJson extends Form
 /*-----Json2Package-----*/
 void Parser.setMember()
 {
+	String buf = ".js";
 	ParserJson pars = new ParserJson(this.name,this.file);
 	this.name = pars.name;
 	this.version = pars.getElement("version");
