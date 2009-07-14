@@ -16,6 +16,5 @@ if ( use_zl_lt ) {
 	eval("using zlib.*;");
 	eval("using libtar.*;");
 } else if ( use_posix ) {
-	OUT << use_posix << EOL;
 	eval("using posix.*;");
 }

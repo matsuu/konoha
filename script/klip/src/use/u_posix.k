@@ -12,7 +12,7 @@ boolean Package.decomPackage(){
 		String trash = rmtmp(this.name);
 		os.rename(path,trash);
 	}
-	if ( os.rename(this.name,path) ) {
+	if ( !os.rename(this.name,path) ) {
 		return false;
 	}
 	return true;

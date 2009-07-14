@@ -15,8 +15,8 @@ PREVDATA = "./sys/previous.json";
 LATEST = "./sys/latest.klip";
 
 /*-----server's klip_data url(klip.xml or etc)-----*/
-//KLIPURL = "http://konoha.sourceforge.jp/klip/%s{0}";
-KLIPURL = "http://localhost/klip/%s{0}";
+KLIPURL = "http://konoha.sourceforge.jp/klip/%s{0}";
+//KLIPURL = "http://localhost/klip/%s{0}";
 
 /*-----sourceforge's mirror server-----*/
 sites = ["keihanna" ,"jaist" ,"globalbase", "osdn", "iij"];
