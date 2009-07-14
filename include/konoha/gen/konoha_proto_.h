@@ -77,6 +77,7 @@ size_t bconv__toUpper(Ctx *ctx, BytesConv *o, knh_bytes_t t, knh_Bytes_t *ba);
 Array *knh_Regex_split(Ctx *ctx, Regex *o, String *s);
 void knh_Regex__s(Ctx *ctx, Regex *o, OutputStream *w, String *m);
 /* ../src/api/systemapi.c */
+METHOD knh__System_hasLib(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__System_setRandomSeed(Ctx *ctx, knh_sfp_t *sfp);
 Object* knh_Context_getProperty(Ctx *ctx, Context *b, knh_bytes_t key);
 void knh_Context_setProperty(Ctx *ctx, Context *b, String *key, Any *value);
@@ -511,7 +512,7 @@ Term *knh_StmtFORMAT_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns);
 Term *knh_StmtCLASS_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns);
 int knh_Stmt_typingBLOCK(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int isIteration);
 /* ../src/deps/dlopen.c */
-void *knh_dlopen(Ctx *ctx, const char* path, int mode);
+void *knh_dlopen(Ctx *ctx, knh_bytes_t libname);
 void *knh_dlsym(Ctx *ctx, void* hdr, const char* symbol);
 const char *knh_dlerror(Ctx *ctx);
 int knh_dlclose(Ctx *ctx, void* hdr);

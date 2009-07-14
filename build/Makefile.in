@@ -19,8 +19,8 @@
 
 
 
+
 VPATH = @srcdir@
-pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
@@ -39,7 +39,7 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = konoha$(EXEEXT)
 subdir = build
-DIST_COMMON = $(libkonoha_la_include_HEADERS) \
+DIST_COMMON = $(dist_pkgdata_SCRIPTS) $(libkonoha_la_include_HEADERS) \
 	$(libkonoha_la_includegen_HEADERS) \
 	$(libkonoha_la_includekonoha_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -57,6 +57,7 @@ am__vpath_adj = case $$p in \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
+	"$(DESTDIR)$(pkgdatadir)" \
 	"$(DESTDIR)$(libkonoha_la_includedir)" \
 	"$(DESTDIR)$(libkonoha_la_includegendir)" \
 	"$(DESTDIR)$(libkonoha_la_includekonohadir)"
@@ -92,6 +93,8 @@ PROGRAMS = $(bin_PROGRAMS)
 am_konoha_OBJECTS = konoha.$(OBJEXT)
 konoha_OBJECTS = $(am_konoha_OBJECTS)
 konoha_DEPENDENCIES = libkonoha.la
+dist_pkgdataSCRIPT_INSTALL = $(INSTALL_SCRIPT)
+SCRIPTS = $(dist_pkgdata_SCRIPTS)
 DEFAULT_INCLUDES = -I. -I$(top_builddir)@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -115,6 +118,7 @@ HEADERS = $(libkonoha_la_include_HEADERS) \
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+pkgdatadir = /usr/local/konoha
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AR = @AR@
@@ -305,6 +309,7 @@ libkonoha_la_includegen_HEADERS =  \
 konoha_SOURCES = ../src/konoha.c
 konoha_INCLUDES = ../include
 konoha_LDADD = libkonoha.la
+dist_pkgdata_SCRIPTS = ../dist/sample/fib.k
 all: all-am
 
 .SUFFIXES:
@@ -398,6 +403,25 @@ clean-binPROGRAMS:
 konoha$(EXEEXT): $(konoha_OBJECTS) $(konoha_DEPENDENCIES) 
 	@rm -f konoha$(EXEEXT)
 	$(LINK) $(konoha_OBJECTS) $(konoha_LDADD) $(LIBS)
+install-dist_pkgdataSCRIPTS: $(dist_pkgdata_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	test -z "$(pkgdatadir)" || $(MKDIR_P) "$(DESTDIR)$(pkgdatadir)"
+	@list='$(dist_pkgdata_SCRIPTS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  if test -f $$d$$p; then \
+	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
+	    echo " $(dist_pkgdataSCRIPT_INSTALL) '$$d$$p' '$(DESTDIR)$(pkgdatadir)/$$f'"; \
+	    $(dist_pkgdataSCRIPT_INSTALL) "$$d$$p" "$(DESTDIR)$(pkgdatadir)/$$f"; \
+	  else :; fi; \
+	done
+
+uninstall-dist_pkgdataSCRIPTS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_pkgdata_SCRIPTS)'; for p in $$list; do \
+	  f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
+	  echo " rm -f '$(DESTDIR)$(pkgdatadir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(pkgdatadir)/$$f"; \
+	done
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -1247,11 +1271,11 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS)
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(SCRIPTS) $(HEADERS)
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libkonoha_la_includedir)" "$(DESTDIR)$(libkonoha_la_includegendir)" "$(DESTDIR)$(libkonoha_la_includekonohadir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkgdatadir)" "$(DESTDIR)$(libkonoha_la_includedir)" "$(DESTDIR)$(libkonoha_la_includegendir)" "$(DESTDIR)$(libkonoha_la_includekonohadir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -1299,7 +1323,8 @@ info: info-am
 
 info-am:
 
-install-data-am: install-libkonoha_la_includeHEADERS \
+install-data-am: install-dist_pkgdataSCRIPTS \
+	install-libkonoha_la_includeHEADERS \
 	install-libkonoha_la_includegenHEADERS \
 	install-libkonoha_la_includekonohaHEADERS
 
@@ -1337,8 +1362,8 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
-	uninstall-libkonoha_la_includeHEADERS \
+uninstall-am: uninstall-binPROGRAMS uninstall-dist_pkgdataSCRIPTS \
+	uninstall-libLTLIBRARIES uninstall-libkonoha_la_includeHEADERS \
 	uninstall-libkonoha_la_includegenHEADERS \
 	uninstall-libkonoha_la_includekonohaHEADERS
 
@@ -1349,10 +1374,10 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	distclean distclean-compile distclean-generic \
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-libLTLIBRARIES \
-	install-libkonoha_la_includeHEADERS \
+	install-data install-data-am install-dist_pkgdataSCRIPTS \
+	install-dvi install-dvi-am install-exec install-exec-am \
+	install-html install-html-am install-info install-info-am \
+	install-libLTLIBRARIES install-libkonoha_la_includeHEADERS \
 	install-libkonoha_la_includegenHEADERS \
 	install-libkonoha_la_includekonohaHEADERS install-man \
 	install-pdf install-pdf-am install-ps install-ps-am \
@@ -1360,8 +1385,8 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
-	uninstall-libkonoha_la_includeHEADERS \
+	uninstall-binPROGRAMS uninstall-dist_pkgdataSCRIPTS \
+	uninstall-libLTLIBRARIES uninstall-libkonoha_la_includeHEADERS \
 	uninstall-libkonoha_la_includegenHEADERS \
 	uninstall-libkonoha_la_includekonohaHEADERS
 

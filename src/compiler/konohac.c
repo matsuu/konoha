@@ -757,7 +757,7 @@ void knh_Asm_openlib(Ctx *ctx, Asm *abr, knh_bytes_t fpath)
 	knh_Bytes_write(ctx, cwb.ba, fpath);
 	knh_Bytes_putc(ctx, cwb.ba, '_');
 	knh_Bytes_write(ctx, cwb.ba, STEXT(KONOHA_PLATFORM));
-	knh_Bytes_write(ctx, cwb.ba, STEXT(KONOHA_OS_DLLEXT));
+//	knh_Bytes_write(ctx, cwb.ba, STEXT(KONOHA_OS_DLLEXT));
 	knh_Bytes_putc(ctx, cwb.ba, 0);
 
 	if(DP(abr)->dlhdr != NULL) {
@@ -765,7 +765,7 @@ void knh_Asm_openlib(Ctx *ctx, Asm *abr, knh_bytes_t fpath)
 	}
 
 	knh_bytes_t f = knh_cwb_tobytes(cwb);
-	DP(abr)->dlhdr =knh_dlopen(ctx, (char*)f.buf, KNH_RTLD_LAZY);
+	DP(abr)->dlhdr =knh_dlopen(ctx, f);
 	if(DP(abr)->dlhdr != NULL) {
 		KNH_NOTICE(ctx, "opened dynamic library: %s", f.buf);
 	}

@@ -547,18 +547,6 @@ knh_drvapi_t *konoha_getDriverAPI(Ctx *ctx, int type, knh_bytes_t name)
 	return p;
 }
 
-///* ------------------------------------------------------------------------ */
-///* @method[STATIC] Boolean! System.hasLibrary(String! lib, String func) */
-//
-//METHOD knh__System_hasLibrary(Ctx *ctx, knh_sfp_t *sfp)
-//{
-//	char *funcname = NULL;
-//	if(IS_NOTNULL(sfp[2].o)) {
-//		funcname = p_char(sfp[2]);
-//	}
-//	KNH_RETURN_Boolean(ctx, sfp, knh_System_hasLibrary(ctx, p_char(sfp[1]), funcname));
-//}
-
 /* ======================================================================== */
 /* [namespace] */
 
