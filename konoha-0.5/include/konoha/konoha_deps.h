@@ -228,9 +228,6 @@
 
 #if defined(KNH_USING_POSIX) && !defined(KONOHA_ON_LKM)
 #include<dlfcn.h>
-#define KNH_RTLD_LAZY               RTLD_LAZY
-#else
-#define KNH_RTLD_LAZY               0
 #endif
 
 /* ------------------------------------------------------------------------ */

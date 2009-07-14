@@ -113,6 +113,28 @@ static METHOD knh__System_setErr(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
+/* @method[STATIC] Boolean! System.hasLib(String! lib, String func) */
+
+METHOD knh__System_hasLib(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_bytes_t libname = knh_String_tobytes(sfp[1].s);
+	void *p = knh_dlopen(ctx, libname);
+	if(p == NULL && !knh_bytes_startsWith(libname, STEXT("lib"))) {
+		char buff[FILEPATH_BUFSIZ];
+		knh_snprintf(buff, sizeof(buff), "lib%s", (char*)libname.buf);
+		p = knh_dlopen(ctx, B(buff));
+	}
+	{
+		int b = (p != NULL);
+		if(p != NULL && IS_NOTNULL(sfp[2].o)) {
+			void *f = knh_dlsym(ctx, p, p_char(sfp[2]));
+			b = (f != NULL);
+		}
+		KNH_RETURN_Boolean(ctx, sfp, b);
+	}
+}
+
+/* ------------------------------------------------------------------------ */
 /* @method[STATIC] void System.setRandomSeed(Int seed) */
 
 METHOD knh__System_setRandomSeed(Ctx *ctx, knh_sfp_t *sfp)
