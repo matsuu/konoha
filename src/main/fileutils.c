@@ -67,7 +67,7 @@ KNHAPI(char*) knh_format_ospath2(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t
 	if(ext != NULL) {
 		size_t esize = knh_strlen(ext) + 1;
 		if(path.len + esize < bufsiz) {
-			knh_memcpy(buf + path.len, ext, esize);
+			knh_memcpy(buf + strlen(path.buf), ext, esize);
 		}
 	}
 	DBG2_P("'%s'", buf);
