@@ -148,15 +148,13 @@ static ssize_t knh_dev_write(struct file *filp,const char __user *user_buf,
     len = copy_from_user(buf,user_buf,count);
     memset(dev->buffer,0,sizeof(char)*MAXCOPYBUF);
     buf[count] = '\0';
-    printk("write:line=%d,%ld %ld [%s]\n", __LINE__,len, count,buf);
+    printk("[%s][user_buf=%s]\n", __FUNCTION__,buf);
     //printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "int fib(int n) { if (n==3) { return 1;}}"));
     //printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "fib(10);"));
     konoha_ret = konoha_eval(dev->konoha,buf);
-    printk(KERN_DEBUG "[%u,%s]\n",(unsigned int)strlen(konoha_ret),konoha_ret);
 
-    snprintf(dev->buffer,MAXCOPYBUF,"%s",konoha_eval(dev->konoha,buf));
-    printk(KERN_DEBUG "%d[%s]\n",__LINE__,konoha_eval(dev->konoha,buf));
-    printk(KERN_DEBUG "[%s]\n",dev->buffer);
+    snprintf(dev->buffer,MAXCOPYBUF,"%s",konoha_ret);
+    printk(KERN_DEBUG "[%s][dev->buffer=%s]\n",__FUNCTION__ ,dev->buffer);
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
     up(&dev->sem);
