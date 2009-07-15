@@ -1991,7 +1991,7 @@ static void knh_System_initProp(Ctx *ctx, System *o)
 	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.path"), UP(sys->homeDir));
 
 #ifdef KNH_PREFIX
-	knh_snprintf(buf, sizeof(buf), "%s/lib/konoha/package", KNH_PREFIX);
+	knh_snprintf(buf, sizeof(buf), "%s/konoha/package", KNH_PREFIX);
 #else
 	knh_snprintf(buf, sizeof(buf), "%s/package", knh_String_tochar(sys->homeDir));
 #endif
