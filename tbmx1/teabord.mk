@@ -58,7 +58,7 @@ libkonoha_la_SOURCES = ../src/api/anyapi.c ../src/api/arrayapi.c \
 	../src/gen/konoha_klr_.c ../src/gen/konohac_.c \
 	../src/gen/method_.c ../src/labs/b4.c  \
 	../src/main/classapi.c ../src/main/exports.c \
-	../src/main/fileutils.c ../src/main/glue.c \
+	../src/main/glue.c \
 	../src/main/konoha_api.c ../src/main/konoha_ext.c \
 	../src/main/logging.c ../src/main/memory.c \
 	../src/main/metadata.c ../src/main/objectdbms.c \
