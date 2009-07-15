@@ -514,9 +514,6 @@ String *konoha_getFileName(Ctx *ctx, knh_fileid_t fileid)
 #define knh_makespecDictSet        DP(ctx->sys)->makespecDictSet
 
 /* ======================================================================== */
-/* [SLOCK] */
-
-/* ======================================================================== */
 /* [DRVAPI] */
 
 void konoha_addDriverAPI(Ctx *ctx, char *alias, knh_drvapi_t* p)

@@ -251,10 +251,27 @@ KNHAPI(char*) knh_format_bytes(char *buf, size_t bufsiz, knh_bytes_t t)
 {
 	size_t i;
 	for(i = 0; i < t.len; i++) {
-		if(bufsiz == i) break;
+		if(bufsiz - 1 == i) break;
 		buf[i] = t.buf[i];
 	}
 	buf[i] = 0;
+	return buf;
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(char*) knh_format_join2(char *buf, size_t bufsiz, knh_bytes_t t, knh_bytes_t t2)
+{
+	size_t i, j;
+	for(i = 0; i < t.len; i++) {
+		if(bufsiz - 1 == i) break;
+		buf[i] = t.buf[i];
+	}
+	for(j = 0; j < t2.len; j++) {
+		if(bufsiz - 1 == i + j) break;
+		buf[i+j] = t2.buf[j];
+	}
+	buf[i+j] = 0;
 	return buf;
 }
 
