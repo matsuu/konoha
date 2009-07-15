@@ -264,7 +264,7 @@ KNHAPI(char*) knh_format_join2(char *buf, size_t bufsiz, knh_bytes_t t, knh_byte
 {
 	size_t i, j;
 	for(i = 0; i < t.len; i++) {
-		if(bufsiz - 1 == i) break;
+		if(t.buf[i] == 0 || bufsiz - 1 == i) break;
 		buf[i] = t.buf[i];
 	}
 	for(j = 0; j < t2.len; j++) {

@@ -1903,7 +1903,7 @@ void knh_StmtMETA_addMeta2(Ctx *ctx, Stmt *o, String *k, Token *p)
 static
 void knh_Stmt_addMETA(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 {
-	DBG2_P("stt=%s, meta=%d", knh_stmt_tochar(o->stt), tc->meta);
+	//DBG2_P("stt=%s, meta=%d", knh_stmt_tochar(o->stt), tc->meta);
 	if(tc->meta == -1 || SP(o)->stt == STT_DONE || SP(o)->stt == STT_ERR) {
 		return ;
 	}
@@ -1920,7 +1920,7 @@ void knh_Stmt_addMETA(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 					i++;
 				}
 				else {
-					DBG2_P("META!! %s", sToken(ts[i]));
+					//DBG2_P("META!! %s", sToken(ts[i]));
 					knh_StmtMETA_addMeta(ctx, o, (String*)DP(ts[i])->data);
 				}
 			}
