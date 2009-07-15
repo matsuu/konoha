@@ -30,20 +30,9 @@
 
 #include"commons.h"
 
-#ifdef KONOHA_ON_LKM
-#undef KNH_USING_POSIX
-#endif
-
-#ifdef KONOHA_ON_LKM
-#undef KNH_USING_POSIX
-#endif
-
 #ifdef KNH_USING_POSIX
-#include <unistd.h>
+#include<unistd.h>
 #include<dlfcn.h>
-
-#include<time.h>
-#include<sys/time.h>
 #endif
 
 #ifdef KNH_USING_WINDOWS
@@ -63,19 +52,19 @@ extern "C" {
 void *knh_dlopen(Ctx *ctx, knh_bytes_t libname)
 {
 #if defined(KNH_USING_WINDOWS)
-    char buff[FILEPATH_BUFSIZ];
-    memset(buff,0,FILEPATH_BUFSIZ);
-    knh_format_ospath2(ctx, buff, sizeof(buff), libname, KONOHA_OS_DLLEXT);
-    DBG_P("knh_dlopen .. '%s'\n", buff);
-    return (void*)LoadLibraryA((LPCTSTR)buff);
+	char buff[FILEPATH_BUFSIZ];
+	//    knh_bzero(buff, sizeof(buff));
+	knh_format_ospath2(ctx, buff, sizeof(buff), libname, KONOHA_OS_DLLEXT);
+	DBG_P("knh_dlopen .. '%s'\n", buff);
+	return (void*)LoadLibraryA((LPCTSTR)buff);
 #elif defined(KNH_USING_POSIX)
-    char buff[FILEPATH_BUFSIZ];
-    memset(buff,'\0',FILEPATH_BUFSIZ);
-    knh_format_ospath2(ctx, buff, sizeof(buff), libname, KONOHA_OS_DLLEXT);
-    DBG_P("knh_dlopen .. '%s'\n", buff);
-    return dlopen(buff, RTLD_LAZY);
+	char buff[FILEPATH_BUFSIZ];
+	//   knh_bzero(buff, sizeof(buff));
+	knh_format_ospath2(ctx, buff, sizeof(buff), libname, KONOHA_OS_DLLEXT);
+	DBG_P("knh_dlopen .. '%s'\n", buff);
+	return dlopen(buff, RTLD_LAZY);
 #else
-    return NULL;
+	return NULL;
 #endif
 }
 

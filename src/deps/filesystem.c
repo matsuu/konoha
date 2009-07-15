@@ -60,6 +60,127 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
+/* [fileutils] */
+
+KNHAPI(char*) knh_format_ospath(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t path)
+{
+	knh_intptr_t i, hasUTF8 = 0;
+	if(knh_bytes_startsWith(path, STEXT("file:"))) {
+		knh_format_bytes(buf, bufsiz, knh_bytes_last(path, 5));
+	}
+	else {
+		knh_format_bytes(buf, bufsiz, path);
+	}
+	for(i = 0; buf[i] != 0; i++) {
+		if(buf[i] == '/' || buf[i] == '\\') {
+			buf[i] = KONOHA_OS_FILE_SEPARATOR;
+		}
+		if(buf[i] < 0) hasUTF8 = 1;
+	}
+	//DBG_P("ospath='%s'", buf);
+	if(hasUTF8) {
+		TODO();
+	}
+	return buf;
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(char*) knh_format_ospath2(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t path, char *ext)
+{
+	knh_intptr_t i, hasUTF8 = 0;
+	if(knh_bytes_startsWith(path, STEXT("file:"))) {
+		path = knh_bytes_last(path, 5);
+	}
+	knh_format_bytes(buf, bufsiz, path);
+	if(ext != NULL) {
+		size_t esize = knh_strlen(ext) + 1;
+		if(path.len + esize < bufsiz) {
+			knh_memcpy(buf + (path.len-1), ext, esize);
+		}
+	}
+	DBG2_P("'%s'", buf);
+	for(i = 0; buf[i] != 0; i++) {
+		if(buf[i] == '/' || buf[i] == '\\') {
+			buf[i] = KONOHA_OS_FILE_SEPARATOR;
+		}
+		if(buf[i] < 0) hasUTF8 = 1;
+	}
+	if(hasUTF8) {
+		TODO();
+	}
+	return buf;
+}
+
+/* ------------------------------------------------------------------------ */
+
+char *
+knh_format_parentpath(char *buf, size_t bufsiz, knh_bytes_t path, int n)
+{
+	int i, c = 0;
+	for(i = path.len - 1; i >= 0; i--) {
+		if(path.buf[i] == '/' || path.buf[i] == '\\') {
+			c++;
+			if(n <= c) {
+				path.len = i;
+				return knh_format_bytes(buf, bufsiz, path);
+			}
+		}
+	}
+	buf[0] = 0;
+	return buf;
+}
+
+
+/* ------------------------------------------------------------------------ */
+
+char *
+knh_format_nzpath(char *buf, size_t bufsiz, knh_bytes_t path)
+{
+	//size_t i, j = 0;
+	int i, j = 0;
+	for(i = 0; i < path.len; i++) {
+		if(path.buf[i] == '/' || path.buf[i] == '\\') {
+			int ch = path.buf[i];
+			if(path.buf[i+1] == '.' && path.buf[i+2] == '.' && path.buf[i+3] == ch) {
+				i = i + 2;
+				for(; j >= 0; j--) {
+					if(buf[j] == ch) {
+						buf[j] = 0;
+						break;
+					}
+					buf[j] = 0;
+				}
+				continue;
+			}
+		}
+		if(j == bufsiz - 1) {
+			buf[j] = 0;
+			return buf;
+		}
+		buf[j] = (path.buf[i] == '\\') ? '/' : path.buf[i];
+		j++; buf[j]= 0;
+	}
+	buf[j] = 0;
+	return buf;
+}
+
+/* ------------------------------------------------------------------------ */
+
+char *
+knh_format_catpath(char *buf, size_t bufsiz, knh_bytes_t path, knh_bytes_t file)
+{
+	if(file.buf[0]=='/' || file.buf[0] == '\\' || path.buf[0] == 0) {
+		return knh_format_nzpath(buf, bufsiz, file);
+	}
+	else {
+		char buff[FILEPATH_BUFSIZ];
+		knh_snprintf(buff, sizeof(buff), "%s/%s", (char*)path.buf, (char*)file.buf);
+		return knh_format_nzpath(buf, bufsiz, B(buff));
+	}
+}
+
+/* ======================================================================== */
 /* [file] */
 
 knh_boolean_t knh_isfile(Ctx *ctx, knh_bytes_t path)
