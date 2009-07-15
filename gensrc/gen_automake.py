@@ -4,7 +4,7 @@ import itertools
 
 #----------------------------------------------------#
 
-MAKEFILE = "../build/Makefile.am"
+MAKEFILE = "../build/Makefile.amz"
 
 #----------------------------------------------------#
 
@@ -96,6 +96,43 @@ for i in all_headers("../include", "*.h"):
 #for path in all_files('../include', '*.h',"libkonoha_la_include_HEADERS += ", True):
 #	file_object.writelines(path + "\n");
 
+#-----------------------------------------#
+# for dist script file for konoha         #
+#-----------------------------------------#
+
+def distfiles(root, pattern="*"):
+  for path,sub,files in os.walk(root):
+   if ( path.find(".svn") == -1 ):
+    name = path.split("dist/")[1]
+    yield name + "dir = " + "/usr/local/konoha/" + name
+    yield "dist_" + name + "_SCRIPTS ="
+    files.sort()
+    for file in files:
+      if fnmatch.fnmatch(file,pattern):
+        yield "dist_" + name + "_SCRIPTS += "  + os.path.join(path,file)
+
+for i in distfiles("../dist/sample","*.k"):
+  file_object.writelines(i + "\n")
+
+#-----------------------------------------#
+# for klip                                #
+#-----------------------------------------#
+#
+#def klipfiles(root, pattern="*"):
+#  for path,sub,files in os.walk(root):
+#   if ( path.find(".svn") == -1 ):
+#    name = path.replace("../","")
+#    name2 = name.replace("/","")
+#    yield name2 + "dir = " + "/usr/local/konoha/" + name
+#    yield "dist_" + name2 + "_SOURCES ="
+#    files.sort()
+#    for file in files:
+#      if fnmatch.fnmatch(file,pattern):
+#        yield "dist_" + name2 + "_SCRIPTS += "  + os.path.join(path,file)
+#
+#file_object.writelines( "scriptdir = /usr/local/konoha/script\n" )
+#for i in klipfiles("../../script/klip"):
+#  file_object.writelines( i + "\n" )
 
 #-----------------------------------------#
 # for executable file "konoha"            #
