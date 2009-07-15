@@ -229,7 +229,7 @@ char *knh_lookup_includeScript(Ctx *ctx, knh_bytes_t path, char *buf, size_t buf
 	char *filename = (char*)path.buf + loc + 1;
 
 #ifdef KNH_PREFIX
-	knh_snprintf(buf, bufsiz, "%s/lib/konoha/include/%s", KNH_PREFIX, filename);
+	knh_snprintf(buf, bufsiz, "%s/konoha/include/%s", KNH_PREFIX, filename);
 #else
 	knh_snprintf(buf, bufsiz, "%s/include/%s", knh_String_tochar(DP(ctx->sys)->homeDir), filename);
 #endif
