@@ -1,8 +1,8 @@
 **************************************************
 *                                                *
-*   klip (Konoha LIbrary Provider)               *
+*   klip   - Konoha LIbrary Provider -           *
 *                                                *
-*    Version 0.1.3 (09/07/14)   (c)utrhira 2009  *
+*    Version 0.1.4 (09/07/16)   (c)utrhira 2009  *
 **************************************************
 
 *INTRODUCTION
@@ -11,9 +11,12 @@
  then you'll be able to use Konoha more comfortably.
 
 
-*USING DEFAULT PACKAGE ( of Konoha )
+*REQUIRED PACKAGES
  - posix or [ zlib + libtar ]
- - curl or not ( using_curl is better )
+
+
+*RECOMMEND PACKAGES
+ - curl ( for speed-up downloading )
 
 
 *USAGE
@@ -33,3 +36,10 @@
 
    utrhira@users.sourceforge.jp
 
+
+*CHANGE LOG
+ 0.1.4 - add [library search]
+ 0.1.3 - add [hello,klip & guide info]
+ 0.1.2 - add [select using package]
+ 0.1.1 - fix [fixed critical bugs & reduced using package]
+ 0.1.0 - first commit

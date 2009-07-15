@@ -1,26 +1,31 @@
 #!/usr/local/bin/konoha
 
-int klipMain(String[] args);
+import "./src/check.k";
+import "./src/init.k";
+import "./src/import.k";
 
-void helloKlip()
+void helloKlip(String code)
 {
 	ins = new InputStream("./sys/hello.klip","r");
-	foreach(String txt from ins) {
-		OUT.println(txt);
+	foreach( String txt from ins ) {
+		if ( txt[0] in? code  || txt.startsWith("*") ) {
+			txt = txt[2..];
+			OUT.println(txt);
+		}
 	}
 	ins.close();
 }
 
 //*-----main-----
-int  main (String[] args)
+int main (String[] args)
 {
- 	if ( |args| > 1 ) { 
-		eval('import "./src/check.k";');
-		
-		eval('import "./src/init.k";');
-		eval('import "./src/import.k";');
-		return klipMain(args); 
+ 	if ( |args| > 1 ) {
+		if ( do_klip.indexOf("#") == -1 ) {
+			return klipMain(args); 
+		}
 	} else {
-		helloKlip();
-		return 0;
+		klipInfo("u");
+	}
+	helloKlip(do_klip);
+	return 0;
 }

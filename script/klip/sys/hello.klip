@@ -1,16 +1,16 @@
-**************************************************
-*   klip (Konoha LIbrary Provider)               *
-*    Version 0.1.3 (09/07/14)   (c)utrhira 2009  *
-**************************************************
-
-USING DEFAULT PACKAGE of Konoha
- - posix or [ zlib + libtar ]
- - curl or not ( using_curl is better )
-
-USAGE
- $ ./klip [operation]*  package_name**
-
- *[operaton] = install / update / remove / undo**
-
- **no need to set package_name for [undo]
-
+* **************************************************
+* *   klip (Konoha LIbrary Provider)               *
+* *    Version 0.1.4 (09/07/16)   (c)utrhira 2009  *
+* **************************************************
+*  
+u  USAGE
+u  $ ./klip [operation]*  package_name**
+u    *[operaton] = install / update / remove / undo**
+u    **no need to set package_name for [undo]
+u  
+1 !ERR : unknown_user_mode 
+2 !ERR : need to set [zlib + libtar / posix]
+3 !ERR : import parser faild
+t INFO : you need to install libtar(-devel)
+z INFO : you need to install zlib(-devel)
+c INFO : you need to install libcurl(-devel)

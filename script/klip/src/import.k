@@ -19,7 +19,7 @@ if ( klip_TYPE == "json" ) {
 } else if ( klip_TYPE == "xml" ) {
 	eval('import "./src/pars/p_xml.k";'); 
 } else {
-	sys_fail("import parser"); 
+	klipInfo("3#");
 }
 
 //*-----import operations-----*/
@@ -28,8 +28,6 @@ if ( use_zl_lt ) {
 	eval('import "./src/use/u_zl_lt.k";'); 
 } else if ( use_posix ) {
 	eval('import "./src/use/u_posix.k";');
-} else {
-	sys_fail("import getPackage");
-}
+} 
 import "extra.k";
 import "main.k";

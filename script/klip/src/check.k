@@ -2,17 +2,15 @@
 //define system_check script for klip
 //
 //*-----system flag-----*/
-boolean system_fail = true;
+String do_klip = "";
 boolean root;
 boolean use_curl = false;
 boolean use_zl_lt = false;
 boolean use_posix = false;
 
-//*-----system fail switch-----*/
-void sys_fail(String msg)
-{
-	print("!ERR : fatal error : " + msg);
-	system_fail = false;
+//*-----fatal problem switch-----*/
+void klipInfo(String code) {
+	do_klip += code; 
 }
 
 //*-----user check-----*/
@@ -25,7 +23,7 @@ if ( !os.mkdir(pkgpath) ){
 	pkgpath = $konoha.path.user.package;
 	if ( !os.hasDir(pkgpath)  ) {
 		if ( !os.mkdir(pkgpath) ) {
-			sys_fail("instDir");
+			klipInfo("1#");
 		}
 	} else {
 		root = false; //user
@@ -38,34 +36,32 @@ if ( !os.mkdir(pkgpath) ){
 
 //*-----curl-----*/
 if ( os.hasDir( pkgpath + "/curl") ) {
-	if ( true ) {//os.hasLib("libcurl") ) {
+	if ( os.hasLib("libcurl") ) {
 		use_curl = true;
 	} else {
-		OUT.println("INFO : you need to install libcurl(-devel)");
+		klipInfo("c");
 	}
 }
 
 //*-----zlib & libtar-----*/
 if ( os.hasDir( pkgpath + "/zlib") && os.hasDir( pkgpath + "/libtar") ) {
-	boolean zl = true;//os.hasLib("libz");
-	boolean lt = true;//os.hasLib("libtar");
+	boolean zl = os.hasLib("libz");
+	boolean lt = os.hasLib("libtar");
 	if ( !zl ) {
-		OUT.println("INFO : you need to install zlib(-devel)");
+		klipInfo("z");
 	}
 	if ( !lt ) {
-		OUT.println("INFO : you need to install libtar(-devel)");
+		klipInfo("t");
 	}
 	if ( zl && lt ) {
 		use_zl_lt = true;
 	}
-} else 
-
-//*-----posix-----*/
-if ( os.hasDir( pkgpath + "/posix" ) ) {
+}
+if ( !use_zl_lt && os.hasDir( pkgpath + "/posix" ) ) {
 	use_posix = true;
 }
 
 //*-----result-----*/
-if ( !use_zl_lt || !use_posix ) {
-	sys_fail("library not found");
+if ( !use_zl_lt && !use_posix ) {
+	klipInfo("2#");
 }

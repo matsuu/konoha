@@ -2,9 +2,9 @@
 //define system_init script for klip
 //
 /*-----abstruct class method-----*/
-eval ("class Curl {void easySetOpt(); boolean easyPerform();}");
-eval ("class Zlib {boolean decompGZ();}");
-eval ("class Tar  {boolean extractTar();}");
+class Curl {void easySetOpt(); boolean easyPerform();}
+class Zlib {boolean decompGZ();}
+class Tar  {boolean extractTar();}
 
 //*-----for Script.getPackage() @gengeral.k-----*/
 if ( use_curl ) {
