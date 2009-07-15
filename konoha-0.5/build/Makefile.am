@@ -126,6 +126,15 @@ bin_PROGRAMS = konoha
 konoha_SOURCES = ../src/konoha.c
 konoha_INCLUDES = ../include
 konoha_LDADD = libkonoha.la
-pkgdatadir = /usr/local/konoha
-dist_pkgdata_SCRIPTS = ../dist/sample/fib.k
+sampledir = /usr/local/konoha/sample
+dist_sample_SCRIPTS =
+dist_sample_SCRIPTS += ../dist/sample/ao.k
+dist_sample_SCRIPTS += ../dist/sample/counter.k
+dist_sample_SCRIPTS += ../dist/sample/fib.k
+dist_sample_SCRIPTS += ../dist/sample/helloworld.k
+dist_sample_SCRIPTS += ../dist/sample/http.k
+dist_sample_SCRIPTS += ../dist/sample/konohaget.k
+dist_sample_SCRIPTS += ../dist/sample/main.k
+dist_sample_SCRIPTS += ../dist/sample/readfile.k
+dist_sample_SCRIPTS += ../dist/sample/sort.k
 
