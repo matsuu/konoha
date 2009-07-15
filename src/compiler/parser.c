@@ -92,48 +92,30 @@ static void knh_tokens_nextStmt(knh_tokens_t *tc)
 /* ------------------------------------------------------------------------ */
 
 static
-knh_tokens_t knh_tokens_splitSTMT(Ctx *ctx, knh_tokens_t *tc)
+void knh_tokens_splitSTMT(Ctx *ctx, knh_tokens_t *tc, knh_tokens_t *sub, int warn)
 {
-	knh_tokens_t sub = *tc;
 	int i;
+	*sub = *tc;
 	for(i = tc->c + 1; i < tc->e; i++) {
-		if(knh_Token_isBOL(sub.ts[i])) {
-			if(SP(sub.ts[i])->tt != TT_SEMICOLON) {
-				knh_Token_perror(ctx, sub.ts[i-1], KERR_INFO, "needs ;");
+		if(knh_Token_isBOL(sub->ts[i])) {
+			if(warn && SP(sub->ts[i])->tt != TT_SEMICOLON) {
+				DBG2_P("i=%d", i);
+				knh_Token_perror(ctx, sub->ts[i-1], KERR_INFO, "needs ;");
 			}
-			sub.e = i;
+			sub->e = i;
 			tc->c = i;
 			knh_tokens_skipSEMICOLON(tc);
-			return sub;
+			return;
 		}
 	}
-	sub.e = tc->e;
+	sub->e = tc->e;
 	tc->c = tc->e;
-	return sub;
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-knh_tokens_t knh_tokens_splitEXPR(Ctx *ctx, knh_tokens_t *tc, knh_token_t tt)
-{
-	knh_tokens_t sub = *tc;
-	int i;
-	for(i = tc->c; i < tc->e; i++) {
-		if(SP(sub.ts[i])->tt == tt) {
-			sub.e =i;
-			tc->c = i + 1;
-			return sub;
-		}
-	}
-	sub.e = i;
-	tc->c = tc->e;
-	return sub;
-}
-
-/* ------------------------------------------------------------------------ */
-static
-void knh_tokens_splitEXPR2(Ctx *ctx, knh_tokens_t *tc, knh_token_t tt, knh_tokens_t *sub)
+void knh_tokens_splitEXPR(Ctx *ctx, knh_tokens_t *tc, knh_token_t tt, knh_tokens_t *sub)
 {
 	*sub = *tc;
 	int i;
@@ -411,7 +393,8 @@ void knh_Stmt_add_PARAMs(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 	Stmt *stmt = NULL;
 	while(param_tc.c <param_tc.e) {
 		Stmt *o2 = new_Stmt(ctx, 0, STT_DECL);
-		knh_tokens_t ptc = knh_tokens_splitEXPR(ctx, &param_tc, TT_COMMA);
+		knh_tokens_t ptc;
+		knh_tokens_splitEXPR(ctx, &param_tc, TT_COMMA, &ptc);
 		if(SP(ptc.ts[ptc.c])->tt == TT_METAN) {
 			ptc.meta = ptc.c;
 			knh_Stmt_addMETA(ctx, o2, &ptc);
@@ -436,7 +419,8 @@ void knh_Stmt_add_PARAMs(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 static
 void knh_Stmt_add_EXPR(Ctx *ctx, Stmt *stmt, knh_tokens_t *tc, int level)
 {
-	knh_tokens_t expr_tc = knh_tokens_splitSTMT(ctx, tc);
+	knh_tokens_t expr_tc;
+	knh_tokens_splitSTMT(ctx, tc, &expr_tc, 1/*need;*/);
 	if(expr_tc.c < expr_tc.e) {
 		knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &expr_tc, level));
 	}
@@ -453,10 +437,11 @@ void knh_Stmt_add_EXPR(Ctx *ctx, Stmt *stmt, knh_tokens_t *tc, int level)
 static
 void knh_Stmt_add_EXPRs(Ctx *ctx, Stmt *stmt_b, knh_tokens_t *tc, int level)
 {
-	knh_tokens_t expr_tc = knh_tokens_splitSTMT(ctx, tc);
+	knh_tokens_t expr_tc;
+	knh_tokens_splitSTMT(ctx, tc, &expr_tc, 0/*needs;*/);
 	while(expr_tc.c < expr_tc.e) {
 		knh_tokens_t sub_tc;
-		knh_tokens_splitEXPR2(ctx, &expr_tc, TT_COMMA, &sub_tc);
+		knh_tokens_splitEXPR(ctx, &expr_tc, TT_COMMA, &sub_tc);
 		if(sub_tc.c < sub_tc.e) {
 			knh_Stmt_add(ctx, stmt_b, new_TermEXPR(ctx, &sub_tc, level));
 		}
@@ -805,7 +790,8 @@ void knh_Stmt_add_IDX(Ctx *ctx, Stmt *stmt, Token *tkb)
 #endif
 	}
 	else {
-		knh_tokens_t first_tc = knh_tokens_splitEXPR(ctx, &tc, SP(tkidx)->tt);
+		knh_tokens_t first_tc;
+		knh_tokens_splitEXPR(ctx, &tc, SP(tkidx)->tt, &first_tc);
 		if(SP(tkidx)->tt == TT_SUBSETE) {
 			knh_Stmt_add(ctx, stmt, TM(new_TokenMN(ctx, FL(tkb), METHODN_opSubsete)));
 		}
@@ -1219,9 +1205,10 @@ Term *new_TermOPR(Ctx *ctx, knh_tokens_t *tc, Token *op)
 	/* $expr ? $expr : $expr */
 	if(SP(op)->tt == TT_QUESTION) {
 		Stmt *stmt = new_Stmt(ctx, 0, STT_TRI);
-		knh_tokens_t expr_tc = knh_tokens_splitEXPR(ctx, tc, SP(op)->tt);
+		knh_tokens_t expr_tc;
+		knh_tokens_splitEXPR(ctx, tc, SP(op)->tt, &expr_tc);
 		knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &expr_tc, 0/*isData*/));
-		expr_tc = knh_tokens_splitEXPR(ctx, tc, TT_COLON);
+		knh_tokens_splitEXPR(ctx, tc, TT_COLON, &expr_tc);
 		if(expr_tc.c < expr_tc.e && tc->c < tc-> e) {
 			knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &expr_tc, 0/*isData*/));
 			knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, tc, 0/*isData*/));
@@ -1236,7 +1223,8 @@ Term *new_TermOPR(Ctx *ctx, knh_tokens_t *tc, Token *op)
 			knh_Token_perror(ctx, op, KERR_DWARN, _("unsupported C/C++ grammer fully"), sToken(op));
 			tc->c += 1;
 		}
-		knh_tokens_t ltc = knh_tokens_splitEXPR(ctx, tc, SP(op)->tt);
+		knh_tokens_t ltc;
+		knh_tokens_splitEXPR(ctx, tc, SP(op)->tt, &ltc);
 		knh_tokens_t rtc = ltc;
 		{
 			Term *lval = new_TermEXPR(ctx, &ltc, 0/*isData*/);
@@ -1283,7 +1271,8 @@ Term *new_TermOPR(Ctx *ctx, knh_tokens_t *tc, Token *op)
 			knh_Stmt_add(ctx, stmt, TM(op));
 		}
 		while(tc->c < tc->e) {
-			knh_tokens_t op_tc = knh_tokens_splitEXPR(ctx, tc, SP(op)->tt);
+			knh_tokens_t op_tc;
+			knh_tokens_splitEXPR(ctx, tc, SP(op)->tt, &op_tc);
 			knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &op_tc, 0/*isData*/));
 		}
 		return TM(stmt);
@@ -1738,12 +1727,13 @@ Stmt *new_StmtLETOP(Ctx *ctx, knh_tokens_t *lvalue_tc, Token *tkl, knh_tokens_t 
 static
 Stmt *new_StmtLETMULTI(Ctx *ctx, knh_tokens_t *lvalue_tc, knh_tokens_t *rvalue_tc)
 {
-	knh_tokens_t cma_tc = knh_tokens_splitEXPR(ctx, lvalue_tc, TT_COMMA);
+	knh_tokens_t cma_tc;
+	knh_tokens_splitEXPR(ctx, lvalue_tc, TT_COMMA, &cma_tc);
 	Stmt *stmt_head = new_StmtLET(ctx, &cma_tc, rvalue_tc);
 	Stmt *stmt = new_Stmt(ctx, 0, STT_LETMULTI);
 	while(cma_tc.c < cma_tc.e) {
 		knh_Stmt_add_VARN(ctx, stmt, &cma_tc);
-		cma_tc = knh_tokens_splitEXPR(ctx, lvalue_tc, TT_COMMA);
+		knh_tokens_splitEXPR(ctx, lvalue_tc, TT_COMMA, &cma_tc);
 	}
 	knh_StmtNULL_tail_append(ctx, stmt_head, stmt);
 	return stmt_head;
@@ -1755,13 +1745,14 @@ static
 Stmt *new_StmtLETMULTI2(Ctx *ctx, knh_tokens_t *lvalue_tc, knh_tokens_t *rvalue_tc)
 {
 	Stmt *stmt_head = NULL;
-	knh_tokens_t ltc = knh_tokens_splitEXPR(ctx, lvalue_tc, TT_COMMA);
-	knh_tokens_t rtc = knh_tokens_splitEXPR(ctx, rvalue_tc, TT_COMMA);
+	knh_tokens_t ltc, rtc;
+	knh_tokens_splitEXPR(ctx, lvalue_tc, TT_COMMA, &ltc);
+	knh_tokens_splitEXPR(ctx, rvalue_tc, TT_COMMA, &rtc);
 	while(ltc.c < ltc.e && rtc.c < rtc.e) {
 		Stmt *stmt = new_StmtLET(ctx, &ltc, &rtc);
 		stmt_head = knh_StmtNULL_tail_append(ctx, stmt_head, stmt);
-		ltc = knh_tokens_splitEXPR(ctx, lvalue_tc, TT_COMMA);
-		rtc = knh_tokens_splitEXPR(ctx, rvalue_tc, TT_COMMA);
+		knh_tokens_splitEXPR(ctx, lvalue_tc, TT_COMMA, &ltc);
+		knh_tokens_splitEXPR(ctx, rvalue_tc, TT_COMMA, &rtc);
 	}
 	KNH_ASSERT(stmt_head != NULL);
 	return stmt_head;
@@ -1804,7 +1795,8 @@ void knh_tokens_divideLET(knh_tokens_t *tc, knh_tokens_t *ltc, knh_tokens_t *rtc
 static
 Stmt* new_StmtLETEXPR(Ctx *ctx, knh_tokens_t *tc, int isData)
 {
-	knh_tokens_t expr_tc = knh_tokens_splitSTMT(ctx, tc);
+	knh_tokens_t expr_tc;
+	knh_tokens_splitSTMT(ctx, tc, &expr_tc, 1/*needs;*/);
 	Token *tkl = knh_tokens_findLETNULL(&expr_tc);
 	if(tkl != NULL) {
 		if(isData) {
@@ -1997,7 +1989,10 @@ static void knh_Stmt_add_SEMICOLON(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		tc->c += 1;
 	}
 	else {
-		knh_perror(ctx, SP(o)->fileid, SP(o)->line, KERR_INFO, _("needs ;"));
+		int c = tc->c - 1;
+		if(c >= tc->e || SP(tc->ts[c])->tt != TT_SEMICOLON) {
+			knh_perror(ctx, SP(o)->fileid, SP(o)->line, KERR_INFO, _("needs ;"));
+		}
 	}
 }
 
@@ -2348,9 +2343,11 @@ static
 void knh_Stmt_add_CLASSTNs(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 {
 	if(SP(o)->stt == STT_ERR) return;
-	knh_tokens_t stmt_tc = knh_tokens_splitSTMT(ctx, tc);
+	knh_tokens_t stmt_tc;
+	knh_tokens_splitSTMT(ctx, tc, &stmt_tc, 0/*needs;*/);
 	while(stmt_tc.c < stmt_tc.e) {
-		knh_tokens_t comma_tc = knh_tokens_splitEXPR(ctx, &stmt_tc, TT_COMMA);
+		knh_tokens_t comma_tc;
+		knh_tokens_splitEXPR(ctx, &stmt_tc, TT_COMMA, &comma_tc);
 		if(comma_tc.c < comma_tc.e) {
 			knh_Stmt_add_CLASSTN(ctx, o, &comma_tc);
 			knh_tokens_ignore(ctx, &comma_tc);
@@ -2597,7 +2594,8 @@ void knh_Stmt_add_PSTMT3(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 	}
 
 	/* for(FIRST;second;third) */
-	knh_tokens_t stmt_tc = knh_tokens_splitEXPR(ctx, &ptc, TT_SEMICOLON);
+	knh_tokens_t stmt_tc;
+	knh_tokens_splitEXPR(ctx, &ptc, TT_SEMICOLON, &stmt_tc);
 	if(stmt_tc.c < stmt_tc.e) {
 		Token *tkT = stmt_tc.ts[stmt_tc.c];
 		if(SP(tkT)->tt == TT_TYPEN && DP(tkT)->tt_next == TT_NAME) {
@@ -2613,7 +2611,7 @@ void knh_Stmt_add_PSTMT3(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 		knh_Stmt_add(ctx, o, TM(new_Stmt(ctx, 0, STT_DONE)));
 	}
 
-	stmt_tc = knh_tokens_splitEXPR(ctx, &ptc, TT_SEMICOLON);
+	knh_tokens_splitEXPR(ctx, &ptc, TT_SEMICOLON, &stmt_tc);
 	/* for(first;SECODN;third) */
 	if(stmt_tc.c < stmt_tc.e) {
 		knh_Stmt_add(ctx, o, new_TermEXPR(ctx, &stmt_tc, 0/*isData*/));
@@ -2782,9 +2780,11 @@ static Stmt *new_StmtREGISTER(Ctx *ctx, knh_tokens_t *tc)
 static
 void knh_Stmt_add_PRINTEXPRs(Ctx *ctx, Stmt *stmt, knh_tokens_t *tc)
 {
-	knh_tokens_t expr_tc = knh_tokens_splitSTMT(ctx, tc);
+	knh_tokens_t expr_tc;
+	knh_tokens_splitSTMT(ctx, tc, &expr_tc, 1/*needs*/);
 	while(expr_tc.c < expr_tc.e) {
-		knh_tokens_t sub_tc = knh_tokens_splitEXPR(ctx, &expr_tc, TT_COMMA);
+		knh_tokens_t sub_tc;
+		knh_tokens_splitEXPR(ctx, &expr_tc, TT_COMMA, &sub_tc);
 		if(sub_tc.c < sub_tc.e) {
 			if(sub_tc.c + 1 == sub_tc.e) {
 				Token *tkn = sub_tc.ts[sub_tc.c];
@@ -2805,7 +2805,6 @@ static Stmt *new_StmtPRINT(Ctx *ctx, knh_tokens_t *tc)
 {
 	Stmt *o = new_StmtMETA(ctx, tc, STT_PRINT);
 	knh_Stmt_add_PRINTEXPRs(ctx, o, tc); /* expr* */
-	knh_Stmt_add_SEMICOLON(ctx, o, tc); /* ; */
 	return o;
 }
 
@@ -2881,8 +2880,8 @@ static
 Stmt *new_StmtDECL(Ctx *ctx, Token *tkT, knh_tokens_t *tc)
 {
 	Stmt *stmt = new_StmtMETA(ctx, tc, STT_DECL);
-
-	knh_tokens_t expr_tc = knh_tokens_splitEXPR(ctx, tc, TT_COMMA);
+	knh_tokens_t expr_tc;
+	knh_tokens_splitEXPR(ctx, tc, TT_COMMA, &expr_tc);
 	knh_Stmt_add(ctx, stmt, TM(tkT));
 	knh_Stmt_add_VARN(ctx, stmt, &expr_tc);
 
@@ -2929,7 +2928,8 @@ Stmt* new_StmtFUNCEXPR(Ctx *ctx, knh_tokens_t *tc, int isData)
 		}
 		if(DP(ts[c])->tt_next == TT_NAME && knh_Token_isVARN(ts[c+1])) {  /* @TEST int name; */
 			Token *tk_TYPEN = ts[c]; tc->c += 1;
-			knh_tokens_t expr_tc = knh_tokens_splitSTMT(ctx, tc);
+			knh_tokens_t expr_tc;
+			knh_tokens_splitSTMT(ctx, tc, &expr_tc, 1/*needs*/);
 			return new_StmtDECL(ctx, tk_TYPEN, &expr_tc);
 		}
 		if(DP(ts[c])->tt_next == TT_PARENTHESIS && DP(ts[c+1])->tt_next== TT_BRACE) { /* @TEST int (n) {...} */
@@ -3056,6 +3056,7 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tokens_t *tc, int isData)
 {
 	Token *tkc = NULL;
 	tc->meta = -1;
+	if(isData) return new_StmtDATA(ctx, tc, isData);
 
 	L_TAIL:;
 	if(!(tc->c < tc->e)) {
