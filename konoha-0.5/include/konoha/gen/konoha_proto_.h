@@ -523,6 +523,9 @@ void  init_IO(Ctx *ctx);
 InputStream *new_InputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
 OutputStream *new_OutputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
 /* ../src/deps/filesystem.c */
+char * knh_format_parentpath(char *buf, size_t bufsiz, knh_bytes_t path, int n);
+char * knh_format_nzpath(char *buf, size_t bufsiz, knh_bytes_t path);
+char * knh_format_catpath(char *buf, size_t bufsiz, knh_bytes_t path, knh_bytes_t file);
 knh_boolean_t knh_isfile(Ctx *ctx, knh_bytes_t path);
 knh_boolean_t knh_isdir(Ctx *ctx, knh_bytes_t path);
 knh_boolean_t knh_mkdir(Ctx *ctx, knh_bytes_t path, int isThrowable);
@@ -572,10 +575,6 @@ void knh_ExceptionHandler_traverse(Ctx *ctx, ExceptionHandler *hdr, knh_ftravers
 void knh_Context_init(Ctx *ctx, knh_Context_t *o, int init);
 void knh_Stmt_done(Ctx *ctx, Stmt *o);
 /* ../src/main/exports.c */
-/* ../src/main/fileutils.c */
-char * knh_format_parentpath(char *buf, size_t bufsiz, knh_bytes_t path, int n);
-char * knh_format_nzpath(char *buf, size_t bufsiz, knh_bytes_t path);
-char * knh_format_catpath(char *buf, size_t bufsiz, knh_bytes_t path, knh_bytes_t file);
 /* ../src/main/glue.c */
 int knh_fcallback_cmpr(Object *obj, Object *obj2);
 void *konoha_generateCallBackFunc(Ctx *ctx, void *func, Closure *c);

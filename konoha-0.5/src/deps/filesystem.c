@@ -92,14 +92,13 @@ KNHAPI(char*) knh_format_ospath2(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t
 	if(knh_bytes_startsWith(path, STEXT("file:"))) {
 		path = knh_bytes_last(path, 5);
 	}
-	knh_format_bytes(buf, bufsiz, path);
-	if(ext != NULL) {
-		size_t esize = knh_strlen(ext) + 1;
-		if(path.len + esize < bufsiz) {
-			knh_memcpy(buf + (path.len-1), ext, esize);
-		}
+	if(ext == NULL) {
+		knh_format_bytes(buf, bufsiz, path);
 	}
-	DBG2_P("'%s'", buf);
+	else {
+		knh_format_join2(buf, bufsiz, path, B(ext));
+		DBG2_P("'%s'", buf);
+	}
 	for(i = 0; buf[i] != 0; i++) {
 		if(buf[i] == '/' || buf[i] == '\\') {
 			buf[i] = KONOHA_OS_FILE_SEPARATOR;
