@@ -2,7 +2,7 @@ using sfcc.*;
 
 int rc;
 String msg;
-CIMCString str = new CIMCString();
+//CIMCString str = new CIMCString();
 String host = "localhost";
 String userid = "Kato";
 String passwd = "konoha";
@@ -26,5 +26,6 @@ if(status.rc == 0){
     while (enm.hasNext()) {
 	op = enm.getNext();
 	str = op.toString();
+	OUT << str << EOL;
     }
 }
