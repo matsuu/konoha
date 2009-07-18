@@ -1,31 +1,33 @@
 #!/usr/local/bin/konoha
 
-import "./src/check.k";
-import "./src/init.k";
-import "./src/import.k";
+import "./src/const.k";
+import "./src/initer.k";
 
-void helloKlip(String code)
-{
-	ins = new InputStream("./sys/hello.klip","r");
-	foreach( String txt from ins ) {
-		if ( txt[0] in? code  || txt.startsWith("*") ) {
-			txt = txt[2..];
-			OUT.println(txt);
-		}
-	}
-	ins.close();
-}
+/*-----decompress-----*/
+import "./src/decomp/decomp.k";
+import "./src/decomp/posix.k";
+import "./src/decomp/zlib.k";
+
+/*-----file getter-----*/
+import "./src/f_getter/getter.k";
+import "./src/f_getter/curl.k";
+import "./src/f_getter/stream.k";
+
+/*-----file parser-----*/
+import "./src/parser/parser.k";
+import "./src/parser/json.k";
+//import "./src/parser/xml.k";
+
+/*-----main-----*/
+import "./src/f_handler.k";
+import "./src/package.k";
+import "./src/operater.k";
+import "./src/klip.k";
 
 //*-----main-----
 int main (String[] args)
 {
- 	if ( |args| > 1 ) {
-		if ( do_klip.indexOf("#") == -1 ) {
-			return klipMain(args); 
-		}
-	} else {
-		klipInfo("u");
-	}
-	helloKlip(do_klip);
-	return 0;
+	Klip klip = new Klip(args);
+	klip.check();
+	return klip.start();
 }

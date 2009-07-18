@@ -2,30 +2,31 @@
 /// parsing data to json
 ///
 /*-----class Parser for Json-----*/
-class ParserJson extends Form
+class ParserJson extends Parser
 {
-	String file;
 
-	/*-----constructor-----*/
-	ParserJson(String name,String jsonfile)
+	/*-----Override Parser.setMember-----*/
+	void setMember()
 	{
-		this.name = name;
-		this.file = jsonfile;
+		this.version = getElement("version");
+		this.url = getElement("url");
+		this.depend = getElement("depend").split("&",0);
 	}
 
-	String rawjs()
+	/*-----Override Parser.generate-----*/
+	String generate()
 	{
 		String ret;
-		ins = new InputStream(this.file,"r");
-		foreach( String txt from ins ) {
-			ret += txt;
-		}
-		ins.close();
-		return ret - "\t";
+		if ( this.url == "" ) { return ret; }
+		ret += "{\n";
+		ret += setNode("name",this.name) + ",\n";
+		ret += setNode("version",this.version) + ",\n";
+		ret += setNode("url",this.url);
+		if ( this.depend[0] != "" ) { ret += ",\n" + arrayNode("depend",this.depend); }
+		return ret + "\n}\n";
 	}
 
-	String succRaw (String raw)	{ return raw % ","; }
-
+	/*-----for setMemberJson-----*/ 
 	String getElement(String elemname)
 	{
 		String ret;
@@ -45,10 +46,11 @@ class ParserJson extends Form
 	String parseThisTree(String raw,String elemname)
 	{
 		String ret;
+		String key = %('"%s{0}":',elemname);
 		while(true) {
 			if ( raw == "" ) { break; }
 			String pic = raw / ",";
-			if ( elemname in? pic ) { 
+			if ( key in? pic ) { 
 				if ( elemname != "depend" ) {
 					ret = pic.split('":"',0).pop();
 					ret = ret.split('"',0)[0];
@@ -72,19 +74,20 @@ class ParserJson extends Form
 		return ret;
 	}
 
-	/*-----Generate Json-----*/
-	String generateJson()
+	String rawjs()
 	{
 		String ret;
-		if ( this.url == "" ) { return ret; }
-		ret += "{\n";
-		ret += setNode("name",this.name) + ",\n";
-		ret += setNode("version",this.version) + ",\n";
-		ret += setNode("url",this.url);
-		if ( this.depend[0] != "" ) { ret += ",\n" + arrayNode("depend",this.depend); }
-		return ret + "\n}\n";
+		ins = new InputStream(this.file,"r");
+		foreach( String txt from ins ) {
+			ret += txt;
+		}
+		ins.close();
+		return ret - "\t";
 	}
 
+	String succRaw (String raw)	{ return raw % ","; }
+
+	/*-----for generateJson-----*/
 	String setNode(String name,String data)
 	{
 		return %('"%s{0}":"%s{1}"',name,data );
@@ -99,15 +102,6 @@ class ParserJson extends Form
 		}
 		return ret[..|ret|-2] + "]";
 	}
+
 }
 
-/*-----Json2Package-----*/
-void Parser.setMember()
-{
-	String buf = ".js";
-	ParserJson pars = new ParserJson(this.name,this.file);
-	this.name = pars.name;
-	this.version = pars.getElement("version");
-	this.url = pars.getElement("url");
-	this.depend = pars.getElement("depend").split("&",0);
-}

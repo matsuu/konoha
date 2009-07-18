@@ -1,10 +1,14 @@
 ///
 /// define const data
 ///
-/*-----system integer for main-----*/
-EXIT_SUCCESS = 0; EXIT_ERROR = -1; EXIT_NORMAL=2;
+/*-----system const integer-----*/
+EXIT_SUCCESS = 1;
+EXIT_NORMAL  = 0;
+EXIT_ERROR   = -1;
 
-ADD = 3; REPLACE = 6; DELETE = 7; //touchList
+ADD = 1;
+REPLACE = 2;
+DELETE = 3;
 
 /*-----already installed list & format to write -----*/
 CURDATA = "./sys/current.json";
@@ -12,18 +16,27 @@ CURFORM = '{"name":"%s{0}","version":"%s{1}","url":"%s{2}"},';
 
 /*-----other files(for undo)-----*/
 PREVDATA = "./sys/previous.json";
-LATEST = "./sys/latest.klip";
+LATEST = "./sys/latest.log";
 
 /*-----server's klip_data url(klip.xml or etc)-----*/
-KLIPURL = "http://konoha.sourceforge.jp/klip/%s{0}";
-//KLIPURL = "http://localhost/klip/%s{0}";
+KLIPFILE = "klip.json";
+//KLIPURL = "http://konoha.sourceforge.jp/klip/" + KLIPFILE;
+KLIPURL = "http://localhost/klip/" +  KLIPFILE;
 
 /*-----sourceforge's mirror server-----*/
 sites = ["keihanna" ,"jaist" ,"globalbase", "osdn", "iij"];
 
 /*-----KLIPDATA-----*/
-KLIPDATA = "./sys/klip.json";
-klip_TYPE = KLIPDATA.split(".",0).pop(); 
+KLIPDATA = "./sys/" + KLIPFILE;
 
-/*-----KLIPINST-----*/
-String klip_INST;
+/*-----system flag-----*/
+boolean root;
+boolean fail = false;
+boolean use_curl = false;
+boolean use_zlib = false;
+boolean use_libtar = false;
+boolean use_posix = false;
+boolean use_zllt = false;
+
+/*-----install path-----*/
+String path;

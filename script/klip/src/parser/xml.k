@@ -1,22 +1,39 @@
 ///
 /// parsing data to Xml
 ///
-using libxml2.*;
-import "form.k";
-
 /*-----class Parser for Xml-----*/
-class ParserXml extends Form
+class ParserXml extends Parser
 {
-	String file;
 
-	/*-----constructor-----*/
-	ParserXml(String name,String xmlfile)
+	/*-----Override Parser.setMember-----*/
+	void setMember()
 	{
-		this.name = name;
-		this.file = xmlfile;
+		this.version = getElement("version");
+		this.url = getElement("url");
+		this.depend = getElement("depend").split("&",0);
 	}
 
-	/*-----parsing Xml-----*/
+	/*-----Override Parser.generate-----*/
+	String generate()
+	{
+		String ret;
+		if ( this.url == "" ) { return ret; }
+		ret += setAttr("package",0) + "\n";
+		ret += setNode("name",this.name) + "\n";
+		ret += setNode("version",this.version) + "\n";
+		ret += setNode("url",this.url) + "\n";
+		int i = 0;
+		ret += setAttr("depend",0) + "\n";
+		foreach( String cell from this.depend ) {
+			if ( cell == "") { break; }
+			ret += setAttr("dpackage",0) + setNode("dname",cell / "=");
+			ret += setNode("dversion",cell % "=") + setAttr("dpackage",1) + "\n";
+		}
+		ret += setAttr("depend",1) + "\n";
+		return  ret + setAttr("package",1) + "\n";
+	}
+
+	/*-----for setMemberXml-----*/
 	String getElement(String elemname)
 	{ 
 		XmlReader reader = new XmlReader (this.file);
@@ -78,26 +95,7 @@ class ParserXml extends Form
 		return ans;
 	}
 
-	/*-----Generate Xml-----*/
-	String generateXml()
-	{
-		String ret;
-		if ( this.url == "" ) { return ret; }
-		ret += setAttr("package",0) + "\n";
-		ret += setNode("name",this.name) + "\n";
-		ret += setNode("version",this.version) + "\n";
-		ret += setNode("url",this.url) + "\n";
-		int i = 0;
-		ret += setAttr("depend",0) + "\n";
-		foreach( String cell from this.depend ) {
-			if ( cell == "") { break; }
-			ret += setAttr("dpackage",0) + setNode("dname",cell / "=");
-			ret += setNode("dversion",cell % "=") + setAttr("dpackage",1) + "\n";
-		}
-		ret += setAttr("depend",1) + "\n";
-		return  ret + setAttr("package",1) + "\n";
-	}
-
+	/*-----for generateXml-----*/
 	String setNode(String attr,String data)
 	{
 		return setAttr(attr,0) + data + setAttr(attr,1);
@@ -110,15 +108,7 @@ class ParserXml extends Form
 		else { ret = name; }
 		return "<" + ret + ">";
 	}
+
 }
 
-/*-----Xml2Package-----*/
-void Parser.setMember()
-{
-	String buf = "xml";
-	ParserXml pars = new ParserXml(this.name,this.file);
-	this.name = pars.name;
-	this.version = pars.getElement("version") + buf - buf;
-	this.url = pars.getElement("url") + buf - buf;
-	this.depend = pars.getElement("depend").split("&",0);
-}
+

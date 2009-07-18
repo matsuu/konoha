@@ -2,24 +2,26 @@
 //registing parsers
 //
 /*-----class Parser Form-----*/
-class Parser extends Form
+class Parser
 {
+	String name;
+	String version;
+	String url;
+	String[] depend;
 	String file;
+
 	/*-----constructor-----*/
 	Parser(String name, String file)
 	{
 		this.name = name;
+		this.depend = [];
 		this.file = file;
  	}
 
 	/*-----Data2Package-----*/
-	void setMember(){}
-}
+	@virtual void setMember();
 
-//*-----get current version from curdata-----*/
-String getCurVer(String name)
-{
-	Parser p = new Parser(name,CURDATA);
-	p.setMember();
-	return p.version;
+	/*-----generate formed txt-----*/
+	@virtual String generate();
+
 }

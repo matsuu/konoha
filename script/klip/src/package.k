@@ -1,11 +1,14 @@
 ///
 /// define class Package 
 ///
-import "form.k";
-
 /*-----Package's class-----*/
-class Package extends Form
+class Package
 {
+	/*-----package-----*/
+	String name;
+	String version;
+	String url;
+	String[] depend;
 
 	/*-----constructor-----*/
 	Package(String name,String version,String url)
@@ -14,62 +17,78 @@ class Package extends Form
 		this.version = version;
 		this.url = url;
 	}
-	
-	//*-----methods for set member variables-----*/
-	boolean setMember(String file)
-	{
-		String filetype = file.split(".",0).pop();
-		Parser pars = new Parser(this.name,file);
-		pars.setMember();
-		return transMembers(pars);
-	}
 
-	boolean transMembers(Parser pars)
+	//*-----methods for set member variables-----*/
+	void setMember(String file)
 	{
+		Parser pars = getParser(file);
 		parsver = pars.version;
-		packver = this.version;
-		if( packver == "" || packver == parsver) { 
-		} else if ( packver < parsver) {
-			String detected = %("%s{0} ver=%s{1}",this.name,parsver);
+		if( version == "" || version == parsver ) { 
+		} else if ( version < parsver) {
+			String detected = %("%s{0} ver=%s{1}",name,parsver);
 			OUT.println("KLIP : install " + detected);
 		} else {
-			OUT.println("!ERR : selected version is incorrect!");
-			return false;
+			print("!WARN: detected lower version only");
 		}
 		this.version = parsver;
 		this.url = pars.url;
 		this.depend = pars.depend;
-		if ( this.url == "" ) {
-			return false; 
-		} else {
-			return true;
+	}
+
+	//*-----get version from CURDATA-----*/
+	String getCurVer()
+	{
+		Parser pars = getParser(CURDATA);
+		return pars.version;
+	}
+
+	//*-----check before install [installed or not]-----*/
+	boolean selectYorN(String message)
+	{
+		boolean ret;
+		OUT.print(%("!ASK : %s{0} [y/n] : ",message));
+		while( true ){
+			input = IN.readLine();
+			if ( input == "y" ) {
+				ret = true;
+				break;
+			} else if ( input == "n" ) {
+				ret = false;
+				break;
+			} else {
+				OUT.print("!ASK : please input [y/n] : "); 
+			}
 		}
+		return ret;
 	}
 
-	//*-----get package data-----*/
-	boolean getPackage(){
-		OUT.println("!ERR : no way to get package data [curl / stream]");
-		return false; 
+	/*-----remove dir to tmp-----*/
+	String rmtmp(String name)
+	{
+		String tmpdir = "/tmp/" + name;
+		while ( os.hasDir(tmpdir) ) {
+			tmpdir = "/tmp/" + (String)Int.random(1024) + "." + name;
+		}
+		return tmpdir;
 	}
 
-	//*-----decompress archieves-----*/
-	boolean decomPackage(){
-		OUT.println("!ERR : no way to decompress package data [zlib + libtar / posix]");
-		return false; 
-	}
 
+	/*
+	  operations
+	 */
+	
 	//*-----do real operation-----*/
 	int do_install()
 	{
 		String filename = this.url.split("/",0).pop();
 		if ( !getPackage() ) {
+			print("!ERR : Package.do_install : getPackage");
 			return EXIT_ERROR;
 		}
-		boolean ret = decomPackage();
-		if ( !os.unlink(filename) ) {
-			return EXIT_ERROR;
-		}
+		boolean ret = decompPackage();
+		os.unlink(filename);
 		if ( !ret ) {
+			print("!ERR : Package.do_install : decompPackage");
 			return EXIT_ERROR;
 		}
 		OUT.println("KLIP : done!");
@@ -78,33 +97,31 @@ class Package extends Form
 
 	int do_remove()
 	{
-		String path = klip_INST + "/" + this.name;
-		String ptmp = rmtmp(this.name);
-		if ( !os.rename(path,ptmp) ) {
+		String ptmp = rmtmp(name);
+		if ( !os.rename(__path + "/" + name,ptmp) ) {
+			print("!ERR : Package.do_remove : rename");
 			return EXIT_ERROR;
 		}
 		OUT.println("KLIP : done!");
 		return EXIT_SUCCESS;
 	}
 
-	//*-----methods for guidance of operation-----*/
+	//*-----methods of operations-----*/
 	int install()
 	{
 		OUT.print("KLIP : install ...  ");
-		OUT.println(%("%s{0} ver=%s{1}",this.name,this.version));
-		path = klip_INST + "/" + this.name;
-		String getver = getCurVer(this.name);
+		OUT.println(%("%s{0} ver=%s{1}",name,version));
+		String getver = getCurVer();
 		if ( getver != "" ) {
-			OUT.println(%("KLIP : %s{0} ver=%s{1} is already installed!",this.name,getver));
-			if ( this.version >= getver ) {
+			OUT.println(%("KLIP : %s{0} ver=%s{1} is already installed!",name,getver));
+			if ( version >= getver ) {
 				return EXIT_NORMAL; 
 			} else {
 				OUT.println("KLIP : you can update this package");
 				return EXIT_NORMAL;
 			}
-		} else if ( os.hasDir(path) ) {
+		} else if ( os.hasDir( __path + "/" + name) ) {
 			OUT.println("KLIP : can't touch this exsited package!");
-			OUT.println("KLIP : denyed to install");
 			return EXIT_NORMAL;
 		}
 		if( !selectYorN("install it?") ) { 
@@ -115,19 +132,21 @@ class Package extends Form
 		}
 		return do_install();
 	}
-
+		
 	int update()
 	{
 		OUT.print("KLIP : update  ...  ");
-		OUT.println(%("%s{0} ver=%s{1}",this.name,this.version));
-		String path = klip_INST + "/" + this.name;
-		String getver = getCurVer(this.name);
+		OUT.println(%("%s{0} ver=%s{1}",name,version));
+		String getver = getCurVer();
 		if ( getver == "" ) {
-			OUT.println("KLIP : this package isn't installed.");
-			OUT.println("KLIP : denyed to update");
+			if ( os.hasDir( __path + "/" + name ) ) {
+				OUT.println("KLIP : can't touch this exsited package!");
+			} else {
+				OUT.println("KLIP : this package isn't installed.");
+			}
 			return EXIT_NORMAL;
-		} else if ( getver >= this.version ) {
-			OUT.println(%("KLIP : %s{0} ver=%s{1} is already installed!",this.name,getver));
+		} else if ( getver >= version ) {
+			OUT.println(%("KLIP : %s{0} ver=%s{1} is already installed!",name,getver));
 			OUT.println("KLIP : no need to update");
 			return EXIT_NORMAL;
 		}
@@ -145,27 +164,78 @@ class Package extends Form
 
 	int remove()
 	{
-		OUT.print("KLIP : remove  ...  ");
-		OUT.println(%("%s{0} ver=??",this.name));
-		String path = klip_INST + "/"+ this.name;
-		String getver = getCurVer(this.name);
-		if ( os.hasDir(path) ) {
+		OUT.println("KLIP : remove  ...  " + name);
+		String getver = getCurVer();
+		if ( os.hasDir( __path + "/" + name) ) {
 			if ( getver != "" ) {
-				OUT.println("KLIP : " + %("%s{0} ver=%s{1} ",this.name,getver) + " is found!");
-				if( !selectYorN("remove it?") ) { 
+				OUT.println("KLIP : " + %("%s{0} ver=%s{1} ",name,getver) + " is found!");
+				if( !selectYorN("remove it?") ) {
 					OUT.println("KLIP : denyed to remove");
 					return EXIT_NORMAL;
 				} else {
 					OUT.println("KLIP : remove this package");
 				}
 			} else {
-				OUT.println("!ERR : klip can't touch this existed package!");
+				OUT.println("!ERR : can't touch this existed package!");
 				return EXIT_NORMAL;
 			}
 		} else {
-			OUT.println("KLIP : " + this.name + " isn't found...");
+			OUT.println("KLIP : " + name + " isn't found...");
 			return EXIT_NORMAL;
 		}
 		return do_remove();
 	}
+
+
+	/*
+	  methods of depend with system flag
+	 */
+
+	Parser getParser(String file)
+	{
+		String type = file.split(".",0).pop();
+		Parser pars;
+		if ( type == "json" ) {
+			pars = (Parser) new ParserJson(name,file);
+			//		} else if ( type == "xml" ) {
+			//			if ( use_libxml ) {
+			//				pars = (Parser) new ParserXml(name,file);
+			//			} else {
+			//				OUT.println("!ERR : Package.setMember : cannot using libxml2 ");
+			//				return false;
+			//			}
+		} else {
+			print ("!ERR : Package.setMember : filetype == " + type );
+		}
+		pars.setMember();
+		return pars;
+	}
+
+	//*-----get package-----*/
+	boolean getPackage()
+	{
+		Getter g;
+		if ( __use_curl ) {
+			g = (Getter) new GetterCurl(url);
+		} else {
+			g = (Getter) new GetterStream(url);
+		}
+		return g.getPackage();
+	}
+	
+	//*-----decompress archieves-----*/
+	boolean decompPackage()
+	{
+		Decomp d;
+		if ( __use_zllt ) {
+			d = (Decomp) new DecompZllT(name,version);
+		} else if ( __use_posix ) {
+			d = (Decomp) new DecompSystem(name,version);
+		} else {
+			print("!ERR : Package.decompPackage : no way to decompPackage");
+			return false;
+		}
+		return d.decompPackage();
+	}
 }
+
