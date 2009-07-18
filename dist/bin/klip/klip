@@ -1,0 +1,33 @@
+#!/usr/local/bin/konoha
+
+import "./src/const.k";
+import "./src/initer.k";
+
+/*-----decompress-----*/
+import "./src/decomp/decomp.k";
+import "./src/decomp/posix.k";
+import "./src/decomp/zlib.k";
+
+/*-----file getter-----*/
+import "./src/f_getter/getter.k";
+import "./src/f_getter/curl.k";
+import "./src/f_getter/stream.k";
+
+/*-----file parser-----*/
+import "./src/parser/parser.k";
+import "./src/parser/json.k";
+//import "./src/parser/xml.k";
+
+/*-----main-----*/
+import "./src/f_handler.k";
+import "./src/package.k";
+import "./src/operater.k";
+import "./src/klip.k";
+
+//*-----main-----
+int main (String[] args)
+{
+	Klip klip = new Klip(args);
+	klip.check();
+	return klip.start();
+}
