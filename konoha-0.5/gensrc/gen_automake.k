@@ -71,6 +71,11 @@ libkonoha_la_SOURCES =
         o.println(%("dist_sample_SCRIPTS += %s{0}",p));
     }
 
+    o.println("""
+scriptdir = /usr/local/konoha/script
+scriptklipdir = /usr/local/konoha/script/klip
+dist_scriptklip_SCRIPTS =
+dist_scriptklip_SCRIPTS += ../dist/bin/klip""");
 
     o.println("""
 bin_PROGRAMS = konoha
