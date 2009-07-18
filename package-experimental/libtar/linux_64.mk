@@ -1,20 +1,21 @@
-#Makefile for deos_kernel.so
+# modified by u.hira@users.sourceforge.jp
 
 CC = gcc
 CFLAGS = -O2 -Wall -fmessage-length=0 -fPIC
-LDLIBS = -lkonoha
+LDLIBS = -ltar -lkonoha
 
-target = linux_32
-pkgname = deos_kernel
+target = linux_64
+pkgname = libtar
 
 library = "$(pkgname)_$(target).so"
 
 .PHONY: all
 all: $(library)
+	cat ./tar.k > ./libtar.k
 
-objs = $(pkgname).o
+objs = tar.o
 
-"$(pkgname).o": $(pkgname).c
+tar.o: tar.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 $(library): $(objs)
@@ -22,5 +23,5 @@ $(library): $(objs)
 
 .PHONY: clean
 clean:
-	$(RM) -rf $(objs) $(library)
+	$(RM) -rf $(objs) $(library) "$(pkgname).k"
 

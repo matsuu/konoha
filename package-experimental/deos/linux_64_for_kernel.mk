@@ -4,7 +4,7 @@ CC = gcc
 CFLAGS = -O2 -Wall -fmessage-length=0 -fPIC
 LDLIBS = -lkonoha
 
-target = linux_32
+target = linux_64
 pkgname = deos_kernel
 
 library = "$(pkgname)_$(target).so"

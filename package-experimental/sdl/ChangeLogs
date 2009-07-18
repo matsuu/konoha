@@ -1,0 +1,3 @@
+2009-07-19 Masahiro Ide <imasahiro@users.sourceforge.jp>
+	* linux_64.mk  surpport 64bit linux
+

@@ -1,18 +1,18 @@
-#Makefile for deos_kernel.so
+# Last modified by Kimio Kuramitsu kkuramitsu@sourceforge.jp
 
 CC = gcc
 CFLAGS = -O2 -Wall -fmessage-length=0 -fPIC
-LDLIBS = -lkonoha
+LDLIBS = -lbfd -lkonoha
 
-target = linux_32
-pkgname = deos_kernel
+target = linux_64
+pkgname = bfd
 
 library = "$(pkgname)_$(target).so"
 
 .PHONY: all
 all: $(library)
 
-objs = $(pkgname).o
+objs = "$(pkgname).o"
 
 "$(pkgname).o": $(pkgname).c
 	$(CC) $(CFLAGS) -o $@ -c $^
