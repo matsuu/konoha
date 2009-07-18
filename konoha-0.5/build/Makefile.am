@@ -3,7 +3,7 @@
 # shinpei@ynu(c)2008
 
 # make target for libtool.
-CFLAGS = -g3 -O3 -pipe
+AM_CFLAGS = -g3 -O3 -pipe
 lib_LTLIBRARIES = libkonoha.la
 
 libkonoha_la_LDFLAGS = -no-undefined -release 0 -version-info 5:0:0
@@ -124,17 +124,6 @@ libkonoha_la_includegen_HEADERS += ../include/konoha/gen/konohac_klr_.h
 libkonoha_la_includegen_HEADERS += ../include/konoha/gen/struct_.h
 libkonoha_la_includegen_HEADERS += ../include/konoha/gen/konoha_proto_.h
 libkonoha_la_includegen_HEADERS += ../include/konoha/gen/konohac_stmt_.h
-sampledir = /usr/local/konoha/sample
-dist_sample_SCRIPTS =
-dist_sample_SCRIPTS += ../dist/sample/konohaget.k
-dist_sample_SCRIPTS += ../dist/sample/readfile.k
-dist_sample_SCRIPTS += ../dist/sample/main.k
-dist_sample_SCRIPTS += ../dist/sample/ao.k
-dist_sample_SCRIPTS += ../dist/sample/helloworld.k
-dist_sample_SCRIPTS += ../dist/sample/http.k
-dist_sample_SCRIPTS += ../dist/sample/counter.k
-dist_sample_SCRIPTS += ../dist/sample/sort.k
-dist_sample_SCRIPTS += ../dist/sample/fib.k
 scriptdir = /usr/local/konoha/script
 scriptklipdir = /usr/local/konoha/script/klip
 dist_scriptklip_SCRIPTS =
