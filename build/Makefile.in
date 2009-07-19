@@ -42,8 +42,8 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = konoha$(EXEEXT)
 subdir = build
-DIST_COMMON = $(dist_pkgdemo_DATA) $(dist_pkgmath_DATA) \
-	$(dist_pkgposix_DATA) $(dist_pkgxml_DATA) \
+DIST_COMMON = $(dist_klip_SCRIPTS) $(dist_pkgdemo_DATA) \
+	$(dist_pkgmath_DATA) $(dist_pkgposix_DATA) $(dist_pkgxml_DATA) \
 	$(dist_sample_SCRIPTS) $(dist_scriptklip_SCRIPTS) \
 	$(libkonoha_la_include_HEADERS) \
 	$(libkonoha_la_includegen_HEADERS) \
@@ -63,9 +63,10 @@ am__vpath_adj = case $$p in \
   esac;
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
-	"$(DESTDIR)$(sampledir)" "$(DESTDIR)$(scriptklipdir)" \
-	"$(DESTDIR)$(pkgdemodir)" "$(DESTDIR)$(pkgmathdir)" \
-	"$(DESTDIR)$(pkgposixdir)" "$(DESTDIR)$(pkgxmldir)" \
+	"$(DESTDIR)$(klipdir)" "$(DESTDIR)$(sampledir)" \
+	"$(DESTDIR)$(scriptklipdir)" "$(DESTDIR)$(pkgdemodir)" \
+	"$(DESTDIR)$(pkgmathdir)" "$(DESTDIR)$(pkgposixdir)" \
+	"$(DESTDIR)$(pkgxmldir)" \
 	"$(DESTDIR)$(libkonoha_la_includedir)" \
 	"$(DESTDIR)$(libkonoha_la_includegendir)" \
 	"$(DESTDIR)$(libkonoha_la_includekonohadir)"
@@ -100,9 +101,11 @@ PROGRAMS = $(bin_PROGRAMS)
 am_konoha_OBJECTS = konoha.$(OBJEXT)
 konoha_OBJECTS = $(am_konoha_OBJECTS)
 konoha_DEPENDENCIES = libkonoha.la
+dist_klipSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 dist_sampleSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 dist_scriptklipSCRIPT_INSTALL = $(INSTALL_SCRIPT)
-SCRIPTS = $(dist_sample_SCRIPTS) $(dist_scriptklip_SCRIPTS)
+SCRIPTS = $(dist_klip_SCRIPTS) $(dist_sample_SCRIPTS) \
+	$(dist_scriptklip_SCRIPTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -351,9 +354,10 @@ dist_pkgxml_DATA = ../dist/package/xml/libxml2.k \
 pkgdemodir = /usr/local/share/konoha/package/demo
 dist_pkgdemo_DATA = ../dist/package/demo/demo.k \
 	../dist/package/demo/demo_macosx_32.dylib
-scriptdir = /usr/local/share/konoha/script
 scriptklipdir = /usr/local/share/konoha/script/klip
-dist_scriptklip_SCRIPTS = ../dist/bin/klip
+dist_scriptklip_SCRIPTS = ../dist/bin/klip.k
+klipdir = /usr/local/bin
+dist_klip_SCRIPTS = ../dist/bin/klip
 konoha_SOURCES = ../src/konoha.c
 konoha_INCLUDES = ../include
 konoha_LDADD = libkonoha.la
@@ -450,6 +454,25 @@ clean-binPROGRAMS:
 konoha$(EXEEXT): $(konoha_OBJECTS) $(konoha_DEPENDENCIES) 
 	@rm -f konoha$(EXEEXT)
 	$(LINK) $(konoha_OBJECTS) $(konoha_LDADD) $(LIBS)
+install-dist_klipSCRIPTS: $(dist_klip_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	test -z "$(klipdir)" || $(MKDIR_P) "$(DESTDIR)$(klipdir)"
+	@list='$(dist_klip_SCRIPTS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  if test -f $$d$$p; then \
+	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
+	    echo " $(dist_klipSCRIPT_INSTALL) '$$d$$p' '$(DESTDIR)$(klipdir)/$$f'"; \
+	    $(dist_klipSCRIPT_INSTALL) "$$d$$p" "$(DESTDIR)$(klipdir)/$$f"; \
+	  else :; fi; \
+	done
+
+uninstall-dist_klipSCRIPTS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_klip_SCRIPTS)'; for p in $$list; do \
+	  f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
+	  echo " rm -f '$(DESTDIR)$(klipdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(klipdir)/$$f"; \
+	done
 install-dist_sampleSCRIPTS: $(dist_sample_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	test -z "$(sampledir)" || $(MKDIR_P) "$(DESTDIR)$(sampledir)"
@@ -1401,7 +1424,7 @@ all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(SCRIPTS) $(DATA) \
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(sampledir)" "$(DESTDIR)$(scriptklipdir)" "$(DESTDIR)$(pkgdemodir)" "$(DESTDIR)$(pkgmathdir)" "$(DESTDIR)$(pkgposixdir)" "$(DESTDIR)$(pkgxmldir)" "$(DESTDIR)$(libkonoha_la_includedir)" "$(DESTDIR)$(libkonoha_la_includegendir)" "$(DESTDIR)$(libkonoha_la_includekonohadir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(klipdir)" "$(DESTDIR)$(sampledir)" "$(DESTDIR)$(scriptklipdir)" "$(DESTDIR)$(pkgdemodir)" "$(DESTDIR)$(pkgmathdir)" "$(DESTDIR)$(pkgposixdir)" "$(DESTDIR)$(pkgxmldir)" "$(DESTDIR)$(libkonoha_la_includedir)" "$(DESTDIR)$(libkonoha_la_includegendir)" "$(DESTDIR)$(libkonoha_la_includekonohadir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -1449,9 +1472,10 @@ info: info-am
 
 info-am:
 
-install-data-am: install-dist_pkgdemoDATA install-dist_pkgmathDATA \
-	install-dist_pkgposixDATA install-dist_pkgxmlDATA \
-	install-dist_sampleSCRIPTS install-dist_scriptklipSCRIPTS \
+install-data-am: install-dist_klipSCRIPTS install-dist_pkgdemoDATA \
+	install-dist_pkgmathDATA install-dist_pkgposixDATA \
+	install-dist_pkgxmlDATA install-dist_sampleSCRIPTS \
+	install-dist_scriptklipSCRIPTS \
 	install-libkonoha_la_includeHEADERS \
 	install-libkonoha_la_includegenHEADERS \
 	install-libkonoha_la_includekonohaHEADERS
@@ -1490,11 +1514,11 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-dist_pkgdemoDATA \
-	uninstall-dist_pkgmathDATA uninstall-dist_pkgposixDATA \
-	uninstall-dist_pkgxmlDATA uninstall-dist_sampleSCRIPTS \
-	uninstall-dist_scriptklipSCRIPTS uninstall-libLTLIBRARIES \
-	uninstall-libkonoha_la_includeHEADERS \
+uninstall-am: uninstall-binPROGRAMS uninstall-dist_klipSCRIPTS \
+	uninstall-dist_pkgdemoDATA uninstall-dist_pkgmathDATA \
+	uninstall-dist_pkgposixDATA uninstall-dist_pkgxmlDATA \
+	uninstall-dist_sampleSCRIPTS uninstall-dist_scriptklipSCRIPTS \
+	uninstall-libLTLIBRARIES uninstall-libkonoha_la_includeHEADERS \
 	uninstall-libkonoha_la_includegenHEADERS \
 	uninstall-libkonoha_la_includekonohaHEADERS
 
@@ -1505,13 +1529,13 @@ uninstall-am: uninstall-binPROGRAMS uninstall-dist_pkgdemoDATA \
 	distclean distclean-compile distclean-generic \
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-dist_pkgdemoDATA \
-	install-dist_pkgmathDATA install-dist_pkgposixDATA \
-	install-dist_pkgxmlDATA install-dist_sampleSCRIPTS \
-	install-dist_scriptklipSCRIPTS install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-libLTLIBRARIES \
-	install-libkonoha_la_includeHEADERS \
+	install-data install-data-am install-dist_klipSCRIPTS \
+	install-dist_pkgdemoDATA install-dist_pkgmathDATA \
+	install-dist_pkgposixDATA install-dist_pkgxmlDATA \
+	install-dist_sampleSCRIPTS install-dist_scriptklipSCRIPTS \
+	install-dvi install-dvi-am install-exec install-exec-am \
+	install-html install-html-am install-info install-info-am \
+	install-libLTLIBRARIES install-libkonoha_la_includeHEADERS \
 	install-libkonoha_la_includegenHEADERS \
 	install-libkonoha_la_includekonohaHEADERS install-man \
 	install-pdf install-pdf-am install-ps install-ps-am \
@@ -1519,11 +1543,11 @@ uninstall-am: uninstall-binPROGRAMS uninstall-dist_pkgdemoDATA \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-binPROGRAMS uninstall-dist_pkgdemoDATA \
-	uninstall-dist_pkgmathDATA uninstall-dist_pkgposixDATA \
-	uninstall-dist_pkgxmlDATA uninstall-dist_sampleSCRIPTS \
-	uninstall-dist_scriptklipSCRIPTS uninstall-libLTLIBRARIES \
-	uninstall-libkonoha_la_includeHEADERS \
+	uninstall-binPROGRAMS uninstall-dist_klipSCRIPTS \
+	uninstall-dist_pkgdemoDATA uninstall-dist_pkgmathDATA \
+	uninstall-dist_pkgposixDATA uninstall-dist_pkgxmlDATA \
+	uninstall-dist_sampleSCRIPTS uninstall-dist_scriptklipSCRIPTS \
+	uninstall-libLTLIBRARIES uninstall-libkonoha_la_includeHEADERS \
 	uninstall-libkonoha_la_includegenHEADERS \
 	uninstall-libkonoha_la_includekonohaHEADERS
 

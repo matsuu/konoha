@@ -73,6 +73,7 @@ libkonoha_la_SOURCES =
     }
 	/* install packages */
 	// TODO: we need System.isdir() to check...
+	
 	pkgs= ["math", "posix", "xml", "demo"];
 	foreach(String pname in pkgs) {
 		o.println(%("pkg%s{0}dir = /usr/local/share/konoha/package/%s{0}", pname));
@@ -87,12 +88,15 @@ libkonoha_la_SOURCES =
 		}
 	}
     o.println("""
-scriptdir = /usr/local/share/konoha/script
 scriptklipdir = /usr/local/share/konoha/script/klip
-dist_scriptklip_SCRIPTS =
-dist_scriptklip_SCRIPTS += ../dist/bin/klip""");
+dist_scriptklip_SCRIPTS = ../dist/bin/klip.k""");
 
     o.println("""
+klipdir = /usr/local/bin
+dist_klip_SCRIPTS = ../dist/bin/klip
+
+
+
 bin_PROGRAMS = konoha
 konoha_SOURCES = ../src/konoha.c
 konoha_INCLUDES = ../include
