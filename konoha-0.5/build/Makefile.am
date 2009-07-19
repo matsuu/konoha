@@ -159,10 +159,13 @@ pkgdemodir = /usr/local/share/konoha/package/demo
 dist_pkgdemo_DATA =
 dist_pkgdemo_DATA += ../dist/package/demo/demo.k
 dist_pkgdemo_DATA += ../dist/package/demo/demo_macosx_32.dylib
-scriptdir = /usr/local/share/konoha/script
 scriptklipdir = /usr/local/share/konoha/script/klip
-dist_scriptklip_SCRIPTS =
-dist_scriptklip_SCRIPTS += ../dist/bin/klip
+dist_scriptklip_SCRIPTS = ../dist/bin/klip.k
+klipdir = /usr/local/bin
+dist_klip_SCRIPTS = ../dist/bin/klip
+
+
+
 bin_PROGRAMS = konoha
 konoha_SOURCES = ../src/konoha.c
 konoha_INCLUDES = ../include
