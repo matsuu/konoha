@@ -6,12 +6,13 @@ MAKEFILE = "../build/Makefile.am";
 int main(String[] args)
 {
     OutputStream o = new OutputStream(MAKEFILE,"w");
-    o.print("""# this Makefile is generated from ../gensrc/gen_automake.k
+    o.print("""
+# this Makefile is generated from ../gensrc/gen_automake.k
 # masahiro@ynu(c)2009
-# shinpei@ynu(c)2008
+# shinpei@ynu(c)2008-09
 
 # make target for libtool.
-CFLAGS = -g3 -O3 -pipe
+AM_CFLAGS = -g3 -O3 -pipe
 lib_LTLIBRARIES = libkonoha.la
 
 libkonoha_la_LDFLAGS = -no-undefined -release 0 -version-info 5:0:0
@@ -60,7 +61,7 @@ libkonoha_la_SOURCES =
         o.println(%("libkonoha_la_includegen_HEADERS += %s{0}",p));
     }
 
-    o.println("sampledir = /usr/local/konoha/sample");
+    o.println("sampledir = /usr/local/share/konoha/sample");
     o.println("dist_sample_SCRIPTS =");
 
     foreach (String p in System.walk("../dist/sample")) {
@@ -70,10 +71,24 @@ libkonoha_la_SOURCES =
 
         o.println(%("dist_sample_SCRIPTS += %s{0}",p));
     }
-
+	/* install packages */
+	// TODO: we need System.isdir() to check...
+	pkgs= ["math", "posix", "xml", "demo"];
+	foreach(String pname in pkgs) {
+		o.println(%("pkg%s{0}dir = /usr/local/share/konoha/package/%s{0}", pname));
+		o.println(%("dist_pkg%s{0}_DATA =", pname));
+		
+		foreach (String p in System.walk(%("../dist/package/%s{0}", pname))) {
+			if(p.indexOf(".svn") >= 0) continue;
+			if((p.endsWith(".k") == false) and (p.endsWith(".so") == false) and (p.endsWith(".dylib") == false)) continue;
+			if(p.endsWith("konoha.h")) continue;
+			// little bit tricky...
+			o.println(%("dist_pkg%s{0}_DATA += %s{1}", pname ,p));
+		}
+	}
     o.println("""
-scriptdir = /usr/local/konoha/script
-scriptklipdir = /usr/local/konoha/script/klip
+scriptdir = /usr/local/share/konoha/script
+scriptklipdir = /usr/local/share/konoha/script/klip
 dist_scriptklip_SCRIPTS =
 dist_scriptklip_SCRIPTS += ../dist/bin/klip""");
 
