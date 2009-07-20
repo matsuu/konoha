@@ -762,12 +762,13 @@ void knh_Iterator_init(Ctx *ctx, Iterator *it, int init)
 	knh_Iterator_struct *b = DP(it);
 	b->fnext  =  knh_fitrnext_single;
 	KNH_INITv(b->source, KNH_VOID);
-	KNH_INITv(b->prefetch, KNH_NULL);
-	b->pos    =  0;
-	b->ref    =  NULL;
-	b->count = 0;
-	b->start = 0;
-	b->end   = (size_t)-1;
+//	KNH_INITv(b->prefetch, KNH_NULL);
+	b->pos      =  0;
+	b->ref      =  NULL;
+	b->freffree = NULL;
+//	b->count = 0;
+//	b->start = 0;
+//	b->end   = (size_t)-1;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -775,9 +776,9 @@ void knh_Iterator_init(Ctx *ctx, Iterator *it, int init)
 static
 void knh_Iterator_traverse(Ctx *ctx, Iterator *it, knh_ftraverse ftr)
 {
-	knh_Iterator_struct *b = DP(it);
-	ftr(ctx, b->source);
-	ftr(ctx, b->prefetch);
+	knh_Iterator_close(ctx, it);
+	ftr(ctx, DP(it)->source);
+//	ftr(ctx, b->prefetch);
 }
 
 /* ======================================================================== */

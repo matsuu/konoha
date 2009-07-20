@@ -36,9 +36,6 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-/* [macros] */
-
-/* ------------------------------------------------------------------------ */
 /* [private] */
 
 static
@@ -49,9 +46,17 @@ ITRNEXT knh_fitrnext_end(Ctx *ctx, knh_sfp_t *sfp, int n)
 
 /* ------------------------------------------------------------------------ */
 
-void knh_Iterator_close(Ctx *ctx, Iterator *it)
+KNHAPI(void) knh_Iterator_close(Ctx *ctx, Iterator *it)
 {
 	KNH_ASSERT(IS_bIterator(it));
+	KNH_SETv(ctx, DP(it)->source, KNH_NULL);
+	if(DP(it)->freffree != NULL) {
+		if(DP(it)->ref != NULL) {
+			DP(it)->freffree(DP(it)->ref);
+		}
+		DP(it)->freffree = NULL;
+	}
+	DP(it)->ref = NULL;
 	DP(it)->fnext = knh_fitrnext_end;
 	it->fnext_1   = knh_fitrnext_end;
 }
@@ -59,15 +64,33 @@ void knh_Iterator_close(Ctx *ctx, Iterator *it)
 /* ======================================================================== */
 /* [constructors] */
 
-Iterator* new_Iterator(Ctx *ctx, knh_class_t p1, Any *source, knh_fitrnext fnext)
+KNHAPI(Iterator*) new_Iterator(Ctx *ctx, knh_class_t p1, Any *source, knh_fitrnext fnext)
 {
 	knh_class_t cid = knh_class_Iterator(ctx, p1);
-	Iterator *o = (Iterator*)new_Object_init(ctx, FLAG_Iterator, cid, 0);
+	Iterator *it = (Iterator*)new_Object_init(ctx, FLAG_Iterator, cid, 0);
 	if(IS_NULL(source)) fnext = knh_fitrnext_end;
-	if(fnext != NULL) DP(o)->fnext = fnext;
-	KNH_SETv(ctx, DP(o)->source, source);
-	o->fnext_1 = DP(o)->fnext;
-	return o;
+	if(fnext != NULL) DP(it)->fnext = fnext;
+	KNH_SETv(ctx, DP(it)->source, source);
+	it->fnext_1 = DP(it)->fnext;
+	return it;
+}
+
+/* ------------------------------------------------------------------------ */
+/* [constructors] */
+
+KNHAPI(Iterator*) new_GlueIterator(Ctx *ctx, knh_class_t p1, void *ref, knh_fitrnext fnext, knh_ffree ffree)
+{
+	knh_class_t cid = knh_class_Iterator(ctx, p1);
+	Iterator *it = (Iterator*)new_Object_init(ctx, FLAG_Iterator, cid, 0);
+	if(ref == NULL) {
+		fnext = knh_fitrnext_end;
+		ffree = NULL;
+	}
+	DP(it)->ref = ref;
+	DP(it)->freffree = ffree;
+	if(fnext != NULL) DP(it)->fnext = fnext;
+	it->fnext_1 = DP(it)->fnext;
+	return it;
 }
 
 /* ------------------------------------------------------------------------ */

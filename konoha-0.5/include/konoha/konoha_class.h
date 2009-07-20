@@ -246,6 +246,8 @@ typedef int   (KNH_CC_FASTCALL *knh_fitrnext)(Ctx *, knh_sfp_t *, int n);
 typedef ITRNEXT (*knh_fitrnext)(Ctx *, knh_sfp_t *, int n);
 #endif
 
+typedef void (*knh_ffree)(void *ptr);
+
 typedef struct knh_Iterator {
 	knh_fitrnext fnext;
 	Object* source;
@@ -254,10 +256,11 @@ typedef struct knh_Iterator {
 		void*   ref;
 		knh_code_t *pc; /* @see(Generator) */
 	};
-	size_t count;
-	size_t start;
-	size_t end;
-	Object* prefetch; /* @see(Generator) */
+	knh_ffree freffree;
+//	size_t count;
+//	size_t start;
+//	size_t end;
+//	Object* prefetch;    /* @see(Generator) */
 } knh_Iterator_struct;
 
 /* ------------------------------------------------------------------------ */
