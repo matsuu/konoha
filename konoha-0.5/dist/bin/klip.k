@@ -1,5 +1,12 @@
 #!/usr/local/bin/konoha
 
+
+/*----------------------------------------------------------*/
+
+///
+/// define const data
+///
+/*-----system info message-----*/
 usage="""
 *************************************
 *  klip ( Konoha LIbrary Provider ) *
@@ -11,7 +18,11 @@ usage:
 
 options:
 
-  search  pkg : search package from list
+  list        : list of package on server
+
+  installed   : list of packages already installed
+
+  search  pkg : search package from list on server
 
   install pkg : install package
 
@@ -20,15 +31,8 @@ options:
   remove  pkg : remove package
 
   undo        : undo previous operation
-
 """;
 
-/*----------------------------------------------------------*/
-/*----------------------------------------------------------*/
-
-///
-/// define const data
-///
 /*-----system const integer-----*/
 EXIT_SUCCESS = 1;
 EXIT_NORMAL  = 0;
@@ -67,50 +71,48 @@ boolean use_libtar = false;
 boolean use_posix = false;
 boolean use_zllt = false;
 
-/*-----install path-----*/
-String path;
-
-/*----------------------------------------------------------*/
 /*----------------------------------------------------------*/
 
 //
 //getting system environment
 //
 
-/*
-  user check
-*/
 if ( !os.hasDir(klipdir) ) {
 	os.mkdir(klipdir);
 }
 
-path = $konoha.path.package + "/";
+/*
+  user check
+*/
+String path = $konoha.path.package;
 if ( !os.hasDir( path ) ) {
 	root = os.mkdir( path );
 } else {
-	int i = 0;
-	while ( !os.hasDir( path + "./klip" * i ) ) { i++; }
-	root = os.mkdir( path + "klip" * i );
-	os.rename( path + "klip","/tmp/klip");
+	String home = $env.HOME;
+	if ( "/home/" in? home ) {
+		root = false;
+	} else {
+		root = true;
+	}
 }
 if ( !root ) { 
-	path = $konoha.path.user.package + "/";
+	path = $konoha.path.user.package;
 	if ( !os.hasDir( path ) ) {
 		os.mkdir( path );
 	}
 }
-
+path += "/";
 
 /*
   library check
- */
-
+*/
 //*-----curl-----*/
+String libcurl = path + "curl";
 class Curl {
 	@abstract boolean easyPerform();
 	@abstract void easySetOpt(int type, Any? data);
 }
-if ( os.hasDir( path + "curl") ) {
+if ( os.hasDir( libcurl ) ) {
 	if ( os.hasLib("libcurl") ) {
 		eval ( "using curl.*;");
 		use_curl = true;
@@ -118,10 +120,11 @@ if ( os.hasDir( path + "curl") ) {
 }
 		
 //*-----zlib-----*/
+String libzlib = path + "zlib";
 class Zlib {
 	@abstract boolean decompGZ(String gzfile);
 }
-if ( os.hasDir( path + "zlib") ) {
+if ( os.hasDir( libzlib ) ) {
 	if ( os.hasLib("libz") ) {
 		eval ( "using zlib.*;" );
 		use_zlib = true;
@@ -129,10 +132,11 @@ if ( os.hasDir( path + "zlib") ) {
 }
 
 //*-----libtar-----*/
+String liblibtar = path + "libtar";
 class Tar {
 	@abstract boolean extractTar(String tarfile);
 }
-if ( os.hasDir( path + "libtar") ) {
+if ( os.hasDir( liblibtar ) ) {
 	if ( os.hasLib("libtar") ) {
 		eval ( "using libtar.*;" );
 		use_libtar = true;
@@ -140,12 +144,15 @@ if ( os.hasDir( path + "libtar") ) {
 }
 		
 //*-----posix-----*/
-if ( os.hasDir( path + "posix" ) ) {
-	eval ( "using posix.*;" );
-	use_posix = true;
+String libposix = path + "posix";
+String shared = $konoha.platform + ".so";
+if ( os.hasDir( libposix ) ) {
+	if ( os.hasLib( libposix + "/posix_" + shared ) ) {
+		eval ( "using posix.*;" );
+		use_posix = true;
+	}
 }
 
-/*----------------------------------------------------------*/
 /*----------------------------------------------------------*/
 
 //
@@ -165,7 +172,6 @@ class Decomp {
 
 }
 
-/*----------------------------------------------------------*/
 /*----------------------------------------------------------*/
 
 //
@@ -188,7 +194,6 @@ class DecompSystem extends Decomp {
 	}
 }
 
-/*----------------------------------------------------------*/
 /*----------------------------------------------------------*/
 
 //
@@ -218,7 +223,6 @@ class DecompZllT extends Decomp {
 }
 
 /*----------------------------------------------------------*/
-/*----------------------------------------------------------*/
 
 //
 //define glue class for get package
@@ -237,7 +241,6 @@ class Getter {
 
 }
 
-/*----------------------------------------------------------*/
 /*----------------------------------------------------------*/
 
 //
@@ -266,7 +269,6 @@ class GetterCurl extends Getter
 	
 }
 
-/*----------------------------------------------------------*/
 /*----------------------------------------------------------*/
 
 //
@@ -312,7 +314,6 @@ class GetterStream extends Getter {
 }
 
 /*----------------------------------------------------------*/
-/*----------------------------------------------------------*/
 
 //
 //registing parsers
@@ -340,9 +341,11 @@ class Parser
 	/*-----generate formed txt-----*/
 	@virtual String generate();
 
+	/*-----generate package name list-----*/
+	@virtual String[] nameList();
+
 }
 
-/*----------------------------------------------------------*/
 /*----------------------------------------------------------*/
 
 //
@@ -421,6 +424,20 @@ class ParserJson extends Parser
 		return ret;
 	}
 
+	String[] nameList()
+	{
+		String[] ret = [];
+		String[] box;
+		String raw = rawjs();
+		String check = '"name":"';
+		box = raw.split(check,0);
+		foreach(String txt from box) {
+			ret << txt / '"';
+		}
+		ret.remove(0);
+		return ret;
+	}
+
 	String rawjs()
 	{
 		String ret;
@@ -452,7 +469,6 @@ class ParserJson extends Parser
 
 }
 
-/*----------------------------------------------------------*/
 /*----------------------------------------------------------*/
 
 //
@@ -675,7 +691,6 @@ class FileHandler {
 }
 
 /*----------------------------------------------------------*/
-/*----------------------------------------------------------*/
 
 ///
 /// define class Package 
@@ -776,6 +791,7 @@ class Package
 
 	int do_remove()
 	{
+		String[] files;
 		String ptmp = rmtmp(name);
 		if ( !os.rename(__path + "/" + name,ptmp) ) {
 			print("!ERR : Package.do_remove : rename");
@@ -869,6 +885,11 @@ class Package
 	/*
 	  methods of depend with system flag
 	 */
+	String[] getList(String filename)
+	{
+		p = getParser(filename);
+		return p.nameList();
+	}
 
 	Parser getParser(String file)
 	{
@@ -919,7 +940,6 @@ class Package
 }
 
 /*----------------------------------------------------------*/
-/*----------------------------------------------------------*/
 
 //
 //define controller of operations
@@ -947,7 +967,14 @@ class Operater {
 	/*-----opr in? operations-----*/
 	boolean checkOpr()
 	{
-		String[] ops = ["search","install","update","remove","undo","clean"];
+		String[] ops = ["search",
+						"install",
+						"update",
+						"remove",
+						"undo",
+						"list",
+						"installed",
+						"clean"];
 		return ( opr in? ops );
 	}
 
@@ -967,26 +994,40 @@ class Operater {
 	{
 		int ret;
 		boolean flag;
+		String filename;
+		String[] need_search = ["search",
+								"install",
+								"update"];
+		String[] need_list = ["list",
+							  "installed"];
 		if ( opr == "undo" ) {
 			ret = undoMain(); 
 		} else if ( opr == "clean" ) {
 			ret = cleanMain(); 
 		} else if ( opr == "remove" ) {
 			ret = removeMain();
-		} else {
+		} else if ( opr in? need_list ) {
+			if ( opr == "list" ) {
+				filename = __klipdata;
+			} else if ( opr == "installed" ) {
+				filename = __curdata;
+			}
+			listKlip(filename);
+			ret = EXIT_SUCCESS;
+		} else if ( opr in? need_search ){
 			flag = searchKlip();
-			if( opr == "install" ) {
-				if ( flag ) {
+			if ( opr == "search" ) {
+				ret = EXIT_SUCCESS;
+			} else if (flag) {
+				if( opr == "install" ) {
 					if ( |pkg.depend| > 1 ) {
 						ret = dinstallMain();
 					} else {
 						ret = installMain();
 					}
+				} else if ( opr == "update" ) {
+					ret = updateMain();
 				}
-			} else if ( opr == "update" ) {
-				if ( flag ) ret = updateMain();
-			} else if ( opr == "search" ) {
-				ret = EXIT_SUCCESS;
 			}
 		}
 		if ( ret == EXIT_ERROR ) {
@@ -1005,9 +1046,27 @@ class Operater {
 			OUT.println("KLIP : package is NOT FOUND...");
 			return false;
 		} else {
-			OUT.println(%("KLIP : %s{0} ver=%s{1} is FOUND", pkg.name, pkg.version));
+			OUT.println(%("PACK : %s{0}\tver=%s{1} is FOUND", pkg.name, pkg.version));
 			return true;
 		}
+	}
+
+	/*-----update KLIPDATA & list pkg from it-----*/
+	void listKlip(String filename)
+	{
+		OUT.println("KLIP : show package list...");
+		String[] names = [];
+		String[] ret = [];
+		String form = "PACK : %s{0}\tver=%s{1}";
+		fh.getklipdata();
+		names = pkg.getList(filename);
+		foreach (String nm from names) {
+			pac = new Package(nm,"","");
+			pac.setMember(filename);
+			if ( pac.version == "" ) continue;
+			OUT.println(%(form,pac.name,pac.version));
+		}
+		OUT.println("KLIP : theere are [" + |names| + "] packages");
 	}
 	
 	/*-----main of install-----*/
@@ -1164,16 +1223,22 @@ class Operater {
 	/*-----undo main-----*/
 	int undoMain()
 	{
-		boolean flag = true;
+		String[] u_fail = [];
 		fh.mkBufCurData();
-		if ( undo("u_remove") == EXIT_ERROR ) { flag = false; }
-		if ( undo("u_install") == EXIT_ERROR ) { flag = false; }
-		fh.cpBufCur2Prev();
-		fh.rmBufCurData();
-		if ( !flag ) {
-			OUT.println("!ERR : some was failed in undo...");
+		if ( undo("u_remove") != EXIT_SUCCESS ) { u_fail << "u_rm"; }
+		if ( undo("u_install") != EXIT_SUCCESS ) { u_fail << "u_in"; }
+		if ( |u_fail| != 0 ) {
+			fh.rmBufCurData();
+			if ( "u_in" in? u_fail ) {
+				OUT.println("!ERR : undo :install failed");
+			}
+			if ( "u_rm" in? u_fail ) {
+				OUT.println("!ERR : undo :remove failed");
+			}
 			return EXIT_NORMAL;
 		}
+		fh.cpBufCur2Prev();
+		fh.rmBufCurData();
 		return EXIT_SUCCESS;
 	}
 
@@ -1192,10 +1257,14 @@ class Operater {
 									   filter(ce,"url"));
 			if( u_opr == "u_install") {
 				ret = pac.install();
-				fh.modCurData([pac.name,pac.version,pac.url],ADD);
+				if ( ret == EXIT_SUCCESS ) {
+					fh.modCurData([pac.name,pac.version,pac.url],ADD);
+				}
 			} else if ( u_opr == "u_remove" ) {
 				ret = pac.remove();
-				fh.modCurData([pac.name,pac.version,pac.url],DELETE);
+				if ( ret == EXIT_SUCCESS ) {
+					fh.modCurData([pac.name,pac.version,pac.url],DELETE);
+				}
 			}
 		}
 		return ret;
@@ -1212,7 +1281,6 @@ class Operater {
 
 }
 
-/*----------------------------------------------------------*/
 /*----------------------------------------------------------*/
 
 //
@@ -1232,19 +1300,16 @@ class Klip {
 	//*-----start klip-----*/
 	int start()
 	{
-		if ( |ecode| != 0 ) {
-			info();
-		}
 		if ( !__fail ) {
 			/*-----oparation exec-----*/
 			Operater op = new Operater(args);
 			op.init();
-			if ( !op.checkOpr() ) {
-				showUsage();
-				return EXIT_NORMAL;
+			if ( op.checkOpr() ) {
+				return op.exec();
 			}
-			return op.exec();
+			showUsage();
 		} 
+		info();
 		return EXIT_ERROR;
 	}
 	
@@ -1264,7 +1329,7 @@ class Klip {
 		if ( __use_zlib && __use_libtar ) {
 			__use_zllt = true;
 		} else {
-			__use_zllt=false;
+			__use_zllt = false;
 		}
 
 		//*-----result-----*/
@@ -1280,21 +1345,25 @@ class Klip {
 		String[] ret = [];
 		if ( "e_user" in? ecode ) {
 			ret << "!ERR : unknown_user_mode";
+			ret << '     : please set "property variable HOME" correctry';
 		}
 		if ( "e_decomp" in? ecode ) {
-			ret << "!ERR : need to set [zlib + libtar / posix]";
+			ret << '!ERR : cannot both "using [zlib+libtar/posix]"';
+			ret << "     : please install either of them by another way";
 		}
 		if ( "libtar" in? ecode ) {
-			ret << "INFO : you need to install libtar(-devel)";
+			ret << "INFO : you should install libtar(-devel)";
 		}
 		if ( "zlib" in? ecode ) {
-			ret << "INFO : you need to install zlib(-devel)";
+			ret << "INFO : you should install zlib(-devel)";
 		}
 		if ( "curl" in? ecode ) {
-			ret << "INFO : you need to install libcurl(-devel)";
+			ret << "INFO : you should install libcurl(-devel)";
 		}
-		foreach( String txt from ret ) {
-			OUT.println(txt);
+		if ( |ecode| != 0 ) {
+			foreach( String txt from ret ) {
+				OUT.println(txt);
+			}
 		}
 	}
 
@@ -1304,8 +1373,6 @@ class Klip {
 
 }
 
-/*----------------------------------------------------------*/
-/*----------------------------------------------------------*/
 
 //
 //Script.main
@@ -1318,6 +1385,3 @@ int main (String[] args)
 }
 
 
-/*----------------------------------------------------------*/
-/*----------------------------------------------------------*/
-/*-----EOF-----*/
