@@ -79,6 +79,7 @@ void knh_Regex__s(Ctx *ctx, Regex *o, OutputStream *w, String *m);
 /* ../src/api/systemapi.c */
 METHOD knh__System_hasLib(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__System_setRandomSeed(Ctx *ctx, knh_sfp_t *sfp);
+METHOD knh__System_listDir(Ctx *ctx, knh_sfp_t *sfp);
 Object* knh_Context_getProperty(Ctx *ctx, Context *b, knh_bytes_t key);
 void knh_Context_setProperty(Ctx *ctx, Context *b, String *key, Any *value);
 void knh_System__k(Ctx *ctx, System *o, OutputStream *w, String *m);

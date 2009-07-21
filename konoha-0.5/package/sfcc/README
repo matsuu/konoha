@@ -1,0 +1,1 @@
+sblim-devel 要インストール* for Ubuntuyou should install "libcimcclient0-dev".$ sudo apt-get install sudo apt-get install sfcb sblim-cmpi-base  libcmpiosbase-common0-dev wbemcli libcimcclient0-dev
