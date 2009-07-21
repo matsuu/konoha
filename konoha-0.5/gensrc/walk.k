@@ -4,7 +4,6 @@
    emulate python's os.walk;
 */
  
-using posix.*;
 import "array.k"
  
 String[] System.walk(String path){

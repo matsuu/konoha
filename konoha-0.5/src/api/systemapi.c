@@ -28,6 +28,7 @@
 /* ************************************************************************ */
 
 #include"commons.h"
+#include <dirent.h>
 
 /* ************************************************************************ */
 
@@ -156,6 +157,34 @@ static METHOD knh__System_exit(Ctx *ctx, knh_sfp_t *sfp)
 	exit((int)status);
 #endif
 	KNH_RETURN_void(ctx, sfp);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method String[] System.listDir(String dirname) */
+METHOD knh__System_listDir(Ctx *ctx, knh_sfp_t *sfp)
+{
+    DIR *dirptr;
+    struct dirent *direntp;
+    char dirname[FILEPATH_BUFSIZ];
+    knh_bytes_t t = (IS_NULL(sfp[1].s)) ? STEXT(".") : knh_String_tobytes(sfp[1].s);
+
+    knh_format_ospath(ctx, dirname, sizeof(dirname), t);
+    String* str = (String *) sfp[1].s;
+    knh_bytes_t bt = {str->str, str->size};
+    knh_format_ospath(ctx, dirname, sizeof(dirname), bt);
+    Array *a = new_Array(ctx, CLASS_String, 0);
+
+    if ((dirptr = opendir(dirname)) == NULL) {
+        KNH_PERRNO(ctx, "OS!!", "opendir", knh_Context_isStrict(ctx));
+    } else {
+        while ((direntp = readdir(dirptr)) != NULL) {
+            char *p = direntp->d_name;
+            if(p[0] == '.' && (p[1] == 0 || p[1] == '.')) continue;
+            knh_Array_add(ctx, a, UP(new_String(ctx, B(p), NULL)));
+        }
+        closedir(dirptr);
+    }
+    KNH_RETURN(ctx, sfp, a);
 }
 
 /* ------------------------------------------------------------------------ */
