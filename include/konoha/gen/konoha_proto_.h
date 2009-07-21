@@ -609,6 +609,7 @@ METHOD knh__System_gc(Ctx *ctx, knh_sfp_t *sfp);
 void knh_System_gc(Ctx *ctx);
 void knh_Object_RCsweep(Ctx *ctx, Object *o);
 knh_ftraverse konoha_getDefaultSweepFunc(void);
+/* ../src/main/security.c */
 /* ../src/main/stack.c */
 int knh_sfp_argc(Ctx *ctx, knh_sfp_t *v);
 METHOD knh__System_stackdump(Ctx *ctx, knh_sfp_t *sfp);

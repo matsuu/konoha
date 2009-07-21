@@ -600,12 +600,13 @@ KNHAPI(int) knh_bytes_parseURLuname(knh_bytes_t url, char *buf, size_t bufsiz)
 }
 
 /* ------------------------------------------------------------------------ */
-
-/* this function return URL without user/password */
+/* this function return URL without user/password and query*/
 
 KNHAPI(int) knh_bytes_parseURL(knh_bytes_t url, char *buf, size_t bufsiz)
 {
-	knh_index_t loc = knh_bytes_index(url, ':');
+	knh_index_t loc = knh_bytes_index(url, '?');
+	if(loc > 0) url = knh_bytes_first(url, loc);
+	loc = knh_bytes_index(url, ':');
 	if(loc > 0 && url.buf[loc+1] == '/' && url.buf[loc+2] == '/') {
 		knh_bytes_t scheme = knh_bytes_first(url, loc + 3);
 		knh_bytes_t t = knh_bytes_last(url, loc+3);
