@@ -1,5 +1,14 @@
 #!/usr/local/bin/konoha
 import "walk.k"
+/*
+ * gen_automake.k
+ * masahiro@ynu 2009
+ *
+ * how to use;
+ * $ cd /path/to/konoha/gensrc
+ * $ konoha ./gen_automake.k
+ * and then, i generate ../build/Makefile.am
+ */
 
 MAKEFILE = "../build/Makefile.am";
 
@@ -28,8 +37,8 @@ libkonoha_la_SOURCES =
 """);
 
     foreach (String p in System.walk("../src")) {
-		OUT << p << EOL;
-		if(p.indexOf(".svn") >= 0) continue;
+        //OUT << p << EOL;
+        if(p.indexOf(".svn") >= 0) continue;
         if(p.endsWith(".c") == false ) continue;
         if(p.endsWith("konoha.c")) continue;
 
@@ -44,7 +53,7 @@ libkonoha_la_SOURCES =
 
     foreach (String p in System.walk("../include/konoha")) {
         if(p.indexOf(".svn") >= 0) continue;
-		if(p.indexOf("gen") >= 0) continue;
+        if(p.indexOf("gen") >= 0) continue;
         if(p.endsWith(".h") == false ) continue;
         if(p.endsWith("konoha.h")) continue;
 
@@ -71,22 +80,22 @@ libkonoha_la_SOURCES =
 
         o.println(%("dist_sample_SCRIPTS += %s{0}",p));
     }
-	/* install packages */
-	// TODO: we need System.isdir() to check...
-	
-	pkgs= ["math", "posix", "xml", "demo"];
-	foreach(String pname in pkgs) {
-		o.println(%("pkg%s{0}dir = /usr/local/share/konoha/package/%s{0}", pname));
-		o.println(%("dist_pkg%s{0}_DATA =", pname));
-		
-		foreach (String p in System.walk(%("../dist/package/%s{0}", pname))) {
-			if(p.indexOf(".svn") >= 0) continue;
-			if((p.endsWith(".k") == false) and (p.endsWith(".so") == false) and (p.endsWith(".dylib") == false)) continue;
-			if(p.endsWith("konoha.h")) continue;
-			// little bit tricky...
-			o.println(%("dist_pkg%s{0}_DATA += %s{1}", pname ,p));
-		}
-	}
+    /* install packages */
+    // TODO: we need System.isdir() to check...
+
+    pkgs= ["math", "posix", "xml", "demo"];
+    foreach(String pname in pkgs) {
+        o.println(%("pkg%s{0}dir = /usr/local/share/konoha/package/%s{0}", pname));
+        o.println(%("dist_pkg%s{0}_DATA =", pname));
+
+        foreach (String p in System.walk(%("../dist/package/%s{0}", pname))) {
+            if(p.indexOf(".svn") >= 0) continue;
+            if((p.endsWith(".k") == false) and (p.endsWith(".so") == false) and (p.endsWith(".dylib") == false)) continue;
+            if(p.endsWith("konoha.h")) continue;
+            // little bit tricky...
+            o.println(%("dist_pkg%s{0}_DATA += %s{1}", pname ,p));
+        }
+    }
     o.println("""
 scriptklipdir = /usr/local/share/konoha/script/klip
 dist_scriptklip_SCRIPTS = ../dist/bin/klip.k""");

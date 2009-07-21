@@ -1,4 +1,17 @@
 #!/usr/local/bin/konoha
+/*
+ * gen_make.k
+ * masahiro@ynu 2009
+ *
+ * generator for kernel makefile.
+ *
+ * how to use;
+ * $ cd /path/to/konoha/
+ * $ konoha ./gensrc/gen_automake.k
+ * and then, i generate Makefile
+ */
+
+
 import "walk.k"
 
 DEV_NAME = "konohadev";
