@@ -2038,6 +2038,11 @@ Term *knh_StmtCALL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_cla
 {
 	DBG2_ASSERT(DP(stmt)->size > 1);
 	knh_methodn_t mn = knh_Token_getmn(ctx, DP(stmt)->tokens[0]);
+	if(mn == METHODN_new) {
+		/* reported by Dr. Maeda */
+		knh_Asm_perror(ctx, abr, KERR_ERROR, _("don't call a %M method"), mn);
+		return NULL;
+	}
 	Term *tm = knh_StmtCALLBASE_typing(ctx, stmt, abr, ns, mn);
 	if(tm == NULL || IS_Token(tm) || knh_Stmt_isTyped(stmt)) {
 		return tm;
@@ -2048,7 +2053,6 @@ Term *knh_StmtCALL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_cla
 	knh_type_t    btype   = TERMs_gettype(stmt, 1);
 	knh_class_t   mtd_cid = CLASS_type(btype);
 	Method *mtd = knh_Class_getMethod(ctx, mtd_cid, mn);
-
 	if(mtd_cid != CLASS_Any && IS_NULL(mtd)) {
 		knh_Asm_perror(ctx, abr, KERR_ERROR, _("undefined method: %C.%M"), mtd_cid, mn);
 		return NULL;

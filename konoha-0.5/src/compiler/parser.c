@@ -1328,7 +1328,8 @@ Term *new_TermCAST(Ctx *ctx, Token *tk, knh_tokens_t *tc, int isData)
 
 /* ------------------------------------------------------------------------ */
 
-static int knh_Token_isNEW(Ctx *ctx, Token *tk)
+static
+int knh_Token_isNEW(Ctx *ctx, Token *tk)
 {
 	if(SP(tk)->tt == TT_NAME) {
 		char *p = sToken(tk);
