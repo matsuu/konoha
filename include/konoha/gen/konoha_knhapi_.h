@@ -186,6 +186,9 @@ KNHAPI(InputStream*) new_FileInputStream(Ctx *ctx, knh_bytes_t file, int isThrow
 KNHAPI(InputStream*) new_BytesInputStream(Ctx *ctx, Bytes *ba, size_t s, size_t e);
 KNHAPI(InputStream*) new_StringInputStream(Ctx *ctx, String *str, size_t s, size_t e);
 KNHAPI(Object*) knh_InputStream_readData(Ctx *ctx, InputStream *in, knh_class_t reqc);
+KNHAPI(void) knh_Iterator_close(Ctx *ctx, Iterator *it);
+KNHAPI(Iterator*) new_Iterator(Ctx *ctx, knh_class_t p1, Any *source, knh_fitrnext fnext);
+KNHAPI(Iterator*) new_GlueIterator(Ctx *ctx, knh_class_t p1, void *ref, knh_fitrnext fnext, knh_ffree ffree);
 KNHAPI(Mapper*) new_Mapper(Ctx *ctx, knh_flag_t flag, knh_class_t scid, knh_class_t tcid, knh_fmapper fmap, Object *mapdata);
 KNHAPI(void) konoha_addMapper(Ctx *ctx, Mapper *mpr);
 KNHAPI(knh_class_t) konoha_findcid(Ctx *ctx, knh_bytes_t lname);

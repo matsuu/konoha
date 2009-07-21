@@ -561,6 +561,127 @@ KNHAPI(knh_int64_t) knh_bytes_toint64(knh_bytes_t t)
 	return n;
 }
 
+/* ======================================================================== */
+/* [URL] */
+
+// url  http://user:passwd@site:port/path
+
+KNHAPI(int) knh_bytes_parseURLscheme(knh_bytes_t url, char *buf, size_t bufsiz)
+{
+	knh_index_t loc = knh_bytes_index(url, ':');
+	if(loc > 0 && url.buf[loc+1] == '/' && url.buf[loc+2] == '/') {
+		knh_format_bytes(buf, bufsiz, knh_bytes_first(url, loc));
+		return 1;
+	}
+	knh_format_bytes(buf, bufsiz, STEXT("http")); // default
+	return 0;
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(int) knh_bytes_parseURLuname(knh_bytes_t url, char *buf, size_t bufsiz)
+{
+	knh_index_t loc = knh_bytes_index(url, ':');
+	if(loc > 0 && url.buf[loc+1] == '/' && url.buf[loc+2] == '/') {
+		knh_bytes_t t = knh_bytes_last(url, loc+3);
+		loc = knh_bytes_index(t, '@');
+		if(loc > 0) {
+			t = knh_bytes_first(t, loc);
+			loc = knh_bytes_index(t, ':');
+			if(loc > 0) {
+				t = knh_bytes_first(t, loc);
+			}
+			knh_format_bytes(buf, bufsiz, t);
+			return 1;
+		}
+	}
+	knh_format_bytes(buf, bufsiz, STEXT("konoha")); // default
+	return 0;
+}
+
+/* ------------------------------------------------------------------------ */
+
+/* this function return URL without user/password */
+
+KNHAPI(int) knh_bytes_parseURL(knh_bytes_t url, char *buf, size_t bufsiz)
+{
+	knh_index_t loc = knh_bytes_index(url, ':');
+	if(loc > 0 && url.buf[loc+1] == '/' && url.buf[loc+2] == '/') {
+		knh_bytes_t scheme = knh_bytes_first(url, loc + 3);
+		knh_bytes_t t = knh_bytes_last(url, loc+3);
+		loc = knh_bytes_index(t, '@');
+		if(loc > 0) {
+			knh_bytes_t t = knh_bytes_last(t, loc+1);
+		}
+		knh_format_join2(buf, bufsiz, scheme, t);
+		return 1;
+	}
+	knh_format_bytes(buf, bufsiz, url); // default
+	return 0;
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(int) knh_bytes_parseURLpath(knh_bytes_t url, char *buf, size_t bufsiz)
+{
+	knh_index_t loc = knh_bytes_index(url, ':');
+	if(loc > 0 && url.buf[loc+1] == '/' && url.buf[loc+2] == '/') {
+		knh_bytes_t t = knh_bytes_last(url, loc+3);
+		loc = knh_bytes_index(t, '@');
+		if(loc > 0) t = knh_bytes_last(t, loc+1);
+		loc = knh_bytes_index(t, '/');
+		if(loc > 0) {
+			knh_format_bytes(buf, bufsiz, knh_bytes_last(t, loc));
+		}
+		return 1;
+	}
+	knh_format_bytes(buf, bufsiz, STEXT("/"));
+	return 0;
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(int) knh_bytes_parseURLhost(knh_bytes_t url, char *buf, size_t bufsiz)
+{
+	knh_index_t loc = knh_bytes_index(url, ':');
+	if(loc > 0 && url.buf[loc+1] == '/' && url.buf[loc+2] == '/') {
+		knh_bytes_t t = knh_bytes_last(url, loc+3);
+		loc = knh_bytes_index(t, '@');
+		if(loc > 0) t = knh_bytes_last(t, loc+1);
+		loc = knh_bytes_index(t, '/');
+		if(loc > 0) t = knh_bytes_first(t, loc);
+		loc = knh_bytes_index(t, ':');
+		if(loc > 0) t = knh_bytes_first(t, loc);
+		knh_format_bytes(buf, bufsiz, t);
+		return 1;
+	}
+	knh_format_bytes(buf, bufsiz, STEXT("localhost"));
+	return 0;
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(int) knh_bytes_parseURLport(knh_bytes_t url, int *port)
+{
+	knh_index_t loc = knh_bytes_index(url, ':');
+	if(loc > 0 && url.buf[loc+1] == '/' && url.buf[loc+2] == '/') {
+		knh_bytes_t t = knh_bytes_last(url, loc+3);
+		loc = knh_bytes_index(t, '@');
+		if(loc > 0) t = knh_bytes_last(t, loc+1);
+		loc = knh_bytes_index(t, '/');
+		if(loc > 0) t = knh_bytes_first(t, loc);
+		loc = knh_bytes_index(t, ':');
+		if(loc > 0) {
+			knh_int_t n = *port;
+			if(knh_bytes_parseint(knh_bytes_last(t, loc+1), &n)) {
+				*port = (int)n;
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
 /* ------------------------------------------------------------------------ */
 
 #ifdef __cplusplus

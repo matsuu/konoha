@@ -251,8 +251,6 @@ int knh_InputStream_isClosed(InputStream *o);
 MAPPER knh_Bytes_InputStream(Ctx *ctx, knh_sfp_t *sfp);
 int knh_bytes_checkStmtLine(knh_bytes_t line);
 /* ../src/class/knh_Iterator.c */
-void knh_Iterator_close(Ctx *ctx, Iterator *it);
-Iterator* new_Iterator(Ctx *ctx, knh_class_t p1, Any *source, knh_fitrnext fnext);
 Iterator* new_ArrayIterator(Ctx *ctx, knh_class_t cid, Array *a);
 /* ../src/class/knh_Mapper.c */
 Mapper* new_MapMap(Ctx *ctx, Mapper *m1, Mapper *m2);
