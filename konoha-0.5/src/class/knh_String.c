@@ -209,6 +209,23 @@ KNHAPI(knh_bytes_t) knh_String_tobytes(String *o)
 }
 
 
+/* ======================================================================== */
+/* [constructors] */
+
+KNHAPI(char*) knh_String_text(Ctx *ctx, String *s)
+{
+	if(s->str[s->size] != '\0') {
+		knh_uchar_t *newstr = (knh_uchar_t*)KNH_MALLOC(ctx, KNH_SIZE(s->size+1));
+		knh_memcpy(newstr, s->str, s->size);
+		newstr[s->size] = '\0';
+		s->str = newstr;
+		KNH_ASSERT(s->orign != NULL);
+		KNH_FINALv(ctx, s->orign);
+		s->orign = NULL;
+	}
+	return (char*)s->str;
+}
+
 /* ------------------------------------------------------------------------ */
 
 knh_bool_t knh_String_equals(String *o, knh_bytes_t s)
