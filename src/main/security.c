@@ -28,9 +28,6 @@
 /* ************************************************************************ */
 
 #include"commons.h"
-#ifndef KONOHA_ON_LKM
-#include<time.h>
-#endif
 
 /* ************************************************************************ */
 
@@ -44,20 +41,7 @@ extern "C" {
 
 KNHAPI(char*) konoha_getPassword(Ctx *ctx, knh_bytes_t url)
 {
-	knh_index_t loc = knh_bytes_index(url, '?');
-	if(loc > 0) url = knh_bytes_first(url, loc);
-	loc = knh_bytes_index(url, ':');
-	if(loc > 0 && url.buf[loc+1] == '/' && url.buf[loc+2] == '/') {
-		knh_bytes_t scheme = knh_bytes_first(url, loc + 3);
-		knh_bytes_t t = knh_bytes_last(url, loc+3);
-		loc = knh_bytes_index(t, '@');
-		if(loc > 0) {
-			knh_bytes_t t = knh_bytes_last(t, loc+1);
-		}
-		knh_format_join2(buf, bufsiz, scheme, t);
-		return 1;
-	}
-	return "UseAnother";
+	return "password";
 }
 
 /* ------------------------------------------------------------------------ */
