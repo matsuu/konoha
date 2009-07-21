@@ -1,3 +1,11 @@
+/*
+   it work 
+   a=2;
+   a &= (~3)
+*/
+
+/* it does not work */
 a=2;
-a= a&(~3);
+a&=~3;
+
 
