@@ -1,7 +1,7 @@
 # Last modified by Kimio Kuramitsu kkuramitsu@sourceforge.jp
 
 CC = gcc
-CFLAGS = -O2 -Wall -fmessage-length=0 -fPIC
+CFLAGS = -O2 -Wall -fmessage-length=0 -fPIC -DKONOHA_OS__LINUX
 LDLIBS = -lGL -lglut -lGLU -lkonoha
 
 target = linux_32

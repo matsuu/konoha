@@ -1,7 +1,7 @@
 #Makefile for sdl.so
 
 CC = gcc
-CFLAGS = -O2 -Wall -fmessage-length=0 -fpic
+CFLAGS = -O2 -Wall -fmessage-length=0 -fpic -DKONOHA_OS__LINUX
 LDLIBS = -lSDL -lkonoha
 
 target = linux_32

@@ -1,9 +1,12 @@
-#include <konoha.h>
 #ifdef KONOHA_OS__MACOSX
 #include <SDL.h>
-#else
-#include<SDL/SDL.h>
 #endif
+
+#ifdef KONOHA_OS__LINUX
+#include <SDL/SDL.h>
+#endif
+
+#include <konoha.h>
 
 typedef struct knh_sdl_rect_t {
   knh_int_t x;
