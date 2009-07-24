@@ -112,8 +112,7 @@ typedef long                knh_int_t;
 typedef unsigned long       knh_uint_t;
 
 #define KNH_INT_MAX               LONG_MAX
-#define KNH_INT_MIN               (LONG_MIN + 1)
-#define KNH_INT_NULL              (LONG_MIN)
+#define KNH_INT_MIN               LONG_MIN
 #define KNH_INT_FMT               "%ld"
 #define KNH_INT_XFMT              "%lx"
 #define KNH_UINT_MAX              ULONG_MAX
@@ -136,8 +135,7 @@ typedef knh_uint64_t       knh_uint_t;
 #endif
 
 #define KNH_INT_MAX               LLONG_MAX
-#define KNH_INT_MIN               (LLONG_MIN + 1)
-#define KNH_INT_NULL              (LLONG_MIN)
+#define KNH_INT_MIN               LLONG_MIN
 #define KNH_INT_FMT               "%lld"
 #define KNH_INT_XFMT              "%llx"
 #define KNH_UINT_MAX              ULLONG_MAX

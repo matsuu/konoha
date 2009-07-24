@@ -260,7 +260,7 @@ KNHAPI(int) konoha_isSystemDump2(void);
 KNHAPI(int) konoha_parseopt(konoha_t konoha, int argc, char **argv);
 KNHAPI(char*) konoha_eval(konoha_t konoha, char *script);
 KNHAPI(void) konoha_readFile(Ctx *ctx, char *fpath);
-KNHAPI(void) konoha_read(konoha_t konoha, char *fpath);
+KNHAPI(void) konoha_loadScript(konoha_t konoha, char *fpath);
 KNHAPI(int) konoha_main(konoha_t konoha, int argc, char **argv);
 KNHAPI(void) konoha_shell(konoha_t konoha);
 KNHAPI(char*) KNH_SAFEFILE(char *file);
