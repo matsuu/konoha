@@ -243,7 +243,7 @@ KNHAPI(void) konoha_readFile(Ctx *ctx, char *fpath)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) konoha_read(konoha_t konoha, char *fpath)
+KNHAPI(void) konoha_loadScript(konoha_t konoha, char *fpath)
 {
 	KONOHA_CHECK_(konoha);
 	konoha_setCurrenContext(konoha.ctx);
