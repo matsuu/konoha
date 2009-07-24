@@ -658,30 +658,17 @@ typedef struct {
 /* ------------------------------------------------------------------------ */
 /* [SystemShare] */
 
-#ifndef KNH_TINT_MIN
-#define KNH_TINT_MIN (-1)  /* @property */
-#endif
-
-#ifndef KNH_TINT_MAX
-#ifdef KNH_FASTMODE
-#define KNH_TINT_MAX 1024  /* @property */
-#else
-#define KNH_TINT_MAX 256  /* @property */
-#endif
-#endif
-
-#define SIZEOF_TINT (sizeof(knh_Object_t*) * (KNH_TINT_MAX - KNH_TINT_MIN + 1))
 #define SIZEOF_TSTRING (sizeof(knh_Object_t*) * KNH_TSTRING_SIZE)
 
-#define knh_systemEncoding    DP(ctx->sys)->enc
+#define KNH_ENC             DP(ctx->sys)->enc
 
 #define KNH_NULL            (ctx->share->constNull)
 #define KNH_VOID            (ctx->share->constNull)
 #define KNH_TRUE            (ctx->share->constTrue)
 #define KNH_FALSE           (ctx->share->constFalse)
-#define KNH_SYSTEM          (ctx->sys)
-#define KNH_INT0            (ctx->share->tInt[0 - KNH_TINT_MIN])
+#define KNH_INT0            (ctx->share->constInt0)
 #define KNH_FLOAT0          (ctx->share->constFloat0)
+#define KNH_SYSTEM          (ctx->sys)
 
 /* ------------------------------------------------------------------------ */
 
@@ -721,11 +708,11 @@ typedef struct {
 	knh_ExptTable_t    *ExptTable;   size_t ExptTableSize;
 
 	/* system const */
-	knh_Object_t   *constNull;
-	knh_Object_t   *constTrue;
-	knh_Object_t   *constFalse;
+	knh_Object_t         *constNull;
+	knh_Object_t         *constTrue;
+	knh_Object_t         *constFalse;
+	struct knh_Int_t     *constInt0;
 	struct knh_Float_t   *constFloat0;
-	struct knh_Int_t     **tInt;
 	struct knh_String_t  **tString;
 } knh_ctxshare_t ;
 

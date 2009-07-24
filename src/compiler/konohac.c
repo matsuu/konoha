@@ -817,7 +817,7 @@ int knh_NameSpace_loadScript(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isE
 	InputStream *in = new_FileInputStream(ctx, fpath, 1);
 	KNH_LPUSH(ctx, in);
 	DP(in)->fileid = fileid;
-	knh_InputStream_setEncoding(ctx, in, knh_systemEncoding);
+	knh_InputStream_setEncoding(ctx, in, KNH_ENC);
 	Stmt *stmt = knh_InputStream_parseStmt(ctx, in, 0/*isData*/);
 	KNH_LPUSH(ctx, stmt);
 	if(isEval) {

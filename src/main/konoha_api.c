@@ -318,7 +318,7 @@ KNHAPI(void) konoha_readFile(Ctx *ctx, char *fpath)
 		KNH_WARNING(ctx, "No such script file: %s\n", fpath);
 	}
 	DP(in)->fileid = konoha_getFileId(ctx, B(fpath));
-	knh_InputStream_setEncoding(ctx, in, knh_systemEncoding);
+	knh_InputStream_setEncoding(ctx, in, KNH_ENC);
 	konohac_eval(ctx, (String*)KNH_NULL, in);
 	knh_Context_clearstack(ctx);
 }
@@ -600,7 +600,7 @@ KNHAPI(void) konoha_shell(konoha_t konoha)
 				KNH_MOV(ctx, lsfp[0].o, in);
 				DP(in)->fileid = konoha_getFileId(ctx, STEXT("(shell)"));
 				DP(in)->line = linenum;
-				knh_InputStream_setEncoding(ctx, in, knh_systemEncoding);
+				knh_InputStream_setEncoding(ctx, in, KNH_ENC);
 				konohac_eval(ctx, TS_main, in);
 				knh_cwb_clear(cwb);
 			}

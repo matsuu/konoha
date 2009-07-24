@@ -482,7 +482,7 @@ void knh_System__dump(Ctx *ctx, System *o, OutputStream *w, String *m)
 void knh_Context_setEncoding(Ctx *ctx, knh_Context_t *o, String *enc)
 {
 	if(IS_NULL(enc)) {
-		enc = knh_systemEncoding;
+		enc = KNH_ENC;
 	}
 	KNH_SETv(ctx, o->enc, enc);
 	if(knh_bytes_strcasecmp(knh_String_tobytes(enc), STEXT(KONOHA_ENCODING))==0) {
