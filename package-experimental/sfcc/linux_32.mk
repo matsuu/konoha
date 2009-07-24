@@ -1,7 +1,7 @@
 # modified by u.hira@users.sourceforge.jp
 
 CC = gcc
-CFLAGS = -O2 -Wall -fmessage-length=0 -fpic -g3
+CFLAGS = -O0 -Wall -fmessage-length=0 -fpic -g3
 
 LDLIBS = -lkonoha -lcmpisfcc
 
@@ -13,9 +13,12 @@ library = "$(pkgname)_$(target).so"
 .PHONY: all
 all: $(library)
 
-objs = "$(pkgname).o"
+objs = $(pkgname).o show.o
 
 "$(pkgname).o": $(pkgname).c
+	$(CC) $(CFLAGS) -o $@ -c $^
+
+show.o: show.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 $(library): $(objs)

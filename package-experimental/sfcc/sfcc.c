@@ -1,363 +1,497 @@
-
-/*
- *  konoha library
- *  sfcc
- */
+/****************************************************************************
+ * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
+ *
+ * Copyright (c) 2005-2008, Kimio Kuramitsu <kimio at ynu.ac.jp>
+ *           (c) 2008-      Konoha Software Foundation
+ * All rights reserved.
+ *
+ * You may choose one of the following two licenses when you use konoha.
+ * See www.konohaware.org/license.html for further information.
+ *
+ * (1) GNU Lesser General Public License 3.0 (with KONOHA_UNDER_LGPL3)
+ * (2) Konoha Software Foundation License 1.0
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+ * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ****************************************************************************/
 
 #include <konoha.h>
+#include <konoha/gen/konoha_proto_.h>
+#include <unistd.h>
+#include <stdlib.h>
 #include <cimc/cimc.h>
 #include <CimClientLib/cmci.h>
 #include <CimClientLib/native.h>
 #include <CimClientLib/cmcimacs.h>
-#include <unistd.h>
-#include <stdlib.h>
-
-
-
+#include "show.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-  /*
-// NewCIMCEnv
-METHOD Sfcc_mkCIMCEnv(Ctx *ctx, knh_sfp_t *sfp)
+
+/* ======================================================================== */
+/* Exception  */
+
+static
+void knh_throw_CIMException(Ctx *ctx, int rc, char *msg)
 {
-  char *sval = p_char(sfp[1]);
-  int   ival = p_int(sfp[2]);
-  int   rc = p_int(sfp[3]);
-  char *msg = p_char(sfp[4]);
-  CIMCEnv *ret;
-  ret = NewCIMCEnv(sval, ival, &rc, &msg);
-  KNH_RETURN(ctx,sfp, new_Glue(ctx,"sfcc.CIMCEnv", ret, NULL));
-}
-  */
-// NewCIMCEnv_rc
-METHOD Sfcc_mkCIMCEnvrc(Ctx *ctx, knh_sfp_t *sfp)
-{
-  char *sval = p_char(sfp[1]);
-  int   ival = p_int(sfp[2]);
-  int rc;
-  char *msg;
-  CIMCEnv *ce;
-  int ret;
-  ce = NewCIMCEnv(sval, ival, &rc, &msg);
-  ret = rc;
-  KNH_RETURN_Int(ctx,sfp,ret);
+  //TODO: throw CIM!! with parameters
+  KNH_THROWs(ctx, msg);
 }
 
-// NewCIMCEnv_msg
-METHOD Sfcc_mkCIMCEnvmsg(Ctx *ctx, knh_sfp_t *sfp)
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_throw_CIMCStatus(Ctx *ctx, CIMCStatus *status)
 {
-  char *sval = p_char(sfp[1]);
-  int   ival = p_int(sfp[2]);
-  int   rc;
-  char *ret;
-  CIMCEnv *ce;
-  ce = NewCIMCEnv(sval, ival, &rc, &ret);
-  if(ret == NULL){
-    KNH_RETURN(ctx, sfp, new_String(ctx, B(""), NULL));
+  //TODO: throw CIM!! with parameters
+  KNH_THROWs(ctx, (char*)status->msg->hdl);
+}
+
+/* ======================================================================== */
+/* [CIMCEnv] WBET/XML Only */
+
+static CIMCEnv *knh_sharedCIMEnv = NULL;
+
+static CIMCEnv *getCIMCEnv(Ctx *ctx)
+{
+  if(knh_sharedCIMEnv == NULL) {
+    int rc;
+    char *msg;
+    knh_sharedCIMEnv = NewCIMCEnv("XML", 0, &rc, &msg);
+    if(knh_sharedCIMEnv == NULL) {
+      knh_throw_CIMException(ctx, rc, msg);
+    }
   }
-  else{
-    KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
+  return knh_sharedCIMEnv;
+}
+  
+/* ======================================================================== */
+/* [CIMObjectPath] */
+  
+static void knh_fgfree_CIMCObjectPath(Ctx *ctx, knh_Glue_t *g)
+{
+  CIMCObjectPath *op = (CIMCObjectPath*)g->ptr;
+  op->ft->release(op);
+}
+  
+/* ------------------------------------------------------------------------ */
+/* @method CIMObjectPath CIMObjectPath.new(String! path,String packname) */
+
+METHOD CIMObjectPath_new(Ctx *ctx, knh_sfp_t *sfp)
+{
+  CIMCEnv *env = getCIMCEnv(ctx);
+  char *path = p_char(sfp[1]);
+  CIMCStatus status;
+  char *packname = p_char(sfp[2]);
+  if(strncmp(packname,"",1) == 0){
+    packname = NULL;
   }
-}
-
-// NewCIMCEnv_ce
-METHOD Sfcc_mkCIMCEnvce(Ctx *ctx, knh_sfp_t *sfp)
-{
-  char *sval = p_char(sfp[1]);
-  int   ival = p_int(sfp[2]);
-  int   rc;
-  char *msg;
-  CIMCEnv *ret;
-  ret = NewCIMCEnv(sval, ival, &rc, &msg);
-  KNH_RETURN(ctx,sfp, new_Glue(ctx,"sfcc.CIMCEnv", ret, NULL));
-}
-
-
-
-
-
-  /*
-// CMRelease なくてもいいかも
-METHOD Sfcc_CMRelease(Ctx *ctx, knh_sfp_t *sfp)
-{
-  CIMCStatus status;
-  status.msg = p_char(sfp[1]);
-  CMRelease(status.msg);
-  KNH_RETURN_void(ctx,sfp); 
-}
-  */
-// CIMCEnv_connect
-   /*
-METHOD CIMCEnv_connect(Ctx *ctx, knh_sfp_t *sfp)
-{
-  CIMCEnv* self = ((sfp[0].glue)->ptr);
-  char *s1 = p_char(sfp[1]);
-  char *s2 = p_char(sfp[2]);
-  char *s3 = p_char(sfp[3]);
-  char *s4 = p_char(sfp[4]);
-  char *s5 = p_char(sfp[5]);
-  CIMCStatus status;// = ((sfp[6].glue)->ptr);
-  CIMCClient *ret;
-  ret = self->ft->connect(self, s1, s2, s3, s4, s5, &status);
-  printf("rc=%d msg=%s\n",(int)status.rc,(char*)status.msg);
-  KNH_RETURN(ctx,sfp, new_Glue(ctx,"sfcc.CIMCClient", ret, NULL));
-}
-   */
-
-METHOD CIMCEnv_connectrc(Ctx *ctx, knh_sfp_t *sfp)
-{
-  CIMCEnv* self = ((sfp[0].glue)->ptr);
-  char *s1 = p_char(sfp[1]);
-  char *s2 = p_char(sfp[2]);
-  char *s3 = p_char(sfp[3]);
-  char *s4 = p_char(sfp[4]);
-  char *s5 = p_char(sfp[5]);
-  CIMCStatus status;
-  CIMCClient *cl;
-  int ret;
-  cl = self->ft->connect(self, s1, s2, s3, s4, s5, &status);
-  ret = (int)status.rc;
-  KNH_RETURN_Int(ctx,sfp,ret);
-}
-
-METHOD CIMCEnv_connectmsg(Ctx *ctx, knh_sfp_t *sfp)
-{
-  CIMCEnv* self = ((sfp[0].glue)->ptr);
-  char *s1 = p_char(sfp[1]);
-  char *s2 = p_char(sfp[2]);
-  char *s3 = p_char(sfp[3]);
-  char *s4 = p_char(sfp[4]);
-  char *s5 = p_char(sfp[5]);
-  CIMCStatus status;
-  CIMCClient *cl;
-  cl = self->ft->connect(self, s1, s2, s3, s4, s5, &status);
-  if(status.msg == NULL){
-    KNH_RETURN(ctx, sfp, new_String(ctx, B(""), NULL));
+  CIMCObjectPath *op = env->ft->newObjectPath(env, path, packname, &status);
+  if(op == NULL || status.rc != 0) {
+    knh_throw_CIMCStatus(ctx, &status);
   }
-  else{
-    KNH_RETURN(ctx, sfp, new_String(ctx, B((char*)status.msg->hdl), NULL));
-  }
+  knh_Glue_init(ctx, sfp[0].glue, op, knh_fgfree_CIMCObjectPath);
+  KNH_RETURN(ctx, sfp, sfp[0].o);
 }
-
-METHOD CIMCEnv_connectcl(Ctx *ctx, knh_sfp_t *sfp)
-{
-  CIMCEnv* self = ((sfp[0].glue)->ptr);
-  char *s1 = p_char(sfp[1]);
-  char *s2 = p_char(sfp[2]);
-  char *s3 = p_char(sfp[3]);
-  char *s4 = p_char(sfp[4]);
-  char *s5 = p_char(sfp[5]);
-  CIMCStatus status;
-  CIMCClient *ret;
-  ret = self->ft->connect(self, s1, s2, s3, s4, s5, &status);
-  KNH_RETURN(ctx,sfp, new_Glue(ctx,"sfcc.CIMCClient", ret, NULL));
-}
-
-
- 
-
-
-
-
-
-/*
-// CIMCEnv_newObjectPath
-METHOD CIMCEnv_newObjectPath(Ctx *ctx, knh_sfp_t *sfp)
-{
-  CIMCEnv *self = ((sfp[0].glue)->ptr);
-  char *s1 = p_char(sfp[1]);
-  CIMCStatus *status = ((sfp[2].glue)->ptr);
-  CIMCObjectPath *ret;
-  ret = self->ft->newObjectPath(self, s1, NULL, status);
-  printf("op=%s\n",(char*)ret->hdl);
-  KNH_RETURN(ctx,sfp, new_Glue(ctx,"sfcc.CIMCObjectPath", ret, NULL));
-}
-*/
-
-
-// CIMCEnv_newObjectPath_rc
-METHOD CIMCEnv_newObjectPathrc(Ctx *ctx, knh_sfp_t *sfp)
-{
-  CIMCEnv *self = ((sfp[0].glue)->ptr);
-  char *s1 = p_char(sfp[1]);
-  CIMCStatus status;
-  CIMCObjectPath *op;
-  int ret;
-  op = self->ft->newObjectPath(self, s1, NULL, &status);
-  ret = (int)status.rc;
-  KNH_RETURN_Int(ctx,sfp,ret);
-}
-
-// CIMCEnv_newObjectPath_msg
-METHOD CIMCEnv_newObjectPathmsg(Ctx *ctx, knh_sfp_t *sfp)
-{
-  CIMCEnv *self = ((sfp[0].glue)->ptr);
-  char *s1 = p_char(sfp[1]);
-  CIMCStatus status;
-  CIMCObjectPath *op;
-  op = self->ft->newObjectPath(self, s1, NULL, &status);
-  if(status.msg == NULL){
-    KNH_RETURN(ctx, sfp, new_String(ctx, B(""), NULL));
-  }
-  else{
-    KNH_RETURN(ctx, sfp, new_String(ctx, B((char*)status.msg->hdl), NULL));
-  }
-}
-
-// CIMCEnv_newObjectPath_op
-METHOD CIMCEnv_newObjectPathop(Ctx *ctx, knh_sfp_t *sfp)
-{
-  CIMCEnv *self = ((sfp[0].glue)->ptr);
-  char *s1 = p_char(sfp[1]);
-  CIMCStatus status;
-  CIMCObjectPath *ret;
-  ret = self->ft->newObjectPath(self, s1, NULL, &status);
-  KNH_RETURN(ctx,sfp, new_Glue(ctx,"sfcc.CIMCObjectPath", ret, NULL));
-}
-
-
-  /*
-// CIMCClient_enumClassNames
-METHOD CIMCClient_enumClassNames(Ctx *ctx, knh_sfp_t *sfp)
-{
-  CIMCClient *self = ((sfp[0].glue)->ptr);
-  CIMCObjectPath *op = ((sfp[1].glue)->ptr);
-  int ival = p_int(sfp[2]);
-  CIMCStatus *status = ((sfp[3].glue)->ptr);
-  CIMCEnumeration *ret;
-  ret = self->ft->enumClassNames(self, op, ival, status);
-  KNH_RETURN(ctx,sfp, new_Glue(ctx,"sfcc.CIMCEnumeration", ret, NULL));
-}
-  */
-
-// CIMCClient_enumClassNames_rc
-METHOD CIMCClient_enumClassNamesrc(Ctx *ctx, knh_sfp_t *sfp)
-{
-  CIMCClient *self = ((sfp[0].glue)->ptr);
-  CIMCObjectPath *op = ((sfp[1].glue)->ptr);
-  int ival = p_int(sfp[2]);
-  CIMCStatus status;
-  CIMCEnumeration *enm;
-  int ret;
-  enm = self->ft->enumClassNames(self, op, ival, &status);
-  ret = (int)status.rc;
-  KNH_RETURN_Int(ctx,sfp,ret);
-}
-
-// CIMCClient_enumClassNames_msg
-METHOD CIMCClient_enumClassNamesmsg(Ctx *ctx, knh_sfp_t *sfp)
-{
-  CIMCClient *self = ((sfp[0].glue)->ptr);
-  CIMCObjectPath *op = ((sfp[1].glue)->ptr);
-  int ival = p_int(sfp[2]);
-  CIMCStatus status;
-  CIMCEnumeration *enm;
-  enm = self->ft->enumClassNames(self, op, ival, &status);
-  if(status.msg == NULL){
-    KNH_RETURN(ctx, sfp, new_String(ctx, B(""), NULL));
-  }
-  else{
-    KNH_RETURN(ctx, sfp, new_String(ctx, B((char*)status.msg->hdl), NULL));
-  }
-}
-
-// CIMCClient_enumClassNames_enm
-METHOD CIMCClient_enumClassNamesenm(Ctx *ctx, knh_sfp_t *sfp)
-{
-  CIMCClient *self = ((sfp[0].glue)->ptr);
-  CIMCObjectPath *op = ((sfp[1].glue)->ptr);
-  int ival = p_int(sfp[2]);
-  CIMCStatus status;
-  CIMCEnumeration *ret;
-  ret = self->ft->enumClassNames(self, op, ival, &status);
-  KNH_RETURN(ctx,sfp, new_Glue(ctx,"sfcc.CIMCEnumeration", ret, NULL));
-}
-
-
-// CIMCEnumeration_hasNext
-METHOD CIMCEnumeration_hasNext(Ctx *ctx, knh_sfp_t *sfp)
-{
-  CIMCEnumeration *self = ((sfp[0].glue)->ptr);
-  int ret;
-  if(self->ft->hasNext(self, NULL)){
-    ret = 1;
-  }
-  else{
-    ret = 0;
-  }
-  KNH_RETURN_Boolean(ctx, sfp, ret);
-}
-
-// CIMCEnumeration_getNext + op = data.value.ref
-METHOD CIMCEnumeration_getNext(Ctx *ctx, knh_sfp_t *sfp)
-{
-  CIMCEnumeration *self = ((sfp[0].glue)->ptr);
-  CIMCData data;
-  CIMCObjectPath *ret;
-  data = self->ft->getNext(self, NULL);
-  ret = data.value.ref; 
-  KNH_RETURN(ctx,sfp, new_Glue(ctx,"sfcc.CIMCObjectPath", ret, NULL));
-}
-
-// CIMCObjectPath_toString
-METHOD CIMCObjectPath_toString(Ctx *ctx, knh_sfp_t *sfp)
+  
+/* ------------------------------------------------------------------------ */
+/* @method CIMObjectPath CIMObjectPath.addKey(String! path,String packname) */
+METHOD CIMObjectPath_addKey(Ctx *ctx, knh_sfp_t *sfp)
 {
   CIMCObjectPath *self = ((sfp[0].glue)->ptr);
-  CIMCString *ret;
-  //char *ret;
-  ret = self->ft->toString(self, NULL);
-  //ret = str->ft->getCharPtr(str,NULL);
-  //printf("result: %s\n",(char*)ret->hdl);
-  //KNH_RETURN(ctx,sfp, new_Glue(ctx,"sfcc.CIMCString", ret, NULL));
-  KNH_RETURN(ctx,sfp,new_String(ctx,B((char*)ret->hdl),NULL));
+  char *name = p_char(sfp[1]);
+  char *value = p_char(sfp[2]);
+  CIMCStatus status;
+  status = self->ft->addKey(self, name, (CIMCValue*)value,CIMC_chars);
+  if(status.rc != 0){
+    knh_throw_CIMCStatus(ctx, &status);
+  }
+  else{
+    KNH_RETURN_void(ctx,sfp);
+  }
 }
 
-// CIMCString_getChar
-METHOD CIMCString_getCharPtr(Ctx *ctx, knh_sfp_t *sfp)
+
+/* ------------------------------------------------------------------------ */
+/* @method void CIMObjectPath.%s(OutputStream! w, String! m) ??? */
+
+METHOD CIMObjectPath_toString(Ctx *ctx, knh_sfp_t *sfp)
 {
-  CIMCString *self = ((sfp[0].glue)->ptr);
-  char ret[1024] = {0};
-  char *str;
-  int len;
-  str = self->ft->getCharPtr(self, NULL);
-  len = strlen(str);
-  strncpy(ret,str,len);
+  CIMCObjectPath *op = ((sfp[0].glue)->ptr);
+  CIMCStatus status;
+  CIMCString *cs = op->ft->toString(op, &status);
+  if(status.rc){
+    knh_throw_CIMCStatus(ctx,&status);
+  }
+  KNH_RETURN(ctx,sfp,new_String(ctx,B((char*)cs->hdl),NULL));
+}
+
+/* ======================================================================== */
+/* [CIMClient] */
+
+static
+void knh_fgfree_CIMCClient(Ctx *ctx, knh_Glue_t *g)
+{
+  CIMCClient *cc = (CIMCClient*)g->ptr;
+  cc->ft->release(cc);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method CIMClient CIMClient.new(String! url) */
+
+METHOD CIMClient_new(Ctx *ctx, knh_sfp_t *sfp)
+{
+  CIMCEnv *env = getCIMCEnv(ctx);
+  CIMCClient *cc;
+  CIMCStatus status;
+  /*
+  if(IS_NULL(sfp[0].s)) {
+  char *pwd = konoha_getPassword(ctx, STEXT("konoha"));
+  cc = env->ft->connect(env, "localhost", "http", "5988", "konoha", pwd, &status);
+  }
+  else {
+    knh_bytes_t url = knh_String_tobytes(sfp[1].s);
+    char bfscheme[20], bfhost[256];
+    char bfuname[20], bfport[20];
+    int port = 5988;
+    knh_bytes_parseURLscheme(url, bfscheme, sizeof(bfscheme));
+    knh_bytes_parseURLhost(url, bfhost, sizeof(bfhost));
+    knh_bytes_parseURLuname(url, bfuname, sizeof(bfuname));
+    knh_bytes_parseURLport(url, &port);
+    knh_snprintf(bfport, sizeof(bfport), "%d", port);
+    cc = env->ft->connect(env, bfhost, bfscheme, bfport, bfuname, konoha_getPassword(ctx, url), &status);
+    }
+  */
+  
+  char *cimhost = p_char(sfp[1]);
+  char *s3 = "5988";
+  char *s4 = "kato";
+  char *s5 = "kato";
+  cc = env->ft->connect(env, cimhost, "http", s3, s4, s5, &status);
+  
+  if(cc == NULL || status.rc != 0) {
+    knh_throw_CIMCStatus(ctx, &status);
+  }
+  knh_Glue_init(ctx, sfp[0].glue, cc, knh_fgfree_CIMCClient);
+  KNH_RETURN(ctx, sfp, sfp[0].o);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+ITRNEXT knh_enumClassNames(Ctx *ctx, knh_sfp_t *sfp, int n)
+{
+  CIMCEnumeration *enm = (CIMCEnumeration *)DP(sfp[0].it)->ref;
+  if(enm != NULL) {
+    if(enm->ft->hasNext(enm, NULL)) {
+      CIMCData data = enm->ft->getNext(enm, NULL);
+      CIMCObjectPath *op = data.value.ref;
+      CIMCString *path = op->ft->toString(op, NULL);
+      String *s = new_String(ctx, B((char*)path->hdl), NULL);
+      KNH_ITRNEXT(ctx, sfp, n, s);
+    }
+  }
+  KNH_ITREND(ctx, sfp, n);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_ffree_CIMCEnumeration(void *ref)
+{
+  CIMCEnumeration *enm = (CIMCEnumeration *)ref;
+  if(enm != NULL) {
+    enm->ft->release(enm);
+  }
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method String.. CIMClient.enumClassNames(CIMObjectPath! path) */
+
+METHOD CIMClient_enumClassNames(Ctx *ctx, knh_sfp_t *sfp)
+{
+  //asm("int3");
+  CIMCClient *cc = ((sfp[0].glue)->ptr);
+  CIMCObjectPath *op = ((sfp[1].glue)->ptr);
+  CIMCEnumeration *enm;
+  //CIMCData data;
+  //CIMCString *path;
+  //Array *a = new_Array(ctx, CLASS_String, 0);
+  if(cc != NULL && op != NULL) {
+    CIMCStatus status;
+    enm = cc->ft->enumClassNames(cc, op, 0, &status);
+    if(status.rc != 0) {
+      knh_throw_CIMCStatus(ctx, &status);
+    }
+  }
+  
+  /*
+  while (enm->ft->hasNext(enm, NULL)){
+    data = enm->ft->getNext(enm, NULL);
+    op = data.value.ref;
+    path = op->ft->toString(op, NULL);
+    char *p = (char*)path->hdl;
+    knh_Array_add(ctx, a, UP(new_String(ctx, B(p), NULL)));
+    //printf("result: %s\n", (char*)path->hdl);
+  }
+  */
+  KNH_RETURN(ctx, sfp,new_GlueIterator(ctx, CLASS_String, enm, knh_enumClassNames, knh_ffree_CIMCEnumeration));
+  //KNH_RETURN(ctx,sfp, new_Glue(ctx,"sfcc.CIMEnumeration",enm, NULL));
+  //KNH_RETURN(ctx, sfp, a);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method String CIMClient.invokeMethod(CIMObjectPath op, String name, String in, String out) */
+
+METHOD CIMClient_invokeMethod(Ctx *ctx, knh_sfp_t *sfp)
+{
+  //asm("int3");
+  CIMCEnv *env = getCIMCEnv(ctx);
+  CIMCClient *cc = ((sfp[0].glue)->ptr);
+  CIMCObjectPath *op = ((sfp[1].glue)->ptr);
+  char *name =  p_char(sfp[2]);
+  char *inkey =  p_char(sfp[3]);
+  char *invalue =  p_char(sfp[4]);
+  char *outkey =  p_char(sfp[5]);
+  char *outvalue =  p_char(sfp[6]);
+  char *ret;
+  //printf("%s\n",in);
+  //CMPIValue inarg;
+  //CMPIValue outarg;
+  CIMCArgs *inargs;
+  CIMCArgs *outargs;
+  CIMCData data;
+  CIMCStatus check;
+  inargs = env->ft->newArgs(env,&check);
+  //printf("%d,%s\n",check.rc,(char*)check.msg->hdl);
+  outargs = env->ft->newArgs(env,NULL);
+  /*
+  for(i=0;i<string_size;i++)
+    key = d[i].key
+    value = d[i].value
+
+    inarg->ft->add(in,key,value,CIM_chars
+  	   );
+  */
+  ((CMPIArgs*)inargs)->ft->addArg((CMPIArgs*)inargs, inkey, (CMPIValue*)invalue, CIMC_chars);
+  if(strncmp(outkey,"",1)!=0 || strncmp(outvalue,"",1)!=0){
+    ((CMPIArgs*)outargs)->ft->addArg((CMPIArgs*)outargs, outkey, (CMPIValue*)outvalue, CMPI_chars);
+  }
+  else{
+    outargs = NULL;
+  }
+  if(cc != NULL && op != NULL) {
+    CIMCStatus status;
+    data = cc->ft->invokeMethod(cc, op, name, (CIMCArgs*)inargs, (CIMCArgs*)outargs, &status);
+    if(status.rc != 0) {
+      knh_throw_CIMCStatus(ctx, &status);
+    }
+  }
+  ret = value2Chars(data.type,&data.value);
+  //KNH_RETURN(ctx,sfp, new_Glue(ctx,"sfcc.CIMEnumeration",enm, NULL));
   KNH_RETURN(ctx,sfp,new_String(ctx,B(ret),NULL));
 }
 
-// CIMCEnv_release
-METHOD CIMCEnv_release(Ctx *ctx, knh_sfp_t *sfp)
+/* ------------------------------------------------------------------------ */
+
+static
+ITRNEXT knh_enumInstanceNames(Ctx *ctx, knh_sfp_t *sfp, int n)
 {
-  CIMCEnv *self = ((sfp[0].glue)->ptr);
-  self->ft->release(self);
-  KNH_RETURN_void(ctx, sfp);
+  CIMCEnumeration *enm = (CIMCEnumeration *)DP(sfp[0].it)->ref;
+  if(enm != NULL) {
+    if(enm->ft->hasNext(enm, NULL)) {
+      CIMCData data = enm->ft->getNext(enm, NULL);
+      CIMCObjectPath *op = data.value.ref;
+      CIMCString *path = op->ft->toString(op, NULL);
+      String *s = new_String(ctx, B((char*)path->hdl), NULL);
+      KNH_ITRNEXT(ctx, sfp, n, s);
+    }
+  }
+  KNH_ITREND(ctx, sfp, n);
 }
 
-// CIMCClient_release
-METHOD CIMCClient_release(Ctx *ctx, knh_sfp_t *sfp)
+
+/* ------------------------------------------------------------------------ */
+/* @method String[]??.. CIMClient.enumInstanceNames(CIMObjectPath! path) */
+
+METHOD CIMClient_enumInstanceNames(Ctx *ctx, knh_sfp_t *sfp)
 {
-  CIMCClient *self = ((sfp[0].glue)->ptr);
-  self->ft->release(self);
-  KNH_RETURN_void(ctx, sfp);
+  CIMCClient *cc = ((sfp[0].glue)->ptr);
+  CIMCObjectPath *op = ((sfp[1].glue)->ptr);
+  CIMCEnumeration *enm;
+  //CIMCData data;
+  //CIMCString *path;
+  //Array *a = new_Array(ctx, CLASS_String, 0);
+  if(cc != NULL && op != NULL) {
+    CIMCStatus status;
+    enm = cc->ft->enumInstanceNames(cc, op, &status);
+    if(status.rc != 0) {
+      knh_throw_CIMCStatus(ctx, &status);
+    }
+  }
+  /*
+  while (enm->ft->hasNext(enm, NULL)){
+    data = enm->ft->getNext(enm, NULL);
+    op = data.value.ref;
+    path = op->ft->toString(op, NULL);
+    char *p = (char*)path->hdl;
+    knh_Array_add(ctx, a, UP(new_String(ctx, B(p), NULL)));
+    //printf("result: %s\n", (char*)path->hdl);
+  }
+  */
+  KNH_RETURN(ctx, sfp,new_GlueIterator(ctx, CLASS_String, enm, knh_enumInstanceNames, knh_ffree_CIMCEnumeration));
+  //KNH_RETURN(ctx,sfp, new_Glue(ctx,"sfcc.CIMEnumeration",enm, NULL));
+  //KNH_RETURN(ctx, sfp, a);
 }
 
-// CIMCObjectPath_release
-METHOD CIMCObjectPath_release(Ctx *ctx, knh_sfp_t *sfp)
+/* ======================================================================== */
+/* [CIMInstance] */
+
+static
+void knh_fgfree_CIMInstance(Ctx *ctx, knh_Glue_t *g)
 {
-  CIMCObjectPath *self = ((sfp[0].glue)->ptr);
-  self->ft->release(self);
-  KNH_RETURN_void(ctx, sfp);
+  CIMCInstance *ins = (CIMCInstance*)g->ptr;
+  ins->ft->release(ins);
 }
 
-// CIMCEnumeration_release
-METHOD CIMCEnumeration_release(Ctx *ctx, knh_sfp_t *sfp)
+/* ------------------------------------------------------------------------ */
+/* @method CIMInstance CIMInstance.new(CIMClient cc,CIMObjectPath op) */
+
+METHOD CIMInstance_new(Ctx *ctx, knh_sfp_t *sfp)
 {
-  CIMCEnumeration *self = ((sfp[0].glue)->ptr);
-  self->ft->release(self);
-  KNH_RETURN_void(ctx, sfp);
+  //asm("int3");
+  //CIMCEnv *env = getCIMCEnv(ctx);
+  CIMCClient *cc = ((sfp[1].glue)->ptr);
+  CIMCObjectPath *op = ((sfp[2].glue)->ptr);
+  CIMCStatus status;
+  CIMCInstance *ins; //= env->ft->newInstance(env, op, &status);
+  //if(ins == NULL || status.rc != 0) {
+  //knh_throw_CIMCStatus(ctx, &status);
+  //}
+  ins = cc->ft->getInstance(cc, op, 0, NULL, &status);
+  if(ins == NULL || status.rc != 0) {
+    knh_throw_CIMCStatus(ctx, &status);
+  }
+  //printf("%s\n",(char*)cs->hdl);
+  knh_Glue_init(ctx, sfp[0].glue, ins, knh_fgfree_CIMInstance);
+  KNH_RETURN(ctx, sfp, sfp[0].o);
 }
+
+/* ------------------------------------------------------------------------ */
+/* @method CIMObjectPath CIMInstance.getObjectPath() */
+
+METHOD CIMInstance_getObjectPath(Ctx *ctx, knh_sfp_t *sfp)
+{
+  //asm("int3");
+  CIMCObjectPath *ret;
+  CIMCStatus status;
+  CIMCInstance *ins = ((sfp[0].glue)->ptr);
+  ret = ins->ft->getObjectPath(ins,&status);
+  if(ret == NULL || status.rc != 0) {
+    knh_throw_CIMCStatus(ctx, &status);
+  }
+  KNH_RETURN(ctx,sfp, new_Glue(ctx,"sfcc.CIMObjectPath", ret, NULL));
+}
+
+
+/* ------------------------------------------------------------------------ */
+/* @method String[] CIMInstance.getProperty() */
+
+METHOD CIMInstance_getProperty(Ctx *ctx, knh_sfp_t *sfp)
+{
+  //asm("int3");
+  CIMCInstance *ins = ((sfp[0].glue)->ptr);
+  CIMCStatus status;
+  CIMCObjectPath *op = ins->ft->getObjectPath(ins,&status);
+  CIMCString * opname = op->ft->toString(op, NULL);
+  CIMCString * namespace = op->ft->getNameSpace(op, NULL);
+  CIMCString * classname = op->ft->getClassName(op, NULL);
+  //int numkeys = op->ft->getKeyCount(op, NULL);
+  int numproperties = ins->ft->getPropertyCount(ins, NULL);
+  int i;
+  char *valuestr;
+  char ret[128]={0};
+  Array *a = new_Array(ctx, CLASS_String, 0);
+  if(numproperties){
+    for(i=0; i<numproperties; i++){
+      CIMCString * propertyname;
+      CIMCData data = ins->ft->getPropertyAt(ins, i,
+						  &propertyname, NULL);
+      //showProperty( data, (char *)propertyname->hdl );
+      if(data.state == CIMC_goodValue){
+        if(CMIsArray(data)){
+	  CIMCArray *arr   = data.value.array;
+	  CIMCType  eletyp = data.type & ~CIMC_ARRAY;
+	  int j, n;
+	  n = (int)arr->ft->getSize(arr, NULL);
+	  for(j = 0; j < n; ++j){
+	    CIMCData ele = arr->ft->getElementAt(arr, (CIMCCount)j, NULL);
+	    valuestr = value2Chars(eletyp, &ele.value);
+	    sprintf(ret,"%s = %s",(char*)propertyname->hdl,valuestr);
+	    knh_Array_add(ctx, a, UP(new_String(ctx, B(ret), NULL)));
+	    free (valuestr);
+	  }
+        }
+        else{
+	  if(data.state == CIMC_goodValue){
+	    valuestr = value2Chars(data.type, &data.value);
+	    sprintf(ret,"%s = %s",(char*)propertyname->hdl,valuestr);
+	    knh_Array_add(ctx, a, UP(new_String(ctx, B(ret), NULL)));
+	    free (valuestr);
+	  }
+	}         
+      }
+      CMRelease(propertyname);
+    }
+  }
+  else{
+    //printf("No properties!\n");
+    knh_Array_add(ctx, a, UP(new_String(ctx, B("No properties!"), NULL)));
+  }
+  if (classname) CMRelease(classname);
+  if (namespace) CMRelease(namespace);
+  if (opname) CMRelease(opname);
+  if (op) CMRelease(op);
+  //if (ret != NULL) free(ret);
+  if(a == NULL || status.rc != 0) {
+    knh_throw_CIMCStatus(ctx, &status);
+  }
+  //KNH_RETURN(ctx,sfp, new_Glue(ctx,"sfcc.CIMObjectPath", ret, NULL));
+  KNH_RETURN(ctx, sfp, a);
+}
+
+/* ======================================================================== */
+/* [CIMEnumeration] */
+
+/* @method void CIMEnumeration.printEnm() */
+/*
+METHOD CIMEnumeration_printEnm(Ctx *ctx, knh_sfp_t *sfp)
+{
+  CIMCEnumeration *enm = ((sfp[0].glue)->ptr);
+  CIMCObjectPath *op = ((sfp[0].glue)->ptr);
+  CIMCData data;
+  CIMCString *path;
+  while (enm->ft->hasNext(enm, NULL)){
+    data = enm->ft->getNext(enm, NULL);
+    op = data.value.ref;
+    path = op->ft->toString(op, NULL);
+    printf("result: %s\n", (char*)path->hdl);
+  }
+  KNH_RETURN_void(ctx,sfp);
+}
+*/
+
 
 
 
@@ -365,9 +499,11 @@ METHOD CIMCEnumeration_release(Ctx *ctx, knh_sfp_t *sfp)
 // init
 KNH_EXPORTS(int) init(Ctx *ctx)
 {
-    KNH_NOTICE(ctx, "loading sfcc..");
-    return 1;
+  KNH_NOTICE(ctx, "loading sfcc..");
+  return 1;
 }
+
+/* ------------------------------------------------------------------------ */
 
 #ifdef __cplusplus
 }
