@@ -367,7 +367,7 @@ static METHOD knh__Exception_new(Ctx *ctx, knh_sfp_t *sfp)
 		knh_write_char(ctx, cwb.w, ": ");
 		knh_write(ctx, cwb.w, knh_String_tobytes(sfp[1].s));
 	}
-	KNH_SETv(ctx, DP(o)->message, new_String__cwb(ctx, cwb));
+	KNH_SETv(ctx, DP(o)->msg, new_String__cwb(ctx, cwb));
 	KNH_SETv(ctx, DP(o)->bag, sfp[2].o);
 	KNH_RETURN(ctx, sfp, o);
 }
@@ -400,7 +400,7 @@ void knh_Exception__k(Ctx *ctx, Exception *o, OutputStream *w, String *m)
 {
 	KNH_ASSERT(IS_Exception(o));
 	knh_putc(ctx, w, '\'');
-	knh_write(ctx, w, knh_String_tobytes(DP(o)->message));
+	knh_write(ctx, w, knh_String_tobytes(DP(o)->msg));
 	knh_putc(ctx, w, '\'');
 }
 
@@ -411,12 +411,12 @@ static
 void knh_Exception__dump(Ctx *ctx, Exception *o, OutputStream *w, String *m)
 {
 	KNH_ASSERT(IS_Exception(o));
-	knh_write_char(ctx, w, "---- ---- 8< 8< ---- ---- >8 >8 ---- ----");
+	//knh_write_char(ctx, w, "---- ---- 8< 8< ---- ---- >8 >8 ---- ----");
 	knh_println(ctx, w, STEXT(""));
 	if(DP(o)->line != 0) {
 		knh_printf(ctx, w, "[%s:%d] ", DP(o)->file, DP(o)->line);
 	}
-	knh_write(ctx, w, knh_String_tobytes(DP(o)->message));
+	knh_write(ctx, w, knh_String_tobytes(DP(o)->msg));
 	knh_println(ctx, w, STEXT(""));
 	if(IS_Array(DP(o)->traces)) {
 		size_t i;
@@ -426,7 +426,7 @@ void knh_Exception__dump(Ctx *ctx, Exception *o, OutputStream *w, String *m)
 			knh_println(ctx, w, STEXT(""));
 		}
 	}
-	knh_write_char(ctx, w, "---- ---- 8< 8< ---- ---- >8 >8 ---- ----");
+	//knh_write_char(ctx, w, "---- ---- 8< 8< ---- ---- >8 >8 ---- ----");
 	knh_println(ctx, w, STEXT(""));
 }
 

@@ -1,1 +1,260 @@
-\chapter{Konohaライブラリ}Konohaは、C言語のライブラリ(libkonoha, konoha.dll)として提供され、アプリケーションに組み込んで利用することができる。\section{Konohaインスタンス}Konohaインスタンスは、Konohaスクリプティング言語エンジンと実行コンテクストから構成され、\verb|konoha_t|という型で定義されている。Konoha 言語の機能は、全て Konoha インスタンスを通して実行される。次は、最も簡単なKonoha インスタンスの利用例である。まず、Konoha インスタンスの生成(\verb|konoha_open()|)し、Konoha ステートメントを実行(\verb|konoha_eval()|)し、最後にKonohaインスタンスを解放(\verb|konoha_close()|)している。\begin{ksource}#include<konoha.h>int main(void){   konoha_t k = konoha_open(0);   konoha_eval(k, "print 'hello,world';");   konoha_close(k);   return 0;}\end{ksource}Konoha インスタンスは、実行コンテクストを保持しているので、同じKonohaインスタンス上で定義されたスクリプト変数やスクリプト関数は、その定義を持続して評価が行える。\begin{ksource}#include<konoha.h>int main(void){   konoha_t k = konoha_open(0);   konoha_eval(k, "a=1;");   konoha_eval(k, "b=2;");   konoha_eval(k, "print a + b;");   konoha_close(k);   return 0;}\end{ksource}また、スクリプトファイルをロードするAPIも用意されている。スクリプトのロードのみであるため、\verb|main()| 関数は実行されない。\begin{ksource}#include<konoha.h>int main(void){   konoha_t k = konoha_open(0);   konoha_include(k, "file.k");   konoha_close(k);   return 0;}\end{ksource}\subsection{マルチ・インスタンス}Konohaライブラリは、マルチ・インスタンス対応である。つまり、複数のインスタンスを同時につくることが可能である。同時に作成できるインスタンスの数は、システムのリソースが続く限り、無制限である。\begin{ksource}#include<konoha.h>int main(void){   konoha_t k1 = konoha_open(0);   konoha_t k2 = konoha_open(0);   ...   konoha_close(k1);   konoha_close(k2);   return 0;}\end{ksource}Konohaのインスタンスは、メモリ効率はあまりよくないが、完全に独立したメモリ領域を持つように設計されている。したがって、マルチスレッド環境においては、スレッドごとにKonohaインスタンスを割り当てる限り、ブロッキングもレースコンディションも起こらない。もし異なるスレッドから、同じKonohaインスタンスを利用したときは、実行コンテクストが混在して破滅的な結果を招くことがある。\section{Cからのスクリプト関数の利用*}Konohaで開発されたプログラムは、スクリプト関数を通して利用することができる。\begin{ksource}konoha_fcall(k, "funcname(%s)", "value");konoha_fcall_int(k, "funcname(%s)", "value");konoha_fcall_float(k, "funcname(%s)", "value");konoha_fcall_text(k, "funcname(%s)", "value");\end{ksource}\chapter{C/C++ライブラリの利用}スクリプティング言語は、別名「グルー(glue)言語」とも呼ばれる。それは、C/C++など、他のプログラミング言語で開発されたライブラリを「糊のごとく」はり合わせて利用することが一般的な利用形態であるためである。実際、多くのC/C++ライブラリが、Konoha にバインドされて、Konoha から利用可能になっている。\section{C言語関数のバインド}最も簡単なバインドは、C言語の関数をKonohaのクラス関数へのバインドである。まずは、C言語の標準ライブラリの \verb|math.h|を例にしながら、バインド機構を紹介する。\subsection{パッケージの作成}Konohaでは、バインドされたC/C++ライブラリは、全てパッケージ機構で管理される。まず、パッケージ名を決めてパッケージスクリプトを開発する。ここでは、\verb|math|パッケージとする。パッケージスクリプトのファイル名は、\verb|math.k|となる。新しく作成したパッケージは、次のどこかのディレクトリに保存する。\begin{ksource}   1. 環境変数      {$KONOHA_PACKAGE}/math/math.k   2. Konoha インストールディレクトリ       {$konoha.home}/package/math/math.k   3. ローカルパッケージ       ~/.konoha/math/math.k   4. 一時的なパッケージ       ./.konoha/math/math.k \end{ksource}注意: パッケージスクリプトは、上の順番で検索され、最初に発見したスクリプトがロードされる。今回の例としている math パッケージは、インストールされているため、実際に試している読者はパッケージ名を変更するなど工夫が必要である。さて、肝心のパッケージスクリプト\verb|math.k|の内容であるが、特別なことはない。単純に、バインドする(予定の)関数をKonohaからみた名前や型で設計するだけである。メソッドの実体は、バインドするため、抽象メソッドとして宣言するのみである。\begin{ksource}class Math;@Static float Math.sin(float x);@Static float Math.abs(float x);...\end{ksource}注意：Konoha は、オブジェクト指向プログラミング言語であるため、クラスが機能の単位の中心となる。そのため、非オブジェクト指向言語のC関数であっても、何らかのクラス関数としてバインドする必要がある。（スクリプト関数にバインドすることはできない。）上記の例では、{\sf Math}クラスをクラス関数のバインド先として定義している。\subsection{グルー関数の作成}Konohaの内部では、メソッドは \verb|knh_fmethod| 型で定義された関数で実装されている。次は、konoha.h ヘッダファイルに定義されている \verb|knh_fmethod|型の抜粋である。コンテクストとスタックフレームポインタを引数として受け取り、戻り値は void 型である。（ただし、一読してメソッドとわかるためとfastcallの切り換えのため、METHOD マクロで定義されている。）\begin{ksource}#define METHOD void KNH_CC_FASTCALLtypedef METHOD (*knh_fmethod)(Ctx *, knh_sfp_t *);\end{ksource}グルー関数とは、\verb|knh_fmethod|型に準拠したラッパー関数のことである。その機能は、単に、Konoha側のスタックフレームポインタで渡されたパラメータをC言語の型に変換し、C関数を実行し、そしてC関数の実行結果を再び、Konoha側のスタックに戻している。\begin{ksource}// Static float Math.abs(float x);METHOD Math_abs(Ctx *ctx, knh_sfp_t *sfp){   double v = (double)sfp[1].fvalue;   // C言語の型へ変換   v = fabs(v);   KNH_RETURN_Float(ctx, sfp, v);      // Konohaのスタックへ戻す}\end{ksource}グルー関数の仕様は、次節で詳しく述べるが、{\tt sfp[1]}には第一引数、{\tt sfp[2]}には第二引数、{\sf sfp[n]}には第n引数の値が格納されている。例えば、次のような場合、第一引数の値は、\verb|-1.0|であり、それは \verb|sfp[1].fvalue|に格納されている。\begin{ksource}>>> Math.abs(-1.0)1.0000\end{ksource}グルー関数の特徴は、型チェック済みの引数が必ず渡される点である。これは、パッケージスクリプトで宣言したメソッド定義に基づいている。つまり、グルー関数の開発者は、特別な場合をのぞいて{\tt sfp[1]}の型をチェックする必要はない。逆に、戻り値は、グルー関数の開発者が型チェック済みの値を正しく返さなければならない。\verb|Math.abs()|の戻り値の型は、{\sf float}であるため、専用のマクロ\verb|KNH_RETURN_Float|を用いて、Konohaスタックに戻り値を設定し、同時にグルー関数から抜け出している。注意：グルー関数内で設定する戻り値の型が間違っていた場合は、ほぼ例外なくクラッシュする原因となる。グルー関数の作者は細心の注意を払う必要がある。\subsection{共有ライブラリのコンパイル}\begin{comment}\subsection{パッケージライブラリの作成}Konoha言語は、C/C++で作成されたライブラリをバインドすることで、Konohaのライブラリとして利用することができます。ここでは、簡単な例をみながら、Konoha のC言語バインド機構を紹介していきます。パッケージスクリプトと共有ライブラリ¶Konoha では、バインドされたライブラリは、パッケージ単位で管理されます。パッケージには、0個以上のクラスを定義することができます。（クラスを定義しなくも構いません。）ここでは、math パッケージを例として用います。Konoha からは、using 文を用いることで、mathパッケージをロードすることができます。>>> using math; パッケージスクリプトは、パッケージ内で定義されているクラス/メソッドを記述したスクリプトファイルです。上の例では、Konoha は、次の順番でパッケージスクリプト math.kを検索します。Konoha言語は、スクリプトファイルを読むとき、同じ名前の共有ライブラリを探し、もし存在すれば同時に読み込みます。共有ライブラリは、OSごとに拡張子が異なります。    * math.so - Linux, Solaris, FreeBSD など    * math.dll - Microsoft Windows    * math.dylib - Apple MacOS X このとき、Konoha 言語のバインド機構で決められた命名則で共有ライブラリが作成されていれば、コンパイル済みのスクリプトとしてKonoha 言語にバインドすることができます。本文書の残りは、これらの共有ライブラリの作り方を紹介していきます。クラスとメソッドの設計¶Konoha は、オブジェクト指向言語です。C言語で作成されたライブラリであっても、Konoha から利用するときは、オブジェクト指向言語らしく、クラスやメソッドのビューが必要になります。最初の作業は、パッケージスクリプトの作成とクラス設計となります。Konoha言語は、全ての関数は何かしらのクラスのメソッドとして登録する必要があります。ここでは、その目的のため、Math クラスを新たに定義しています。（新たに定義しなくても既存のクラスに追加することもできます。）@Staticは、クラスのインスタンス化なしにメソッドの呼び出しが可能なことを表す修飾子です。@Static 修飾子を付ければ、次のようにいちいちインスタンス化する必要なく、クラス名＋メソッド名で直接関数を呼び出せるようになります。もしくは、using 文で、メソッドを関数として再定義し、クラス名も省略可能になります。>>> math = new Math();　// インスタンスを作る>>> math.abs(-1)1.0000>>> Math.abs(-1)  // インスタンスを作る必要はない1.0000>>> using Math.abs;　// 更に、関数化も可能>>> abs(-1)1.0000関数のバインド¶\end{comment}\section{グルー関数とメソッド}\section{構造体とクラス}\section{関数ポインタとクロージャ}
+\chapter{Konoha ライブラリ}
+
+Konohaは、C言語のライブラリ(libkonoha, konoha.dll)として提供されるため、既存のC言語アプリケーション（ミドルウェア）に組み込んで自由に利用することができます。
+
+この章では、C/C++ 開発者に対して、Konoha スクリプティング言語エンジンを既存のアプリケーションに統合する方法を説明します。
+
+\section{Konohaインスタンス}
+
+Konoha インスタンスは、Konoha スクリプティング言語エンジンと実行環境のリソースからなります。C言語では、\verb|konoha_t| が与えられ、スクリプトの実行は全てKonohaインスタンスを通して実行されます。
+
+\subsection{インスタンスの生成と解放}
+
+Konoha インスタンスは、\verb|konoha_open()|で生成し、\verb|konoha_close()| で解放します。
+
+次は、最も簡単な（何のスクリプトも実行しない）Konoha インスタンスの利用例です。\verb|konoha_open()|で新しいインスタンスを生成し、\verb|konoha_close()| で全てのリソースを解放しています。
+
+\begin{ksource}
+#include<konoha.h>
+int main(void)
+{
+   konoha_t konoha = konoha_open(0);
+   konoha_close(konoha);
+   return 0;
+}
+\end{ksource}
+
+Konoha インスタンスは、ひとつのプロセス空間で複数生成することができます。それぞれのインスタンスは、完全に Memory Isolation されており、スクリプトやデータは独立しています。
+
+\subsection{クラス/関数のロード}
+
+Konoha インスタンスは、クラスや関数をロードすることで、Konohaスクリプトを実行できるようになります。クラスや関数は、ファイルに保存されているスクリプトをロードする、もしくはテキストで記述されたスクリプトを直接評価することで、Konoha インスタンスにロードできます。
+
+\begin{source}
+int
+konoha_loadScript(konoha_t k, const char *file);
+
+int
+konoha_evalScript(konoha_t k, const char *script);
+\end{source}
+
+次は、\verb|print 'hello,world'|を実行する例である。
+
+\begin{ksource}
+#include<konoha.h>
+int main(void)
+{
+   konoha_t konoha = konoha_open(0);
+   konoha_evalScript(konoha, "print 'hello,world';");
+   konoha_close(konoha);
+   return 0;
+}
+\end{ksource}
+
+Konoha インスタンスでは、生成されてから解放されるまで、実行コンテクストを保持しているため、同じKonohaインスタンス上で定義されたスクリプト変数やスクリプト関数は、前の状態に続けて評価が行えます。
+
+\begin{ksource}
+#include<konoha.h>
+int main(void)
+{
+   konoha_t k = konoha_open(0);
+   konoha_eval(k, "a=1;");
+   konoha_eval(k, "b=2;");
+   konoha_eval(k, "print a + b;");
+   konoha_close(k);
+   return 0;
+}
+\end{ksource}
+
+注意：loadScript や evalScript は、スクリプトを実行するより、ロードすることを主目的としています。そのため、実行結果は、標準出力に出力されます。Konoha の上の関数（メソッド）を実行し、その結果を値として得るときは、次節の「スクリプト関数の呼び出し」を用いてください。
+
+\begin{source}
+int
+konoha_restart(konoha_t k);
+\end{source}
+
+\section{スクリプト関数の呼び出し}
+
+Konohaで書かれたプログラムは、\verb|konoha_invokeScriptFunc()|関数を用いることで、スクリプト関数を経由して呼び出すことができます。
+
+まず、おなじみの\verb|fibo()|関数を呼び出します。
+
+\begin{ksource}
+int fibo(int n) {
+   if(n < 3) return n;
+   return fibo(n-1)+fibo(n-2);
+}
+\end{ksource}
+
+
+\begin{source}
+int n = (int)
+  konoha_invokeScriptFuncI(konoha, "fib(%d)", 12);
+printf("result: %d\n", n);
+\end{source}
+
+\verb|konoha_invokeScriptFunc()|は、スクリプト関数の戻り値の型によって、いくつかバリエーションが用意されています。
+
+\begin{source}
+void
+konoha_invokeScriptFunc(konoha_t k, char *fmt, ...);
+
+knh_int_t
+konoha_invokeScriptFuncI(konoha_t k, char *fmt, ...);
+
+knh_float_t
+konoha_invokeScriptFuncF(konoha_t k, char *fmt, ...);
+
+const char*
+konoha_invokeScriptFuncS(konoha_t k, char *fmt, ...);
+\end{source}
+
+注意: \verb|konoha_invokeScriptFuncS()|は、新たに \verb|malloc()|された\verb|\0|終端文字列が返されます。(メモリーリークを避けるため、\verb|free()|してください。)
+
+\section{マルチスレッディング}
+
+Konohaライブラリは、マルチ・インスタンス対応である。つまり、複数のインスタンスを同時につくることが可能である。同時に作成できるインスタンスの数は、システムのリソースが続く限り、無制限である。
+
+\begin{ksource}
+#include<konoha.h>
+int main(void)
+{
+   konoha_t k1 = konoha_open(0);
+   konoha_t k2 = konoha_open(0);
+   ...
+   konoha_close(k1);
+   konoha_close(k2);
+   return 0;
+}
+\end{ksource}
+
+Konohaのインスタンスは、メモリ効率はあまりよくないが、完全に独立したメモリ領域を持つように設計されている。したがって、マルチスレッド環境においては、スレッドごとにKonohaインスタンスを割り当てる限り、ブロッキングもレースコンディションも起こらない。もし異なるスレッドから、同じKonohaインスタンスを利用したときは、実行コンテクストが混在して破滅的な結果を招くことがある。
+
+
+
+\chapter{C/C++ライブラリの利用}
+
+スクリプティング言語は、別名「グルー(glue)言語」とも呼ばれる。それは、C/C++など、他のプログラミング言語で開発されたライブラリを「糊のごとく」はり合わせて利用することが一般的な利用形態であるためである。実際、多くのC/C++ライブラリが、Konoha にバインドされて、Konoha から利用可能になっている。
+
+\section{C言語関数のバインド}
+
+最も簡単なバインドは、C言語の関数をKonohaのクラス関数へのバインドである。まずは、C言語の標準ライブラリの \verb|math.h|を例にしながら、バインド機構を紹介する。
+
+\subsection{パッケージの作成}
+
+Konohaでは、バインドされたC/C++ライブラリは、全てパッケージ機構で管理される。まず、パッケージ名を決めてパッケージスクリプトを開発する。
+
+ここでは、\verb|math|パッケージとする。パッケージスクリプトのファイル名は、\verb|math.k|となる。新しく作成したパッケージは、次のどこかのディレクトリに保存する。
+
+\begin{ksource}
+   1. 環境変数
+      {$KONOHA_PACKAGE}/math/math.k
+   2. Konoha インストールディレクトリ 
+      {$konoha.home}/package/math/math.k
+   3. ローカルパッケージ 
+      ~/.konoha/math/math.k
+   4. 一時的なパッケージ 
+      ./.konoha/math/math.k 
+\end{ksource}
+
+注意: パッケージスクリプトは、上の順番で検索され、最初に発見したスクリプトがロードされる。今回の例としている math パッケージは、インストールされているため、実際に試している読者はパッケージ名を変更するなど工夫が必要である。
+
+さて、肝心のパッケージスクリプト\verb|math.k|の内容であるが、特別なことはない。単純に、バインドする(予定の)関数をKonohaからみた名前や型で設計するだけである。メソッドの実体は、バインドするため、抽象メソッドとして宣言するのみである。
+
+\begin{ksource}
+class Math;
+@Static float Math.sin(float x);
+@Static float Math.abs(float x);
+...
+\end{ksource}
+
+注意：Konoha は、オブジェクト指向プログラミング言語であるため、クラスが機能の単位の中心となる。そのため、非オブジェクト指向言語のC関数であっても、何らかのクラス関数としてバインドする必要がある。（スクリプト関数にバインドすることはできない。）上記の例では、{\sf Math}クラスをクラス関数のバインド先として定義している。
+
+\subsection{グルー関数の作成}
+
+Konohaの内部では、メソッドは \verb|knh_fmethod| 型で定義された関数で実装されている。次は、konoha.h ヘッダファイルに定義されている \verb|knh_fmethod|型の抜粋である。コンテクストとスタックフレームポインタを引数として受け取り、戻り値は void 型である。（ただし、一読してメソッドとわかるためとfastcallの切り換えのため、METHOD マクロで定義されている。）
+
+\begin{ksource}
+#define METHOD void KNH_CC_FASTCALL
+typedef METHOD (*knh_fmethod)(Ctx *, knh_sfp_t *);
+\end{ksource}
+
+グルー関数とは、\verb|knh_fmethod|型に準拠したラッパー関数のことである。その機能は、単に、Konoha側のスタックフレームポインタで渡されたパラメータをC言語の型に変換し、C関数を実行し、そしてC関数の実行結果を再び、Konoha側のスタックに戻している。
+
+\begin{ksource}
+// Static float Math.abs(float x);
+METHOD Math_abs(Ctx *ctx, knh_sfp_t *sfp)
+{
+   double v = (double)sfp[1].fvalue;   // C言語の型へ変換
+   v = fabs(v);
+   KNH_RETURN_Float(ctx, sfp, v);      // Konohaのスタックへ戻す
+}
+\end{ksource}
+
+グルー関数の仕様は、次節で詳しく述べるが、{\tt sfp[1]}には第一引数、{\tt sfp[2]}には第二引数、{\sf sfp[n]}には第n引数の値が格納されている。例えば、次のような場合、第一引数の値は、\verb|-1.0|であり、それは \verb|sfp[1].fvalue|に格納されている。
+
+\begin{ksource}
+>>> Math.abs(-1.0)
+1.0000
+\end{ksource}
+
+グルー関数の特徴は、型チェック済みの引数が必ず渡される点である。これは、パッケージスクリプトで宣言したメソッド定義に基づいている。つまり、グルー関数の開発者は、特別な場合をのぞいて{\tt sfp[1]}の型をチェックする必要はない。
+
+逆に、戻り値は、グルー関数の開発者が型チェック済みの値を正しく返さなければならない。\verb|Math.abs()|の戻り値の型は、{\sf float}であるため、専用のマクロ\verb|KNH_RETURN_Float|を用いて、Konohaスタックに戻り値を設定し、同時にグルー関数から抜け出している。
+
+注意：グルー関数内で設定する戻り値の型が間違っていた場合は、ほぼ例外なくクラッシュする原因となる。グルー関数の作者は細心の注意を払う必要がある。
+
+\subsection{共有ライブラリのコンパイル}
+
+\begin{comment}
+
+\subsection{パッケージライブラリの作成}
+
+Konoha言語は、C/C++で作成されたライブラリをバインドすることで、Konohaのライブラリとして利用することができます。ここでは、簡単な例をみながら、Konoha のC言語バインド機構を紹介していきます。
+パッケージスクリプトと共有ライブラリ¶
+
+Konoha では、バインドされたライブラリは、パッケージ単位で管理されます。パッケージには、0個以上のクラスを定義することができます。（クラスを定義しなくも構いません。）
+
+ここでは、math パッケージを例として用います。Konoha からは、using 文を用いることで、mathパッケージをロードすることができます。
+
+>>> using math; 
+
+パッケージスクリプトは、パッケージ内で定義されているクラス/メソッドを記述したスクリプトファイルです。上の例では、Konoha は、次の順番でパッケージスクリプト math.kを検索します。
+
+
+Konoha言語は、スクリプトファイルを読むとき、同じ名前の共有ライブラリを探し、もし存在すれば同時に読み込みます。共有ライブラリは、OSごとに拡張子が異なります。
+
+    * math.so - Linux, Solaris, FreeBSD など
+    * math.dll - Microsoft Windows
+    * math.dylib - Apple MacOS X 
+
+このとき、Konoha 言語のバインド機構で決められた命名則で共有ライブラリが作成されていれば、コンパイル済みのスクリプトとしてKonoha 言語にバインドすることができます。
+
+本文書の残りは、これらの共有ライブラリの作り方を紹介していきます。
+クラスとメソッドの設計¶
+
+Konoha は、オブジェクト指向言語です。C言語で作成されたライブラリであっても、Konoha から利用するときは、オブジェクト指向言語らしく、クラスやメソッドのビューが必要になります。最初の作業は、パッケージスクリプトの作成とクラス設計となります。
+
+
+Konoha言語は、全ての関数は何かしらのクラスのメソッドとして登録する必要があります。ここでは、その目的のため、Math クラスを新たに定義しています。（新たに定義しなくても既存のクラスに追加することもできます。）
+
+@Staticは、クラスのインスタンス化なしにメソッドの呼び出しが可能なことを表す修飾子です。@Static 修飾子を付ければ、次のようにいちいちインスタンス化する必要なく、クラス名＋メソッド名で直接関数を呼び出せるようになります。もしくは、using 文で、メソッドを関数として再定義し、クラス名も省略可能になります。
+
+>>> math = new Math();　// インスタンスを作る
+>>> math.abs(-1)
+1.0000
+>>> Math.abs(-1)  // インスタンスを作る必要はない
+1.0000
+>>> using Math.abs;　// 更に、関数化も可能
+>>> abs(-1)
+1.0000
+
+関数のバインド¶
+\end{comment}
+
+\section{グルー関数とメソッド}
+
+\section{構造体とクラス}
+
+\section{関数ポインタとクロージャ}
+

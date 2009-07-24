@@ -151,7 +151,7 @@ static ssize_t knh_dev_write(struct file *filp,const char __user *user_buf,
     printk("[%s][user_buf=%s]\n", __FUNCTION__,buf);
     //printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "int fib(int n) { if (n==3) { return 1;}}"));
     //printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "fib(10);"));
-    konoha_ret = konoha_eval(dev->konoha,buf);
+    konoha_ret = konoha_evalScript(dev->konoha,buf);
 
     snprintf(dev->buffer,MAXCOPYBUF,"%s",konoha_ret);
     printk(KERN_DEBUG "[%s][dev->buffer=%s]\n",__FUNCTION__ ,dev->buffer);

@@ -764,7 +764,7 @@ typedef struct knh_ResultSet {
 typedef struct knh_Exception {
 	knh_flag_t flag;
 	knh_expt_t eid;
-	knh_String_t* message;
+	knh_String_t* msg;
 	Object* bag;
 	knh_Array_t* traces;
 	char*     file;

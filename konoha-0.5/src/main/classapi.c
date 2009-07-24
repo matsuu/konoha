@@ -1849,7 +1849,7 @@ void knh_Exception_init(Ctx *ctx, Exception *e, int init)
 	knh_Exception_struct *b = DP(e);
 	b->eid  = 1;
 	b->flag = 0;
-	KNH_INITv(b->message, TS_EMPTY);
+	KNH_INITv(b->msg, TS_EMPTY);
 	KNH_INITv(b->bag, KNH_NULL);
 	KNH_INITv(b->traces, KNH_NULL);
 	b->file = "";
@@ -1862,7 +1862,7 @@ static
 void knh_Exception_traverse(Ctx *ctx, Exception *e, knh_ftraverse ftr)
 {
 	knh_Exception_struct *b = DP(e);
-	ftr(ctx, UP(b->message));
+	ftr(ctx, UP(b->msg));
 	ftr(ctx, b->bag);
 	ftr(ctx, UP(b->traces));
 }

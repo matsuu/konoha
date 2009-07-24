@@ -186,7 +186,7 @@ void knh_Context_initCommon(Ctx *ctx, knh_Context_t *o, size_t stacksize)
 
 	KNH_INITv(o->ns,   KNH_NULL);
 	KNH_INITv(o->tsymbolDictMap, new_DictMap0(ctx, 256));
-	KNH_INITv(o->cmpr, KNH_NULL);
+	KNH_INITv(o->abr, KNH_NULL);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -213,7 +213,7 @@ void knh_Context_traverseCommon(Ctx *ctx, knh_Context_t *o, knh_ftraverse ftr)
 
 	ftr(ctx, UP(o->ns));
 	ftr(ctx, UP(o->tsymbolDictMap));
-	ftr(ctx, UP(o->cmpr));
+	ftr(ctx, UP(o->abr));
 
 	if(IS_SWEEP(ftr)) {
 		DBG2_P("freeing stack (ctxid=%d)...", o->ctxid);
