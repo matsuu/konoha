@@ -69,10 +69,10 @@ static Asm *new_Asm(Ctx *ctx)
 
 Asm* knh_Context_getAsm(Ctx *ctx)
 {
-	if(IS_NULL(ctx->cmpr)) {
-		KNH_SETv(ctx, ((Context*)ctx)->cmpr, new_Asm(ctx));
+	if(IS_NULL(ctx->abr)) {
+		KNH_SETv(ctx, ((Context*)ctx)->abr, new_Asm(ctx));
 	}
-	return ctx->cmpr;
+	return ctx->abr;
 }
 
 /* ======================================================================== */

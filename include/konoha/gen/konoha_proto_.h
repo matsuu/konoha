@@ -579,6 +579,8 @@ int knh_fcallback_cmpr(Object *obj, Object *obj2);
 void *konoha_generateCallBackFunc(Ctx *ctx, void *func, Closure *c);
 /* ../src/main/konoha_api.c */
 void konoha_init(void);
+void knh_Context_setRuntimeError(Ctx *ctx, String *msg);
+int konoha_runMain(konoha_t konoha, int argc, char **argv);
 int knh_readline_askYesNo(char *prompt, int def);
 METHOD knh__Script_eval(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_isStatement(Ctx *ctx, knh_sfp_t *sfp);

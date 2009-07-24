@@ -749,8 +749,8 @@ typedef struct knh_Context_t {
 	struct knh_Mapper_t         **mprCache;
 
 	/* root table */
-	knh_ctxshare_t   *share;
-	knh_ctxstat_t    *stat;
+	knh_ctxshare_t               *share;
+	knh_ctxstat_t                *stat;
 
 	knh_flag_t                   flag;
 	knh_ushort_t                 ctxid;
@@ -767,13 +767,13 @@ typedef struct knh_Context_t {
 	struct knh_OutputStream_t*   bufw;
 	struct knh_Bytes_t*          bconvbuf;
 	struct knh_DictMap_t*        props;
+	struct knh_Asm_t            *abr;
 
 	struct knh_NameSpace_t      *ns;
 	struct knh_DictMap_t        *tsymbolDictMap;
-	struct knh_Asm_t            *cmpr;
 
-//	struct knh_HashMap_t        *tmapperHashMap;
-//	struct knh_HashMap_t        *tmethodHashMap;
+	int    hasError;
+	struct knh_String_t *msgError;
 } knh_Context_t ;
 
 /* ------------------------------------------------------------------------ */

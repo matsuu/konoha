@@ -225,8 +225,8 @@ KNHAPI(OutputStream*) new_FileOutputStream(Ctx *ctx, knh_bytes_t file, char *mod
 KNHAPI(OutputStream*) new_BytesOutputStream(Ctx *ctx, Bytes *ba)
 {
 	OutputStream* o = (OutputStream*)new_Object_bcid(ctx, CLASS_OutputStream, -1);
-	knh_OutputStream_setBOL(o, 1);
 	KNH_ASSERT(IS_Bytes(ba));
+	knh_OutputStream_setBOL(o, 1);
 	KNH_SETv(ctx, DP(o)->ba, ba);
 	knh_OutputStream_setStoringBuffer(o, 1);
 	return o;

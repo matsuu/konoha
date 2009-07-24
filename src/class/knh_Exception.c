@@ -189,12 +189,12 @@ Exception* knh_Exception_new__init(Ctx *ctx, Exception *o, String *e, String *ms
 			knh_write_char(ctx, cwb.w, EXPTN(DP(o)->eid));
 			knh_write_char(ctx, cwb.w, "!!: ");
 			knh_write(ctx, cwb.w, knh_String_tobytes(msg));
-			KNH_SETv(ctx, DP(o)->message, new_String__cwb(ctx, cwb));
+			KNH_SETv(ctx, DP(o)->msg, new_String__cwb(ctx, cwb));
 		}
 		else {
 			int loc = knh_bytes_indexOf(knh_String_tobytes(e), STEXT("!!:"));
 			if(loc > 0 && eid != EXPT_unknown) {
-				KNH_SETv(ctx, DP(o)->message, e);
+				KNH_SETv(ctx, DP(o)->msg, e);
 				return o;
 			}
 			knh_cwb_t cwb = new_cwb(ctx);
@@ -204,7 +204,7 @@ Exception* knh_Exception_new__init(Ctx *ctx, Exception *o, String *e, String *ms
 				knh_write_char(ctx, cwb.w, ": ");
 				knh_write(ctx, cwb.w, knh_bytes_last(knh_String_tobytes(e), loc+3));
 			}
-			KNH_SETv(ctx, DP(o)->message, new_String__cwb(ctx, cwb));
+			KNH_SETv(ctx, DP(o)->msg, new_String__cwb(ctx, cwb));
 		}
 	}
 	KNH_SETv(ctx, DP(o)->bag, bag);
@@ -217,7 +217,7 @@ int knh_Exception_isa(Ctx *ctx, Exception *o, String *msg)
 {
 	knh_expt_t eid = knh_texpt_forname(ctx, knh_String_tobytes(msg), EXPT_unknown);
 	int res = 0;
-	DBG2_P("%s(%d) isa? %s(%d)", knh_String_tochar(DP(o)->message), DP(o)->eid, knh_String_tochar(msg), eid);
+	DBG2_P("%s(%d) isa? %s(%d)", knh_String_tochar(DP(o)->msg), DP(o)->eid, knh_String_tochar(msg), eid);
 	if(eid == EXPT_unknown) res = 0;
 	res = knh_ExptTable_isa(ctx, DP(o)->eid, eid);
 	DBG2_P("res=%d", res);

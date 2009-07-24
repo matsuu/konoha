@@ -698,7 +698,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		DBG2_ASSERT(IS_ExceptionHandler(sfp[hn].o)); \
 		if(knh_ExceptionHandler_isCatching(sfp[hn].hdr)) {\
 			Exception *_e = DP(sfp[hn].hdr)->caught; \
-			DBG2_P("THROW AGAIN .. %s", knh_String_tochar(DP(_e)->message)); \
+			DBG2_P("THROW AGAIN .. %s", knh_String_tochar(DP(_e)->msg)); \
 			((Context*)ctx)->esp = sfp; \
 			knh_throwException(ctx, _e, NULL, 0); \
 		} \
@@ -850,8 +850,10 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 	} \
 
 #define KNH_PRINT_STACKTRACE(ctx, lsfp, hn) {\
+		Exception *e_ = DP(lsfp[hn].hdr)->caught;\
 		KNH_ASSERT(IS_ExceptionHandler(lsfp[hn].hdr));\
-		knh_format(ctx, KNH_STDERR, METHODN__dump, UP(DP(lsfp[hn].hdr)->caught), KNH_NULL);\
+		knh_format(ctx, KNH_STDERR, METHODN__dump, UP(e_), KNH_NULL);\
+		knh_Context_setRuntimeError(ctx, DP(e_)->msg);\
 		KNH_LOCALBACK(ctx, lsfp);\
 	}\
 

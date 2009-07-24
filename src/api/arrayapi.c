@@ -60,8 +60,8 @@ static METHOD knh__Array_new(Ctx *ctx, knh_sfp_t *sfp)
 static METHOD knh__Array_new__array(Ctx *ctx, knh_sfp_t *sfp)
 {
 	Array *o = (Array*)sfp[0].o;
-	int init = p_int(sfp[1]);
-	if(init > 0) {
+	knh_intptr_t init = (knh_intptr_t)sfp[1].ivalue;
+	if(init >= 0 && init == sfp[1].ivalue) {
 		knh_class_t p1 = ctx->share->ClassTable[knh_Object_cid(o)].p1;
 		Object *v = konoha_getClassDefaultValue(ctx, p1);
 		knh_Array_grow(ctx, o, init, v);

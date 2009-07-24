@@ -35,4 +35,12 @@
 
 /* ------------------------------------------------------------------------ */
 
+#ifdef KONOHA_MACROS
+#define T(msg)          new_String__T(ctx, msg)
+#define S(msg)          new_String(ctx, B(msg), NULL)
+#endif
+
+/* ------------------------------------------------------------------------ */
+
+
 #endif /*KONOHA_MACRO_H_*/

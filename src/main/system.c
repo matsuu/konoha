@@ -85,9 +85,9 @@ static void konoha_addConstData(Ctx *ctx, char *dname, Object *value)
 			cid = konoha_getcid(ctx, knh_bytes_first(n, loc));
 		}
 		else {
-			KNH_ASSERT(IS_Asm(ctx->cmpr));
-			DBG_P("nsname=%s", knh_String_tochar(DP(DP(ctx->cmpr)->ns)->nsname));
-			cid = knh_NameSpace_getcid(ctx, DP(ctx->cmpr)->ns, knh_bytes_first(n, loc));
+			KNH_ASSERT(IS_Asm(ctx->abr));
+			DBG_P("nsname=%s", knh_String_tochar(DP(DP(ctx->abr)->ns)->nsname));
+			cid = knh_NameSpace_getcid(ctx, DP(ctx->abr)->ns, knh_bytes_first(n, loc));
 		}
 		if(cid == CLASS_unknown) {
 			DBG_P("unknown class const: %s", dname);

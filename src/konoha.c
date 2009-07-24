@@ -31,7 +31,8 @@
 extern "C" {
 #endif
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
 #if defined(KNH_USING_BTRON)
     char buf[4096];
@@ -63,7 +64,7 @@ int main(int argc, char **argv)
     }
     else {
         konoha_loadScript(konoha, args[n]);
-        konoha_main(konoha, argc - n, args + n);
+        konoha_runMain(konoha, argc - n, args + n);
     }
     konoha_close(konoha);
     return 0;

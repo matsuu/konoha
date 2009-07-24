@@ -243,7 +243,7 @@ KNHAPI(void) knh_throwException(Ctx *ctx, Exception *e, char *file, int line)
 	}
 
 	fprintf(stderr, "********** USE STACKTRACE IN YOUR C/C++ DEBUGGER ************\n");
-	fprintf(stderr, "Uncaught Exception: %s\n", knh_String_tochar(DP(e)->message));
+	fprintf(stderr, "Uncaught Exception: %s\n", knh_String_tochar(DP(e)->msg));
 	fprintf(stderr, "*************************************************************\n");
 	abort();
 }
@@ -273,11 +273,19 @@ KNHAPI(void) knh_throw(Ctx *ctx, Object *e, char *file, int line)
 
 /* ------------------------------------------------------------------------ */
 
+KNHAPI(void) knh_throwStupidException(Ctx *ctx)
+{
+	knh_throw__s(ctx, "Stupid!!", NULL, 0);
+}
+
+/* ------------------------------------------------------------------------ */
+
 KNHAPI(void) konoha_throwSecurityException(void)
 {
 	Ctx *ctx = konoha_getCurrentContext();
 	knh_throwException(ctx, new_Exception(ctx, TS_SecurityException), NULL, 0);
 }
+
 
 /* ------------------------------------------------------------------------ */
 
