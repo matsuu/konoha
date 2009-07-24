@@ -324,19 +324,15 @@ Ctx *konoha_createContext0(size_t stacksize)
 	KNH_INITv(ctx->share->constNull, new_Null(ctx));
 	KNH_INITv(ctx->share->constTrue, new_Boolean0(ctx, 1));
 	KNH_INITv(ctx->share->constFalse, new_Boolean0(ctx, 0));
-	KNH_INITv(ctx->share->constFloat0, new_hObject(ctx, FLAG_Float, CLASS_Float, CLASS_Float));
-	(ctx->share->constFloat0)->n.fvalue = 0.0;
-
-	/*TINT*/ {
-		knh_intptr_t i;
-		KNH_ASSERT(KNH_TINT_MIN < KNH_TINT_MAX);
-		KNH_ASSERT(ctx->share->tInt == NULL);
-		ctx->share->tInt = (knh_Int_t**)KNH_MALLOC(ctx, SIZEOF_TINT);
-		for(i = KNH_TINT_MIN; i <= KNH_TINT_MAX; i++) {
-			Int *n = (Int*)new_hObject(ctx, FLAG_Int, CLASS_Int, CLASS_Int);
-			KNH_INITv(ctx->share->tInt[i - KNH_TINT_MIN], n);
-			(n)->n.ivalue = i;
-		}
+	{
+		knh_Int_t *io = (knh_Int_t*)new_hObject(ctx, FLAG_Float, CLASS_Int, CLASS_Int);
+		(io)->n.ivalue = 0;
+		KNH_INITv(ctx->share->constInt0, io);
+	}
+	{
+		knh_Float_t *fo = (knh_Float_t*)new_hObject(ctx, FLAG_Float, CLASS_Float, CLASS_Float);
+		(fo)->n.fvalue = 0.0;
+		KNH_INITv(ctx->share->constFloat0, fo);
 	}
 
 	KNH_ASSERT(ctx->share->tString == NULL);
@@ -384,13 +380,11 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 	ftr(ctx, ctx->share->constNull);
 	ftr(ctx, ctx->share->constTrue);
 	ftr(ctx, ctx->share->constFalse);
+	ftr(ctx, UP(ctx->share->constInt0));
 	ftr(ctx, UP(ctx->share->constFloat0));
 	ftr(ctx, UP(ctx->sys));
 
 	int i;
-	for(i = KNH_TINT_MIN; i <= KNH_TINT_MAX; i++) {
-		ftr(ctx, UP(ctx->share->tInt[i - KNH_TINT_MIN]));
-	}
 	for(i = 0; i < KNH_TSTRING_SIZE; i++) {
 		ftr(ctx, UP(ctx->share->tString[i]));
 	}
@@ -472,8 +466,6 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 
 		KNH_FREE(ctx, ctx->share->ExptTable, SIZEOF_TEXPT);
 		((Context*)ctx)->share->ExptTable = NULL;
-		KNH_FREE(ctx, ctx->share->tInt, SIZEOF_TINT);
-		ctx->share->tInt = NULL;
 		KNH_FREE(ctx, ctx->share->tString, SIZEOF_TSTRING);
 		ctx->share->tString = NULL;
 
