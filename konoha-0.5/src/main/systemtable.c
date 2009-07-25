@@ -256,42 +256,43 @@ Ctx *konoha_createContext0(size_t stacksize)
 	ctx->unusedObject = NULL;
 	ctx->unusedObjectSize = 0;
 
-	ctx->share = (knh_ctxshare_t*)malloc(sizeof(knh_ctxshare_t) + sizeof(knh_ctxstat_t));
-	knh_bzero(ctx->share, sizeof(knh_ctxshare_t) + sizeof(knh_ctxstat_t));
-	ctx->share->threadSize = 1;
-	ctx->stat = (knh_ctxstat_t*)((ctx->share+1));
+	knh_SharedData_t *share = (knh_SharedData_t*)malloc(sizeof(knh_SharedData_t) + sizeof(knh_ctxstat_t));
+	ctx->share = share;
+	knh_bzero(share, sizeof(knh_SharedData_t) + sizeof(knh_ctxstat_t));
+	share->threadSize = 1;
+	ctx->stat = (knh_ctxstat_t*)((share+1));
 
 	/* System Table */
 	size_t i;
-	KNH_ASSERT(ctx->share->ObjectPageTable == NULL);
-	ctx->share->ObjectPageTableMaxSize = KNH_TOBJECTPAGE_INITSIZE;
-	ctx->share->ObjectPageTable =
+	KNH_ASSERT(share->ObjectPageTable == NULL);
+	share->ObjectPageTableMaxSize = KNH_TOBJECTPAGE_INITSIZE;
+	share->ObjectPageTable =
 		(knh_ObjectPageTable_t*)KNH_MALLOC((Ctx*)ctx,
-			ctx->share->ObjectPageTableMaxSize * sizeof(knh_ObjectPageTable_t));
-	knh_bzero(ctx->share->ObjectPageTable,
-		ctx->share->ObjectPageTableMaxSize * sizeof(knh_ObjectPageTable_t));
-	ctx->share->ObjectPageTableSize = 0;
+			share->ObjectPageTableMaxSize * sizeof(knh_ObjectPageTable_t));
+	knh_bzero(share->ObjectPageTable,
+		share->ObjectPageTableMaxSize * sizeof(knh_ObjectPageTable_t));
+	share->ObjectPageTableSize = 0;
 
-	KNH_ASSERT(ctx->share->LockTable == NULL);
-	ctx->share->LockTable = (knh_LockTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TLOCK);
-	knh_bzero(ctx->share->LockTable, SIZEOF_TLOCK);
+	KNH_ASSERT(share->LockTable == NULL);
+	share->LockTable = (knh_LockTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TLOCK);
+	knh_bzero(share->LockTable, SIZEOF_TLOCK);
 	for(i = 0; i < KNH_TLOCK_SIZE; i++) {
-		ctx->share->LockTable[i].flock = knh_fmutexlock_nop;
-		ctx->share->LockTable[i].funlock = knh_fmutexunlock_nop;
+		share->LockTable[i].flock = knh_fmutexlock_nop;
+		share->LockTable[i].funlock = knh_fmutexunlock_nop;
 		if(LOCK_GIANT < i && i < KNH_TLOCK_SIZE - 1) {
-			ctx->share->LockTable[i].unused = &(ctx->share->LockTable[i+1]);
+			share->LockTable[i].unused = &(share->LockTable[i+1]);
 		}
 	}
-	ctx->share->unusedLockTable = &(ctx->share->LockTable[LOCK_GIANT+1]);
+	share->unusedLockTable = &(share->LockTable[LOCK_GIANT+1]);
 
-	KNH_ASSERT(ctx->share->StructTable == NULL);
-	ctx->share->StructTable = (knh_StructTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TSTRUCT);
-	knh_bzero((void*)ctx->share->StructTable, SIZEOF_TSTRUCT);
-	ctx->share->StructTableSize = 0;
+	KNH_ASSERT(share->StructTable == NULL);
+	share->StructTable = (knh_StructTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TSTRUCT);
+	knh_bzero((void*)share->StructTable, SIZEOF_TSTRUCT);
+	share->StructTableSize = 0;
 
-	KNH_ASSERT(ctx->share->ClassTable == NULL);
-	ctx->share->ClassTable = (knh_ClassTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TCLASS);
-	knh_bzero((void*)ctx->share->ClassTable, SIZEOF_TCLASS);
+	KNH_ASSERT(share->ClassTable == NULL);
+	share->ClassTable = (knh_ClassTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TCLASS);
+	knh_bzero((void*)share->ClassTable, SIZEOF_TCLASS);
 	for(i = 0; i < KNH_TCLASS_SIZE; i++) {
 		knh_ClassTable_t *t = pClassTable(i);
 		t->p1       = CLASS_unknown;   /* @deps knh_Class_isGenerics(cid)*/
@@ -299,37 +300,37 @@ Ctx *konoha_createContext0(size_t stacksize)
 		t->keyidx   = -1;
 		t->keyidx2   = -1;
 	}
-	ctx->share->ClassTableSize = KNH_TCLASS_SIZE;
+	share->ClassTableSize = KNH_TCLASS_SIZE;
 
-	ctx->share->ExptTable = (knh_ExptTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TEXPT);
-	knh_bzero((void*)ctx->share->ExptTable, SIZEOF_TEXPT);
-	ctx->share->ExptTableSize = 0;
+	share->ExptTable = (knh_ExptTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TEXPT);
+	knh_bzero((void*)share->ExptTable, SIZEOF_TEXPT);
+	share->ExptTableSize = 0;
 	konoha_loadSystemStructData(ctx);
 
-	KNH_INITv(ctx->share->constNull, new_Null(ctx));
-	KNH_INITv(ctx->share->constTrue, new_Boolean0(ctx, 1));
-	KNH_INITv(ctx->share->constFalse, new_Boolean0(ctx, 0));
+	KNH_INITv(share->constNull, new_Null(ctx));
+	KNH_INITv(share->constTrue, new_Boolean0(ctx, 1));
+	KNH_INITv(share->constFalse, new_Boolean0(ctx, 0));
 	{
 		knh_Int_t *io = (knh_Int_t*)new_hObject(ctx, FLAG_Float, CLASS_Int, CLASS_Int);
 		(io)->n.ivalue = 0;
-		KNH_INITv(ctx->share->constInt0, io);
+		KNH_INITv(share->constInt0, io);
 	}
 	{
 		knh_Float_t *fo = (knh_Float_t*)new_hObject(ctx, FLAG_Float, CLASS_Float, CLASS_Float);
 		(fo)->n.fvalue = 0.0;
-		KNH_INITv(ctx->share->constFloat0, fo);
+		KNH_INITv(share->constFloat0, fo);
 	}
 
-	KNH_ASSERT(ctx->share->tString == NULL);
-	ctx->share->tString = (knh_String_t**)KNH_MALLOC(ctx, SIZEOF_TSTRING);
-	knh_bzero(ctx->share->tString, SIZEOF_TSTRING);
+	KNH_ASSERT(share->tString == NULL);
+	share->tString = (knh_String_t**)KNH_MALLOC(ctx, SIZEOF_TSTRING);
+	knh_bzero(share->tString, SIZEOF_TSTRING);
 	konoha_loadSystemString(ctx);
 	ctx->fsweep = konoha_getDefaultSweepFunc();
 	ctx->parent = ctx;
 
 	KNH_INITv(ctx->sys, new_System(ctx));
 	konoha_loadSystemData(ctx);
-	KNH_INITv(ctx->share->mainns, new_NameSpace(ctx, TS_main));
+	KNH_INITv(share->mainns, new_NameSpace(ctx, TS_main));
 
 	knh_Context_initCommon(ctx, ctx, stacksize);
 	return (Ctx*)ctx;
@@ -361,31 +362,32 @@ void knh_ClassStruct_toAbstractAll(Ctx *ctx, ClassStruct *cs)
 static
 void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 {
+	knh_SharedData_t *share = (knh_SharedData_t*)ctx->share;
 	knh_Context_traverseCommon(ctx, (knh_Context_t*)ctx, ftr);
 
-	ftr(ctx, ctx->share->constNull);
-	ftr(ctx, ctx->share->constTrue);
-	ftr(ctx, ctx->share->constFalse);
-	ftr(ctx, UP(ctx->share->constInt0));
-	ftr(ctx, UP(ctx->share->constFloat0));
+	ftr(ctx, share->constNull);
+	ftr(ctx, share->constTrue);
+	ftr(ctx, share->constFalse);
+	ftr(ctx, UP(share->constInt0));
+	ftr(ctx, UP(share->constFloat0));
 	ftr(ctx, UP(ctx->sys));
-	ftr(ctx, UP(ctx->share->mainns));
+	ftr(ctx, UP(share->mainns));
 
 	int i;
 	for(i = 0; i < KNH_TSTRING_SIZE; i++) {
-		ftr(ctx, UP(ctx->share->tString[i]));
+		ftr(ctx, UP(share->tString[i]));
 	}
 
 	for(i = 0; i < KNH_TLOCK_SIZE; i++) {
-		if(ctx->share->LockTable[i].name != NULL) {
-			ftr(ctx, UP(ctx->share->LockTable[i].name));
-			if(ctx->share->LockTable[i].sharedObject != NULL) {
-				ftr(ctx, ctx->share->LockTable[i].sharedObject);
+		if(share->LockTable[i].name != NULL) {
+			ftr(ctx, UP(share->LockTable[i].name));
+			if(share->LockTable[i].sharedObject != NULL) {
+				ftr(ctx, share->LockTable[i].sharedObject);
 			}
 		}
 	}
 
-	for(i = 0; i < (int)(ctx->share->ExptTableSize); i++) {
+	for(i = 0; i < (int)(share->ExptTableSize); i++) {
 		if(ExptTable(i).name != NULL) {
 			ftr(ctx, UP(ExptTable(i).name));
 		}
@@ -393,17 +395,17 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 
 	/* tclass */
 	if(IS_SWEEP(ftr)) {
-		for(i = 0; i < ctx->share->StructTableSize; i++) {
+		for(i = 0; i < share->StructTableSize; i++) {
 			DBG2_ASSERT(ClassTable(i).sname != NULL);
 			knh_ClassStruct_toAbstractAll(ctx, ClassTable(i).cstruct);
 		}
-		for(i = ctx->share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
+		for(i = share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
 			DBG2_ASSERT(ClassTable(i).sname != NULL);
 			knh_ClassStruct_toAbstractAll(ctx, ClassTable(i).cstruct);
 		}
 	}
 
-	for(i = 0; i < ctx->share->StructTableSize; i++) {
+	for(i = 0; i < share->StructTableSize; i++) {
 		DBG2_ASSERT(ClassTable(i).sname != NULL);
 		ftr(ctx, UP(ClassTable(i).class_cid));
 		ftr(ctx, UP(ClassTable(i).cmap));
@@ -419,7 +421,7 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 		}
 		ftr(ctx, UP(ClassTable(i).lname));
 	}
-	for(i = ctx->share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
+	for(i = share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
 		DBG2_ASSERT(ClassTable(i).sname != NULL);
 		ftr(ctx, UP(ClassTable(i).class_cid));
 		ftr(ctx, UP(ClassTable(i).cmap));
@@ -436,12 +438,12 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 		ftr(ctx, UP(ClassTable(i).lname));
 	}
 
-	for(i = 0; i < ctx->share->StructTableSize; i++) {
+	for(i = 0; i < share->StructTableSize; i++) {
 		DBG2_ASSERT(ClassTable(i).sname != NULL);
 		ftr(ctx, UP(ClassTable(i).cstruct));
 		ftr(ctx, UP(ClassTable(i).sname));
 	}
-	for(i = ctx->share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
+	for(i = share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
 		DBG2_ASSERT(ClassTable(i).sname != NULL);
 		ftr(ctx, UP(ClassTable(i).cstruct));
 		ftr(ctx, UP(ClassTable(i).sname));
@@ -451,31 +453,31 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 	if(IS_SWEEP(ftr)) {
 		DBG2_P("*** FREEING ALL SYSTEM TABLES ***");
 
-		KNH_FREE(ctx, (void*)ctx->share->ExptTable, SIZEOF_TEXPT);
-		((Context*)ctx)->share->ExptTable = NULL;
-		KNH_FREE(ctx, ctx->share->tString, SIZEOF_TSTRING);
-		ctx->share->tString = NULL;
+		KNH_FREE(ctx, (void*)share->ExptTable, SIZEOF_TEXPT);
+		share->ExptTable = NULL;
+		KNH_FREE(ctx, share->tString, SIZEOF_TSTRING);
+		share->tString = NULL;
 
 		((Context*)ctx)->fsweep = knh_Object_finalSweep;
-		KNH_ASSERT(ctx->share->ObjectPageTable != NULL);
-		for(i = 0; i < (int)(ctx->share->ObjectPageTableSize); i++) {
-			knh_ObjectPageTable_free(ctx, ctx->share->ObjectPageTable[i].thead);
-			ctx->share->ObjectPageTable[i].thead = NULL;
+		KNH_ASSERT(share->ObjectPageTable != NULL);
+		for(i = 0; i < (int)(share->ObjectPageTableSize); i++) {
+			knh_ObjectPageTable_free(ctx, share->ObjectPageTable[i].thead);
+			share->ObjectPageTable[i].thead = NULL;
 		}
 
-		KNH_ASSERT(ctx->share->LockTable != NULL);
-		KNH_FREE(ctx, ctx->share->LockTable, SIZEOF_TLOCK);
-		ctx->share->unusedLockTable = NULL;
+		KNH_ASSERT(share->LockTable != NULL);
+		KNH_FREE(ctx, share->LockTable, SIZEOF_TLOCK);
+		share->unusedLockTable = NULL;
 
-		KNH_FREE(ctx, (void*)ctx->share->ClassTable, SIZEOF_TCLASS);
-		ctx->share->ClassTable = NULL;
+		KNH_FREE(ctx, (void*)share->ClassTable, SIZEOF_TCLASS);
+		share->ClassTable = NULL;
 
-		KNH_FREE(ctx, (void*)ctx->share->StructTable, SIZEOF_TSTRUCT);
-		ctx->share->StructTable = NULL;
+		KNH_FREE(ctx, (void*)share->StructTable, SIZEOF_TSTRUCT);
+		share->StructTable = NULL;
 
-		KNH_FREE(ctx, ctx->share->ObjectPageTable,
-				ctx->share->ObjectPageTableMaxSize * sizeof(knh_ObjectPageTable_t));
-		ctx->share->ObjectPageTable = NULL;
+		KNH_FREE(ctx, share->ObjectPageTable,
+				share->ObjectPageTableMaxSize * sizeof(knh_ObjectPageTable_t));
+		share->ObjectPageTable = NULL;
 
 		if(ctx->stat->usedMemorySize != 0) {
 			fprintf(stderr, "memory leaks: %d bytes", (int)ctx->stat->usedMemorySize);
@@ -485,8 +487,8 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 		DBG_P("formatter cache hit/miss %d/%d", (int)ctx->stat->fmtCacheHit, (int)ctx->stat->fmtCacheMiss);
 		DBG_P("mapper cache hit/miss %d/%d", (int)ctx->stat->mprCacheHit, (int)ctx->stat->mprCacheMiss);
 
-		knh_bzero(ctx->share, sizeof(knh_ctxshare_t) + sizeof(knh_ctxstat_t));
-		free(ctx->share);
+		knh_bzero(share, sizeof(knh_SharedData_t) + sizeof(knh_ctxstat_t));
+		free(share);
 
 		knh_bzero((void*)ctx, sizeof(knh_Context_t));
 		free((void*)ctx);

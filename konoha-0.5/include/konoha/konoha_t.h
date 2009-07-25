@@ -721,7 +721,7 @@ typedef struct {
 	size_t              threadSize;
 	knh_LockTable_t    *LockTable;
 	knh_LockTable_t    *unusedLockTable;
-} knh_ctxshare_t ;
+} knh_SharedData_t ;
 
 #define LockTable(mx)     ctx->share->LockTable[mx]
 #define pLockTable(mx)    (knh_LockTable_t*)(ctx->share->LockTable + (mx))
@@ -752,8 +752,8 @@ typedef struct knh_Context_t {
 	struct knh_Method_t         **fmtCache;
 	struct knh_Mapper_t         **mprCache;
 
-	/* root table */
-	knh_ctxshare_t               *share;
+	/* shared table */
+	const knh_SharedData_t       *share;
 	knh_ctxstat_t                *stat;
 
 	knh_flag_t                   flag;

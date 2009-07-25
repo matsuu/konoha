@@ -170,29 +170,29 @@ konoha_addClosureClass(Ctx *ctx, knh_class_t cid, String *name, knh_type_t r0, k
 		cid = knh_ClassTable_newId(ctx);
 	} else {
 		//KNH_ASSERT(cid + 1 == ctx->share->ClassTableSize);
-		ctx->share->ClassTableSize = cid;
+		((knh_SharedData_t*)ctx->share)->ClassTableSize = cid;
 	}
-	knh_ClassTable_t *TC = (knh_ClassTable_t*)(&ClassTable(cid));
+	knh_ClassTable_t *t = pClassTable(cid);
 	KNH_ASSERT(ClassTable(cid).class_cid == NULL);
 
-	TC->cflag  = ctx->share->ClassTable[CLASS_Closure].cflag;
-	TC->oflag  = ctx->share->ClassTable[CLASS_Closure].oflag;
-	TC->sid    = ctx->share->ClassTable[CLASS_Closure].sid;
+	t->cflag  = ctx->share->ClassTable[CLASS_Closure].cflag;
+	t->oflag  = ctx->share->ClassTable[CLASS_Closure].oflag;
+	t->sid    = ctx->share->ClassTable[CLASS_Closure].sid;
 
-	TC->bcid   = CLASS_Closure;
-	TC->supcid = ctx->share->ClassTable[CLASS_Closure].supcid;
-	TC->offset = ctx->share->ClassTable[CLASS_Closure].offset;
+	t->bcid   = CLASS_Closure;
+	t->supcid = ctx->share->ClassTable[CLASS_Closure].supcid;
+	t->offset = ctx->share->ClassTable[CLASS_Closure].offset;
 
-	TC->size = ctx->share->ClassTable[CLASS_Closure].size;
-	TC->bsize  = ctx->share->ClassTable[CLASS_Closure].bsize;
+	t->size = ctx->share->ClassTable[CLASS_Closure].size;
+	t->bsize  = ctx->share->ClassTable[CLASS_Closure].bsize;
 
 	konoha_setClassName(ctx, cid, name);
-	KNH_INITv(TC->cstruct, ctx->share->ClassTable[CLASS_Closure].cstruct);
-	KNH_INITv(TC->cmap, ctx->share->ClassTable[CLASS_Closure].cmap);
-	TC->r0 = r0;
-	TC->p1 = p1;
-	TC->p2 = p2;
-	TC->p3 = p3;
+	KNH_INITv(t->cstruct, ctx->share->ClassTable[CLASS_Closure].cstruct);
+	KNH_INITv(t->cmap, ctx->share->ClassTable[CLASS_Closure].cmap);
+	t->r0 = r0;
+	t->p1 = p1;
+	t->p2 = p2;
+	t->p3 = p3;
 	konoha_setClassDefaultValue(ctx, cid, UP(new_ClosureDEFAULT(ctx, r0, cid)), NULL);
 	return cid;
 }
