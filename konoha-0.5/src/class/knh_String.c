@@ -318,7 +318,7 @@ Object *new_Object_parseOf(Ctx *ctx, String *s)
 	if(loc > 2 && t.buf[loc-2] == '!' && t.buf[loc-1] == '!') {
 		return UP(new_Exception(ctx, s));
 	}
-	knh_class_t tagcid = knh_NameSpace_tagcid(ctx, ctx->ns, CLASS_String, knh_bytes_first(t, loc));
+	knh_class_t tagcid = knh_NameSpace_tagcid(ctx, ctx->share->mainns, CLASS_String, knh_bytes_first(t, loc));
 	if(tagcid != CLASS_unknown) {
 		DBG2_P("cid=%s", CLASSN(tagcid));
 

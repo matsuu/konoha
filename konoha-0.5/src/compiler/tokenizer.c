@@ -59,14 +59,15 @@ void knh_InputStream_perror(Ctx *ctx, InputStream *in, int pe, char *fmt, ...)
 static
 String *new_String__NAME(Ctx *ctx, knh_bytes_t tname)
 {
-	knh_index_t idx = knh_DictMap_index__b((ctx)->tsymbolDictMap, tname);
+	DictMap *symbolDictMap = DP((ctx)->abr)->symbolDictMap;
+	knh_index_t idx = knh_DictMap_index__b(symbolDictMap, tname);
 	if(idx == -1) {
 		String *s = new_String(ctx, tname, NULL);
-		knh_DictMap_set(ctx, (ctx)->tsymbolDictMap, s, UP(s));
+		knh_DictMap_set(ctx, symbolDictMap, s, UP(s));
 		return s;
 	}
 	else {
-		return knh_DictMap_keyAt((ctx)->tsymbolDictMap, idx);
+		return knh_DictMap_keyAt(symbolDictMap, idx);
 	}
 }
 

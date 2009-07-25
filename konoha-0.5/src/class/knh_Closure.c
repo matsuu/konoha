@@ -172,8 +172,8 @@ konoha_addClosureClass(Ctx *ctx, knh_class_t cid, String *name, knh_type_t r0, k
 		//KNH_ASSERT(cid + 1 == ctx->share->ClassTableSize);
 		ctx->share->ClassTableSize = cid;
 	}
-	knh_ClassTable_t *TC = (knh_ClassTable_t*)(&ctx->share->ClassTable[cid]);
-	KNH_ASSERT(ctx->share->ClassTable[cid].class_cid == NULL);
+	knh_ClassTable_t *TC = (knh_ClassTable_t*)(&ClassTable(cid));
+	KNH_ASSERT(ClassTable(cid).class_cid == NULL);
 
 	TC->cflag  = ctx->share->ClassTable[CLASS_Closure].cflag;
 	TC->oflag  = ctx->share->ClassTable[CLASS_Closure].oflag;
@@ -292,8 +292,8 @@ knh_class_t knh_Method_gencid(Ctx *ctx, Method *mtd, knh_class_t cid)
 	knh_type_t rtype = knh_pmztype_totype(ctx, knh_Method_rztype(mtd), cid);
 	cid = CLASS_type(rtype);
 	KNH_ASSERT_cid(cid);
-	KNH_ASSERT(ctx->share->ClassTable[cid].bcid == CLASS_Iterator);
-	return ctx->share->ClassTable[cid].p1;
+	KNH_ASSERT(ClassTable(cid).bcid == CLASS_Iterator);
+	return ClassTable(cid).p1;
 }
 
 /* ------------------------------------------------------------------------ */

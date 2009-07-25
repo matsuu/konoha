@@ -367,8 +367,6 @@ typedef knh_ushort_t          knh_methodn_t;
 #define METHODN_TOFIELDN(mn)     (mn & KNH_FLAG_MN_FIELDN)
 
 /* ------------------------------------------------------------------------ */
-
-/* ------------------------------------------------------------------------ */
 /* Object */
 /* ------------------------------------------------------------------------ */
 
@@ -523,6 +521,7 @@ typedef struct knh_sfp_t {
 		knh_code_t    *pc;
 	};
 } knh_sfp_t;
+
 
 /* ------------------------------------------------------------------------ */
 /* [Context] */
@@ -698,23 +697,41 @@ typedef struct knh_ObjectPageTable_t {
 
 typedef struct {
 	/* system table */
-	size_t              threadSize;
-	knh_LockTable_t    *LockTable;
-	knh_LockTable_t    *unusedLockTable;
-	knh_ObjectPageTable_t  *ObjectPageTable;
-	size_t ObjectPageTableSize; size_t ObjectPageTableMaxSize;
-	knh_StructTable_t  *StructTable; size_t StructTableSize;
-	knh_ClassTable_t   *ClassTable;  size_t ClassTableSize;
-	knh_ExptTable_t    *ExptTable;   size_t ExptTableSize;
+	knh_ObjectPageTable_t    *ObjectPageTable;
+	const knh_StructTable_t  *StructTable;
+	const knh_ClassTable_t   *ClassTable;
+	const knh_ExptTable_t    *ExptTable;
+	size_t ObjectPageTableSize;
+	size_t ObjectPageTableMaxSize;
+	size_t StructTableSize;
+	size_t ClassTableSize;
+	size_t ExptTableSize;
 
-	/* system const */
+	/* system shared const */
 	knh_Object_t         *constNull;
 	knh_Object_t         *constTrue;
 	knh_Object_t         *constFalse;
 	struct knh_Int_t     *constInt0;
 	struct knh_Float_t   *constFloat0;
 	struct knh_String_t  **tString;
+	/* share level=2 */
+	struct knh_NameSpace_t   *mainns;
+
+	/* thread */
+	size_t              threadSize;
+	knh_LockTable_t    *LockTable;
+	knh_LockTable_t    *unusedLockTable;
 } knh_ctxshare_t ;
+
+#define LockTable(mx)     ctx->share->LockTable[mx]
+#define pLockTable(mx)    (knh_LockTable_t*)(ctx->share->LockTable + (mx))
+
+#define StructTable(sid)  ctx->share->StructTable[sid]
+#define pStructTable(sid) (knh_StructTable_t*)(ctx->share->StructTable + (sid))
+#define ClassTable(cid)   ctx->share->ClassTable[cid]
+#define pClassTable(cid)  (knh_ClassTable_t*)(ctx->share->ClassTable + (cid))
+#define ExptTable(eid)    ctx->share->ExptTable[eid]
+#define pExptTable(eid)   (knh_ExptTable_t*)(ctx->share->ExptTable + (eid))
 
 /* ------------------------------------------------------------------------ */
 
@@ -755,9 +772,6 @@ typedef struct knh_Context_t {
 	struct knh_Bytes_t*          bconvbuf;
 	struct knh_DictMap_t*        props;
 	struct knh_Asm_t            *abr;
-
-	struct knh_NameSpace_t      *ns;
-	struct knh_DictMap_t        *tsymbolDictMap;
 
 	int    hasError;
 	struct knh_String_t *msgError;

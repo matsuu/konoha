@@ -378,14 +378,14 @@ typedef struct knh_DictIdx_t {
 /* ------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------ */
 /* @class Class Object knh_Class_t */
-/* @flag Class.Release!Debug CF ctx->share->ClassTable[(%s)].cflag 'is:*:is:*' */
-/* @flag Class.Immutable CF ctx->share->ClassTable[(%s)].cflag 'is:*:is:*' */
-/* @flag Class.Cyclic CF ctx->share->ClassTable[(%s)].cflag 'is:set:*:*' */
-/* @flag Class.MetaExtensible CF ctx->share->ClassTable[(%s)].cflag 'is:*:is:*' */
-/* @flag Class.Private!Public CF ctx->share->ClassTable[(%s)].cflag 'is:*:is:*' */
-/* @flag Class.Final CF ctx->share->ClassTable[(%s)].cflag 'is:*:is:*' */
-/* @flag Class.Singleton CF ctx->share->ClassTable[(%s)].cflag 'is:*:*:*' */
-/* @flag Class.Interface  CF ctx->share->ClassTable[(%s)].cflag 'is:*:is:*' */
+/* @flag Class.Release!Debug CF (pClassTable(%s))->cflag 'is:*:is:*' */
+/* @flag Class.Immutable CF (pClassTable(%s))->cflag 'is:*:is:*' */
+/* @flag Class.Cyclic CF (pClassTable(%s))->cflag 'is:set:*:*' */
+/* @flag Class.MetaExtensible CF (pClassTable(%s))->cflag 'is:*:is:*' */
+/* @flag Class.Private!Public CF (pClassTable(%s))->cflag 'is:*:is:*' */
+/* @flag Class.Final CF (pClassTable(%s))->cflag 'is:*:is:*' */
+/* @flag Class.Singleton CF (pClassTable(%s))->cflag 'is:*:*:*' */
+/* @flag Class.Interface  CF (pClassTable(%s))->cflag 'is:*:is:*' */
 
 typedef struct knh_Class_t {
 	knh_hObject_t h;
@@ -403,7 +403,7 @@ typedef struct knh_Class_t {
 
 #define knh_Class_cid(c)     (knh_class_t)(c)->cid
 #define KNH_FLAG_CF2OF(f)        (f)
-#define knh_Class_isGenerics(cid)    (ctx->share->ClassTable[cid].p1 != CLASS_unknown)
+#define knh_Class_isGenerics(cid)    (ClassTable(cid).p1 != CLASS_unknown)
 
 /* ------------------------------------------------------------------------ */
 /* @class ClassStruct Object knh_ClassStruct_t @Private */
@@ -1033,8 +1033,8 @@ typedef struct knh_Asm {
 	struct knh_NameSpace_t *ns;
 	struct knh_Method_t    *mtd;
 	knh_type_t             rtype;
-	knh_ushort_t vars_size;
-	knh_cfield_t* vars;
+	knh_ushort_t           vars_size;
+	knh_cfield_t*          vars;
 	knh_rtti_t nnrtti0;
 	knh_rtti_t nnrtti;
 	int                     level; /* 0.3 */
@@ -1060,9 +1060,12 @@ typedef struct knh_Asm {
 	knh_kode_t         *prev_op;
 
 	void *dlhdr;
-	struct knh_Array_t *constPools;
-	struct knh_Array_t *exportsMethods;
+	struct knh_DictMap_t  *symbolDictMap;
+	struct knh_Array_t    *constPools;
+	struct knh_Array_t    *exportsMethods;
 } knh_Asm_struct;
+
+#define knh_Context_getAsm(ctx)    (ctx)->abr
 
 /* ------------------------------------------------------------------------ */
 /* @class KLRCode Object knh_KLRCode_struct */

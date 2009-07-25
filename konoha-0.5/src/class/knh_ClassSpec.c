@@ -277,7 +277,7 @@ static MAPPER knh_Vocab_IntX(Ctx *ctx, knh_sfp_t *sfp)
 
 void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid)
 {
-	knh_class_t bcid = ctx->share->ClassTable[cid].bcid;
+	knh_class_t bcid = ClassTable(cid).bcid;
 	if(bcid == CLASS_Int) {
 		knh_int_t v = 0;
 		if(!DP(u)->fichk(u, v)) {
@@ -631,7 +631,7 @@ ClassSpec *new_ClassSpecNULL(Ctx *ctx, knh_bytes_t urn)
 
 ClassSpec *konoha_getClassSpec(Ctx *ctx, knh_class_t cid)
 {
-	ClassSpec *u = (ClassSpec*)ctx->share->ClassTable[cid].cspec;
+	ClassSpec *u = (ClassSpec*)ClassTable(cid).cspec;
 	KNH_ASSERT(IS_ClassSpec(u));
 	return u;
 }
@@ -668,65 +668,65 @@ Object *knh_ClassTable_fdefault__SSPEC(Ctx *ctx, knh_class_t cid)
 static
 knh_class_t konoha_addSpecializedType(Ctx *ctx, knh_class_t cid, knh_class_t bcid, ClassSpec *u)
 {
+	char bufcn[CLASSNAME_BUFSIZ];
 	if(cid == CLASS_newid) {
 		cid = knh_ClassTable_newId(ctx);
-	}else {
-		//KNH_ASSERT(cid + 1 == ctx->share->ClassTableSize);
-		//ctx->share->ClassTableSize = cid;
 	}
-	char bufcn[CLASSNAME_BUFSIZ];
 	knh_snprintf(bufcn, sizeof(bufcn), KNH_CLASSSPEC_FMT, CLASSN(bcid), knh_String_tochar(DP(u)->urn));
 	konoha_setClassName(ctx, cid, new_String(ctx, B(bufcn), NULL));
-	if((DP(u)->tag)->size > 0) {
-		knh_snprintf(bufcn, sizeof(bufcn), "%s:%s", CLASSN(bcid), knh_String_tochar(DP(u)->tag));
-		KNH_SETv(ctx, ctx->share->ClassTable[cid].sname, new_String(ctx, B(bufcn), NULL));
-	}
-	DBG2_P("added %d, '%s'", cid, knh_String_tochar(ctx->share->ClassTable[cid].lname));
+	{
+		knh_ClassTable_t *t = pClassTable(cid);
+		if((DP(u)->tag)->size > 0) {
+			knh_snprintf(bufcn, sizeof(bufcn), "%s:%s", CLASSN(bcid), knh_String_tochar(DP(u)->tag));
+			KNH_SETv(ctx, t->sname, new_String(ctx, B(bufcn), NULL));
+		}
+		DBG2_P("added %d, '%s'", cid, knh_String_tochar(t->lname));
 
-	ctx->share->ClassTable[cid].bcid   = bcid;
-	ctx->share->ClassTable[cid].supcid = bcid;
+		t->bcid   = bcid;
+		t->supcid = bcid;
 
-//	if(bcid == CLASS_Int) bcid = CLASS_IntX;
-//	else if(bcid == CLASS_Float) bcid = CLASS_FloatX;
-//	else if(bcid == CLASS_String) bcid = CLASS_StringX;
+		//	if(bcid == CLASS_Int) bcid = CLASS_IntX;
+		//	else if(bcid == CLASS_Float) bcid = CLASS_FloatX;
+		//	else if(bcid == CLASS_String) bcid = CLASS_StringX;
 
-	//DBG2_P("%s\n\tcopying from %s", bufcn, CLASSN(bcid));
-	ctx->share->ClassTable[cid].cflag  = ctx->share->ClassTable[bcid].cflag | KNH_FLAG_CF_FINAL;
-	ctx->share->ClassTable[cid].oflag  = ctx->share->ClassTable[bcid].oflag;
-	ctx->share->ClassTable[cid].offset = ctx->share->ClassTable[bcid].offset;
+		//DBG2_P("%s\n\tcopying from %s", bufcn, CLASSN(bcid));
+		t->cflag  = ClassTable(bcid).cflag | KNH_FLAG_CF_FINAL;
+		t->oflag  = ClassTable(bcid).oflag;
+		t->offset = ClassTable(bcid).offset;
 
-	ctx->share->ClassTable[cid].sid  = ctx->share->ClassTable[bcid].sid;
-	ctx->share->ClassTable[cid].size = ctx->share->ClassTable[bcid].size;
-	ctx->share->ClassTable[cid].bsize  = ctx->share->ClassTable[bcid].bsize;
+		t->sid  = ClassTable(bcid).sid;
+		t->size = ClassTable(bcid).size;
+		t->bsize  = ClassTable(bcid).bsize;
 
-	KNH_ASSERT(ctx->share->ClassTable[cid].cstruct == NULL);
-	KNH_INITv(ctx->share->ClassTable[cid].cstruct, ctx->share->ClassTable[bcid].cstruct);
+		KNH_ASSERT(t->cstruct == NULL);
+		KNH_INITv(t->cstruct, ClassTable(bcid).cstruct);
 
-	if(ctx->share->ClassTable[cid].cmap == NULL) {
-		KNH_INITv(ctx->share->ClassTable[cid].cmap, new_ClassMap0(ctx, 4));
-	}
-	else {
-		KNH_ASSERT(IS_ClassMap(ctx->share->ClassTable[cid].cmap));
-	}
+		if(t->cmap == NULL) {
+			KNH_INITv(t->cmap, new_ClassMap0(ctx, 4));
+		}
+		else {
+			KNH_ASSERT(IS_ClassMap(t->cmap));
+		}
 
-	KNH_ASSERT(ctx->share->ClassTable[cid].cspec == NULL);
-	KNH_INITv(ctx->share->ClassTable[cid].cspec, u);
+		KNH_ASSERT(t->cspec == NULL);
+		KNH_INITv(t->cspec, u);
 
-	if(DP(u)->ucid != cid) {
-		knh_ClassSpec_reuse(ctx, u, cid);
-	}
-	if(bcid == CLASS_Int) {
-		KNH_ASSERT(DP(u)->ivalue != NULL);
-		ctx->share->ClassTable[cid].fdefault = knh_ClassTable_fdefault__ISPEC;
-	}
-	else if(bcid == CLASS_Float) {
-		KNH_ASSERT(DP(u)->fvalue != NULL);
-		ctx->share->ClassTable[cid].fdefault = knh_ClassTable_fdefault__FSPEC;
-	}
-	else {
-		KNH_ASSERT(bcid == CLASS_String);
-		KNH_ASSERT(DP(u)->svalue != NULL);
-		ctx->share->ClassTable[cid].fdefault = knh_ClassTable_fdefault__SSPEC;
+		if(DP(u)->ucid != cid) {
+			knh_ClassSpec_reuse(ctx, u, cid);
+		}
+		if(bcid == CLASS_Int) {
+			KNH_ASSERT(DP(u)->ivalue != NULL);
+			t->fdefault = knh_ClassTable_fdefault__ISPEC;
+		}
+		else if(bcid == CLASS_Float) {
+			KNH_ASSERT(DP(u)->fvalue != NULL);
+			t->fdefault = knh_ClassTable_fdefault__FSPEC;
+		}
+		else {
+			KNH_ASSERT(bcid == CLASS_String);
+			KNH_ASSERT(DP(u)->svalue != NULL);
+			t->fdefault = knh_ClassTable_fdefault__SSPEC;
+		}
 	}
 	return cid;
 }

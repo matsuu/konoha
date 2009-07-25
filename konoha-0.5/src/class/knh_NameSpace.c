@@ -47,9 +47,9 @@ knh_class_t knh_system_loadVocabulary(Ctx *ctx, knh_bytes_t urn);
 
 NameSpace* new_NameSpace(Ctx *ctx, String *nsname)
 {
-	knh_NameSpace_t* o = (NameSpace*)new_Object_bcid(ctx, CLASS_NameSpace, KNH_OBJECT_RAWINIT);
-	KNH_INITv(DP(o)->nsname, nsname);
-	return o;
+	knh_NameSpace_t* ns = (NameSpace*)new_Object_bcid(ctx, CLASS_NameSpace, KNH_OBJECT_RAWINIT);
+	KNH_INITv(DP(ns)->nsname, nsname);
+	return ns;
 }
 
 /* ======================================================================== */
@@ -167,7 +167,7 @@ void knh_NameSpace_setLocalName(Ctx *ctx, NameSpace *o, knh_class_t cid)
 {
 	KNH_ASSERT(IS_NameSpace(o));
 	KNH_ASSERT_cid(cid);
-	knh_DictSet_set(ctx, DP(o)->name2cidDictSet, ctx->share->ClassTable[cid].sname, (knh_uintptr_t)(cid+1));
+	knh_DictSet_set(ctx, DP(o)->name2cidDictSet, ClassTable(cid).sname, (knh_uintptr_t)(cid+1));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -205,7 +205,7 @@ knh_class_t knh_NameSpace_getcid(Ctx *ctx, NameSpace *o, knh_bytes_t name)
 			knh_class_t bcid = knh_NameSpace_getcid(ctx, o, knh_bytes_first(name, loc));
 			KNH_ASSERT_cid(bcid);
 			if(!knh_Class_isGenerics(bcid)) return bcid;
-			knh_class_t p1 = CLASS_Any, p2 = ctx->share->ClassTable[bcid].p2;
+			knh_class_t p1 = CLASS_Any, p2 = ClassTable(bcid).p2;
 			knh_bytes_t nsub = knh_NameSpace_firstType(ctx, o, knh_bytes_last(name, loc+1), &p1);
 			knh_NameSpace_firstType(ctx, o, nsub, &p2);
 			knh_class_t cid = knh_class_Generics(ctx, bcid, CLASS_type(p1), CLASS_type(p2));
@@ -239,15 +239,15 @@ knh_class_t knh_NameSpace_getcid(Ctx *ctx, NameSpace *o, knh_bytes_t name)
 char* knh_Context_CLASSN(Ctx *ctx, knh_class_t cid)
 {
 	KNH_ASSERT_cid(cid);
-	String *name = ctx->share->ClassTable[cid].lname;
+	String *name = ClassTable(cid).lname;
 	if(knh_String_startsWith(name, STEXT("konoha."))) {
-		return knh_String_tochar(ctx->share->ClassTable[cid].sname);
+		return knh_String_tochar(ClassTable(cid).sname);
 	}
 	else {
 		knh_uintptr_t cid2 =
-			knh_DictSet_get__b(DP(ctx->ns)->name2cidDictSet, knh_String_tobytes(ctx->share->ClassTable[cid].sname));
+			knh_DictSet_get__b(DP(ctx->share->mainns)->name2cidDictSet, knh_String_tobytes(ClassTable(cid).sname));
 		if(cid2 > 0 && cid == cid2 - 1) {
-			return knh_String_tochar(ctx->share->ClassTable[cid].sname);
+			return knh_String_tochar(ClassTable(cid).sname);
 		}
 		return CLASSN(cid);
 	}
@@ -265,10 +265,10 @@ void knh_NameSpace_importClass(Ctx *ctx, NameSpace *o, knh_bytes_t pkgname)
 		pkgname.len--;
 	}
 	for(i = 0; i < KNH_TCLASS_SIZE; i++) {
-		if(ctx->share->ClassTable[i].sname == NULL) continue;
-		KNH_ASSERT(IS_bString(ctx->share->ClassTable[i].lname));
+		if(ClassTable(i).sname == NULL) continue;
+		KNH_ASSERT(IS_bString(ClassTable(i).lname));
 		if(knh_class_isPrivate(i)) continue;
-		knh_bytes_t cname = knh_String_tobytes(ctx->share->ClassTable[i].lname);
+		knh_bytes_t cname = knh_String_tobytes(ClassTable(i).lname);
 		if(knh_bytes_startsWith(cname, pkgname)
 				&& cname.buf[pkgname.len] == '.'
 					&& isupper(cname.buf[pkgname.len+1])) {
@@ -282,75 +282,75 @@ void knh_NameSpace_importClass(Ctx *ctx, NameSpace *o, knh_bytes_t pkgname)
 
 knh_type_t knh_NameSpace_gettype(Ctx *ctx, NameSpace *ns, knh_bytes_t name, int isNullable)
 {
-    if(name.buf[0] == 'v') {
-        if(name.len == 4 && name.buf[1] == 'o' &&
-                name.buf[2] == 'i' && name.buf[3] == 'd') return TYPE_void;
-        if(name.len == 3 && name.buf[1] == 'a' && name.buf[2] == 'r') return TYPE_var;
-    }
+	if(name.buf[0] == 'v') {
+		if(name.len == 4 && name.buf[1] == 'o' &&
+				name.buf[2] == 'i' && name.buf[3] == 'd') return TYPE_void;
+		if(name.len == 3 && name.buf[1] == 'a' && name.buf[2] == 'r') return TYPE_var;
+	}
 
-    if(name.len > 2 && name.buf[name.len-1] == '!') {
-        name.len--;
-        isNullable = 0;
-    }
+	if(name.len > 2 && name.buf[name.len-1] == '!') {
+		name.len--;
+		isNullable = 0;
+	}
 
-    if(name.len > 2 && name.buf[name.len-1] == '?') {
-        name.len--;
-        isNullable = 1;
-    }
+	if(name.len > 2 && name.buf[name.len-1] == '?') {
+		name.len--;
+		isNullable = 1;
+	}
 
-    {
-        knh_class_t cid = knh_NameSpace_getcid(ctx, ns, name);
-        if(cid==CLASS_Any) return cid;
-            if(cid != CLASS_unknown && !isNullable) return NNTYPE_cid(cid);
-        return cid;
-    }
+	{
+		knh_class_t cid = knh_NameSpace_getcid(ctx, ns, name);
+		if(cid==CLASS_Any) return cid;
+		if(cid != CLASS_unknown && !isNullable) return NNTYPE_cid(cid);
+		return cid;
+	}
 }
 
 /* ======================================================================== */
 /* [const] */
 
-    Object *
+Object *
 knh_NameSpace_getConstNULL(Ctx *ctx, NameSpace *ns, knh_bytes_t name)
 {
-    knh_index_t idx = knh_bytes_index(name, '.');
-    if(idx > 0) {
-        knh_class_t cid = knh_NameSpace_getcid(ctx, ns, knh_bytes_first(name, idx));
-        if(cid == CLASS_unknown) return NULL;
-        return konoha_getClassConstNULL(ctx, cid, knh_bytes_last(name, idx+1));
-    }
-    if(knh_bytes_index(name, '_') == -1) {
-        if(IS_NOTNULL(DP(ns)->lconstDictMap)) {
-            idx = knh_DictMap_index__b(DP(ns)->lconstDictMap, name);
-            if(idx != -1) return knh_DictMap_valueAt(DP(ns)->lconstDictMap, idx);
-        }
-        size_t i = 0;
-        NameSpace *ins = NULL;
-        while((ins = knh_NameSpace_getImportedNameSpace(ctx, ns, i++)) != NULL) {
-            if(IS_NOTNULL(DP(ins)->lconstDictMap)) {
-                idx = knh_DictMap_index__b(DP(ins)->lconstDictMap, name);
-                if(idx != -1) return knh_DictMap_valueAt(DP(ins)->lconstDictMap, idx);
-            }
-        }
-        return NULL;
-    }
-    return konoha_getClassConstNULL(ctx, CLASS_Any, name);
+	knh_index_t idx = knh_bytes_index(name, '.');
+	if(idx > 0) {
+		knh_class_t cid = knh_NameSpace_getcid(ctx, ns, knh_bytes_first(name, idx));
+		if(cid == CLASS_unknown) return NULL;
+		return konoha_getClassConstNULL(ctx, cid, knh_bytes_last(name, idx+1));
+	}
+	if(knh_bytes_index(name, '_') == -1) {
+		if(IS_NOTNULL(DP(ns)->lconstDictMap)) {
+			idx = knh_DictMap_index__b(DP(ns)->lconstDictMap, name);
+			if(idx != -1) return knh_DictMap_valueAt(DP(ns)->lconstDictMap, idx);
+		}
+		size_t i = 0;
+		NameSpace *ins = NULL;
+		while((ins = knh_NameSpace_getImportedNameSpace(ctx, ns, i++)) != NULL) {
+			if(IS_NOTNULL(DP(ins)->lconstDictMap)) {
+				idx = knh_DictMap_index__b(DP(ins)->lconstDictMap, name);
+				if(idx != -1) return knh_DictMap_valueAt(DP(ins)->lconstDictMap, idx);
+			}
+		}
+		return NULL;
+	}
+	return konoha_getClassConstNULL(ctx, CLASS_Any, name);
 }
 
 /* ------------------------------------------------------------------------ */
 
 void knh_NameSpace_addConst(Ctx *ctx, NameSpace *ns, String *name, Object *value)
 {
-    KNH_ASSERT(IS_NameSpace(ns));
-    KNH_ASSERT(IS_String(name));
-    if(knh_bytes_index(knh_String_tobytes(name), '_') == -1) {
-        if(IS_NULL(DP(ns)->lconstDictMap)) {
-            KNH_SETv(ctx, DP(ns)->lconstDictMap, new_DictMap0(ctx, 16));
-        }
-        knh_DictMap_set(ctx, DP(ns)->lconstDictMap, name, value);
-    }
-    else {
-        konoha_addClassConst(ctx, CLASS_Any, name, value);
-    }
+	KNH_ASSERT(IS_NameSpace(ns));
+	KNH_ASSERT(IS_String(name));
+	if(knh_bytes_index(knh_String_tobytes(name), '_') == -1) {
+		if(IS_NULL(DP(ns)->lconstDictMap)) {
+			KNH_SETv(ctx, DP(ns)->lconstDictMap, new_DictMap0(ctx, 16));
+		}
+		knh_DictMap_set(ctx, DP(ns)->lconstDictMap, name, value);
+	}
+	else {
+		konoha_addClassConst(ctx, CLASS_Any, name, value);
+	}
 }
 
 /* ======================================================================== */
@@ -358,25 +358,25 @@ void knh_NameSpace_addConst(Ctx *ctx, NameSpace *ns, String *name, Object *value
 
 void knh_NameSpace_setFuncClass(Ctx *ctx, NameSpace *o, knh_methodn_t mn, knh_class_t c)
 {
-    KNH_ASSERT(IS_NameSpace(o));
-    if(IS_NULL(DP(o)->func2cidDictSet)) {
-        KNH_SETv(ctx, DP(o)->func2cidDictSet, new_DictSet(ctx, 16));
-    }
-    knh_DictSet_set(ctx, DP(o)->func2cidDictSet, new_String__mn(ctx, mn), (knh_uintptr_t)(c+1));
+	KNH_ASSERT(IS_NameSpace(o));
+	if(IS_NULL(DP(o)->func2cidDictSet)) {
+		KNH_SETv(ctx, DP(o)->func2cidDictSet, new_DictSet(ctx, 16));
+	}
+	knh_DictSet_set(ctx, DP(o)->func2cidDictSet, new_String__mn(ctx, mn), (knh_uintptr_t)(c+1));
 }
 
 /* ------------------------------------------------------------------------ */
 
-    knh_class_t
+knh_class_t
 knh_NameSpace_getFuncClass(Ctx *ctx, NameSpace *o, knh_bytes_t funcname)
 {
-    if(IS_NOTNULL(DP(o)->func2cidDictSet)) {
-        knh_uintptr_t cid = knh_DictSet_get__b(DP(o)->func2cidDictSet, funcname);
-        if(cid != 0) {
-            return (knh_class_t)(cid-1);
-        }
-    }
-    return CLASS_unknown; /* if it isn't found */
+	if(IS_NOTNULL(DP(o)->func2cidDictSet)) {
+		knh_uintptr_t cid = knh_DictSet_get__b(DP(o)->func2cidDictSet, funcname);
+		if(cid != 0) {
+			return (knh_class_t)(cid-1);
+		}
+	}
+	return CLASS_unknown; /* if it isn't found */
 }
 
 /* ======================================================================== */
@@ -384,25 +384,25 @@ knh_NameSpace_getFuncClass(Ctx *ctx, NameSpace *o, knh_bytes_t funcname)
 
 knh_type_t knh_NameSpace_tagcid(Ctx *ctx, NameSpace *o, knh_class_t cid, knh_bytes_t tag)
 {
-    knh_cwb_t cwb = new_cwb(ctx);
-    knh_class_t bcid = ctx->share->ClassTable[cid].bcid;
-    //DBG2_P("%s:'%s'", CLASSN(bcid), tag.buf);
-    knh_printf(ctx, cwb.w, "%C:%B", bcid, tag);
-    cid = knh_NameSpace_getcid(ctx, o, knh_cwb_tobytes(cwb));
-    knh_cwb_clear(cwb);
-    //	if(cid == CLASS_unknown) {
-    //		if(bcid == CLASS_Int) {
-    //			knh_printf(ctx, cwb.w, "Float:%B", tag);
-    //			cid = knh_NameSpace_getcid(ctx, o, knh_cwb_tobytes(cwb));
-    //			knh_cwb_clear(cwb);
-    //		}
-    //		else if(bcid == CLASS_Float) {
-    //			knh_printf(ctx, cwb.w, "Int:%B", tag);
-    //			cid = knh_NameSpace_getcid(ctx, o, knh_cwb_tobytes(cwb));
-    //			knh_cwb_clear(cwb);
-    //		}
-    //	}
-    return cid;
+	knh_cwb_t cwb = new_cwb(ctx);
+	knh_class_t bcid = ClassTable(cid).bcid;
+	//DBG2_P("%s:'%s'", CLASSN(bcid), tag.buf);
+	knh_printf(ctx, cwb.w, "%C:%B", bcid, tag);
+	cid = knh_NameSpace_getcid(ctx, o, knh_cwb_tobytes(cwb));
+	knh_cwb_clear(cwb);
+	//	if(cid == CLASS_unknown) {
+	//		if(bcid == CLASS_Int) {
+	//			knh_printf(ctx, cwb.w, "Float:%B", tag);
+	//			cid = knh_NameSpace_getcid(ctx, o, knh_cwb_tobytes(cwb));
+	//			knh_cwb_clear(cwb);
+	//		}
+	//		else if(bcid == CLASS_Float) {
+	//			knh_printf(ctx, cwb.w, "Int:%B", tag);
+	//			cid = knh_NameSpace_getcid(ctx, o, knh_cwb_tobytes(cwb));
+	//			knh_cwb_clear(cwb);
+	//		}
+	//	}
+	return cid;
 }
 
 

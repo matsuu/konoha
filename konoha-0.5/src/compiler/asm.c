@@ -67,13 +67,22 @@ static Asm *new_Asm(Ctx *ctx)
 /* ======================================================================== */
 /* [Asm] */
 
-Asm* knh_Context_getAsm(Ctx *ctx)
+void knh_Context_initAsm(Ctx *ctx)
 {
 	if(IS_NULL(ctx->abr)) {
 		KNH_SETv(ctx, ((Context*)ctx)->abr, new_Asm(ctx));
 	}
-	return ctx->abr;
 }
+
+///* ------------------------------------------------------------------------ */
+//
+//Asm* knh_Context_getAsm(Ctx *ctx)
+//{
+//	if(IS_NULL(ctx->abr)) {
+//		KNH_SETv(ctx, ((Context*)ctx)->abr, new_Asm(ctx));
+//	}
+//	return ctx->abr;
+//}
 
 /* ======================================================================== */
 /* [namespace] */
@@ -398,7 +407,7 @@ void KNH_ASM_BOX(Ctx *ctx, Asm *abr, knh_type_t atype, int a)
 	if(knh_rtti_issync(abr, a)) return;
 	knh_class_t cid = CLASS_type(atype);
 	KNH_ASSERT_cid(cid);
-	knh_class_t bcid = ctx->share->ClassTable[cid].bcid;
+	knh_class_t bcid = ClassTable(cid).bcid;
 	if(bcid == CLASS_Boolean || bcid == CLASS_Int || bcid == CLASS_Float) {
 		if(IS_NNTYPE(atype)) {
 			KNH_ASM_BOX_(ctx, abr, a, cid);
@@ -418,7 +427,7 @@ void KNH_ASM_NNBOX(Ctx *ctx, Asm *abr, knh_type_t atype, int a)
 	if(knh_rtti_issync(abr, a)) return;
 	knh_class_t cid = CLASS_type(atype);
 	KNH_ASSERT_cid(cid);
-	knh_class_t bcid = ctx->share->ClassTable[cid].bcid;
+	knh_class_t bcid = ClassTable(cid).bcid;
 	if(bcid == CLASS_Boolean || bcid == CLASS_Int || bcid == CLASS_Float) {
 		if(IS_NNTYPE(atype)) {
 			KNH_ASM_NNBOX_(ctx, abr, a, cid);

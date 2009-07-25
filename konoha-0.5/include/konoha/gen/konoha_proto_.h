@@ -398,7 +398,7 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap);
 void konoha_setverbose(int v);
 METHOD knh_fmethod_movableText(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/compiler/asm.c */
-Asm* knh_Context_getAsm(Ctx *ctx);
+void knh_Context_initAsm(Ctx *ctx);
 NameSpace *knh_Context_getNameSpace(Ctx *ctx);
 NameSpace *knh_Context_setNameSpace(Ctx *ctx, String *nsname);
 NameSpace *knh_Context_switchNameSpace(Ctx *ctx, NameSpace *newns);
@@ -580,8 +580,6 @@ void *konoha_generateCallBackFunc(Ctx *ctx, void *func, Closure *c);
 /* ../src/main/konoha_api.c */
 void konoha_init(void);
 void knh_Context_setRuntimeError(Ctx *ctx, String *msg);
-int konoha_runMain(konoha_t konoha, int argc, char **argv);
-int knh_readline_askYesNo(char *prompt, int def);
 METHOD knh__Script_eval(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_isStatement(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_readLine(Ctx *ctx, knh_sfp_t *sfp);
