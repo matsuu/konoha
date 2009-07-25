@@ -88,48 +88,103 @@ KNHAPI(void) knh_Closure_invokesfp(Ctx *ctx, Closure *cc, knh_sfp_t *lsfp, int a
 // knh_Closure_finvoke(ctx, c, "oo", sfp[1].o, sfp[2].o)
 // knh_Closure_finvoke(ctx, c, "ii", 1, 2)
 
-KNHAPI(knh_sfp_t*) knh_Closure_invokef(Ctx *ctx, Closure *c, const char *fmt, ...)
+int
+knh_stack_vpush(Ctx *ctx, knh_sfp_t *sfp, const char *fmt, va_list args)
 {
 	char *p = (char*)fmt;
-	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 	int ch, n = 2;
-	va_list args;
-	va_start(args , fmt);
 	while((ch = *p) != '\0') {
 		p++;
 		switch(ch) {
 		case '%':
-		break;
-		case 'i': case 'u': case 'd':
-			KNH_SETv(ctx, lsfp[n].o, KNH_INT0); // NONNULL
-			lsfp[n].ivalue = (knh_int_t)va_arg(args, knh_int_t);
+			break;
+		case 'U': case 'D':
+			KNH_SETv(ctx, sfp[n].o, KNH_INT0); // NONNULL
+		case 'u': case 'd':
+			sfp[n].ivalue = (knh_int_t)va_arg(args, knh_intptr_t);
 			n++;
-		break;
+			break;
+
+		case 'I': case 'L':
+			KNH_SETv(ctx, sfp[n].o, KNH_INT0); // NONNULL
+		case 'i': case 'l':
+			sfp[n].ivalue = (knh_int_t)va_arg(args, knh_int_t);
+			n++;
+			break;
+
+		case 'F':
+			KNH_SETv(ctx, sfp[n].o, KNH_FLOAT0);  // NONNULL
 		case 'f':
-			KNH_SETv(ctx, lsfp[n].o, KNH_FLOAT0);  // NONNULL
-			lsfp[n].fvalue = (knh_float_t)va_arg(args, knh_float_t);
+			sfp[n].fvalue = (knh_float_t)va_arg(args, knh_float_t);
 			n++;
-		break;
-		case 'o':
-		{
-			Int *num = (Int*)va_arg(args, knh_Object_t*);
-			KNH_SETv(ctx, lsfp[n].o, num);
-			lsfp[n].data = num->n.data;
-			n++;
-		}
-		break;
+			break;
+
+		case 'B': case 'b':
+			sfp[n].bvalue = (knh_intptr_t)va_arg(args, knh_intptr_t);
+			KNH_SETv(ctx, sfp[n].o, new_Boolean(ctx, sfp[n].bvalue));
+			break;
+
 		case 's':
 		{
 			char *s = (char*)va_arg(args, char*);
-			KNH_SETv(ctx, lsfp[n].o, new_String(ctx, B(s), NULL));
+			Object *o = NULL;
+			if(s == NULL) {
+				o = KNH_NULL;
+			}
+			else {
+				o = (Object*)new_String(ctx, B(s), NULL);
+			}
+			KNH_SETv(ctx, sfp[n].o, o);
+			n++;
+		}
+		break;
+
+		case 'o':
+		{
+			Object *o = (Object*)va_arg(args, knh_Object_t*);
+			KNH_SETv(ctx, sfp[n].o, o);
+			sfp[n].data = knh_Object_data(o);
 			n++;
 		}
 		break;
 		}/*switch*/
 	} /* while */
+	return n;
+}
+
+/* ------------------------------------------------------------------------ */
+
+//#define _knh_Closure_binvokef(ctx, c, fmt, ...)  ((knh_Closure_invokef(ctx, c, fmt, ## __VA_ARGS__))->bvalue)
+//#define _knh_Closure_iinvokef(ctx, c, fmt, ...)  ((knh_Closure_invokef(ctx, c, fmt, ## __VA_ARGS__))->ivalue)
+//#define _knh_Closure_finvokef(ctx, c, fmt, ...)  ((knh_Closure_invokef(ctx, c, fmt, ## __VA_ARGS__))->fvalue)
+//#define _knh_Closure_sinvokef(ctx, c, fmt, ...)  knh_String_tochar((knh_Closure_invokef(ctx, c, fmt, ## __VA_ARGS__))->s)
+
+// knh_Closure_finvoke(ctx, c, "oo", sfp[1].o, sfp[2].o)
+// knh_Closure_finvoke(ctx, c, "ii", 1, 2)
+
+KNHAPI(knh_sfp_t*) knh_Closure_invokef(Ctx *ctx, Closure *c, const char *fmt, ...)
+{
+	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
+	int n;
+	va_list args;
+	va_start(args , fmt);
+	n = knh_stack_vpush(ctx, lsfp, fmt, args);
 	va_end(args);
 	knh_Closure_invokesfp(ctx, c, lsfp, n - 2);
 	return lsfp;
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(void) knh_Closure_invoke(Ctx *ctx, Closure *c, const char *fmt, ...)
+{
+	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
+	int n;
+	va_list args;
+	va_start(args , fmt);
+	n = knh_stack_vpush(ctx, lsfp, fmt, args);
+	va_end(args);
+	knh_Closure_invokesfp(ctx, c, lsfp, n - 2);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -175,20 +230,20 @@ konoha_addClosureClass(Ctx *ctx, knh_class_t cid, String *name, knh_type_t r0, k
 	knh_ClassTable_t *t = pClassTable(cid);
 	KNH_ASSERT(ClassTable(cid).class_cid == NULL);
 
-	t->cflag  = ctx->share->ClassTable[CLASS_Closure].cflag;
-	t->oflag  = ctx->share->ClassTable[CLASS_Closure].oflag;
-	t->sid    = ctx->share->ClassTable[CLASS_Closure].sid;
+	t->cflag  = ClassTable(CLASS_Closure).cflag;
+	t->oflag  = ClassTable(CLASS_Closure).oflag;
+	t->sid    = ClassTable(CLASS_Closure).sid;
 
 	t->bcid   = CLASS_Closure;
-	t->supcid = ctx->share->ClassTable[CLASS_Closure].supcid;
-	t->offset = ctx->share->ClassTable[CLASS_Closure].offset;
+	t->supcid = ClassTable(CLASS_Closure).supcid;
+	t->offset = ClassTable(CLASS_Closure).offset;
 
-	t->size = ctx->share->ClassTable[CLASS_Closure].size;
-	t->bsize  = ctx->share->ClassTable[CLASS_Closure].bsize;
+	t->size = ClassTable(CLASS_Closure).size;
+	t->bsize  = ClassTable(CLASS_Closure).bsize;
 
 	konoha_setClassName(ctx, cid, name);
-	KNH_INITv(t->cstruct, ctx->share->ClassTable[CLASS_Closure].cstruct);
-	KNH_INITv(t->cmap, ctx->share->ClassTable[CLASS_Closure].cmap);
+	KNH_INITv(t->cstruct, ClassTable(CLASS_Closure).cstruct);
+	KNH_INITv(t->cmap, ClassTable(CLASS_Closure).cmap);
 	t->r0 = r0;
 	t->p1 = p1;
 	t->p2 = p2;
