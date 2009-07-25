@@ -121,7 +121,7 @@
 
 #ifdef __GNUC__
 	#define KONOHA_CC_VERSION "GCC " __VERSION__
-	#if defined(__i386__) || defined(__x86_64__)
+	#if defined(__i386__) || (defined(__x86_64__) && !defined(__amd64__))
 		#if defined(KONOHA_ON_LKM)
 			#if (LINUX_VERSION_CODE <= KERNEL_VERSION(2,6,25))
 				#define KNH_CC_FASTCALL   fastcall

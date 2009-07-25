@@ -22,39 +22,6 @@
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("masahiro ide");
-//#if 1
-// TODO_LKM
-// cant find these functions
-// I think it seam that "float" or "double" is still active.
-// so, remove these type that can remove these functions.
-//
-
-
-/*
-float  __floatsisf (int i) { return i; } //need
-double __floatsidf (int i) { return i; } //need
-
-signed   int __fixsfsi    (float  d) { return d; } //need
-signed   int __fixdfsi (float  d) { return d; } //need
-
-unsigned int __fixunsdfsi (float  d) { return d; } //need
-double __adddf3(double a, double b) { return a+b; }//need
-double __addsf3(float a, float b) { return a+b; } //ne
-double __subdf3(double a, double b) { return a-b; } //need
-double __mulsf3(double a, double b) { return a*b; } //need
-double __muldf3(double a, double b) { return a*b; }//need
-double __divdf3(double a, double b) { return a/b; } //need
-double __gedf2(double a,double b) { return (a >= b) -1 ; } //need
-float __nedf2(float a,float b) { return (a != b); }
-float __nesf2(float a,float b) { return (a != b); }
-float  __gtsf2(float  a,float  b) { return (a > b); }
-double __gtdf2(double a,double b) { return (a > b); }
-float __eqsf2(float a,float b) { return !(a == b); }
-float __eqdf2(float a,float b) { return !(a == b); }
-double __extendsfdf2(float a) {return a;}
- */
-
-//#endif
 
 enum {
     MAXCOPYBUF = 128
@@ -151,7 +118,8 @@ static ssize_t knh_dev_write(struct file *filp,const char __user *user_buf,
     printk("[%s][user_buf=%s]\n", __FUNCTION__,buf);
     //printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "int fib(int n) { if (n==3) { return 1;}}"));
     //printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "fib(10);"));
-    konoha_ret = konoha_evalScript(dev->konoha,buf);
+    konoha_evalScript(dev->konoha,buf);
+    konoha_ret = konoha_getSTDOUTBuffer(dev->konoha);
 
     snprintf(dev->buffer,MAXCOPYBUF,"%s",konoha_ret);
     printk(KERN_DEBUG "[%s][dev->buffer=%s]\n",__FUNCTION__ ,dev->buffer);
@@ -175,6 +143,7 @@ static void knh_dev_setup(struct konohadev_t *dev){
     cdev_init(&dev->cdev,&knh_fops);
     dev->cdev.owner = THIS_MODULE;
     dev->konoha = konoha_open(128);
+    konoha_setOutputStreamBuffer(dev->konoha, 128,128);
     dev->buffer = kmalloc(sizeof(char)*MAXCOPYBUF,GFP_KERNEL);
     memset(dev->buffer,0,sizeof(char)*MAXCOPYBUF);
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
