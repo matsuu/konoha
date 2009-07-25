@@ -419,7 +419,7 @@ static METHOD knh__String_format(Ctx *ctx, knh_sfp_t *sfp)
 			Object *m = KNH_NULL;
 			if(knh_bytes_isOptionalMT(mt)) m = UP(new_String(ctx, mt, NULL));
 			mt.buf = mt.buf - 1; mt.len++;   /* 's' == > '%s' */
-			knh_methodn_t mn = konoha_getMethodName(ctx, mt, METHODN__empty);
+			knh_methodn_t mn = knh_getmn(ctx, mt, METHODN__empty);
 			knh_esp1_format(ctx, mn, cwb.w, m);
 		}
 		else {
@@ -872,7 +872,7 @@ Array *knh_Regex_split(Ctx *ctx, Regex *o, String *s)
 		return a;
 	}
 	else {
-		return (Array*)konoha_getClassDefaultValue(ctx, ACLASS_String);
+		return (Array*)knh_getClassDefaultValue(ctx, ACLASS_String);
 		//return (Array*)KNH_NULL;
 	}
 }

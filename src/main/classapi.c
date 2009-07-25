@@ -351,8 +351,8 @@ int knh_Int_compareTo(Int *o, Int *o2)
 		return (int)(o->n.ivalue - o2->n.ivalue);
 	}
 	else {
-		Ctx *ctx = konoha_getCurrentContext();
-		ClassSpec *u = konoha_getClassSpec(ctx, o->h.cid);
+		Ctx *ctx = knh_getCurrentContext();
+		ClassSpec *u = knh_getClassSpec(ctx, o->h.cid);
 		return DP(u)->ficmp(u, o->n.ivalue, o2->n.ivalue);
 	}
 }
@@ -408,8 +408,8 @@ int knh_Float_compareTo(Float *o, Float *o2)
 		return (int)(o->n.fvalue - o2->n.fvalue);
 	}
 	else {
-		Ctx *ctx = konoha_getCurrentContext();
-		ClassSpec *fu = konoha_getClassSpec(ctx, o->h.cid);
+		Ctx *ctx = knh_getCurrentContext();
+		ClassSpec *fu = knh_getClassSpec(ctx, o->h.cid);
 		return DP(fu)->ffcmp(fu, o->n.fvalue, o2->n.fvalue);
 	}
 }
@@ -489,8 +489,8 @@ int knh_String_compareTo(String *o, String *o2)
 	}
 	else {
 		if(o->h.cid == o2->h.cid) {
-			Ctx *ctx = konoha_getCurrentContext();
-			ClassSpec *u = konoha_getClassSpec(ctx, o->h.cid);
+			Ctx *ctx = knh_getCurrentContext();
+			ClassSpec *u = knh_getClassSpec(ctx, o->h.cid);
 			return DP(u)->fscmp(u, knh_String_tobytes(o), knh_String_tobytes(o2));
 		}
 		return (int)(o - o2);
@@ -643,8 +643,8 @@ void knh_Array_newClass(Ctx *ctx, knh_class_t cid)
 	knh_class_t p1 = ClassTable(cid).p1;
 	knh_class_t icid = knh_class_Iterator(ctx, p1);
 	DBG2_P("********* %s, %s", CLASSN(p1), CLASSN(icid));
-	konoha_addMapperFunc(ctx, KNH_FLAG_MMF_ITERATION, cid, icid, knh_Array_Iterator, KNH_NULL);
-	konoha_addMapperFunc(ctx, KNH_FLAG_MMF_ITERATION, icid, cid, knh_Iterator_Array, KNH_NULL);
+	knh_addMapperFunc(ctx, KNH_FLAG_MMF_ITERATION, cid, icid, knh_Array_Iterator, KNH_NULL);
+	knh_addMapperFunc(ctx, KNH_FLAG_MMF_ITERATION, icid, cid, knh_Iterator_Array, KNH_NULL);
 }
 
 /* ======================================================================== */
@@ -1041,7 +1041,7 @@ knh_hcode_t knh_Class_hashCode(Ctx *ctx, Class *o)
 static
 int knh_Class_compareTo(Class *o, Class *o2)
 {
-	Ctx *ctx = konoha_getCurrentContext();
+	Ctx *ctx = knh_getCurrentContext();
 	return knh_strcmp(CLASSN(o->cid), CLASSN(o2->cid));
 }
 
@@ -1603,14 +1603,14 @@ void knh_InputStream_init(Ctx *ctx, InputStream *in, int init)
 	b->bufpos = 0;
 	b->bufend = 0;
 	b->bufsiz = 0;
-	b->driver = konoha_getDefaultIODriver();
+	b->driver = knh_getDefaultIODriver();
 	KNH_INITv(b->bconv, KNH_NULL);
 	KNH_INITv(b->enc, TS_ENCODING);
 	KNH_INITv(b->urn, TS_DEVNULL);
 	b->size    = 0;
 	b->line    = 1;
 	b->prev    = '\n';
-	b->fileid   = 0;
+	b->resid   = 0;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1652,7 +1652,7 @@ knh_OutputStream_init(Ctx *ctx, OutputStream *out, int init)
 {
 	knh_OutputStream_struct *b = DP(out);
 	b->fd = -1;
-	b->driver = konoha_getDefaultIODriver();
+	b->driver = knh_getDefaultIODriver();
 	if(init == -1) {
 		KNH_INITv(b->ba, KNH_NULL);
 	}
@@ -1713,8 +1713,8 @@ void knh_Socket_init(Ctx *ctx, Socket *o, int init)
 	so->sd = -1;
 	so->port = init;
 	KNH_INITv(so->urn, TS_EMPTY);
-	KNH_INITv(so->in, konoha_getDefaultValue(ctx, CLASS_InputStream));
-	KNH_INITv(so->out, konoha_getDefaultValue(ctx, CLASS_OutputStream));
+	KNH_INITv(so->in, knh_getDefaultValue(ctx, CLASS_InputStream));
+	KNH_INITv(so->out, knh_getDefaultValue(ctx, CLASS_OutputStream));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2034,8 +2034,8 @@ void knh_System_init(Ctx *ctx, System *o, int init)
 
 	KNH_INITv(sys->props, new_DictMap0(ctx, 64));
 	KNH_INITv(sys->FieldNameDictIdx, new_DictIdx0__ignoreCase(ctx, KNH_TFIELDN_SIZE * 2, 0));
-	KNH_INITv(sys->FileNameDictIdx, new_DictIdx0(ctx, 32, 0));
-	knh_DictIdx_add__fast(ctx, sys->FileNameDictIdx, new_String__T(ctx, "(unknown)"));
+	KNH_INITv(sys->ResourceDictIdx, new_DictIdx0(ctx, 32, 0));
+	knh_DictIdx_add__fast(ctx, sys->ResourceDictIdx, new_String__T(ctx, "(unknown)"));
 	KNH_INITv(sys->MethodFieldHashMap, new_HashMap(ctx, "System.MethodField", (KNH_TCLASS_SIZE * 2) + 31 ));
 	KNH_INITv(sys->DriversTableDictSet, new_DictSet(ctx, 32));
 	KNH_INITv(sys->SpecFuncDictSet, new_DictSet(ctx, 32));
@@ -2064,7 +2064,7 @@ static void knh_System_traverse(Ctx *ctx, System *o, knh_ftraverse ftr)
 	ftr(ctx, UP(sys->ClassNameDictSet));
 
 	ftr(ctx, UP(sys->FieldNameDictIdx));
-	ftr(ctx, UP(sys->FileNameDictIdx));
+	ftr(ctx, UP(sys->ResourceDictIdx));
 
 	ftr(ctx, UP(sys->MethodFieldHashMap));
 	ftr(ctx, UP(sys->NameSpaceTableDictMap));
@@ -2217,7 +2217,7 @@ void knh_Asm_init(Ctx *ctx, Asm *abr, int init)
 	b->flag = 0;
 	b->this_cid = CLASS_Object;
 
-	KNH_INITv(b->ns, knh_System_getNameSpace(ctx, STEXT("main")));
+	KNH_INITv(b->ns, ctx->share->mainns);
 	KNH_INITv(b->mtd,   KNH_NULL);
 	b->level = 0;
 
@@ -2245,7 +2245,7 @@ void knh_Asm_init(Ctx *ctx, Asm *abr, int init)
 	KNH_INITv(b->lstacks, new_Array(ctx, CLASS_String, 8));
 	KNH_INITv(b->finallyStmt, KNH_NULL);
 
-	b->fileid = 0;
+	b->resid = 0;
 	b->line = 0;
 	KNH_INITv(b->elf, new_Bytes(ctx, 4096));
 	KNH_INITv(b->dwarf, new_Bytes(ctx, 1024));
@@ -2314,7 +2314,7 @@ void knh_KLRCode_init(Ctx *ctx, KLRCode *o, int init)
 	knh_KLRCode_struct *b = DP(o);
 	b->size = 0;
 	b->code = (knh_code_t*)"";
-	b->fileid = 0;
+	b->resid = 0;
 //	b->nsid = 0;
 	b->dwarf = NULL;
 	b->dsize = 0;
@@ -2447,7 +2447,7 @@ Object *knh_Float_fdefault(Ctx *ctx, knh_class_t cid)
 //static
 //Object *knh_FloatX_fdefault(Ctx *ctx, knh_class_t cid)
 //{
-//	ClassSpec *o = konoha_getClassSpec(ctx, cid].cspec;
+//	ClassSpec *o = knh_getClassSpec(ctx, cid].cspec;
 //	KNH_ASSERT(IS_ClassSpec(o));
 //	return UP(DP(o)->fvalue);
 //}
@@ -2465,7 +2465,7 @@ Object *knh_Int_fdefault(Ctx *ctx, knh_class_t cid)
 //static
 //Object *knh_IntX_fdefault(Ctx *ctx, knh_class_t cid)
 //{
-//	ClassSpec *o = konoha_getClassSpec(ctx, cid].cspec;
+//	ClassSpec *o = knh_getClassSpec(ctx, cid].cspec;
 //	KNH_ASSERT(IS_ClassSpec(o));
 //	return UP(DP(o)->ivalue);
 //}
@@ -2483,7 +2483,7 @@ Object *knh_String_fdefault(Ctx *ctx, knh_class_t cid)
 //static
 //Object *knh_StringX_fdefault(Ctx *ctx, knh_class_t cid)
 //{
-//	ClassSpec *u = konoha_getClassSpec(ctx, cid].cspec;
+//	ClassSpec *u = knh_getClassSpec(ctx, cid].cspec;
 //	KNH_ASSERT(IS_ClassSpec(u));
 //	return UP(DP(u)->svalue);
 //}
@@ -2723,7 +2723,7 @@ static
 void konoha_loadGenericsData(Ctx *ctx, knh_GenericsData_t *data)
 {
 	while(data->name != NULL) {
-		konoha_addGenericsClass(ctx, data->cid, new_String__T(ctx, data->name), data->bcid, data->p1, data->p2);
+		knh_addGenericsClass(ctx, data->cid, new_String__T(ctx, data->name), data->bcid, data->p1, data->p2);
 		data++;
 	}
 }
@@ -2734,7 +2734,7 @@ static
 void konoha_loadClosureData(Ctx *ctx, knh_ClosureData_t *data)
 {
 	while(data->name != NULL) {
-		konoha_addClosureClass(ctx, data->cid, new_String__T(ctx, data->name), data->r0, data->p1, data->p2, data->p3);
+		knh_addClosureClass(ctx, data->cid, new_String__T(ctx, data->name), data->r0, data->p1, data->p2, data->p3);
 		data++;
 	}
 }
@@ -2745,7 +2745,7 @@ static
 void konoha_loadExptData(Ctx *ctx, knh_ExptData_t *data)
 {
 	while(data->name != NULL) {
-		konoha_addException(ctx, data->flag, data->eid, new_String__T(ctx, data->name), data->parent);
+		knh_addException(ctx, data->flag, data->eid, new_String__T(ctx, data->name), data->parent);
 		data++;
 	}
 }
@@ -2849,7 +2849,7 @@ static
 void konoha_loadMapperData(Ctx *ctx, knh_MapperData_t *data)
 {
 	while(data->func != NULL) {
-		konoha_addMapperFunc(ctx, data->flag, data->scid, data->tcid, data->func, KNH_NULL);
+		knh_addMapperFunc(ctx, data->flag, data->scid, data->tcid, data->func, KNH_NULL);
 		data++;
 	}
 }
@@ -2922,9 +2922,9 @@ static void konoha_loadClassProperties(Ctx *ctx)
 	t->p2 = CLASS_Any;
 	t->p3 = CLASS_Any;
 
-	konoha_loadIntConstData(ctx, IntConstData);
-	konoha_loadFloatConstData(ctx, FloatConstData);
-	konoha_loadStringConstData(ctx, StringConstData);
+	knh_loadIntConstData(ctx, IntConstData);
+	knh_loadFloatConstData(ctx, FloatConstData);
+	knh_loadStringConstData(ctx, StringConstData);
 	konoha_loadStringPropertyData(ctx, StringPropertyData);
 }
 
@@ -2954,7 +2954,7 @@ void konoha_loadSystemData(Ctx *ctx)
 		konoha_loadMethodData(ctx, MethodData, pools);
 		int i;
 		for(i = 0; i < KNH_TMETHODFIELD_SIZE; i++) {
-			konoha_addMethodFieldTable(ctx, pools[i]);
+			knh_addMethodFieldTable(ctx, pools[i]);
 		}
 	}
 	konoha_loadMapperData(ctx, MapperData);

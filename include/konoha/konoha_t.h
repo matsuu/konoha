@@ -416,13 +416,13 @@ typedef struct knh_Object_t {
 /* ------------------------------------------------------------------------ */
 /* Common Object Structure */
 
-typedef knh_ushort_t          knh_fileid_t;
+typedef knh_ushort_t          knh_resid_t;
 typedef knh_ushort_t          knh_sline_t;
 
 typedef struct {
 	knh_hObject_t h;
 	void *ref;
-	knh_fileid_t fileid;
+	knh_resid_t resid;
 	knh_sline_t  line;
 } knh_FileLine_t ;
 

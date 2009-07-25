@@ -544,7 +544,7 @@ void knh_Object_RCsweep(Ctx *ctx, Object *o)
 
 /* ------------------------------------------------------------------------ */
 
-knh_ftraverse konoha_getDefaultSweepFunc(void)
+knh_ftraverse knh_getDefaultSweepFunc(void)
 {
 	return knh_Object_RCsweep;
 }

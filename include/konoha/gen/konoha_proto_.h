@@ -123,10 +123,10 @@ knh_class_t knh_ClassTable_newId(Ctx *ctx);
 void konoha_setClassName(Ctx *ctx, knh_class_t cid, String *lname);
 char *knh_ClassTable_CLASSN(Ctx *ctx, knh_class_t cid);
 void konoha_setClassDefaultValue(Ctx *ctx, knh_class_t cid, Object *value, knh_fdefault fdefault);
-Object *konoha_getClassDefaultValue(Ctx *ctx, knh_class_t cid);
-Object *konoha_getDefaultValue(Ctx *ctx, knh_type_t type);
+Object *knh_getClassDefaultValue(Ctx *ctx, knh_class_t cid);
+Object *knh_getDefaultValue(Ctx *ctx, knh_type_t type);
 void konoha_setClassParam(Ctx *ctx, knh_class_t cid, knh_class_t p1, knh_class_t p2);
-knh_class_t konoha_addGenericsClass(Ctx *ctx, knh_class_t cid, String *name, knh_class_t bcid, knh_class_t p1, knh_class_t p2);
+knh_class_t knh_addGenericsClass(Ctx *ctx, knh_class_t cid, String *name, knh_class_t bcid, knh_class_t p1, knh_class_t p2);
 ClassStruct* new_ClassStruct0(Ctx *ctx, int field_size, int method_size);
 knh_index_t knh_Class_indexOfField(Ctx *ctx, knh_class_t cid, knh_fieldn_t fn);
 knh_index_t knh_Class_queryField(Ctx *ctx, knh_class_t cid, knh_fieldn_t fnq);
@@ -141,18 +141,19 @@ void knh_ClassMap_sort(Ctx *ctx, ClassMap *o);
 void knh_ClassMap_add(Ctx *ctx, ClassMap *o, Mapper *map);
 void knh_ClassMap__dump(Ctx *ctx, ClassMap *o, OutputStream *w, String *m);
 void knh_ClassMap__man(Ctx *ctx, ClassMap *o, OutputStream *w, knh_class_t cid);
-Array* konoha_getClassDomain(Ctx *ctx, knh_class_t cid);
+Array* knh_getClassDomain(Ctx *ctx, knh_class_t cid);
 /* ../src/class/knh_ClassSpec.c */
 void knh_write_intx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_int_t v);
 void knh_write_floatx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_float_t v);
 void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid);
-knh_bytes_t konoha_getURNAlias(Ctx *ctx, knh_bytes_t aurn);
-ClassSpec *konoha_getClassSpec(Ctx *ctx, knh_class_t cid);
+knh_bytes_t knh_getURNAlias(Ctx *ctx, knh_bytes_t aurn);
+ClassSpec *knh_getClassSpec(Ctx *ctx, knh_class_t cid);
 knh_class_t konoha_findcidx(Ctx *ctx, knh_bytes_t lname);
 /* ../src/class/knh_Closure.c */
 METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Closure_invoke(Ctx *ctx, knh_sfp_t *sfp);
-knh_class_t konoha_addClosureClass(Ctx *ctx, knh_class_t cid, String *name, knh_type_t r0, knh_type_t p1, knh_type_t p2, knh_type_t p3);
+int knh_stack_vpush(Ctx *ctx, knh_sfp_t *sfp, const char *fmt, va_list args);
+knh_class_t knh_addClosureClass(Ctx *ctx, knh_class_t cid, String *name, knh_type_t r0, knh_type_t p1, knh_type_t p2, knh_type_t p3);
 knh_class_t knh_class_Closure(Ctx *ctx, knh_type_t r0, knh_type_t p1, knh_type_t p2, knh_type_t p3);
 knh_class_t knh_class_MethodClosure(Ctx *ctx, knh_class_t cid, Method *mtd);
 Closure* new_Closure(Ctx *ctx, knh_sfp_t *sfp, Method *mtd);
@@ -223,7 +224,7 @@ void knh_DictSet_remove(Ctx *ctx, DictSet *o, String *key);
 void knh_DictSet_clear(Ctx *ctx, DictSet *o);
 /* ../src/class/knh_Exception.c */
 String *knh_ExptTable_name(Ctx *ctx, knh_expt_t eid);
-knh_expt_t konoha_addException(Ctx *ctx, knh_flag_t flag, knh_class_t eid, String *name, char *pname);
+knh_expt_t knh_addException(Ctx *ctx, knh_flag_t flag, knh_class_t eid, String *name, char *pname);
 Exception* knh_Exception_new__init(Ctx *ctx, Exception *o, String *e, String *msg, Object *bag);
 int knh_Exception_isa(Ctx *ctx, Exception *o, String *msg);
 Exception* new_NullException (Ctx *ctx, Object *o);
@@ -256,7 +257,7 @@ Iterator* new_ArrayIterator(Ctx *ctx, knh_class_t cid, Array *a);
 /* ../src/class/knh_Mapper.c */
 Mapper* new_MapMap(Ctx *ctx, Mapper *m1, Mapper *m2);
 void knh_Mapper__k(Ctx *ctx, Mapper *o, OutputStream *w, String *m);
-void konoha_addMapperFunc(Ctx *ctx, knh_flag_t flag, knh_type_t stype, knh_type_t ttype, knh_fmapper fmap, Object *mapdata);
+void knh_addMapperFunc(Ctx *ctx, knh_flag_t flag, knh_type_t stype, knh_type_t ttype, knh_fmapper fmap, Object *mapdata);
 MAPPER knh_Mapper_fasis(Ctx *ctx, knh_sfp_t *sfp);
 MAPPER knh_fmapper_null(Ctx *ctx, knh_sfp_t *sfp);
 knh_bool_t knh_Mapper_isNoSuchMapping(Mapper *mpr);
@@ -286,7 +287,7 @@ int knh_Method_isWoven(Method *mtd);
 int knh_Method_canWeave(Ctx *ctx, Method *mtd, Method *aspect);
 void knh_Method_weave(Ctx *ctx, Method *aspect, Method *mtd);
 void knh_Class_addMethod(Ctx *ctx, knh_class_t cid, Method *mtd);
-void konoha_addMethodFieldTable(Ctx *ctx, MethodField *mf);
+void knh_addMethodFieldTable(Ctx *ctx, MethodField *mf);
 MethodField *konoha_findMethodField0(Ctx *ctx, knh_type_t rtype);
 MethodField *konoha_findMethodField1(Ctx *ctx, knh_type_t rtype, knh_type_t p1, knh_fieldn_t fn1);
 Method* knh_Class_getMethod__(Ctx *ctx, knh_class_t this_cid, knh_methodn_t mn, knh_bool_t gen);
@@ -296,7 +297,7 @@ Method *konoha_lookupFormatter(Ctx *ctx, knh_class_t cid, knh_methodn_t mn);
 NameSpace* new_NameSpace(Ctx *ctx, String *nsname);
 void knh_NameSpace_importNameSpace(Ctx *ctx, NameSpace *ns, NameSpace *other);
 Script *knh_NameSpace_getScript(Ctx *ctx, NameSpace *ns);
-knh_class_t konoha_getcid(Ctx *ctx, knh_bytes_t lname);
+knh_class_t knh_getcid(Ctx *ctx, knh_bytes_t lname);
 void knh_NameSpace_setcid(Ctx *ctx, NameSpace *o, String *name, knh_class_t c);
 void knh_NameSpace_setLocalName(Ctx *ctx, NameSpace *o, knh_class_t cid);
 knh_class_t knh_NameSpace_getcid(Ctx *ctx, NameSpace *o, knh_bytes_t name);
@@ -399,10 +400,10 @@ void konoha_setverbose(int v);
 METHOD knh_fmethod_movableText(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/compiler/asm.c */
 void knh_Context_initAsm(Ctx *ctx);
-NameSpace *knh_Context_getNameSpace(Ctx *ctx);
-NameSpace *knh_Context_setNameSpace(Ctx *ctx, String *nsname);
-NameSpace *knh_Context_switchNameSpace(Ctx *ctx, NameSpace *newns);
-Script *knh_Asm_getScript(Ctx *ctx, Asm *o);
+NameSpace *knh_getCurrentNameSpace(Ctx *ctx);
+NameSpace *knh_setCurrentNameSpace(Ctx *ctx, String *nsname);
+NameSpace *knh_switchCurrentNameSpace(Ctx *ctx, NameSpace *newns);
+Script *knh_getCurrentScript(Ctx *ctx);
 void knh_Asm_initThis(Ctx *ctx, Asm *abr, knh_class_t cid);
 void knh_Asm_initThisScript(Ctx *ctx, Asm *abr);
 void *knh_Asm_asmmalloc(Ctx *ctx, Asm *abr, size_t size);
@@ -422,7 +423,7 @@ void knh_StmtMETHOD_asm(Ctx *ctx, Stmt *stmt, Asm *abr);
 void knh_StmtFORMAT_asm(Ctx *ctx, Stmt *stmt, Asm *abr);
 void knh_StmtCLASS_asm(Ctx *ctx, Stmt *stmt, Asm *abr);
 /* ../src/compiler/kcode.c */
-KLRCode* new_KLRCode(Ctx *ctx, knh_fileid_t fileid, knh_bytes_t elf, knh_bytes_t dwarf);
+KLRCode* new_KLRCode(Ctx *ctx, knh_resid_t resid, knh_bytes_t elf, knh_bytes_t dwarf);
 void knh_Method_setKLRCode(Ctx *ctx, Method *mtd, KLRCode *code);
 knh_code_t* knh_Method_pcstartNULL(Method *mtd);
 knh_bytes_t knh_KLRCode_tobytes(KLRCode *o);
@@ -439,7 +440,7 @@ knh_fmethod knh_Asm_getCompiledMethod(Ctx *ctx, Asm *abr, knh_bytes_t cname, knh
 /* ../src/compiler/konohac.c */
 int knh_Stmt_compile(Ctx *ctx, Stmt *stmt, String *nsname, int isEval);
 Object *knh_Stmt_toData(Ctx *ctx, Stmt *stmt, knh_class_t reqc);
-Stmt *knh_bytes_parseStmt(Ctx *ctx, knh_bytes_t kscript, int fileid, int line);
+Stmt *knh_bytes_parseStmt(Ctx *ctx, knh_bytes_t kscript, int resid, int line);
 void konohac_eval(Ctx *ctx, String *nsname, InputStream *in);
 Object *konohac_data(Ctx *ctx, InputStream *in, knh_class_t reqc);
 void knh_Asm_openlib(Ctx *ctx, Asm *abr, knh_bytes_t fpath);
@@ -449,8 +450,8 @@ void konoha_compile(Ctx *ctx, String *nsname, knh_bytes_t fpath);
 Stmt *new_StmtINSTMT(Ctx *ctx, Token *tk, int isData);
 void knh_Stmt_add_PEACH(Ctx *ctx, Stmt *o, knh_tokens_t *tc);
 /* ../src/compiler/perror.c */
-void knh_vperror(Ctx *ctx, knh_fileid_t fileid, int line, int pe, char *fmt, va_list ap);
-void knh_perror(Ctx *ctx, knh_fileid_t fileid, int line, int pe, char *fmt, ...);
+void knh_vperror(Ctx *ctx, knh_resid_t resid, int line, int pe, char *fmt, va_list ap);
+void knh_perror(Ctx *ctx, knh_resid_t resid, int line, int pe, char *fmt, ...);
 void knh_Token_perror(Ctx *ctx, Token *tk, int pe, char *fmt, ...);
 void knh_Asm_perror(Ctx *ctx, Asm *abr, int pe, char *fmt, ...);
 /* ../src/compiler/stmt.c */
@@ -468,7 +469,7 @@ int knh_StmtMETA_is(Ctx *ctx, Stmt *stmt, knh_bytes_t name);
 void knh_Stmt__s(Ctx *ctx, Stmt *o, OutputStream *w, String *m);
 void knh_Stmt__dump(Ctx *ctx, Stmt *o, OutputStream *w, String *m);
 /* ../src/compiler/token.c */
-Token* new_Token(Ctx *ctx, knh_flag_t flag, knh_fileid_t fileid, knh_sline_t line, knh_token_t tt);
+Token* new_Token(Ctx *ctx, knh_flag_t flag, knh_resid_t resid, knh_sline_t line, knh_token_t tt);
 void knh_Token_setFL(Token *o, Any *fln);
 Token *new_TokenASIS(Ctx *ctx, Any *fln);
 Token *new_TokenCID(Ctx *ctx, Any *fln, knh_class_t cid);
@@ -516,8 +517,8 @@ void *knh_dlsym(Ctx *ctx, void* hdr, const char* symbol);
 const char *knh_dlerror(Ctx *ctx);
 int knh_dlclose(Ctx *ctx, void* hdr);
 /* ../src/deps/fileio.c */
-knh_iodrv_t *konoha_getIODriver(Ctx *ctx, knh_bytes_t name);
-knh_iodrv_t *konoha_getDefaultIODriver(void);
+knh_iodrv_t *knh_getIODriver(Ctx *ctx, knh_bytes_t name);
+knh_iodrv_t *knh_getDefaultIODriver(void);
 void  init_IO(Ctx *ctx);
 InputStream *new_InputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
 OutputStream *new_OutputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
@@ -539,7 +540,7 @@ void knh_write_USING_REGEX(Ctx *ctx, OutputStream *w);
 knh_regex_drvapi_t *knh_System_getRegexDriver(Ctx *ctx, knh_bytes_t name);
 void  init_Regex(Ctx *ctx);
 /* ../src/deps/socket.c */
-knh_iodrv_t *konoha_getSocketDriver(void);
+knh_iodrv_t *knh_getSocketDriver(void);
 void  init_SocketDriver(Ctx *ctx);
 /* ../src/deps/sqlite3.c */
 void knh_dbcurfree__NOP(knh_dbcur_t *dbcur);
@@ -556,9 +557,9 @@ void* knh_thread_getspecific(knh_thread_key_t key);
 int knh_thread_key_delete(knh_thread_key_t key);
 /* ../src/deps/time.c */
 knh_uint_t knh_initseed(void);
-knh_uint64_t konoha_getTimeMilliSecond(void);
-knh_uint64_t konoha_getProfCount(void);
-knh_uint64_t konoha_getProfCountPerSecond(void);
+knh_uint64_t knh_getTimeMilliSecond(void);
+knh_uint64_t knh_getProfCount(void);
+knh_uint64_t knh_getProfCountPerSecond(void);
 /* ../src/konoha.c */
 int main(int argc, char **argv);
 /* ../src/labs/b4.c */
@@ -609,32 +610,32 @@ void knh_Object_mark1(Ctx *ctx, Object *o);
 METHOD knh__System_gc(Ctx *ctx, knh_sfp_t *sfp);
 void knh_System_gc(Ctx *ctx);
 void knh_Object_RCsweep(Ctx *ctx, Object *o);
-knh_ftraverse konoha_getDefaultSweepFunc(void);
+knh_ftraverse knh_getDefaultSweepFunc(void);
 /* ../src/main/security.c */
 /* ../src/main/stack.c */
 int knh_sfp_argc(Ctx *ctx, knh_sfp_t *v);
 METHOD knh__System_stackdump(Ctx *ctx, knh_sfp_t *sfp);
 void knh_sfp_typecheck(Ctx *ctx, knh_sfp_t *sfp, Method *mtd, knh_code_t *pc);
 /* ../src/main/system.c */
-int konoha_addClassConst(Ctx *ctx, knh_class_t cid, String* name, Object *value);
-Object *konoha_getClassConstNULL(Ctx *ctx, knh_class_t cid, knh_bytes_t name);
+int knh_addClassConst(Ctx *ctx, knh_class_t cid, String* name, Object *value);
+Object *knh_getClassConstNULL(Ctx *ctx, knh_class_t cid, knh_bytes_t name);
 void knh_Const__man(Ctx *ctx, knh_class_t cid, OutputStream *w);
-Object *konoha_getSystemConst(Ctx *ctx, int n);
+Object *knh_getSystemConst(Ctx *ctx, int n);
 int knh_bytes_isOptionalMT(knh_bytes_t t);
 knh_bytes_t knh_bytes_mtoption(knh_bytes_t t);
 char *knh_format_newFMT(char *buf, size_t bufsiz, knh_bytes_t t, int dot, char *fmt);
-String *konoha_getFieldName(Ctx *ctx, knh_fieldn_t fn);
-knh_fieldn_t knh_tName_get_fnq(Ctx *ctx, knh_bytes_t tname, knh_fieldn_t def);
+String *knh_getFieldName(Ctx *ctx, knh_fieldn_t fn);
+knh_fieldn_t knh_getfnq(Ctx *ctx, knh_bytes_t tname, knh_fieldn_t def);
 String *new_String__mn(Ctx *ctx, knh_methodn_t mn);
-knh_methodn_t konoha_getMethodName(Ctx *ctx, knh_bytes_t tname, knh_methodn_t def);
+knh_methodn_t knh_getmn(Ctx *ctx, knh_bytes_t tname, knh_methodn_t def);
 char *knh_format_methodn(Ctx *ctx, char *buf, size_t bufsiz, knh_methodn_t mn);
 char * knh_format_cmethodn(Ctx *ctx, char *buf, size_t bufsiz, knh_class_t cid, knh_methodn_t mn);
-knh_fileid_t konoha_getFileId(Ctx *ctx, knh_bytes_t t);
-String *konoha_getFileName(Ctx *ctx, knh_fileid_t fileid);
-void konoha_addDriverAPI(Ctx *ctx, char *alias, knh_drvapi_t* p);
-knh_drvapi_t *konoha_getDriverAPI(Ctx *ctx, int type, knh_bytes_t name);
-NameSpace *knh_System_loadPackage(Ctx *ctx, knh_bytes_t pkgname);
-NameSpace *knh_System_getNameSpace(Ctx *ctx, knh_bytes_t name);
+knh_resid_t knh_getResourceId(Ctx *ctx, knh_bytes_t t);
+String *knh_getResourceName(Ctx *ctx, knh_resid_t resid);
+void knh_addDriverAPI(Ctx *ctx, char *alias, knh_drvapi_t* p);
+knh_drvapi_t *knh_getDriverAPI(Ctx *ctx, int type, knh_bytes_t name);
+NameSpace *knh_loadPackage(Ctx *ctx, knh_bytes_t pkgname);
+NameSpace *knh_getNameSpace(Ctx *ctx, knh_bytes_t name);
 /* ../src/main/systemtable.c */
 Ctx *new_Context(Ctx *parent);
 void knh_Context_traverse(Ctx *ctx, knh_Context_t *o, knh_ftraverse ftr);

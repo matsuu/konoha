@@ -50,8 +50,8 @@ extern "C" {
 #define B2(c,n)   new_bytes__2(c,n)
 #define STEXT(c)  new_bytes__2(c,sizeof(c)-1)
 #define ISB(t,c) (t.len == (sizeof(c)-1) && knh_strncmp((char*)t.buf,c,t.len) == 0)
-#define KNH_DEF(ctx, cid)  konoha_getClassDefaultValue(ctx, cid)
-#define KNH_DEF(ctx, cid)  konoha_getClassDefaultValue(ctx, cid)
+#define KNH_DEF(ctx, cid)  knh_getClassDefaultValue(ctx, cid)
+#define KNH_DEF(ctx, cid)  knh_getClassDefaultValue(ctx, cid)
 #define KNH_STDIN          (((Context*)ctx)->in)
 #define KNH_STDOUT         (((Context*)ctx)->out)
 #define KNH_STDERR         (((Context*)ctx)->err)
@@ -126,15 +126,15 @@ extern "C" {
 
 
 #define TODO_THROW(ctx) knh_throw_TODO(ctx, (char*)__FILE__, __LINE__, (char*)__FUNCTION__)
-#define KNH_SYS(ctx, n)    konoha_getSystemConst(ctx, n)
+#define KNH_SYS(ctx, n)    knh_getSystemConst(ctx, n)
 #define KNH_SYS_CTX    0
 #define KNH_SYS_STDIN  1
 #define KNH_SYS_STDOUT 2
 #define KNH_SYS_STDERR 3
 #define KNH_SYS_OS     4
 #define KNH_SYS_SCRIPT 5
-#define FIELDN(fn) knh_String_tochar(konoha_getFieldName(ctx, fn))
-#define FILEIDN(fileid) knh_String_tochar(konoha_getFileName(ctx, fileid))
+#define FIELDN(fn) knh_String_tochar(knh_getFieldName(ctx, fn))
+#define FILEIDN(resid) knh_String_tochar(knh_getResourceName(ctx, resid))
 
 /* ======================================================================== */
 /* [PROTOTYPE] */
@@ -181,6 +181,7 @@ KNHAPI(void) konoha_loadClassSpecFuncData(Ctx *ctx, knh_NamedPointerData_t *data
 KNHAPI(void) knh_putsfp(Ctx *ctx, knh_sfp_t *lsfp, int n, Object *obj);
 KNHAPI(void) knh_Closure_invokesfp(Ctx *ctx, Closure *cc, knh_sfp_t *lsfp, int argc);
 KNHAPI(knh_sfp_t*) knh_Closure_invokef(Ctx *ctx, Closure *c, const char *fmt, ...);
+KNHAPI(void) knh_Closure_invoke(Ctx *ctx, Closure *c, const char *fmt, ...);
 KNHAPI(Exception*) new_Exception(Ctx *ctx, String *msg);
 KNHAPI(Exception*) new_Exception__b(Ctx *ctx, knh_bytes_t msg);
 KNHAPI(void) knh_perrno(Ctx *ctx, char *emsg, char *func, char *file, int line, int isThrowable);
@@ -196,7 +197,7 @@ KNHAPI(void) knh_Iterator_close(Ctx *ctx, Iterator *it);
 KNHAPI(Iterator*) new_Iterator(Ctx *ctx, knh_class_t p1, Any *source, knh_fitrnext fnext);
 KNHAPI(Iterator*) new_GlueIterator(Ctx *ctx, knh_class_t p1, void *ref, knh_fitrnext fnext, knh_ffree ffree);
 KNHAPI(Mapper*) new_Mapper(Ctx *ctx, knh_flag_t flag, knh_class_t scid, knh_class_t tcid, knh_fmapper fmap, Object *mapdata);
-KNHAPI(void) konoha_addMapper(Ctx *ctx, Mapper *mpr);
+KNHAPI(void) knh_addMapper(Ctx *ctx, Mapper *mpr);
 KNHAPI(knh_class_t) konoha_findcid(Ctx *ctx, knh_bytes_t lname);
 KNHAPI(Int*) new_Int(Ctx *ctx, knh_int_t value);
 KNHAPI(Int*) new_IntX__fast(Ctx *ctx, knh_class_t cid, knh_int_t value);
@@ -204,7 +205,7 @@ KNHAPI(Int*) new_IntX(Ctx *ctx, knh_class_t cid, knh_int_t value);
 KNHAPI(Float*) new_Float(Ctx *ctx, knh_float_t value);
 KNHAPI(Float*) new_FloatX__fast(Ctx *ctx, knh_class_t cid, knh_float_t value);
 KNHAPI(Float*) new_FloatX(Ctx *ctx, knh_class_t cid, knh_float_t value);
-KNHAPI(void) konoha_addAffineMapper(Ctx *ctx, knh_class_t scid, char *text, knh_float_t scale, knh_float_t shift);
+KNHAPI(void) knh_addAffineMapper(Ctx *ctx, knh_class_t scid, char *text, knh_float_t scale, knh_float_t shift);
 KNHAPI(void) knh_Glue_init(Ctx *ctx, knh_Glue_t *g, void *ptr, knh_fgfree gfree);
 KNHAPI(Object*) new_Glue(Ctx *ctx, char *lname, void *ptr, knh_fgfree gfree);
 KNHAPI(OutputStream*) new_OutputStream__io(Ctx *ctx, String *urn, knh_io_t fd, knh_iodrv_t *drv);
@@ -222,7 +223,7 @@ KNHAPI(void) knh_ResultSet_setNULL(Ctx *ctx, ResultSet *o, size_t n);
 KNHAPI(String*) new_String(Ctx *ctx, knh_bytes_t t, String *orign);
 KNHAPI(knh_bytes_t) knh_String_tobytes(String *o);
 KNHAPI(char*) knh_String_text(Ctx *ctx, String *s);
-KNHAPI(void) konoha_addParserDriver(Ctx *ctx, char *alias, knh_parser_drvapi_t *d);
+KNHAPI(void) knh_addParserDriver(Ctx *ctx, char *alias, knh_parser_drvapi_t *d);
 KNHAPI(void) konoha_setSystemPropertyText(Ctx *ctx, char *key, char *value);
 KNHAPI(void) knh_putc(Ctx *ctx, OutputStream *w, int ch);
 KNHAPI(void) knh_write(Ctx *ctx, OutputStream *w, knh_bytes_t s);
@@ -241,36 +242,37 @@ KNHAPI(size_t) knh_fread(Ctx *ctx, void *ptr, size_t size, FILE *fp);
 KNHAPI(size_t) knh_fwrite(Ctx *ctx, void *ptr, size_t size, FILE *fp);
 KNHAPI(int) knh_fflush(Ctx *ctx, FILE *fp);
 KNHAPI(int) knh_fclose(Ctx *ctx, FILE *fp);
-KNHAPI(void) konoha_addIODriver(Ctx *ctx, char *alias, knh_iodrv_t *d);
+KNHAPI(void) knh_addIODriver(Ctx *ctx, char *alias, knh_iodrv_t *d);
 KNHAPI(char*) knh_format_ospath(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t path);
 KNHAPI(char*) knh_format_ospath2(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t path, char *ext);
-KNHAPI(void) konoha_addRegexDriver(Ctx *ctx, char *alias, knh_regex_drvapi_t *d);
+KNHAPI(void) knh_addRegexDriver(Ctx *ctx, char *alias, knh_regex_drvapi_t *d);
 KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port, int isThrowable);
 KNHAPI(int) knh_socket_send(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz, int flags);
 KNHAPI(int) knh_socket_recv(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz, int flags);
 KNHAPI(int) knh_socket_close(Ctx *ctx, knh_intptr_t sd);
-KNHAPI(void) konoha_addDBDriver(Ctx *ctx, char *alias, knh_db_drvapi_t *d);
+KNHAPI(void) knh_addDBDriver(Ctx *ctx, char *alias, knh_db_drvapi_t *d);
 KNHAPI(void) konoha_SETv(Ctx *ctx, Object **v, Object *o);
 KNHAPI(void) konoha_FINALv(Ctx *ctx, Object **v);
 KNHAPI(void) konoha_setCurrentContext(Ctx *ctx);
-KNHAPI(Ctx*) konoha_getCurrentContext(void);
-KNHAPI(Ctx*) konoha_getThreadContext(Ctx *ctx);
+KNHAPI(Ctx*) knh_getCurrentContext(void);
+KNHAPI(Ctx*) knh_getThreadContext(Ctx *ctx);
 KNHAPI(int) konoha_debugLevel(void);
 KNHAPI(int) konoha_isSystemDump2(void);
 KNHAPI(int) konoha_parseopt(konoha_t konoha, int argc, char **argv);
 KNHAPI(int) konoha_hasRuntimeError(konoha_t konoha);
-KNHAPI(char*) konoha_getRuntimeError(konoha_t konoha);
+KNHAPI(char*) knh_getRuntimeError(konoha_t konoha);
 KNHAPI(void) konoha_setOutputStreamBuffer(konoha_t konoha, size_t osize, size_t esize);
-KNHAPI(char*) konoha_getSTDOUTBuffer(konoha_t konoha);
-KNHAPI(char*) konoha_getSTDERRBuffer(konoha_t konoha);
+KNHAPI(char*) knh_getSTDOUTBuffer(konoha_t konoha);
+KNHAPI(char*) knh_getSTDERRBuffer(konoha_t konoha);
 KNHAPI(void) konoha_evalScript(konoha_t konoha, char *script);
 KNHAPI(void) konoha_readFile(Ctx *ctx, char *fpath);
 KNHAPI(void) konoha_loadScript(konoha_t konoha, char *fpath);
 KNHAPI(int) konoha_runMain(konoha_t konoha, int argc, char **argv);
+KNHAPI(void) konoha_invokeScriptFunc(konoha_t konoha, char *fmt, ...);
 KNHAPI(void) konoha_shell(konoha_t konoha);
 KNHAPI(char*) KNH_SAFEFILE(char *file);
 KNHAPI(Object*) new_Object_boxing(Ctx *ctx, knh_class_t cid, knh_sfp_t *sfp);
-KNHAPI(char*) konoha_getPassword(Ctx *ctx, knh_bytes_t url);
+KNHAPI(char*) knh_getPassword(Ctx *ctx, knh_bytes_t url);
 KNHAPI(void) knh_sfp_boxing(Ctx *ctx, knh_sfp_t *sfp);
 KNHAPI(void) knh_sfp_unboxing(Ctx *ctx, knh_sfp_t *sfp);
 KNHAPI(void) knh_esp1_sformat(Ctx *ctx, Method *mtd, OutputStream *w, Any *m);
@@ -282,9 +284,9 @@ KNHAPI(void) knh_throw__s(Ctx *ctx, char *msg, char *file, int line);
 KNHAPI(void) knh_throw(Ctx *ctx, Object *e, char *file, int line);
 KNHAPI(void) knh_throwStupidException(Ctx *ctx);
 KNHAPI(void) konoha_throwSecurityException(void);
-KNHAPI(void) konoha_loadIntConstData(Ctx *ctx, knh_IntConstData_t *data);
-KNHAPI(void) konoha_loadFloatConstData(Ctx *ctx, knh_FloatConstData_t *data);
-KNHAPI(void) konoha_loadStringConstData(Ctx *ctx, knh_StringConstData_t *data);
+KNHAPI(void) knh_loadIntConstData(Ctx *ctx, knh_IntConstData_t *data);
+KNHAPI(void) knh_loadFloatConstData(Ctx *ctx, knh_FloatConstData_t *data);
+KNHAPI(void) knh_loadStringConstData(Ctx *ctx, knh_StringConstData_t *data);
 KNHAPI(konoha_t) konoha_open(size_t stacksize);
 KNHAPI(void) konoha_close(konoha_t konoha);
 

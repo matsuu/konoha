@@ -51,7 +51,7 @@ static
 knh_fieldn_t knh_Token_getfnq(Ctx *ctx, Token *o)
 {
 	if(SP(o)->tt == TT_NAME) {
-		return knh_tName_get_fnq(ctx, knh_Token_tobytes(ctx, o), FIELDN_NEWID);
+		return knh_getfnq(ctx, knh_Token_tobytes(ctx, o), FIELDN_NEWID);
 	}
 	else if(SP(o)->tt == TT_FN) {
 		return DP(o)->fn;
@@ -83,7 +83,7 @@ knh_methodn_t knh_Token_getmn(Ctx *ctx, Token *o)
 
 	knh_bytes_t name = knh_Token_tobytes(ctx, o);
 	if(SP(o)->tt == TT_NAME) {
-		knh_methodn_t mn = konoha_getMethodName(ctx, name, METHODN_NEWID);
+		knh_methodn_t mn = knh_getmn(ctx, name, METHODN_NEWID);
 		if(knh_Token_isGetter(o)) {
 			return mn | KNH_FLAG_MN_GETTER;
 		}
@@ -97,11 +97,11 @@ knh_methodn_t knh_Token_getmn(Ctx *ctx, Token *o)
 		if(idx != -1) {
 			name = knh_bytes_last(name, idx+1);
 		}
-		knh_methodn_t mn = konoha_getMethodName(ctx, name, METHODN_NEWID);
+		knh_methodn_t mn = knh_getmn(ctx, name, METHODN_NEWID);
 		return mn;
 	}
 	else if(SP(o)->tt == TT_MT) {
-		return konoha_getMethodName(ctx, name, METHODN_NEWID) | KNH_FLAG_MN_MOVTEXT;
+		return knh_getmn(ctx, name, METHODN_NEWID) | KNH_FLAG_MN_MOVTEXT;
 	}
 	DBG2_P("SP(o)->tt=%s, '%s'", knh_token_tochar(SP(o)->tt), (char*)name.buf);
 	TODO();
@@ -290,7 +290,7 @@ int knh_Token_toSYSVAL(Ctx *ctx, Token *tk, Asm *abr)
 		return 1;
 	}
 	else if(IS_SYSVAL(t, "__file__")) {
-		knh_Token_setCONST(ctx, tk, UP(konoha_getFileName(ctx, SP(tk)->fileid)));
+		knh_Token_setCONST(ctx, tk, UP(knh_getResourceName(ctx, SP(tk)->resid)));
 		return 1;
 	}
 	else if(IS_SYSVAL(t, "__method__") || IS_SYSVAL(t, "__function__")) {
@@ -298,7 +298,7 @@ int knh_Token_toSYSVAL(Ctx *ctx, Token *tk, Asm *abr)
 		return 1;
 	}
 	else if(IS_SYSVAL(t, "__namespace__") || IS_SYSVAL(t, "__ns__")) {
-		NameSpace *ns = knh_Context_getNameSpace(ctx);
+		NameSpace *ns = knh_getCurrentNameSpace(ctx);
 		knh_Token_setCONST(ctx, tk, UP(DP(ns)->nsname));
 		return 1;
 	}
@@ -393,7 +393,7 @@ knh_index_t knh_Asm_addVariableTable(Ctx *ctx, Asm *abr,
 static
 int knh_Asm_declareScriptVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_t type, knh_fieldn_t fn, Object *value)
 {
-	knh_Script_t *scr = knh_Asm_getScript(ctx, abr);
+	knh_Script_t *scr = knh_getCurrentScript(ctx);
 	knh_class_t cid = knh_Object_cid(scr);
 	knh_cfield_t *cf = (ClassTable(cid).cstruct)->fields;
 	knh_index_t idx = knh_Asm_addVariableTable(ctx, abr, cf, KNH_SCRIPT_FIELDSIZE, flag, type, fn, value);
@@ -510,7 +510,7 @@ knh_index_t knh_Asm_indexOfVariable(Asm *abr, knh_fieldn_t fnq)
 }
 
 #define knh_Asm_indexOfScriptVariable(abr, fnq)\
-	knh_Class_queryField(ctx, knh_Object_cid(knh_Asm_getScript(ctx, abr)), fnq)
+	knh_Class_queryField(ctx, knh_Object_cid(knh_getCurrentScript(ctx)), fnq)
 
 #define knh_Asm_indexOfFieldVariable(abr, fnq)\
 	knh_Class_queryField(ctx, DP(abr)->this_cid, fnq)
@@ -532,7 +532,7 @@ int knh_Asm_globalIndex(Ctx *ctx, Asm *abr)
 {
 	if(DP(abr)->globalidx == -1) {
 		DP(abr)->globalidx =
-			knh_Asm_declareLocalVariable(ctx, abr, 0, NNTYPE_Script, FIELDN_GLOBAL, UP(knh_Asm_getScript(ctx, abr)));
+			knh_Asm_declareLocalVariable(ctx, abr, 0, NNTYPE_Script, FIELDN_GLOBAL, UP(knh_getCurrentScript(ctx)));
 		if(DP(abr)->globalidx == -1) return 0;
 	}
 	return 1;
@@ -581,7 +581,7 @@ static int knh_TokenNAME_typing(Ctx *ctx, Token *tk, Asm *abr)
 
 	L_GLOBAL:;
 	{
-		Script *scr = knh_Asm_getScript(ctx, abr);
+		Script *scr = knh_getCurrentScript(ctx);
 		idx = knh_Class_queryField(ctx, knh_Object_cid(scr), fnq);
 		if(idx != -1) {
 			knh_cfield_t *cf = knh_Class_fieldAt(ctx, knh_Object_cid(scr), idx);
@@ -680,7 +680,7 @@ int knh_TokenCMETHODN_typing(Ctx *ctx, Token *tk, NameSpace *ns)
 		return 0;
 	}
 	t = knh_bytes_last(t, idx+1);
-	knh_methodn_t mn = konoha_getMethodName(ctx, t, METHODN_NONAME);
+	knh_methodn_t mn = knh_getmn(ctx, t, METHODN_NONAME);
 	Method *mtd = knh_Class_getMethod(ctx, cid, mn);
 	if(IS_NULL(mtd)) {
 		knh_Token_perror(ctx, tk, KERR_ERROR, _("undefined method: %s"), sToken(tk));
@@ -809,7 +809,7 @@ int knh_TokenNUM_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqc)
 			knh_Token_perror(ctx, tk, KERR_EWARN, _("float overflow: %B"), t);
 		}
 		knh_class_t tagc = knh_Token_tagcNUM(ctx, tk, reqc, ns);
-		ClassSpec *u = konoha_getClassSpec(ctx, tagc);
+		ClassSpec *u = knh_getClassSpec(ctx, tagc);
 		if(!DP(u)->ffchk(u, n)) {
 			knh_Token_perror(ctx, tk, KERR_ERRATA, _("%C: out of range: %B ==> %O"), tagc, t, DP(u)->fvalue);
 			knh_Token_setCONST(ctx, tk, UP(DP(u)->fvalue));
@@ -824,7 +824,7 @@ int knh_TokenNUM_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqc)
 			knh_Token_perror(ctx, tk, KERR_EWARN, _("int overflow: %B"), t);
 		}
 		knh_class_t tagc = knh_Token_tagcNUM(ctx, tk, reqc, ns);
-		ClassSpec *u = konoha_getClassSpec(ctx, tagc);
+		ClassSpec *u = knh_getClassSpec(ctx, tagc);
 		if(!DP(u)->fichk(u, n)) {
 			knh_Token_perror(ctx, tk, KERR_ERRATA, _("%C: out of range: %B ==> %O"), tagc, t, DP(u)->ivalue);
 			knh_Token_setCONST(ctx, tk, UP(DP(u)->ivalue));
@@ -856,7 +856,7 @@ int knh_TokenSTR_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqt)
 		knh_class_t breqc = ctx->share->ClassTable[reqc].bcid;
 		if(breqc == CLASS_String) {
 			knh_bytes_t t = knh_Token_tobytes(ctx, tk);
-			ClassSpec *u = konoha_getClassSpec(ctx, reqc);
+			ClassSpec *u = knh_getClassSpec(ctx, reqc);
 			int foundError = 0;
 			String *s = DP(u)->fsnew(ctx, reqc, t, NULL, &foundError);
 			if(foundError) {
@@ -892,7 +892,7 @@ int knh_TokenTSTR_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqt)
 	else {
 		knh_class_t tagcid = knh_NameSpace_tagcid(ctx, ctx->share->mainns, CLASS_String, tag);
 		if(tagcid != CLASS_unknown) {
-			ClassSpec *u = konoha_getClassSpec(ctx, tagcid);
+			ClassSpec *u = knh_getClassSpec(ctx, tagcid);
 			int foundError = 0;
 			String *s = DP(u)->fsnew(ctx, tagcid, t, NULL, &foundError);
 			knh_Token_setCONST(ctx, tk, UP(s));
@@ -1038,7 +1038,7 @@ Term *knh_TokenESTR_toTerm(Ctx *ctx, Token *tk, Asm *abr)
 		knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 		KNH_LPUSH(ctx, KNH_NULL);   // lsfp[0]
 		Stmt *stmt = new_Stmt(ctx, 0, STT_OP);
-		Token *tkop = new_Token(ctx, 0, SP(tk)->fileid, SP(tk)->line, TT_ADD);
+		Token *tkop = new_Token(ctx, 0, SP(tk)->resid, SP(tk)->line, TT_ADD);
 		knh_Stmt_add(ctx, stmt, TM(tkop));
 		while(res) {
 			//DBG2_P("mt='%s', len=%d", mt.buf, mt.len);
@@ -1048,12 +1048,12 @@ Term *knh_TokenESTR_toTerm(Ctx *ctx, Token *tk, Asm *abr)
 			if(text.len > 0) {
 				knh_Stmt_add(ctx, stmt, new_TermCONST(ctx, FL(tk), UP(new_String(ctx, text, NULL))));
 			}
-			Stmt *stmt_expr = knh_bytes_parseStmt(ctx, expr, SP(tk)->fileid, SP(tk)->line);
+			Stmt *stmt_expr = knh_bytes_parseStmt(ctx, expr, SP(tk)->resid, SP(tk)->line);
 			KNH_SETv(ctx, lsfp[0].o, stmt_expr);
 			if(knh_stmt_isExpr(SP(stmt_expr)->stt)) {
 				Stmt *stmt_mt = new_Stmt(ctx, 0, STT_MT);
 				knh_Stmt_add(ctx, stmt, TM(stmt_mt));
-				tkop = new_Token(ctx, 0, SP(tk)->fileid, SP(tk)->line, TT_MT);
+				tkop = new_Token(ctx, 0, SP(tk)->resid, SP(tk)->line, TT_MT);
 				KNH_SETv(ctx, DP(tkop)->data, new_String(ctx, mt, NULL));
 				knh_Stmt_add(ctx, stmt_mt, TM(tkop));
 				knh_Stmt_add(ctx, stmt_mt, TM(stmt_expr));
@@ -1129,7 +1129,7 @@ static Object *TERMs_value(Ctx *ctx, Stmt *stmt, size_t n, knh_type_t type)
 		if(SP(tk)->tt == TT_CONST) return DP(tk)->data;
 		if(SP(tk)->tt == TT_ASIS) {
 			return IS_NNTYPE(type) ?
-					konoha_getClassDefaultValue(ctx, CLASS_type(type)) : KNH_NULL;
+					knh_getClassDefaultValue(ctx, CLASS_type(type)) : KNH_NULL;
 		}
 	}
 	return KNH_NULL;
@@ -1184,13 +1184,13 @@ void TERMs_perrorTYPE(Ctx *ctx, Stmt *stmt, size_t n, knh_type_t reqt)
 	{
 		Method *mtd = DP(DP(stmt)->tokens[0])->mtd;
 		DBG2_ASSERT(IS_Method(mtd));
-		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line,
+		knh_perror(ctx, SP(stmt)->resid, SP(stmt)->line,
 				KERR_ERROR, _("type error: %T must be %T at the parameter %d of %M"), type, reqt, n - 1, DP(mtd)->mn);
 	}
 	break;
 	case STT_DECL:
 	case STT_LET:
-		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line,
+		knh_perror(ctx, SP(stmt)->resid, SP(stmt)->line,
 				KERR_ERROR, _("type error: %T must be %T at the assignment"), type, reqt);
 		break;
 		//	case STT_FOREACH:
@@ -1204,7 +1204,7 @@ void TERMs_perrorTYPE(Ctx *ctx, Stmt *stmt, size_t n, knh_type_t reqt)
 		//		}
 		//		break;
 	default :
-		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line,
+		knh_perror(ctx, SP(stmt)->resid, SP(stmt)->line,
 				KERR_ERROR, _("type error: %T must be %T at %s(%d)"), type, reqt, knh_stmt_tochar(SP(stmt)->stt), n);
 	}
 }
@@ -1250,7 +1250,7 @@ knh_bool_t knh_Asm_existsName(Ctx *ctx, Asm *abr, knh_fieldn_t fnq)
 	if(idx != -1) return 1;
 
 	L_GLOBAL:;
-	idx = knh_Class_queryField(ctx, knh_Object_cid(knh_Asm_getScript(ctx, abr)), fnq);
+	idx = knh_Class_queryField(ctx, knh_Object_cid(knh_getCurrentScript(ctx)), fnq);
 	if(idx != -1) return 1;
 	return 0;
 }
@@ -1260,7 +1260,7 @@ knh_bool_t knh_Asm_existsName(Ctx *ctx, Asm *abr, knh_fieldn_t fnq)
 static
 Object *knh_StmtDECL_value(Ctx *ctx, knh_type_t type)
 {
-	return IS_NNTYPE(type) ? konoha_getClassDefaultValue(ctx, CLASS_type(type)) : KNH_NULL;
+	return IS_NNTYPE(type) ? knh_getClassDefaultValue(ctx, CLASS_type(type)) : KNH_NULL;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1428,7 +1428,7 @@ Term *knh_StmtLET_declConst(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int l
 					knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown class: %B"), fn);
 					return NULL;
 				}
-				if(!konoha_addClassConst(ctx, cid, new_String(ctx, knh_bytes_last(cn, dotidx+1), NULL), value)) {
+				if(!knh_addClassConst(ctx, cid, new_String(ctx, knh_bytes_last(cn, dotidx+1), NULL), value)) {
 					goto L_DUPCONST;
 				}
 			}
@@ -1438,7 +1438,7 @@ Term *knh_StmtLET_declConst(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int l
 			if(dotidx != -1) {
 				goto L_NOTHERE;
 			}
-			if(!konoha_addClassConst(ctx, cid, new_String(ctx, knh_bytes_last(cn, dotidx+1), NULL), value)) {
+			if(!knh_addClassConst(ctx, cid, new_String(ctx, knh_bytes_last(cn, dotidx+1), NULL), value)) {
 				goto L_DUPCONST;
 			}
 		}
@@ -1505,7 +1505,7 @@ Term *knh_StmtLET_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type
 		Object *value = TERMs_value(ctx, stmt, 1, type);
 
 		if(level == 0) { /* SCRIPT LEVEL */
-			Script *scr = knh_Asm_getScript(ctx, abr);
+			Script *scr = knh_getCurrentScript(ctx);
 			DP(abr)->this_cid = knh_Object_cid(scr);
 			//KNH_ASSERT(DP(abr)->vars_size == 1);  /* That means prepared */
 			flag |= KNH_FLAG_CFF_GETTER | KNH_FLAG_CFF_SETTER;
@@ -1740,7 +1740,7 @@ static int knh_TokenNAME_isClosure(Ctx *ctx, Token *tk, Asm *abr)
 
 	L_GLOBAL:;
 	{
-		Script *scr = knh_Asm_getScript(ctx, abr);
+		Script *scr = knh_getCurrentScript(ctx);
 		knh_index_t idx = knh_Class_queryField(ctx, knh_Object_cid(scr), fnq);
 		if(idx != -1) {
 			knh_cfield_t *cf = knh_Class_fieldAt(ctx, knh_Object_cid(scr), idx);
@@ -1945,7 +1945,7 @@ Term *knh_StmtCALLBASE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh
 		cid = CLASS_type(DP(abr)->vars[0].type);
 		Method *mtd = knh_Class_getMethod(ctx, cid, mn);
 		if(IS_NULL(mtd)) {
-			Script *scr = knh_Asm_getScript(ctx, abr);
+			Script *scr = knh_getCurrentScript(ctx);
 			cid = knh_Object_cid(scr);
 			mtd = knh_Class_getMethod(ctx, cid, mn);
 			if(IS_NULL(mtd)) { emsg = _("undefined method: %s"); goto L_ERROR; }
@@ -2015,7 +2015,7 @@ Term *knh_StmtCALLBASE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh
 		}
 
 		//DBG2_P("3. lookup script function %s()", bufmn);
-		Script *scr = knh_Asm_getScript(ctx, abr);
+		Script *scr = knh_getCurrentScript(ctx);
 		mtd_cid = knh_Object_cid(scr);
 		Method *mtd = knh_Class_getMethod(ctx, mtd_cid, mn);
 		//KNH_ASSERT(IS_NOTNULL(mtd));
@@ -2251,13 +2251,13 @@ int knh_Stmt_checkOPSIZE(Ctx *ctx,Stmt *stmt, size_t n)
 {
 	if(DP(stmt)->size == n + 1) return 1;
 	if(n == 1) {
-		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, KERR_ERROR, _("must be uniary operator"));
+		knh_perror(ctx, SP(stmt)->resid, SP(stmt)->line, KERR_ERROR, _("must be uniary operator"));
 	}
 	else if(n == 2) {
-		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, KERR_ERROR, _("must be binary operator"));
+		knh_perror(ctx, SP(stmt)->resid, SP(stmt)->line, KERR_ERROR, _("must be binary operator"));
 	}
 	else {
-		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, KERR_ERROR, _("syntax error"));
+		knh_perror(ctx, SP(stmt)->resid, SP(stmt)->line, KERR_ERROR, _("syntax error"));
 	}
 	return 0;
 }
@@ -2989,7 +2989,7 @@ Term *knh_StmtFOREACH_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 			itrcid = TERMs_getcid(stmt, FOREACH_iter);
 			type = NNTYPE_cid(ctx->share->ClassTable[itrcid].p1);
 			type = knh_Asm_typeinfer(ctx, abr, type, FIELDN(fn));
-			knh_Asm_declareLocalVariable(ctx, abr, 0, type, fn, konoha_getClassDefaultValue(ctx, CLASS_type(type)));
+			knh_Asm_declareLocalVariable(ctx, abr, 0, type, fn, knh_getClassDefaultValue(ctx, CLASS_type(type)));
 			if(!TERMs_typing(ctx, stmt, FOREACH_name, abr, ns, type, TCHECK_)) {
 				return NULL;
 			}
@@ -3359,7 +3359,7 @@ knh_class_t knh_StmtMETHOD_class(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, 
 	KNH_ASSERT(IS_Token(tk));
 	if(SP(tk)->tt == TT_ASIS) {
 		if(level == 0) {
-			Script *scr = knh_Asm_getScript(ctx, abr);
+			Script *scr = knh_getCurrentScript(ctx);
 			return knh_Object_cid(scr);
 		}
 		else {
@@ -3521,7 +3521,7 @@ int knh_Stmt_checkLastReturn(Ctx *ctx, Stmt *stmt, Method *mtd)
 
 	}
 	else { /* return default value */
-		knh_perror(ctx, SP(last_stmt)->fileid, SP(last_stmt)->line, KERR_ERRATA, _("added return value"));
+		knh_perror(ctx, SP(last_stmt)->resid, SP(last_stmt)->line, KERR_ERRATA, _("added return value"));
 		knh_StmtRETURN_addValue(ctx, rstmt, knh_Method_rtype(ctx, mtd, DP(mtd)->cid));
 	}
 	KNH_ASSERT(last_stmt != NULL);
@@ -3610,7 +3610,7 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 					knh_MethodField_set(mf, i - 1, DP(abr)->vars[i].type, DP(abr)->vars[i].fn);
 				}
 			}
-			konoha_addMethodFieldTable(ctx, mf);
+			knh_addMethodFieldTable(ctx, mf);
 		}
 		mtd = new_Method(ctx, flag, mtd_cid, mn, NULL);
 		KNH_SETv(ctx, DP(mtd)->mf, mf);

@@ -41,7 +41,7 @@ extern "C" {
 Stmt* new_Stmt(Ctx *ctx, knh_flag_t flag, knh_stmt_t stt)
 {
 	knh_Stmt_t *o = (Stmt*)new_Object_bcid(ctx, CLASS_Stmt, knh_stmt_size(stt));
-	SP(o)->fileid = 0;
+	SP(o)->resid = 0;
 	SP(o)->line = 0;
 	SP(o)->flag = flag;
 	SP(o)->stt  = stt;
@@ -55,19 +55,19 @@ void knh_Stmt_toERR(Ctx *ctx, Stmt *stmt, Term *tm)
 {
 	if(SP(stmt)->stt == STT_ERR) return;
 	SP(stmt)->stt = STT_ERR;
-	knh_fileid_t fileid = 0;
+	knh_resid_t resid = 0;
 	int line = 0;
 	if(IS_Token(tm)) {
-		fileid =  SP((Token*)tm)->fileid;
+		resid =  SP((Token*)tm)->resid;
 		line =  SP((Token*)tm)->line;
 	}
 	else if(IS_Stmt(tm)) {
-		fileid =  SP((Stmt*)tm)->fileid;
+		resid =  SP((Stmt*)tm)->resid;
 		line =  SP((Stmt*)tm)->line;
 	}
 	{
 		char buf[256];
-		knh_snprintf(buf, sizeof(buf), "Script!!: running errors at %s:%d", FILEIDN(SP(stmt)->fileid), SP(stmt)->line);
+		knh_snprintf(buf, sizeof(buf), "Script!!: running errors at %s:%d", FILEIDN(SP(stmt)->resid), SP(stmt)->line);
 		KNH_SETv(ctx, DP(stmt)->errMsg, new_String(ctx, B(buf), NULL));
 		KNH_SETv(ctx, DP(stmt)->next, KNH_NULL);
 	}
@@ -107,7 +107,7 @@ void knh_Stmt_add(Ctx *ctx, Stmt *o, Term *tm)
 		DP(o)->line_end = SP(stmt)->line;
 		if(SP(o)->line == 0) {
 			SP(o)->line = DP(stmt)->line_end;
-			SP(o)->fileid = SP(stmt)->fileid;
+			SP(o)->resid = SP(stmt)->resid;
 		}
 		if(SP(stmt)->stt == STT_ERR) {
 			knh_Stmt_toERR(ctx, o, tm);
@@ -118,7 +118,7 @@ void knh_Stmt_add(Ctx *ctx, Stmt *o, Term *tm)
 		DP(o)->line_end = SP(tk)->line;
 		if(SP(o)->line == 0) {
 			SP(o)->line = DP(o)->line_end;
-			SP(o)->fileid = SP(tk)->fileid;
+			SP(o)->resid = SP(tk)->resid;
 		}
 		if(SP(tk)->tt == TT_ERR) {
 			knh_Stmt_toERR(ctx, o, tm);

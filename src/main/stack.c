@@ -282,7 +282,7 @@ KNHAPI(void) knh_throwStupidException(Ctx *ctx)
 
 KNHAPI(void) konoha_throwSecurityException(void)
 {
-	Ctx *ctx = konoha_getCurrentContext();
+	Ctx *ctx = knh_getCurrentContext();
 	knh_throwException(ctx, new_Exception(ctx, TS_SecurityException), NULL, 0);
 }
 

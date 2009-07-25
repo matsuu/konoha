@@ -85,7 +85,7 @@ knh_uint_t knh_initseed(void)
 
 /* ------------------------------------------------------------------------ */
 
-knh_uint64_t konoha_getTimeMilliSecond(void)
+knh_uint64_t knh_getTimeMilliSecond(void)
 {
 #if defined(KNH_USING_WINDOWS)
 	DWORD tickCount = GetTickCount();
@@ -113,14 +113,14 @@ knh_uint64_t konoha_getTimeMilliSecond(void)
 /* ------------------------------------------------------------------------ */
 /* [Profiler] */
 
-knh_uint64_t konoha_getProfCount(void)
+knh_uint64_t knh_getProfCount(void)
 {
 	return 0;
 }
 
 /* ------------------------------------------------------------------------ */
 
-knh_uint64_t konoha_getProfCountPerSecond(void)
+knh_uint64_t knh_getProfCountPerSecond(void)
 {
 	return 1;
 }

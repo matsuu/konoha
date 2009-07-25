@@ -63,31 +63,6 @@ METHOD knh__Closure_invoke(Ctx *ctx, knh_sfp_t *sfp)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) knh_putsfp(Ctx *ctx, knh_sfp_t *lsfp, int n, Object *obj)
-{
-	KNH_SETv(ctx, lsfp[n].o, obj);
-	lsfp[n].data = knh_Object_data(obj);
-}
-
-/* ------------------------------------------------------------------------ */
-
-KNHAPI(void) knh_Closure_invokesfp(Ctx *ctx, Closure *cc, knh_sfp_t *lsfp, int argc)
-{
-	KNH_MOV(ctx, lsfp[1].o, (cc)->base);
-	KNH_SCALL(ctx, lsfp, 0, (cc)->mtd, argc);
-	KNH_LOCALBACK(ctx, lsfp);
-}
-
-/* ------------------------------------------------------------------------ */
-
-//#define _knh_Closure_binvokef(ctx, c, fmt, ...)  ((knh_Closure_invokef(ctx, c, fmt, ## __VA_ARGS__))->bvalue)
-//#define _knh_Closure_iinvokef(ctx, c, fmt, ...)  ((knh_Closure_invokef(ctx, c, fmt, ## __VA_ARGS__))->ivalue)
-//#define _knh_Closure_finvokef(ctx, c, fmt, ...)  ((knh_Closure_invokef(ctx, c, fmt, ## __VA_ARGS__))->fvalue)
-//#define _knh_Closure_sinvokef(ctx, c, fmt, ...)  knh_String_tochar((knh_Closure_invokef(ctx, c, fmt, ## __VA_ARGS__))->s)
-
-// knh_Closure_finvoke(ctx, c, "oo", sfp[1].o, sfp[2].o)
-// knh_Closure_finvoke(ctx, c, "ii", 1, 2)
-
 int
 knh_stack_vpush(Ctx *ctx, knh_sfp_t *sfp, const char *fmt, va_list args)
 {
@@ -154,6 +129,23 @@ knh_stack_vpush(Ctx *ctx, knh_sfp_t *sfp, const char *fmt, va_list args)
 
 /* ------------------------------------------------------------------------ */
 
+KNHAPI(void) knh_putsfp(Ctx *ctx, knh_sfp_t *lsfp, int n, Object *obj)
+{
+	KNH_SETv(ctx, lsfp[n].o, obj);
+	lsfp[n].data = knh_Object_data(obj);
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(void) knh_Closure_invokesfp(Ctx *ctx, Closure *cc, knh_sfp_t *lsfp, int argc)
+{
+	KNH_MOV(ctx, lsfp[1].o, (cc)->base);
+	KNH_SCALL(ctx, lsfp, 0, (cc)->mtd, argc);
+	KNH_LOCALBACK(ctx, lsfp);
+}
+
+/* ------------------------------------------------------------------------ */
+
 //#define _knh_Closure_binvokef(ctx, c, fmt, ...)  ((knh_Closure_invokef(ctx, c, fmt, ## __VA_ARGS__))->bvalue)
 //#define _knh_Closure_iinvokef(ctx, c, fmt, ...)  ((knh_Closure_invokef(ctx, c, fmt, ## __VA_ARGS__))->ivalue)
 //#define _knh_Closure_finvokef(ctx, c, fmt, ...)  ((knh_Closure_invokef(ctx, c, fmt, ## __VA_ARGS__))->fvalue)
@@ -198,7 +190,7 @@ METHOD knh_fmethod_closureDEFAULT(Ctx *ctx, knh_sfp_t *sfp)
 	if(rtype == TYPE_void) {
 		KNH_RETURN_void(ctx, sfp);
 	}
-	KNH_RETURN(ctx, sfp, konoha_getDefaultValue(ctx, rtype));
+	KNH_RETURN(ctx, sfp, knh_getDefaultValue(ctx, rtype));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -219,7 +211,7 @@ Closure* new_ClosureDEFAULT(Ctx *ctx, knh_type_t rtype, knh_class_t cid)
 /* ------------------------------------------------------------------------ */
 
 knh_class_t
-konoha_addClosureClass(Ctx *ctx, knh_class_t cid, String *name, knh_type_t r0, knh_type_t p1, knh_type_t p2, knh_type_t p3)
+knh_addClosureClass(Ctx *ctx, knh_class_t cid, String *name, knh_type_t r0, knh_type_t p1, knh_type_t p2, knh_type_t p3)
 {
 	if(cid == CLASS_newid) {
 		cid = knh_ClassTable_newId(ctx);
@@ -274,10 +266,10 @@ knh_class_t knh_class_Closure(Ctx *ctx, knh_type_t r0, knh_type_t p1, knh_type_t
 		knh_format_type(ctx, tb3, sizeof(tb3), p3);
 		knh_snprintf(buf, sizeof(buf), "%s(%s,%s,%s)", tb0, tb1, tb2, tb3);
 	}
-	knh_class_t cid = konoha_getcid(ctx, B(buf));
+	knh_class_t cid = knh_getcid(ctx, B(buf));
 	if(cid == CLASS_unknown) {
 		DBG2_P("*** Generating %s ***", buf);
-		cid = konoha_addClosureClass(ctx, CLASS_newid, new_String(ctx, B(buf), NULL), r0, p1, p2, p3);
+		cid = knh_addClosureClass(ctx, CLASS_newid, new_String(ctx, B(buf), NULL), r0, p1, p2, p3);
 	}
 	return cid;
 }

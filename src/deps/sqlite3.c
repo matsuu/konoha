@@ -264,7 +264,7 @@ knh_db_drvapi_t *knh_System_getDBDriver(Ctx *ctx, knh_bytes_t name)
 		return &DB__NOP;
 	}
 	else {
-		knh_db_drvapi_t *p = (knh_db_drvapi_t *)konoha_getDriverAPI(ctx, KNH_DRVAPI_TYPE__DB, name);
+		knh_db_drvapi_t *p = (knh_db_drvapi_t *)knh_getDriverAPI(ctx, KNH_DRVAPI_TYPE__DB, name);
 		if(p == NULL) {
 			KNH_WARNING(ctx, "DB: unsupported scheme '%s'", name);
 			p = &DB__NOP;
@@ -275,9 +275,9 @@ knh_db_drvapi_t *knh_System_getDBDriver(Ctx *ctx, knh_bytes_t name)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) konoha_addDBDriver(Ctx *ctx, char *alias, knh_db_drvapi_t *d)
+KNHAPI(void) knh_addDBDriver(Ctx *ctx, char *alias, knh_db_drvapi_t *d)
 {
-	konoha_addDriverAPI(ctx, alias, (knh_drvapi_t*)d);
+	knh_addDriverAPI(ctx, alias, (knh_drvapi_t*)d);
 }
 
 /* ======================================================================== */
@@ -285,10 +285,10 @@ KNHAPI(void) konoha_addDBDriver(Ctx *ctx, char *alias, knh_db_drvapi_t *d)
 
 void KNHINIT init_DB(Ctx *ctx)
 {
-	konoha_addDBDriver(ctx, NULL, &DB__NOP);
+	knh_addDBDriver(ctx, NULL, &DB__NOP);
 #ifdef KNH_USING_SQLITE3
-	konoha_addDBDriver(ctx, NULL, &DB__sqlite3);
-	konoha_addDBDriver(ctx, "sqlite", &DB__sqlite3);
+	knh_addDBDriver(ctx, NULL, &DB__sqlite3);
+	knh_addDBDriver(ctx, "sqlite", &DB__sqlite3);
 #endif
 }
 

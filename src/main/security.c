@@ -39,7 +39,7 @@ extern "C" {
 /* [verbose] */
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(char*) konoha_getPassword(Ctx *ctx, knh_bytes_t url)
+KNHAPI(char*) knh_getPassword(Ctx *ctx, knh_bytes_t url)
 {
 	return "password";
 }

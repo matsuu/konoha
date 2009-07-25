@@ -157,7 +157,7 @@ String *new_StringX(Ctx *ctx, knh_class_t cid, knh_bytes_t t, String *orign)
 		TODO();
 		return new_String(ctx, t, orign);
 	}
-//	ClassSpec *u = konoha_getClassSpec(ctx, cid].cspec;
+//	ClassSpec *u = knh_getClassSpec(ctx, cid].cspec;
 //	KNH_ASSERT(IS_ClassSpec(u));
 //		if(DP(u)->fbconv != NULL) {
 //		return new_String__fcnv(ctx, DP(u)->)
@@ -266,13 +266,13 @@ static knh_parser_drvapi_t PARSER__String = {
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) konoha_addParserDriver(Ctx *ctx, char *alias, knh_parser_drvapi_t *d)
+KNHAPI(void) knh_addParserDriver(Ctx *ctx, char *alias, knh_parser_drvapi_t *d)
 {
 	if(alias != NULL) {
-		konoha_addDriverAPI(ctx, alias, (knh_drvapi_t*)d);
+		knh_addDriverAPI(ctx, alias, (knh_drvapi_t*)d);
 	}
 	else {
-		konoha_addDriverAPI(ctx, d->name, (knh_drvapi_t*)d);
+		knh_addDriverAPI(ctx, d->name, (knh_drvapi_t*)d);
 	}
 }
 
@@ -281,7 +281,7 @@ KNHAPI(void) konoha_addParserDriver(Ctx *ctx, char *alias, knh_parser_drvapi_t *
 static
 knh_parser_drvapi_t *knh_System_getParserDriver(Ctx *ctx, knh_bytes_t name)
 {
-	knh_drvapi_t *d = konoha_getDriverAPI(ctx, KNH_DRVAPI_TYPE__PARSER, name);
+	knh_drvapi_t *d = knh_getDriverAPI(ctx, KNH_DRVAPI_TYPE__PARSER, name);
 	if(d == NULL) {
 		return &(PARSER__String);
 	}

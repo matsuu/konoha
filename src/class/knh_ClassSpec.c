@@ -37,7 +37,7 @@ extern "C" {
 
 
 static
-knh_class_t konoha_addSpecializedType(Ctx *ctx, knh_class_t cid, knh_class_t bcid, ClassSpec *u);
+knh_class_t knh_addSpecializedType(Ctx *ctx, knh_class_t cid, knh_class_t bcid, ClassSpec *u);
 
 /* ======================================================================== */
 /* [Int] */
@@ -287,16 +287,16 @@ void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid)
 		KNH_INITv(DP(u)->ivalue, new_IntX__fast(ctx, cid, v));
 		if(DP(u)->fvalue != NULL) {
 			Mapper *mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, DP(u)->ucid, cid, knh_FloatX_IntX, (Object*)u);
-			konoha_addMapper(ctx, mpr);
+			knh_addMapper(ctx, mpr);
 			mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, cid, DP(u)->ucid, knh_IntX_FloatX, (Object*)u);
-			konoha_addMapper(ctx, mpr);
+			knh_addMapper(ctx, mpr);
 		}
 		if(DP(u)->svalue != NULL) {
 			if(knh_ClassSpec_isVocab(u)) {
 				Mapper *mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, cid, DP(u)->ucid, knh_IntX_Vocab, (Object*)u);
-				konoha_addMapper(ctx, mpr);
+				knh_addMapper(ctx, mpr);
 				mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, DP(u)->ucid, cid, knh_Vocab_IntX, (Object*)u);
-				konoha_addMapper(ctx, mpr);
+				knh_addMapper(ctx, mpr);
 			}
 		}
 	}
@@ -309,9 +309,9 @@ void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid)
 		KNH_INITv(DP(u)->fvalue, new_FloatX__fast(ctx, cid, v));
 		if(DP(u)->ivalue != NULL) {
 			Mapper *mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, cid, DP(u)->ucid, knh_FloatX_IntX, (Object*)u);
-			konoha_addMapper(ctx, mpr);
+			knh_addMapper(ctx, mpr);
 			mpr = new_Mapper(ctx, KNH_FLAG_MMF_AFFINE, DP(u)->ucid, cid, knh_IntX_FloatX, (Object*)u);
-			konoha_addMapper(ctx, mpr);
+			knh_addMapper(ctx, mpr);
 		}
 	}
 	else {
@@ -339,7 +339,7 @@ KNHAPI(ClassSpec*) new_Enum(Ctx *ctx, char *tag, knh_bytes_t urn, knh_int_t min,
 	else {
 		KNH_INITv(DP(u)->ivalue, new_IntX__fast(ctx, cid, 0));
 	}
-	konoha_addSpecializedType(ctx, cid, CLASS_Int, u);
+	knh_addSpecializedType(ctx, cid, CLASS_Int, u);
 	return u;
 }
 
@@ -363,7 +363,7 @@ KNHAPI(ClassSpec*) new_Unit(Ctx *ctx, char *tag, knh_bytes_t urn, knh_float_t mi
 	else {
 		KNH_INITv(DP(u)->fvalue, new_FloatX__fast(ctx, cid, 0.0));
 	}
-	konoha_addSpecializedType(ctx, cid, CLASS_Float, u);
+	knh_addSpecializedType(ctx, cid, CLASS_Float, u);
 	return u;
 }
 
@@ -373,7 +373,7 @@ KNHAPI(ClassSpec*) new_Unit(Ctx *ctx, char *tag, knh_bytes_t urn, knh_float_t mi
 static
 String *knh_fsnew__dict(Ctx *ctx, knh_class_t cid, knh_bytes_t t, String *orign, int *foundError)
 {
-	ClassSpec *u = konoha_getClassSpec(ctx, cid);
+	ClassSpec *u = knh_getClassSpec(ctx, cid);
 	knh_index_t n = knh_DictIdx_index(ctx, DP(u)->vocabDictIdx, t);
 	if(n == -1) {
 		knh_bytes_t tag;
@@ -421,7 +421,7 @@ DictIdx* new_DictIdx__Array(Ctx *ctx, Array *a)
 static
 MAPPER knh_fmapper_vocabidx(Ctx *ctx, knh_sfp_t *sfp)
 {
-	ClassSpec *u = konoha_getClassSpec(ctx, knh_Object_cid(sfp[0].o));
+	ClassSpec *u = knh_getClassSpec(ctx, knh_Object_cid(sfp[0].o));
 	knh_int_t n = knh_ClassSpec_getVocabIdx(ctx, u, sfp[0].s);
 	DBG2_P("n = %ld", n);
 	KNH_MAPPED_Int(ctx, sfp, n);
@@ -469,12 +469,12 @@ KNHAPI(ClassSpec*) new_Vocab(Ctx *ctx, char *tag, knh_bytes_t urn, int base, cha
 		KNH_ASSERT(knh_Array_size(a) > 0);
 		KNH_INITv(DP(u)->svalue, knh_Array_n(a, 0));
 	}
-	konoha_addSpecializedType(ctx, cid, CLASS_String, u);
+	knh_addSpecializedType(ctx, cid, CLASS_String, u);
 	{
 		Mapper *mpr = new_Mapper(ctx, KNH_FLAG_MMF_TOTAL|KNH_FLAG_MMF_CONST|KNH_FLAG_MMF_FINAL, cid, CLASS_Int, knh_fmapper_vocabidx, (Object*)u);
-		konoha_addMapper(ctx, mpr);
+		knh_addMapper(ctx, mpr);
 		mpr = new_Mapper(ctx, KNH_FLAG_MMF_CONST|KNH_FLAG_MMF_FINAL, CLASS_Int, cid, knh_fmapper_vocab, (Object*)u);
-		konoha_addMapper(ctx, mpr);
+		knh_addMapper(ctx, mpr);
 	}
 	return u;
 }
@@ -485,11 +485,11 @@ KNHAPI(ClassSpec*) new_Vocab(Ctx *ctx, char *tag, knh_bytes_t urn, int base, cha
 //MAPPER knh_Mapper__fdict(Ctx *ctx, knh_sfp_t *sfp)
 //{
 //	String *s = sfp[0].s;
-//	ClassSpec *u = konoha_getClassSpec(ctx, knh_Object_cid(sfp[0].o)].cspec;
+//	ClassSpec *u = knh_getClassSpec(ctx, knh_Object_cid(sfp[0].o)].cspec;
 //	KNH_ASSERT(IS_ClassSpec(u));
 //	KNH_ASSERT(IS_DictIdx(DP(u)->vocabDictIdx));
 //
-//	ClassSpec *u2 = konoha_getClassSpec(ctx, DP(sfp[1].mpr)->tcid].cspec;
+//	ClassSpec *u2 = knh_getClassSpec(ctx, DP(sfp[1].mpr)->tcid].cspec;
 //	KNH_ASSERT(IS_ClassSpec(u2));
 //	KNH_ASSERT(IS_DictIdx(DP(u2)->vocabDictIdx));
 //
@@ -500,18 +500,18 @@ KNHAPI(ClassSpec*) new_Vocab(Ctx *ctx, char *tag, knh_bytes_t urn, int base, cha
 //
 ///* ------------------------------------------------------------------------ */
 //
-//KNHAPI(void) konoha_addVocabularyMapper(Ctx *ctx, knh_class_t scid, char *text)
+//KNHAPI(void) knh_addVocabularyMapper(Ctx *ctx, knh_class_t scid, char *text)
 //{
 //	KNH_ASSERT_cid(scid);
 //	knh_class_t tcid = konoha_findcid(ctx, B(text));
 //
 //	if(tcid != CLASS_unknown || ctx->share->ClassTable[tcid].bcid != tcid) {
-////		ClassSpec *u = konoha_getClassSpec(ctx, scid].cspec;
+////		ClassSpec *u = knh_getClassSpec(ctx, scid].cspec;
 ////		if(!IS_ClassSpec(u) || !IS_DictIdx(DP(u)->vocabDictIdx)) {
 ////			TODO();
 ////			return;
 ////		}
-//		ClassSpec *u2 = konoha_getClassSpec(ctx, tcid].cspec;
+//		ClassSpec *u2 = knh_getClassSpec(ctx, tcid].cspec;
 //		if(!IS_ClassSpec(u2) || !IS_DictIdx(DP(u2)->vocabDictIdx)) {
 //			TODO();
 //			return;
@@ -541,7 +541,7 @@ KNHAPI(ClassSpec*) new_Vocab(Ctx *ctx, char *tag, knh_bytes_t urn, int base, cha
 /* ======================================================================== */
 /* [urnalias] */
 
-knh_bytes_t konoha_getURNAlias(Ctx *ctx, knh_bytes_t aurn)
+knh_bytes_t knh_getURNAlias(Ctx *ctx, knh_bytes_t aurn)
 {
 	String *s = (String*)knh_DictMap_get__b(ctx,  DP(ctx->sys)->URNAliasDictMap, aurn);
 	if(IS_NOTNULL(s)) {
@@ -629,7 +629,7 @@ ClassSpec *new_ClassSpecNULL(Ctx *ctx, knh_bytes_t urn)
 /* ======================================================================== */
 /* [SPEC] */
 
-ClassSpec *konoha_getClassSpec(Ctx *ctx, knh_class_t cid)
+ClassSpec *knh_getClassSpec(Ctx *ctx, knh_class_t cid)
 {
 	ClassSpec *u = (ClassSpec*)ClassTable(cid).cspec;
 	KNH_ASSERT(IS_ClassSpec(u));
@@ -641,7 +641,7 @@ ClassSpec *konoha_getClassSpec(Ctx *ctx, knh_class_t cid)
 static
 Object *knh_ClassTable_fdefault__ISPEC(Ctx *ctx, knh_class_t cid)
 {
-	ClassSpec *u = konoha_getClassSpec(ctx, cid);
+	ClassSpec *u = knh_getClassSpec(ctx, cid);
 	return UP(DP(u)->ivalue);
 }
 
@@ -650,7 +650,7 @@ Object *knh_ClassTable_fdefault__ISPEC(Ctx *ctx, knh_class_t cid)
 static
 Object *knh_ClassTable_fdefault__FSPEC(Ctx *ctx, knh_class_t cid)
 {
-	ClassSpec *u = konoha_getClassSpec(ctx, cid);
+	ClassSpec *u = knh_getClassSpec(ctx, cid);
 	return UP(DP(u)->fvalue);
 }
 
@@ -659,14 +659,14 @@ Object *knh_ClassTable_fdefault__FSPEC(Ctx *ctx, knh_class_t cid)
 static
 Object *knh_ClassTable_fdefault__SSPEC(Ctx *ctx, knh_class_t cid)
 {
-	ClassSpec *u = konoha_getClassSpec(ctx, cid);
+	ClassSpec *u = knh_getClassSpec(ctx, cid);
 	return UP(DP(u)->svalue);
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-knh_class_t konoha_addSpecializedType(Ctx *ctx, knh_class_t cid, knh_class_t bcid, ClassSpec *u)
+knh_class_t knh_addSpecializedType(Ctx *ctx, knh_class_t cid, knh_class_t bcid, ClassSpec *u)
 {
 	char bufcn[CLASSNAME_BUFSIZ];
 	if(cid == CLASS_newid) {
@@ -741,19 +741,19 @@ ClassSpec* konoha_findClassSpecNULL(Ctx *ctx, knh_bytes_t lname)
 		char *postfix = (char*)lname.buf + loc;
 		char cname[CLASSNAME_BUFSIZ];
 		knh_snprintf(cname, sizeof(cname), "Int%s", postfix);
-		knh_class_t cid = konoha_getcid(ctx, B(cname));
+		knh_class_t cid = knh_getcid(ctx, B(cname));
 		if(cid != CLASS_unknown) {
-			return konoha_getClassSpec(ctx, cid);
+			return knh_getClassSpec(ctx, cid);
 		}
 		knh_snprintf(cname, sizeof(cname), "Float%s", postfix);
-		cid = konoha_getcid(ctx, B(cname));
+		cid = knh_getcid(ctx, B(cname));
 		if(cid != CLASS_unknown) {
-			return konoha_getClassSpec(ctx, cid);
+			return knh_getClassSpec(ctx, cid);
 		}
 		knh_snprintf(cname, sizeof(cname), "String%s", postfix);
-		cid = konoha_getcid(ctx, B(cname));
+		cid = knh_getcid(ctx, B(cname));
 		if(cid != CLASS_unknown) {
-			return konoha_getClassSpec(ctx, cid);
+			return knh_getClassSpec(ctx, cid);
 		}
 	}
 	return NULL;
@@ -766,22 +766,22 @@ knh_class_t konoha_findcidx(Ctx *ctx, knh_bytes_t lname)
 	ClassSpec *u = 	konoha_findClassSpecNULL(ctx, lname);
 	if(u != NULL) {
 		knh_index_t loc = knh_bytes_index(lname, '{');
-		knh_class_t bcid = konoha_getcid(ctx, knh_bytes_first(lname, loc));
-		return konoha_addSpecializedType(ctx, CLASS_newid, bcid, u);
+		knh_class_t bcid = knh_getcid(ctx, knh_bytes_first(lname, loc));
+		return knh_addSpecializedType(ctx, CLASS_newid, bcid, u);
 	}
 	else {
 		knh_index_t loc = knh_bytes_index(lname, '{');
 		knh_bytes_t urn = knh_bytes_last(lname, loc+1); urn.len -= 1;
-		knh_class_t bcid = konoha_getcid(ctx, knh_bytes_first(lname, loc));
+		knh_class_t bcid = knh_getcid(ctx, knh_bytes_first(lname, loc));
 		DBG2_P("cid=%d,%s", bcid, CLASSN(bcid));
 		u = new_ClassSpecNULL(ctx, urn);
 		if(u != NULL) {
 			knh_class_t ucid = DP(u)->ucid;
 			knh_class_t ubcid = DP(u)->ubcid;
 			DBG2_P("cid=%d,%s", ubcid, CLASSN(ubcid));
-			//konoha_addSpecializedType(ctx, ucid, ubcid, u);
+			//knh_addSpecializedType(ctx, ucid, ubcid, u);
 			if(ubcid != bcid) {
-				return konoha_addSpecializedType(ctx, CLASS_newid, bcid, u);
+				return knh_addSpecializedType(ctx, CLASS_newid, bcid, u);
 			}
 			return ucid;
 		}

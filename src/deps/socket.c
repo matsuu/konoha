@@ -250,7 +250,7 @@ static knh_iodrv_t IO__SOCKET = {
 
 /* ------------------------------------------------------------------------ */
 
-knh_iodrv_t *konoha_getSocketDriver(void)
+knh_iodrv_t *knh_getSocketDriver(void)
 {
 	return &IO__SOCKET;
 }
@@ -348,10 +348,10 @@ static knh_iodrv_t IO__HTTP = {
 
 void KNHINIT init_SocketDriver(Ctx *ctx)
 {
-	konoha_addIODriver(ctx, NULL, &IO__SOCKET);
-	konoha_addIODriver(ctx, "ip", &IO__SOCKET);
-	konoha_addIODriver(ctx, "host", &IO__SOCKET);
-	konoha_addIODriver(ctx, "http", &IO__HTTP);
+	knh_addIODriver(ctx, NULL, &IO__SOCKET);
+	knh_addIODriver(ctx, "ip", &IO__SOCKET);
+	knh_addIODriver(ctx, "host", &IO__SOCKET);
+	knh_addIODriver(ctx, "http", &IO__HTTP);
 }
 
 /* ------------------------------------------------------------------------ */

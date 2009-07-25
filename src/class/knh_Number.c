@@ -103,7 +103,7 @@ KNHAPI(Int*) new_IntX__fast(Ctx *ctx, knh_class_t cid, knh_int_t value)
 
 KNHAPI(Int*) new_IntX(Ctx *ctx, knh_class_t cid, knh_int_t value)
 {
-	ClassSpec *u = konoha_getClassSpec(ctx, cid);
+	ClassSpec *u = knh_getClassSpec(ctx, cid);
 	if(DP(u)->fichk(u, value)) {
 		Int *n = (knh_Int_t*)new_hObject(ctx, FLAG_Int, CLASS_Int, cid);
 		n->n.ivalue = value;
@@ -144,7 +144,7 @@ KNHAPI(Float*) new_FloatX__fast(Ctx *ctx, knh_class_t cid, knh_float_t value)
 KNHAPI(Float*) new_FloatX(Ctx *ctx, knh_class_t cid, knh_float_t value)
 {
 	KNH_ASSERT_cid(cid);
-	ClassSpec *u = konoha_getClassSpec(ctx, cid);
+	ClassSpec *u = knh_getClassSpec(ctx, cid);
 	if(DP(u)->ffchk(u, value)) {
 		Float *f = (Float*)new_hObject(ctx, FLAG_Float, CLASS_Float, cid);
 		f->n.fvalue = value;
@@ -247,7 +247,7 @@ void KNH_TAFFINE(Ctx *ctx, knh_class_t scid, knh_class_t tcid, knh_float_t scale
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) konoha_addAffineMapper(Ctx *ctx, knh_class_t scid, char *text, knh_float_t scale, knh_float_t shift)
+KNHAPI(void) knh_addAffineMapper(Ctx *ctx, knh_class_t scid, char *text, knh_float_t scale, knh_float_t shift)
 {
 	//KNH_ASSERT_cid(scid);
 	knh_class_t tcid = konoha_findcid(ctx, B(text));

@@ -233,9 +233,9 @@ static knh_iodrv_t IO__FILE = {
 /* ======================================================================== */
 /* [drivers] */
 
-knh_iodrv_t *konoha_getIODriver(Ctx *ctx, knh_bytes_t name)
+knh_iodrv_t *knh_getIODriver(Ctx *ctx, knh_bytes_t name)
 {
-	knh_iodrv_t *p = (knh_iodrv_t*)konoha_getDriverAPI(ctx, KNH_DRVAPI_TYPE__IO, name);
+	knh_iodrv_t *p = (knh_iodrv_t*)knh_getDriverAPI(ctx, KNH_DRVAPI_TYPE__IO, name);
 	if(p == NULL) {
 		KNH_WARNING(ctx, "IO!!: unsupported scheme '%s'", name);
 		p = &IO__NOP;
@@ -245,16 +245,16 @@ knh_iodrv_t *konoha_getIODriver(Ctx *ctx, knh_bytes_t name)
 
 /* ------------------------------------------------------------------------ */
 
-knh_iodrv_t *konoha_getDefaultIODriver(void)
+knh_iodrv_t *knh_getDefaultIODriver(void)
 {
 	return &IO__NOP;
 }
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) konoha_addIODriver(Ctx *ctx, char *alias, knh_iodrv_t *d)
+KNHAPI(void) knh_addIODriver(Ctx *ctx, char *alias, knh_iodrv_t *d)
 {
-	konoha_addDriverAPI(ctx, alias, (knh_drvapi_t*)d);
+	knh_addDriverAPI(ctx, alias, (knh_drvapi_t*)d);
 }
 
 /* ======================================================================== */
@@ -262,8 +262,8 @@ KNHAPI(void) konoha_addIODriver(Ctx *ctx, char *alias, knh_iodrv_t *d)
 
 void KNHINIT init_IO(Ctx *ctx)
 {
-	konoha_addIODriver(ctx, NULL, &IO__NOP);
-	konoha_addIODriver(ctx, NULL, &IO__FILE);
+	knh_addIODriver(ctx, NULL, &IO__NOP);
+	knh_addIODriver(ctx, NULL, &IO__FILE);
 }
 
 /* ======================================================================== */

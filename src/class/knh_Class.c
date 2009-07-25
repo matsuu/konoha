@@ -195,9 +195,9 @@ void konoha_setClassDefaultValue(Ctx *ctx, knh_class_t cid, Object *value, knh_f
 
 /* ------------------------------------------------------------------------ */
 
-#define _KNH_DEF(ctx, cid)  konoha_getClassDefaultValue(ctx, cid)
+#define _KNH_DEF(ctx, cid)  knh_getClassDefaultValue(ctx, cid)
 
-Object *konoha_getClassDefaultValue(Ctx *ctx, knh_class_t cid)
+Object *knh_getClassDefaultValue(Ctx *ctx, knh_class_t cid)
 {
 	KNH_ASSERT_cid(cid);
 	return ClassTable(cid).fdefault(ctx, cid);
@@ -205,9 +205,9 @@ Object *konoha_getClassDefaultValue(Ctx *ctx, knh_class_t cid)
 
 /* ------------------------------------------------------------------------ */
 
-#define _KNH_DEF(ctx, cid)  konoha_getClassDefaultValue(ctx, cid)
+#define _KNH_DEF(ctx, cid)  knh_getClassDefaultValue(ctx, cid)
 
-Object *konoha_getDefaultValue(Ctx *ctx, knh_type_t type)
+Object *knh_getDefaultValue(Ctx *ctx, knh_type_t type)
 {
 	if(IS_NNTYPE(type)) {
 		knh_class_t cid = CLASS_type(type);
@@ -238,7 +238,7 @@ void konoha_setClassParam(Ctx *ctx, knh_class_t cid, knh_class_t p1, knh_class_t
 /* ------------------------------------------------------------------------ */
 
 knh_class_t
-konoha_addGenericsClass(Ctx *ctx, knh_class_t cid, String *name, knh_class_t bcid, knh_class_t p1, knh_class_t p2)
+knh_addGenericsClass(Ctx *ctx, knh_class_t cid, String *name, knh_class_t bcid, knh_class_t p1, knh_class_t p2)
 {
 	if(cid == CLASS_newid) {
 		cid = knh_ClassTable_newId(ctx);
@@ -551,7 +551,7 @@ static Array* knh_Method_domain(Ctx *ctx)
 
 /* ------------------------------------------------------------------------ */
 
-Array* konoha_getClassDomain(Ctx *ctx, knh_class_t cid)
+Array* knh_getClassDomain(Ctx *ctx, knh_class_t cid)
 {
 	Array *a = NULL;
 	switch(cid) {

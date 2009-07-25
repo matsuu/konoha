@@ -223,7 +223,7 @@ static knh_parser_drvapi_t PARSER__Regex = {
 
 knh_regex_drvapi_t *knh_System_getRegexDriver(Ctx *ctx, knh_bytes_t name)
 {
-	knh_regex_drvapi_t *p = (knh_regex_drvapi_t *)konoha_getDriverAPI(ctx, KNH_DRVAPI_TYPE__REGEX, name);
+	knh_regex_drvapi_t *p = (knh_regex_drvapi_t *)knh_getDriverAPI(ctx, KNH_DRVAPI_TYPE__REGEX, name);
 	if(p == NULL) {
 		KNH_WARNING(ctx, "Regex: unsupported scheme '%s'", name);
 		p = &RE__NOP;
@@ -233,15 +233,15 @@ knh_regex_drvapi_t *knh_System_getRegexDriver(Ctx *ctx, knh_bytes_t name)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) konoha_addRegexDriver(Ctx *ctx, char *alias, knh_regex_drvapi_t *d)
+KNHAPI(void) knh_addRegexDriver(Ctx *ctx, char *alias, knh_regex_drvapi_t *d)
 {
 	if(alias != NULL) {
-		konoha_addParserDriver(ctx, alias, &PARSER__Regex);
+		knh_addParserDriver(ctx, alias, &PARSER__Regex);
 	}
 	else {
-		konoha_addParserDriver(ctx, d->name, &PARSER__Regex);
+		knh_addParserDriver(ctx, d->name, &PARSER__Regex);
 	}
-	konoha_addDriverAPI(ctx, alias, (knh_drvapi_t*)d);
+	knh_addDriverAPI(ctx, alias, (knh_drvapi_t*)d);
 }
 
 /* ======================================================================== */
@@ -249,10 +249,10 @@ KNHAPI(void) konoha_addRegexDriver(Ctx *ctx, char *alias, knh_regex_drvapi_t *d)
 
 void KNHINIT init_Regex(Ctx *ctx)
 {
-	konoha_addRegexDriver(ctx, NULL, &RE__NOP);
+	knh_addRegexDriver(ctx, NULL, &RE__NOP);
 #ifdef KNH_USING_REGEX
-	konoha_addRegexDriver(ctx, NULL, &RE__regex);
-	konoha_addRegexDriver(ctx, "re", &RE__regex);
+	knh_addRegexDriver(ctx, NULL, &RE__regex);
+	knh_addRegexDriver(ctx, "re", &RE__regex);
 #if defined(KNH_USING_ONIGURUMA)
 	konoha_setSystemPropertyText(ctx, "konoha.regex", "oniguruma");
 #else

@@ -58,7 +58,7 @@ static METHOD knh__System_setIn(Ctx *ctx, knh_sfp_t *sfp)
 {
 	if(knh_Context_isTrusted(ctx)) {
 		if(IS_NULL(sfp[1].o)) {
-			KNH_SETv(ctx, DP(ctx->sys)->in, konoha_getClassDefaultValue(ctx, CLASS_InputStream));
+			KNH_SETv(ctx, DP(ctx->sys)->in, knh_getClassDefaultValue(ctx, CLASS_InputStream));
 		}
 		else {
 			KNH_SETv(ctx, DP(ctx->sys)->in, sfp[1].o);
@@ -82,7 +82,7 @@ static METHOD knh__System_setOut(Ctx *ctx, knh_sfp_t *sfp)
 {
 	if(knh_Context_isTrusted(ctx)) {
 		if(IS_NULL(sfp[1].o)) {
-			KNH_SETv(ctx, DP(ctx->sys)->out, konoha_getClassDefaultValue(ctx, CLASS_OutputStream));
+			KNH_SETv(ctx, DP(ctx->sys)->out, knh_getClassDefaultValue(ctx, CLASS_OutputStream));
 		}
 		else {
 			KNH_SETv(ctx, DP(ctx->sys)->out, sfp[1].o);
@@ -106,7 +106,7 @@ static METHOD knh__System_setErr(Ctx *ctx, knh_sfp_t *sfp)
 {
 	if(knh_Context_isTrusted(ctx)) {
 		if(IS_NULL(sfp[1].o)) {
-			KNH_SETv(ctx, DP(ctx->sys)->err, konoha_getClassDefaultValue(ctx, CLASS_OutputStream));
+			KNH_SETv(ctx, DP(ctx->sys)->err, knh_getClassDefaultValue(ctx, CLASS_OutputStream));
 		}
 		else {
 			KNH_SETv(ctx, DP(ctx->sys)->err, sfp[1].o);
@@ -305,7 +305,7 @@ static METHOD knh__Context_setIn(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_ASSERT(ctx == (Ctx*)sfp[0].o);
 	if(IS_NULL(sfp[1].o)) {
-		KNH_SETv(ctx, ((Context*)ctx)->in, konoha_getClassDefaultValue(ctx, CLASS_InputStream));
+		KNH_SETv(ctx, ((Context*)ctx)->in, knh_getClassDefaultValue(ctx, CLASS_InputStream));
 	}
 	else {
 		KNH_SETv(ctx, ((Context*)ctx)->in, sfp[1].o);
@@ -320,7 +320,7 @@ static METHOD knh__Context_setOut(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_ASSERT(ctx == (Ctx*)sfp[0].o);
 	if(IS_NULL(sfp[1].o)) {
-		KNH_SETv(ctx, ((Context*)ctx)->out, konoha_getClassDefaultValue(ctx, CLASS_OutputStream));
+		KNH_SETv(ctx, ((Context*)ctx)->out, knh_getClassDefaultValue(ctx, CLASS_OutputStream));
 	}
 	else {
 		KNH_SETv(ctx, ((Context*)ctx)->out, sfp[1].o);
@@ -335,7 +335,7 @@ static METHOD knh__Context_setErr(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_ASSERT(ctx == (Ctx*)sfp[0].o);
 	if(IS_NULL(sfp[1].o)) {
-		KNH_SETv(ctx, ((Context*)ctx)->err, konoha_getClassDefaultValue(ctx, CLASS_OutputStream));
+		KNH_SETv(ctx, ((Context*)ctx)->err, knh_getClassDefaultValue(ctx, CLASS_OutputStream));
 	}
 	else {
 		KNH_SETv(ctx, ((Context*)ctx)->err, sfp[1].o);

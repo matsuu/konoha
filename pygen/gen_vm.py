@@ -748,7 +748,7 @@ static knh_fmethod codeTempList[%d][%d] = {
 	f.write('''
 };
 
-knh_fmethod konoha_getCodeTemplate(int opcode, int pos)
+knh_fmethod knh_getCodeTemplate(int opcode, int pos)
 {
 	return codeTempList[opcode][pos];
 }

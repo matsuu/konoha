@@ -128,7 +128,7 @@ METHOD CIMClient_new(Ctx *ctx, knh_sfp_t *sfp)
 	CIMCClient *cc;
 	CIMCStatus status;
 	if(IS_NULL(sfp[0].s)) {
-		char *pwd = konoha_getPassword(ctx, STEXT("konoha"));
+		char *pwd = knh_getPassword(ctx, STEXT("konoha"));
 		cc = env->ft->connect(env, "localhost", "http", "5988", "konoha", pwd, &status);
 	}
 	else {
@@ -141,7 +141,7 @@ METHOD CIMClient_new(Ctx *ctx, knh_sfp_t *sfp)
 		knh_bytes_parseURLuname(url, bfuname, sizeof(bfuname));
 		knh_bytes_parseURLport(url, &port);
 		knh_snprintf(bfport, sizeof(bfport), "%d", port);
-		cc = env->ft->connect(env, bfhost, bfscheme, bfport, bfuname, konoha_getPassword(ctx, url), &status);
+		cc = env->ft->connect(env, bfhost, bfscheme, bfport, bfuname, knh_getPassword(ctx, url), &status);
 	}
 	if(cc == NULL || status.rc == 0) {
 		knh_throw_CIMCStatus(ctx, &status);

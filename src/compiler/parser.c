@@ -493,14 +493,14 @@ static
 Token *new_TokenFUNCNAME(Ctx *ctx, Token *tk, knh_bytes_t name, int isfunc)
 {
 	if(!isfunc) {
-		knh_fieldn_t fn = knh_tName_get_fnq(ctx, name, FIELDN_NEWID);
+		knh_fieldn_t fn = knh_getfnq(ctx, name, FIELDN_NEWID);
 		Token *tkfunc = new_TokenFN(ctx, FL(tk), fn);
 		knh_Token_setGetter(tkfunc, 1);
 		knh_Token_setTopDot(tkfunc, 1);
 		return tkfunc;
 	}
 	else {
-		knh_methodn_t mn = konoha_getMethodName(ctx, name, METHODN_NEWID);
+		knh_methodn_t mn = knh_getmn(ctx, name, METHODN_NEWID);
 		Token *tkfunc = new_TokenMN(ctx, FL(tk), mn);
 		knh_Token_setTopDot(tkfunc, 1);
 		return tkfunc;
@@ -512,7 +512,7 @@ Token *new_TokenFUNCNAME(Ctx *ctx, Token *tk, knh_bytes_t name, int isfunc)
 static
 Token *new_TokenVARN(Ctx *ctx, Token *tk, knh_bytes_t name)
 {
-	knh_fieldn_t fn = knh_tName_get_fnq(ctx, name, FIELDN_NEWID);
+	knh_fieldn_t fn = knh_getfnq(ctx, name, FIELDN_NEWID);
 	return new_TokenFN(ctx, FL(tk), fn);
 }
 
@@ -533,7 +533,7 @@ static int knh_bytes_isCLASSN(knh_bytes_t t)
 static
 Token *new_TokenCLASSN(Ctx *ctx, Token *tk, knh_bytes_t name)
 {
-	knh_NameSpace_t *ns = knh_Context_getNameSpace(ctx);
+	knh_NameSpace_t *ns = knh_getCurrentNameSpace(ctx);
 	return new_Token__S(ctx, FL(tk), TT_TYPEN, new_String__DictSet(ctx, DP(ns)->name2cidDictSet, name));
 }
 
@@ -871,7 +871,7 @@ void knh_Stmt_add_PAIR(Ctx *ctx, Stmt *stmt, knh_tokens_t *tc, int isData)
 
 	if(!(tc->c < tc->e)) {
 		if(!isData) {
-			knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, KERR_DWARN, _("empty"));
+			knh_perror(ctx, SP(stmt)->resid, SP(stmt)->line, KERR_DWARN, _("empty"));
 		}
 		return;
 	}
@@ -886,7 +886,7 @@ void knh_Stmt_add_PAIR(Ctx *ctx, Stmt *stmt, knh_tokens_t *tc, int isData)
 	}
 	else {
 		if(!isData) {
-			knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, KERR_DWARN, _("empty"));
+			knh_perror(ctx, SP(stmt)->resid, SP(stmt)->line, KERR_DWARN, _("empty"));
 		}
 		return;
 	}
@@ -894,7 +894,7 @@ void knh_Stmt_add_PAIR(Ctx *ctx, Stmt *stmt, knh_tokens_t *tc, int isData)
 	//fprintf(stderr, "VALUE s=%d, e=%d\n", s, tc->e);
 	if(s == tc->e) {
 		if(!isData) {
-			knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, KERR_ERRATA, _("empty: ==> null"));
+			knh_perror(ctx, SP(stmt)->resid, SP(stmt)->line, KERR_ERRATA, _("empty: ==> null"));
 		}
 		knh_Stmt_add(ctx, stmt, TM(new_TokenCONST(ctx, UP(ts[s]), KNH_NULL)));
 		return;
@@ -1351,9 +1351,9 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int isData)
 	if(!(oc < e)) {
 		DBG2_P("tc->c=%d, tc->e=%d", (int)oc, (int)e);
 		DBG2_ASSERT(oc < e);
-		Token *tke = new_Token(ctx, 0, SP(tc->ts[e-1])->fileid, SP(tc->ts[e-1])->line, TT_ERR);
+		Token *tke = new_Token(ctx, 0, SP(tc->ts[e-1])->resid, SP(tc->ts[e-1])->line, TT_ERR);
 		if(!isData) {
-			knh_perror(ctx, SP(tc->ts[e-1])->fileid, SP(tc->ts[e-1])->line, KERR_ERROR, _("syntax error"));
+			knh_perror(ctx, SP(tc->ts[e-1])->resid, SP(tc->ts[e-1])->line, KERR_ERROR, _("syntax error"));
 		}
 		return TM(tke);
 	}
@@ -1610,7 +1610,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int isData)
 	}
 	if(DP(stmt)->size == 1) {
         DBG2_P("size=%d", DP(stmt)->size);
-		knh_perror(ctx, SP(ts[pc])->fileid, SP(ts[pc])->line, KERR_ERRATA, _("empty: () == > (void)"));
+		knh_perror(ctx, SP(ts[pc])->resid, SP(ts[pc])->line, KERR_ERRATA, _("empty: () == > (void)"));
 		knh_Stmt_add(ctx, stmt, TM(new_TokenCONST(ctx, FL(ts[oc]), KNH_NULL)));
 	}
 	fc = pc + 1; pc = 0;
@@ -1680,7 +1680,7 @@ void knh_Stmt_toLVALUE(Ctx *ctx, Stmt *stmt, int pe, char *fmt)
 		}
 	}
 	SP(stmt)->stt = STT_ERR;
-	knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, pe, fmt);
+	knh_perror(ctx, SP(stmt)->resid, SP(stmt)->line, pe, fmt);
 	DBG2_P("stt=%s", knh_stmt_tochar(SP(stmt)->stt));
 }
 
@@ -1961,7 +1961,7 @@ Stmt *new_StmtMETA(Ctx *ctx,  knh_tokens_t *tc, knh_stmt_t stt)
 	int c = tc->c - 1;
 	if(c < 0) c = 0;
 	SP(o)->line = SP(tc->ts[c])->line;
-	SP(o)->fileid = SP(tc->ts[c])->fileid;
+	SP(o)->resid = SP(tc->ts[c])->resid;
 	return o;
 }
 
@@ -1992,7 +1992,7 @@ static void knh_Stmt_add_SEMICOLON(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 	else {
 		int c = tc->c - 1;
 		if(c >= tc->e || SP(tc->ts[c])->tt != TT_SEMICOLON) {
-			knh_perror(ctx, SP(o)->fileid, SP(o)->line, KERR_INFO, _("needs ;"));
+			knh_perror(ctx, SP(o)->resid, SP(o)->line, KERR_INFO, _("needs ;"));
 		}
 	}
 }
@@ -2896,7 +2896,7 @@ Stmt *new_StmtDECL(Ctx *ctx, Token *tkT, knh_tokens_t *tc)
 		knh_Stmt_add(ctx, stmt, new_TermEXPR(ctx, &expr_tc, 0/*isData*/));
 	}
 	else { /* Syntax Error */
-		knh_perror(ctx, SP(stmt)->fileid, SP(stmt)->line, KERR_ERROR, _("initialization needs ="));
+		knh_perror(ctx, SP(stmt)->resid, SP(stmt)->line, KERR_ERROR, _("initialization needs ="));
 		SP(stmt)->stt = STT_ERR;
 		return stmt;
 	}

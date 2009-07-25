@@ -47,11 +47,11 @@ extern "C" {
 /* ======================================================================== */
 /* [constructors] */
 
-KLRCode* new_KLRCode(Ctx *ctx, knh_fileid_t fileid, knh_bytes_t elf, knh_bytes_t dwarf)
+KLRCode* new_KLRCode(Ctx *ctx, knh_resid_t resid, knh_bytes_t elf, knh_bytes_t dwarf)
 {
 	knh_KLRCode_t *o = (KLRCode*)new_Object_bcid(ctx, CLASS_KLRCode, 0);
 
-	DP(o)->fileid = fileid;
+	DP(o)->resid = resid;
 	DP(o)->code = (knh_code_t*)KNH_MALLOC(ctx, KNH_SIZE(elf.len));
 	DP(o)->size = elf.len;
 	knh_memcpy(DP(o)->code, elf.buf, elf.len);
@@ -113,7 +113,7 @@ char *knh_Method_file(Ctx *ctx, Method *mtd)
 		return "(naitive)";
 	}
 	KLRCode *o = (KLRCode*)DP(mtd)->code;
-	return FILEIDN(DP(o)->fileid);
+	return FILEIDN(DP(o)->resid);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -208,7 +208,7 @@ void knh_Asm_genConstPool(Ctx *ctx, Asm *abr, OutputStream *w)
 		size_t i;
 		for(i = 0; i < (a)->size; i++) {
 			Object *ao = knh_Array_n(a, i);
-			knh_write(ctx, w, STEXT("\tkonoha_addConstPools(ctx, "));
+			knh_write(ctx, w, STEXT("\tknh_addConstPools(ctx, "));
 			knh_format(ctx, w, METHODN__const, ao, KNH_NULL);
 			knh_println(ctx, w, STEXT(");"));
 		}
