@@ -81,10 +81,10 @@ Object *knh_InputStream_open(Ctx *ctx, InputStream *o, String *urn, String *m)
 	knh_bytes_t fname = knh_String_tobytes(urn);
 	knh_index_t loc = knh_bytes_index(fname, ':');
 	if(loc == -1 || (loc == 1 && isalpha(fname.buf[0]))) {  /* 'C:/' */
-		DP(o)->driver = konoha_getIODriver(ctx, STEXT("file"));
+		DP(o)->driver = knh_getIODriver(ctx, STEXT("file"));
 	}
 	else {
-		DP(o)->driver = konoha_getIODriver(ctx, knh_bytes_first(fname, loc));
+		DP(o)->driver = knh_getIODriver(ctx, knh_bytes_first(fname, loc));
 	}
 	KNH_SETv(ctx, DP(o)->urn, new_String(ctx, fname, NULL));
 	char *mode = "r";
@@ -105,7 +105,7 @@ Object *knh_InputStream_open(Ctx *ctx, InputStream *o, String *urn, String *m)
 		DP(o)->driver->finit(ctx, (Object*)o, mode);
 	}
 	else {
-		DP(o)->driver = konoha_getDefaultIODriver();
+		DP(o)->driver = knh_getDefaultIODriver();
 	}
 	return (Object*)o;
 }
@@ -201,7 +201,7 @@ String* knh_InputStream_readLine(Ctx *ctx, InputStream *in)
 void knh_InputStream_close(Ctx *ctx, InputStream *o)
 {
 	f_io_close f = DP(o)->driver->fclose;
-	DP(o)->driver = konoha_getDefaultIODriver();
+	DP(o)->driver = knh_getDefaultIODriver();
 	f(ctx, DP(o)->fd);
 	DP(o)->fd = -1;
 }
@@ -218,7 +218,7 @@ int knh_InputStream_isClosed(InputStream *o)
 
 KNHAPI(InputStream*) new_FileInputStream(Ctx *ctx, knh_bytes_t file, int isThrowable)
 {
-	knh_iodrv_t *drv = konoha_getIODriver(ctx, STEXT("file"));
+	knh_iodrv_t *drv = knh_getIODriver(ctx, STEXT("file"));
 	knh_io_t fd = drv->fopen(ctx, file, "r", isThrowable);
 	return new_InputStream__io(ctx, new_String(ctx, file, NULL), fd, drv);
 }
@@ -325,7 +325,7 @@ KNHAPI(Object*) knh_InputStream_readData(Ctx *ctx, InputStream *in, knh_class_t 
 	{
 		InputStream *bin = new_BytesInputStream(ctx, cwb.ba, cwb.pos, knh_Bytes_size(cwb.ba));
 		Object *value = NULL;
-		DP(bin)->fileid = konoha_getFileId(ctx, STEXT("(eval)"));
+		DP(bin)->resid = knh_getResourceId(ctx, STEXT("(eval)"));
 		DP(bin)->line = linenum;
 		knh_InputStream_setEncoding(ctx, bin, DP(in)->enc);
 		value = konohac_data(ctx, bin, reqc);

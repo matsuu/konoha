@@ -40,7 +40,7 @@ extern "C" {
 
 int knh_fcallback_cmpr(Object *obj, Object *obj2)
 {
-	Ctx *ctx = konoha_getCurrentContext();
+	Ctx *ctx = knh_getCurrentContext();
 	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 	knh_putsfp(ctx, lsfp, 2, obj);
 	knh_putsfp(ctx, lsfp, 3, obj2);

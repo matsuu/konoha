@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-#define KONOHA_BUILDID                  605
+#define KONOHA_BUILDID                  608
 
 /* ======================================================================== */
 
@@ -3381,7 +3381,7 @@ typedef struct knh_System_t {
 typedef struct knh_Token_t {
 	knh_hObject_t h;
 	knh_Token_struct *b;
-	knh_fileid_t fileid;
+	knh_resid_t resid;
 	knh_ushort_t line;
 	knh_flag_t flag;
 	knh_token_t  tt;
@@ -3390,7 +3390,7 @@ typedef struct knh_Token_t {
 typedef struct knh_Stmt_t {
 	knh_hObject_t h;
 	knh_Stmt_struct *b;
-	knh_fileid_t fileid;
+	knh_resid_t resid;
 	knh_ushort_t line;
 	knh_flag_t flag;
 	knh_stmt_t  stt;
@@ -3399,14 +3399,14 @@ typedef struct knh_Stmt_t {
 typedef struct knh_Asm_t {
 	knh_hObject_t h;
 	knh_Asm_struct *b;
-	knh_fileid_t fileid;
+	knh_resid_t resid;
 	knh_ushort_t line;
 } knh_Asm_t; 
 
 typedef struct knh_KLRCode_t {
 	knh_hObject_t h;
 	knh_KLRCode_struct *b;
-	knh_fileid_t fileid;
+	knh_resid_t resid;
 	knh_ushort_t line;
 } knh_KLRCode_t; 
 

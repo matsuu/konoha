@@ -138,7 +138,7 @@ void knh_Mapper__k(Ctx *ctx, Mapper *o, OutputStream *w, String *m)
 /* ======================================================================== */
 /* [mapper] */
 
-KNHAPI(void) konoha_addMapper(Ctx *ctx, Mapper *mpr)
+KNHAPI(void) knh_addMapper(Ctx *ctx, Mapper *mpr)
 {
 	knh_ClassTable_readyClassMap(ctx, DP(mpr)->scid);
 	knh_ClassMap_add(ctx, ctx->share->ClassTable[DP(mpr)->scid].cmap, mpr);
@@ -146,7 +146,7 @@ KNHAPI(void) konoha_addMapper(Ctx *ctx, Mapper *mpr)
 
 /* ------------------------------------------------------------------------ */
 
-void konoha_addMapperFunc(Ctx *ctx, knh_flag_t flag, knh_type_t stype, knh_type_t ttype, knh_fmapper fmap, Object *mapdata)
+void knh_addMapperFunc(Ctx *ctx, knh_flag_t flag, knh_type_t stype, knh_type_t ttype, knh_fmapper fmap, Object *mapdata)
 {
 	knh_class_t cid = CLASS_type(stype);
 	KNH_ASSERT_cid(cid);
@@ -275,7 +275,7 @@ Mapper *konoha_findMapper_(Ctx *ctx, knh_class_t scid, knh_class_t tcid, int isg
 					mpr = DP(cmap2)->maplist[j];
 					if(DP(mpr)->tcid == tcid) {
 						Mapper *mapmap = new_MapMap(ctx, DP(cmap)->maplist[i], mpr);
-						konoha_addMapper(ctx, mapmap);
+						knh_addMapper(ctx, mapmap);
 						return knh_Context_setMapperCache(ctx, scid, tcid, mapmap);
 					}
 				}
@@ -283,7 +283,7 @@ Mapper *konoha_findMapper_(Ctx *ctx, knh_class_t scid, knh_class_t tcid, int isg
 					mpr = DP(cmap2)->maplist[j];
 					if(knh_class_instanceof(ctx, DP(mpr)->tcid, tcid)) {
 						Mapper *mapmap = new_MapMap(ctx, DP(cmap)->maplist[i], mpr);
-						konoha_addMapper(ctx, mapmap);
+						knh_addMapper(ctx, mapmap);
 						return knh_Context_setMapperCache(ctx, scid, tcid, mapmap);
 					}
 				}
@@ -299,13 +299,13 @@ Mapper *konoha_findMapper_(Ctx *ctx, knh_class_t scid, knh_class_t tcid, int isg
 	/* GENERATIVE PART */
 	if(scid == tcid || knh_class_instanceof(ctx, scid, tcid)) {  /* default */
 		mpr = new_Mapper__asis(ctx, scid, tcid);
-		konoha_addMapper(ctx, mpr);
+		knh_addMapper(ctx, mpr);
 		return knh_Context_setMapperCache(ctx, scid, tcid, mpr);
 	}
 
 	if(isgen) {
 		mpr = new_Mapper__NoSuchMapping(ctx, scid, tcid);
-		konoha_addMapper(ctx, mpr);
+		knh_addMapper(ctx, mpr);
 		return knh_Context_setMapperCache(ctx, scid, tcid, mpr);
 	}
 	else {

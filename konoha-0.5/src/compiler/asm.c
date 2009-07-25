@@ -74,46 +74,36 @@ void knh_Context_initAsm(Ctx *ctx)
 	}
 }
 
-///* ------------------------------------------------------------------------ */
-//
-//Asm* knh_Context_getAsm(Ctx *ctx)
-//{
-//	if(IS_NULL(ctx->abr)) {
-//		KNH_SETv(ctx, ((Context*)ctx)->abr, new_Asm(ctx));
-//	}
-//	return ctx->abr;
-//}
-
 /* ======================================================================== */
 /* [namespace] */
 
-NameSpace *knh_Context_getNameSpace(Ctx *ctx)
+NameSpace *knh_getCurrentNameSpace(Ctx *ctx)
 {
+	knh_Context_initAsm(ctx);
 	return DP(knh_Context_getAsm(ctx))->ns;
 }
 
 /* ------------------------------------------------------------------------ */
 
-NameSpace *knh_Context_setNameSpace(Ctx *ctx, String *nsname)
+NameSpace *knh_setCurrentNameSpace(Ctx *ctx, String *nsname)
 {
+	knh_Context_initAsm(ctx);
 	Asm *abr = knh_Context_getAsm(ctx);
-	if(IS_NULL(nsname)) {
-		if(IS_NameSpace(DP(abr)->ns)) {
-			KNH_SETv(ctx, DP(abr)->ns, knh_System_getNameSpace(ctx, knh_String_tobytes(TS_main)));
-		}
+	if(IS_NULL(nsname) || knh_String_equals(nsname, STEXT("main"))) {
+		KNH_SETv(ctx, DP(abr)->ns, ctx->share->mainns);
 	}
 	else {
-		KNH_SETv(ctx, DP(abr)->ns, knh_System_getNameSpace(ctx, knh_String_tobytes(nsname)));
+		KNH_SETv(ctx, DP(abr)->ns, knh_getNameSpace(ctx, knh_String_tobytes(nsname)));
 	}
 	return DP(abr)->ns;
 }
 
 /* ------------------------------------------------------------------------ */
 
-NameSpace *knh_Context_switchNameSpace(Ctx *ctx, NameSpace *newns)
+NameSpace *knh_switchCurrentNameSpace(Ctx *ctx, NameSpace *newns)
 {
+	knh_Context_initAsm(ctx);
 	Asm *abr = knh_Context_getAsm(ctx);
-	KNH_ASSERT(IS_NameSpace(DP(abr)->ns));
 	NameSpace *oldns = DP(abr)->ns;
 	KNH_SETv(ctx, DP(abr)->ns, newns);
 	return oldns;
@@ -121,9 +111,10 @@ NameSpace *knh_Context_switchNameSpace(Ctx *ctx, NameSpace *newns)
 
 /* ------------------------------------------------------------------------ */
 
-Script *knh_Asm_getScript(Ctx *ctx, Asm *o)
+Script *knh_getCurrentScript(Ctx *ctx)
 {
-	return knh_NameSpace_getScript(ctx, DP(o)->ns);
+	Asm *abr = knh_Context_getAsm(ctx);
+	return knh_NameSpace_getScript(ctx, DP(abr)->ns);
 }
 
 /* ======================================================================== */
@@ -144,7 +135,6 @@ void knh_Asm_prepare(Ctx *ctx, Asm *abr, Method *mtd, Stmt *stmt)
 		DP(abr)->vars[i].flag  = 0;
 		DP(abr)->vars[i].type  = TYPE_Any;
 		DP(abr)->vars[i].fn    = FIELDN_NONAME;
-//		DP(abr)->vars[i].count = 0;
 		KNH_SETv(ctx, DP(abr)->vars[i].value, KNH_NULL);
 	}
 	knh_Asm_initReg(ctx, abr);
@@ -161,7 +151,7 @@ void knh_Asm_prepare(Ctx *ctx, Asm *abr, Method *mtd, Stmt *stmt)
 	DP(abr)->labelmax = 0;
 	knh_Array_clear(ctx, DP(abr)->lstacks);
 
-	DP(abr)->fileid  = SP(stmt)->fileid;
+	DP(abr)->resid  = SP(stmt)->resid;
 	DP(abr)->line   = 0;
 	knh_Bytes_clear(DP(abr)->elf, 0);
 	knh_Bytes_clear(DP(abr)->dwarf, 0);
@@ -186,7 +176,7 @@ void knh_Asm_initThis(Ctx *ctx, Asm *abr, knh_class_t cid)
 
 void knh_Asm_initThisScript(Ctx *ctx, Asm *abr)
 {
-	knh_Asm_initThis(ctx, abr, knh_Object_cid(knh_Asm_getScript(ctx, abr)));
+	knh_Asm_initThis(ctx, abr, knh_Object_cid(knh_getCurrentScript(ctx)));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -227,7 +217,7 @@ void knh_Asm_finish(Ctx *ctx, Asm *abr)
 		return;
 	}
 
-	KLRCode *vmc = new_KLRCode(ctx, DP(abr)->fileid,
+	KLRCode *vmc = new_KLRCode(ctx, DP(abr)->resid,
 			knh_Bytes_tobytes(DP(abr)->elf), knh_Bytes_tobytes(DP(abr)->dwarf));
 	knh_Method_setKLRCode(ctx, mtd, vmc);
 	knh_Asm_writeAddress(ctx, abr, DP(vmc)->code);
@@ -2298,7 +2288,7 @@ void knh_StmtERR_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 {
 	if(!IS_bString(DP(stmt)->errMsg)) {
 		char buf[512];
-		knh_snprintf(buf, sizeof(buf), "Script!!: running errors at %s:%d", FILEIDN(SP(stmt)->fileid), SP(stmt)->line);
+		knh_snprintf(buf, sizeof(buf), "Script!!: you'll fix bugs at %s:%d", FILEIDN(SP(stmt)->resid), SP(stmt)->line);
 		KNH_SETv(ctx, DP(stmt)->errMsg, new_String(ctx, B(buf), NULL));
 		KNH_SETv(ctx, DP(stmt)->next, KNH_NULL);
 	}
@@ -2341,7 +2331,7 @@ void knh_StmtPRINT_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 	KNH_ASM_SKIP_(ctx, abr, lbskip);
 	if(konoha_debugLevel() > 1) {
 		char buf[128];
-		knh_snprintf(buf, sizeof(buf), "[%s:%d]", FILEIDN(DP(abr)->fileid), DP(abr)->line);
+		knh_snprintf(buf, sizeof(buf), "[%s:%d]", FILEIDN(DP(abr)->resid), DP(abr)->line);
 		KNH_ASM_PMSG_(ctx, abr, flag | KNH_FLAG_PF_BOL, UP(new_String(ctx, B(buf), NULL)));
 	}
 	else if(flag != 0 ) {

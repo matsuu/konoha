@@ -122,7 +122,7 @@ knh_expt_t knh_texpt_forname(Ctx *ctx, knh_bytes_t msg, knh_expt_t def)
 	knh_expt_t eid = (knh_expt_t)knh_DictSet_get__b(DP(ctx->sys)->ExptNameDictSet, msg);
 	if(eid != 0) return eid;
 	if(def == EXPT_newid) {
-		return konoha_addException(ctx, KNH_FLAG_EF_GENERATED, EXPT_newid, new_String(ctx, msg, NULL), NULL);
+		return knh_addException(ctx, KNH_FLAG_EF_GENERATED, EXPT_newid, new_String(ctx, msg, NULL), NULL);
 	}
 	return def;
 }
@@ -131,7 +131,7 @@ knh_expt_t knh_texpt_forname(Ctx *ctx, knh_bytes_t msg, knh_expt_t def)
 /* [TABLE] */
 
 knh_expt_t
-konoha_addException(Ctx *ctx, knh_flag_t flag, knh_class_t eid, String *name, char *pname)
+knh_addException(Ctx *ctx, knh_flag_t flag, knh_class_t eid, String *name, char *pname)
 {
 	if(eid == EXPT_newid) {
 		eid = knh_ExptTable_newId(ctx);

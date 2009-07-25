@@ -63,7 +63,7 @@ static METHOD knh__Array_new__array(Ctx *ctx, knh_sfp_t *sfp)
 	knh_intptr_t init = (knh_intptr_t)sfp[1].ivalue;
 	if(init >= 0 && init == sfp[1].ivalue) {
 		knh_class_t p1 = ctx->share->ClassTable[knh_Object_cid(o)].p1;
-		Object *v = konoha_getClassDefaultValue(ctx, p1);
+		Object *v = knh_getClassDefaultValue(ctx, p1);
 		knh_Array_grow(ctx, o, init, v);
 		o->size = init;
 	}
@@ -1096,7 +1096,7 @@ void knh_ArrayDim_init(Ctx *ctx, Array *a, size_t x, size_t y, size_t z)
 	a->list = (Object**)knh_array_dmalloc(ctx, x, y, z, sizeof(Object*));
 	a->capacity = x * y * z;
 	knh_class_t p1 = ctx->share->ClassTable[knh_Object_cid(a)].p1;
-	Object *v = (p1 == CLASS_Any) ? KNH_NULL : konoha_getClassDefaultValue(ctx, p1);
+	Object *v = (p1 == CLASS_Any) ? KNH_NULL : knh_getClassDefaultValue(ctx, p1);
 	int i = 0;
 	for(i = 0; i < a->capacity; i++) {
 		KNH_INITv(a->list[i], v);

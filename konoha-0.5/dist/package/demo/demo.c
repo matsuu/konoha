@@ -68,12 +68,12 @@ ClassSpec *unit_Temperature(Ctx *ctx, knh_bytes_t urn)
 	}
 	else if(ISB(t, "Fahrenheit")) {
 		ClassSpec *u = new_Unit(ctx, "F", urn, -459.67, KNH_FLOAT_MAX, 0.01);
-		konoha_addAffineMapper(ctx, DP(u)->ucid, "Float{http://konoha/Temperature/Celsius}", 5.0/9.0, -32.0*5.0/9.0);
+		knh_addAffineMapper(ctx, DP(u)->ucid, "Float{http://konoha/Temperature/Celsius}", 5.0/9.0, -32.0*5.0/9.0);
 		return u;
 	}
 	else if(ISB(t, "Kelvin")) {
 		ClassSpec *u = new_Unit(ctx, "K", urn, 0.0, KNH_FLOAT_MAX, 0.001);
-		konoha_addAffineMapper(ctx, DP(u)->ucid, "Float{http://konoha/Temperature/Celsius}", 1.0, -273.15);
+		knh_addAffineMapper(ctx, DP(u)->ucid, "Float{http://konoha/Temperature/Celsius}", 1.0, -273.15);
 		return u;
 	}
 	else if(ISB(t, "MyRoom")) {
@@ -82,7 +82,7 @@ ClassSpec *unit_Temperature(Ctx *ctx, knh_bytes_t urn)
 		Mapper *mpr = new_Mapper(ctx,
 				KNH_FLAG_MMF_TOTAL|KNH_FLAG_MMF_CONST|KNH_FLAG_MMF_FINAL, scid, DP(u)->ucid,
 				knh_fmapper_myroom, (Object*)u);
-		konoha_addMapper(ctx, mpr);
+		knh_addMapper(ctx, mpr);
 		return u;
 	}
 	return NULL;

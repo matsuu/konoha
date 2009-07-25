@@ -390,7 +390,7 @@ void knh_Class_addMethod(Ctx *ctx, knh_class_t cid, Method *mtd)
 /* ------------------------------------------------------------------------ */
 /* [MethodField] */
 
-void konoha_addMethodFieldTable(Ctx *ctx, MethodField *mf)
+void knh_addMethodFieldTable(Ctx *ctx, MethodField *mf)
 {
 	knh_hcode_t h = knh_MethodField_hachCode(ctx, mf);
 	HashMap *hmap = DP(ctx->sys)->MethodFieldHashMap;
@@ -428,7 +428,7 @@ MethodField *konoha_findMethodField0(Ctx *ctx, knh_type_t rtype)
 		}
 	}
 	MethodField *mf = new_MethodField(ctx, rtype, 0);
-	konoha_addMethodFieldTable(ctx, mf);
+	knh_addMethodFieldTable(ctx, mf);
 	return mf;
 }
 
@@ -452,7 +452,7 @@ MethodField *konoha_findMethodField1(Ctx *ctx, knh_type_t rtype, knh_type_t p1, 
 	MethodField *mf = new_MethodField(ctx, rtype, 1);
 	mf->p0.type = p1;
 	mf->p0.fn = fn1;
-	konoha_addMethodFieldTable(ctx, mf);
+	knh_addMethodFieldTable(ctx, mf);
 	return mf;
 }
 

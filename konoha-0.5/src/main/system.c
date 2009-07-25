@@ -36,10 +36,9 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-/* [Const] */
+/* [Constant Value] */
 
-int
-konoha_addClassConst(Ctx *ctx, knh_class_t cid, String* name, Object *value)
+int knh_addClassConst(Ctx *ctx, knh_class_t cid, String* name, Object *value)
 {
 	KNH_ASSERT_cid(cid);
 	if(ClassTable(cid).constPool == NULL) {
@@ -58,7 +57,7 @@ konoha_addClassConst(Ctx *ctx, knh_class_t cid, String* name, Object *value)
 
 /* ------------------------------------------------------------------------ */
 
-Object *konoha_getClassConstNULL(Ctx *ctx, knh_class_t cid, knh_bytes_t name)
+Object *knh_getClassConstNULL(Ctx *ctx, knh_class_t cid, knh_bytes_t name)
 {
 	KNH_ASSERT_cid(cid);
 	if(ClassTable(cid).constPool == NULL) return NULL;
@@ -75,58 +74,58 @@ Object *konoha_getClassConstNULL(Ctx *ctx, knh_class_t cid, knh_bytes_t name)
 
 /* ------------------------------------------------------------------------ */
 
-static void konoha_addConstData(Ctx *ctx, char *dname, Object *value)
+static
+void knh_addConstData(Ctx *ctx, char *dname, Object *value)
 {
 	knh_bytes_t n = B(dname);
 	knh_index_t loc = knh_bytes_rindex(n, '.');
-	String *name = new_String__T(ctx, dname +(loc+1));
+	String *name = new_String__T(ctx, dname + (loc+1));
 	knh_class_t cid = CLASS_Any;
 	if(loc != -1) {
-		if(ctx->share->mainns == NULL) {
-			cid = konoha_getcid(ctx, knh_bytes_first(n, loc));
-		}
-		else {
-			KNH_ASSERT(IS_Asm(ctx->abr));
-			DBG_P("nsname=%s", knh_String_tochar(DP(DP(ctx->abr)->ns)->nsname));
+		if(ctx->abr != NULL && IS_Asm(ctx->abr)) {
+			DBG2_P("nsname=%s", knh_String_tochar(DP(DP(ctx->abr)->ns)->nsname));
 			cid = knh_NameSpace_getcid(ctx, DP(ctx->abr)->ns, knh_bytes_first(n, loc));
 		}
+		else {
+			cid = knh_getcid(ctx, knh_bytes_first(n, loc));
+		}
 		if(cid == CLASS_unknown) {
-			DBG_P("unknown class const: %s", dname);
+			DBG2_P("unknown class const: %s", dname);
 			cid = CLASS_Any;
 		}
 	}
-	konoha_addClassConst(ctx, cid, name, value);
+	knh_addClassConst(ctx, cid, name, value);
 }
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) konoha_loadIntConstData(Ctx *ctx, knh_IntConstData_t *data)
+KNHAPI(void) knh_loadIntConstData(Ctx *ctx, knh_IntConstData_t *data)
 {
 	while(data->name != NULL) {
 		Object *value = UP(new_Int(ctx, data->ivalue));
-		konoha_addConstData(ctx, data->name, value);
+		knh_addConstData(ctx, data->name, value);
 		data++;
 	}
 }
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) konoha_loadFloatConstData(Ctx *ctx, knh_FloatConstData_t *data)
+KNHAPI(void) knh_loadFloatConstData(Ctx *ctx, knh_FloatConstData_t *data)
 {
 	while(data->name != NULL) {
 		Object *value = UP(new_Float(ctx, data->fvalue));
-		konoha_addConstData(ctx, data->name, value);
+		knh_addConstData(ctx, data->name, value);
 		data++;
 	}
 }
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) konoha_loadStringConstData(Ctx *ctx, knh_StringConstData_t *data)
+KNHAPI(void) knh_loadStringConstData(Ctx *ctx, knh_StringConstData_t *data)
 {
 	while(data->name != NULL) {
 		Object *value = UP(new_String__T(ctx, data->value));
-		konoha_addConstData(ctx, data->name, value);
+		knh_addConstData(ctx, data->name, value);
 		data++;
 	}
 }
@@ -157,7 +156,7 @@ void knh_Const__man(Ctx *ctx, knh_class_t cid, OutputStream *w)
 /* ======================================================================== */
 /* [SystemConst] */
 
-#define _KNH_SYS(ctx, n)    konoha_getSystemConst(ctx, n)
+#define _KNH_SYS(ctx, n)    knh_getSystemConst(ctx, n)
 #define _KNH_SYS_CTX    0
 #define _KNH_SYS_STDIN  1
 #define _KNH_SYS_STDOUT 2
@@ -165,14 +164,14 @@ void knh_Const__man(Ctx *ctx, knh_class_t cid, OutputStream *w)
 #define _KNH_SYS_OS     4
 #define _KNH_SYS_SCRIPT 5
 
-Object *konoha_getSystemConst(Ctx *ctx, int n)
+Object *knh_getSystemConst(Ctx *ctx, int n)
 {
 	switch(n) {
 		case _KNH_SYS_CTX:     return (Object*)ctx;
 		case _KNH_SYS_STDIN:   return (Object*)((ctx)->in);
 		case _KNH_SYS_STDOUT:  return (Object*)((ctx)->out);
 		case _KNH_SYS_STDERR:  return (Object*)((ctx)->err);
-		case _KNH_SYS_OS:      return (Object*)konoha_getClassDefaultValue(ctx, CLASS_System);
+		case _KNH_SYS_OS:      return (Object*)knh_getClassDefaultValue(ctx, CLASS_System);
 		case _KNH_SYS_SCRIPT:  return (Object*)knh_NameSpace_getScript(ctx, (ctx->share)->mainns);
 	}
 	DBG_P("unknown system const n=%d", n);
@@ -216,24 +215,28 @@ char *knh_format_nzname(char *buf, size_t bufsiz, knh_bytes_t t)
 /* ------------------------------------------------------------------------ */
 
 static
-knh_fieldn_t knh_tfieldn_common(Ctx *ctx, knh_bytes_t n, knh_fieldn_t def)
+knh_fieldn_t knh_System_getfn(Ctx *ctx, knh_bytes_t n, knh_fieldn_t def)
 {
 	char buf[CLASSNAME_BUFSIZ];
-	knh_format_nzname(buf, sizeof(buf), n);
-	knh_bytes_t tname = B(buf);
-
-	knh_index_t idx = knh_DictIdx_index(ctx, DP(ctx->sys)->FieldNameDictIdx, tname);
+	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+	knh_index_t idx = knh_DictIdx_index(ctx, DP(ctx->sys)->FieldNameDictIdx, n);
+	if(idx == -1) {
+		knh_format_nzname(buf, sizeof(buf), n);
+		n = B(buf);
+		idx = knh_DictIdx_index(ctx, DP(ctx->sys)->FieldNameDictIdx, n);
+	}
 	if(idx == -1) {
 		if(def == FIELDN_NEWID) {
-			String *s = new_String(ctx, tname, NULL);
-			knh_fieldn_t fn =
-				(knh_fieldn_t)knh_DictIdx_add__fast(ctx, DP(ctx->sys)->FieldNameDictIdx, s);
-			if(fn == (knh_fieldn_t)-1) {  /* Integer overflowed */
-				KNH_THROWs(ctx, "OutOfMemory!!: Too many field names");
-			}
-			return fn;
+			String *s = new_String(ctx, n, NULL);
+			idx = knh_DictIdx_add__fast(ctx, DP(ctx->sys)->FieldNameDictIdx, s);
 		}
-		return def;
+		else {
+			idx = def;
+		}
+	}
+	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+	if(!(idx < KNH_FLAG_MN_SETTER)) {  /* Integer overflowed */
+		KNH_THROWs(ctx, "OutOfMemory!!: Too many field names");
 	}
 	return (knh_fieldn_t)idx;
 }
@@ -295,7 +298,7 @@ char *knh_format_newFMT(char *buf, size_t bufsiz, knh_bytes_t t, int dot, char *
 /* ======================================================================== */
 /* [tfieldn] */
 
-String *konoha_getFieldName(Ctx *ctx, knh_fieldn_t fn)
+String *knh_getFieldName(Ctx *ctx, knh_fieldn_t fn)
 {
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 	String *s = (String*)knh_DictIdx_get__fast(DP(ctx->sys)->FieldNameDictIdx, FIELDN_UNMASK(fn));
@@ -308,11 +311,11 @@ String *konoha_getFieldName(Ctx *ctx, knh_fieldn_t fn)
 	return s;
 }
 
-#define _FIELDN(fn) knh_String_tochar(konoha_getFieldName(ctx, fn))
+#define _FIELDN(fn) knh_String_tochar(knh_getFieldName(ctx, fn))
 
 /* ------------------------------------------------------------------------ */
 
-knh_fieldn_t knh_tName_get_fnq(Ctx *ctx, knh_bytes_t tname, knh_fieldn_t def)
+knh_fieldn_t knh_getfnq(Ctx *ctx, knh_bytes_t tname, knh_fieldn_t def)
 {
 	knh_index_t idx = knh_bytes_index(tname, ':');
 	if(idx > 0) {
@@ -342,17 +345,21 @@ knh_fieldn_t knh_tName_get_fnq(Ctx *ctx, knh_bytes_t tname, knh_fieldn_t def)
 			}
 		}
 
+		KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 		idx = knh_DictIdx_index(ctx, DP(ctx->sys)->FieldNameDictIdx, tname);
 		if(idx == -1) {
 			if(def == FIELDN_NEWID) {
 				String *s = new_String(ctx, tname, NULL);
-				knh_fieldn_t fn = (knh_fieldn_t)knh_DictIdx_add__fast(ctx, DP(ctx->sys)->FieldNameDictIdx, s);
-				if(!(fn < KNH_FLAG_FN_U2)) {
-					KNH_THROWs(ctx, "OutOfMemory!!: Too many field names");
-				}
-				return fn | mask;
+				idx = knh_DictIdx_add__fast(ctx, DP(ctx->sys)->FieldNameDictIdx, s);
 			}
-			return def;
+			else {
+				idx = def;
+			}
+		}
+		KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+
+		if(!(idx < KNH_FLAG_FN_U2)) {
+			KNH_THROWs(ctx, "OutOfMemory!!: Too many field names");
 		}
 		return ((knh_fieldn_t)idx | mask);
 	}
@@ -380,7 +387,10 @@ String *new_String__mn(Ctx *ctx, knh_methodn_t mn)
 		if(islower(buf[3])) buf[3] = toupper(buf[3]);
 		return new_String(ctx, B(buf), NULL);
 	}
+
+	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 	String *s = (String*)knh_DictIdx_get__fast(DP(ctx->sys)->FieldNameDictIdx, FIELDN_UNMASK(mn));
+	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
 	if(IS_NULL(s)) {
 		return TS_EMPTY;
 	}
@@ -389,35 +399,35 @@ String *new_String__mn(Ctx *ctx, knh_methodn_t mn)
 
 /* ------------------------------------------------------------------------ */
 
-knh_methodn_t konoha_getMethodName(Ctx *ctx, knh_bytes_t tname, knh_methodn_t def)
+knh_methodn_t knh_getmn(Ctx *ctx, knh_bytes_t tname, knh_methodn_t def)
 {
 	if(tname.len == 0 || tname.len > 64) {
 		DBG2_P("invalid method name '%s'", tname.buf);
 		return METHODN_NONAME;
 	}
 	if(tname.buf[0] == '%') {
-		knh_fieldn_t fn = knh_tfieldn_common(ctx, knh_bytes_last(tname, 1), def);
+		knh_fieldn_t fn = knh_System_getfn(ctx, knh_bytes_last(tname, 1), def);
 		if(fn == FIELDN_NONAME) {
 			return METHODN_NONAME;
 		}
 		return KNH_FLAG_MN_MOVTEXT | fn;
 	}
 	else if(tname.buf[0] == 'g' && tname.buf[1] == 'e' && tname.buf[2] == 't') {
-		knh_fieldn_t fn = knh_tfieldn_common(ctx, knh_bytes_last(tname, 3), def);
+		knh_fieldn_t fn = knh_System_getfn(ctx, knh_bytes_last(tname, 3), def);
 		if(fn == FIELDN_NONAME) {
 			return METHODN_NONAME;
 		}
 		return KNH_FLAG_MN_GETTER | fn;
 	}
 	else if(tname.buf[0] == 's' && tname.buf[1] == 'e' && tname.buf[2] == 't') {
-		knh_fieldn_t fn = knh_tfieldn_common(ctx, knh_bytes_last(tname, 3), def);
+		knh_fieldn_t fn = knh_System_getfn(ctx, knh_bytes_last(tname, 3), def);
 		if(fn == FIELDN_NONAME) {
 			return METHODN_NONAME;
 		}
 		return KNH_FLAG_MN_SETTER | fn;
 	}
 	else {
-		knh_fieldn_t fn = knh_tfieldn_common(ctx, tname, def);
+		knh_fieldn_t fn = knh_System_getfn(ctx, tname, def);
 		return fn;
 	}
 }
@@ -470,40 +480,37 @@ knh_format_cmethodn(Ctx *ctx, char *buf, size_t bufsiz, knh_class_t cid, knh_met
 }
 
 /* ======================================================================== */
-/* [fileid] */
+/* [resid] */
 
-knh_fileid_t konoha_getFileId(Ctx *ctx, knh_bytes_t t)
+knh_resid_t knh_getResourceId(Ctx *ctx, knh_bytes_t t)
 {
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-	knh_index_t idx = knh_DictIdx_index(ctx, DP(ctx->sys)->FileNameDictIdx, t);
-	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+	knh_index_t idx = knh_DictIdx_index(ctx, DP(ctx->sys)->ResourceDictIdx, t);
 	if(idx == -1) {
 		String *s = new_String(ctx, t, NULL);
-		KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-		knh_fileid_t filen = (knh_fileid_t)knh_DictIdx_add__fast(ctx, DP(ctx->sys)->FileNameDictIdx, s);
-		KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-		return filen;
+		idx = knh_DictIdx_add__fast(ctx, DP(ctx->sys)->ResourceDictIdx, s);
 	}
-	return (knh_fileid_t)idx;
+	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+	return (knh_resid_t)idx;
 }
 
 /* ------------------------------------------------------------------------ */
 
-String *konoha_getFileName(Ctx *ctx, knh_fileid_t fileid)
+String *knh_getResourceName(Ctx *ctx, knh_resid_t resid)
 {
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-	String *s = (String*)knh_DictIdx_get__fast(DP(ctx->sys)->FileNameDictIdx, fileid);
+	String *s = (String*)knh_DictIdx_get__fast(DP(ctx->sys)->ResourceDictIdx, resid);
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
 	DBG_(
 		if(IS_NULL(s)) {
-			DBG_P("unknown fileid=%d", (int)fileid);
+			DBG_P("unknown resid=%d", (int)resid);
 			return TS_EMPTY;
 		}
 	)
 	return s;
 }
 
-#define _FILEIDN(fileid) knh_String_tochar(konoha_getFileName(ctx, fileid))
+#define _FILEIDN(resid) knh_String_tochar(knh_getResourceName(ctx, resid))
 
 /* ======================================================================== */
 /* [tPackage] */
@@ -517,7 +524,7 @@ String *konoha_getFileName(Ctx *ctx, knh_fileid_t fileid)
 /* ======================================================================== */
 /* [DRVAPI] */
 
-void konoha_addDriverAPI(Ctx *ctx, char *alias, knh_drvapi_t* p)
+void knh_addDriverAPI(Ctx *ctx, char *alias, knh_drvapi_t* p)
 {
 	char bufn[CLASSNAME_BUFSIZ];
 	KNH_ASSERT(IS_DRVAPI(p->type));
@@ -534,7 +541,7 @@ void konoha_addDriverAPI(Ctx *ctx, char *alias, knh_drvapi_t* p)
 
 /* ------------------------------------------------------------------------ */
 
-knh_drvapi_t *konoha_getDriverAPI(Ctx *ctx, int type, knh_bytes_t name)
+knh_drvapi_t *knh_getDriverAPI(Ctx *ctx, int type, knh_bytes_t name)
 {
 	char bufn[CLASSNAME_BUFSIZ], bufn2[CLASSNAME_BUFSIZ];
 	knh_format_bytes(bufn2, sizeof(bufn2), name);
@@ -549,7 +556,7 @@ knh_drvapi_t *konoha_getDriverAPI(Ctx *ctx, int type, knh_bytes_t name)
 /* [namespace] */
 
 static
-char *knh_lookup_packageScript(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t pkgname)
+char *knh_lookupPackageScript(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t pkgname)
 {
 	char pbuf[40], fbuf[40], *file1 = NULL, *file2 = NULL, *rootdir;
 	knh_index_t loc = knh_bytes_rindex(pkgname, '.');
@@ -568,10 +575,6 @@ char *knh_lookup_packageScript(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t p
 	if(rootdir != NULL) {
 		knh_snprintf(buf, bufsiz, "%s/%s/%s.k", rootdir, pbuf, file1);
 		if(knh_isfile(ctx, B(buf))) return buf;
-//		if(file2 != NULL) {
-//			knh_snprintf(buf, bufsiz, "%s/%s/%s.k", rootdir, pbuf, file2);
-//		}
-//		if(knh_isfile(ctx, B(buf))) return buf;
 	}
 
 	path = (String*)knh_Context_getProperty(ctx, (Context*)ctx, STEXT("konoha.path.package"));
@@ -593,17 +596,12 @@ char *knh_lookup_packageScript(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t p
 	return NULL;
 }
 
-
 /* ------------------------------------------------------------------------ */
 
-int konohaget(Ctx *ctx, knh_bytes_t pkgname);
-
-/* ------------------------------------------------------------------------ */
-
-NameSpace *knh_System_loadPackage(Ctx *ctx, knh_bytes_t pkgname)
+NameSpace *knh_loadPackage(Ctx *ctx, knh_bytes_t pkgname)
 {
 	char buff[FILEPATH_BUFSIZ];
-	char *fpath = knh_lookup_packageScript(ctx, buff, sizeof(buff), pkgname);
+	char *fpath = knh_lookupPackageScript(ctx, buff, sizeof(buff), pkgname);
 //#ifdef KNH_USING_KONOHAGET
 //	if(fpath == NULL && knh_Context_isInteractive(ctx)) {
 //		fprintf(stdout,
@@ -626,9 +624,9 @@ NameSpace *knh_System_loadPackage(Ctx *ctx, knh_bytes_t pkgname)
 			knh_DictMap_set(ctx, DP(ctx->sys)->NameSpaceTableDictMap, nsname, UP(ns));
 			KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
 
-			NameSpace *curns = knh_Context_switchNameSpace(ctx, ns);
+			NameSpace *curns = knh_switchCurrentNameSpace(ctx, ns);
 			knh_NameSpace_loadScript(ctx, ns, B(fpath), 1 /* isEval */);
-			knh_Context_switchNameSpace(ctx, curns);
+			knh_switchCurrentNameSpace(ctx, curns);
 		}
 		return ns;
 	}
@@ -638,28 +636,27 @@ NameSpace *knh_System_loadPackage(Ctx *ctx, knh_bytes_t pkgname)
 /* ------------------------------------------------------------------------ */
 /* [NameSpace] */
 
-NameSpace *knh_System_getNameSpace(Ctx *ctx, knh_bytes_t name)
+NameSpace *knh_getNameSpace(Ctx *ctx, knh_bytes_t name)
 {
+	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+	NameSpace *ns = (NameSpace*)knh_DictMap_get__b(ctx,  DP(ctx->sys)->NameSpaceTableDictMap, name);
 	if(knh_bytes_equals(name, STEXT("main"))) {
 		KNH_ASSERT(IS_NameSpace(ctx->share->mainns));
-		return ctx->share->mainns;
+		ns = ctx->share->mainns;
+		goto L_UNLOCK;
 	}
-	else {
-		KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-		NameSpace *ns = (NameSpace*)knh_DictMap_get__b(ctx,  DP(ctx->sys)->NameSpaceTableDictMap, name);
-		if(IS_NULL(ns)) {
-			ns = knh_System_loadPackage(ctx, name);
-			if(ns != NULL) goto L_UNLOCK;
-		}
-		{
-			String *nsname = new_String(ctx, name, NULL);
-			ns = new_NameSpace(ctx, nsname);
-			knh_DictMap_set(ctx, DP(ctx->sys)->NameSpaceTableDictMap, nsname, UP(ns));
-		}
-		L_UNLOCK:
-		KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-		return ns;
+	if(IS_NULL(ns)) {
+		ns = knh_loadPackage(ctx, name);
+		if(ns != NULL) goto L_UNLOCK;
 	}
+	{
+		String *nsname = new_String(ctx, name, NULL);
+		ns = new_NameSpace(ctx, nsname);
+		knh_DictMap_set(ctx, DP(ctx->sys)->NameSpaceTableDictMap, nsname, UP(ns));
+	}
+	L_UNLOCK:
+	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+	return ns;
 }
 
 /* ------------------------------------------------------------------------ */

@@ -250,7 +250,7 @@ int knh_StmtIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	String *fname = (String*)DP(StmtIMPORT_file(stmt))->data;
 	char bufp[FILEPATH_BUFSIZ], buff[FILEPATH_BUFSIZ];
 
-	String *cfname = konoha_getFileName(ctx, SP(stmt)->fileid);
+	String *cfname = knh_getResourceName(ctx, SP(stmt)->resid);
 	KNH_ASSERT(IS_String(fname));
 	if(knh_String_endsWith(cfname, STEXT(".k"))) {
 		knh_format_parentpath(bufp, sizeof(bufp), knh_String_tobytes(cfname), 1);
@@ -276,8 +276,8 @@ int knh_StmtUIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	knh_bytes_t name = knh_Token_tobytes(ctx, tk);
 	knh_index_t loc = knh_bytes_rindex(name, '.');
 	if(loc != -1 && isupper(name.buf[loc+1])) { /* using math.Math */
-		if(knh_System_loadPackage(ctx, knh_bytes_first(name, loc))) {
-			knh_class_t newcid = konoha_getcid(ctx, name);
+		if(knh_loadPackage(ctx, knh_bytes_first(name, loc))) {
+			knh_class_t newcid = knh_getcid(ctx, name);
 			if(newcid == CLASS_unknown) {
 				knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown class: %s"), sToken(tk));
 				return 0;
@@ -290,7 +290,7 @@ int knh_StmtUIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 			return 1;
 		}
 	}else {
-		if(knh_System_loadPackage(ctx, name)) {
+		if(knh_loadPackage(ctx, name)) {
 			if(knh_Token_isTailWildCard(tk)) {
 				knh_NameSpace_importClass(ctx, ns, name);
 			}
@@ -347,7 +347,7 @@ int knh_StmtXCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_class
 	Token *tkurn = DP(stmt)->tokens[1];
 
 	char bufcu[CLASSNAME_BUFSIZ];
-	knh_format_classurn(ctx, bufcu, sizeof(bufcu), bcid, konoha_getURNAlias(ctx, knh_Token_tobytes(ctx, tkurn)));
+	knh_format_classurn(ctx, bufcu, sizeof(bufcu), bcid, knh_getURNAlias(ctx, knh_Token_tobytes(ctx, tkurn)));
 
 	knh_class_t cid = konoha_findcid(ctx, B(bufcu));
 	if(cid == bcid || cid == CLASS_unknown) {
@@ -403,7 +403,7 @@ int knh_StmtUFUNC_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 			knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown class: %s"), sToken(tk));
 			return 0;
 		}
-		knh_methodn_t mn = konoha_getMethodName(ctx, knh_bytes_last(name, loc+1), METHODN_NONAME);
+		knh_methodn_t mn = knh_getmn(ctx, knh_bytes_last(name, loc+1), METHODN_NONAME);
 		if(mn == METHODN_NONAME) {
 			knh_Token_perror(ctx, tk, KERR_ERROR, _("unknown method: %C.%s"), cid, sToken(tk));
 			return 0;
@@ -449,7 +449,7 @@ int knh_StmtUMAPMAP_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 static
 int knh_Stmt_eval(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int isEval)
 {
-	Script *scr = knh_Asm_getScript(ctx, abr);
+	Script *scr = knh_getCurrentScript(ctx);
 	Method *mtd = knh_Class_getMethod(ctx, knh_Object_cid(scr), METHODN_lambda);
 	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 
@@ -458,7 +458,7 @@ int knh_Stmt_eval(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int isEval)
 	knh_methodn_t mt = METHODN__k;
 	if(SP(stmt)->stt == STT_MT) {
 		Token *tk0 = DP(stmt)->tokens[0];
-		knh_methodn_t mn = konoha_getMethodName(ctx, knh_Token_tobytes(ctx, tk0), METHODN_NEWID);
+		knh_methodn_t mn = knh_getmn(ctx, knh_Token_tobytes(ctx, tk0), METHODN_NEWID);
 		char *name = FIELDN(METHODN_TOFIELDN(mn));
 		if(name[1] != 0) mt = METHODN__s;
 	}
@@ -527,12 +527,12 @@ int knh_Stmt_eval(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int isEval)
 int knh_Stmt_compile(Ctx *ctx, Stmt *stmt, String *nsname, int isEval)
 {
 	Asm *abr = knh_Context_getAsm(ctx);
-	NameSpace *ns = knh_Context_setNameSpace(ctx, nsname);
+	NameSpace *ns = knh_setCurrentNameSpace(ctx, nsname);
 	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 	KNH_LPUSH(ctx, stmt);
 
 	Stmt *cur = stmt;
-	DP(abr)->fileid = SP(stmt)->fileid;
+	DP(abr)->resid = SP(stmt)->resid;
 	while(IS_Stmt(cur)) {
 		knh_stmt_t stt = SP(cur)->stt;
 		DP(abr)->line = SP(cur)->line;
@@ -682,7 +682,7 @@ Object *knh_Stmt_toData(Ctx *ctx, Stmt *stmt, knh_class_t reqc)
 static
 Stmt *knh_InputStream_parseStmt(Ctx *ctx, InputStream *in, int isData)
 {
-	Token *tk = new_Token(ctx, 0, DP(in)->fileid, 0, knh_char_totoken('{'));
+	Token *tk = new_Token(ctx, 0, DP(in)->resid, 0, knh_char_totoken('{'));
 	KNH_LPUSH(ctx, tk);
 	KNH_LPUSH(ctx, in);
 	knh_Token_parse(ctx, tk, in);
@@ -692,13 +692,13 @@ Stmt *knh_InputStream_parseStmt(Ctx *ctx, InputStream *in, int isData)
 
 /* ------------------------------------------------------------------------ */
 
-Stmt *knh_bytes_parseStmt(Ctx *ctx, knh_bytes_t kscript, int fileid, int line)
+Stmt *knh_bytes_parseStmt(Ctx *ctx, knh_bytes_t kscript, int resid, int line)
 {
 	knh_cwb_t cwb = new_cwb(ctx);
 	knh_Bytes_write(ctx, cwb.ba, kscript);
 	knh_Bytes_putc(ctx, cwb.ba, ';');
 	InputStream *in = new_BytesInputStream(ctx, cwb.ba, cwb.pos, knh_Bytes_size(cwb.ba));
-	DP(in)->fileid = (knh_fileid_t)fileid;
+	DP(in)->resid = (knh_resid_t)resid;
 	DP(in)->line = line;
 	Stmt *stmt = knh_InputStream_parseStmt(ctx, in, 0/*isData*/);
 	knh_cwb_clear(cwb);
@@ -780,25 +780,25 @@ void knh_Asm_openlib(Ctx *ctx, Asm *abr, knh_bytes_t fpath)
 /* [loaded] */
 
 static
-void knh_NameSpace_loaded(Ctx *ctx, NameSpace *o, knh_fileid_t fileid)
+void knh_NameSpace_loaded(Ctx *ctx, NameSpace *o, knh_resid_t resid)
 {
 	KNH_ASSERT(IS_NameSpace(o));
 	if(IS_NULL(DP(o)->lconstDictMap)) {
 		KNH_SETv(ctx, DP(o)->lconstDictMap, new_DictMap0(ctx, 16));
 	}
 	char buf[40];
-	knh_snprintf(buf, sizeof(buf), "_LOADED_%d", (int)fileid);
-	knh_DictMap_set(ctx, DP(o)->lconstDictMap, new_String(ctx, B(buf), NULL), UP(konoha_getFileName(ctx, fileid)));
+	knh_snprintf(buf, sizeof(buf), "_LOADED_%d", (int)resid);
+	knh_DictMap_set(ctx, DP(o)->lconstDictMap, new_String(ctx, B(buf), NULL), UP(knh_getResourceName(ctx, resid)));
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-int knh_NameSpace_isLoaded(Ctx *ctx, NameSpace *o, knh_fileid_t fileid)
+int knh_NameSpace_isLoaded(Ctx *ctx, NameSpace *o, knh_resid_t resid)
 {
 	if(IS_NOTNULL(DP(o)->lconstDictMap)) {
 		char buf[40];
-		knh_snprintf(buf, sizeof(buf), "_LOADED_%d", (int)fileid);
+		knh_snprintf(buf, sizeof(buf), "_LOADED_%d", (int)resid);
 		return (knh_DictMap_index__b(DP(o)->lconstDictMap, B(buf)) != -1);
 	}
 	return 0;
@@ -808,16 +808,16 @@ int knh_NameSpace_isLoaded(Ctx *ctx, NameSpace *o, knh_fileid_t fileid)
 
 int knh_NameSpace_loadScript(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isEval)
 {
-	knh_fileid_t fileid = konoha_getFileId(ctx, fpath);
-	if(knh_NameSpace_isLoaded(ctx, ns, fileid)) {
+	knh_resid_t resid = knh_getResourceId(ctx, fpath);
+	if(knh_NameSpace_isLoaded(ctx, ns, resid)) {
 		DBG2_P("Already imported: %s", fpath.buf);
 		return 1;
 	}
-	knh_NameSpace_loaded(ctx, ns, fileid);
+	knh_NameSpace_loaded(ctx, ns, resid);
 	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 	InputStream *in = new_FileInputStream(ctx, fpath, 1);
 	KNH_LPUSH(ctx, in);
-	DP(in)->fileid = fileid;
+	DP(in)->resid = resid;
 	knh_InputStream_setEncoding(ctx, in, KNH_ENC);
 	Stmt *stmt = knh_InputStream_parseStmt(ctx, in, 0/*isData*/);
 	KNH_LPUSH(ctx, stmt);
@@ -837,7 +837,7 @@ void konoha_compile(Ctx *ctx, String *nsname, knh_bytes_t fpath)
 	KNH_LPUSH(ctx, new_ExceptionHandler(ctx));
 	KNH_TRY(ctx, L_CATCH, lsfp, 0);
 	{
-		NameSpace *ns = knh_Context_setNameSpace(ctx, nsname);
+		NameSpace *ns = knh_setCurrentNameSpace(ctx, nsname);
 		knh_NameSpace_loadScript(ctx, ns, fpath, 0);
 	}
 	KNH_LOCALBACK(ctx, lsfp);

@@ -325,7 +325,7 @@ Ctx *konoha_createContext0(size_t stacksize)
 	share->tString = (knh_String_t**)KNH_MALLOC(ctx, SIZEOF_TSTRING);
 	knh_bzero(share->tString, SIZEOF_TSTRING);
 	konoha_loadSystemString(ctx);
-	ctx->fsweep = konoha_getDefaultSweepFunc();
+	ctx->fsweep = knh_getDefaultSweepFunc();
 	ctx->parent = ctx;
 
 	KNH_INITv(ctx->sys, new_System(ctx));
@@ -542,7 +542,7 @@ Ctx *new_Context(Ctx *parent)
 	ctx->stat = parent->stat;
 	ctx->sys  = parent->sys;
 	ctx->parent = parent->parent;
-	ctx->fsweep = konoha_getDefaultSweepFunc();
+	ctx->fsweep = knh_getDefaultSweepFunc();
 
 	knh_Context_initCommon(ctx, ctx, parent->stacksize);
 	knh_System_addContext((Ctx*)parent, parent->sys, ctx);

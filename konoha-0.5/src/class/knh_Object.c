@@ -59,7 +59,7 @@ KNHAPI(void) knh_Glue_init(Ctx *ctx, knh_Glue_t *g, void *ptr, knh_fgfree gfree)
 
 KNHAPI(Object*) new_Glue(Ctx *ctx, char *lname, void *ptr, knh_fgfree gfree)
 {
-	knh_class_t cid = konoha_getcid(ctx, B(lname));
+	knh_class_t cid = knh_getcid(ctx, B(lname));
 	if(cid == CLASS_unknown) {
 		KNH_THROWf(ctx, "Unknown!!: %s", lname);
 	}
@@ -142,7 +142,7 @@ int knh_Object_compareTo(Ctx *ctx, Object *o1, Object *o2)
 int knh_Object_cmp(Object *o1, Object *o2)
 {
 	/* this funtion is prepared for the compatibility with qsort. */
-	return knh_Object_compareTo(konoha_getCurrentContext(), o1, o2);
+	return knh_Object_compareTo(knh_getCurrentContext(), o1, o2);
 }
 
 /* ------------------------------------------------------------------------ */

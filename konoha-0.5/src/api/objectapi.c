@@ -397,7 +397,7 @@ void knh_Any__k(Ctx *ctx, knh_Any_t *o, OutputStream *w, String *m)
 static
 METHOD knh__Class_domain(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN(ctx, sfp, konoha_getClassDomain(ctx, (sfp[0].c)->cid));
+	KNH_RETURN(ctx, sfp, knh_getClassDomain(ctx, (sfp[0].c)->cid));
 }
 
 /* ------------------------------------------------------------------------ */

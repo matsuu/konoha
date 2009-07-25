@@ -270,9 +270,9 @@ KNHAPI(int) init(Ctx *ctx)
     konoha_loadStringConstData(ctx, StringConstData);
 
     // pipe dirver
-    konoha_addIODriver(ctx, NULL, &IO__PIPE);
-    konoha_addIODriver(ctx, "sh", &IO__PIPE);
-    konoha_addIODriver(ctx, "cmd", &IO__PIPE);
+    knh_addIODriver(ctx, NULL, &IO__PIPE);
+    knh_addIODriver(ctx, "sh", &IO__PIPE);
+    knh_addIODriver(ctx, "cmd", &IO__PIPE);
     return 1;
 }
 

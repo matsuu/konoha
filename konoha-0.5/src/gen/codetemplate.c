@@ -4931,7 +4931,7 @@ static knh_fmethod codeTempList[146][6] = {
 
 };
 
-knh_fmethod konoha_getCodeTemplate(int opcode, int pos)
+knh_fmethod knh_getCodeTemplate(int opcode, int pos)
 {
 	return codeTempList[opcode][pos];
 }
