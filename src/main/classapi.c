@@ -2629,14 +2629,14 @@ KNHAPI(void) konoha_loadStructData(Ctx *ctx, knh_StructData_t *data)
 		int sid = d->sid;
 		if(sid == STRUCT_newid) sid = ctx->share->StructTableSize;
 		KNH_ASSERT(sid == ctx->share->StructTableSize);
-		ctx->share->StructTableSize++;
+		((knh_SharedData_t*)ctx->share)->StructTableSize += 1;
 		KNH_ASSERT(sid >= 0);
 		if(!(sid < KNH_TSTRUCT_SIZE)) {
 			KNH_EXIT("enlarge KNH_TSTRUCT_SIZE %d", KNH_TSTRUCT_SIZE);
 			goto L_UNLOCK;
 		}
 		{
-			knh_StructTable_t *t = (knh_StructTable_t *)(ctx->share->StructTable + sid);
+			knh_StructTable_t *t = pStructTable(sid);
 			t->name = d->name;
 			t->size = d->size;
 			DBG2_ASSERT(d->size % sizeof(Object*) == 0);
@@ -2664,7 +2664,7 @@ void konoha_loadClassData(Ctx *ctx, knh_ClassData_t *data)
 	while(data->name != NULL) {
 		knh_class_t cid = data->cid;
 		if(cid + 1 == ctx->share->ClassTableSize) {
-			ctx->share->ClassTableSize = cid;
+			((knh_SharedData_t*)ctx->share)->ClassTableSize = cid;
 		}
 		konoha_setClassName(ctx, cid, new_String__T(ctx, data->name));
 		{

@@ -132,10 +132,10 @@ knh_Object_t *new_UnusedObject(Ctx *ctx)
 		knh_bzero(newpage, sizeof(knh_ObjectPageTable_t) * newsize);
 		knh_memcpy(newpage, ctx->share->ObjectPageTable, ctx->share->ObjectPageTableMaxSize);
 		KNH_FREE(ctx, ctx->share->ObjectPageTable, ctx->share->ObjectPageTableMaxSize);
-		ctx->share->ObjectPageTable = newpage;
-		ctx->share->ObjectPageTableMaxSize = newsize;
+		((knh_SharedData_t*)ctx->share)->ObjectPageTable = newpage;
+		((knh_SharedData_t*)ctx->share)->ObjectPageTableMaxSize = newsize;
 	}
-	ctx->share->ObjectPageTableSize += 1;
+	((knh_SharedData_t*)ctx->share)->ObjectPageTableSize += 1;
 	KNH_UNLOCK(ctx, LOCK_MEMORY, NULL);
 
 	char *t = (char*)KNH_MALLOC(ctx, SIZEOF_OBJECTPAGE);

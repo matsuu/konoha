@@ -71,7 +71,7 @@ knh_expt_t knh_ExptTable_newId(Ctx *ctx)
 		return 0;
 	}
 	newid = ctx->share->ExptTableSize;
-	ctx->share->ExptTableSize += 1;
+	((knh_SharedData_t*)ctx->share)->ExptTableSize += 1;
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
 	return newid + 1;
 }
@@ -136,7 +136,7 @@ konoha_addException(Ctx *ctx, knh_flag_t flag, knh_class_t eid, String *name, ch
 	if(eid == EXPT_newid) {
 		eid = knh_ExptTable_newId(ctx);
 	}else {
-		ctx->share->ExptTableSize += 1;
+		((knh_SharedData_t*)ctx->share)->ExptTableSize += 1;
 		KNH_ASSERT(eid == ctx->share->ExptTableSize);
 	}
 	KNH_ASSERT_eid(eid);
