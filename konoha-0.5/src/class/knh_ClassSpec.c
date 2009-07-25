@@ -423,7 +423,7 @@ MAPPER knh_fmapper_vocabidx(Ctx *ctx, knh_sfp_t *sfp)
 {
 	ClassSpec *u = konoha_getClassSpec(ctx, knh_Object_cid(sfp[0].o));
 	knh_int_t n = knh_ClassSpec_getVocabIdx(ctx, u, sfp[0].s);
-	DBG2_P("n = %lld", n);
+	DBG2_P("n = %ld", n);
 	KNH_MAPPED_Int(ctx, sfp, n);
 }
 
