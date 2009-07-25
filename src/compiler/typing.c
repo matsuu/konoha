@@ -395,7 +395,7 @@ int knh_Asm_declareScriptVariable(Ctx *ctx, Asm *abr, knh_flag_t flag, knh_type_
 {
 	knh_Script_t *scr = knh_Asm_getScript(ctx, abr);
 	knh_class_t cid = knh_Object_cid(scr);
-	knh_cfield_t *cf = (ctx->share->ClassTable[cid].cstruct)->fields;
+	knh_cfield_t *cf = (ClassTable(cid).cstruct)->fields;
 	knh_index_t idx = knh_Asm_addVariableTable(ctx, abr, cf, KNH_SCRIPT_FIELDSIZE, flag, type, fn, value);
 	if(idx != -1) {
 #ifdef KNH_USING_UNBOXFIELD
@@ -638,7 +638,7 @@ void knh_Token_toCLASSID(Ctx *ctx, Token *o, knh_class_t cid)
 	SP(o)->tt = TT_CLASSID;
 	DP(o)->cid = cid;
 	DP(o)->type = NNTYPE_Class;
-	KNH_SETv(ctx, DP(o)->data, ctx->share->ClassTable[cid].class_cid);
+	KNH_SETv(ctx, DP(o)->data, ClassTable(cid).class_cid);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -890,7 +890,7 @@ int knh_TokenTSTR_typing(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t reqt)
 		knh_Token_setCONST(ctx, tk, UP(new_Exception(ctx, DP(tk)->text)));
 	}
 	else {
-		knh_class_t tagcid = knh_NameSpace_tagcid(ctx, ctx->ns, CLASS_String, tag);
+		knh_class_t tagcid = knh_NameSpace_tagcid(ctx, ctx->share->mainns, CLASS_String, tag);
 		if(tagcid != CLASS_unknown) {
 			ClassSpec *u = konoha_getClassSpec(ctx, tagcid);
 			int foundError = 0;
@@ -1591,7 +1591,7 @@ void KNH_BOX(Ctx *ctx, knh_sfp_t *sfp, knh_type_t type)
 {
 	knh_class_t cid = CLASS_type(type);
 	KNH_ASSERT_cid(cid);
-	knh_class_t bcid = ctx->share->ClassTable[cid].bcid;
+	knh_class_t bcid = ClassTable(cid).bcid;
 	if(bcid == CLASS_Int || bcid == CLASS_Float || bcid == CLASS_Boolean) {
 		if(IS_NNTYPE(type) || IS_NOTNULL(sfp[0].o)) {
 			KNH_SETv(ctx, sfp[0].o, new_Object_boxing(ctx, cid, sfp));
@@ -1698,7 +1698,7 @@ static int knh_type_isClosure(Ctx *ctx, knh_type_t type)
 {
 	knh_class_t cid = CLASS_type(type);
 	KNH_ASSERT_cid(cid);
-	return (ctx->share->ClassTable[cid].bcid == CLASS_Closure);
+	return (ClassTable(cid).bcid == CLASS_Closure);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1780,13 +1780,13 @@ Term *knh_StmtINVOKE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		return TM(stmt);
 	}
 
-	knh_Stmt_setType(ctx, stmt, ctx->share->ClassTable[cid].r0);
+	knh_Stmt_setType(ctx, stmt, ClassTable(cid).r0);
 
-	if(ctx->share->ClassTable[cid].p1 != TYPE_void) {
+	if(ClassTable(cid).p1 != TYPE_void) {
 		if(!(DP(stmt)->size > 2)) {
-			knh_Stmt_add(ctx, stmt, UP(new_TokenNULL(ctx, FL(stmt), ctx->share->ClassTable[cid].p1)));
+			knh_Stmt_add(ctx, stmt, UP(new_TokenNULL(ctx, FL(stmt), ClassTable(cid).p1)));
 		}
-		if(!TERMs_typing(ctx, stmt, 2, abr, ns, ctx->share->ClassTable[cid].p1, TCHECK_)) {
+		if(!TERMs_typing(ctx, stmt, 2, abr, ns, ClassTable(cid).p1, TCHECK_)) {
 			return NULL;
 		}
 	}
@@ -1795,11 +1795,11 @@ Term *knh_StmtINVOKE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		return TM(stmt);
 	}
 
-	if(ctx->share->ClassTable[cid].p2 != TYPE_void) {
+	if(ClassTable(cid).p2 != TYPE_void) {
 		if(!(DP(stmt)->size > 3)) {
-			knh_Stmt_add(ctx, stmt, UP(new_TokenNULL(ctx, FL(stmt), ctx->share->ClassTable[cid].p2)));
+			knh_Stmt_add(ctx, stmt, UP(new_TokenNULL(ctx, FL(stmt), ClassTable(cid).p2)));
 		}
-		if(!TERMs_typing(ctx, stmt, 3, abr, ns, ctx->share->ClassTable[cid].p2, TCHECK_)) {
+		if(!TERMs_typing(ctx, stmt, 3, abr, ns, ClassTable(cid).p2, TCHECK_)) {
 			return NULL;
 		}
 	}
@@ -1808,11 +1808,11 @@ Term *knh_StmtINVOKE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		return TM(stmt);
 	}
 
-	if(ctx->share->ClassTable[cid].p3 != TYPE_void) {
+	if(ClassTable(cid).p3 != TYPE_void) {
 		if(!(DP(stmt)->size > 4)) {
-			knh_Stmt_add(ctx, stmt, UP(new_TokenNULL(ctx, FL(stmt), ctx->share->ClassTable[cid].p3)));
+			knh_Stmt_add(ctx, stmt, UP(new_TokenNULL(ctx, FL(stmt), ClassTable(cid).p3)));
 		}
-		if(!TERMs_typing(ctx, stmt, 4, abr, ns, ctx->share->ClassTable[cid].p3, TCHECK_)) {
+		if(!TERMs_typing(ctx, stmt, 4, abr, ns, ClassTable(cid).p3, TCHECK_)) {
 			return NULL;
 		}
 		DP(stmt)->size = 5;
@@ -3535,7 +3535,7 @@ static
 char *knh_format_funcname(Ctx *ctx, char *buf, size_t bufsiz, knh_class_t cid, knh_methodn_t mn)
 {
 	KNH_ASSERT_cid(cid);
-	char *cname = knh_String_tochar(ctx->share->ClassTable[cid].sname);
+	char *cname = knh_String_tochar(ClassTable(cid).sname);
 	if(METHODN_IS_MOVTEXT(mn)) {
 		knh_snprintf(buf, bufsiz, "%s__%s", cname, FIELDN(METHODN_TOFIELDN(mn)));
 		return buf;
@@ -3719,7 +3719,7 @@ void knh_Asm_iniClassTableField(Ctx *ctx, Asm *abr, knh_class_t cid)
 static
 void knh_Asm_declareClassField(Ctx *ctx, Asm *abr, NameSpace* ns, knh_class_t cid)
 {
-	knh_ClassTable_t *TC = (knh_ClassTable_t*)(&ctx->share->ClassTable[cid]);
+	knh_ClassTable_t *TC = (knh_ClassTable_t*)(&ClassTable(cid));
 	DBG2_ASSERT(IS_ClassStruct(TC->cstruct));
 	DBG2_ASSERT((TC->cstruct)->fields == NULL);
 	{

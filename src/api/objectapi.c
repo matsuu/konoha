@@ -334,7 +334,7 @@ void knh_Object__dump(Ctx *ctx, Object *b, OutputStream *w, String *m)
 //	}
 //	knh_intptr_t i, c = 0;
 //	knh_putc(ctx, w, '[');
-//	for(i = 0; i < ctx->share->ClassTable[cid].bsize; i++) {
+//	for(i = 0; i < ClassTable(cid).bsize; i++) {
 //		knh_cfield_t *cf = knh_Class_fieldAt(ctx, cid, i);
 //		if(cf->fn == FIELDN_NONAME || KNH_FLAG_IS(cf->flag, KNH_FLAG_CFF_HIDDEN)) continue;
 //		if(c > 0) {
@@ -503,14 +503,14 @@ void knh_Class_NAME__man(Ctx *ctx, knh_class_t cid, OutputStream *w)
 	knh_write_EOL(ctx, w);
 
 	knh_write_TAB(ctx, w);
-	knh_write(ctx, w, knh_String_tobytes(ctx->share->ClassTable[cid].lname));
+	knh_write(ctx, w, knh_String_tobytes(ClassTable(cid).lname));
 	knh_write_EOL(ctx, w);
 
-	while(ctx->share->ClassTable[cid].supcid != CLASS_Object) {
-		cid = ctx->share->ClassTable[cid].supcid;
+	while(ClassTable(cid).supcid != CLASS_Object) {
+		cid = ClassTable(cid).supcid;
 		knh_write_TAB(ctx, w);
 		knh_write(ctx, w, STEXT("extends "));
-		knh_write(ctx, w, knh_String_tobytes(ctx->share->ClassTable[cid].lname));
+		knh_write(ctx, w, knh_String_tobytes(ClassTable(cid).lname));
 		knh_write_EOL(ctx, w);
 	}
 }
@@ -573,7 +573,7 @@ void knh_Class__man(Ctx *ctx, Class *o, OutputStream *w, String *m)
 	KNH_LPUSH(ctx, dm);
 	size_t i = 0;
 	while(1) {
-		Array *a = ctx->share->ClassTable[cid].cstruct->methods;
+		Array *a = ClassTable(cid).cstruct->methods;
 		for(i = 0; i < knh_Array_size(a); i++) {
 			Method *mtd = (Method*)knh_Array_n(a, i);
 			char *op = knh_methodop_tochar(DP(mtd)->mn);
@@ -593,7 +593,7 @@ void knh_Class__man(Ctx *ctx, Class *o, OutputStream *w, String *m)
 			}
 		}
 		if(cid == CLASS_Object) break;
-		cid = ctx->share->ClassTable[cid].supcid;
+		cid = ClassTable(cid).supcid;
 	}
 
 	int cnt = 0;
@@ -639,7 +639,7 @@ void knh_Class__man(Ctx *ctx, Class *o, OutputStream *w, String *m)
 		if(IS_Method(mtd)) {
 			if(METHODN_IS_MOVTEXT(DP(mtd)->mn)) continue;
 			if(DP(mtd)->cid == CLASS_Object && cid != CLASS_Object) continue;
-//			if(DP(mtd)->cid != ctx->share->ClassTable[cid].bcid) continue;
+//			if(DP(mtd)->cid != ClassTable(cid).bcid) continue;
 			if(hasCaption == 0) {
 				knh_write_char(ctx, w, _("Method"));
 				knh_write_EOL(ctx, w);
@@ -677,7 +677,7 @@ void knh_Class__man(Ctx *ctx, Class *o, OutputStream *w, String *m)
 	}
 	knh_write_EOL(ctx, w);
 
-	knh_ClassMap__man(ctx, ctx->share->ClassTable[cid].cmap, w, cid);
+	knh_ClassMap__man(ctx, ClassTable(cid).cmap, w, cid);
 	KNH_LOCALBACK(ctx, lsfp);
 }
 

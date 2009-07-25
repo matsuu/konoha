@@ -151,7 +151,7 @@ void konoha_addMapperFunc(Ctx *ctx, knh_flag_t flag, knh_type_t stype, knh_type_
 	knh_class_t cid = CLASS_type(stype);
 	KNH_ASSERT_cid(cid);
 	knh_ClassTable_readyClassMap(ctx, cid);
-	knh_ClassMap_add(ctx, ctx->share->ClassTable[cid].cmap,
+	knh_ClassMap_add(ctx, ClassTable(cid).cmap,
 		new_Mapper(ctx, flag, CLASS_type(stype), CLASS_type(ttype), fmap, mapdata));
 }
 

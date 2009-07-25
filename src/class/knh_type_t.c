@@ -54,11 +54,11 @@ knh_class_t knh_pmztype_toclass(Ctx *ctx, knh_type_t t, knh_class_t this_cid)
 	if(cid == CLASS_Any2) {
 		return ctx->share->ClassTable[this_cid].p2;
 	}
-	if(ctx->share->ClassTable[cid].bcid == CLASS_Closure) {
-		knh_type_t r0 = ctx->share->ClassTable[cid].r0;
-		knh_type_t p1 = ctx->share->ClassTable[cid].p1;
-		knh_type_t p2 = ctx->share->ClassTable[cid].p2;
-		knh_type_t p3 = ctx->share->ClassTable[cid].p3;
+	if(ClassTable(cid).bcid == CLASS_Closure) {
+		knh_type_t r0 = ClassTable(cid).r0;
+		knh_type_t p1 = ClassTable(cid).p1;
+		knh_type_t p2 = ClassTable(cid).p2;
+		knh_type_t p3 = ClassTable(cid).p3;
 		knh_type_t rr0 = knh_pmztype_totype(ctx, r0, this_cid);
 		knh_type_t pp1 = knh_pmztype_totype(ctx, p1, this_cid);
 		knh_type_t pp2 = knh_pmztype_totype(ctx, p2, this_cid);
@@ -69,12 +69,12 @@ knh_class_t knh_pmztype_toclass(Ctx *ctx, knh_type_t t, knh_class_t this_cid)
 		return cid;
 	}
 	if(knh_Class_isGenerics(cid)) { /* Iterator<This> */
-		knh_class_t p1 = ctx->share->ClassTable[cid].p1;
-		knh_class_t p2 = ctx->share->ClassTable[cid].p2;
+		knh_class_t p1 = ClassTable(cid).p1;
+		knh_class_t p2 = ClassTable(cid).p2;
 		knh_class_t pp1 = knh_pmztype_toclass(ctx, p1, this_cid);
 		knh_class_t pp2 = knh_pmztype_toclass(ctx, p2, this_cid);
 		if(p1 != pp1 || p2 != pp2) {
-			return knh_class_Generics(ctx, ctx->share->ClassTable[cid].bcid, pp1, pp2);
+			return knh_class_Generics(ctx, ClassTable(cid).bcid, pp1, pp2);
 		}
 		return cid;
 	}
@@ -97,11 +97,11 @@ knh_type_t knh_pmztype_totype(Ctx *ctx, knh_type_t t, knh_class_t this_cid)
 	if(cid == CLASS_Any2) {
 		return ctx->share->ClassTable[this_cid].p2 | mask;
 	}
-	if(ctx->share->ClassTable[cid].bcid == CLASS_Closure) {
-		knh_type_t r0 = ctx->share->ClassTable[cid].r0;
-		knh_type_t p1 = ctx->share->ClassTable[cid].p1;
-		knh_type_t p2 = ctx->share->ClassTable[cid].p2;
-		knh_type_t p3 = ctx->share->ClassTable[cid].p3;
+	if(ClassTable(cid).bcid == CLASS_Closure) {
+		knh_type_t r0 = ClassTable(cid).r0;
+		knh_type_t p1 = ClassTable(cid).p1;
+		knh_type_t p2 = ClassTable(cid).p2;
+		knh_type_t p3 = ClassTable(cid).p3;
 		knh_type_t rr0 = knh_pmztype_totype(ctx, r0, this_cid);
 		knh_type_t pp1 = knh_pmztype_totype(ctx, p1, this_cid);
 		knh_type_t pp2 = knh_pmztype_totype(ctx, p2, this_cid);
@@ -112,17 +112,17 @@ knh_type_t knh_pmztype_totype(Ctx *ctx, knh_type_t t, knh_class_t this_cid)
 		return cid | mask;
 	}
 	if(knh_Class_isGenerics(cid)) { /* Iterator<This> */
-		knh_class_t p1 = ctx->share->ClassTable[cid].p1;
-		knh_class_t p2 = ctx->share->ClassTable[cid].p2;
+		knh_class_t p1 = ClassTable(cid).p1;
+		knh_class_t p2 = ClassTable(cid).p2;
 		knh_class_t pp1 = knh_pmztype_toclass(ctx, p1, this_cid);
 		if(p2 != CLASS_unknown) {
 			knh_class_t pp2 = knh_pmztype_toclass(ctx, p2, this_cid);
 			if(p1 != pp1 || p2 != pp2) {
-				return knh_class_Generics(ctx, ctx->share->ClassTable[cid].bcid, pp1, pp2) | mask;
+				return knh_class_Generics(ctx, ClassTable(cid).bcid, pp1, pp2) | mask;
 			}
 		}else {
 			if(p1 != pp1) {
-				return knh_class_Generics(ctx, ctx->share->ClassTable[cid].bcid, pp1, CLASS_unknown) | mask;
+				return knh_class_Generics(ctx, ClassTable(cid).bcid, pp1, CLASS_unknown) | mask;
 			}
 		}
 		return cid | mask;

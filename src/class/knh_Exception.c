@@ -139,7 +139,6 @@ konoha_addException(Ctx *ctx, knh_flag_t flag, knh_class_t eid, String *name, ch
 		ctx->share->ExptTableSize += 1;
 		KNH_ASSERT(eid == ctx->share->ExptTableSize);
 	}
-
 	KNH_ASSERT_eid(eid);
 
 	knh_expt_t parent = EXPT_Exception;
@@ -150,12 +149,13 @@ konoha_addException(Ctx *ctx, knh_flag_t flag, knh_class_t eid, String *name, ch
 		}
 	}
 
-	KNH_ASSERT(ctx->share->ExptTable[eid-1].name == NULL);
-	ctx->share->ExptTable[eid-1].flag = flag;
-	ctx->share->ExptTable[eid-1].parent = parent;
-	KNH_INITv(ctx->share->ExptTable[eid-1].name, name);
+	knh_ExptTable_t *t = pExptTable(eid-1);
+	KNH_ASSERT(t->name == NULL);
+	t->flag = flag;
+	t->parent = parent;
+	KNH_INITv(t->name, name);
 	knh_DictSet_set(ctx, DP(ctx->sys)->ExptNameDictSet, name, eid);
-	//DBG2_P("Generating new Exception eid=%d name='%s'", eid, knh_String_tochar(((Context*)ctx)->ExptTable[eid].name));
+	//DBG2_P("Generating new Exception eid=%d name='%s'", eid, knh_String_tochar(t->name));
 	return eid;
 }
 

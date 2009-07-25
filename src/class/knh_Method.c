@@ -370,7 +370,7 @@ void knh_Class_addMethod(Ctx *ctx, knh_class_t cid, Method *mtd)
 	KNH_ASSERT(IS_Method(mtd));
 	KNH_ASSERT(cid == DP(mtd)->cid);
 	KNH_ASSERT_cid(cid);
-	ClassStruct *cs = ctx->share->ClassTable[cid].cstruct;;
+	ClassStruct *cs = ClassTable(cid).cstruct;;
 	size_t i;
 	for(i = 0; i < knh_Array_size(cs->methods); i++) {
 		Method *mtd2 = (Method*)knh_Array_n(cs->methods, i);
@@ -648,7 +648,7 @@ knh_Class_getMethod__(Ctx *ctx, knh_class_t this_cid, knh_methodn_t mn, knh_bool
 	TAIL_RECURSION:;
 	KNH_ASSERT_cid(cid);
 	{
-		ClassStruct *cs = ctx->share->ClassTable[cid].cstruct;;
+		ClassStruct *cs = ClassTable(cid).cstruct;;
 		size_t i;
 		for(i = 0; i < knh_Array_size(cs->methods); i++) {
 			Method *mtd = (Method*)knh_Array_n(cs->methods, i);
@@ -658,7 +658,7 @@ knh_Class_getMethod__(Ctx *ctx, knh_class_t this_cid, knh_methodn_t mn, knh_bool
 			cid = this_cid;
 			goto L_GenerateField;
 		}
-		cid = ctx->share->ClassTable[cid].supcid;
+		cid = ClassTable(cid).supcid;
 	}
 	goto TAIL_RECURSION;
 

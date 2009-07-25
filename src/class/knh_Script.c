@@ -45,10 +45,10 @@ Script *new_Script(Ctx *ctx, knh_bytes_t nsname)
 	o->h.cid = cid;
 
 	char buf[CLASSNAME_BUFSIZ];
-	knh_ClassTable_t *TC = (knh_ClassTable_t*)(&ctx->share->ClassTable[cid]);
+	knh_ClassTable_t *TC = (knh_ClassTable_t*)(&ClassTable(cid));
 	knh_snprintf(buf, sizeof(buf), "%s.Script", (char*)nsname.buf);
 
-	KNH_ASSERT(ctx->share->ClassTable[cid].class_cid == NULL);
+	KNH_ASSERT(ClassTable(cid).class_cid == NULL);
 
 	TC->cflag  = CFLAG_Script;
 	TC->oflag  = FLAG_Script;
@@ -82,7 +82,7 @@ Script *new_Script(Ctx *ctx, knh_bytes_t nsname)
 //void knh_Script_restart(Ctx *ctx, Script *o)
 //{
 //	knh_class_t cid = o->h.cid;
-//	knh_ClassTable_t *TC = (knh_ClassTable_t*)(&ctx->share->ClassTable[cid]);
+//	knh_ClassTable_t *TC = (knh_ClassTable_t*)(&ClassTable(cid));
 //	int i;
 //	for(i = 0; i < KNH_SCRIPT_FIELDSIZE; i++) {
 //		KNH_SETv(ctx, o->fields[i], KNH_NULL);

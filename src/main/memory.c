@@ -335,13 +335,13 @@ knh_Object_t *new_Object_init(Ctx *ctx, knh_flag_t flag, knh_class_t cid, int in
 		o->h.magic = KNH_OBJECT_MAGIC;
 		knh_Object_RCset(o, KNH_RCGC_INIT);
 		KNH_ASSERT_cid(cid);
-		knh_class_t bcid = ctx->share->ClassTable[cid].bcid;
+		knh_class_t bcid = ClassTable(cid).bcid;
 		o->h.bcid = bcid;
-		o->h.flag = ctx->share->ClassTable[cid].oflag | flag;
+		o->h.flag = ClassTable(cid).oflag | flag;
 		o->h.cid  = cid;
 		o->h.ctxid = ctx->ctxid;
 		o->h.lock  = LOCK_NO;
-		size_t size = ctx->share->ClassTable[cid].size;
+		size_t size = ClassTable(cid).size;
 		if(size > 0) {
 			o->ref = KNH_MALLOC(ctx, size);
 		}
@@ -370,7 +370,7 @@ KNHAPI(Object*) new_Object_boxing(Ctx *ctx, knh_class_t cid, knh_sfp_t *sfp)
 		o->h.magic = KNH_OBJECT_MAGIC;
 		knh_Object_RCset(o, KNH_RCGC_INIT);
 		o->h.flag = FLAG_Float;
-		o->h.bcid = ctx->share->ClassTable[cid].bcid;
+		o->h.bcid = ClassTable(cid).bcid;
 		o->h.cid  = cid;
 		o->h.ctxid = ctx->ctxid;
 		o->h.lock  = LOCK_NO;

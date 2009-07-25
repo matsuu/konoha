@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-#define KONOHA_BUILDID                  604
+#define KONOHA_BUILDID                  605
 
 /* ======================================================================== */
 
@@ -216,45 +216,45 @@ extern "C" {
 #define KNH_FLAG_CF_RELEASE             KNH_FLAG_T0
 
 #define knh_class_isRelease(o)  \
-	((ctx->share->ClassTable[(o)].cflag & KNH_FLAG_CF_RELEASE) == KNH_FLAG_CF_RELEASE)
+	(((pClassTable(o))->cflag & KNH_FLAG_CF_RELEASE) == KNH_FLAG_CF_RELEASE)
 
 #define knh_class_isDebug(o)   \
-	((ctx->share->ClassTable[(o)].cflag & KNH_FLAG_CF_RELEASE) != KNH_FLAG_CF_RELEASE)
+	(((pClassTable(o))->cflag & KNH_FLAG_CF_RELEASE) != KNH_FLAG_CF_RELEASE)
 #define KNH_FLAG_CF_IMMUTABLE           KNH_FLAG_T1
 
 #define knh_class_isImmutable(o)  \
-	((ctx->share->ClassTable[(o)].cflag & KNH_FLAG_CF_IMMUTABLE) == KNH_FLAG_CF_IMMUTABLE)
+	(((pClassTable(o))->cflag & KNH_FLAG_CF_IMMUTABLE) == KNH_FLAG_CF_IMMUTABLE)
 #define KNH_FLAG_CF_CYCLIC              KNH_FLAG_T2
 
 #define knh_class_isCyclic(o)  \
-	((ctx->share->ClassTable[(o)].cflag & KNH_FLAG_CF_CYCLIC) == KNH_FLAG_CF_CYCLIC)
+	(((pClassTable(o))->cflag & KNH_FLAG_CF_CYCLIC) == KNH_FLAG_CF_CYCLIC)
 
 #define knh_class_setCyclic(o,b)  \
-	if(b) ctx->share->ClassTable[(o)].cflag |= KNH_FLAG_CF_CYCLIC; else ctx->share->ClassTable[(o)].cflag &= ~(KNH_FLAG_CF_CYCLIC);
+	if(b) (pClassTable(o))->cflag |= KNH_FLAG_CF_CYCLIC; else (pClassTable(o))->cflag &= ~(KNH_FLAG_CF_CYCLIC);
 
 #define KNH_FLAG_CF_METAEXTENSIBLE      KNH_FLAG_T3
 
 #define knh_class_isMetaExtensible(o)  \
-	((ctx->share->ClassTable[(o)].cflag & KNH_FLAG_CF_METAEXTENSIBLE) == KNH_FLAG_CF_METAEXTENSIBLE)
+	(((pClassTable(o))->cflag & KNH_FLAG_CF_METAEXTENSIBLE) == KNH_FLAG_CF_METAEXTENSIBLE)
 #define KNH_FLAG_CF_PRIVATE             KNH_FLAG_T4
 
 #define knh_class_isPrivate(o)  \
-	((ctx->share->ClassTable[(o)].cflag & KNH_FLAG_CF_PRIVATE) == KNH_FLAG_CF_PRIVATE)
+	(((pClassTable(o))->cflag & KNH_FLAG_CF_PRIVATE) == KNH_FLAG_CF_PRIVATE)
 
 #define knh_class_isPublic(o)   \
-	((ctx->share->ClassTable[(o)].cflag & KNH_FLAG_CF_PRIVATE) != KNH_FLAG_CF_PRIVATE)
+	(((pClassTable(o))->cflag & KNH_FLAG_CF_PRIVATE) != KNH_FLAG_CF_PRIVATE)
 #define KNH_FLAG_CF_FINAL               KNH_FLAG_T5
 
 #define knh_class_isFinal(o)  \
-	((ctx->share->ClassTable[(o)].cflag & KNH_FLAG_CF_FINAL) == KNH_FLAG_CF_FINAL)
+	(((pClassTable(o))->cflag & KNH_FLAG_CF_FINAL) == KNH_FLAG_CF_FINAL)
 #define KNH_FLAG_CF_SINGLETON           KNH_FLAG_T6
 
 #define knh_class_isSingleton(o)  \
-	((ctx->share->ClassTable[(o)].cflag & KNH_FLAG_CF_SINGLETON) == KNH_FLAG_CF_SINGLETON)
+	(((pClassTable(o))->cflag & KNH_FLAG_CF_SINGLETON) == KNH_FLAG_CF_SINGLETON)
 #define KNH_FLAG_CF_INTERFACE           KNH_FLAG_T7
 
 #define knh_class_isInterface(o)  \
-	((ctx->share->ClassTable[(o)].cflag & KNH_FLAG_CF_INTERFACE) == KNH_FLAG_CF_INTERFACE)
+	(((pClassTable(o))->cflag & KNH_FLAG_CF_INTERFACE) == KNH_FLAG_CF_INTERFACE)
 
 /* ------------------------------------------------------------------------ */
 /* ClassStruct */

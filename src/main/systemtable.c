@@ -178,14 +178,9 @@ void knh_Context_initCommon(Ctx *ctx, knh_Context_t *o, size_t stacksize)
 	KNH_INITv(o->props, new_DictMap0(ctx, 16));
 
 	KNH_INITv(o->enc, DP(ctx->sys)->enc);
-	//#ifndef KONOHA_ON_LKM
 	KNH_INITv(o->in,  DP(ctx->sys)->in);
 	KNH_INITv(o->out, DP(ctx->sys)->out);
 	KNH_INITv(o->err, DP(ctx->sys)->err);
-	//#endif
-
-	KNH_INITv(o->ns,   KNH_NULL);
-	KNH_INITv(o->tsymbolDictMap, new_DictMap0(ctx, 256));
 	KNH_INITv(o->abr, KNH_NULL);
 }
 
@@ -205,14 +200,9 @@ void knh_Context_traverseCommon(Ctx *ctx, knh_Context_t *o, knh_ftraverse ftr)
 	ftr(ctx, UP(o->props));
 
 	ftr(ctx, UP(o->enc));
-#ifndef KONOHA_ON_LKM
 	ftr(ctx, UP(o->in));
 	ftr(ctx, UP(o->out));
 	ftr(ctx, UP(o->err));
-#endif
-
-	ftr(ctx, UP(o->ns));
-	ftr(ctx, UP(o->tsymbolDictMap));
 	ftr(ctx, UP(o->abr));
 
 	if(IS_SWEEP(ftr)) {
@@ -283,8 +273,7 @@ Ctx *konoha_createContext0(size_t stacksize)
 	ctx->share->ObjectPageTableSize = 0;
 
 	KNH_ASSERT(ctx->share->LockTable == NULL);
-	ctx->share->LockTable =
-		(knh_LockTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TLOCK);
+	ctx->share->LockTable = (knh_LockTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TLOCK);
 	knh_bzero(ctx->share->LockTable, SIZEOF_TLOCK);
 	for(i = 0; i < KNH_TLOCK_SIZE; i++) {
 		ctx->share->LockTable[i].flock = knh_fmutexlock_nop;
@@ -297,28 +286,24 @@ Ctx *konoha_createContext0(size_t stacksize)
 
 	KNH_ASSERT(ctx->share->StructTable == NULL);
 	ctx->share->StructTable = (knh_StructTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TSTRUCT);
-	knh_bzero(ctx->share->StructTable, SIZEOF_TSTRUCT);
+	knh_bzero((void*)ctx->share->StructTable, SIZEOF_TSTRUCT);
 	ctx->share->StructTableSize = 0;
 
 	KNH_ASSERT(ctx->share->ClassTable == NULL);
 	ctx->share->ClassTable = (knh_ClassTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TCLASS);
-	knh_bzero(ctx->share->ClassTable, SIZEOF_TCLASS);
+	knh_bzero((void*)ctx->share->ClassTable, SIZEOF_TCLASS);
 	for(i = 0; i < KNH_TCLASS_SIZE; i++) {
-		ctx->share->ClassTable[i].p1       = CLASS_unknown;   /* @deps knh_Class_isGenerics(cid)*/
-		ctx->share->ClassTable[i].p2       = CLASS_unknown;
-		ctx->share->ClassTable[i].keyidx   = -1;
-		ctx->share->ClassTable[i].keyidx2   = -1;
+		knh_ClassTable_t *t = pClassTable(i);
+		t->p1       = CLASS_unknown;   /* @deps knh_Class_isGenerics(cid)*/
+		t->p2       = CLASS_unknown;
+		t->keyidx   = -1;
+		t->keyidx2   = -1;
 	}
 	ctx->share->ClassTableSize = KNH_TCLASS_SIZE;
 
 	ctx->share->ExptTable = (knh_ExptTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TEXPT);
+	knh_bzero((void*)ctx->share->ExptTable, SIZEOF_TEXPT);
 	ctx->share->ExptTableSize = 0;
-	for(i = 0; i < KNH_TEXPT_SIZE; i++) {
-		(ctx)->share->ExptTable[i].flag     = 0;
-		(ctx)->share->ExptTable[i].parent   = 1;
-		(ctx)->share->ExptTable[i].name     = NULL;
-	}
-
 	konoha_loadSystemStructData(ctx);
 
 	KNH_INITv(ctx->share->constNull, new_Null(ctx));
@@ -343,8 +328,9 @@ Ctx *konoha_createContext0(size_t stacksize)
 	ctx->parent = ctx;
 
 	KNH_INITv(ctx->sys, new_System(ctx));
-
 	konoha_loadSystemData(ctx);
+	KNH_INITv(ctx->share->mainns, new_NameSpace(ctx, TS_main));
+
 	knh_Context_initCommon(ctx, ctx, stacksize);
 	return (Ctx*)ctx;
 }
@@ -383,6 +369,7 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 	ftr(ctx, UP(ctx->share->constInt0));
 	ftr(ctx, UP(ctx->share->constFloat0));
 	ftr(ctx, UP(ctx->sys));
+	ftr(ctx, UP(ctx->share->mainns));
 
 	int i;
 	for(i = 0; i < KNH_TSTRING_SIZE; i++) {
@@ -399,72 +386,72 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 	}
 
 	for(i = 0; i < (int)(ctx->share->ExptTableSize); i++) {
-		if(ctx->share->ExptTable[i].name != NULL) {
-			ftr(ctx, UP(ctx->share->ExptTable[i].name));
+		if(ExptTable(i).name != NULL) {
+			ftr(ctx, UP(ExptTable(i).name));
 		}
 	}
 
 	/* tclass */
 	if(IS_SWEEP(ftr)) {
 		for(i = 0; i < ctx->share->StructTableSize; i++) {
-			DBG2_ASSERT(ctx->share->ClassTable[i].sname != NULL);
-			knh_ClassStruct_toAbstractAll(ctx, ctx->share->ClassTable[i].cstruct);
+			DBG2_ASSERT(ClassTable(i).sname != NULL);
+			knh_ClassStruct_toAbstractAll(ctx, ClassTable(i).cstruct);
 		}
 		for(i = ctx->share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
-			DBG2_ASSERT(ctx->share->ClassTable[i].sname != NULL);
-			knh_ClassStruct_toAbstractAll(ctx, ctx->share->ClassTable[i].cstruct);
+			DBG2_ASSERT(ClassTable(i).sname != NULL);
+			knh_ClassStruct_toAbstractAll(ctx, ClassTable(i).cstruct);
 		}
 	}
 
 	for(i = 0; i < ctx->share->StructTableSize; i++) {
-		DBG2_ASSERT(ctx->share->ClassTable[i].sname != NULL);
-		ftr(ctx, UP(ctx->share->ClassTable[i].class_cid));
-		ftr(ctx, UP(ctx->share->ClassTable[i].cmap));
-		ftr(ctx, UP(ctx->share->ClassTable[i].cspec));
-		if(ctx->share->ClassTable[i].constPool != NULL) {
-			ftr(ctx, UP(ctx->share->ClassTable[i].constPool));
+		DBG2_ASSERT(ClassTable(i).sname != NULL);
+		ftr(ctx, UP(ClassTable(i).class_cid));
+		ftr(ctx, UP(ClassTable(i).cmap));
+		ftr(ctx, UP(ClassTable(i).cspec));
+		if(ClassTable(i).constPool != NULL) {
+			ftr(ctx, UP(ClassTable(i).constPool));
 		}
-		if(ctx->share->ClassTable[i].dataList != NULL) {
-			ftr(ctx, UP(ctx->share->ClassTable[i].dataList));
+		if(ClassTable(i).dataList != NULL) {
+			ftr(ctx, UP(ClassTable(i).dataList));
 		}
-		if(ctx->share->ClassTable[i].dataMap != NULL) {
-			ftr(ctx, UP(ctx->share->ClassTable[i].dataMap));
+		if(ClassTable(i).dataMap != NULL) {
+			ftr(ctx, UP(ClassTable(i).dataMap));
 		}
-		ftr(ctx, UP(ctx->share->ClassTable[i].lname));
+		ftr(ctx, UP(ClassTable(i).lname));
 	}
 	for(i = ctx->share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
-		DBG2_ASSERT(ctx->share->ClassTable[i].sname != NULL);
-		ftr(ctx, UP(ctx->share->ClassTable[i].class_cid));
-		ftr(ctx, UP(ctx->share->ClassTable[i].cmap));
-		ftr(ctx, UP(ctx->share->ClassTable[i].cspec));
-		if(ctx->share->ClassTable[i].constPool != NULL) {
-			ftr(ctx, UP(ctx->share->ClassTable[i].constPool));
+		DBG2_ASSERT(ClassTable(i).sname != NULL);
+		ftr(ctx, UP(ClassTable(i).class_cid));
+		ftr(ctx, UP(ClassTable(i).cmap));
+		ftr(ctx, UP(ClassTable(i).cspec));
+		if(ClassTable(i).constPool != NULL) {
+			ftr(ctx, UP(ClassTable(i).constPool));
 		}
-		if(ctx->share->ClassTable[i].dataList != NULL) {
-			ftr(ctx, UP(ctx->share->ClassTable[i].dataList));
+		if(ClassTable(i).dataList != NULL) {
+			ftr(ctx, UP(ClassTable(i).dataList));
 		}
-		if(ctx->share->ClassTable[i].dataMap != NULL) {
-			ftr(ctx, UP(ctx->share->ClassTable[i].dataMap));
+		if(ClassTable(i).dataMap != NULL) {
+			ftr(ctx, UP(ClassTable(i).dataMap));
 		}
-		ftr(ctx, UP(ctx->share->ClassTable[i].lname));
+		ftr(ctx, UP(ClassTable(i).lname));
 	}
 
 	for(i = 0; i < ctx->share->StructTableSize; i++) {
-		DBG2_ASSERT(ctx->share->ClassTable[i].sname != NULL);
-		ftr(ctx, UP(ctx->share->ClassTable[i].cstruct));
-		ftr(ctx, UP(ctx->share->ClassTable[i].sname));
+		DBG2_ASSERT(ClassTable(i).sname != NULL);
+		ftr(ctx, UP(ClassTable(i).cstruct));
+		ftr(ctx, UP(ClassTable(i).sname));
 	}
 	for(i = ctx->share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
-		DBG2_ASSERT(ctx->share->ClassTable[i].sname != NULL);
-		ftr(ctx, UP(ctx->share->ClassTable[i].cstruct));
-		ftr(ctx, UP(ctx->share->ClassTable[i].sname));
+		DBG2_ASSERT(ClassTable(i).sname != NULL);
+		ftr(ctx, UP(ClassTable(i).cstruct));
+		ftr(ctx, UP(ClassTable(i).sname));
 	}
 
 	/* System Table */
 	if(IS_SWEEP(ftr)) {
 		DBG2_P("*** FREEING ALL SYSTEM TABLES ***");
 
-		KNH_FREE(ctx, ctx->share->ExptTable, SIZEOF_TEXPT);
+		KNH_FREE(ctx, (void*)ctx->share->ExptTable, SIZEOF_TEXPT);
 		((Context*)ctx)->share->ExptTable = NULL;
 		KNH_FREE(ctx, ctx->share->tString, SIZEOF_TSTRING);
 		ctx->share->tString = NULL;
@@ -480,10 +467,10 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 		KNH_FREE(ctx, ctx->share->LockTable, SIZEOF_TLOCK);
 		ctx->share->unusedLockTable = NULL;
 
-		KNH_FREE(ctx, ctx->share->ClassTable, SIZEOF_TCLASS);
+		KNH_FREE(ctx, (void*)ctx->share->ClassTable, SIZEOF_TCLASS);
 		ctx->share->ClassTable = NULL;
 
-		KNH_FREE(ctx, ctx->share->StructTable, SIZEOF_TSTRUCT);
+		KNH_FREE(ctx, (void*)ctx->share->StructTable, SIZEOF_TSTRUCT);
 		ctx->share->StructTable = NULL;
 
 		KNH_FREE(ctx, ctx->share->ObjectPageTable,

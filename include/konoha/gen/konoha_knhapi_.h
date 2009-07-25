@@ -266,6 +266,7 @@ KNHAPI(char*) konoha_getSTDERRBuffer(konoha_t konoha);
 KNHAPI(void) konoha_evalScript(konoha_t konoha, char *script);
 KNHAPI(void) konoha_readFile(Ctx *ctx, char *fpath);
 KNHAPI(void) konoha_loadScript(konoha_t konoha, char *fpath);
+KNHAPI(int) konoha_runMain(konoha_t konoha, int argc, char **argv);
 KNHAPI(void) konoha_shell(konoha_t konoha);
 KNHAPI(char*) KNH_SAFEFILE(char *file);
 KNHAPI(Object*) new_Object_boxing(Ctx *ctx, knh_class_t cid, knh_sfp_t *sfp);

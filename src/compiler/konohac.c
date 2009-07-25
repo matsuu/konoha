@@ -136,7 +136,7 @@ void knh_class_addInterface(Ctx *ctx, knh_class_t cid, knh_class_t icid)
 				isupcid = ctx->share->ClassTable[isupcid].supcid;
 			}
 			DBG2_P("add interface %s to %s", CLASSN(icid), CLASSN(cid));
-			knh_ClassMap_add(ctx, ctx->share->ClassTable[cid].cmap, new_Mapper__interface(ctx, cid, icid));
+			knh_ClassMap_add(ctx, ClassTable(cid).cmap, new_Mapper__interface(ctx, cid, icid));
 		}
 	}
 }
@@ -152,7 +152,7 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	knh_class_t cid  = knh_NameSpace_getcid(ctx, ns, B(bufn));
 	if(cid == CLASS_unknown) {
 		cid = knh_ClassTable_newId(ctx);
-		KNH_ASSERT(ctx->share->ClassTable[cid].class_cid == NULL);
+		KNH_ASSERT(ClassTable(cid).class_cid == NULL);
 	}
 	else {
 		knh_Asm_perror(ctx, abr, KERR_ERROR, _("cannot redefine %C"), cid);
@@ -176,7 +176,7 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 
 	DP(StmtCLASS_class(stmt))->cid = cid;
 
-	knh_ClassTable_t *TC = (knh_ClassTable_t*)&(ctx->share->ClassTable[cid]);
+	knh_ClassTable_t *TC = (knh_ClassTable_t*)&(ClassTable(cid));
 	TC->cflag  = knh_StmtCLASS_flag(ctx, stmt);
 	TC->oflag  = KNH_FLAG_CF2OF(TC->cflag);
 	if(SP(StmtCLASS_instmt(stmt))->stt == STT_DONE) {
@@ -418,7 +418,7 @@ int knh_StmtUFUNC_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		}
 		else {
 			KNH_ASSERT_cid(cid);
-			Array *a = (ctx->share->ClassTable[cid].cstruct)->methods;
+			Array *a = (ClassTable(cid).cstruct)->methods;
 			size_t i;
 			for(i = 0; i < knh_Array_size(a); i++) {
 				Method *mtd = (Method*)knh_Array_n(a, i);
@@ -712,6 +712,7 @@ void konohac_eval(Ctx *ctx, String *nsname, InputStream *in)
 	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 	KNH_LPUSH(ctx, new_ExceptionHandler(ctx));
 	KNH_TRY(ctx, L_CATCH, lsfp, 0);
+	knh_Context_initAsm(ctx);   // initialization
 	{
 		Stmt *stmt = knh_InputStream_parseStmt(ctx, in, 0/*isData*/);
 		KNH_LPUSH(ctx, stmt);
