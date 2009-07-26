@@ -611,11 +611,11 @@ static void knh_initSIGINT(void)
 #if defined(KNH_USING_POSIX)
 	struct sigaction sa_sigint;
 	knh_bzero(&sa_sigint, sizeof(sa_sigint));
-    sa_sigint.sa_sigaction = sigint_action;
-    sa_sigint.sa_flags = SA_RESTART;
-    if (sigaction(SIGINT, &sa_sigint, NULL) < 0) {
-    	perror("sigaction");
-    }
+	sa_sigint.sa_sigaction = sigint_action;
+	sa_sigint.sa_flags = SA_SIGINFO | SA_RESTART;
+	if (sigaction(SIGINT, &sa_sigint, NULL) < 0) {
+		perror("sigaction");
+	}
 #endif
 }
 
