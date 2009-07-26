@@ -209,7 +209,7 @@ void knh_Context_traverseCommon(Ctx *ctx, knh_Context_t *o, knh_ftraverse ftr)
 		o->mtdCache = NULL;
 		o->fmtCache = NULL;
 		o->mprCache = NULL;
-		knh_mutex_destory(&o->ctxlock);
+		knh_mutex_destroy(&o->ctxlock);
 	}
 }
 

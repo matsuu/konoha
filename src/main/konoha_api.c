@@ -154,6 +154,7 @@ static void konoha_dumpInit(void)
 	fprintf(stderr, "sizeof(knh_sfp_t)=%d, sizeof(Ctx)=%d\n", (int)sizeof(knh_sfp_t), (int)sizeof(knh_Context_t));
 	fprintf(stderr, "sizeof(Object)=%d FASTMALLOC=%d\n", (int)sizeof(knh_Object_t), (int)KNH_FASTMALLOC_SIZE);
 	fprintf(stderr, "sizeof(Int)=%d, sizeof(Method)=%d\n", (int)sizeof(knh_Int_t), (int)sizeof(knh_Method_struct));
+	fprintf(stderr, "sizeof(knh_thread_t)=%d, sizeof(knh_mutex_t)=%d\n", (int)sizeof(knh_thread_t), (int)sizeof(knh_mutex_t));
 }
 
 /* ----------------------------------------------------------------------- */
@@ -583,7 +584,6 @@ static Ctx* shellContext = NULL;
 
 #if defined(KNH_USING_POSIX)
 #include <signal.h>
-
 
 static
 void sigint_action(int signum, siginfo_t *info, void *ctx)
