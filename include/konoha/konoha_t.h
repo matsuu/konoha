@@ -451,36 +451,31 @@ typedef struct knh_Thread_t {
 	knh_thread_t thid;
 } knh_Thread_t ;
 
-#ifndef KNH_TLOCK_SIZE
-#define KNH_TLOCK_SIZE 256
-#endif
-
-#define SIZEOF_TLOCK       (KNH_TLOCK_SIZE * sizeof(knh_LockTable_t))
-
-typedef void (*knh_fmutexlock)(Ctx *ctx, knh_lock_t lock, Object *o);
-typedef void (*knh_fmutexunlock)(Ctx *ctx, knh_lock_t lock);
-
 typedef struct knh_LockTable_t {
-	knh_lock_t  lock;     knh_flag_t  flag;
-	knh_mutex_t mutex;
-	knh_fmutexlock       flock;
-	knh_fmutexunlock       funlock;
-	int ctxid;
+	knh_mutex_t *mutex;
 	size_t count;
 	struct knh_String_t *name;
 	union {
-		Object *sharedObject;
+		Object *so;   /* shared object*/
 		struct knh_LockTable_t *unused;
 	};
+	char *filename;
+	int   lineno;
 } knh_LockTable_t;
 
-#define LOCK_NO           ((knh_lock_t)0)
+#define LOCK_NOP          ((knh_lock_t)0)
 #define LOCK_MEMORY       ((knh_lock_t)1)
 #define LOCK_SYSTBL       ((knh_lock_t)2)
-#define LOCK_GIANT        ((knh_lock_t)3)
+#define LOCK_UNUSED       3
 
-#define KNH_LOCK(ctx, lk, o)    (ctx->share)->LockTable[lk].flock(ctx, lk, o)
-#define KNH_UNLOCK(ctx, lk, o)  (ctx->share)->LockTable[lk].funlock(ctx, lk)
+#ifndef KNH_TLOCK_SIZE
+#define KNH_TLOCK_SIZE (LOCK_UNUSED+1)
+#endif
+
+#define SIZEOF_TLOCK   (KNH_TLOCK_SIZE * sizeof(knh_LockTable_t))
+
+#define KNH_LOCK(ctx, lockid, o)    knh_lockID(ctx, lockid, o, __FILE__, __LINE__)
+#define KNH_UNLOCK(ctx, lockid, o)  knh_unlockID(ctx, lockid, __FILE__, __LINE__)
 
 /* ------------------------------------------------------------------------ */
 /* Stack Frame Pointer */

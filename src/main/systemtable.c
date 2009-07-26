@@ -238,7 +238,7 @@ static Ctx *new_Context0(Ctx *parent)
 	ctx->h.bcid = CLASS_Context;
 	ctx->h.cid  = CLASS_Context;
 	ctx->h.ctxid = 0;
-	ctx->h.lock  = LOCK_NO;
+	ctx->h.lock  = LOCK_NOP;
 	ctx->ctxid = 0;
 	ctx->unusedObject = NULL;
 	ctx->unusedObjectSize = 0;
@@ -248,20 +248,33 @@ static Ctx *new_Context0(Ctx *parent)
 	return (Ctx*)ctx;
 }
 
-
 /* ------------------------------------------------------------------------ */
-/* [Context0] */
+/* [LOCKTABLE] */
 
-static void knh_fmutexlock_nop(Ctx *ctx, knh_lock_t lck, Object *ref)
+void knh_lockID(Ctx *ctx, knh_lock_t lockid, Object *ref, char *filename, int lineno)
 {
-
+	knh_LockTable_t *t = pLockTable(lockid);
+	if(t->mutex != NULL) {
+		DBG_(fprintf(stderr, "LOCK[%d] count=%d at %s:%d\n", (int)lockid, (int)(t->count + 1), filename, lineno));
+		knh_mutex_lock(t->mutex);
+		t->count += 1;
+		DBG2_({
+			t->filename = filename;
+			t->lineno = lineno;
+		});
+	}
 }
 
 /* ------------------------------------------------------------------------ */
 
-static void knh_fmutexunlock_nop(Ctx *ctx, knh_lock_t lck)
+void knh_unlockID(Ctx *ctx, knh_lock_t lockid, char *filename, int lineno)
 {
-
+	knh_LockTable_t *t = pLockTable(lockid);
+	if(t->mutex != NULL) {
+		DBG_(fprintf(stderr, "UNLOCK[%d] count=%d at %s:%d\n", (int)lockid, (int)t->count, filename, lineno));
+		t->count -= 1;
+		knh_mutex_unlock(t->mutex);
+	}
 }
 
 /* ------------------------------------------------------------------------ */
@@ -289,13 +302,11 @@ void knh_initSharedData(Context *ctx)
 	share->LockTable = (knh_LockTable_t*)KNH_MALLOC(ctx, SIZEOF_TLOCK);
 	knh_bzero(share->LockTable, SIZEOF_TLOCK);
 	for(i = 0; i < KNH_TLOCK_SIZE; i++) {
-		share->LockTable[i].flock = knh_fmutexlock_nop;
-		share->LockTable[i].funlock = knh_fmutexunlock_nop;
-		if(LOCK_GIANT < i && i < KNH_TLOCK_SIZE - 1) {
+		if(LOCK_UNUSED <= i && i < KNH_TLOCK_SIZE - 1) {
 			share->LockTable[i].unused = &(share->LockTable[i+1]);
 		}
 	}
-	share->unusedLockTable = &(share->LockTable[LOCK_GIANT+1]);
+	share->unusedLockTable = &(share->LockTable[LOCK_UNUSED]);
 
 	DBG2_ASSERT(share->StructTable == NULL);
 	share->StructTable = (knh_StructTable_t*)KNH_MALLOC(ctx, SIZEOF_TSTRUCT);
@@ -397,8 +408,8 @@ void knh_traverseSharedData(Ctx *ctx, knh_SharedData_t *share, knh_ftraverse ftr
 	for(i = 0; i < KNH_TLOCK_SIZE; i++) {
 		if(share->LockTable[i].name != NULL) {
 			ftr(ctx, UP(share->LockTable[i].name));
-			if(share->LockTable[i].sharedObject != NULL) {
-				ftr(ctx, share->LockTable[i].sharedObject);
+			if(share->LockTable[i].so != NULL) {
+				ftr(ctx, share->LockTable[i].so);
 			}
 		}
 	}
