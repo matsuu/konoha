@@ -143,7 +143,7 @@ static void knh_dev_setup(struct konohadev_t *dev){
     cdev_init(&dev->cdev,&knh_fops);
     dev->cdev.owner = THIS_MODULE;
     dev->konoha = konoha_open(128);
-    konoha_setOutputStreamBuffer(dev->konoha, 128,128);
+    knh_setOutputStreamBuffer(dev->konoha, 128,128);
     dev->buffer = kmalloc(sizeof(char)*MAXCOPYBUF,GFP_KERNEL);
     memset(dev->buffer,0,sizeof(char)*MAXCOPYBUF);
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))

@@ -233,14 +233,14 @@ knh_addClosureClass(Ctx *ctx, knh_class_t cid, String *name, knh_type_t r0, knh_
 	t->size = ClassTable(CLASS_Closure).size;
 	t->bsize  = ClassTable(CLASS_Closure).bsize;
 
-	konoha_setClassName(ctx, cid, name);
+	knh_setClassName(ctx, cid, name);
 	KNH_INITv(t->cstruct, ClassTable(CLASS_Closure).cstruct);
 	KNH_INITv(t->cmap, ClassTable(CLASS_Closure).cmap);
 	t->r0 = r0;
 	t->p1 = p1;
 	t->p2 = p2;
 	t->p3 = p3;
-	konoha_setClassDefaultValue(ctx, cid, UP(new_ClosureDEFAULT(ctx, r0, cid)), NULL);
+	knh_setClassDefaultValue(ctx, cid, UP(new_ClosureDEFAULT(ctx, r0, cid)), NULL);
 	return cid;
 }
 

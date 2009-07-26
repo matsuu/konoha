@@ -486,7 +486,7 @@ METHOD knh__System_gc(Ctx *ctx, knh_sfp_t *sfp)
 
 	DBG_DISABLE_FREE();
 	markedObjectSize = 0;
-	konoha_traverse(ctx, knh_Object_mark1);
+	knh_traverseAll(ctx, knh_Object_mark1);
 	DBG_ENABLE_FREE();
 	DBG_P("** GC - Marked %d/%d object(s)", (int)markedObjectSize, (int)ctx->stat->usedObjectSize);
 

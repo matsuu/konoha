@@ -2082,7 +2082,7 @@ static void knh_System_traverse(Ctx *ctx, System *o, knh_ftraverse ftr)
 
 #define knh_Context_init_ NULL
 #define knh_Context_copy NULL
-#define knh_Context_traverse_ NULL
+#define knh_Context_traverse NULL
 #define knh_Context_compareTo NULL
 #define knh_Context_hashCode NULL
 #define knh_Context_newClass NULL
@@ -2551,7 +2551,7 @@ char *konoha_geStructTableName(Ctx *ctx, knh_struct_t sid)
 /* ------------------------------------------------------------------------ */
 
 static
-void konoha_loadStringData(Ctx *ctx, knh_StringData_t *data)
+void knh_loadStringData(Ctx *ctx, knh_StringData_t *data)
 {
 	while(data->name != NULL) {
 		KNH_ASSERT(ctx->share->tString[data->index] == NULL);
@@ -2563,9 +2563,9 @@ void konoha_loadStringData(Ctx *ctx, knh_StringData_t *data)
 
 /* ------------------------------------------------------------------------ */
 
-void konoha_loadSystemString(Ctx *ctx)
+void knh_loadSystemString(Ctx *ctx)
 {
-	konoha_loadStringData(ctx, StringData);
+	knh_loadStringData(ctx, StringData);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2621,7 +2621,7 @@ static String* knh_fgetkey__default(Ctx *ctx, knh_sfp_t *lsfp)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) konoha_loadStructData(Ctx *ctx, knh_StructData_t *data)
+KNHAPI(void) knh_loadStructData(Ctx *ctx, knh_StructData_t *data)
 {
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 	knh_StructData_t *d = data;
@@ -2659,14 +2659,14 @@ KNHAPI(void) konoha_loadStructData(Ctx *ctx, knh_StructData_t *data)
 /* ------------------------------------------------------------------------ */
 
 static
-void konoha_loadClassData(Ctx *ctx, knh_ClassData_t *data)
+void knh_loadClassData(Ctx *ctx, knh_ClassData_t *data)
 {
 	while(data->name != NULL) {
 		knh_class_t cid = data->cid;
 		if(cid + 1 == ctx->share->ClassTableSize) {
 			((knh_SharedData_t*)ctx->share)->ClassTableSize = cid;
 		}
-		konoha_setClassName(ctx, cid, new_String__T(ctx, data->name));
+		knh_setClassName(ctx, cid, new_String__T(ctx, data->name));
 		{
 			knh_ClassTable_t *t = (knh_ClassTable_t*)(ctx->share->ClassTable + cid);
 			t->cflag  = data->flag;
@@ -2711,7 +2711,7 @@ void konoha_loadClassData(Ctx *ctx, knh_ClassData_t *data)
 				}
 				KNH_INITv(t->cmap, cm);
 			}
-			konoha_setClassDefaultValue(ctx, cid, KNH_NULL, data->fdefault);
+			knh_setClassDefaultValue(ctx, cid, KNH_NULL, data->fdefault);
 		}
 		data++;
 	}
@@ -2720,7 +2720,7 @@ void konoha_loadClassData(Ctx *ctx, knh_ClassData_t *data)
 /* ------------------------------------------------------------------------ */
 
 static
-void konoha_loadGenericsData(Ctx *ctx, knh_GenericsData_t *data)
+void knh_loadGenericsData(Ctx *ctx, knh_GenericsData_t *data)
 {
 	while(data->name != NULL) {
 		knh_addGenericsClass(ctx, data->cid, new_String__T(ctx, data->name), data->bcid, data->p1, data->p2);
@@ -2731,7 +2731,7 @@ void konoha_loadGenericsData(Ctx *ctx, knh_GenericsData_t *data)
 /* ------------------------------------------------------------------------ */
 
 static
-void konoha_loadClosureData(Ctx *ctx, knh_ClosureData_t *data)
+void knh_loadClosureData(Ctx *ctx, knh_ClosureData_t *data)
 {
 	while(data->name != NULL) {
 		knh_addClosureClass(ctx, data->cid, new_String__T(ctx, data->name), data->r0, data->p1, data->p2, data->p3);
@@ -2742,7 +2742,7 @@ void konoha_loadClosureData(Ctx *ctx, knh_ClosureData_t *data)
 /* ------------------------------------------------------------------------ */
 
 static
-void konoha_loadExptData(Ctx *ctx, knh_ExptData_t *data)
+void knh_loadExptData(Ctx *ctx, knh_ExptData_t *data)
 {
 	while(data->name != NULL) {
 		knh_addException(ctx, data->flag, data->eid, new_String__T(ctx, data->name), data->parent);
@@ -2753,7 +2753,7 @@ void konoha_loadExptData(Ctx *ctx, knh_ExptData_t *data)
 /* ------------------------------------------------------------------------ */
 
 static
-void konoha_loadFuncData(Ctx *ctx, knh_FuncData_t *data)
+void knh_loadFuncData(Ctx *ctx, knh_FuncData_t *data)
 {
 	while(data->name != NULL) {
 		knh_DictSet_set(ctx, DP(ctx->sys)->funcDictSet_UNUSED, new_String__T(ctx, data->name), (knh_uintptr_t)data->func);
@@ -2764,7 +2764,7 @@ void konoha_loadFuncData(Ctx *ctx, knh_FuncData_t *data)
 /* ------------------------------------------------------------------------ */
 
 static
-void konoha_loadFieldNameData(Ctx *ctx, knh_FieldNameData_t *data)
+void knh_loadFieldNameData(Ctx *ctx, knh_FieldNameData_t *data)
 {
 	while(data->name != NULL) {
 		String *name = new_String__T(ctx, data->name);
@@ -2782,7 +2782,7 @@ void konoha_loadFieldNameData(Ctx *ctx, knh_FieldNameData_t *data)
 /* ------------------------------------------------------------------------ */
 
 static
-void konoha_loadMethodFieldData(Ctx *ctx, knh_MethodFieldData_t *data, MethodField **pools)
+void knh_loadMethodFieldData(Ctx *ctx, knh_MethodFieldData_t *data, MethodField **pools)
 {
 	int chk = -1;
 	while(data->mfindex != -1) {
@@ -2822,7 +2822,7 @@ void konoha_loadMethodFieldData(Ctx *ctx, knh_MethodFieldData_t *data, MethodFie
 /* ------------------------------------------------------------------------ */
 
 static
-void konoha_loadMethodData(Ctx *ctx, knh_MethodData_t *data, MethodField **pools)
+void knh_loadMethodData(Ctx *ctx, knh_MethodData_t *data, MethodField **pools)
 {
 	while(data->func != NULL) {
 		KNH_ASSERT_cid(data->cid);
@@ -2846,7 +2846,7 @@ void konoha_loadMethodData(Ctx *ctx, knh_MethodData_t *data, MethodField **pools
 /* ------------------------------------------------------------------------ */
 
 static
-void konoha_loadMapperData(Ctx *ctx, knh_MapperData_t *data)
+void knh_loadMapperData(Ctx *ctx, knh_MapperData_t *data)
 {
 	while(data->func != NULL) {
 		knh_addMapperFunc(ctx, data->flag, data->scid, data->tcid, data->func, KNH_NULL);
@@ -2856,7 +2856,7 @@ void konoha_loadMapperData(Ctx *ctx, knh_MapperData_t *data)
 
 /* ------------------------------------------------------------------------ */
 
-static void konoha_loadStringPropertyData(Ctx *ctx, knh_StringConstData_t *data)
+static void knh_loadStringPropertyData(Ctx *ctx, knh_StringConstData_t *data)
 {
 	DictMap *pmap = DP(ctx->sys)->props;
 	while(data->name != NULL) {
@@ -2894,7 +2894,7 @@ static knh_StringConstData_t StringPropertyData[] = {
 
 /* ------------------------------------------------------------------------ */
 
-static void konoha_loadClassProperties(Ctx *ctx)
+static void knh_loadClassProperties(Ctx *ctx)
 {
 	knh_ClassTable_t *t = NULL;
 	ClassSpec *u = (ClassSpec*)new_Object_bcid(ctx, CLASS_ClassSpec, 0);
@@ -2909,12 +2909,12 @@ static void konoha_loadClassProperties(Ctx *ctx)
 	t = pClassTable(CLASS_String);
 	KNH_SETv(ctx, t->cspec, u);
 
-	konoha_setClassParam(ctx, CLASS_Array, CLASS_Any, CLASS_unknown);
-	konoha_setClassParam(ctx, CLASS_Iterator, CLASS_Any, CLASS_unknown);
-	konoha_setClassParam(ctx, CLASS_DictMap, CLASS_Any, CLASS_unknown);
-	konoha_setClassParam(ctx, CLASS_DictSet, CLASS_Any, CLASS_unknown);
-	konoha_setClassParam(ctx, CLASS_HashMap, CLASS_Any, CLASS_Any);
-	konoha_setClassParam(ctx, CLASS_HashSet, CLASS_Any, CLASS_Any);
+	knh_setClassParam(ctx, CLASS_Array, CLASS_Any, CLASS_unknown);
+	knh_setClassParam(ctx, CLASS_Iterator, CLASS_Any, CLASS_unknown);
+	knh_setClassParam(ctx, CLASS_DictMap, CLASS_Any, CLASS_unknown);
+	knh_setClassParam(ctx, CLASS_DictSet, CLASS_Any, CLASS_unknown);
+	knh_setClassParam(ctx, CLASS_HashMap, CLASS_Any, CLASS_Any);
+	knh_setClassParam(ctx, CLASS_HashSet, CLASS_Any, CLASS_Any);
 
 	t = pClassTable(CLASS_Closure);
 	t->r0 = CLASS_Any;
@@ -2925,39 +2925,39 @@ static void konoha_loadClassProperties(Ctx *ctx)
 	knh_loadIntConstData(ctx, IntConstData);
 	knh_loadFloatConstData(ctx, FloatConstData);
 	knh_loadStringConstData(ctx, StringConstData);
-	konoha_loadStringPropertyData(ctx, StringPropertyData);
+	knh_loadStringPropertyData(ctx, StringPropertyData);
 }
 
 /* ------------------------------------------------------------------------ */
 
-void konoha_loadSystemStructData(Ctx *ctx)
+void knh_loadSystemStructData(Ctx *ctx)
 {
-	konoha_loadStructData(ctx, StructData);
+	knh_loadStructData(ctx, StructData);
 }
 
 /* ------------------------------------------------------------------------ */
 
-void konoha_loadSystemData(Ctx *ctx)
+void knh_loadSystemData(Ctx *ctx)
 {
-	konoha_loadClassData(ctx, ClassData);
+	knh_loadClassData(ctx, ClassData);
 
-	konoha_loadClassProperties(ctx);
-	konoha_loadGenericsData(ctx, GenericsData);
-	konoha_loadClosureData(ctx, ClosureData);
-	konoha_loadExptData(ctx, ExptData);
-	konoha_loadFuncData(ctx, FuncData);
+	knh_loadClassProperties(ctx);
+	knh_loadGenericsData(ctx, GenericsData);
+	knh_loadClosureData(ctx, ClosureData);
+	knh_loadExptData(ctx, ExptData);
+	knh_loadFuncData(ctx, FuncData);
 
-	konoha_loadFieldNameData(ctx, FieldNameData);
+	knh_loadFieldNameData(ctx, FieldNameData);
 	{
 		MethodField *pools[KNH_TMETHODFIELD_SIZE];
-		konoha_loadMethodFieldData(ctx, MethodFieldData, pools);
-		konoha_loadMethodData(ctx, MethodData, pools);
+		knh_loadMethodFieldData(ctx, MethodFieldData, pools);
+		knh_loadMethodData(ctx, MethodData, pools);
 		int i;
 		for(i = 0; i < KNH_TMETHODFIELD_SIZE; i++) {
 			knh_addMethodFieldTable(ctx, pools[i]);
 		}
 	}
-	konoha_loadMapperData(ctx, MapperData);
+	knh_loadMapperData(ctx, MapperData);
 
 	knh_finit_ *f = InitFuncData;
 	while(f[0] != NULL) {

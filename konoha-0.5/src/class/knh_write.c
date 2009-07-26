@@ -552,7 +552,7 @@ static int verbose = 0;
 
 /* ------------------------------------------------------------------------ */
 
-void konoha_setverbose(int v)
+void knh_setverbose(int v)
 {
 	verbose = v;
 }

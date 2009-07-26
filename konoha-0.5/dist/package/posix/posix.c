@@ -265,9 +265,9 @@ static knh_iodrv_t IO__PIPE = {
 KNHAPI(int) init(Ctx *ctx)
 {
     KNH_NOTICE(ctx, "loading posix package ..");
-    konoha_loadIntConstData(ctx, IntConstData);
-    konoha_loadFloatConstData(ctx, FloatConstData);
-    konoha_loadStringConstData(ctx, StringConstData);
+    knh_loadIntConstData(ctx, IntConstData);
+    knh_loadFloatConstData(ctx, FloatConstData);
+    knh_loadStringConstData(ctx, StringConstData);
 
     // pipe dirver
     knh_addIODriver(ctx, NULL, &IO__PIPE);

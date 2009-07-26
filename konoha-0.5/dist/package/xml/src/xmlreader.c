@@ -295,7 +295,7 @@ static knh_IntConstData_t IntConstData[] = {
 KNHAPI(int) init(Ctx *ctx)
 {
     KNH_NOTICE(ctx, "loading xmlreader...");
-    konoha_loadIntConstData(ctx, IntConstData);
+    knh_loadIntConstData(ctx, IntConstData);
     return 1;
 }
 

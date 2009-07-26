@@ -45,10 +45,6 @@
 //他スレッドの終了を待つ 	pthread_join 	WaitForSingleObject, WaitForMultipleObjects
 //使い終わったスレッドid(handle)を解放する 	解放する必要なし 	CloseHandle
 //現在実行中のスレッドのid(handle)を返す 	pthread_self 	GetCurrentThread
-//mutexの作成 	pthread_mutex_init 	CreateMutex
-//mutexのロックを取る 	pthread_mutex_lock 	WaitForSingleObject
-//mutexのロックを解除する 	pthread_mutex_unlock 	ReleaseMutex
-//mutexの破棄 	pthread_mutex_destroy 	CloseHandle
 //スレッド固有の大域変数(TSD*5 or TLS*6 )を指す領域を確保 	pthread_key_create 	TlsAlloc
 //TSD(TLS)を指す領域を解放 	pthread_key_delete 	TlsFree
 //TSD(TLS)のアドレスを得る 	pthread_getspecific 	TlsGetValue
@@ -72,10 +68,126 @@ knh_thread_t knh_thread_self(void)
 
 /* ------------------------------------------------------------------------ */
 
-int thread_create(knh_thread_t *thread, void *attr, void *(*frun)(void *), void * arg)
+int knh_thread_create(Ctx *ctx, knh_thread_t *thread, void *attr, void *(*frun)(void *), void * arg)
 {
 #if defined(KNH_USING_PTHREAD)
 	return pthread_create((pthread_t*)thread, attr, frun, arg);
+#else
+	return -1;
+#endif
+}
+
+/* ------------------------------------------------------------------------ */
+
+int knh_thread_detach(Ctx *ctx, knh_thread_t *thread)
+{
+#if defined(KNH_USING_PTHREAD)
+	return pthread_detach(*thread);
+#else
+	return 0;
+#endif
+}
+
+/* ------------------------------------------------------------------------ */
+/* @data */
+
+typedef struct knh_threadcc_t {
+	Ctx *ctx;
+	knh_sfp_t *sfp;
+} knh_threadcc_t ;
+
+static void *threading(void *p)
+{
+	knh_threadcc_t ta = *((knh_threadcc_t*)p);
+	Ctx *ctx = new_ThreadContext(ta.ctx);
+
+	knh_setCurrentContext(ctx);
+	knh_sfp_t *lsfp = ctx->stack;
+
+	KNH_MOV(ctx, lsfp[0].o, new_ExceptionHandler(ctx));
+	KNH_TRY(ctx, L_CATCH, lsfp, 0);
+	{
+		Method *mtd = ta.sfp[0].mtd;
+		DBG2_ASSERT(IS_Method(mtd));
+		KNH_SETv(ctx, lsfp[1].o, mtd);
+		KNH_SETv(ctx, lsfp[2].o, ta.sfp[1].o);
+		lsfp[2].data = knh_Object_data(ta.sfp[1].o);
+		{
+			int i, args = knh_Method_psize(mtd);
+			for(i = 0; i < args; i++) {
+				KNH_SETv(ctx, lsfp[3+i].o, ta.sfp[2+i].o);
+				lsfp[3+i].data = knh_Object_data(ta.sfp[2+i].o);
+			}
+			KNH_SCALL(ctx, lsfp, 1, mtd, args);
+		}
+		goto L_FINALLY;
+	}
+	/* catch */
+	L_CATCH:;
+	KNH_PRINT_STACKTRACE(ctx, lsfp, 0);
+
+	L_FINALLY:
+	knh_Context_clearstack(ctx);
+	knh_setCurrentContext(NULL);
+	knh_ThreadContext_dispose(ctx);
+	return NULL;
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_stack_threadRun(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_thread_t th;
+	knh_threadcc_t ta = {ctx, sfp};
+	knh_thread_create(ctx, &th, NULL, threading, (void*)&ta);
+	knh_thread_detach(ctx, &th);
+}
+
+/* ======================================================================== */
+/* [mutex] */
+
+//mutexの作成 	pthread_mutex_init 	CreateMutex
+//mutexのロックを取る 	pthread_mutex_lock 	WaitForSingleObject
+//mutexのロックを解除する 	pthread_mutex_unlock 	ReleaseMutex
+//mutexの破棄 	pthread_mutex_destroy 	CloseHandle
+
+int knh_mutex_init(knh_mutex_t *m)
+{
+#if defined(KNH_USING_PTHREAD)
+	return pthread_mutex_init((pthread_mutex_t*)m, NULL);
+#else
+	return -1;
+#endif
+}
+
+/* ------------------------------------------------------------------------ */
+
+int knh_mutex_lock(knh_mutex_t *m)
+{
+#if defined(KNH_USING_PTHREAD)
+	return pthread_mutex_lock((pthread_mutex_t*)m);
+#else
+	return -1;
+#endif
+}
+
+/* ------------------------------------------------------------------------ */
+
+int knh_mutex_unlock(knh_mutex_t *m)
+{
+#if defined(KNH_USING_PTHREAD)
+	return pthread_mutex_unlock((pthread_mutex_t*)m);
+#else
+	return -1;
+#endif
+}
+
+/* ------------------------------------------------------------------------ */
+
+int knh_mutex_destory(knh_mutex_t *m)
+{
+#if defined(KNH_USING_PTHREAD)
+	return pthread_mutex_destory((pthread_mutex_t*)m);
 #else
 	return -1;
 #endif

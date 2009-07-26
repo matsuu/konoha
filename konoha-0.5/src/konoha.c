@@ -63,7 +63,7 @@ main(int argc, char **argv)
         konoha_shell(konoha);
     }
     else {
-        konoha_loadScript(konoha, args[n]);
+        knh_loadScript(konoha, args[n]);
         konoha_runMain(konoha, argc - n, args + n);
     }
     konoha_close(konoha);

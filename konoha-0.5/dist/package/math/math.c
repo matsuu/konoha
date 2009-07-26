@@ -177,7 +177,7 @@ knh_FloatConstData_t FloatConstData[] = {
 KNHAPI(int) init(Ctx *ctx)
 {
     KNH_NOTICE(ctx, "loading math...");
-    konoha_loadFloatConstData(ctx, FloatConstData);
+    knh_loadFloatConstData(ctx, FloatConstData);
     return 1;
 }
 
