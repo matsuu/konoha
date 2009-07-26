@@ -61,14 +61,14 @@ Script *new_Script(Ctx *ctx, knh_bytes_t nsname)
 	TC->bsize  = KNH_SCRIPT_FIELDSIZE;
 	TC->size = TC->bsize * sizeof(knh_Object_t*);
 
-	konoha_setClassName(ctx, cid, new_String(ctx, B(buf), NULL));
+	knh_setClassName(ctx, cid, new_String(ctx, B(buf), NULL));
 	KNH_INITv(TC->cstruct, new_ClassStruct0(ctx, KNH_SCRIPT_FIELDSIZE, KNH_SCRIPT_FIELDSIZE/2));
 
 	KNH_ASSERT(TC->cmap == NULL);
 	KNH_INITv(TC->cmap, ctx->share->ClassTable[CLASS_Script].cmap);
 
 	KNH_ASSERT(TC->cspec == NULL);
-	konoha_setClassDefaultValue(ctx, cid, UP(o), NULL);
+	knh_setClassDefaultValue(ctx, cid, UP(o), NULL);
 
 	Method *mtd = new_Method(ctx, 0, cid, METHODN_lambda, NULL);
 	KNH_SETv(ctx, DP(mtd)->mf, konoha_findMethodField0(ctx, TYPE_Any));

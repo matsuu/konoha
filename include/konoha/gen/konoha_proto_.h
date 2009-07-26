@@ -120,12 +120,12 @@ void knh_OutputStream_write__bconv(Ctx *ctx, OutputStream *w, knh_bytes_t t);
 /* ../src/class/knh_Class.c */
 knh_struct_t knh_StructTable_newId(Ctx *ctx);
 knh_class_t knh_ClassTable_newId(Ctx *ctx);
-void konoha_setClassName(Ctx *ctx, knh_class_t cid, String *lname);
+void knh_setClassName(Ctx *ctx, knh_class_t cid, String *lname);
 char *knh_ClassTable_CLASSN(Ctx *ctx, knh_class_t cid);
-void konoha_setClassDefaultValue(Ctx *ctx, knh_class_t cid, Object *value, knh_fdefault fdefault);
+void knh_setClassDefaultValue(Ctx *ctx, knh_class_t cid, Object *value, knh_fdefault fdefault);
 Object *knh_getClassDefaultValue(Ctx *ctx, knh_class_t cid);
 Object *knh_getDefaultValue(Ctx *ctx, knh_type_t type);
-void konoha_setClassParam(Ctx *ctx, knh_class_t cid, knh_class_t p1, knh_class_t p2);
+void knh_setClassParam(Ctx *ctx, knh_class_t cid, knh_class_t p1, knh_class_t p2);
 knh_class_t knh_addGenericsClass(Ctx *ctx, knh_class_t cid, String *name, knh_class_t bcid, knh_class_t p1, knh_class_t p2);
 ClassStruct* new_ClassStruct0(Ctx *ctx, int field_size, int method_size);
 knh_index_t knh_Class_indexOfField(Ctx *ctx, knh_class_t cid, knh_fieldn_t fn);
@@ -396,7 +396,7 @@ void knh_write_mn(Ctx *ctx, OutputStream *w, knh_methodn_t mn);
 void knh_write_type(Ctx *ctx, OutputStream *w, knh_type_t type);
 void knh_write_fline(Ctx *ctx, OutputStream *w, char *file, int line);
 void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap);
-void konoha_setverbose(int v);
+void knh_setverbose(int v);
 METHOD knh_fmethod_movableText(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/compiler/asm.c */
 void knh_Context_initAsm(Ctx *ctx);
@@ -550,7 +550,13 @@ knh_db_drvapi_t *knh_System_getDBDriver(Ctx *ctx, knh_bytes_t name);
 void  init_DB(Ctx *ctx);
 /* ../src/deps/thread.c */
 knh_thread_t knh_thread_self(void);
-int thread_create(knh_thread_t *thread, void *attr, void *(*frun)(void *), void * arg);
+int knh_thread_create(Ctx *ctx, knh_thread_t *thread, void *attr, void *(*frun)(void *), void * arg);
+int knh_thread_detach(Ctx *ctx, knh_thread_t *thread);
+void knh_stack_threadRun(Ctx *ctx, knh_sfp_t *sfp);
+int knh_mutex_init(knh_mutex_t *m);
+int knh_mutex_lock(knh_mutex_t *m);
+int knh_mutex_unlock(knh_mutex_t *m);
+int knh_mutex_destory(knh_mutex_t *m);
 int knh_thread_key_create(knh_thread_key_t *key);
 int knh_thread_setspecific(knh_thread_key_t key, const void *data);
 void* knh_thread_getspecific(knh_thread_key_t key);
@@ -637,9 +643,9 @@ knh_drvapi_t *knh_getDriverAPI(Ctx *ctx, int type, knh_bytes_t name);
 NameSpace *knh_loadPackage(Ctx *ctx, knh_bytes_t pkgname);
 NameSpace *knh_getNameSpace(Ctx *ctx, knh_bytes_t name);
 /* ../src/main/systemtable.c */
-Ctx *new_Context(Ctx *parent);
-void knh_Context_traverse(Ctx *ctx, knh_Context_t *o, knh_ftraverse ftr);
-void konoha_traverse(Ctx* ctx, knh_ftraverse ftr);
+Ctx *new_ThreadContext(Ctx *parent);
+void knh_ThreadContext_dispose(Ctx *ctx);
+void knh_traverseAll(Ctx* ctx, knh_ftraverse ftr);
 /* ../src/main/typesystem.c */
 knh_bool_t knh_class_instanceof(Ctx *ctx, knh_class_t scid, knh_class_t tcid);
 METHOD knh__Object_opInstanceof(Ctx *ctx, knh_sfp_t *sfp);

@@ -200,7 +200,7 @@ void knh_Method__const(Ctx *ctx, Method *o, OutputStream *w, String *m)
 static
 void knh_Asm_genConstPool(Ctx *ctx, Asm *abr, OutputStream *w)
 {
-	knh_println(ctx, w, STEXT("size_t konoha_loadConstPools(Ctx *ctx)"));
+	knh_println(ctx, w, STEXT("size_t knh_loadConstPools(Ctx *ctx)"));
 	knh_println(ctx, w, STEXT("{"));
 	knh_println(ctx, w, STEXT("\tsize_t delta = (DP(ctx->sys)->constPools)->size;"));
 	if(IS_NOTNULL(DP(abr)->constPools)) {

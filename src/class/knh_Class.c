@@ -87,7 +87,7 @@ static knh_Class_t *new_Class(Ctx *ctx, knh_class_t cid)
 
 /* ------------------------------------------------------------------------ */
 
-void konoha_setClassName(Ctx *ctx, knh_class_t cid, String *lname)
+void knh_setClassName(Ctx *ctx, knh_class_t cid, String *lname)
 {
 	KNH_ASSERT_cid(cid);
 	knh_ClassTable_t *t = pClassTable(cid);
@@ -172,7 +172,7 @@ knh_Object_t *knh_fdefault__INIT(Ctx *ctx, knh_class_t cid)
 
 /* ------------------------------------------------------------------------ */
 
-void konoha_setClassDefaultValue(Ctx *ctx, knh_class_t cid, Object *value, knh_fdefault fdefault)
+void knh_setClassDefaultValue(Ctx *ctx, knh_class_t cid, Object *value, knh_fdefault fdefault)
 {
 	KNH_ASSERT_cid(cid);
 	knh_ClassTable_t *t = pClassTable(cid);
@@ -222,7 +222,7 @@ Object *knh_getDefaultValue(Ctx *ctx, knh_type_t type)
 /* ======================================================================== */
 /* [PARAM] */
 
-void konoha_setClassParam(Ctx *ctx, knh_class_t cid, knh_class_t p1, knh_class_t p2)
+void knh_setClassParam(Ctx *ctx, knh_class_t cid, knh_class_t p1, knh_class_t p2)
 {
 	KNH_ASSERT_cid(cid);
 	knh_ClassTable_t *t = pClassTable(cid);
@@ -264,11 +264,11 @@ knh_addGenericsClass(Ctx *ctx, knh_class_t cid, String *name, knh_class_t bcid, 
 	t->size = ClassTable(bcid).size;
 	t->bsize  = ClassTable(bcid).bsize;
 
-	konoha_setClassName(ctx, cid, name);
+	knh_setClassName(ctx, cid, name);
 	KNH_INITv(t->cstruct, ClassTable(bcid).cstruct);
 	KNH_INITv(t->cmap, new_ClassMap0(ctx, 0));
-	konoha_setClassDefaultValue(ctx, cid, KNH_NULL, NULL);
-	konoha_setClassParam(ctx, cid, p1, p2);
+	knh_setClassDefaultValue(ctx, cid, KNH_NULL, NULL);
+	knh_setClassParam(ctx, cid, p1, p2);
 	ctx->share->StructTable[bcid].fnewClass(ctx, cid);
 	return cid;
 }

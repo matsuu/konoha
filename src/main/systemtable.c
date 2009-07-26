@@ -40,15 +40,14 @@ extern "C" {
 /* ======================================================================== */
 /* [ContextTable] */
 
-void konoha_loadSystemString(Ctx *ctx); /* konoha_data.c */
-void konoha_loadSystemStructData(Ctx *ctx);
-void konoha_loadSystemData(Ctx *ctx);
+void knh_loadSystemString(Ctx *ctx); /* konoha_data.c */
+void knh_loadSystemStructData(Ctx *ctx);
+void knh_loadSystemData(Ctx *ctx);
 
 /* ======================================================================== */
 /* [INITCONST] */
 
-static
-Object *new_Null(Ctx *ctx)
+static Object *new_Null(Ctx *ctx)
 {
 	knh_Glue_t *glue = (knh_Glue_t*)new_hObject(ctx, KNH_FLAG_OF_IMMUTABLE, CLASS_Any, CLASS_Any);
 	knh_Glue_init(ctx, glue, NULL, NULL);
@@ -57,8 +56,7 @@ Object *new_Null(Ctx *ctx)
 
 /* ------------------------------------------------------------------------ */
 
-static
-knh_Object_t *new_Boolean0(Ctx *ctx, knh_bool_t tf)
+static knh_Object_t *new_Boolean0(Ctx *ctx, knh_bool_t tf)
 {
 	knh_Boolean_t *o = (knh_Boolean_t*)new_hObject(ctx, FLAG_Boolean, CLASS_Boolean, CLASS_Boolean);
 	o->n.bvalue = tf;
@@ -79,12 +77,6 @@ static knh_System_t *new_System(Ctx *ctx)
 #else
 #define FLAG_CTX(f)      (f|KNH_FLAG_CTXF_STRICT)
 #endif
-
-
-/* ------------------------------------------------------------------------ */
-
-static
-void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr);
 
 
 /* ------------------------------------------------------------------------ */
@@ -182,6 +174,7 @@ void knh_Context_initCommon(Ctx *ctx, knh_Context_t *o, size_t stacksize)
 	KNH_INITv(o->out, DP(ctx->sys)->out);
 	KNH_INITv(o->err, DP(ctx->sys)->err);
 	KNH_INITv(o->abr, KNH_NULL);
+	knh_mutex_init(&(o->ctxlock));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -216,8 +209,41 @@ void knh_Context_traverseCommon(Ctx *ctx, knh_Context_t *o, knh_ftraverse ftr)
 		o->mtdCache = NULL;
 		o->fmtCache = NULL;
 		o->mprCache = NULL;
+		knh_mutex_destory(&o->ctxlock);
 	}
 }
+
+/* ------------------------------------------------------------------------ */
+
+static Ctx *new_Context0(Ctx *parent)
+{
+	knh_Context_t *ctx;
+	if(parent == NULL) {
+		ctx = (knh_Context_t*)malloc(sizeof(knh_Context_t));
+		parent = ctx;
+	}
+	else {
+		ctx = (knh_Context_t*)knh_malloc(parent, sizeof(knh_Context_t));
+	}
+	knh_bzero(ctx, sizeof(knh_Context_t));
+	ctx->h.magic = KNH_OBJECT_MAGIC;
+#ifdef KNH_HOBJECT_REFC
+	ctx->h.refc = KNH_RCGC_INIT;
+#endif
+	ctx->h.flag = 	FLAG_CTX(FLAG_Context);
+	ctx->h.bcid = CLASS_Context;
+	ctx->h.cid  = CLASS_Context;
+	ctx->h.ctxid = 0;
+	ctx->h.lock  = LOCK_NO;
+	ctx->ctxid = 0;
+	ctx->unusedObject = NULL;
+	ctx->unusedObjectSize = 0;
+	ctx->parent = parent;
+	ctx->fsweep = knh_getDefaultSweepFunc();
+	ctx->unusedContext = NULL;
+	return (Ctx*)ctx;
+}
+
 
 /* ------------------------------------------------------------------------ */
 /* [Context0] */
@@ -237,44 +263,26 @@ static void knh_fmutexunlock_nop(Ctx *ctx, knh_lock_t lck)
 /* ------------------------------------------------------------------------ */
 
 static
-Ctx *konoha_createContext0(size_t stacksize)
+void knh_initSharedData(Context *ctx)
 {
-	knh_Context_t *ctx = (knh_Context_t*)malloc(sizeof(knh_Context_t));
-	knh_bzero(ctx, sizeof(knh_Context_t));
-	ctx->h.magic = KNH_OBJECT_MAGIC;
-#ifdef KNH_HOBJECT_REFC
-	ctx->h.refc = KNH_RCGC_INIT;
-#endif
-	ctx->h.flag = 	FLAG_CTX(FLAG_Context);
-	ctx->h.bcid = CLASS_Context;
-	ctx->h.cid  = CLASS_Context;
-	ctx->h.ctxid = 0;
-	ctx->h.lock  = LOCK_NO;
-	ctx->ctxid = 0;
-	ctx->threadid = knh_thread_self();
-
-	ctx->unusedObject = NULL;
-	ctx->unusedObjectSize = 0;
-
+	size_t i;
 	knh_SharedData_t *share = (knh_SharedData_t*)malloc(sizeof(knh_SharedData_t) + sizeof(knh_ctxstat_t));
 	ctx->share = share;
 	knh_bzero(share, sizeof(knh_SharedData_t) + sizeof(knh_ctxstat_t));
-	share->threadSize = 1;
+	share->threadCounter = 1;
 	ctx->stat = (knh_ctxstat_t*)((share+1));
 
-	/* System Table */
-	size_t i;
-	KNH_ASSERT(share->ObjectPageTable == NULL);
+	DBG2_ASSERT(share->ObjectPageTable == NULL);
 	share->ObjectPageTableMaxSize = KNH_TOBJECTPAGE_INITSIZE;
 	share->ObjectPageTable =
-		(knh_ObjectPageTable_t*)KNH_MALLOC((Ctx*)ctx,
+		(knh_ObjectPageTable_t*)KNH_MALLOC(ctx,
 			share->ObjectPageTableMaxSize * sizeof(knh_ObjectPageTable_t));
 	knh_bzero(share->ObjectPageTable,
 		share->ObjectPageTableMaxSize * sizeof(knh_ObjectPageTable_t));
 	share->ObjectPageTableSize = 0;
 
-	KNH_ASSERT(share->LockTable == NULL);
-	share->LockTable = (knh_LockTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TLOCK);
+	DBG2_ASSERT(share->LockTable == NULL);
+	share->LockTable = (knh_LockTable_t*)KNH_MALLOC(ctx, SIZEOF_TLOCK);
 	knh_bzero(share->LockTable, SIZEOF_TLOCK);
 	for(i = 0; i < KNH_TLOCK_SIZE; i++) {
 		share->LockTable[i].flock = knh_fmutexlock_nop;
@@ -285,12 +293,12 @@ Ctx *konoha_createContext0(size_t stacksize)
 	}
 	share->unusedLockTable = &(share->LockTable[LOCK_GIANT+1]);
 
-	KNH_ASSERT(share->StructTable == NULL);
-	share->StructTable = (knh_StructTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TSTRUCT);
+	DBG2_ASSERT(share->StructTable == NULL);
+	share->StructTable = (knh_StructTable_t*)KNH_MALLOC(ctx, SIZEOF_TSTRUCT);
 	knh_bzero((void*)share->StructTable, SIZEOF_TSTRUCT);
 	share->StructTableSize = 0;
 
-	KNH_ASSERT(share->ClassTable == NULL);
+	DBG2_ASSERT(share->ClassTable == NULL);
 	share->ClassTable = (knh_ClassTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TCLASS);
 	knh_bzero((void*)share->ClassTable, SIZEOF_TCLASS);
 	for(i = 0; i < KNH_TCLASS_SIZE; i++) {
@@ -302,10 +310,11 @@ Ctx *konoha_createContext0(size_t stacksize)
 	}
 	share->ClassTableSize = KNH_TCLASS_SIZE;
 
-	share->ExptTable = (knh_ExptTable_t*)KNH_MALLOC((Ctx*)ctx, SIZEOF_TEXPT);
+	share->ExptTable = (knh_ExptTable_t*)KNH_MALLOC(ctx, SIZEOF_TEXPT);
 	knh_bzero((void*)share->ExptTable, SIZEOF_TEXPT);
 	share->ExptTableSize = 0;
-	konoha_loadSystemStructData(ctx);
+
+	knh_loadSystemStructData(ctx);
 
 	KNH_INITv(share->constNull, new_Null(ctx));
 	KNH_INITv(share->constTrue, new_Boolean0(ctx, 1));
@@ -324,16 +333,25 @@ Ctx *konoha_createContext0(size_t stacksize)
 	KNH_ASSERT(share->tString == NULL);
 	share->tString = (knh_String_t**)KNH_MALLOC(ctx, SIZEOF_TSTRING);
 	knh_bzero(share->tString, SIZEOF_TSTRING);
-	konoha_loadSystemString(ctx);
-	ctx->fsweep = knh_getDefaultSweepFunc();
-	ctx->parent = ctx;
+	knh_loadSystemString(ctx);
 
 	KNH_INITv(ctx->sys, new_System(ctx));
-	konoha_loadSystemData(ctx);
-	KNH_INITv(share->mainns, new_NameSpace(ctx, TS_main));
+	knh_loadSystemData(ctx);
 
-	knh_Context_initCommon(ctx, ctx, stacksize);
-	return (Ctx*)ctx;
+	KNH_INITv(share->mainns, new_NameSpace(ctx, TS_main));
+}
+
+
+
+/* ------------------------------------------------------------------------ */
+
+static
+Ctx *knh_createRootContext(size_t stacksize)
+{
+	Ctx *ctx = new_Context0(NULL);
+	knh_initSharedData((Context*)ctx);
+	knh_Context_initCommon(ctx, (Context*)ctx, stacksize);
+	return ctx;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -360,11 +378,9 @@ void knh_ClassStruct_toAbstractAll(Ctx *ctx, ClassStruct *cs)
 /* ------------------------------------------------------------------------ */
 
 static
-void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
+void knh_traverseSharedData(Ctx *ctx, knh_SharedData_t *share, knh_ftraverse ftr)
 {
-	knh_SharedData_t *share = (knh_SharedData_t*)ctx->share;
-	knh_Context_traverseCommon(ctx, (knh_Context_t*)ctx, ftr);
-
+	int i;
 	ftr(ctx, share->constNull);
 	ftr(ctx, share->constTrue);
 	ftr(ctx, share->constFalse);
@@ -373,7 +389,6 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 	ftr(ctx, UP(ctx->sys));
 	ftr(ctx, UP(share->mainns));
 
-	int i;
 	for(i = 0; i < KNH_TSTRING_SIZE; i++) {
 		ftr(ctx, UP(share->tString[i]));
 	}
@@ -489,80 +504,120 @@ void konoha_traverseContext0(Ctx *ctx, knh_ftraverse ftr)
 
 		knh_bzero(share, sizeof(knh_SharedData_t) + sizeof(knh_ctxstat_t));
 		free(share);
+	}
+}
 
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_traverseUnusedContext(Ctx *ctx, knh_ftraverse ftr)
+{
+	if(ctx->unusedContext != NULL) {
+		knh_traverseUnusedContext(ctx->unusedContext, ftr);
+	}
+	knh_Context_traverseCommon(ctx, (knh_Context_t*)ctx, ftr);
+	if(IS_SWEEP(ftr)) {
 		knh_bzero((void*)ctx, sizeof(knh_Context_t));
-		free((void*)ctx);
+		knh_free(ctx, (void*)ctx, sizeof(knh_Context_t));
 	}
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_System_addContext(Ctx *ctx, System *o, Context *c)
+void knh_traverseContext(Ctx *ctx, knh_ftraverse ftr)
 {
-
+	knh_Context_traverseCommon(ctx, (knh_Context_t*)ctx, ftr);
+	if(ctx->parent == (Context*)ctx) {
+		if(ctx->unusedContext != NULL) {
+			knh_traverseUnusedContext(ctx->unusedContext, ftr);
+		}
+		knh_traverseSharedData(ctx, (knh_SharedData_t*)ctx->share, ftr);
+		if(IS_SWEEP(ftr)) {
+			knh_bzero((void*)ctx, sizeof(knh_Context_t));
+			free((void*)ctx);
+		}
+	}
+	else {
+		if(IS_SWEEP(ftr)) {
+			knh_bzero((void*)ctx, sizeof(knh_Context_t));
+			knh_free(ctx, (void*)ctx, sizeof(knh_Context_t));
+		}
+	}
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_System_removeContext(Ctx *ctx, System *o, Context *c)
+Ctx *knh_getRootContext(Ctx *ctx)
 {
-
+	if(ctx->parent == ctx) return ctx;
+	return knh_getRootContext(ctx->parent);
 }
-/* ------------------------------------------------------------------------ */
-
-static knh_ushort_t contextId = 1;
 
 /* ------------------------------------------------------------------------ */
 
-Ctx *new_Context(Ctx *parent)
+Ctx *new_ThreadContext(Ctx *parent)
 {
-	knh_Context_t *ctx = (knh_Context_t*)KNH_MALLOC(parent, sizeof(knh_Context_t));
-	knh_bzero(ctx, sizeof(knh_Context_t));
-	ctx->h.magic = KNH_OBJECT_MAGIC;
-#ifdef KNH_HOBJECT_REFC
-	ctx->h.refc = KNH_RCGC_INIT;
-#endif
-	ctx->h.flag = 	FLAG_CTX(FLAG_Context);
-	ctx->h.bcid = CLASS_Context;
-	ctx->h.cid  = CLASS_Context;
+	Ctx *root = knh_getRootContext(parent);
+	knh_Context_t *ctx = NULL;
+	if(root->unusedContext != NULL) {
+		KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+		ctx = (knh_Context_t*)root->unusedContext;
+		if(ctx != NULL) {
+			((Context*)root)->unusedContext = ctx->unusedContext;
+		}
+		KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+		if(ctx != NULL) {
+			DBG2_P("reuseing Context: ctxid=%d", (int)ctx->ctxid);
+			ctx->parent = parent;
+			ctx->esp = ctx->stack;
+			ctx->fsweep = knh_getDefaultSweepFunc();
+			KNH_SETv(root, ctx->props, new_DictMap0(root, 16));
+			KNH_SETv(root, ctx->enc, DP(root->sys)->enc);
+			KNH_SETv(root, ctx->in,  DP(root->sys)->in);
+			KNH_SETv(root, ctx->out, DP(root->sys)->out);
+			KNH_SETv(root, ctx->err, DP(root->sys)->err);
+			KNH_SETv(root, ctx->abr, KNH_NULL);
+		}
+	}
+	if(ctx == NULL) {
+		ctx = (knh_Context_t*)new_Context0(parent);
+		ctx->share = parent->share;
+		ctx->stat = parent->stat;
+		ctx->sys  = parent->sys;
+		knh_Context_initCommon(root, ctx, parent->stacksize);
+		((knh_SharedData_t*)ctx->share)->contextCounter += 1;
+		ctx->ctxid = (knh_ushort_t)ctx->share->contextCounter;
+	}
+	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+	((knh_SharedData_t*)ctx->share)->threadCounter += 1;
+	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+	if(ctx->share->threadCounter == 2) {
+		DBG2_P("Activating multi-threading mode!!");
 
-	ctx->ctxid = contextId;
-	contextId += 2;  /* BE always odd */
-	ctx->threadid = knh_thread_self();
-
-	ctx->h.ctxid = ctx->ctxid;
-	ctx->h.lock  = LOCK_NO;
-
-	ctx->unusedObject = NULL;
-	ctx->unusedObjectSize = 0;
-
-	ctx->share = parent->share;
-	ctx->stat = parent->stat;
-	ctx->sys  = parent->sys;
-	ctx->parent = parent->parent;
-	ctx->fsweep = knh_getDefaultSweepFunc();
-
-	knh_Context_initCommon(ctx, ctx, parent->stacksize);
-	knh_System_addContext((Ctx*)parent, parent->sys, ctx);
+	}
 	return (Ctx*)ctx;
 }
 
 /* ------------------------------------------------------------------------ */
 
-void knh_Context_traverse(Ctx *ctx, knh_Context_t *o, knh_ftraverse ftr)
+void knh_ThreadContext_dispose(Ctx *ctx)
 {
-	if(o->ctxid == 0) return;
-	knh_Context_traverseCommon(ctx, o, ftr);
-	if(IS_SWEEP(ftr)) {
-		knh_System_removeContext(ctx, o->sys, o);
-		knh_free(ctx, o, sizeof(knh_Context_t));
-	}
+	KNH_ASSERT(ctx->parent != ctx);
+	Ctx *root = knh_getRootContext(ctx);
+	knh_mutex_lock(&(((Context*)ctx)->ctxlock));  // checking using or not
+	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+	((Context*)ctx)->unusedContext = root->unusedContext;
+	((Context*)root)->unusedContext = ctx;
+	((knh_SharedData_t*)ctx->share)->threadCounter -= 1;
+	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+	knh_mutex_unlock(&(((Context*)ctx)->ctxlock));
 }
 
 /* ======================================================================== */
-/* [share] */
+/* [konohaapi] */
 
 /* ------------------------------------------------------------------------ */
 
@@ -578,15 +633,15 @@ KNHAPI(konoha_t) konoha_open(size_t stacksize)
 		konoha_init();
 	}
 	if(stacksize < KONOHA_STACKSIZE) stacksize = KONOHA_STACKSIZE;
-	k.ctx = konoha_createContext0(stacksize);
+	k.ctx = knh_createRootContext(stacksize);
 	return k;
 }
 
 /* ------------------------------------------------------------------------ */
 
-void konoha_traverse(Ctx* ctx, knh_ftraverse ftr)
+void knh_traverseAll(Ctx* ctx, knh_ftraverse ftr)
 {
-	konoha_traverseContext0(ctx->parent, ftr);
+	knh_traverseContext(ctx->parent, ftr);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -594,11 +649,11 @@ void konoha_traverse(Ctx* ctx, knh_ftraverse ftr)
 KNHAPI(void) konoha_close(konoha_t konoha)
 {
 	KONOHA_CHECK_(konoha);
-	if(konoha.ctx->share->threadSize > 1) {
-		fprintf(stderr, "Many threads are still running... Found %d threads", (int)konoha.ctx->share->threadSize);
+	if(konoha.ctx->share->threadCounter > 1) {
+		fprintf(stderr, "Many threads are still running... Found %d threads", (int)konoha.ctx->share->threadCounter);
 		return;
 	}
-	konoha_traverseContext0(konoha.ctx, konoha.ctx->fsweep);
+	knh_traverseContext(konoha.ctx, konoha.ctx->fsweep);
 }
 
 /* ------------------------------------------------------------------------ */

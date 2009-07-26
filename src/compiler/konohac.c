@@ -188,10 +188,10 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	TC->supcid = supcid;
 	TC->offset = 0; /* will be extended in CLASS_typing */
 	KNH_ASSERT(TC->class_cid == NULL);
-	konoha_setClassName(ctx, cid, new_String(ctx, B(bufn), NULL));
+	knh_setClassName(ctx, cid, new_String(ctx, B(bufn), NULL));
 	KNH_INITv(TC->cstruct, new_ClassStruct0(ctx, 0, 8));
 	KNH_INITv(TC->cmap, ctx->share->ClassTable[CLASS_Any].cmap);
-	konoha_setClassDefaultValue(ctx, cid, KNH_NULL, NULL);
+	knh_setClassDefaultValue(ctx, cid, KNH_NULL, NULL);
 	knh_NameSpace_setLocalName(ctx, ns, cid);
 
 	if(SP(StmtCLASS_interface(stmt))->stt != STT_DONE) {

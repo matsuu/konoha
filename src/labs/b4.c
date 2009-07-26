@@ -39,7 +39,7 @@ extern "C" {
 /* ======================================================================== */
 
 /* ------------------------------------------------------------------------ */
-/* @method void Script.changeChannel(Int! ch) */
+/* @ method void Script.changeChannel(Int! ch) */
 
 METHOD knh__Script_changeChannel(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -48,7 +48,7 @@ METHOD knh__Script_changeChannel(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method void Script.hook(String! funcname) */
+/* @ method void Script.hook(String! funcname) */
 
 METHOD knh__Script_hook(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -59,17 +59,17 @@ METHOD knh__Script_hook(Ctx *ctx, knh_sfp_t *sfp)
 /* ------------------------------------------------------------------------ */
 
 #if defined(KNHX_API)
-/**
-  regist C function to Method.
-  @param method  method name,types... like this -> "void System.echo(String str)"
-  @param func    function pointer.  that func must have normal library API
-                 METHOD funcname (Ctx *ctx, knh_sfp_t* ){}
-  @return true/false
- */
+///**
+//  regist C function to Method.
+//  @param method  method name,types... like this -> "void System.echo(String str)"
+//  @param func    function pointer.  that func must have normal library API
+//                 METHOD funcname (Ctx *ctx, knh_sfp_t* ){}
+//  @return true/false
+// */
 //KNHAPI(int) knh_registLocalFunction(konoha_t konoha, char* method, knh_fmethod func)
 //{
 //    Ctx *ctx = konoha.ctx;
-//    konoha_setCurrentContext(ctx);
+//    knh_setCurrentContext(ctx);
 //    knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 //
 //    knh_cwb_t cwb = new_cwb(ctx);

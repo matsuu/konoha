@@ -146,8 +146,8 @@ knh_NamedPointerData_t ClassSpecFuncData[] = {
 int init(Ctx *ctx)
 {
 	KNH_NOTICE(ctx, "loading SCOPE2009..");
-	konoha_loadURNAliasData(ctx, URNAliasData);
-	konoha_loadClassSpecFuncData(ctx, ClassSpecFuncData);
+	knh_loadURNAliasData(ctx, URNAliasData);
+	knh_loadClassSpecFuncData(ctx, ClassSpecFuncData);
 	return 1;
 }
 

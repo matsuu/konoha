@@ -254,9 +254,9 @@ void KNHINIT init_Regex(Ctx *ctx)
 	knh_addRegexDriver(ctx, NULL, &RE__regex);
 	knh_addRegexDriver(ctx, "re", &RE__regex);
 #if defined(KNH_USING_ONIGURUMA)
-	konoha_setSystemPropertyText(ctx, "konoha.regex", "oniguruma");
+	knh_setSystemPropertyText(ctx, "konoha.regex", "oniguruma");
 #else
-	konoha_setSystemPropertyText(ctx, "konoha.regex", "POSIX.2");
+	knh_setSystemPropertyText(ctx, "konoha.regex", "POSIX.2");
 #endif
 #endif
 }

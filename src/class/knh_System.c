@@ -92,7 +92,7 @@ void knh_System_setProperty(Ctx *ctx, System *o, String *key, Any *value)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) konoha_setSystemPropertyText(Ctx *ctx, char *key, char *value)
+KNHAPI(void) knh_setSystemPropertyText(Ctx *ctx, char *key, char *value)
 {
 	String *k = new_String__T(ctx, key);
 	String *v = new_String__T(ctx, value);

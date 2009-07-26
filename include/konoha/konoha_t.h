@@ -310,18 +310,18 @@ typedef knh_uint16_t       knh_expt_t;    /* knh_expt_t */
 
 /* knh_type_t */
 
-#define KNH_FLAG_TF_NN                KNH_FLAG_T0
-#define TYPE_ISNULLABLE(t)            ((t & KNH_FLAG_TF_NN)==0)
-#define IS_NNTYPE(t)                  ((t & KNH_FLAG_TF_NN)==KNH_FLAG_TF_NN)
-#define NNTYPE_cid(c)                 (c|KNH_FLAG_TF_NN)
-#define TYPE_TONNTYPE(t)              (t|KNH_FLAG_TF_NN)
+#define KNH_FLAG_TF_NN      KNH_FLAG_T0
+#define TYPE_ISNULLABLE(t)  ((t & KNH_FLAG_TF_NN)==0)
+#define IS_NNTYPE(t)        ((t & KNH_FLAG_TF_NN)==KNH_FLAG_TF_NN)
+#define NNTYPE_cid(c)       (c|KNH_FLAG_TF_NN)
+#define TYPE_TONNTYPE(t)    (t|KNH_FLAG_TF_NN)
 
-#define IS_ubxint(t)                  (IS_NNTYPE(t) && ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Int)
-#define IS_ubxfloat(t)                (IS_NNTYPE(t) && ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Float)
-#define IS_ubxboolean(t)              (NNTYPE_Boolean == t)
-#define IS_ubxtype(t)                 (IS_NNTYPE(t) && (ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Int || ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Float || t == NNTYPE_Boolean) )
-#define IS_bxint(t)                   (!IS_NNTYPE(t) && ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Int)
-#define IS_bxfloat(t)                 (!IS_NNTYPE(t) && ctx->share->ClassTable[CLASS_type(t)].bcid == CLASS_Float)
+#define IS_ubxint(t)        (IS_NNTYPE(t) && ClassTable(CLASS_type(t)).bcid == CLASS_Int)
+#define IS_ubxfloat(t)      (IS_NNTYPE(t) && ClassTable(CLASS_type(t)).bcid == CLASS_Float)
+#define IS_ubxboolean(t)    (NNTYPE_Boolean == t)
+#define IS_ubxtype(t)       (IS_NNTYPE(t) && (ClassTable(CLASS_type(t)).bcid == CLASS_Int || ClassTable(CLASS_type(t)).bcid == CLASS_Float || t == NNTYPE_Boolean) )
+#define IS_bxint(t)         (!IS_NNTYPE(t) && ClassTable(CLASS_type(t)).bcid == CLASS_Int)
+#define IS_bxfloat(t)       (!IS_NNTYPE(t) && ClassTable(CLASS_type(t)).bcid == CLASS_Float)
 
 // @NOUSE
 #define TYPEQN(t)                     TYPEN(t), TYPEQ(t)
@@ -446,9 +446,9 @@ typedef struct {
 #endif
 
 #ifdef KNH_USING_NOTHREAD
-typedef knh_int_t knh_thread_t;
-typedef knh_int_t knh_thread_key_t;
-typedef knh_int_t knh_mutex_t;
+typedef knh_intptr_t knh_thread_t;
+typedef knh_intptr_t knh_thread_key_t;
+typedef knh_intptr_t knh_mutex_t;
 #endif
 
 typedef struct knh_Thread_t {
@@ -717,7 +717,8 @@ typedef struct {
 	struct knh_NameSpace_t   *mainns;
 
 	/* thread */
-	size_t              threadSize;
+	size_t              contextCounter;
+	size_t              threadCounter;
 	knh_LockTable_t    *LockTable;
 	knh_LockTable_t    *unusedLockTable;
 } knh_SharedData_t ;
@@ -758,8 +759,9 @@ typedef struct knh_Context_t {
 	knh_flag_t                   flag;
 	knh_ushort_t                 ctxid;
 	char*                        cwd;
-	knh_thread_t                 threadid;
-	struct knh_Context_t        *parent;
+	const struct knh_Context_t   *parent;
+	knh_mutex_t                  ctxlock;
+	const struct knh_Context_t   *unusedContext;
 
 	struct knh_System_t*         sys;
 	struct knh_String_t*         enc;
@@ -774,6 +776,7 @@ typedef struct knh_Context_t {
 
 	int    hasError;
 	struct knh_String_t *msgError;
+
 } knh_Context_t ;
 
 /* ------------------------------------------------------------------------ */

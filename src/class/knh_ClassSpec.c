@@ -423,7 +423,7 @@ MAPPER knh_fmapper_vocabidx(Ctx *ctx, knh_sfp_t *sfp)
 {
 	ClassSpec *u = knh_getClassSpec(ctx, knh_Object_cid(sfp[0].o));
 	knh_int_t n = knh_ClassSpec_getVocabIdx(ctx, u, sfp[0].s);
-	DBG2_P("n = %ld", n);
+	DBG2_P("n = %d", (int)n);
 	KNH_MAPPED_Int(ctx, sfp, n);
 }
 
@@ -552,7 +552,7 @@ knh_bytes_t knh_getURNAlias(Ctx *ctx, knh_bytes_t aurn)
 
 ///* ------------------------------------------------------------------------ */
 //
-//void konoha_setAliasURN(Ctx *ctx, String *alias, String *urn)
+//void knh_setAliasURN(Ctx *ctx, String *alias, String *urn)
 //{
 //	if(knh_Context_isVerbose(ctx)) {
 //		String *s =(String*)knh_DictMap_get__b(ctx,  DP(ctx->sys)->URNAliasDictMap, knh_String_tobytes(urn));
@@ -565,7 +565,7 @@ knh_bytes_t knh_getURNAlias(Ctx *ctx, knh_bytes_t aurn)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) konoha_loadURNAliasData(Ctx *ctx, knh_StringConstData_t *data)
+KNHAPI(void) knh_loadURNAliasData(Ctx *ctx, knh_StringConstData_t *data)
 {
 	DictMap *map = DP(ctx->sys)->URNAliasDictMap;
 	knh_StringConstData_t *d = data;
@@ -586,7 +586,7 @@ KNHAPI(void) konoha_loadURNAliasData(Ctx *ctx, knh_StringConstData_t *data)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) konoha_loadClassSpecFuncData(Ctx *ctx, knh_NamedPointerData_t *data)
+KNHAPI(void) knh_loadClassSpecFuncData(Ctx *ctx, knh_NamedPointerData_t *data)
 {
 	DictSet *ds = DP(ctx->sys)->SpecFuncDictSet;
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
@@ -673,7 +673,7 @@ knh_class_t knh_addSpecializedType(Ctx *ctx, knh_class_t cid, knh_class_t bcid, 
 		cid = knh_ClassTable_newId(ctx);
 	}
 	knh_snprintf(bufcn, sizeof(bufcn), KNH_CLASSSPEC_FMT, CLASSN(bcid), knh_String_tochar(DP(u)->urn));
-	konoha_setClassName(ctx, cid, new_String(ctx, B(bufcn), NULL));
+	knh_setClassName(ctx, cid, new_String(ctx, B(bufcn), NULL));
 	{
 		knh_ClassTable_t *t = pClassTable(cid);
 		if((DP(u)->tag)->size > 0) {
