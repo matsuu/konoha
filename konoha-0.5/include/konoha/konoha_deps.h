@@ -23,6 +23,8 @@
 #define		KNH_USING_POSIX 1
 #define		KNH_USING_UNIX  1
 #define     KNH_USING_SOCKET 1
+#define 	KNH_USING_THREAD   1
+#define     KNH_USING_PTHREAD  1
 #define		KONOHA_OS_ENCODING "UTF-8"
 #define 	KNH_USING_KONOHAGET 1
 	#ifdef HAVE_ICONV_H
@@ -42,7 +44,8 @@
 #define 	KNH_USING_ICONV    1
 #define 	KNH_USING_REGEX    1
 #define 	KNH_USING_SQLITE3  1
-#define 	KNH_USING_KONOHAGET 1
+#define 	KNH_USING_THREAD   1
+#define     KNH_USING_PTHREAD  1
 #define 	KONOHA_OS_ENCODING "UTF-8"
 #define 	KONOHA_OS_LINEFEED "\n"
 #define 	KONOHA_OS_DLLEXT ".dylib"

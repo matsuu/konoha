@@ -184,10 +184,10 @@ int knh_mutex_unlock(knh_mutex_t *m)
 
 /* ------------------------------------------------------------------------ */
 
-int knh_mutex_destory(knh_mutex_t *m)
+int knh_mutex_destroy(knh_mutex_t *m)
 {
 #if defined(KNH_USING_PTHREAD)
-	return pthread_mutex_destory((pthread_mutex_t*)m);
+	return pthread_mutex_destroy((pthread_mutex_t*)m);
 #else
 	return -1;
 #endif
