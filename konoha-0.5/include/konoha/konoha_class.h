@@ -804,8 +804,6 @@ typedef struct knh_NameSpace {
 	struct knh_DictSet_t*   func2cidDictSet;
 	struct knh_DictMap_t*   lconstDictMap;
 	struct knh_DictMap_t*   tag2urnDictMap;
-//	void                   *dlhdr;
-//	knh_pkgmeta_t          *pkgmeta;
 } knh_NameSpace_struct;
 
 /* ------------------------------------------------------------------------ */

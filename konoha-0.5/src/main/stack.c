@@ -233,6 +233,7 @@ KNHAPI(void) knh_throwException(Ctx *ctx, Exception *e, char *file, int line)
 	knh_sfp_t *sp = ctx->esp;
 	while(ctx->stack <= sp) {
 		if(IS_ExceptionHandler(sp[0].hdr) && knh_ExceptionHandler_isCatching(sp[0].hdr)) {
+			DBG2_P("stack[%d] ExceptionHandler", sp - ctx->stack);
 			knh_ExceptionHandler_setCatching(sp[0].hdr, 0);
 			knh_ExceptionHandler_longjmp(ctx, sp[0].hdr, e);
 		}
