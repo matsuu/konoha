@@ -577,15 +577,12 @@ void knh_add_history(char *line)
 //}
 
 /* ======================================================================== */
-/* Thanks to Prof. Oikawa */
-/* @see http://www.coins.tsukuba.ac.jp/~syspro/2005/No5.html */
 /* @data */
 
 static Ctx* shellContext = NULL;
 
-#if KNH_USING_POSIX
+#if defined(KNH_USING_POSIX)
 #include <signal.h>
-#endif
 
 
 static
@@ -599,11 +596,13 @@ void sigint_action(int signum, siginfo_t *info, void *ctx)
 		KNH_THROWs(shellContext, "Interrupted!!");
 	}
 }
+#endif
 
 /* ------------------------------------------------------------------------ */
 
 static void knh_initSIGINT(void)
 {
+#if defined(KNH_USING_POSIX)
 	struct sigaction sa_sigint;
 	knh_bzero(&sa_sigint, sizeof(sa_sigint));
     sa_sigint.sa_sigaction = sigint_action;
@@ -611,6 +610,7 @@ static void knh_initSIGINT(void)
     if (sigaction(SIGINT, &sa_sigint, NULL) < 0) {
     	perror("sigaction");
     }
+#endif
 }
 
 /* ======================================================================== */

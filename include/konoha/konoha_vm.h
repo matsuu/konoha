@@ -654,6 +654,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 				KLR_JMP(ctx, NPC, JUMP); \
 			} \
 			DP(_hdr)->esp = ctx->esp; \
+			DP(_hdr)->pc = NULL; \
 		} \
 		knh_ExceptionHandler_setCatching(_hdr, 1); \
 	} \
