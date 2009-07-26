@@ -5,7 +5,9 @@
 #ifdef KNH_USING_STDC
 #include<stdlib.h>
 #include<string.h>
+#include<setjmp.h>
 #endif
+
 
 /* ======================================================================== */
 /* [UNIX] */
@@ -132,6 +134,20 @@
 #define 	KONOHA_OS_DLLEXT ".so"
 #define     ALT_GETENV
 #undef      KNH_USING_I18N
+#endif
+
+
+/* ======================================================================== */
+/* [setjmp] */
+
+#if KNH_USING_POSIX
+#define knh_jmpbuf_t            sigjmp_buf
+#define knh_setjmp(buf)         sigsetjmp(buf, 0)
+#define knh_longjmp(buf, val)   siglongjmp(buf, val)
+#else
+#define knh_jmpbuf_t            jmp_buf
+#define knh_setjmp(buf)         setjmp(buf)
+#define knh_longjmp(buf, val)   longjmp(buf, val)
 #endif
 
 /* ======================================================================== */

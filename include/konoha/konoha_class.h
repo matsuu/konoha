@@ -777,7 +777,7 @@ typedef struct knh_Exception {
 /* @flag ExceptionHandler.Catching EHF:2 (%s)->h.flag 'is:set:*:*' */
 
 typedef struct knh_ExceptionHandler {
-	jmp_buf jmpbuf;
+	knh_jmpbuf_t jmpbuf;
 	knh_sfp_t *esp;
 	knh_code_t *pc;
 	struct knh_Exception_t* caught;

@@ -328,7 +328,7 @@ void knh_ExceptionHandler_longjmp(Ctx *ctx, ExceptionHandler *o, Exception *e)
 {
 	KNH_ASSERT(IS_Exception(e));
 	KNH_SETv(ctx, DP(o)->caught, e);
-	longjmp(DP(o)->jmpbuf, DP(e)->eid);
+	knh_longjmp(DP(o)->jmpbuf, ((int)DP(e)->eid));
 }
 
 /* ------------------------------------------------------------------------ */
