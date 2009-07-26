@@ -436,15 +436,11 @@ typedef struct {
 /* Thread */
 /* ------------------------------------------------------------------------ */
 
-#define KNH_USING_NOTHREAD 1
-#ifdef KNH_USING_PTHREAD
-#undef KNH_USING_NOTHREAD
+#if defined(KNH_USING_PTHREAD)
 #define knh_thread_t pthread_t
 #define knh_thread_key_t pthread_key_t
 #define knh_mutex_t pthread_mutex_t
-#endif
-
-#ifdef KNH_USING_NOTHREAD
+#else
 typedef knh_intptr_t knh_thread_t;
 typedef knh_intptr_t knh_thread_key_t;
 typedef knh_intptr_t knh_mutex_t;
@@ -454,7 +450,6 @@ typedef struct knh_Thread_t {
 	knh_hObject_t h;
 	knh_thread_t thid;
 } knh_Thread_t ;
-
 
 #ifndef KNH_TLOCK_SIZE
 #define KNH_TLOCK_SIZE 256
@@ -759,7 +754,7 @@ typedef struct knh_Context_t {
 	knh_ushort_t                 ctxid;
 	char*                        cwd;
 	const struct knh_Context_t   *parent;
-	knh_mutex_t                  ctxlock;
+	knh_mutex_t                  *ctxlock;
 	const struct knh_Context_t   *unusedContext;
 
 	struct knh_System_t*         sys;
