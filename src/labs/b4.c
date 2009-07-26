@@ -57,13 +57,50 @@ METHOD knh__Script_hook(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
+
+#if defined(KNHX_API)
+/**
+  regist C function to Method.
+  @param method  method name,types... like this -> "void System.echo(String str)"
+  @param func    function pointer.  that func must have normal library API
+                 METHOD funcname (Ctx *ctx, knh_sfp_t* ){}
+  @return true/false
+ */
+//KNHAPI(int) knh_registLocalFunction(konoha_t konoha, char* method, knh_fmethod func)
+//{
+//    Ctx *ctx = konoha.ctx;
+//    konoha_setCurrentContext(ctx);
+//    knh_sfp_t *lsfp = KNH_LOCAL(ctx);
+//
+//    knh_cwb_t cwb = new_cwb(ctx);
+//    knh_Bytes_write(ctx, cwb.ba, B(method));
+//    InputStream *in = new_BytesInputStream(ctx, cwb.ba, cwb.pos, knh_Bytes_size(cwb.ba));
+//
+//    KNH_LPUSH(ctx, in);
+//    knh_InputStream_setEncoding(ctx, in, KNH_ENC);
+//
+//    Stmt *stmt = knh_InputStream_parseStmt(ctx, in, 0/*isData*/);
+//    KNH_LPUSH(ctx, stmt);
+//
+//    NameSpace *ns = knh_getCurrentNameSpace(ctx);
+//    knh_Stmt_compile(ctx, stmt, DP(ns)->nsname, 1);
+//
+//    knh_methodn_t mn = knh_Method_fromName(ctx, method);
+//    knh_Method_syncfunc(mtd, func);
+//    KNH_LOCALBACK(ctx, lsfp);
+//    return;
+//}
+
+#endif
+
+/* ------------------------------------------------------------------------ */
 /* [pacage test] */
 
 /* ------------------------------------------------------------------------ */
 
 int package_init(Ctx *ctx)
 {
-	return 1;
+    return 1;
 }
 
 /* ------------------------------------------------------------------------ */
