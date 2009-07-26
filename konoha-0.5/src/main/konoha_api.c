@@ -577,6 +577,43 @@ void knh_add_history(char *line)
 //}
 
 /* ======================================================================== */
+/* Thanks to Prof. Oikawa */
+/* @see http://www.coins.tsukuba.ac.jp/~syspro/2005/No5.html */
+/* @data */
+
+static Ctx* shellContext = NULL;
+
+#if KNH_USING_POSIX
+#include <signal.h>
+#endif
+
+
+static
+void sigint_action(int signum, siginfo_t *info, void *ctx)
+{
+	DBG2_P("sigint_handler(%d):  signo(%d) code(0x%x)\n", signum, info->si_signo, info->si_code);
+	if(shellContext == NULL) {
+		exit(0);
+	}
+	else {
+		KNH_THROWs(shellContext, "Interrupted!!");
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+static void knh_initSIGINT(void)
+{
+	struct sigaction sa_sigint;
+	knh_bzero(&sa_sigint, sizeof(sa_sigint));
+    sa_sigint.sa_sigaction = sigint_action;
+    sa_sigint.sa_flags = SA_RESTART;
+    if (sigaction(SIGINT, &sa_sigint, NULL) < 0) {
+    	perror("sigaction");
+    }
+}
+
+/* ======================================================================== */
 /* [shell] */
 
 KNHAPI(void) konoha_shell(konoha_t konoha)
@@ -586,6 +623,7 @@ KNHAPI(void) konoha_shell(konoha_t konoha)
 	knh_setCurrentContext(ctx);
 	knh_Context_setInteractive(ctx, 1);
 	knh_Context_setDebug(ctx, 1);
+	knh_initSIGINT();
 	{
 		knh_System__dump(ctx, ctx->sys, KNH_STDOUT, (String*)KNH_NULL);
 		int linenum, linecnt = 0;
@@ -664,7 +702,9 @@ KNHAPI(void) konoha_shell(konoha_t konoha)
 				DP(in)->resid = knh_getResourceId(ctx, STEXT("(shell)"));
 				DP(in)->line = linenum;
 				knh_InputStream_setEncoding(ctx, in, KNH_ENC);
+				shellContext = ctx;
 				konohac_eval(ctx, TS_main, in);
+				shellContext = NULL;
 				knh_cwb_clear(cwb);
 			}
 		}

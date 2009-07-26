@@ -642,7 +642,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 
 #define NPC  /* for KNH_TRY */
 
-#define KNH_SETJUMP(hdlr) setjmp(DP(hdlr)->jmpbuf)
+#define KNH_SETJUMP(hdlr) knh_setjmp(DP(hdlr)->jmpbuf)
 
 #define KNH_TRY(ctx, JUMP, lsfp, hn)  {\
 		ExceptionHandler* _hdr = lsfp[hn].hdr; \

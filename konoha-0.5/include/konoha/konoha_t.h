@@ -34,7 +34,6 @@
 #include<stdio.h>
 #include<limits.h>
 #include<float.h>
-#include<setjmp.h>
 
 #define __STDC_LIMIT_MACROS
 #include<stdint.h>
