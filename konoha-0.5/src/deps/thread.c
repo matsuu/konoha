@@ -34,6 +34,11 @@
 #include<pthread.h>
 #endif
 
+#ifdef KNH_USING_BTRON
+#include<btron/proctask.h>
+#include<btron/taskcomm.h>
+#endif
+
 
 /* ************************************************************************ */
 
@@ -61,6 +66,8 @@ knh_thread_t knh_thread_self(void)
 {
 #if defined(KNH_USING_PTHREAD)
 	return (knh_thread_t)pthread_self();
+#elif defined(KNH_USING_BTRON)
+        return b_get_tid();
 #else
 	return 0;
 #endif
@@ -68,10 +75,48 @@ knh_thread_t knh_thread_self(void)
 
 /* ------------------------------------------------------------------------ */
 
+#ifdef KNH_USING_BTRON
+typedef struct {
+    void* (*func)(void*);
+    void* arg;
+} knh_thread_target_btron;
+
+static void knh_thread_btronEntryPoint(knh_thread_target_btron* arg)
+{
+    knh_thread_target_btron target = *arg;
+    free(arg);
+
+    // FIXME: return value is ignored
+    target.func(target.arg);
+
+    // BTRON threads must terminate with b_ext_tsk; 
+    //       that's why we need this stub function
+    b_ext_tsk();
+}
+#endif /* KNH_USING_BTRON */
+
+
 int knh_thread_create(Ctx *ctx, knh_thread_t *thread, void *attr, void *(*frun)(void *), void * arg)
 {
 #if defined(KNH_USING_PTHREAD)
 	return pthread_create((pthread_t*)thread, attr, frun, arg);
+#elif defined(KNH_USING_BTRON)
+        // FIXME: attr is ignored
+        W err;
+        knh_thread_target_btron* target = 
+            (knh_thread_target_btron*)malloc(sizeof(knh_thread_target_btron));
+        if (target == NULL) {
+            return -1;
+        }
+        target->func = frun;
+        target->arg = arg;
+        err = b_cre_tsk((FP)knh_thread_btronEntryPoint, -1, (W)target);
+        if (err < 0) {
+            free(target);
+            return -1;
+        }
+        *thread = err;
+        return 0;
 #else
 	return -1;
 #endif
@@ -155,6 +200,13 @@ int knh_mutex_init(knh_mutex_t *m)
 {
 #if defined(KNH_USING_PTHREAD)
 	return pthread_mutex_init((pthread_mutex_t*)m, NULL);
+#elif defined(KNH_USING_BTRON)
+        W sem = b_cre_sem(1, SEM_EXCL|DELEXIT);
+        if (sem < 0) {
+            return -1;
+        }
+        *m = sem;
+        return 0;
 #else
 	return -1;
 #endif
@@ -166,6 +218,12 @@ int knh_mutex_lock(knh_mutex_t *m)
 {
 #if defined(KNH_USING_PTHREAD)
 	return pthread_mutex_lock((pthread_mutex_t*)m);
+#elif defined(KNH_USING_BTRON)
+        W err = b_wai_sem(*m, T_FOREVER);
+        if (err < 0) {
+            return -1;
+        }
+        return 0;
 #else
 	return -1;
 #endif
@@ -177,6 +235,12 @@ int knh_mutex_unlock(knh_mutex_t *m)
 {
 #if defined(KNH_USING_PTHREAD)
 	return pthread_mutex_unlock((pthread_mutex_t*)m);
+#elif defined(KNH_USING_BTRON)
+        W err = b_sig_sem(*m);
+        if (err < 0) {
+            return -1;
+        }
+        return 0;
 #else
 	return -1;
 #endif
@@ -188,6 +252,12 @@ int knh_mutex_destroy(knh_mutex_t *m)
 {
 #if defined(KNH_USING_PTHREAD)
 	return pthread_mutex_destroy((pthread_mutex_t*)m);
+#elif defined(KNH_USING_BTRON)
+        W err = b_del_sem(*m);
+        if (err < 0) {
+            return -1;
+        }
+        return 0;
 #else
 	return -1;
 #endif
