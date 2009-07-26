@@ -277,7 +277,7 @@ knh_Object_t *new_hObject(Ctx *ctx, knh_flag_t flag, knh_class_t bcid, knh_class
 		o->h.bcid = bcid;
 		o->h.cid  = cid;
 		o->h.ctxid = ctx->ctxid;
-		o->h.lock  = LOCK_NO;
+		o->h.lock  = LOCK_NOP;
 		DBG2_({o->ref = NULL;});
 		return o;
 	}
@@ -304,7 +304,7 @@ knh_Object_t *new_Object_bcid(Ctx *ctx, knh_class_t bcid, int init)
 		o->h.bcid = bcid;
 		o->h.cid  = bcid;
 		o->h.ctxid = ctx->ctxid;
-		o->h.lock  = LOCK_NO;
+		o->h.lock  = LOCK_NOP;
 		size_t size = ctx->share->StructTable[bcid].size;
 		//DBG2_P("cid=%d,%s,size=%d", bcid, STRUCTN(bcid), size);
 		if(size > 0) {
@@ -340,7 +340,7 @@ knh_Object_t *new_Object_init(Ctx *ctx, knh_flag_t flag, knh_class_t cid, int in
 		o->h.flag = ClassTable(cid).oflag | flag;
 		o->h.cid  = cid;
 		o->h.ctxid = ctx->ctxid;
-		o->h.lock  = LOCK_NO;
+		o->h.lock  = LOCK_NOP;
 		size_t size = ClassTable(cid).size;
 		if(size > 0) {
 			o->ref = KNH_MALLOC(ctx, size);
@@ -373,7 +373,7 @@ KNHAPI(Object*) new_Object_boxing(Ctx *ctx, knh_class_t cid, knh_sfp_t *sfp)
 		o->h.bcid = ClassTable(cid).bcid;
 		o->h.cid  = cid;
 		o->h.ctxid = ctx->ctxid;
-		o->h.lock  = LOCK_NO;
+		o->h.lock  = LOCK_NOP;
 		knh_Float_t *v = (knh_Float_t*)o;
 		v->n.data = sfp[0].data;
 		return o;
@@ -417,7 +417,6 @@ void knh_Object_traverse(Ctx *ctx, knh_Object_t *o, knh_ftraverse ftr)
 	}
 	ctx->share->StructTable[o->h.bcid].ftraverse(ctx, o, ftr);
 }
-
 
 /* ========================================================================= */
 
