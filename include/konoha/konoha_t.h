@@ -440,6 +440,10 @@ typedef struct {
 #define knh_thread_t pthread_t
 #define knh_thread_key_t pthread_key_t
 #define knh_mutex_t pthread_mutex_t
+#elif defined(KNH_USING_BTRON)
+#define knh_thread_t W
+#define knh_thread_key_t W
+#define knh_mutex_t W
 #else
 typedef knh_intptr_t knh_thread_t;
 typedef knh_intptr_t knh_thread_key_t;

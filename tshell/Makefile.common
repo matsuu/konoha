@@ -9,7 +9,7 @@ VPATH = "./ $(shell find ../../ -type d) ./"
 
 # -I../support/include must precede -I$(BD)/include, so as to avoid
 # ../support/include/machine.h be loaded earlier
-CFLAGS += -O0 -Wall -fmessage-length=0 -I../support/include -I$(BD)/include -I../../include -DKONOHA_ON_TB -DKONOHA_MONOLITHIC
+CFLAGS += -Wall -fmessage-length=0 -I../support/include -I$(BD)/include -I../../include -DKONOHA_ON_TB -DKONOHA_MONOLITHIC
 
 LDLIBS := -ldl $(LDLIBS)
 
