@@ -11,6 +11,8 @@ VPATH = "./ $(shell find ../../ -type d) ./"
 # ../support/include/machine.h be loaded earlier
 CFLAGS += -O0 -Wall -fmessage-length=0 -I../support/include -I$(BD)/include -I../../include -DKONOHA_ON_TB -DKONOHA_MONOLITHIC
 
+LDLIBS := -ldl $(LDLIBS)
+
 program = konoha
 library = lib$(program)
 
@@ -32,12 +34,12 @@ libkonoha_la_SOURCES += ../src/main/stack.c
 libkonoha_la_SOURCES += ../src/main/konoha_api.c
 libkonoha_la_SOURCES += ../src/main/logging.c
 libkonoha_la_SOURCES += ../src/main/memory.c
-#libkonoha_la_SOURCES += ../src/main/classapi.c
+libkonoha_la_SOURCES += ../src/main/classapi.c
 libkonoha_la_SOURCES += ../src/api/hashapi.c
 libkonoha_la_SOURCES += ../src/api/streamapi.c
 libkonoha_la_SOURCES += ../src/api/objectapi.c
 libkonoha_la_SOURCES += ../src/api/bytesapi.c
-#libkonoha_la_SOURCES += ../src/api/systemapi.c
+libkonoha_la_SOURCES += ../src/api/systemapi.c
 libkonoha_la_SOURCES += ../src/api/dbapi.c
 libkonoha_la_SOURCES += ../src/api/numberapi.c
 libkonoha_la_SOURCES += ../src/api/stringapi.c
