@@ -39,6 +39,12 @@
 #include<windows.h>
 #endif
 
+#ifdef KNH_USING_BTRON
+#include<btron/file.h>
+#include<btron/dynload.h>
+#include<tstring.h>
+#endif
+
 
 /* ************************************************************************ */
 
@@ -71,6 +77,29 @@ void *knh_dlopen(Ctx *ctx, knh_bytes_t libname)
 	}
 	DBG_P("knh_dlopen .. '%s'\n", buff);
 	return dlopen(buff, RTLD_LAZY);
+#elif defined(KNH_USING_BTRON)
+        char buff[FILEPATH_BUFSIZ];
+        TC buff_tc[FILEPATH_BUFSIZ];
+        LINK lnk;
+        W err;
+	if(knh_bytes_endsWith(libname, STEXT(KONOHA_OS_DLLEXT))) {
+		knh_format_ospath(ctx, buff, sizeof(buff), libname);
+	}
+	else {
+		knh_format_ospath2(ctx, buff, sizeof(buff), libname, KONOHA_OS_DLLEXT);
+	}
+	DBG_P("knh_dlopen .. '%s'\n", buff);
+        eucstotcs(buff_tc, buff);
+        err = b_get_lnk(buff_tc, &lnk, F_NORM);
+        if (err < 0) {
+            return NULL;
+        }
+        err = b_dlopen(&lnk, DL_LAZY);
+        if (err <= 0) {
+            return NULL;
+        }
+        // Be careful that BTRON dlopen handles are of type W, not void*!
+        return (void*)err;
 #else
 	return NULL;
 #endif
@@ -84,6 +113,13 @@ void *knh_dlsym(Ctx *ctx, void* hdr, const char* symbol)
     return GetProcAddress((HMODULE)hdr, (LPCSTR)symbol);
 #elif defined(KNH_USING_POSIX)
     return dlsym(hdr, symbol);
+#elif defined(KNH_USING_BTRON)
+    UW val = NULL;
+    W err = b_dlsym((W)hdr, symbol, &val);
+    if (err < 0) {
+        return NULL;
+    }
+    return val;
 #else
     return NULL;
 #endif
@@ -110,6 +146,8 @@ int knh_dlclose(Ctx *ctx, void* hdr)
     return (int)FreeLibrary((HMODULE)hdr);
 #elif defined(KNH_USING_POSIX)
     return dlclose(hdr);
+#elif defined(KNH_USING_BTRON)
+    return b_dlclose((W)hdr);
 #else
     return 0;
 #endif

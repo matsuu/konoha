@@ -28,7 +28,7 @@
 /* ************************************************************************ */
 
 #include"commons.h"
-#ifndef KONOHA_ON_LKM
+#if !defined(KONOHA_ON_LKM) && !defined(KNH_USING_BTRON)
 #include <dirent.h>
 #endif
 
@@ -166,7 +166,7 @@ static METHOD knh__System_exit(Ctx *ctx, knh_sfp_t *sfp)
 METHOD knh__System_listDir(Ctx *ctx, knh_sfp_t *sfp)
 {
     //FIXME cant treat in kernel mode.
-#ifndef KONOHA_ON_LKM
+#if !defined(KONOHA_ON_LKM) && !defined(KNH_USING_BTRON)
     DIR *dirptr;
     struct dirent *direntp;
     char dirname[FILEPATH_BUFSIZ];
