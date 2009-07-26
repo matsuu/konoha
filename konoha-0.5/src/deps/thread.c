@@ -60,7 +60,7 @@ extern "C" {
 knh_thread_t knh_thread_self(void)
 {
 #if defined(KNH_USING_PTHREAD)
-	return pthread_self();
+	return (knh_thread_t)pthread_self();
 #else
 	return 0;
 #endif
@@ -79,10 +79,10 @@ int knh_thread_create(Ctx *ctx, knh_thread_t *thread, void *attr, void *(*frun)(
 
 /* ------------------------------------------------------------------------ */
 
-int knh_thread_detach(Ctx *ctx, knh_thread_t *thread)
+int knh_thread_detach(Ctx *ctx, knh_thread_t th)
 {
 #if defined(KNH_USING_PTHREAD)
-	return pthread_detach(*thread);
+	return pthread_detach((pthread_t)th);
 #else
 	return 0;
 #endif
@@ -101,7 +101,7 @@ static void *threading(void *p)
 	knh_threadcc_t ta = *((knh_threadcc_t*)p);
 	Ctx *ctx = new_ThreadContext(ta.ctx);
 
-	knh_setCurrentContext(ctx);
+	knh_beginContext(ctx);
 	knh_sfp_t *lsfp = ctx->stack;
 
 	KNH_MOV(ctx, lsfp[0].o, new_ExceptionHandler(ctx));
@@ -128,7 +128,7 @@ static void *threading(void *p)
 
 	L_FINALLY:
 	knh_Context_clearstack(ctx);
-	knh_setCurrentContext(NULL);
+	knh_endContext(ctx);
 	knh_ThreadContext_dispose(ctx);
 	return NULL;
 }
@@ -140,7 +140,7 @@ void knh_stack_threadRun(Ctx *ctx, knh_sfp_t *sfp)
 	knh_thread_t th;
 	knh_threadcc_t ta = {ctx, sfp};
 	knh_thread_create(ctx, &th, NULL, threading, (void*)&ta);
-	knh_thread_detach(ctx, &th);
+	knh_thread_detach(ctx, th);
 }
 
 /* ======================================================================== */

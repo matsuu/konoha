@@ -551,12 +551,12 @@ void  init_DB(Ctx *ctx);
 /* ../src/deps/thread.c */
 knh_thread_t knh_thread_self(void);
 int knh_thread_create(Ctx *ctx, knh_thread_t *thread, void *attr, void *(*frun)(void *), void * arg);
-int knh_thread_detach(Ctx *ctx, knh_thread_t *thread);
+int knh_thread_detach(Ctx *ctx, knh_thread_t th);
 void knh_stack_threadRun(Ctx *ctx, knh_sfp_t *sfp);
 int knh_mutex_init(knh_mutex_t *m);
 int knh_mutex_lock(knh_mutex_t *m);
 int knh_mutex_unlock(knh_mutex_t *m);
-int knh_mutex_destory(knh_mutex_t *m);
+int knh_mutex_destroy(knh_mutex_t *m);
 int knh_thread_key_create(knh_thread_key_t *key);
 int knh_thread_setspecific(knh_thread_key_t key, const void *data);
 void* knh_thread_getspecific(knh_thread_key_t key);

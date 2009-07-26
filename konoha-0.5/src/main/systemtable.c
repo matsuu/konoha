@@ -169,12 +169,14 @@ void knh_Context_initCommon(Ctx *ctx, knh_Context_t *o, size_t stacksize)
 	KNH_INITv(o->bconvbuf, new_Bytes(ctx, 256));
 	KNH_INITv(o->props, new_DictMap0(ctx, 16));
 
+	o->ctxlock = (knh_mutex_t*)KNH_MALLOC(ctx, sizeof(knh_mutex_t));
+	knh_mutex_init(o->ctxlock);
+	DBG2_ASSERT(ctx->sys != NULL);
 	KNH_INITv(o->enc, DP(ctx->sys)->enc);
 	KNH_INITv(o->in,  DP(ctx->sys)->in);
 	KNH_INITv(o->out, DP(ctx->sys)->out);
 	KNH_INITv(o->err, DP(ctx->sys)->err);
 	KNH_INITv(o->abr, KNH_NULL);
-	knh_mutex_init(&(o->ctxlock));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -209,7 +211,9 @@ void knh_Context_traverseCommon(Ctx *ctx, knh_Context_t *o, knh_ftraverse ftr)
 		o->mtdCache = NULL;
 		o->fmtCache = NULL;
 		o->mprCache = NULL;
-		knh_mutex_destroy(&o->ctxlock);
+		knh_mutex_destroy(o->ctxlock);
+		KNH_FREE(ctx, o->ctxlock, sizeof(knh_mutex_t));
+		o->ctxlock = NULL;
 	}
 }
 
@@ -337,11 +341,8 @@ void knh_initSharedData(Context *ctx)
 
 	KNH_INITv(ctx->sys, new_System(ctx));
 	knh_loadSystemData(ctx);
-
 	KNH_INITv(share->mainns, new_NameSpace(ctx, TS_main));
 }
-
-
 
 /* ------------------------------------------------------------------------ */
 
@@ -607,13 +608,13 @@ void knh_ThreadContext_dispose(Ctx *ctx)
 {
 	KNH_ASSERT(ctx->parent != ctx);
 	Ctx *root = knh_getRootContext(ctx);
-	knh_mutex_lock(&(((Context*)ctx)->ctxlock));  // checking using or not
+	knh_mutex_lock((((Context*)ctx)->ctxlock));  // checking using or not
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 	((Context*)ctx)->unusedContext = root->unusedContext;
 	((Context*)root)->unusedContext = ctx;
 	((knh_SharedData_t*)ctx->share)->threadCounter -= 1;
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-	knh_mutex_unlock(&(((Context*)ctx)->ctxlock));
+	knh_mutex_unlock((((Context*)ctx)->ctxlock));
 }
 
 /* ======================================================================== */
