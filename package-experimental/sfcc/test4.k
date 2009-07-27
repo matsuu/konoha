@@ -8,15 +8,11 @@ op = new CIMObjectPath("root/cimv2","Linux_Hello");
 
 op.addKey("CreationClassName","Linux_Hello");
 
-op.addKey("Name","hello");
+op.addKey("CLASS","Test");
 
 cc = new CIMClient("192.168.59.202");
 
-s = cc.invokeMethod(op, "fib.k", "");
+s = cc.invokeMethod(op, "func", ["",""]);
 
 OUT << s << EOL;
-
-ins = new CIMInstance(cc,op);
-
-OUT << op.toString() << EOL;
 

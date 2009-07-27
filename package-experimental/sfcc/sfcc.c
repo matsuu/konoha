@@ -261,13 +261,19 @@ METHOD CIMClient_invokeMethod(Ctx *ctx, knh_sfp_t *sfp)
   CIMCClient *cc = ((sfp[0].glue)->ptr);
   CIMCObjectPath *op = ((sfp[1].glue)->ptr);
   char *name =  p_char(sfp[2]);
-  char *arg =  p_char(sfp[3]);
+  Array *a = (Array*)sfp[3].o;
+  //char *arg =  p_char(sfp[3]);
+  int i,argc;
   char *ret;
-  CIMCArgs *inargs;
+  CIMCStatus check;
+  CIMCArgs *inargs = env->ft->newArgs(env,&check);
   CIMCArgs *outargs = NULL;
   CIMCData data;
-  CIMCStatus check;
-  inargs = env->ft->newArgs(env,&check);
+  CIMCStatus status;
+  char *c = "0";
+  argc = knh_Array_size(a);
+  
+  
   //printf("%d,%s\n",check.rc,(char*)check.msg->hdl);
   /*
   for(i=0;i<string_size;i++)
@@ -277,17 +283,18 @@ METHOD CIMClient_invokeMethod(Ctx *ctx, knh_sfp_t *sfp)
     inarg->ft->add(in,key,value,CIM_chars
   	   );
   */
-  char src[128]={0};
-  snprintf(src,128,"/usr/local/share/konoha/sample/%s",name);
+  //char src[128]={0};
+  //snprintf(src,128,"/usr/local/share/konoha/sample/%s",name);
   
-  ((CMPIArgs*)inargs)->ft->addArg((CMPIArgs*)inargs, "src", (CMPIValue*)src, CMPI_chars);
-  
-  if(strncmp(arg,"",1) != 0){
-    ((CMPIArgs*)inargs)->ft->addArg((CMPIArgs*)inargs, "arg", (CMPIValue*)arg, CMPI_chars);
+  ((CMPIArgs*)inargs)->ft->addArg((CMPIArgs*)inargs, "src", (CMPIValue*)name, CMPI_chars);
+
+  for(i=0;i<argc;i++){
+    if(strncmp(knh_String_tochar((String *)knh_Array_n(a, i)),"",1) != 0){
+      ((CMPIArgs*)inargs)->ft->addArg((CMPIArgs*)inargs, c, (CMPIValue*)knh_String_tochar((String *)knh_Array_n(a, i)), CMPI_chars);
+      c[0] += 1;
+    } 
   }
-  outargs = NULL;
   if(cc != NULL && op != NULL) {
-    CIMCStatus status;
     data = cc->ft->invokeMethod(cc, op, "call", inargs, outargs, &status);
     if(status.rc != 0) {
       knh_throw_CIMCStatus(ctx, &status);

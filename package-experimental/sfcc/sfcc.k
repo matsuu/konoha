@@ -84,7 +84,7 @@ String.. CIMClient.enumClassNames(CIMObjectPath op, Int? flag);
   * @param arg Input parameter
   * @return Method return value.
   */
-String CIMClient.invokeMethod(CIMObjectPath op, String name, String arg);
+String CIMClient.invokeMethod(CIMObjectPath op, String name, String[] arg);
 
 /**
  * インスタンス名の一覧をイテレータとしてえる
