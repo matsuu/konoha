@@ -61,7 +61,6 @@ METHOD Curl_new(Ctx *ctx, knh_sfp_t *sfp)
 METHOD Curl_easySetOpt(Ctx *ctx, knh_sfp_t *sfp)
 {
 	CURL* curl = (CURL*)p_cptr(sfp[0]);
-	char* str = NULL;
 	FILE* fp = NULL;
 	if(curl != NULL) {
 		knh_int_t curlopt = p_int(sfp[1]);
@@ -184,10 +183,7 @@ METHOD Curl_easySetOpt(Ctx *ctx, knh_sfp_t *sfp)
 		case CURLOPT_USERAGENT:
 		case CURLOPT_USERPWD:
 			if(IS_String(sfp[2].o)) {
-				str = (char*)alloca(sizeof(char)*(sfp[2].s->size + 1));
-				strncpy(str,(char*)sfp[2].s->str,sfp[2].s->size);
-				str[sfp[2].s->size] = '\0';
-				curl_easy_setopt(curl, curlopt, str);
+			  curl_easy_setopt(curl, curlopt, knh_String_text(ctx,sfp[2].s));
 			}
 			else {
 				if(knh_Context_isStrict(ctx)) {
@@ -390,7 +386,7 @@ knh_IntConstData_t IntConstData[] = {
 KNH_EXPORTS(int) init(Ctx *ctx)
 {
 	KNH_NOTICE(ctx, "loading curl..");
-	konoha_loadIntConstData(ctx, IntConstData);
+	knh_loadIntConstData(ctx, IntConstData);
 
 	return 1;
 }

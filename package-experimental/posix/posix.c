@@ -244,35 +244,6 @@ METHOD System_raise(Ctx *ctx, knh_sfp_t *sfp)
 /* [FILESYSTEM] */
 
 /* ------------------------------------------------------------------------ */
-/* @method String[] System.listDir(String dirname) */
-
-METHOD System_listDir(Ctx *ctx, knh_sfp_t *sfp)
-{
-    DIR *dirptr;
-    struct dirent *direntp;
-    char dirname[FILEPATH_BUFSIZ];
-    knh_bytes_t t = (IS_NULL(sfp[1].s)) ? STEXT(".") : knh_String_tobytes(sfp[1].s);
-
-    knh_format_ospath(ctx, dirname, sizeof(dirname), t);
-    String* str = (String *) sfp[1].s;
-    knh_bytes_t bt = {str->str, str->size};
-    knh_format_ospath(ctx, dirname, sizeof(dirname), bt);
-    Array *a = new_Array(ctx, CLASS_String, 0);
-
-    if ((dirptr = opendir(dirname)) == NULL) {
-        KNH_PERRNO(ctx, "OS!!", "opendir", knh_Context_isStrict(ctx));
-    } else {
-        while ((direntp = readdir(dirptr)) != NULL) {
-            char *p = direntp->d_name;
-            if(p[0] == '.' && (p[1] == 0 || p[1] == '.')) continue;
-            knh_Array_add(ctx, a, UP(new_String(ctx, B(p), NULL)));
-        }
-        closedir(dirptr);
-    }
-    KNH_RETURN(ctx, sfp, a);
-}
-
-/* ------------------------------------------------------------------------ */
 // String! System.getCwd();
 
 METHOD System_getCwd(Ctx *ctx, knh_sfp_t *sfp)
@@ -385,14 +356,14 @@ static knh_iodrv_t IO__PIPE = {
 KNHAPI(int) init(Ctx *ctx)
 {
     KNH_NOTICE(ctx, "loading posix package ..");
-    konoha_loadIntConstData(ctx, IntConstData);
-    konoha_loadFloatConstData(ctx, FloatConstData);
-    konoha_loadStringConstData(ctx, StringConstData);
+    knh_loadIntConstData(ctx, IntConstData);
+    knh_loadFloatConstData(ctx, FloatConstData);
+    knh_loadStringConstData(ctx, StringConstData);
 
     // pipe dirver
-    konoha_addIODriver(ctx, NULL, &IO__PIPE);
-    konoha_addIODriver(ctx, "sh", &IO__PIPE);
-    konoha_addIODriver(ctx, "cmd", &IO__PIPE);
+    knh_addIODriver(ctx, NULL, &IO__PIPE);
+    knh_addIODriver(ctx, "sh", &IO__PIPE);
+    knh_addIODriver(ctx, "cmd", &IO__PIPE);
     return 1;
 }
 
