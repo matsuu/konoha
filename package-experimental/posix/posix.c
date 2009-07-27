@@ -155,7 +155,7 @@ METHOD System_sleep(Ctx *ctx, knh_sfp_t *sfp)
 Closure *segvfunc = NULL;
 static void knh_sig_segv(int sig)
 {
-    Ctx *lctx = konoha_getCurrentContext();
+    Ctx *lctx = knh_getCurrentContext();
     knh_sfp_t *lsfp = KNH_LOCAL(lctx);
     knh_Closure_invokesfp(lctx, segvfunc, lsfp, 0);
 }
@@ -175,7 +175,7 @@ METHOD System_setSigSegv(Ctx *ctx, knh_sfp_t *sfp)
 Closure *busfunc = NULL;
 static void knh_sig_bus(int sig)
 {
-    Ctx *lctx = konoha_getCurrentContext();
+    Ctx *lctx = knh_getCurrentContext();
     knh_sfp_t *lsfp = KNH_LOCAL(lctx);
     knh_Closure_invokesfp(lctx, busfunc, lsfp, 0);
 }
@@ -195,7 +195,7 @@ METHOD System_setSigBus(Ctx *ctx, knh_sfp_t *sfp)
 Closure *killfunc = NULL;
 static void knh_sig_kill(int sig)
 {
-    Ctx *lctx = konoha_getCurrentContext();
+    Ctx *lctx = knh_getCurrentContext();
     knh_sfp_t *lsfp = KNH_LOCAL(lctx);
     knh_Closure_invokesfp(lctx, killfunc, lsfp, 0);
 }
@@ -215,7 +215,7 @@ METHOD System_setSigKill(Ctx *ctx, knh_sfp_t *sfp)
 Closure *intfunc = NULL;
 static void knh_sig_int(int sig)
 {
-    Ctx *lctx = konoha_getCurrentContext();
+    Ctx *lctx = knh_getCurrentContext();
     knh_sfp_t *lsfp = KNH_LOCAL(lctx);
     knh_Closure_invokesfp(lctx, intfunc, lsfp, 0);
 }
