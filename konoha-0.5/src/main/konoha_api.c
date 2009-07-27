@@ -598,28 +598,28 @@ void knh_add_history(char *line)
 
 ///* ------------------------------------------------------------------------ */
 //
-//int knh_readline_askYesNo(char *prompt, int def)
-//{
-//	L_TAIL:;
-//	char *line = knh_readline(prompt);  /* "Please enter [Y/n] : " */
-//	if(line == NULL) return def;
-//	int res;
-//	if (line[0] == 'y' || line[0] == 'Y') {
-//		res = 1;
-//	}
-//	else if (line[0] == 'n' || line[0] == 'N') {
-//		res = 0;
-//	}
-//	else if (line[0] == '\0') {
-//		res = def;
-//	}
-//	else {
-//		fprintf(stdout, "Again. "); fflush(stdout);
-//		goto L_TAIL;
-//	}
-//	free(line);
-//	return res;
-//}
+int knh_ask(char *prompt, int def)
+{
+	L_TAIL:;
+	char *line = knh_readline(prompt);  /* "Please enter [Y/n] : " */
+	if(line == NULL) return def;
+	int res;
+	if (line[0] == 'y' || line[0] == 'Y') {
+		res = 1;
+	}
+	else if (line[0] == 'n' || line[0] == 'N') {
+		res = 0;
+	}
+	else if (line[0] == '\0') {
+		res = def;
+	}
+	else {
+		fprintf(stdout, "Again. "); fflush(stdout);
+		goto L_TAIL;
+	}
+	free(line);
+	return res;
+}
 
 /* ======================================================================== */
 /* @data */
@@ -636,7 +636,9 @@ void sigint_action(int signum, siginfo_t *info, void *ctx)
 {
 	DBG2_P("sigint_handler(%d):  signo(%d) code(0x%x)\n", signum, info->si_signo, info->si_code);
 	if(shellContext == NULL) {
-		exit(0);
+//		if(knh_ask("\nAre you sure ?[Y/n]", 1)) {
+			exit(0);
+//		}
 	}
 	else {
 		//knh_initSIGINT();

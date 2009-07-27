@@ -139,20 +139,6 @@
 #undef      KNH_USING_I18N
 #endif
 
-
-/* ======================================================================== */
-/* [setjmp] */
-
-#if KNH_USING_POSIX
-#define knh_jmpbuf_t            sigjmp_buf
-#define knh_setjmp(buf)         sigsetjmp(buf, 0)
-#define knh_longjmp(buf, val)   siglongjmp(buf, val)
-#else
-#define knh_jmpbuf_t            jmp_buf
-#define knh_setjmp(buf)         setjmp(buf)
-#define knh_longjmp(buf, val)   longjmp(buf, val)
-#endif
-
 /* ======================================================================== */
 /* [KNHAPI] */
 
