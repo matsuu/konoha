@@ -854,7 +854,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		Exception *e_ = DP(lsfp[hn].hdr)->caught;\
 		KNH_ASSERT(IS_ExceptionHandler(lsfp[hn].hdr));\
 		knh_format(ctx, KNH_STDERR, METHODN__dump, UP(e_), KNH_NULL);\
-		knh_Context_setRuntimeError(ctx, DP(e_)->msg);\
+		knh_setRuntimeError(ctx, DP(e_)->msg);\
 		KNH_LOCALBACK(ctx, lsfp);\
 	}\
 

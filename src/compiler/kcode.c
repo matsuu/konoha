@@ -79,7 +79,7 @@ void knh_Method_setKLRCode(Ctx *ctx, Method *mtd, KLRCode *code)
 		KNH_INITv(DP(mtd)->code, code);
 		knh_Method_setObjectCode(mtd, 1);
 	}
-	knh_Method_syncfunc(mtd, knh_KLRCode_exec);
+	knh_Method_syncFunc(mtd, knh_KLRCode_exec);
 	mtd->pc_start = DP(code)->code;
 }
 

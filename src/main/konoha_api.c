@@ -209,7 +209,7 @@ KNHAPI(int) konoha_hasRuntimeError(konoha_t konoha)
 
 /* ------------------------------------------------------------------------ */
 
-void knh_Context_setRuntimeError(Ctx *ctx, String *msg)
+void knh_setRuntimeError(Ctx *ctx, String *msg)
 {
 	KNH_SETv(ctx, ((Context*)ctx)->msgError, msg);
 	((Context*)ctx)->hasError = 1;
@@ -367,7 +367,7 @@ KNHAPI(int) konoha_runMain(konoha_t konoha, int argc, char **argv)
 		if(knh_Method_psize(mtd) == 1) {
 			knh_type_t ptype = knh_Method_pztype(mtd, 0);
 			if(ptype != ATYPE_String && ptype != NNATYPE_String) {
-				knh_Context_setRuntimeError(ctx, T("Type!!: main()"));
+				knh_setRuntimeError(ctx, T("Type!!: main()"));
 				goto L_END_TRY;
 			}
 			else {
@@ -383,7 +383,7 @@ KNHAPI(int) konoha_runMain(konoha_t konoha, int argc, char **argv)
 			}
 		}
 		else {
-			knh_Context_setRuntimeError(ctx, T("Type!!: main()"));
+			knh_setRuntimeError(ctx, T("Type!!: main()"));
 			goto L_END_TRY;
 		}
 	}
@@ -500,7 +500,7 @@ KNHAPI(char*) konoha_invokeStringFunc(konoha_t konoha, char *fmt, ...)
 			String *s = lsfp[0].s;
 			char *p = (char*)malloc(s->size+1);
 			if(p == NULL) {
-				knh_Context_setRuntimeError(ctx, T("out of memory"));
+				knh_setRuntimeError(ctx, T("out of memory"));
 			}
 			else {
 				knh_memcpy(p, s->str, s->size);
@@ -510,6 +510,44 @@ KNHAPI(char*) konoha_invokeStringFunc(konoha_t konoha, char *fmt, ...)
 		}
 	}
 	return NULL;
+}
+
+/* ------------------------------------------------------------------------ */
+
+KNHAPI(int) konoha_addMethodFunc(konoha_t konoha, char *name, knh_fmethod func)
+{
+	KONOHA_CHECK(konoha, -1);
+	Ctx *ctx = konoha.ctx;
+	NameSpace *ns = ctx->share->mainns;
+	knh_class_t cid; knh_methodn_t mn;
+	knh_bytes_t n = B(name);
+	knh_index_t loc = knh_bytes_rindex(n, '.');
+	if(loc == -1) {
+		cid = knh_Object_cid(knh_NameSpace_getScript(ctx, ns));
+	}
+	else {
+		cid = knh_NameSpace_getcid(ctx, ns, knh_bytes_first(n, loc));
+		if(cid == CLASS_unknown) {
+			cid = knh_getcid(ctx, knh_bytes_first(n, loc));
+			if(cid == CLASS_unknown) {
+				goto L_ERROR;
+			}
+		}
+		n = knh_bytes_last(n, loc+1);
+	}
+	mn = knh_getmn(ctx, n, METHODN_NONAME);
+	{
+		Method *mtd = knh_Class_getMethod(ctx, cid, mn);
+		if(IS_NULL(mtd)) {
+			goto L_ERROR;
+		}
+		knh_Method_syncFunc(mtd, func);
+	}
+	return 0;
+
+	L_ERROR:
+	knh_setRuntimeError(ctx, T("method not found"));
+	return -1;
 }
 
 /* ======================================================================== */
@@ -591,6 +629,8 @@ static Ctx* shellContext = NULL;
 #if defined(KNH_USING_POSIX)
 #include <signal.h>
 
+static void knh_initSIGINT(void);
+
 static
 void sigint_action(int signum, siginfo_t *info, void *ctx)
 {
@@ -599,6 +639,7 @@ void sigint_action(int signum, siginfo_t *info, void *ctx)
 		exit(0);
 	}
 	else {
+		//knh_initSIGINT();
 		KNH_THROWs(shellContext, "Interrupted!!");
 	}
 }
