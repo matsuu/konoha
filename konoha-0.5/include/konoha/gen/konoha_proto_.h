@@ -275,7 +275,7 @@ int knh_MethodField_equalsType(MethodField *o, MethodField *o2);
 METHOD knh_fmethod_abstract(Ctx *ctx, knh_sfp_t *sfp);
 knh_bool_t knh_Method_isAbstract(Method *o);
 void knh_Method_toAbstract(Ctx *ctx, Method *o);
-void knh_Method_syncfunc(Method *o, knh_fmethod f);
+void knh_Method_syncFunc(Method *o, knh_fmethod f);
 Method* new_Method(Ctx *ctx, knh_flag_t flag, knh_class_t cid, knh_methodn_t mn, knh_fmethod func);
 knh_bool_t knh_Method_isNoSuchMethod(Method *o);
 Method* new_Method__NoSuchMethod(Ctx *ctx, knh_class_t cid, knh_methodn_t mn);
@@ -585,7 +585,7 @@ int knh_fcallback_cmpr(Object *obj, Object *obj2);
 void *konoha_generateCallBackFunc(Ctx *ctx, void *func, Closure *c);
 /* ../src/main/konoha_api.c */
 void konoha_init(void);
-void knh_Context_setRuntimeError(Ctx *ctx, String *msg);
+void knh_setRuntimeError(Ctx *ctx, String *msg);
 METHOD knh__Script_eval(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_isStatement(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_readLine(Ctx *ctx, knh_sfp_t *sfp);

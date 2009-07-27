@@ -776,11 +776,21 @@ typedef struct knh_Exception {
 /* @flag ExceptionHandler.Jumpable   EHF:1 (%s)->h.flag 'is:set:*:*' */
 /* @flag ExceptionHandler.Catching EHF:2 (%s)->h.flag 'is:set:*:*' */
 
+#ifdef KNH_USING_POSIX
+typedef sigjmp_buf knh_jmpbuf_t;
+#define knh_setjmp(buf)         sigsetjmp(buf, 1)
+#define knh_longjmp(buf, val)   siglongjmp(buf, val)
+#else
+typedef jmp_buf knh_jmpbuf_t
+#define knh_setjmp(buf)         setjmp(buf)
+#define knh_longjmp(buf, val)   longjmp(buf, val)
+#endif
+
 typedef struct knh_ExceptionHandler {
-	knh_jmpbuf_t jmpbuf;
 	knh_sfp_t *esp;
 	knh_code_t *pc;
 	struct knh_Exception_t* caught;
+	knh_jmpbuf_t jmpbuf;
 } knh_ExceptionHandler_struct;
 
 /* ------------------------------------------------------------------------ */

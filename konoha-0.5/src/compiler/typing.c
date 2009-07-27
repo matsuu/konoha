@@ -3672,7 +3672,7 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	{
 		knh_fmethod func = knh_Asm_loadMethodFunc(ctx, abr, mtd_cid, DP(mtd)->mn);
 		if(func != NULL) {
-			knh_Method_syncfunc(mtd, func);
+			knh_Method_syncFunc(mtd, func);
 			knh_Stmt_done(ctx, stmt);
 		}
 	}

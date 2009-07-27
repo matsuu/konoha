@@ -34,11 +34,13 @@
 #include<stdio.h>
 #include<limits.h>
 #include<float.h>
+#include<setjmp.h>
 
 #define __STDC_LIMIT_MACROS
 #include<stdint.h>
 #define __STDC_FORMAT_MACROS
 #include<inttypes.h>
+
 #endif
 
 #if defined(KNH_USING_PTHREAD)
@@ -478,7 +480,7 @@ typedef struct knh_LockTable_t {
 
 #define SIZEOF_TLOCK   (KNH_TLOCK_SIZE * sizeof(knh_LockTable_t))
 
-#define KNH_LOCK(ctx, lockid, o)    knh_lockID(ctx, lockid, o, (char*)__FILE__, __LINE__)
+#define KNH_LOCK(ctx, lockid, o)    knh_lockID(ctx, lockid, o, (char*)__FILE__, (int)__LINE__)
 #define KNH_UNLOCK(ctx, lockid, o)  knh_unlockID(ctx, lockid, (char*)__FILE__, __LINE__)
 
 /* ------------------------------------------------------------------------ */

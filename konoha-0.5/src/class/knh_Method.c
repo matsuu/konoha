@@ -198,15 +198,18 @@ void knh_Method_toAbstract(Ctx *ctx, Method *o)
 		KNH_FINALv(ctx, DP(o)->code);
 		knh_Method_setObjectCode(o, 0);
 	}
-	knh_Method_syncfunc(o, knh_fmethod_abstract);
+	knh_Method_syncFunc(o, knh_fmethod_abstract);
 	o->pc_start  = NULL;
 }
 
 /* ======================================================================== */
 /* [Method] */
 
-void knh_Method_syncfunc(Method *o, knh_fmethod f)
+void knh_Method_syncFunc(Method *o, knh_fmethod f)
 {
+	if(f == NULL) {
+		f = knh_fmethod_abstract;
+	}
 	DP(o)->fproceed = f;
 	(o)->fcall_1 = f;
 }
@@ -223,7 +226,7 @@ Method* new_Method(Ctx *ctx, knh_flag_t flag, knh_class_t cid, knh_methodn_t mn,
 		KNH_SETv(ctx, DP(o)->mf, konoha_findMethodField0(ctx, TYPE_void));
 	}
 	func = (func == NULL) ? knh_fmethod_abstract : func;
-	knh_Method_syncfunc(o, func);
+	knh_Method_syncFunc(o, func);
 	DP(o)->code  = NULL;
 	o->pc_start  = NULL;
 	return o;
