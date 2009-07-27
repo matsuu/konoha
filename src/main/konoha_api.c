@@ -624,7 +624,7 @@ int knh_ask(char *prompt, int def)
 /* ======================================================================== */
 /* @data */
 
-static Ctx* shellContext = NULL;
+static volatile Ctx* shellContext = NULL;
 
 #if defined(KNH_USING_POSIX)
 #include <signal.h>
