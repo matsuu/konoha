@@ -20,6 +20,9 @@
 
 #ifdef KONOHA_ON_LINUX
 #include <GL/glut.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <pthread.h>
 #endif
 
 
