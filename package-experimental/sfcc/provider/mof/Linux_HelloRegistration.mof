@@ -1,0 +1,45 @@
+//
+// Description:
+// CIM classes for Linux RPM Package Instrumentation
+//
+
+
+#pragma locale ("en_US")
+#pragma namespace ("root/PG_InterOp")
+
+
+instance of PG_ProviderModule
+{
+   Name = "OSBase_HelloProviderModule";
+   //The library name on disk
+   Location = "cmpiOSBase_HelloProvider";
+   Vendor = "SBLIM";
+   Version = "2.0.0";
+   InterfaceType = "CMPI";
+   InterfaceVersion = "2.0.0";
+};
+
+instance of PG_Provider
+{
+   //The provider module as defined in PG_ProviderModule
+   ProviderModuleName = "OSBase_HelloProviderModule";
+   // The provider name as referenced in the code
+   Name = "OSBase_HelloProvider";
+};
+
+instance of PG_ProviderCapabilities
+{
+   //The provider module as defined in PG_ProviderModule
+   ProviderModuleName = "OSBase_HelloProviderModule";
+   //The provider name as defined in PG_Provider
+   ProviderName = "OSBase_HelloProvider";
+   CapabilityID = "1";
+   //Name of the CIM class as defined in the mof
+   ClassName = "Linux_Hello";
+   Namespaces = {"root/cimv2"};
+   ProviderType = { 2 }; // Instance
+   SupportedProperties = NULL; // All properties
+   SupportedMethods = NULL; // All methods
+};
+
+

@@ -1,0 +1,38 @@
+
+Make cmpiOSBase_HelloProvider
+$ make
+
+make sample client
+$ make test
+
+Remote Method Invoke
+$ ./hello (サーバ側のスクリプトのパス)
+( sample 
+[masa@miami sfpro]$ ./hello /usr/local/share/konoha/sample/fib.k
+
+----------------------------------------------------------
+Testing invokeMethod() ...
++++T1:passing IN chars argument
+invokeMethod() rc=0, msg=(null)
+return value:[fib(36): 14930352]
+
+)
+Regist to sfcb
+$ sudo sh /usr/share/sblim-cmpi-base/provider-register.sh -v -r mof/Linux_Hello.registration -m mof/Linux_Hello.mof
+
+UnRegist from sfcb
+$ sudo sh /usr/share/sblim-cmpi-base/provider-register.sh -v -r mof/Linux_Hello.registration -m mof/Linux_Hello.mof -d
+
+How to Get Instance
+$ wbemcli gi 'http://masa:konoha@localhost:5988/root/cimv2:Linux_Hello.Name="world"'
+
+
+TODO
+
+* プロバイダをkonohaで記述する
+    そもそも、できるのか？
+    たぶん、できる。
+    というのも、バインドすべき関数はすでにソースコード中に存在している
+    プロバイダがどのようにbrokerから呼ばれるかがわかれば、初期化関数があるはずなので、
+    その初期化関数をのっとってしまう事で実現できそう。
+

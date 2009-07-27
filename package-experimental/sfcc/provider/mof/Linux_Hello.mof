@@ -1,0 +1,9 @@
+#pragma locale ("en_US")
+#pragma namespace ("root/cimv2")
+
+[ Provider("cmpi:cmpiOSBase_HelloProvider"),
+  Description("Hello Class. It is the SoftwareElement for Linux RPMs.")
+]
+class Linux_Hello : CIM_SoftwareElement
+{ };
+
