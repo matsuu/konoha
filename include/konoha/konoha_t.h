@@ -478,8 +478,8 @@ typedef struct knh_LockTable_t {
 
 #define SIZEOF_TLOCK   (KNH_TLOCK_SIZE * sizeof(knh_LockTable_t))
 
-#define KNH_LOCK(ctx, lockid, o)    knh_lockID(ctx, lockid, o, __FILE__, __LINE__)
-#define KNH_UNLOCK(ctx, lockid, o)  knh_unlockID(ctx, lockid, __FILE__, __LINE__)
+#define KNH_LOCK(ctx, lockid, o)    knh_lockID(ctx, lockid, o, (char*)__FILE__, __LINE__)
+#define KNH_UNLOCK(ctx, lockid, o)  knh_unlockID(ctx, lockid, (char*)__FILE__, __LINE__)
 
 /* ------------------------------------------------------------------------ */
 /* Stack Frame Pointer */

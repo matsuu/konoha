@@ -550,7 +550,6 @@ knh_db_drvapi_t *knh_System_getDBDriver(Ctx *ctx, knh_bytes_t name);
 void  init_DB(Ctx *ctx);
 /* ../src/deps/thread.c */
 knh_thread_t knh_thread_self(void);
-int knh_thread_create(Ctx *ctx, knh_thread_t *thread, void *attr, void *(*frun)(void *), void * arg);
 int knh_thread_detach(Ctx *ctx, knh_thread_t th);
 void knh_stack_threadRun(Ctx *ctx, knh_sfp_t *sfp);
 int knh_mutex_init(knh_mutex_t *m);
@@ -643,6 +642,8 @@ knh_drvapi_t *knh_getDriverAPI(Ctx *ctx, int type, knh_bytes_t name);
 NameSpace *knh_loadPackage(Ctx *ctx, knh_bytes_t pkgname);
 NameSpace *knh_getNameSpace(Ctx *ctx, knh_bytes_t name);
 /* ../src/main/systemtable.c */
+void knh_lockID(Ctx *ctx, knh_lock_t lockid, Object *ref, char *filename, int lineno);
+void knh_unlockID(Ctx *ctx, knh_lock_t lockid, char *filename, int lineno);
 Ctx *new_ThreadContext(Ctx *parent);
 void knh_ThreadContext_dispose(Ctx *ctx);
 void knh_traverseAll(Ctx* ctx, knh_ftraverse ftr);
