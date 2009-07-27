@@ -40,9 +40,9 @@ extern "C" {
 /* ======================================================================== */
 /* [ContextTable] */
 
-void knh_loadSystemString(Ctx *ctx); /* konoha_data.c */
-void knh_loadSystemStructData(Ctx *ctx);
-void knh_loadSystemData(Ctx *ctx);
+void knh_loadSystemString(Ctx *o); /* konoha_data.c */
+void knh_loadSystemStructData(Ctx *o);
+void knh_loadSystemData(Ctx *o);
 
 /* ======================================================================== */
 /* [INITCONST] */
@@ -148,7 +148,7 @@ void knh_Context_initCommon(Ctx *ctx, knh_Context_t *o, size_t stacksize)
 		}
 	}
 
-	o->cachesize = (KNH_TCLASS_SIZE * 2) + 1;
+	o->cachesize = (KNH_TCLASS_SIZE / 2) + 1;
 	o->mtdCache = (knh_Method_t**)KNH_MALLOC(ctx, sizeof(knh_Method_t*) * o->cachesize);
 	o->fmtCache = (knh_Method_t**)KNH_MALLOC(ctx, sizeof(knh_Method_t*) * o->cachesize);
 	o->mprCache = (knh_Mapper_t**)KNH_MALLOC(ctx, sizeof(knh_Mapper_t*) * o->cachesize);
@@ -450,6 +450,7 @@ void knh_traverseSharedData(Ctx *ctx, knh_SharedData_t *share, knh_ftraverse ftr
 		}
 		ftr(ctx, UP(ClassTable(i).lname));
 	}
+
 	for(i = share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
 		DBG2_ASSERT(ClassTable(i).sname != NULL);
 		ftr(ctx, UP(ClassTable(i).class_cid));
@@ -539,24 +540,23 @@ void knh_traverseUnusedContext(Ctx *ctx, knh_ftraverse ftr)
 
 /* ------------------------------------------------------------------------ */
 
-static
-void knh_traverseContext(Ctx *ctx, knh_ftraverse ftr)
+void knh_Context_traverse(Ctx *ctx, Context *o, knh_ftraverse ftr)
 {
-	knh_Context_traverseCommon(ctx, (knh_Context_t*)ctx, ftr);
-	if(ctx->parent == (Context*)ctx) {
-		if(ctx->unusedContext != NULL) {
-			knh_traverseUnusedContext(ctx->unusedContext, ftr);
+	knh_Context_traverseCommon(ctx, (knh_Context_t*)o, ftr);
+	if(o->parent == (Context*)o) {
+		if(o->unusedContext != NULL) {
+			knh_traverseUnusedContext(o->unusedContext, ftr);
 		}
-		knh_traverseSharedData(ctx, (knh_SharedData_t*)ctx->share, ftr);
+		knh_traverseSharedData(ctx, (knh_SharedData_t*)o->share, ftr);
 		if(IS_SWEEP(ftr)) {
-			knh_bzero((void*)ctx, sizeof(knh_Context_t));
-			free((void*)ctx);
+			knh_bzero((void*)o, sizeof(knh_Context_t));
+			free((void*)o);
 		}
 	}
 	else {
 		if(IS_SWEEP(ftr)) {
-			knh_bzero((void*)ctx, sizeof(knh_Context_t));
-			knh_free(ctx, (void*)ctx, sizeof(knh_Context_t));
+			knh_bzero((void*)o, sizeof(knh_Context_t));
+			knh_free(o, (void*)o, sizeof(knh_Context_t));
 		}
 	}
 }
@@ -655,7 +655,7 @@ KNHAPI(konoha_t) konoha_open(size_t stacksize)
 
 void knh_traverseAll(Ctx* ctx, knh_ftraverse ftr)
 {
-	knh_traverseContext(ctx->parent, ftr);
+	knh_Context_traverse(ctx, (Context*)ctx, ftr);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -667,7 +667,7 @@ KNHAPI(void) konoha_close(konoha_t konoha)
 		fprintf(stderr, "Many threads are still running... Found %d threads", (int)konoha.ctx->share->threadCounter);
 		return;
 	}
-	knh_traverseContext(konoha.ctx, konoha.ctx->fsweep);
+	knh_Context_traverse(konoha.ctx, (Context*)konoha.ctx, konoha.ctx->fsweep);
 }
 
 /* ------------------------------------------------------------------------ */

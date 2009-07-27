@@ -143,11 +143,14 @@ knh_Object_t *new_UnusedObject(Ctx *ctx)
 	ctx->share->ObjectPageTable[tindex].ctxid = ctx->ctxid;
 	ctx->share->ObjectPageTable[tindex].thead = t;
 	if((knh_uintptr_t)t % KONOHA_PAGESIZE != 0) {
-		t = (char*)((((knh_uintptr_t)t / KONOHA_PAGESIZE) + 1) * KONOHA_PAGESIZE);
+		char *t2 = (char*)((((knh_uintptr_t)t / KONOHA_PAGESIZE) + 1) * KONOHA_PAGESIZE);
+		DBG_P("KONOHA_PAGESIZE=%d, shift=%d", (int)KONOHA_PAGESIZE, (int)(t2 - t));
+		t = t2;
 		KNH_ASSERT((knh_uintptr_t)t % KONOHA_PAGESIZE == 0);
 	}
 	char *h = t, *max = ctx->share->ObjectPageTable[tindex].thead + SIZEOF_OBJECTPAGE;
 	int cnt = 0;
+	//DBG_P("OBJECTS IN PAGESIZE=%d", KONOHA_PAGESIZE / sizeof(knh_Object_t));
 	while(t + KONOHA_PAGESIZE < max) {
 		size_t i;
 		knh_Object_t *o = (knh_Object_t*)t;
@@ -178,9 +181,9 @@ knh_Object_t *new_UnusedObject(Ctx *ctx)
 static void knh_setFastMallocMemory(void *p)
 {
 	knh_uintptr_t *b = (knh_uintptr_t*)((((knh_uintptr_t)p) / KONOHA_PAGESIZE) * KONOHA_PAGESIZE);
-	int n = ((knh_uintptr_t)p % KONOHA_PAGESIZE) / sizeof(knh_Object_t);
-	int x = n/(sizeof(knh_uintptr_t)*8);
-	knh_uintptr_t mask = 1 << (n % (sizeof(knh_uintptr_t)*8));
+	int n = ((Object*)p - (Object*)b); /*((knh_uintptr_t)p % KONOHA_PAGESIZE) / sizeof(knh_Object_t); */
+	int x = n / (sizeof(knh_uintptr_t)*8);
+	knh_uintptr_t mask = ((knh_uintptr_t)1) << (n % (sizeof(knh_uintptr_t)*8));
 	b[x] = b[x] | mask;
 }
 
@@ -189,9 +192,9 @@ static void knh_setFastMallocMemory(void *p)
 static void knh_unsetFastMallocMemory(void *p)
 {
 	knh_uintptr_t *b = (knh_uintptr_t*)((((knh_uintptr_t)p) / KONOHA_PAGESIZE) * KONOHA_PAGESIZE);
-	int n = ((knh_uintptr_t)p % KONOHA_PAGESIZE) / sizeof(knh_Object_t);
-	int x = n/(sizeof(knh_uintptr_t)*8);
-	knh_uintptr_t mask = 1 << (n % (sizeof(knh_uintptr_t)*8));
+	int n = ((Object*)p - (Object*)b); /*((knh_uintptr_t)p % KONOHA_PAGESIZE) / sizeof(knh_Object_t); */
+	int x = n / (sizeof(knh_uintptr_t)*8);
+	knh_uintptr_t mask = ((knh_uintptr_t)1) << (n % (sizeof(knh_uintptr_t)*8));
 	b[x] = b[x] & ~(mask);
 }
 
@@ -200,9 +203,9 @@ static void knh_unsetFastMallocMemory(void *p)
 int knh_isFastMallocMemory(void *p)
 {
 	knh_uintptr_t *b = (knh_uintptr_t*)((((knh_uintptr_t)p) / KONOHA_PAGESIZE) * KONOHA_PAGESIZE);
-	int n = ((knh_uintptr_t)p % KONOHA_PAGESIZE) / sizeof(knh_Object_t);
-	int x = n/(sizeof(knh_uintptr_t)*8);
-	knh_uintptr_t mask = 1 << (n % (sizeof(knh_uintptr_t)*8));
+	int n = ((Object*)p - (Object*)b); /*((knh_uintptr_t)p % KONOHA_PAGESIZE) / sizeof(knh_Object_t); */
+	int x = n / (sizeof(knh_uintptr_t)*8);
+	knh_uintptr_t mask = ((knh_uintptr_t)1) << (n % (sizeof(knh_uintptr_t)*8));
 	return ((b[x] & mask) == mask);
 }
 
@@ -422,7 +425,7 @@ void knh_Object_traverse(Ctx *ctx, knh_Object_t *o, knh_ftraverse ftr)
 
 #define BSHIFT ((KONOHA_PAGESIZE / sizeof(knh_Object_t)) / (sizeof(knh_uintptr_t) * 8))
 
-static size_t markedObjectSize = 0;
+volatile static size_t markedObjectSize = 0;
 
 /* ------------------------------------------------------------------------ */
 
@@ -430,18 +433,20 @@ void knh_Object_mark1(Ctx *ctx, Object *o)
 {
 	if(IS_Context(o)) {
 		//DBG2_P("marked %p, cid=%d,%s", o, knh_Object_cid(o), CLASSN(knh_Object_cid(o)));
-		knh_Object_traverse(ctx, o, knh_Object_mark1);
+		TODO();
+		knh_Context_traverse(ctx, (Context*)o, knh_Object_mark1);
 	}
 	else {
 		DBG2_ASSERT(o->h.magic == KNH_OBJECT_MAGIC);
 		DBG2_ASSERT(!knh_isFastMallocMemory((void*)o));
 		knh_uintptr_t *b = (knh_uintptr_t*)((((knh_uintptr_t)o) / KONOHA_PAGESIZE) * KONOHA_PAGESIZE);
+		int n = (o - (Object*)b);
 		b = b + BSHIFT;
-		int n = ((knh_uintptr_t)o % KONOHA_PAGESIZE) / sizeof(knh_Object_t);
-		int x = n/(sizeof(knh_uintptr_t)*8);
-		knh_uintptr_t mask = 1 << (n % (sizeof(knh_uintptr_t)*8));
+		DBG2_ASSERT(n < KONOHA_PAGESIZE / sizeof(knh_Object_t));
+		int x = n / (sizeof(knh_uintptr_t)*8);
+		knh_uintptr_t mask = ((knh_uintptr_t)1) << (n % (sizeof(knh_uintptr_t)*8));
 		if(!((b[x] & mask) == mask)) {
-			//DBG2_P("marked %p, cid=%d,%s", o, knh_Object_cid(o), CLASSN(knh_Object_cid(o)));
+			//DBG2_P("marking %p(%d,%d), cid=%d, %s", o, x, n % (sizeof(knh_uintptr_t)*8), knh_Object_cid(o), CLASSN(knh_Object_cid(o)));
 			markedObjectSize++;
 			b[x] = b[x] | mask;
 			knh_Object_traverse(ctx, o, knh_Object_mark1);
@@ -465,20 +470,17 @@ METHOD knh__System_gc(Ctx *ctx, knh_sfp_t *sfp)
 	int tindex, size = (int)(ctx->share->ObjectPageTableSize);
 
 	DBG_P("** GC - Starting (used %d Kb) ***", (int)ctx->stat->usedMemorySize/1024);
+
 	for(tindex = 0; tindex < size; tindex++) {
 		char *t = ctx->share->ObjectPageTable[tindex].thead;
-
 		if((knh_uintptr_t)t % KONOHA_PAGESIZE != 0) {
 			t = (char*)((((knh_uintptr_t)t / KONOHA_PAGESIZE) + 1) * KONOHA_PAGESIZE);
 			KNH_ASSERT((knh_uintptr_t)t % KONOHA_PAGESIZE == 0);
 		}
 		char *max = ctx->share->ObjectPageTable[tindex].thead + SIZEOF_OBJECTPAGE;
 		while(t + KONOHA_PAGESIZE < max) {
-			knh_uintptr_t *b = (knh_uintptr_t*)t;
-			int i;
-			for(i = 0; i < BSHIFT; i++) {
-				b[i + BSHIFT] = b[i];
-			}
+			knh_memcpy(t + ((BSHIFT) * sizeof(knh_uintptr_t)), t, (BSHIFT) * sizeof(knh_uintptr_t));
+			//knh_bzero(t + ((BSHIFT) * sizeof(knh_uintptr_t)), (BSHIFT) * sizeof(knh_uintptr_t));
 			t += KONOHA_PAGESIZE;
 		}
 	}
@@ -487,6 +489,7 @@ METHOD knh__System_gc(Ctx *ctx, knh_sfp_t *sfp)
 	markedObjectSize = 0;
 	knh_traverseAll(ctx, knh_Object_mark1);
 	DBG_ENABLE_FREE();
+
 	DBG_P("** GC - Marked %d/%d object(s)", (int)markedObjectSize, (int)ctx->stat->usedObjectSize);
 
 	size_t cnt = 0;
@@ -500,19 +503,18 @@ METHOD knh__System_gc(Ctx *ctx, knh_sfp_t *sfp)
 			KNH_ASSERT((knh_uintptr_t)t % KONOHA_PAGESIZE == 0);
 		}
 		char *max = ctx->share->ObjectPageTable[tindex].thead + SIZEOF_OBJECTPAGE;
-
 		while(t + KONOHA_PAGESIZE < max) {
 			knh_uintptr_t *b = ((knh_uintptr_t*)t) + BSHIFT;
 			int i;
 			for(i = 1; i < (KONOHA_PAGESIZE / sizeof(knh_Object_t)); i++) {
-				int x = i/(sizeof(knh_uintptr_t)*8);
-				knh_uintptr_t mask = 1 << (i % (sizeof(knh_uintptr_t)*8));
+				int x = i / (sizeof(knh_uintptr_t)*8);
+				knh_uintptr_t mask = ((knh_uintptr_t)1) << (i % (sizeof(knh_uintptr_t)*8));
 				if((b[x] & mask) == mask) continue;
 				knh_Object_t *o = ((Object*)t) + i;
 				DBG2_ASSERT(!knh_isFastMallocMemory((void*)o));
+				if(o->h.magic == 0) continue;   // knh_Object_free
+				DBG2_P("%p(%d,%d), magic=%d, cid=%s(%d)", o, i, x, o->h.magic, CLASSN(o->h.bcid), o->h.bcid);
 				knh_Object_RCset(o, 0);
-				if(o->h.magic == 0) continue;
-				//DBG2_P("i=%d, x=%d, o=%p, magic=%d, cid=%s(%d)", i, x, o, o->h.magic, CLASSN(o->h.bcid), o->h.bcid);
 				knh_Object_free(ctx, o);
 				cnt++;
 			}

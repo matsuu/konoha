@@ -63,14 +63,21 @@
 /* ======================================================================== */
 /* COMMON */
 
-#define KONOHA_TSTRUCT_SIZE                64
-#define KONOHA_TCLASS_SIZE                 256
-#define KONOHA_TEXP_SIZE                   128
-
-/* object specification */
-#define KONOHA_PAGESIZE                    4096
-#define KONOHA_FIELDSIZE                   64
+#if defined(__LP64__)
+#define KONOHA_TSTRUCT_SIZE                 512
+#define KONOHA_TCLASS_SIZE                 4096
+#define KONOHA_TEXP_SIZE                    128
+#define KONOHA_PAGESIZE                    8192
+#define KONOHA_FIELDSIZE                     64
 #define KONOHA_STACKSIZE                   4096
+#else
+#define KONOHA_TSTRUCT_SIZE                  64
+#define KONOHA_TCLASS_SIZE                  256
+#define KONOHA_TEXP_SIZE                    128
+#define KONOHA_PAGESIZE                    4096
+#define KONOHA_FIELDSIZE                     64
+#define KONOHA_STACKSIZE                   1024
+#endif
 
 #define KONOHA_SMALLPAGESIZE               256
 
