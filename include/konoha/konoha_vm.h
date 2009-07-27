@@ -362,7 +362,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 	}\
 
 #define KLR_NNBOXnc(ctx, n, cid) \
-	if(knh_Object_cid(sfp[n].o) != ((knh_class_t)cid)){ \
+	if(IS_NOTNULL(sfp[n].o)) { \
 		KLR_MOV(ctx, sfp[n].o, KNH_DEF(ctx, cid));\
 	}\
 
