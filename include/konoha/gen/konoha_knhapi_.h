@@ -273,6 +273,7 @@ KNHAPI(knh_int_t) konoha_invokeIntFunc(konoha_t konoha, char *fmt, ...);
 KNHAPI(knh_float_t) konoha_invokeFloatFunc(konoha_t konoha, char *fmt, ...);
 KNHAPI(int) konoha_invokeBooleanFunc(konoha_t konoha, char *fmt, ...);
 KNHAPI(char*) konoha_invokeStringFunc(konoha_t konoha, char *fmt, ...);
+KNHAPI(int) konoha_addMethodFunc(konoha_t konoha, char *name, knh_fmethod func);
 KNHAPI(void) konoha_shell(konoha_t konoha);
 KNHAPI(char*) KNH_SAFEFILE(char *file);
 KNHAPI(Object*) new_Object_boxing(Ctx *ctx, knh_class_t cid, knh_sfp_t *sfp);

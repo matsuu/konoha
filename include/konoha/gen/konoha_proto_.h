@@ -644,6 +644,7 @@ NameSpace *knh_getNameSpace(Ctx *ctx, knh_bytes_t name);
 /* ../src/main/systemtable.c */
 void knh_lockID(Ctx *ctx, knh_lock_t lockid, Object *ref, char *filename, int lineno);
 void knh_unlockID(Ctx *ctx, knh_lock_t lockid, char *filename, int lineno);
+void knh_Context_traverse(Ctx *ctx, Context *o, knh_ftraverse ftr);
 Ctx *new_ThreadContext(Ctx *parent);
 void knh_ThreadContext_dispose(Ctx *ctx);
 void knh_traverseAll(Ctx* ctx, knh_ftraverse ftr);

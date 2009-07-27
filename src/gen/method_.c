@@ -48,7 +48,7 @@ METHOD knh__Object_isRelease(Ctx *ctx, knh_sfp_t *sfp)
 static
 METHOD knh__Object_isDebug(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Boolean(ctx, sfp, !(knh_Object_isDebug((knh_Object_t*)sfp[0].o)));
+	KNH_RETURN_Boolean(ctx, sfp, !(knh_Object_isRelease((knh_Object_t*)sfp[0].o)));
 }
 
 static 
@@ -123,7 +123,7 @@ METHOD knh__Class_isRelease(Ctx *ctx, knh_sfp_t *sfp)
 static
 METHOD knh__Class_isDebug(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Boolean(ctx, sfp, !(knh_class_isDebug(knh_Class_cid(sfp[0].c))));
+	KNH_RETURN_Boolean(ctx, sfp, !(knh_class_isRelease(knh_Class_cid(sfp[0].c))));
 }
 
 static 
@@ -147,7 +147,7 @@ METHOD knh__Class_isPrivate(Ctx *ctx, knh_sfp_t *sfp)
 static
 METHOD knh__Class_isPublic(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Boolean(ctx, sfp, !(knh_class_isPublic(knh_Class_cid(sfp[0].c))));
+	KNH_RETURN_Boolean(ctx, sfp, !(knh_class_isPrivate(knh_Class_cid(sfp[0].c))));
 }
 
 static 
@@ -171,7 +171,7 @@ METHOD knh__Method_isPrivate(Ctx *ctx, knh_sfp_t *sfp)
 static
 METHOD knh__Method_isPublic(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Boolean(ctx, sfp, !(knh_Method_isPublic((knh_Method_t*)sfp[0].o)));
+	KNH_RETURN_Boolean(ctx, sfp, !(knh_Method_isPrivate((knh_Method_t*)sfp[0].o)));
 }
 
 static 
@@ -183,7 +183,7 @@ METHOD knh__Method_isVirtual(Ctx *ctx, knh_sfp_t *sfp)
 static
 METHOD knh__Method_isFinal(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Boolean(ctx, sfp, !(knh_Method_isFinal((knh_Method_t*)sfp[0].o)));
+	KNH_RETURN_Boolean(ctx, sfp, !(knh_Method_isVirtual((knh_Method_t*)sfp[0].o)));
 }
 
 static 
@@ -261,7 +261,7 @@ METHOD knh__Mapper_isTotal(Ctx *ctx, knh_sfp_t *sfp)
 static
 METHOD knh__Mapper_isPartial(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Boolean(ctx, sfp, !(knh_Mapper_isPartial((knh_Mapper_t*)sfp[0].o)));
+	KNH_RETURN_Boolean(ctx, sfp, !(knh_Mapper_isTotal((knh_Mapper_t*)sfp[0].o)));
 }
 
 static 
@@ -273,7 +273,7 @@ METHOD knh__Mapper_isConst(Ctx *ctx, knh_sfp_t *sfp)
 static
 METHOD knh__Mapper_isTemporal(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Boolean(ctx, sfp, !(knh_Mapper_isTemporal((knh_Mapper_t*)sfp[0].o)));
+	KNH_RETURN_Boolean(ctx, sfp, !(knh_Mapper_isConst((knh_Mapper_t*)sfp[0].o)));
 }
 
 static 
