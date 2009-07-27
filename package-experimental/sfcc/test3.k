@@ -18,9 +18,16 @@ ins = new CIMInstance(cc,op);
 
 s1 = cc.enumClassNames(op,0);
 
-print s1;
+foreach(String s in s1){
+
+    OUT << "s1:" << s << EOL;
+
+}
 
 s2 = ins.getProperty();
 
-print (String..)s2;
+foreach(s in s2..){
 
+ OUT << s << EOL;
+
+}

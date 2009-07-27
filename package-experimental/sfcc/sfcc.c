@@ -176,8 +176,8 @@ METHOD CIMClient_new(Ctx *ctx, knh_sfp_t *sfp)
   
   char *cimhost = p_char(sfp[1]);
   char *s3 = "5988";
-  char *s4 = "kato";
-  char *s5 = "kato";
+  char *s4 = "root";
+  char *s5 = "password";
   cc = env->ft->connect(env, cimhost, "http", s3, s4, s5, &status);
   
   if(cc == NULL || status.rc != 0) {
@@ -261,21 +261,14 @@ METHOD CIMClient_invokeMethod(Ctx *ctx, knh_sfp_t *sfp)
   CIMCClient *cc = ((sfp[0].glue)->ptr);
   CIMCObjectPath *op = ((sfp[1].glue)->ptr);
   char *name =  p_char(sfp[2]);
-  char *inkey =  p_char(sfp[3]);
-  char *invalue =  p_char(sfp[4]);
-  char *outkey =  p_char(sfp[5]);
-  char *outvalue =  p_char(sfp[6]);
+  char *arg =  p_char(sfp[3]);
   char *ret;
-  //printf("%s\n",in);
-  //CMPIValue inarg;
-  //CMPIValue outarg;
   CIMCArgs *inargs;
-  CIMCArgs *outargs;
+  CIMCArgs *outargs = NULL;
   CIMCData data;
   CIMCStatus check;
   inargs = env->ft->newArgs(env,&check);
   //printf("%d,%s\n",check.rc,(char*)check.msg->hdl);
-  outargs = env->ft->newArgs(env,NULL);
   /*
   for(i=0;i<string_size;i++)
     key = d[i].key
@@ -284,16 +277,18 @@ METHOD CIMClient_invokeMethod(Ctx *ctx, knh_sfp_t *sfp)
     inarg->ft->add(in,key,value,CIM_chars
   	   );
   */
-  ((CMPIArgs*)inargs)->ft->addArg((CMPIArgs*)inargs, inkey, (CMPIValue*)invalue, CIMC_chars);
-  if(strncmp(outkey,"",1)!=0 || strncmp(outvalue,"",1)!=0){
-    ((CMPIArgs*)outargs)->ft->addArg((CMPIArgs*)outargs, outkey, (CMPIValue*)outvalue, CMPI_chars);
+  char src[128]={0};
+  snprintf(src,128,"/usr/local/share/konoha/sample/%s",name);
+  
+  ((CMPIArgs*)inargs)->ft->addArg((CMPIArgs*)inargs, "src", (CMPIValue*)src, CMPI_chars);
+  
+  if(strncmp(arg,"",1) != 0){
+    ((CMPIArgs*)inargs)->ft->addArg((CMPIArgs*)inargs, "arg", (CMPIValue*)arg, CMPI_chars);
   }
-  else{
-    outargs = NULL;
-  }
+  outargs = NULL;
   if(cc != NULL && op != NULL) {
     CIMCStatus status;
-    data = cc->ft->invokeMethod(cc, op, name, (CIMCArgs*)inargs, (CIMCArgs*)outargs, &status);
+    data = cc->ft->invokeMethod(cc, op, "call", inargs, outargs, &status);
     if(status.rc != 0) {
       knh_throw_CIMCStatus(ctx, &status);
     }
@@ -438,7 +433,7 @@ METHOD CIMInstance_getProperty(Ctx *ctx, knh_sfp_t *sfp)
 	  for(j = 0; j < n; ++j){
 	    CIMCData ele = arr->ft->getElementAt(arr, (CIMCCount)j, NULL);
 	    valuestr = value2Chars(eletyp, &ele.value);
-	    sprintf(ret,"%s = %s",(char*)propertyname->hdl,valuestr);
+	    snprintf(ret,128,"%s = %s",(char*)propertyname->hdl,valuestr);
 	    knh_Array_add(ctx, a, UP(new_String(ctx, B(ret), NULL)));
 	    free (valuestr);
 	  }
@@ -446,7 +441,7 @@ METHOD CIMInstance_getProperty(Ctx *ctx, knh_sfp_t *sfp)
         else{
 	  if(data.state == CIMC_goodValue){
 	    valuestr = value2Chars(data.type, &data.value);
-	    sprintf(ret,"%s = %s",(char*)propertyname->hdl,valuestr);
+	    snprintf(ret,128,"%s = %s",(char*)propertyname->hdl,valuestr);
 	    knh_Array_add(ctx, a, UP(new_String(ctx, B(ret), NULL)));
 	    free (valuestr);
 	  }

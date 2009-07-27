@@ -13,9 +13,12 @@ library = "$(pkgname)_$(target).so"
 .PHONY: all
 all: $(library)
 
-objs = "$(pkgname).o"
+objs = $(pkgname).o show.o
 
 "$(pkgname).o": $(pkgname).c
+	$(CC) $(CFLAGS) -o $@ -c $^
+
+show.o: show.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 $(library): $(objs)
