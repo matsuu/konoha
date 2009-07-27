@@ -201,24 +201,68 @@ void knh_Exception_addStackTrace(Ctx *ctx, Exception *o, String *msg)
 /* ------------------------------------------------------------------------ */
 
 static
-String *knh_stackf_getStackTraceMsg(Ctx *ctx, knh_sfp_t *sfp)
+String *knh_stack_newStackTrace(Ctx *ctx, knh_sfp_t *sfp, Exception *e)
 {
 	Method *mtd = sfp[-1].mtd;
 	knh_code_t *pc = sfp[-1].pc;
-	DBG2_P("pc=%p, mtd->func=%p, mtd->pc=%p", pc, mtd->fcall_1, mtd->pc_start);
-	char *fn = "-";
+	char *file = "-";
 	int  line = 0;
-	if(pc != NULL && pc != (knh_code_t*)mtd->fcall_1 && pc != mtd->pc_start) {
-		fn = knh_Method_file(ctx, mtd);
+	if(pc != NULL) {
 		line = knh_Method_pctoline(mtd, pc);
+		if(line > 0) {
+			file = knh_Method_file(ctx, mtd);
+			//DBG2_P("file=%s, line=%d", file, line);
+			if(IS_Exception(e) && DP(e)->line == 0) {
+				DP(e)->file = file;
+				DP(e)->line = line;
+			}
+		}
+		else {
+			return (String*)KNH_NULL;
+		}
 	}
 	knh_cwb_t cwb = new_cwb(ctx);
-	knh_write_cid(ctx, cwb.w, DP(mtd)->cid);
-	knh_putc(ctx, cwb.w, '.');
-	knh_write_mn(ctx, cwb.w, DP(mtd)->mn);
+	knh_write_fline(ctx, cwb.w, file, line);
 	knh_putc(ctx, cwb.w, ':');
-	knh_write_fline(ctx, cwb.w, fn, line);
-	return new_String__cwb(ctx, cwb);
+	knh_write_cid(ctx, cwb.w, DP(mtd)->cid);
+	if(DP(mtd)->mn != METHODN_lambda) {
+		int i = 0;
+		knh_putc(ctx, cwb.w, '.');
+		knh_write_mn(ctx, cwb.w, DP(mtd)->mn);
+		knh_putc(ctx, cwb.w, '(');
+		for(i = 0; i < knh_Method_psize(mtd); i++) {
+			knh_mparam_t p = knh_Method_param(mtd, i);
+			p.type = knh_Method_ptype(ctx, mtd, knh_Object_cid(sfp[0].o), i);
+			if(i > 0) {
+				knh_putc(ctx, cwb.w, ',');
+			}
+			knh_write_fn(ctx, cwb.w, p.fn);
+			knh_putc(ctx, cwb.w, '=');
+			if(p.type == NNTYPE_Int) {
+				knh_write_ifmt(ctx, cwb.w, KNH_INT_FMT, sfp[1+i].ivalue);
+			}
+			else if (p.type == NNTYPE_Float) {
+				knh_write_ffmt(ctx, cwb.w, KNH_FLOAT_FMT, sfp[1+i].fvalue);
+			}
+			else if (p.type == NNTYPE_Boolean) {
+				if(sfp[1+i].bvalue) knh_write(ctx, cwb.w, STEXT("true"));
+				else knh_write(ctx, cwb.w, STEXT("false"));
+			}
+			else if (IS_NULL(sfp[1+i].o)) {
+				knh_write(ctx, cwb.w, STEXT("null"));
+			}
+			else {
+				knh_sfp_t *esp1 = ctx->esp + 1;
+				KNH_SETv(ctx, esp1[0].o, sfp[1+i].o);
+				esp1[0].data = sfp[1+i].data;
+				knh_esp1_format(ctx, METHODN__k, cwb.w, KNH_NULL);
+			}
+		}
+		knh_putc(ctx, cwb.w, ')');
+	}
+	String *s = new_String__cwb(ctx, cwb);
+	//DBG2_P("stacktrace=%s", knh_String_tochar(s));
+	return s;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -226,19 +270,18 @@ String *knh_stackf_getStackTraceMsg(Ctx *ctx, knh_sfp_t *sfp)
 KNHAPI(void) knh_throwException(Ctx *ctx, Exception *e, char *file, int line)
 {
 	KNH_ASSERT(IS_Exception(e));
-	if(file != NULL) {
-		DP(e)->file = file;
-		DP(e)->line = line;
-	}
+//	if(file != NULL) {
+//		DP(e)->file = file;
+//		DP(e)->line = line;
+//	}
 	knh_sfp_t *sp = ctx->esp;
 	while(ctx->stack <= sp) {
 		if(IS_ExceptionHandler(sp[0].hdr) && knh_ExceptionHandler_isCatching(sp[0].hdr)) {
-			DBG2_P("stack[%d] ExceptionHandler", sp - ctx->stack);
 			knh_ExceptionHandler_setCatching(sp[0].hdr, 0);
 			knh_ExceptionHandler_longjmp(ctx, sp[0].hdr, e);
 		}
 		else if(IS_Method(sp[0].o)) {
-			knh_Exception_addStackTrace(ctx, e, knh_stackf_getStackTraceMsg(ctx, sp+1));
+			knh_Exception_addStackTrace(ctx, e, knh_stack_newStackTrace(ctx, sp+1, e));
 		}
 		sp--;
 	}
@@ -246,7 +289,7 @@ KNHAPI(void) knh_throwException(Ctx *ctx, Exception *e, char *file, int line)
 	fprintf(stderr, "********** USE STACKTRACE IN YOUR C/C++ DEBUGGER ************\n");
 	fprintf(stderr, "Uncaught Exception: %s\n", knh_String_tochar(DP(e)->msg));
 	fprintf(stderr, "*************************************************************\n");
-	abort();
+	exit(0);
 }
 
 /* ------------------------------------------------------------------------ */

@@ -217,10 +217,8 @@ int knh_Exception_isa(Ctx *ctx, Exception *o, String *msg)
 {
 	knh_expt_t eid = knh_texpt_forname(ctx, knh_String_tobytes(msg), EXPT_unknown);
 	int res = 0;
-	DBG2_P("%s(%d) isa? %s(%d)", knh_String_tochar(DP(o)->msg), DP(o)->eid, knh_String_tochar(msg), eid);
 	if(eid == EXPT_unknown) res = 0;
 	res = knh_ExptTable_isa(ctx, DP(o)->eid, eid);
-	DBG2_P("res=%d", res);
 	return res;
 }
 

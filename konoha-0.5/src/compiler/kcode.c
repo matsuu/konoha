@@ -120,17 +120,12 @@ char *knh_Method_file(Ctx *ctx, Method *mtd)
 
 int knh_Method_pctoline(Method *mtd, knh_code_t *pc)
 {
-	if(!knh_Method_isObjectCode(mtd) || !IS_KLRCode((Object*)DP(mtd)->code)) {
-		return 0;
-	}
-	else {
-		KLRCode *o = (KLRCode*)DP(mtd)->code;
-		if(DP(o)->dwarf == NULL && DP(o)->dsize > 0) {
-			return 0;
-		}
-		else {
-			size_t i = 0, offset = pc - DP(o)->code;
-			for(i = 0; i < DP(o)->dsize - 1; i++) {
+	if(knh_Method_isObjectCode(mtd) && IS_KLRCode((Object*)DP(mtd)->code)) {
+		knh_KLRCode_t *o = (KLRCode*)DP(mtd)->code;
+		int offset = pc - DP(o)->code;
+		if(0 <= offset && offset <= DP(o)->size) {
+			int i;
+			for(i = 0; i < (int)DP(o)->dsize - 1; i++) {
 				if(DP(o)->dwarf[i].offset <= offset && offset < DP(o)->dwarf[i+1].offset) {
 					return DP(o)->dwarf[i].line;
 				}
@@ -138,6 +133,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc)
 			return DP(o)->dwarf[DP(o)->dsize-1].line;
 		}
 	}
+	return 0;
 }
 
 /* ------------------------------------------------------------------------ */
