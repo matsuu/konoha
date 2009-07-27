@@ -415,24 +415,32 @@ void knh_Exception__k(Ctx *ctx, Exception *o, OutputStream *w, String *m)
 static
 void knh_Exception__dump(Ctx *ctx, Exception *o, OutputStream *w, String *m)
 {
-	KNH_ASSERT(IS_Exception(o));
-	//knh_write_char(ctx, w, "---- ---- 8< 8< ---- ---- >8 >8 ---- ----");
-	knh_println(ctx, w, STEXT(""));
+	DBG2_ASSERT(IS_Exception(o));
+	knh_write_EOL(ctx, w);
 	if(DP(o)->line != 0) {
 		knh_printf(ctx, w, "[%s:%d] ", DP(o)->file, DP(o)->line);
 	}
 	knh_write(ctx, w, knh_String_tobytes(DP(o)->msg));
-	knh_println(ctx, w, STEXT(""));
-	if(IS_Array(DP(o)->traces)) {
-		size_t i;
-		for(i = 0; i < knh_Array_size(DP(o)->traces); i++) {
-			knh_write(ctx, w, STEXT("  at "));
-			knh_format(ctx, w, METHODN__s, knh_Array_n(DP(o)->traces, i), KNH_NULL);
-			knh_println(ctx, w, STEXT(""));
+	knh_print(ctx, w, STEXT(" Exception"));
+	if(IS_bArray(DP(o)->traces)) {
+		size_t i, size = knh_Array_size(DP(o)->traces), c = 0;
+		knh_bytes_t prev = STEXT("?");
+		for(i = 0; i < size; i++) {
+			String *s = (String*)knh_Array_n(DP(o)->traces, i);
+			if(knh_String_startsWith(s, prev)) {
+				c++;
+				continue;
+			}
+			if(c > 0) {
+				knh_printf(ctx, w, "\n    ** called %d times recursively **", c);
+				c = 0;
+			}
+			knh_printf(ctx, w, "\n  at %s", knh_String_tochar(s));
+			prev = knh_String_tobytes(s);
+			prev = knh_bytes_first(prev, knh_bytes_rindex(prev, '('));
 		}
 	}
-	//knh_write_char(ctx, w, "---- ---- 8< 8< ---- ---- >8 >8 ---- ----");
-	knh_println(ctx, w, STEXT(""));
+	knh_write_EOL(ctx, w);
 }
 
 /* ------------------------------------------------------------------------ */

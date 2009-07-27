@@ -1664,7 +1664,7 @@ knh_OutputStream_init(Ctx *ctx, OutputStream *out, int init)
 	KNH_INITv(b->urn, TS_DEVNULL);
 	b->size = 0;
 	b->line = 0;
-	KNH_INITv(b->NEWLINE, TS_LF);
+	KNH_INITv(b->NEWLINE, TS_EOL);
 	KNH_INITv(b->TAB, TS_TAB);
 	b->indent = 0;
 	b->flag = 0;

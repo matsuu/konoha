@@ -40,9 +40,7 @@ extern "C" {
 static knh_StringData_t StringData[] = {
 	{"", TSN_EMPTY}, 
 	{"\t", TSN_TAB}, 
-	{"\n", TSN_LF}, 
-	{" ", TSN_SPC}, 
-	{"EOL", TSN_EOL}, 
+	{""KONOHA_OS_LINEFEED"", TSN_EOL}, 
 	{"BEGIN", TSN_BEGIN}, 
 	{"END", TSN_END}, 
 	{"void", TSN_void}, 
