@@ -254,6 +254,7 @@ KNHAPI(void) knh_addDBDriver(Ctx *ctx, char *alias, knh_db_drvapi_t *d);
 KNHAPI(void) konoha_SETv(Ctx *ctx, Object **v, Object *o);
 KNHAPI(void) konoha_FINALv(Ctx *ctx, Object **v);
 KNHAPI(void) knh_beginContext(Ctx *ctx);
+KNHAPI(void) knh_endContext(Ctx *ctx);
 KNHAPI(Ctx*) knh_getCurrentContext(void);
 KNHAPI(int) konoha_debugLevel(void);
 KNHAPI(int) konoha_isSystemDump2(void);
