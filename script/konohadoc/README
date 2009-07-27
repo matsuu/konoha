@@ -1,0 +1,8 @@
+konoha doc generator
+
+> konoha konohadoc.k othello.k > othello.java
+> javadoc -d othello othello.java
+> cd othello
+> firefox index.html &
+
+
