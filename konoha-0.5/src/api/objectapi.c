@@ -190,7 +190,7 @@ static METHOD knh__Object_opTo(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[CONST] Class! Object.getClass() */
+/* @method[CONST|NULLBASE] Class! Object.getClass() */
 
 static METHOD knh__Object_getClass(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -520,16 +520,19 @@ void knh_Class_NAME__man(Ctx *ctx, knh_class_t cid, OutputStream *w)
 static
 void knh_Method__man(Ctx *ctx, Method *o, OutputStream *w, knh_class_t cid)
 {
-	if(knh_Method_isAbstract(o)) {
-		knh_write(ctx, w, STEXT("@abstract"));
-		knh_putc(ctx, w, ' ');
+	if(!knh_Context_isVerbose(ctx)) {
+		if(knh_Method_isPrivate(o)) return;
 	}
 
-	if(knh_Method_rztype(o) == TYPE_void) {
-		knh_write(ctx, w, knh_String_tobytes(TS_void));
-	}else{
-		knh_write_type(ctx, w, knh_pmztype_totype(ctx, knh_Method_rztype(o), cid));
+	if(knh_Method_isAbstract(o)) {
+		knh_write(ctx, w, STEXT("@Abstract"));
+		knh_putc(ctx, w, ' ');
 	}
+//	if(knh_Method_rztype(o) == TYPE_void) {
+//		knh_write(ctx, w, knh_String_tobytes(TS_void));
+//	}else{
+		knh_write_type(ctx, w, knh_pmztype_totype(ctx, knh_Method_rztype(o), cid));
+//	}
 	knh_putc(ctx, w, ' ');
 
 	if(knh_Method_isStatic(o)) {
