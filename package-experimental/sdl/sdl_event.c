@@ -91,19 +91,19 @@ METHOD SDLEvent_peepEvents(Ctx* ctx, knh_sfp_t *sfp)
   KNH_RETURN_Int(ctx, sfp, ret);
 }
 
-/* int SDLEvent.pollEvent(Event evt) */
+/* int SDLEvent.pollEvent() */
 METHOD SDLEvent_pollEvent(Ctx* ctx,knh_sfp_t *sfp)
 {
-	SDL_Event *event = ((sfp[1].glue)->ptr);
+	SDL_Event *event = ((sfp[0].glue)->ptr);
 	
 	KNH_RETURN_Int(ctx,sfp,SDL_PollEvent(event));
 }
 
-/* int SDLEvent.waitEvent(Event evt) */
+/* int SDLEvent.waitEvent() */
 METHOD SDLEvent_waitEvent(Ctx* ctx, knh_sfp_t *sfp)
 {
   int ret;
-  SDL_Event *event = (SDL_Event *)((sfp[1].glue)->ptr);
+  SDL_Event *event = (SDL_Event *)((sfp[0].glue)->ptr);
   if((ret = SDL_WaitEvent(event)) == 0){
     fprintf(stderr,"error:%s\n",SDL_GetError());
   }
@@ -111,10 +111,10 @@ METHOD SDLEvent_waitEvent(Ctx* ctx, knh_sfp_t *sfp)
   KNH_RETURN_Int(ctx, sfp, ret);
 }
 
-/* void SDLEvent.pushEvent(Event evt) */
+/* void SDLEvent.pushEvent() */
 METHOD SDLEvent_pushEvent(Ctx* ctx, knh_sfp_t *sfp)
 {
-  SDL_Event *event = ((sfp[1].glue)->ptr);
+  SDL_Event *event = ((sfp[0].glue)->ptr);
   if(SDL_PushEvent(event)==-1){
     fprintf(stderr,"error:%s\n",SDL_GetError());
   }

@@ -142,15 +142,15 @@ float SDL.getTicks();
 
 //-----------------SDLEvent-------------------------------------
 int SDLEvent.getType();
-int SDLEvent.waitEvent(SDLEvent evt);
+int SDLEvent.waitEvent();
 int SDLEvent.eventState(int type, int state);
 int SDLEvent.getModState();
 int SDLEvent.getAppState();
 int SDLEvent.joystickEventState(int state);
 int SDLEvent.enableUNICODE(int enable);
 void SDLEvent.pumpEvents();
-int SDLEvent.pollEvent(SDLEvent evt);
-void SDLEvent.pushEvent(SDLEvent evt);
+int SDLEvent.pollEvent();
+void SDLEvent.pushEvent();
 void SDLEvent.setModState(int modstate);
 void SDLEvent.enableKeyRepeat(int delay, int interval);
 SDLEvent SDLEvent.new();
