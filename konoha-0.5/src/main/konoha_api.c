@@ -642,6 +642,133 @@ static void knh_initSIGINT(void)
 }
 
 /* ======================================================================== */
+
+#if defined(KNH_USING_READLINE)
+
+volatile
+static Ctx *ctxRL = NULL;
+
+char *dupstr(char *s)
+{
+	 char *r = malloc(strlen(s) + 1);
+	 if(r != NULL) {
+		 strcpy(r, s);
+		 return r;
+	 }
+	 return NULL;
+}
+
+static char* keywords[]= {
+		"if",
+		"while",
+		"do",
+		"for",
+		"foreach",
+		"try",
+		"catch",
+		"finally",
+		"class",
+		"function",
+		"print",
+		"assert",
+		NULL,
+};
+
+static
+char *knh_rl_stmt(const char *text, int state)
+{
+	static int index, len;
+	char *name;
+	if(state == 0) {
+		len = knh_strlen(text);
+		index = 0;
+	}
+	while((name = keywords[index]) != NULL) {
+		index++;
+		if (strncmp(name, text, len) == 0) return (dupstr(name));
+	}
+	return NULL;
+}
+
+static
+knh_bytes_t knh_bytes_token(knh_bytes_t t)
+{
+	int i;
+	for(i = t.len - 1; i >= 0; i--) {
+		if(!isalnum(t.buf[i])) {
+			t.buf = t.buf + i + 1;
+			t.len = t.len -(i + 1);
+			break;
+		}
+	}
+	return t;
+}
+
+static
+char *knh_rl_name(const char *text, int state)
+{
+	static int index, len2;
+	static knh_bytes_t t = {(knh_uchar_t*)"", 0};
+	static char buf[1024], *buf2;
+	Ctx *ctx = (Ctx*)ctxRL;
+	if(state == 0) {
+		knh_snprintf(buf, sizeof(buf), "%s", text);
+		t = knh_bytes_token(B(buf));
+		buf2 = buf + ((char*)t.buf - text);
+		len2 = sizeof(buf) - ((char*)t.buf - text);
+		DBG2_P("len2=%d", len2);
+		index = 0;
+	}
+	if(ctx != NULL) {
+		DictMap *symbolDictMap = DP(ctx->abr)->symbolDictMap;
+		if(state == 0) {
+			knh_DictMap_sort(symbolDictMap);
+		}
+		for(; index < knh_DictMap_size(symbolDictMap); ) {
+			char *name = knh_String_tochar(knh_DictMap_keyAt(symbolDictMap, index));
+			index++;
+			if (strncmp(name, (char*)t.buf, t.len) == 0) {
+				knh_snprintf(buf2, len2, "%s", name);
+				DBG2_P("mathces '%s'", buf2);
+				return (dupstr(buf2));
+			}
+		}
+	}
+	return NULL;
+}
+
+static
+void knh_Context_initSymbolTable(Ctx *ctx)
+{
+	knh_Context_initAsm(ctx);
+	DictMap *symbolDictMap = DP((ctx)->abr)->symbolDictMap;
+	int i;
+	for(i = 0; i < KNH_TCLASS_SIZE; i++) {
+		String *sname = ClassTable(i).sname;
+		if(sname != NULL) {
+			knh_DictMap_set(ctx, symbolDictMap, sname, UP(sname));
+		}
+	}
+}
+
+
+static
+char **knh_completion(const char* text, int start, int end)
+{
+	char **matches = NULL;
+	DBG2_P("text='%s', start=%d, end=%d", text, start, end);
+	if (end == 0) {
+		matches = completion_matches(text, knh_rl_stmt);
+	}
+//	else {
+//		matches = completion_matches(text, knh_rl_name);
+//	}
+	return matches;
+}
+
+#endif
+
+/* ======================================================================== */
 /* [shell] */
 
 KNHAPI(void) konoha_shell(konoha_t konoha)
@@ -652,6 +779,11 @@ KNHAPI(void) konoha_shell(konoha_t konoha)
 	knh_Context_setInteractive(ctx, 1);
 	knh_Context_setDebug(ctx, 1);
 	knh_initSIGINT();
+#if defined(KNH_USING_READLINE)
+	ctxRL = ctx;
+	rl_attempted_completion_function = knh_completion;
+	knh_Context_initSymbolTable(ctx);
+#endif
 	{
 		knh_System__dump(ctx, ctx->sys, KNH_STDOUT, (String*)KNH_NULL);
 		int linenum, linecnt = 0;
