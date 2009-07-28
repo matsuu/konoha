@@ -659,18 +659,16 @@ char *dupstr(char *s)
 }
 
 static char* keywords[]= {
-		"if",
-		"while",
-		"do",
-		"for",
-		"foreach",
-		"try",
-		"catch",
-		"finally",
-		"class",
-		"function",
-		"print",
-		"assert",
+		"using", "import", "pragma",
+		"if", "else", "switch", "case",
+		"while", "do", "for", "foreach",
+		"break", "continue", "throw",
+		"try", "catch", "finally",
+		"class", "extends", "implements",
+		"function", "return", "yeild",
+		"print", "assert",
+		"int", "float", "boolean", "var",
+		"null", "true", "false",
 		NULL,
 };
 
@@ -707,16 +705,11 @@ knh_bytes_t knh_bytes_token(knh_bytes_t t)
 static
 char *knh_rl_name(const char *text, int state)
 {
-	static int index, len2;
+	static int index;
 	static knh_bytes_t t = {(knh_uchar_t*)"", 0};
-	static char buf[1024], *buf2;
 	Ctx *ctx = (Ctx*)ctxRL;
 	if(state == 0) {
-		knh_snprintf(buf, sizeof(buf), "%s", text);
-		t = knh_bytes_token(B(buf));
-		buf2 = buf + ((char*)t.buf - text);
-		len2 = sizeof(buf) - ((char*)t.buf - text);
-		DBG2_P("len2=%d", len2);
+		t = knh_bytes_token(B((char*)text));
 		index = 0;
 	}
 	if(ctx != NULL) {
@@ -728,9 +721,7 @@ char *knh_rl_name(const char *text, int state)
 			char *name = knh_String_tochar(knh_DictMap_keyAt(symbolDictMap, index));
 			index++;
 			if (strncmp(name, (char*)t.buf, t.len) == 0) {
-				knh_snprintf(buf2, len2, "%s", name);
-				DBG2_P("mathces '%s'", buf2);
-				return (dupstr(buf2));
+				return (dupstr(name));
 			}
 		}
 	}
@@ -749,8 +740,12 @@ void knh_Context_initSymbolTable(Ctx *ctx)
 			knh_DictMap_set(ctx, symbolDictMap, sname, UP(sname));
 		}
 	}
-}
+	for(i = 0; keywords[i] != NULL; i++) {
+		String *s = T(keywords[i]);
+		knh_DictMap_set(ctx, symbolDictMap, s, UP(s));
+	}
 
+}
 
 static
 char **knh_completion(const char* text, int start, int end)
@@ -760,9 +755,9 @@ char **knh_completion(const char* text, int start, int end)
 	if (end == 0) {
 		matches = completion_matches(text, knh_rl_stmt);
 	}
-//	else {
-//		matches = completion_matches(text, knh_rl_name);
-//	}
+	else {
+		matches = completion_matches(text, knh_rl_name);
+	}
 	return matches;
 }
 
