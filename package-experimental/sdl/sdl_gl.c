@@ -39,7 +39,7 @@
 
 /* void SDL.glSetAttribute(int attr, int value) */
 
-  /*METHOD SDL_glSetAttribute(Ctx* ctx, knh_sfp_t *sfp)
+METHOD SDL_glSetAttribute(Ctx* ctx, knh_sfp_t *sfp)
 {
   int i1 = p_int(sfp[1]);
   int i2 = p_int(sfp[2]);
@@ -49,14 +49,13 @@
 
   KNH_RETURN_void(ctx,sfp);
 }
-  */
 
 /* void SDL.glSwapBuffers(void) */
- /*
+
 METHOD SDL_glSwapBuffers(Ctx* ctx, knh_sfp_t *sfp)
 {
   SDL_GL_SwapBuffers();
 
   KNH_RETURN_void(ctx,sfp);
 }
- */
+

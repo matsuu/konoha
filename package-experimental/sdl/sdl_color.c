@@ -1,7 +1,7 @@
 #include"knh_sdl.h"
 
-/* void Color.setColors(Surface screen, int firstcolor, int ncolors) */
-METHOD Color_setColors(Ctx* ctx, knh_sfp_t *sfp)
+/* void SDLColor.setColors(Surface screen, int firstcolor, int ncolors) */
+METHOD SDLColor_setColors(Ctx* ctx, knh_sfp_t *sfp)
 {
   SDL_Color *c = ((sfp[0].glue)->ptr);
   SDL_Surface *s = ((sfp[1].glue)->ptr);
@@ -14,8 +14,8 @@ METHOD Color_setColors(Ctx* ctx, knh_sfp_t *sfp)
   KNH_RETURN_void(ctx, sfp);
 }
 
-/* void Color.setPalette(Surface screen, int flags, int firstcolor, int ncolors) */
-METHOD Color_setPalette(Ctx* ctx,knh_sfp_t *sfp)
+/* void SDLColor.setPalette(Surface screen, int flags, int firstcolor, int ncolors) */
+METHOD SDLColor_setPalette(Ctx* ctx,knh_sfp_t *sfp)
 {
   SDL_Color *self = ((sfp[0].glue)->ptr);
   SDL_Surface *screen = ((sfp[1].glue)->ptr);

@@ -5,8 +5,9 @@ class KeySym;
 class KeyBoard;
 class MouseMotion;
 class MouseButton;
-class Event;
+class SDLEvent;
 class Cursor;
+class SDLttf;
 
 class Rect
 {
@@ -22,12 +23,12 @@ class Rect
     }
 };
 
-class Color
+class SDLColor
 {
     int r;
     int g;
     int b;
-    Color(int r, int g, int b){
+    SDLColor(int r, int g, int b){
         _r = r;
         _g = g;
         _b = b;
@@ -74,8 +75,8 @@ void Surface.setAlpha(int flag, int alpha);
 void Surface.blitSurface(Rect srcrect, Surface screen, Rect dstrect);
 void Surface.fillRect(Rect dstrect, int color);
 void SDL.warpMouse(int x,int y);
-void Color.setColors(Surface screen, int firstcolor, int ncolors);
-void Color.setPalette(Surface screen, int flags, int firstcolor, int ncolors);
+void SDLColor.setColors(Surface screen, int firstcolor, int ncolors);
+void SDLColor.setPalette(Surface screen, int flags, int firstcolor, int ncolors);
 String SDL.videoDriverName(String namebuf, int maxlen);
 Surface SDL.getVideoSurface();
 Surface SDL.setVideoMode(int width, int height, int bpp, int flags);
@@ -139,32 +140,37 @@ float SDL.getTicks();
 
 
 
-//-----------------Event-------------------------------------
-int Event.getType();
-int Event.waitEvent(Event evt);
-int Event.eventState(int type, int state);
-int Event.getModState();
-int Event.getAppState();
-int Event.joystickEventState(int state);
-int Event.enableUNICODE(int enable);
-void Event.pumpEvents();
-void Event.pollEvent(Event evt);
-void Event.pushEvent(Event evt);
-void Event.setModState(int modstate);
-void Event.enableKeyRepeat(int delay, int interval);
-Event Event.new();
-String Event.getKeyName(int key);
-KeyBoard Event.getKeyBoard();
-MouseMotion Event.getMouseMotion();
-MouseButton Event.getMouseButton();
+//-----------------SDLEvent-------------------------------------
+int SDLEvent.getType();
+int SDLEvent.waitEvent(SDLEvent evt);
+int SDLEvent.eventState(int type, int state);
+int SDLEvent.getModState();
+int SDLEvent.getAppState();
+int SDLEvent.joystickEventState(int state);
+int SDLEvent.enableUNICODE(int enable);
+void SDLEvent.pumpEvents();
+int SDLEvent.pollEvent(SDLEvent evt);
+void SDLEvent.pushEvent(SDLEvent evt);
+void SDLEvent.setModState(int modstate);
+void SDLEvent.enableKeyRepeat(int delay, int interval);
+SDLEvent SDLEvent.new();
+String SDLEvent.getKeyName(int key);
+KeyBoard SDLEvent.getKeyBoard();
+MouseMotion SDLEvent.getMouseMotion();
+MouseButton SDLEvent.getMouseButton();
 
-//   void Event.peepEvents(Event evt, int num, int action, int mask);
-//   void Event.setEventFilter(EventFilter filter);
-//   EventFilter Event.getEventFilter();
-//   int[] Event.getKeyState(int[] numkeys);
-//   int Event.getMouseState(int[] x, int[] y);
-//   int Event.getRelativemouseState(int[] x, int[] y);
+//   void SDLEvent.peepEvents(SDLEvent evt, int num, int action, int mask);
+//   void SDLEvent.setEventFilter(EventFilter filter);
+//   EventFilter SDLEvent.getEventFilter();
+//   int[] SDLEvent.getKeyState(int[] numkeys);
+//   int SDLEvent.getMouseState(int[] x, int[] y);
+//   int SDLEvent.getRelativemouseState(int[] x, int[] y);
 
+//------------SDLEvent original---------------------------
+int SDLEvent.getButton();
+int SDLEvent.getButtonX();
+int SDLEvent.getButtonY();
+int SDLEvent.getKeySym();
 
 
 
@@ -248,6 +254,51 @@ int MouseButton.getY();
 
 
 //-----------------SDL_image--------------------------------
-//	Surface SDL.imgLoad();
+	Surface SDL.imgLoad(String file_name);
 //	Surface SDL.imgLoadRW();
+
+
+//-----------------SDLttf----------------------
+//General
+int SDLttf.init();
+Boolean SDLttf.wasInit();
+void SDLttf.quit();
+//void SDLttf.setError();
+String SDLttf.getError();
+//management
+SDLttf? SDLttf.openFont(String path,int font_size);
+SDLttf? SDLttf.new(String path,int font_size);
+SDLttf? SDLttf.openFontIndex(String path,int font_size,int index);
+void SDLttf.closeFont();
+//attribute
+int SDLttf.getFontStyle();
+void SDLttf.setFontStyle(int style);
+int SDLttf.fontHeight();
+int SDLttf.fontAscent();
+int SDLttf.fontDescent();
+int SDLttf.fontLineSkip();
+int SDLttf.fontFaces();
+Boolean SDLttf.fontFaceIsFixedWidth();
+String SDLttf.fontFaceFamilyName();
+String SDLttf.fontFaceStyleName();
+//int SDLttf.glyphMetrics(int ch,int? minx,int? maxx,int? miny,int? maxy,int? advance);
+//int SDLttf.sizeText(String text,int? w,int? h);
+//int SDLttf.sizeUTF8(String text,int? w,int? h);
+//int SDLttf.sizeUNICODE(String text,int? w,int? h);
+//render
+Surface SDLttf.renderTextSolid(String text,SDLColor fg);
+Surface SDLttf.renderUTF8Solid(String text,SDLColor fg);
+//Surface SDLttf.renderUNICODESolid(int text,SDLColor fg);
+//Surface SDLttf.renderGlyphSolid(int ch,SDLColor fg);
+Surface SDLttf.renderTextShaded(String text,SDLColor fg,SDLColor bg);
+Surface SDLttf.renderUTF8Shaded(String text,SDLColor fg,SDLColor bg);
+//Surface SDLttf.renderUNICODEShaded(int text,SDLColor fg,SDLColor bg);
+//Surface SDLttf.renderGlyphShaded(int ch,SDLColor fg,SDLColor bg);
+Surface SDLttf.renderTextBlended(String text,SDLColor fg);
+Surface SDLttf.renderUTF8Blended(String text,SDLColor fg);
+//Surface SDLttf.renderUNICODEBlended(int text,SDLColor fg);
+//Surface SDLttf.renderGlyphSolid(int ch,SDLColor fg);
+
+
+
 

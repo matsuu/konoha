@@ -2,7 +2,7 @@
 
 CC = gcc
 CFLAGS = -O2 -Wall -fmessage-length=0 -fpic -DKONOHA_OS__LINUX
-LDLIBS = -lSDL -lkonoha
+LDLIBS = -lSDL -lkonoha -lSDL_ttf -lSDL_image
 
 target = linux_32
 pkgname = sdl
@@ -12,7 +12,7 @@ library = "$(pkgname)_$(target).so"
 .PHONY: all
 all: $(library)
 
-objs = $(pkgname).o sdl_event.o sdl_keyboard.o sdl_color.o sdl_mouse.o sdl_cursor.o
+objs = $(pkgname).o sdl_event.o sdl_keyboard.o sdl_color.o sdl_mouse.o sdl_cursor.o sdl_ttf.o sdl_img.o
 
 "$(pkgname).o": $(pkgname).c
 	$(CC) $(CFLAGS) -o $@ -c $^
@@ -30,6 +30,12 @@ sdl_mouse.o: sdl_mouse.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 sdl_cursor.o: sdl_cursor.c
+	$(CC) $(CFLAGS) -o $@ -c $^
+
+sdl_ttf.o: sdl_ttf.c
+	$(CC) $(CFLAGS) -o $@ -c $^
+
+sdl_img.o: sdl_img.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 $(library): $(objs)

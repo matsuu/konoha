@@ -23,3 +23,17 @@ METHOD SDL_imgLoadRW(Ctx* ctx, knh_sfp_t *sfp)
 }
 */
 
+/* Surface SDL.imgLoad(String file_name) */
+METHOD SDL_imgLoad(Ctx *ctx,knh_sfp_t *sfp)
+{
+	char* file_name = p_char(sfp[1]);
+	SDL_Surface *image = IMG_Load(file_name);
+	if(image==NULL){
+		fprintf(stderr,"%s\n",IMG_GetError());
+		SDL_Quit();
+	}
+	
+	KNH_RETURN(ctx,sfp,new_Glue(ctx,"sdl.Surface",image,NULL));
+}
+
+/* Surface SDL.imgLoadRW() */

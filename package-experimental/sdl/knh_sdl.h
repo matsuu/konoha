@@ -1,9 +1,13 @@
 #ifdef KONOHA_OS__MACOSX
 #include <SDL.h>
+#include <SDL_ttf.h>
+#include <SDL_image.h>
 #endif
 
 #ifdef KONOHA_OS__LINUX
 #include <SDL/SDL.h>
+#include <SDL/SDL_ttf.h>
+#include <SDL/SDL_image.h>
 #endif
 
 #include <konoha.h>
