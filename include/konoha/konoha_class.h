@@ -781,7 +781,7 @@ typedef sigjmp_buf knh_jmpbuf_t;
 #define knh_setjmp(buf)         sigsetjmp(buf, 1)
 #define knh_longjmp(buf, val)   siglongjmp(buf, val)
 #else
-typedef jmp_buf knh_jmpbuf_t
+typedef jmp_buf knh_jmpbuf_t;
 #define knh_setjmp(buf)         setjmp(buf)
 #define knh_longjmp(buf, val)   longjmp(buf, val)
 #endif
