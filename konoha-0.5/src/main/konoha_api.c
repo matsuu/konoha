@@ -744,14 +744,16 @@ void knh_Context_initSymbolTable(Ctx *ctx)
 		String *s = T(keywords[i]);
 		knh_DictMap_set(ctx, symbolDictMap, s, UP(s));
 	}
-
 }
+
+#ifdef RL_VERSION_MAJOR  /* 5, or later */
+char **completion_matches(const char *, rl_compentry_func_t *);
+#endif
 
 static
 char **knh_completion(const char* text, int start, int end)
 {
 	char **matches = NULL;
-	DBG2_P("text='%s', start=%d, end=%d", text, start, end);
 	if (end == 0) {
 		matches = completion_matches(text, knh_rl_stmt);
 	}
@@ -760,8 +762,110 @@ char **knh_completion(const char* text, int start, int end)
 	}
 	return matches;
 }
+#endif/*KNH_USING_READLINE*/
 
-#endif
+/* ======================================================================== */
+
+static
+void knh_initScriptLine(Ctx *ctx)
+{
+	DBG2_ASSERT(ctx->lines == NULL);
+	KNH_INITv(((Context*)ctx)->lines, new_Array(ctx, CLASS_String, 0));
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_Context_addScriptLine(Ctx *ctx, knh_bytes_t l)
+{
+	if(ctx->lines != NULL) {
+		knh_Array_add(ctx, ctx->lines, UP(new_String(ctx, l, NULL)));
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_cancelScriptLine(Ctx *ctx, size_t at)
+{
+	if(ctx->lines != NULL) {
+		DBG2_P("lines (size) %d at=%d", (int)(ctx->lines)->size, (int)at);
+		if(at < (ctx->lines)->size) {
+			(ctx->lines)->size = at;
+		}
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+String *knh_Context_getScriptLineNULL(Ctx *ctx, size_t at)
+{
+	if(ctx->lines != NULL) {
+		DBG2_ASSERT(at < (ctx->lines)->size);
+		return (String*)knh_Array_n(ctx->lines, at - 1);
+	}
+	return NULL;
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method String[] Script.getLines() @Hidden */
+
+METHOD knh__Script_getLines(Ctx *ctx, knh_sfp_t *sfp)
+{
+	Array *res = (ctx->lines == NULL)
+		? new_Array(ctx, CLASS_String, 0) : ctx->lines;
+	KNH_RETURN(ctx, sfp, res);
+}
+
+/* ------------------------------------------------------------------------ */
+
+int knh_getpid()
+{
+	return 0;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_clearScriptLine(Ctx *ctx)
+{
+	if(ctx->lines != NULL) {
+		char buff[FILEPATH_BUFSIZ];
+		int i, pid = knh_getpid();
+		//knh_snprintf(buff, sizeof(buff), "\nDo you want to save 'myscript%d.k'? [Y/n]: ", pid);
+		fprintf(stdout, "\nThank you for joining 'Konoha User Experience Program'.\n");
+		fprintf(stdout, "All your activity have been sent to our project server.\n");
+		L_AGAIN:;
+		knh_snprintf(buff, sizeof(buff), "\nDo you want to report your actions? [Y/n]: ");
+		if(knh_ask(ctx, buff, 1)) {
+			knh_sfp_t *lsfp = KNH_LOCAL(ctx);
+			OutputStream *w;
+			knh_snprintf(buff, sizeof(buff), "myscript%d.k", pid);
+			w = new_FileOutputStream(ctx, B(buff), "w", 0);
+			KNH_LPUSH(ctx, w);
+			for(i = 0; i < knh_Array_size(ctx->lines); i++) {
+				knh_bytes_t line = knh_String_tobytes((String*)knh_Array_n(ctx->lines, i));
+				if(knh_bytes_startsWith(line, STEXT("man ")) || knh_bytes_startsWith(line, STEXT("dump "))) {
+					knh_write(ctx, w, STEXT("// "));
+				}
+				knh_println(ctx, w, line);
+			}
+			knh_OutputStream_close(ctx, w);
+			KNH_LOCALBACK(ctx, lsfp);
+		}
+		else {
+			fprintf(stdout, "Your activity will improve Konoha project.\n");
+			fprintf(stdout, "Think about it, AGAIN.\n");
+			goto L_AGAIN;
+		}
+		fprintf(stdout, "\nOpps!! The server isn't working.\n");
+		fprintf(stdout, "(Don't report the server malfunction. It's a joke.)\n");
+		fprintf(stdout, "More importantly, your script was saved at '%s'\n", buff);
+		fprintf(stdout, "See you.\n");
+		KNH_FINALv(ctx, ((Context*)ctx)->lines);
+		((Context*)ctx)->lines = NULL;
+	}
+}
 
 /* ======================================================================== */
 /* [shell] */
@@ -778,9 +882,11 @@ KNHAPI(void) konoha_shell(konoha_t konoha)
 	ctxRL = ctx;
 	rl_attempted_completion_function = knh_completion;
 	knh_Context_initSymbolTable(ctx);
+	using_history();
 #endif
+	knh_System__dump(ctx, ctx->sys, KNH_STDOUT, (String*)KNH_NULL);
+	knh_initScriptLine(ctx);
 	{
-		knh_System__dump(ctx, ctx->sys, KNH_STDOUT, (String*)KNH_NULL);
 		int linenum, linecnt = 0;
 		knh_cwb_t cwb = new_cwb(ctx);
 		char *ln = NULL;
@@ -800,14 +906,15 @@ KNHAPI(void) konoha_shell(konoha_t konoha)
 		while(1) {
 			int nest = 0;
 			if(ln == NULL) {
-				KNH_LOCALBACK(ctx, lsfp);
-				knh_Context_clearstack(ctx);
-				return;
+				goto L_CLOSE;
 			}
 			knh_Bytes_write(ctx, cwb.ba, B(ln));
+			knh_Context_addScriptLine(ctx, B(ln));
 			nest = knh_bytes_checkStmtLine(knh_cwb_tobytes(cwb));
 			if(nest == 0) break;
 			if(nest < 0) {
+				knh_cancelScriptLine(ctx, linenum);
+				linecnt = linenum;
 				knh_println(ctx, KNH_STDOUT, STEXT("(Canceled)"));
 				knh_cwb_clear(cwb);
 				goto START_LINE;
@@ -821,13 +928,7 @@ KNHAPI(void) konoha_shell(konoha_t konoha)
 		if(cwb.pos < knh_Bytes_size(cwb.ba)) {
 			knh_bytes_t t = knh_cwb_tobytes(cwb);
 			if(ISB(t, "exit") || ISB(t, "quit") || ISB(t, "bye")) {
-				if(ln != NULL) free(ln);
-				knh_cwb_clear(cwb);
-				KNH_LOCALBACK(ctx, lsfp);
-				knh_Context_clearstack(ctx);
-				knh_Context_setInteractive(ctx, 0);
-				knh_endContext(ctx);
-				return;
+				goto L_CLOSE;
 			}
 			if(knh_bytes_startsWith(t, STEXT("man "))) {
 				char bufc[CLASSNAME_BUFSIZ], *p = bufc;
@@ -864,6 +965,15 @@ KNHAPI(void) konoha_shell(konoha_t konoha)
 			}
 		}
 		goto START_LINE;
+
+		L_CLOSE:
+		if(ln != NULL) free(ln);
+		knh_clearScriptLine(ctx);
+		knh_cwb_clear(cwb);
+		KNH_LOCALBACK(ctx, lsfp);
+		knh_Context_clearstack(ctx);
+		knh_Context_setInteractive(ctx, 0);
+		knh_endContext(ctx);
 	}
 }
 

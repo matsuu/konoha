@@ -768,6 +768,7 @@ typedef struct knh_Context_t {
 	struct knh_Bytes_t*          bconvbuf;
 	struct knh_DictMap_t*        props;
 	struct knh_Asm_t            *abr;
+	struct knh_Array_t          *lines;
 
 	int    hasError;
 	struct knh_String_t *msgError;
