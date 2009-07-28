@@ -138,8 +138,8 @@ KNHAPI(int) knh_socket_send(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz,
 #elif defined(KNH_USING_POSIX)
 	res = send(sd, buf, bufsiz, flags);
 #elif defined(KNH_USING_BTRON)
-        int err = so_send(sd, buf, bufsiz, flags);
-        if (err < 0) res = -1;        
+        res = so_send(sd, buf, bufsiz, flags);
+        if (res < 0) res = -1;
 #endif
 	if(res == -1) {
 		KNH_PERRNO(ctx, "Socket!!", "send", knh_Context_isStrict(ctx));
@@ -156,8 +156,8 @@ KNHAPI(int) knh_socket_recv(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz,
 #elif defined(KNH_USING_POSIX)
 	res = recv(sd, buf, bufsiz, flags);
 #elif defined(KNH_USING_BTRON)
-        int err = so_recv(sd, buf, bufsiz, flags);
-        if (err < 0) res = -1;
+        res = so_recv(sd, buf, bufsiz, flags);
+        if (res < 0) res = -1;
 #endif
 	if(res == -1) {
 		KNH_PERRNO(ctx, "Socket!!", "recv", knh_Context_isStrict(ctx));
