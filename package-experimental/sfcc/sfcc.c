@@ -266,7 +266,7 @@ METHOD CIMClient_invokeMethod(Ctx *ctx, knh_sfp_t *sfp)
   CIMCArgs *outargs = NULL;
   CIMCData data;
   CIMCStatus status;
-  char c = '0';
+  char c[64] = {0};
   argc = knh_Array_size(a);
  
   argv = (char **)alloca(argc * sizeof(char*));
@@ -276,8 +276,8 @@ METHOD CIMClient_invokeMethod(Ctx *ctx, knh_sfp_t *sfp)
 
   for(i=0;i<argc;i++){
     if(strncmp(argv[i],"",1) != 0){
-      ((CMPIArgs*)inargs)->ft->addArg((CMPIArgs*)inargs, &c, (CMPIValue*)argv[i], CMPI_chars);
-      c++;
+      snprintf(c,64,"a%d",i);
+      ((CMPIArgs*)inargs)->ft->addArg((CMPIArgs*)inargs, c, (CMPIValue*)argv[i], CMPI_chars);
     } 
   }
   if(cc != NULL && op != NULL) {
