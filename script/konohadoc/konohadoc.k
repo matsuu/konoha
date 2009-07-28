@@ -1,7 +1,92 @@
 /*
  * Konoha Document generator
+ * kindofbrown@users.sourceforge.jp
+ * kindofbrown(c)2009
  */
 
+class MethodInfo {
+	String name;
+	String classname;
+	String defs;
+
+	MethodInfo() {
+		name = '';
+		classname = '';
+		defs= '';
+	}
+}
+
+
+class ScriptParser {
+	String[] clsdefined;
+	String[] mtddefined;
+	MethodInfo[] methods;
+	
+	Parser () {
+		clsdefined = [];
+		mtddefined = [];
+		methods = [];
+	}
+	
+	/**
+	 * One line parser and checks if it has a 
+	 * style of class definition, or
+	 * method definition.
+	 */
+	void parseOneLine(String line) {
+		re = @'re:[A-Za-z0-9.[]+[] \n]+[A-Za-z0-9]+[.][A-Za-z0-9]+[(]';
+		classn = ''
+		if (line =~ /class/ ) {
+//			OUT << line << EOL;
+			classn = line;
+			classn = classn.trim();
+			classn = classn.replace("class ", "");
+			classn = classn.replace(";","");
+//			OUT << classn << EOL;
+			clsdefined << classn;
+
+		} else if (line =~ re) {
+			/* here we parse methods */
+			tmp = line.trim();
+			tmp = tmp.replace("..", "");
+			didx = tmp.indexOf(".");
+			sidx = tmp.indexOf(" ");
+			pidx = tmp.indexOf("(");
+			mname = tmp[(didx+1)..(pidx-1)];
+
+			tmp = tmp[sidx..didx];
+			belonging = '';
+			foreach(String s in clsdefined) {
+				if (s in? tmp) {
+					belonging = s;
+					break;
+				}
+			}
+			MethodInfo mi = new MethodInfo();
+			OUT << belonging << "." <<  mname << EOL;
+			mi.name = mname;
+			mi.classname = belonging;
+			mi.defs = line;
+			methods.add(mi);
+		} else {
+			/* it is out */
+		}
+	}
+	void showclasses() {
+		foreach(String s in clsdefined) {
+			OUT << s << EOL;
+		}
+	}
+
+	void showmethods () {
+		foreach (MethodInfo mi in methods) {
+			OUT << %("class:%s{0} methods:%s{1}", mi.name, mi.classname) << EOL;
+			OUT << mi.defs << EOL;
+		}
+
+	}
+	
+}
 
 class KonohaDocGenerator {
 	Class[] defaultclasses;
@@ -16,13 +101,6 @@ class KonohaDocGenerator {
 		newmethods = [];
 	}
 
-	void gen() {
-		foreach(String line in defaultclasses) {
-			OUT << typeof(line) << EOL;
-			line.indexOf("hi");
-
-		}
-	}
 	void importing(String file) {
 		eval('import "' + file + '";');
 		afterclasses = domain(Class);
@@ -115,6 +193,8 @@ int main (String[] args)
 		OUT << "usage:" << EOL;
 		return 0;
 	}
+
+/*
 	KonohaDocGenerator kdg = new KonohaDocGenerator();
 
 	kdg.importing(args[1]);
@@ -122,4 +202,14 @@ int main (String[] args)
 //	kdg.showClasses();
 	kdg.showMethods();
 	kdg.showModSigs();
+	*/
+
+	ScriptParser p = new ScriptParser();
+	foreach(String line from new InputStream(args[1], "r")) {
+		p.parseOneLine(line);
+	}
+	p.showclasses();
+	p.showmethods();
+
+	
 }
