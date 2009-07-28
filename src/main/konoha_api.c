@@ -572,10 +572,13 @@ void knh_add_history(char *line)
 #endif
 }
 
-///* ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------ */
 
-int knh_ask(char *prompt, int def)
+int knh_ask(Ctx *ctx, char *prompt, int def)
 {
+	if(!knh_Context_isInteractive(ctx)) {
+		return def;
+	}
 	L_TAIL:;
 	char *line = knh_readline(prompt);  /* "Please enter [Y/n] : " */
 	if(line == NULL) return def;

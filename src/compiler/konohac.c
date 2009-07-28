@@ -221,22 +221,33 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 /* ------------------------------------------------------------------------ */
 /* [declc] */
 
-static
-char *knh_lookup_includeScript(Ctx *ctx, knh_bytes_t path, char *buf, size_t bufsiz)
+knh_bool_t knh_bytes_isSystemScript(knh_bytes_t path)
 {
-	knh_index_t loc = knh_bytes_rindex(path, '/');
-	if(loc == -1) loc = knh_bytes_rindex(path, '\\');
-	char *filename = (char*)path.buf + loc + 1;
+	size_t i;
+	for(i = 0; i < path.len; i++) {
+		int ch = path.buf[i];
+		if(ch == '/' || ch == '\\' || ch == '.') return 0;
+	}
+	return 1;
+}
 
+/* ------------------------------------------------------------------------ */
+
+char *knh_lookupSystemScript(Ctx *ctx, knh_bytes_t path, char *buf, size_t bufsiz)
+{
+	char *p, *filename = (char*)path.buf;
+	if(!knh_bytes_isSystemScript(path)) {
+		return NULL;
+	}
 #ifdef KNH_PREFIX
-	knh_snprintf(buf, bufsiz, "%s/konoha/imports/%s", KNH_PREFIX, filename);
+	knh_snprintf(buf, bufsiz, "%s/konoha/script/%s", KNH_PREFIX, filename);
 #else
-	knh_snprintf(buf, bufsiz, "%s/imports/%s", knh_String_tochar(DP(ctx->sys)->homeDir), filename);
+	knh_snprintf(buf, bufsiz, "%s/script/%s", knh_String_tochar(DP(ctx->sys)->homeDir), filename);
 #endif
 	if(knh_isfile(ctx, B(buf))) return buf;
-	char *p = knh_getenv("HOME");
+	p = knh_getenv("HOME");
 	if(p != NULL) {
-		knh_snprintf(buf, bufsiz, "%s/.konoha/imports/%s", p, filename);
+		knh_snprintf(buf, bufsiz, "%s/" KONOHA_FOLDER "/script/%s", p, filename);
 		if(knh_isfile(ctx, B(buf))) return buf;
 	}
 	return NULL;
@@ -247,24 +258,32 @@ char *knh_lookup_includeScript(Ctx *ctx, knh_bytes_t path, char *buf, size_t buf
 static
 int knh_StmtIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 {
-	String *fname = (String*)DP(StmtIMPORT_file(stmt))->data;
-	char bufp[FILEPATH_BUFSIZ], buff[FILEPATH_BUFSIZ];
-
+	knh_bytes_t sname = knh_String_tobytes(DP(StmtIMPORT_file(stmt))->text);
 	String *cfname = knh_getResourceName(ctx, SP(stmt)->resid);
-	KNH_ASSERT(IS_String(fname));
+	char bufp[FILEPATH_BUFSIZ], buff[FILEPATH_BUFSIZ];
 	if(knh_String_endsWith(cfname, STEXT(".k"))) {
 		knh_format_parentpath(bufp, sizeof(bufp), knh_String_tobytes(cfname), 1);
 	}
 	else {
 		bufp[0]=0;
 	}
-	knh_format_catpath(buff, sizeof(buff), B(bufp), knh_String_tobytes(fname));
+	knh_format_catpath(buff, sizeof(buff), B(bufp), sname);
+	DBG_P("import? '%s'", buff);
 	if(!knh_isfile(ctx, B(buff))) {
-		knh_lookup_includeScript(ctx, knh_String_tobytes(fname), buff, sizeof(buff));
+		if(knh_lookupSystemScript(ctx, sname, buff, sizeof(buff)) != NULL) {
+			goto L_LOADING;
+		}
+		goto L_ERROR;
 	}
-	KNH_NOTICE(ctx, "including script: %s", buff);
+	L_LOADING:;
+	KNH_NOTICE(ctx, "importing script: %s", buff);
 	knh_NameSpace_loadScript(ctx, ns, B(buff), 1 /* isEval */);
 	return 1;
+
+	L_ERROR:;
+	knh_snprintf(buff, sizeof(buff), "Import!!: %s", (char*)sname.buf);
+	KNH_THROWs(ctx, buff);
+	return 0;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -810,23 +829,27 @@ int knh_NameSpace_loadScript(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isE
 {
 	knh_resid_t resid = knh_getResourceId(ctx, fpath);
 	if(knh_NameSpace_isLoaded(ctx, ns, resid)) {
-		DBG2_P("Already imported: %s", fpath.buf);
+		KNH_WARNING(ctx, "Already imported: %s", (char*)fpath.buf);
+		if(!knh_ask(ctx, "Do you want to reload it [y/N] ?", 0)) {
+			return 1;
+		}
+	}
+	{
+		knh_sfp_t *lsfp = KNH_LOCAL(ctx);
+		InputStream *in = new_FileInputStream(ctx, fpath, 1);
+		KNH_LPUSH(ctx, in);
+		DP(in)->resid = resid;
+		knh_InputStream_setEncoding(ctx, in, KNH_ENC);
+		Stmt *stmt = knh_InputStream_parseStmt(ctx, in, 0/*isData*/);
+		KNH_LPUSH(ctx, stmt);
+		if(isEval) {
+			knh_Asm_openlib(ctx, knh_Context_getAsm(ctx), fpath);
+		}
+		knh_Stmt_compile(ctx, stmt, DP(ns)->nsname, isEval);
+		KNH_LOCALBACK(ctx, lsfp);
+		knh_NameSpace_loaded(ctx, ns, resid);
 		return 1;
 	}
-	knh_NameSpace_loaded(ctx, ns, resid);
-	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
-	InputStream *in = new_FileInputStream(ctx, fpath, 1);
-	KNH_LPUSH(ctx, in);
-	DP(in)->resid = resid;
-	knh_InputStream_setEncoding(ctx, in, KNH_ENC);
-	Stmt *stmt = knh_InputStream_parseStmt(ctx, in, 0/*isData*/);
-	KNH_LPUSH(ctx, stmt);
-	if(isEval) {
-		knh_Asm_openlib(ctx, knh_Context_getAsm(ctx), fpath);
-	}
-	knh_Stmt_compile(ctx, stmt, DP(ns)->nsname, isEval);
-	KNH_LOCALBACK(ctx, lsfp);
-	return 1;
 }
 
 /* ------------------------------------------------------------------------ */
