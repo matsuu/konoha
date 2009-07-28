@@ -836,7 +836,7 @@ void knh_clearScriptLine(Ctx *ctx)
 		fprintf(stdout, "\nThank you for joining 'Konoha User Experience Program'.\n");
 		fprintf(stdout, "All your activity have been sent to our project server.\n");
 		L_AGAIN:;
-		knh_snprintf(buff, sizeof(buff), "\nDo you want to report your actions? [Y/n]: ");
+		knh_snprintf(buff, sizeof(buff), "\nDo you want to report your experience? [Y/n]: ");
 		if(knh_ask(ctx, buff, 1)) {
 			knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 			OutputStream *w;
@@ -854,7 +854,7 @@ void knh_clearScriptLine(Ctx *ctx)
 			KNH_LOCALBACK(ctx, lsfp);
 		}
 		else {
-			fprintf(stdout, "Your activity will improve Konoha project.\n");
+			fprintf(stdout, "Your experience will improve the future version of Konoha.\n");
 			fprintf(stdout, "Think about it, AGAIN.\n");
 			goto L_AGAIN;
 		}
