@@ -2002,9 +2002,15 @@ static void knh_System_initProp(Ctx *ctx, System *o)
 	{
 		char *rootdir = knh_getenv("HOME");
 		if(rootdir != NULL) {
-			knh_snprintf(buf, sizeof(buf), "%s/.konoha/package", rootdir);
+			knh_snprintf(buf, sizeof(buf), "%s/" KONOHA_FOLDER, rootdir);
+			knh_DictMap_set(ctx, sys->props,
+				new_String__T(ctx, "konoha.path.folder"), UP(new_String(ctx, B(buf), NULL)));
+			knh_snprintf(buf, sizeof(buf), "%s/" KONOHA_FOLDER "/package", rootdir);
 			knh_DictMap_set(ctx, sys->props,
 				new_String__T(ctx, "konoha.path.user.package"), UP(new_String(ctx, B(buf), NULL)));
+			knh_snprintf(buf, sizeof(buf), "%s/" KONOHA_FOLDER "/temp", rootdir);
+			knh_DictMap_set(ctx, sys->props,
+				new_String__T(ctx, "konoha.path.temp"), UP(new_String(ctx, B(buf), NULL)));
 		}
 	}
 }

@@ -2064,9 +2064,10 @@ static int knh_Token_isFURN(Token *tk)
 
 static void knh_Stmt_add_FURN(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 {
+	Token *tkF = tc->ts[tc->c];
 	if(SP(o)->stt == STT_ERR) return;
-	if(tc->c < tc->e && knh_Token_isFURN(tc->ts[tc->c])) {
-		knh_Stmt_add(ctx, o, UP(tc->ts[tc->c]));
+	if(tc->c < tc->e && (knh_Token_isFURN(tkF) || SP(tkF)->tt == TT_NAME)) {
+		knh_Stmt_add(ctx, o, UP(tkF));
 		tc->c += 1;
 	}
 	else {

@@ -98,6 +98,7 @@
 
 #define 	KONOHA_OS_DLLEXT ".dll"
 #define		KONOHA_OS_FILE_SEPARATOR '\\'
+#define     KONOHA_FOLDER "Konoha"
 #endif
 
 #ifdef KONOHA_ON_MINGW
@@ -148,6 +149,10 @@
 #else
 #define KNHAPI_(T)       T KNH_CC_FASTCALL
 #endif
+#endif
+
+#ifndef KONOHA_FOLDER
+#define KONOHA_FOLDER ".konoha"
 #endif
 
 #ifndef KNHAPI
