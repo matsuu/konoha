@@ -2526,6 +2526,9 @@ Object *knh_System_fdefault(Ctx *ctx, knh_class_t cid)
 #include"../api/streamapi.c"
 #include"../api/dbapi.c"
 
+#include"../api/anyapi.c"
+#include"../api/narutoapi.c"
+
 #ifdef KONOHA_ON_LKM
 #include"../../include/konoha/gen/struct_.h"
 #else

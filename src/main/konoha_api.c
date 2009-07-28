@@ -107,28 +107,6 @@ KNHAPI(Ctx*) knh_getCurrentContext(void)
 	return ctx;
 }
 
-///* ------------------------------------------------------------------------ */
-//
-//KNHAPI(Ctx*) knh_getThreadContext(Ctx *ctx)
-//{
-//#ifdef KNH_USING_NOTHREAD
-//	curctx = ctx;
-//	return ctx;
-//#else
-//	knh_thread_t thread = knh_thread_self();
-//	if(ctx->threadid != thread) {
-//		ctx = (Ctx*)knh_thread_getspecific(ctxkey);
-//		if(ctx != NULL && ctx->threadid == thread) {
-//			return ctx;
-//		}
-//	}
-//	DBG_P("thread inconsitency.. creating new context..");
-//	Ctx *newctx = new_Context(ctx);
-//	knh_thread_setspecific(ctxkey, newctx);
-//	return newctx;
-//#endif
-//}
-
 /* ======================================================================== */
 /* [option] */
 
@@ -336,7 +314,7 @@ KNHAPI(void) konoha_readFile(Ctx *ctx, char *fpath)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) knh_loadScript(konoha_t konoha, char *fpath)
+KNHAPI(void) konoha_loadScript(konoha_t konoha, char *fpath)
 {
 	KONOHA_CHECK_(konoha);
 	knh_beginContext(konoha.ctx);
@@ -514,7 +492,7 @@ KNHAPI(char*) konoha_invokeStringFunc(konoha_t konoha, char *fmt, ...)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(int) konoha_addMethodFunc(konoha_t konoha, char *name, knh_fmethod func)
+KNHAPI(int) konoha_setMethodFunc(konoha_t konoha, char *name, knh_fmethod func)
 {
 	KONOHA_CHECK(konoha, -1);
 	Ctx *ctx = konoha.ctx;
@@ -553,7 +531,6 @@ KNHAPI(int) konoha_addMethodFunc(konoha_t konoha, char *name, knh_fmethod func)
 /* ======================================================================== */
 /* [readline] */
 
-static
 char *knh_readline(char *prompt)
 {
 	char *ln = NULL;
@@ -588,7 +565,6 @@ char *knh_readline(char *prompt)
 
 /* ------------------------------------------------------------------------ */
 
-static
 void knh_add_history(char *line)
 {
 #if defined(KNH_USING_READLINE)
@@ -597,7 +573,7 @@ void knh_add_history(char *line)
 }
 
 ///* ------------------------------------------------------------------------ */
-//
+
 int knh_ask(char *prompt, int def)
 {
 	L_TAIL:;
@@ -759,75 +735,6 @@ KNHAPI(void) konoha_shell(konoha_t konoha)
 		}
 		goto START_LINE;
 	}
-}
-
-/* ======================================================================== */
-/* @method void Script.eval(String script, String file, Int linenum) @Static */
-
-METHOD knh__Script_eval(Ctx *ctx, knh_sfp_t *sfp)
-{
-	if(IS_NOTNULL(sfp[1].s)) {
-		knh_sfp_t *lsfp = KNH_LOCAL(ctx);
-		knh_cwb_t cwb = new_cwb(ctx);
-		knh_Bytes_write(ctx, cwb.ba, knh_String_tobytes(sfp[1].s));
-		knh_Bytes_putc(ctx, cwb.ba, ';');
-		knh_Bytes_putc(ctx, cwb.ba, '\n');
-		InputStream *in = new_BytesInputStream(ctx, cwb.ba, cwb.pos, knh_Bytes_size(cwb.ba));
-		KNH_LPUSH(ctx, in);
-		if(IS_NULL(sfp[2].o)) {
-			DP(in)->resid = knh_getResourceId(ctx, STEXT("(eval)"));
-		}
-		else {
-			DP(in)->resid = knh_getResourceId(ctx, knh_String_tobytes(sfp[2].s));
-		}
-		if(IS_NULL(sfp[3].o)) {
-			DP(in)->line = 0;
-		}
-		else {
-			DP(in)->resid = (knh_resid_t)p_int(sfp[3]);
-		}
-		konohac_eval(ctx, TS_main, in);
-		knh_cwb_clear(cwb);
-		KNH_LOCALBACK(ctx, lsfp);
-	}
-	KNH_RETURN_void(ctx, sfp);
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method Boolean! Script.isStatement(String! script) @Static */
-
-METHOD knh__Script_isStatement(Ctx *ctx, knh_sfp_t *sfp)
-{
-	KNH_RETURN_Boolean(ctx, sfp, !(knh_bytes_checkStmtLine(knh_String_tobytes(sfp[1].s))));
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method String Script.readLine(String prompt) @Static */
-
-METHOD knh__Script_readLine(Ctx *ctx, knh_sfp_t *sfp)
-{
-	char *line;
-	if(IS_NULL(sfp[1].o)) {
-		line = knh_readline("");
-	}
-	else {
-		line = knh_readline(knh_String_tochar(sfp[1].s));
-	}
-	if(line == NULL) {
-		KNH_RETURN(ctx, sfp, KNH_NULL);
-	}
-	else {
-		KNH_RETURN(ctx, sfp, new_String(ctx, B(line), NULL));
-	}
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method void Script.addHistory(String! s) @Static */
-
-METHOD knh__Script_addHistory(Ctx *ctx, knh_sfp_t *sfp)
-{
-	knh_add_history(knh_String_tochar(sfp[1].s));
-	KNH_RETURN_void(ctx, sfp);
 }
 
 /* ------------------------------------------------------------------------ */

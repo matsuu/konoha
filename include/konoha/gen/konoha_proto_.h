@@ -58,6 +58,11 @@ int knh_ResultSet_indexof_(Ctx *ctx, knh_sfp_t *sfp);
 void knh_HashMap__k(Ctx *ctx, knh_Hash_t *o, OutputStream *w, String *m);
 void knh_HashMap__dump(Ctx *ctx, HashMap *o, OutputStream *w, String *m);
 MAPPER knh_HashMap_Iterator(Ctx *ctx, knh_sfp_t *sfp);
+/* ../src/api/narutoapi.c */
+METHOD knh__Script_isStmt(Ctx *ctx, knh_sfp_t *sfp);
+METHOD knh__Script_eval(Ctx *ctx, knh_sfp_t *sfp);
+METHOD knh__Script_readLine(Ctx *ctx, knh_sfp_t *sfp);
+METHOD knh__Script_addHistory(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/api/objectapi.c */
 void knh_Method__s(Ctx *ctx, Method *o, OutputStream *w, String *m);
 void knh_Method__k(Ctx *ctx, Method *o, OutputStream *w, String *m);
@@ -150,7 +155,6 @@ knh_bytes_t knh_getURNAlias(Ctx *ctx, knh_bytes_t aurn);
 ClassSpec *knh_getClassSpec(Ctx *ctx, knh_class_t cid);
 knh_class_t konoha_findcidx(Ctx *ctx, knh_bytes_t lname);
 /* ../src/class/knh_Closure.c */
-METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Closure_invoke(Ctx *ctx, knh_sfp_t *sfp);
 int knh_stack_vpush(Ctx *ctx, knh_sfp_t *sfp, const char *fmt, va_list args);
 knh_class_t knh_addClosureClass(Ctx *ctx, knh_class_t cid, String *name, knh_type_t r0, knh_type_t p1, knh_type_t p2, knh_type_t p3);
@@ -586,10 +590,8 @@ void *konoha_generateCallBackFunc(Ctx *ctx, void *func, Closure *c);
 /* ../src/main/konoha_api.c */
 void konoha_init(void);
 void knh_setRuntimeError(Ctx *ctx, String *msg);
-METHOD knh__Script_eval(Ctx *ctx, knh_sfp_t *sfp);
-METHOD knh__Script_isStatement(Ctx *ctx, knh_sfp_t *sfp);
-METHOD knh__Script_readLine(Ctx *ctx, knh_sfp_t *sfp);
-METHOD knh__Script_addHistory(Ctx *ctx, knh_sfp_t *sfp);
+char *knh_readline(char *prompt);
+void knh_add_history(char *line);
 /* ../src/main/konoha_ext.c */
 void knh_srand(knh_uint_t seed);
 knh_uint_t knh_rand(void);

@@ -41,19 +41,19 @@ extern "C" {
 /* ======================================================================== */
 /* [constructors] */
 
-/* ------------------------------------------------------------------------ */
-/* @method This! Closure.new(Any! base, Method! mtd) */
+///* ------------------------------------------------------------------------ */
+///* @ method This! Closure.new(Any! base, Method! mtd) */
+//
+//METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp)
+//{
+//	KNH_INITv((sfp[0].cc)->base, sfp[1].o);
+//	KNH_INITv((sfp[0].cc)->mtd, sfp[2].mtd);
+//	(sfp[0].cc)->envsfp = NULL;
+//	KNH_RETURN(ctx, sfp, sfp[0].o);
+//}
 
-METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp)
-{
-	KNH_INITv((sfp[0].cc)->base, sfp[1].o);
-	KNH_INITv((sfp[0].cc)->mtd, sfp[2].mtd);
-	(sfp[0].cc)->envsfp = NULL;
-	KNH_RETURN(ctx, sfp, sfp[0].o);
-}
-
 /* ------------------------------------------------------------------------ */
-/* @method Any0 Closure.invoke(Any1 x, Any2 y, Any3 z) */
+/* @method Any0 Closure.invoke(Any1 x, Any2 y, Any3 z) @VarArgs */
 
 METHOD knh__Closure_invoke(Ctx *ctx, knh_sfp_t *sfp)
 {
