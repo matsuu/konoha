@@ -28,7 +28,7 @@
  
 
 if(!System.hasLib("cimcclient0")) {
-	OUT << "you need sfcc (libcimcclient0)" << EOL;
+    /*	OUT << "you need sfcc (libcimcclient0)" << EOL;
 }
 
 
