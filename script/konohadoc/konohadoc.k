@@ -7,12 +7,18 @@
 class MethodInfo {
 	String name;
 	String classname;
+	String retval;
+	String args;
 	String defs;
+	String annotation;
 
 	MethodInfo() {
 		name = '';
 		classname = '';
 		defs= '';
+		retval = '';
+		args = '';
+		annotation = '';
 	}
 }
 
@@ -21,11 +27,14 @@ class ScriptParser {
 	String[] clsdefined;
 	String[] mtddefined;
 	MethodInfo[] methods;
-	
+	Boolean javadocflag;
+	String annotation;
 	Parser () {
 		clsdefined = [];
 		mtddefined = [];
 		methods = [];
+		javadocflag = false;
+		annotation = "";
 	}
 	
 	/**
@@ -36,13 +45,22 @@ class ScriptParser {
 	void parseOneLine(String line) {
 		re = @'re:[A-Za-z0-9.[]+[] \n]+[A-Za-z0-9]+[.][A-Za-z0-9]+[(]';
 		classn = ''
-		if (line =~ /class/ ) {
-//			OUT << line << EOL;
+		if (javadocflag == true) {
+			if (annotation == "") annotation = "/**" + EOL;
+			if ("*/" in? line) {
+				javadocflag = false;
+			}
+			annotation = annotation + line + EOL;
+		}
+		
+		if ("/**" in? line) {
+			annotation = "";
+			javadocflag = true;
+		}else if (line =~ /class/ ) {
 			classn = line;
 			classn = classn.trim();
 			classn = classn.replace("class ", "");
 			classn = classn.replace(";","");
-//			OUT << classn << EOL;
 			clsdefined << classn;
 
 		} else if (line =~ re) {
@@ -63,15 +81,17 @@ class ScriptParser {
 				}
 			}
 			MethodInfo mi = new MethodInfo();
-			OUT << belonging << "." <<  mname << EOL;
 			mi.name = mname;
 			mi.classname = belonging;
 			mi.defs = line;
+			mi.annotation = annotation;
 			methods.add(mi);
+			annotation = "";
 		} else {
 			/* it is out */
 		}
 	}
+	
 	void showclasses() {
 		foreach(String s in clsdefined) {
 			OUT << s << EOL;
@@ -83,7 +103,32 @@ class ScriptParser {
 			OUT << %("class:%s{0} methods:%s{1}", mi.name, mi.classname) << EOL;
 			OUT << mi.defs << EOL;
 		}
+	}
 
+	void genJava () {
+		foreach(String cls in clsdefined) {
+			OUT << %("public class %s{0} {", cls) << EOL;
+			
+			  foreach (MethodInfo mi in methods) {
+				if (mi.classname == cls) {
+					/* replace Method new with Constructor */
+					OUT << mi.annotation << EOL;
+					if (mi.name == 'new') {
+						line = mi.defs.replace("new", "");
+					} else {
+						line = mi.defs;
+					}
+					line = line.replace(%("%s{0}.", cls), "");
+					line = line.replace(";", "");
+					line = line.replace("?", "");
+					//TODO iterator transform
+					line = line.replace("..", "");
+					OUT << %("\tpublic %s{0} { }", line) << EOL;
+				}
+			}
+			
+			OUT << "}" << EOL;
+		}
 	}
 	
 }
@@ -205,11 +250,20 @@ int main (String[] args)
 	*/
 
 	ScriptParser p = new ScriptParser();
-	foreach(String line from new InputStream(args[1], "r")) {
+	lines = [];
+	foreach(String line from new InputStream(args[1], "r")) {	
+		line = line.trim();
+		if (line.startsWith(@"//")) {
+			continue;
+		}
+		lines << line;
+	}
+
+	foreach(String line from lines) {
 		p.parseOneLine(line);
 	}
-	p.showclasses();
-	p.showmethods();
-
+//	p.showclasses();
+//	p.showmethods();
+	p.genJava();
 	
 }
