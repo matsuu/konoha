@@ -3,8 +3,6 @@
 DEPS = Dependencies
 DEPENDENCIES_OUTPUT := $(DEPS)
 
-include $(BD)/bappl/etc/makerules
-
 VPATH = "./ $(shell find ../../ -type d) ./"
 
 # -I../support/include must precede -I$(BD)/include, so as to avoid
