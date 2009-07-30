@@ -860,10 +860,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 
 /* ------------------------------------------------------------------------ */
 
-#define KNH_SECURE(ctx) \
-	if(((ctx)->flag & KNH_FLAG_CTXF_TRUSTED) != KNH_FLAG_CTXF_TRUSTED) { \
-		knh_throwException(ctx, new_Exception(ctx, TS_SecurityException), KNH_SAFEFILE(__FILE__), __LINE__); \
-	} \
+#define KNH_SECURE(ctx, sfp) knh_stack_checkSecurityManager(ctx, sfp)
 
 /* ------------------------------------------------------------------------ */
 

@@ -417,13 +417,18 @@ typedef struct knh_Object_t {
 /* ------------------------------------------------------------------------ */
 /* Common Object Structure */
 
-typedef knh_ushort_t          knh_resid_t;
-typedef knh_ushort_t          knh_sline_t;
+typedef knh_ushort_t              knh_urid_t;
+#define KNH_FLAG_URI_UNTRUSTED    KNH_FLAG_T0
+#define URID_UNMASK(urid)         (urid & (~(KNH_FLAG_URI_UNTRUSTED)))
+#define URID_UNTRUSTED(urid)      (urid & KNH_FLAG_URI_UNTRUSTED)
+#define URID_ISTRUSTED(urid)      ((urid & KNH_FLAG_URI_UNTRUSTED) == 0)
+
+typedef knh_ushort_t              knh_sline_t;
 
 typedef struct {
 	knh_hObject_t h;
 	void *ref;
-	knh_resid_t resid;
+	knh_urid_t urid;
 	knh_sline_t  line;
 } knh_FileLine_t ;
 

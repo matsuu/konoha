@@ -134,7 +134,7 @@ extern "C" {
 #define KNH_SYS_OS     4
 #define KNH_SYS_SCRIPT 5
 #define FIELDN(fn) knh_String_tochar(knh_getFieldName(ctx, fn))
-#define FILEIDN(resid) knh_String_tochar(knh_getResourceName(ctx, resid))
+#define URIDN(urid) knh_String_tochar(knh_getResourceName(ctx, urid))
 
 /* ======================================================================== */
 /* [PROTOTYPE] */
@@ -278,6 +278,7 @@ KNHAPI(void) konoha_shell(konoha_t konoha);
 KNHAPI(char*) KNH_SAFEFILE(char *file);
 KNHAPI(Object*) new_Object_boxing(Ctx *ctx, knh_class_t cid, knh_sfp_t *sfp);
 KNHAPI(char*) knh_getPassword(Ctx *ctx, knh_bytes_t url);
+KNHAPI(void) knh_stack_checkSecurityManager(Ctx *ctx, knh_sfp_t *sfp);
 KNHAPI(void) knh_sfp_boxing(Ctx *ctx, knh_sfp_t *sfp);
 KNHAPI(void) knh_sfp_unboxing(Ctx *ctx, knh_sfp_t *sfp);
 KNHAPI(void) knh_esp1_sformat(Ctx *ctx, Method *mtd, OutputStream *w, Any *m);

@@ -480,9 +480,9 @@ knh_format_cmethodn(Ctx *ctx, char *buf, size_t bufsiz, knh_class_t cid, knh_met
 }
 
 /* ======================================================================== */
-/* [resid] */
+/* [urid] */
 
-knh_resid_t knh_getResourceId(Ctx *ctx, knh_bytes_t t)
+knh_urid_t knh_getResourceId(Ctx *ctx, knh_bytes_t t)
 {
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 	knh_index_t idx = knh_DictIdx_index(ctx, DP(ctx->sys)->ResourceDictIdx, t);
@@ -491,26 +491,26 @@ knh_resid_t knh_getResourceId(Ctx *ctx, knh_bytes_t t)
 		idx = knh_DictIdx_add__fast(ctx, DP(ctx->sys)->ResourceDictIdx, s);
 	}
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-	return (knh_resid_t)idx;
+	return (knh_urid_t)idx;
 }
 
 /* ------------------------------------------------------------------------ */
 
-String *knh_getResourceName(Ctx *ctx, knh_resid_t resid)
+String *knh_getResourceName(Ctx *ctx, knh_urid_t urid)
 {
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-	String *s = (String*)knh_DictIdx_get__fast(DP(ctx->sys)->ResourceDictIdx, resid);
+	String *s = (String*)knh_DictIdx_get__fast(DP(ctx->sys)->ResourceDictIdx, urid);
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
 	DBG_(
 		if(IS_NULL(s)) {
-			DBG_P("unknown resid=%d", (int)resid);
+			DBG_P("unknown urid=%d", (int)urid);
 			return TS_EMPTY;
 		}
 	)
 	return s;
 }
 
-#define _FILEIDN(resid) knh_String_tochar(knh_getResourceName(ctx, resid))
+#define _URIDN(urid) knh_String_tochar(knh_getResourceName(ctx, urid))
 
 /* ======================================================================== */
 /* [tPackage] */

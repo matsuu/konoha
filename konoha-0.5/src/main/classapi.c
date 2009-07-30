@@ -1192,10 +1192,9 @@ void knh_Method_init(Ctx *ctx, Method *mtd, int init)
 	b->fproceed  = knh_fmethod_abstract;
 	KNH_INITv(b->mf, konoha_findMethodField0(ctx, TYPE_Any));
 	b->code  = NULL;
-#ifdef KNH_USING_KONOHA_PROF
+	b->urid  = 0;  b->sline = 0;
 	b->prof_count = 0;
 	b->prof_time = 0;
-#endif
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1610,7 +1609,7 @@ void knh_InputStream_init(Ctx *ctx, InputStream *in, int init)
 	b->size    = 0;
 	b->line    = 1;
 	b->prev    = '\n';
-	b->resid   = 0;
+	b->urid   = 0;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2251,7 +2250,7 @@ void knh_Asm_init(Ctx *ctx, Asm *abr, int init)
 	KNH_INITv(b->lstacks, new_Array(ctx, CLASS_String, 8));
 	KNH_INITv(b->finallyStmt, KNH_NULL);
 
-	b->resid = 0;
+	b->urid = 0;
 	b->line = 0;
 	KNH_INITv(b->elf, new_Bytes(ctx, 4096));
 	KNH_INITv(b->dwarf, new_Bytes(ctx, 1024));
@@ -2320,7 +2319,7 @@ void knh_KLRCode_init(Ctx *ctx, KLRCode *o, int init)
 	knh_KLRCode_struct *b = DP(o);
 	b->size = 0;
 	b->code = (knh_code_t*)"";
-	b->resid = 0;
+	b->urid = 0;
 //	b->nsid = 0;
 	b->dwarf = NULL;
 	b->dsize = 0;

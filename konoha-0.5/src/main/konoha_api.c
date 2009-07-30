@@ -110,6 +110,7 @@ KNHAPI(Ctx*) knh_getCurrentContext(void)
 /* ======================================================================== */
 /* [option] */
 
+static int userExperienceProgram = 0;
 static int dumpLevel2 = 0;    // this is -d2 debug mode for konoha itself
 static int debugLevel = 0;
 
@@ -129,7 +130,26 @@ KNHAPI(int) konoha_isSystemDump2(void)
 
 /* ----------------------------------------------------------------------- */
 
-static void konoha_dumpInit(void)
+int knh_isUserExperienceProgram(Ctx *ctx)
+{
+	return (knh_Context_isInteractive(ctx) && userExperienceProgram == 1);
+}
+
+/* ----------------------------------------------------------------------- */
+
+void knh_startUserExperienceProgram(Ctx *ctx)
+{
+	if(userExperienceProgram == 0) {
+		userExperienceProgram = 1;
+		if(knh_Context_isInteractive(ctx)) {
+			knh_printf(ctx, KNH_STDOUT, "\nThank you for joining 'Konoha User Experience Program.'\n");
+		}
+	}
+}
+
+/* ----------------------------------------------------------------------- */
+
+static void knh_dumpInit(void)
 {
 	fprintf(stderr, "sizeof(knh_intptr_t)=%d, sizeof(void*)=%d\n", (int)sizeof(knh_intptr_t), (int)sizeof(void*));
 	KNH_ASSERT(sizeof(knh_intptr_t) == sizeof(void*));
@@ -150,14 +170,21 @@ KNHAPI(int) konoha_parseopt(konoha_t konoha, int argc, char **argv)
 	for(n = 1; n < argc; n++) {
 		char *t = argv[n];
 		if(t[0] != '-') return n;
-		if(t[1] == 's' && t[2] == 0) {
-			knh_Context_setTrusted(konoha.ctx, 1);
-		}
-		else if(t[1] == 'c' && t[2] == 0) {
+//		if(t[1] == 's' && t[2] == 0) {
+//			knh_Context_setTrusted(konoha.ctx, 1);
+//		}
+//		else
+		if(t[1] == 'c' && t[2] == 0) {
 			knh_Context_setCompiling(konoha.ctx, 1);
 		}
 		else if(t[1] == 'v') {
 			knh_Context_setVerbose(konoha.ctx, 1);
+			if(t[2] == '2') {
+				debugLevel = 2;
+				knh_Context_setDebug(konoha.ctx, 1);
+				dumpLevel2 = 2;
+				knh_dumpInit();
+			}
 		}
 		else if(t[1] == 'g' && t[2] == 0) {
 			debugLevel = 1;
@@ -167,9 +194,13 @@ KNHAPI(int) konoha_parseopt(konoha_t konoha, int argc, char **argv)
 			debugLevel = 2;
 			knh_Context_setDebug(konoha.ctx, 1);
 		}
-		else if(t[1] == 'd' && t[2] == '2' && t[3] == 0) {
-			dumpLevel2 = 2;
-			konoha_dumpInit();
+		else if(t[1] == 'x' && t[2] == 0) {
+			if(userExperienceProgram != 0) {
+				userExperienceProgram = 0;
+			}
+			else {
+				userExperienceProgram = 1;
+			}
 		}
 	}
 	return n;
@@ -283,7 +314,7 @@ KNHAPI(void) konoha_evalScript(konoha_t konoha, char *script)
 		{
 			InputStream *in = new_BytesInputStream(ctx, cwb.ba, cwb.pos, knh_Bytes_size(cwb.ba));
 			KNH_LPUSH(ctx, in);
-			DP(in)->resid = knh_getResourceId(ctx, STEXT("(eval)"));
+			DP(in)->urid = knh_getResourceId(ctx, STEXT("(eval)"));
 			DP(in)->line = 0;
 			konohac_eval(ctx, TS_main, in);
 		}
@@ -306,7 +337,7 @@ KNHAPI(void) konoha_readFile(Ctx *ctx, char *fpath)
 	if(knh_InputStream_isClosed(in)) {
 		KNH_WARNING(ctx, "No such script file: %s\n", fpath);
 	}
-	DP(in)->resid = knh_getResourceId(ctx, B(fpath));
+	DP(in)->urid = knh_getResourceId(ctx, B(fpath));
 	knh_InputStream_setEncoding(ctx, in, KNH_ENC);
 	konohac_eval(ctx, (String*)KNH_NULL, in);
 	knh_Context_clearstack(ctx);
@@ -819,13 +850,6 @@ METHOD knh__Script_getLines(Ctx *ctx, knh_sfp_t *sfp)
 
 /* ------------------------------------------------------------------------ */
 
-int knh_getpid()
-{
-	return 0;
-}
-
-/* ------------------------------------------------------------------------ */
-
 static
 void knh_clearScriptLine(Ctx *ctx)
 {
@@ -860,7 +884,7 @@ void knh_clearScriptLine(Ctx *ctx)
 		}
 		fprintf(stdout, "\nOpps!! The server isn't working.\n");
 		fprintf(stdout, "(Don't report the server malfunction. It's a joke.)\n");
-		fprintf(stdout, "More importantly, your script was saved at '%s'\n", buff);
+		fprintf(stdout, "More importantly, your script was saved at '%s'\n\n", buff);
 		fprintf(stdout, "See you.\n");
 		KNH_FINALv(ctx, ((Context*)ctx)->lines);
 		((Context*)ctx)->lines = NULL;
@@ -955,7 +979,7 @@ KNHAPI(void) konoha_shell(konoha_t konoha)
 			{
 				InputStream *in = new_BytesInputStream(ctx, cwb.ba, cwb.pos, knh_Bytes_size(cwb.ba));
 				KNH_MOV(ctx, lsfp[0].o, in);
-				DP(in)->resid = knh_getResourceId(ctx, STEXT("(shell)"));
+				DP(in)->urid = knh_getResourceId(ctx, STEXT("(shell)"));
 				DP(in)->line = linenum;
 				knh_InputStream_setEncoding(ctx, in, KNH_ENC);
 				shellContext = ctx;

@@ -199,9 +199,7 @@ knh_io_t knh_iodrv_open__SOCKET(Ctx *ctx, knh_bytes_t file, char *mode, int isTh
 	}
 	char host_or_ip[128];
 	knh_format_bytes(host_or_ip, sizeof(host_or_ip), urn);
-
 	DBG_P("opening socket host='%s', port=%d", host_or_ip, port);
-	KNH_SECURE(ctx);
 	return (knh_io_t)knh_socket_open(ctx, host_or_ip, port, isThrowable);
 }
 

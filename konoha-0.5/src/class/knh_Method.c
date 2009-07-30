@@ -609,7 +609,7 @@ Method *new_Method_getter(Ctx *ctx, knh_class_t cid, knh_methodn_t mn, knh_type_
 	else if(IS_ubxboolean(type)) {
 		f = knh_fmethod_bgetter;
 	}
-	Method *mtd = new_Method(ctx, KNH_FLAG_MF_GENERATED, cid, mn, f);
+	Method *mtd = new_Method(ctx, /*KNH_FLAG_MF_GENERATED*/0, cid, mn, f);
 	DP(mtd)->delta = idx;
 	KNH_SETv(ctx, DP(mtd)->mf, konoha_findMethodField0(ctx, type));
 	return mtd;
@@ -636,7 +636,7 @@ Method *new_Method_setter(Ctx *ctx, knh_class_t cid, knh_methodn_t mn, knh_type_
 	else if(IS_ubxboolean(type)) {
 		f = knh_fmethod_bsetter;
 	}
-	Method *mtd = new_Method(ctx, KNH_FLAG_MF_GENERATED, cid, mn, f);
+	Method *mtd = new_Method(ctx, /*KNH_FLAG_MF_GENERATED*/0, cid, mn, f);
 	DP(mtd)->delta = idx;
 	KNH_SETv(ctx, DP(mtd)->mf, konoha_findMethodField1(ctx, TYPE_void, type, FIELDN_v));
 	return mtd;

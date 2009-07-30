@@ -36,12 +36,43 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-/* [verbose] */
+/* [password] */
 /* ------------------------------------------------------------------------ */
 
 KNHAPI(char*) knh_getPassword(Ctx *ctx, knh_bytes_t url)
 {
 	return "password";
+}
+
+/* ======================================================================== */
+/* [Trusted] */
+
+KNHAPI(void) knh_stack_checkSecurityManager(Ctx *ctx, knh_sfp_t *sfp)
+{
+	/* VERY SLOW */
+	knh_sfp_t *sp = sfp - 2;
+	while(ctx->stack < sp) {
+		if(IS_Method(sp[0].mtd)) {
+			if(!URID_ISTRUSTED(DP(sp[0].mtd)->urid)) {
+				char buf[FILEPATH_BUFSIZ];
+				knh_snprintf(buf, sizeof(buf), "Security!!: untrusted domain='%s'", URIDN(DP(sp[0].mtd)->urid));
+				KNH_THROWs(ctx, buf);
+			}
+		}
+		sp--;
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+knh_bool_t knh_isTrustedHost(Ctx *ctx, knh_bytes_t host)
+{
+	TODO();
+//	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+//	int res = knh_DictMap_index__b(DP(ctx->sys)->trustedHostDictMap, host);
+//	if(res != -1) return 1;
+//	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+	return 0;
 }
 
 /* ------------------------------------------------------------------------ */
