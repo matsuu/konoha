@@ -211,12 +211,6 @@ METHOD knh__Method_isVarArgs(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 static 
-METHOD knh__Method_isAspect(Ctx *ctx, knh_sfp_t *sfp)
-{
-	KNH_RETURN_Boolean(ctx, sfp, knh_Method_isAspect((knh_Method_t*)sfp[0].o));
-}
-
-static 
 METHOD knh__Mapper_isInterface(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Mapper_isInterface((knh_Mapper_t*)sfp[0].o));
@@ -369,12 +363,6 @@ METHOD knh__Context_setVerbose(Ctx *ctx, knh_sfp_t *sfp)
 {
 	knh_Context_setVerbose((knh_Context_t*)sfp[0].o, p_bool(sfp[1]));
 	KNH_RETURN_void(ctx, sfp);
-}
-
-static 
-METHOD knh__Context_isTrusted(Ctx *ctx, knh_sfp_t *sfp)
-{
-	KNH_RETURN_Boolean(ctx, sfp, knh_Context_isTrusted((knh_Context_t*)sfp[0].o));
 }
 
 static 

@@ -39,11 +39,11 @@ extern "C" {
 /* ======================================================================== */
 /* [constructors] */
 
-Token* new_Token(Ctx *ctx, knh_flag_t flag, knh_resid_t resid, knh_sline_t line, knh_token_t tt)
+Token* new_Token(Ctx *ctx, knh_flag_t flag, knh_urid_t urid, knh_sline_t line, knh_token_t tt)
 {
 	knh_Token_t *o = (Token*)new_Object_bcid(ctx, CLASS_Token, 0);
 	SP(o)->flag =   flag;
-	SP(o)->resid = resid;
+	SP(o)->urid = urid;
 	SP(o)->line =   line;
 	SP(o)->tt   =   tt;
 	return o;
@@ -55,18 +55,18 @@ void knh_Token_setFL(Token *o, Any *fln)
 {
 	if(IS_Token(fln)) {
 		Token *tk = (Token*)fln;
-		SP(o)->resid =  SP(tk)->resid;
+		SP(o)->urid =  SP(tk)->urid;
 		SP(o)->line =  SP(tk)->line;
 	}
 	else if(IS_Asm((Object*)fln)) {
 		Asm *abr = (Asm*)fln;
-		SP(o)->resid =  DP(abr)->resid;
+		SP(o)->urid =  DP(abr)->urid;
 		SP(o)->line =  DP(abr)->line;
 	}
 	else {
 		Stmt *stmt = (Stmt*)fln;
 		KNH_ASSERT(IS_Stmt(stmt));
-		SP(o)->resid =  SP(stmt)->resid;
+		SP(o)->urid =  SP(stmt)->urid;
 		SP(o)->line =  SP(stmt)->line;
 	}
 }

@@ -325,7 +325,7 @@ KNHAPI(Object*) knh_InputStream_readData(Ctx *ctx, InputStream *in, knh_class_t 
 	{
 		InputStream *bin = new_BytesInputStream(ctx, cwb.ba, cwb.pos, knh_Bytes_size(cwb.ba));
 		Object *value = NULL;
-		DP(bin)->resid = knh_getResourceId(ctx, STEXT("(eval)"));
+		DP(bin)->urid = knh_getResourceId(ctx, STEXT("(eval)"));
 		DP(bin)->line = linenum;
 		knh_InputStream_setEncoding(ctx, bin, DP(in)->enc);
 		value = konohac_data(ctx, bin, reqc);

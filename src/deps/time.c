@@ -68,10 +68,24 @@ extern "C" {
 /* ======================================================================== */
 /* [time] */
 
+int knh_getpid(void)
+{
+#if defined(KNH_USING_WINDOWS)
+	return _getpid();
+#elif defined(KNH_USING_POSIX)
+	return getpid();
+#else
+	return 0;
+#endif
+}
+
+/* ======================================================================== */
+/* [time] */
+
 knh_uint_t knh_initseed(void)
 {
 #if defined(KNH_USING_WINDOWS)
-	return (knh_uint_t)time(NULL);
+	return (knh_uint_t)time(NULL) + getpid();
 #elif defined(KNH_USING_POSIX)
 	return (knh_uint_t)time(NULL) + getpid();
 #elif defined(KNH_USING_BTRON)

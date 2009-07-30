@@ -48,7 +48,7 @@ static const char *KERR_MSG[] = {
 
 /* ------------------------------------------------------------------------ */
 
-void knh_vperror(Ctx *ctx, knh_resid_t resid, int line, int pe, char *fmt, va_list ap)
+void knh_vperror(Ctx *ctx, knh_urid_t urid, int line, int pe, char *fmt, va_list ap)
 {
 	KNH_ASSERT(pe <= KERR_INFO);
 	if(knh_Context_isInteractive(ctx)) {
@@ -60,7 +60,7 @@ void knh_vperror(Ctx *ctx, knh_resid_t resid, int line, int pe, char *fmt, va_li
 	L_PRINT:;
 	{
 		OutputStream *w = KNH_STDERR;
-		knh_printf(ctx, w, " - [%s:%d]:%s ", FILEIDN(resid), (knh_intptr_t)line, KERR_MSG[pe]);
+		knh_printf(ctx, w, " - [%s:%d]:%s ", URIDN(urid), (knh_intptr_t)line, KERR_MSG[pe]);
 		knh_vprintf(ctx, w, fmt, ap);
 		knh_write_EOL(ctx, w);
 	}
@@ -68,11 +68,11 @@ void knh_vperror(Ctx *ctx, knh_resid_t resid, int line, int pe, char *fmt, va_li
 
 /* ------------------------------------------------------------------------ */
 
-void knh_perror(Ctx *ctx, knh_resid_t resid, int line, int pe, char *fmt, ...)
+void knh_perror(Ctx *ctx, knh_urid_t urid, int line, int pe, char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
-	knh_vperror(ctx, resid, line, pe, fmt, ap);
+	knh_vperror(ctx, urid, line, pe, fmt, ap);
 	va_end(ap);
 }
 
@@ -83,7 +83,7 @@ void knh_Token_perror(Ctx *ctx, Token *tk, int pe, char *fmt, ...)
 	if(SP(tk)->tt != TT_ERR) {
 		va_list ap;
 		va_start(ap, fmt);
-		knh_vperror(ctx, SP(tk)->resid, SP(tk)->line, pe, fmt, ap);
+		knh_vperror(ctx, SP(tk)->urid, SP(tk)->line, pe, fmt, ap);
 		va_end(ap);
 		if(pe < KERR_EWARN) {
 			SP(tk)->tt = TT_ERR;
@@ -97,7 +97,7 @@ void knh_Asm_perror(Ctx *ctx, Asm *abr, int pe, char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
-	knh_vperror(ctx, DP(abr)->resid, (int)DP(abr)->line, pe, fmt, ap);
+	knh_vperror(ctx, DP(abr)->urid, (int)DP(abr)->line, pe, fmt, ap);
 	va_end(ap);
 }
 
@@ -110,7 +110,7 @@ void knh_Asm_perror(Ctx *ctx, Asm *abr, int pe, char *fmt, ...)
 //void
 //knh_Asm_assert(Ctx *ctx, Asm *abr, int c)
 //{
-//	knh_perror0(ctx, DP(abr)->resid, (int)DP(abr)->line, KMSG_EABORT, NULL);
+//	knh_perror0(ctx, DP(abr)->urid, (int)DP(abr)->line, KMSG_EABORT, NULL);
 //	knh_Asm_setCancelled(abr, 1);
 //}
 //

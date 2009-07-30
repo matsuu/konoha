@@ -259,7 +259,7 @@ static
 int knh_StmtIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 {
 	knh_bytes_t sname = knh_String_tobytes(DP(StmtIMPORT_file(stmt))->text);
-	String *cfname = knh_getResourceName(ctx, SP(stmt)->resid);
+	String *cfname = knh_getResourceName(ctx, SP(stmt)->urid);
 	char bufp[FILEPATH_BUFSIZ], buff[FILEPATH_BUFSIZ];
 	if(knh_String_endsWith(cfname, STEXT(".k"))) {
 		knh_format_parentpath(bufp, sizeof(bufp), knh_String_tobytes(cfname), 1);
@@ -551,7 +551,7 @@ int knh_Stmt_compile(Ctx *ctx, Stmt *stmt, String *nsname, int isEval)
 	KNH_LPUSH(ctx, stmt);
 
 	Stmt *cur = stmt;
-	DP(abr)->resid = SP(stmt)->resid;
+	DP(abr)->urid = SP(stmt)->urid;
 	while(IS_Stmt(cur)) {
 		knh_stmt_t stt = SP(cur)->stt;
 		DP(abr)->line = SP(cur)->line;
@@ -701,7 +701,7 @@ Object *knh_Stmt_toData(Ctx *ctx, Stmt *stmt, knh_class_t reqc)
 static
 Stmt *knh_InputStream_parseStmt(Ctx *ctx, InputStream *in, int isData)
 {
-	Token *tk = new_Token(ctx, 0, DP(in)->resid, 0, knh_char_totoken('{'));
+	Token *tk = new_Token(ctx, 0, DP(in)->urid, 0, knh_char_totoken('{'));
 	KNH_LPUSH(ctx, tk);
 	KNH_LPUSH(ctx, in);
 	knh_Token_parse(ctx, tk, in);
@@ -711,13 +711,13 @@ Stmt *knh_InputStream_parseStmt(Ctx *ctx, InputStream *in, int isData)
 
 /* ------------------------------------------------------------------------ */
 
-Stmt *knh_bytes_parseStmt(Ctx *ctx, knh_bytes_t kscript, int resid, int line)
+Stmt *knh_bytes_parseStmt(Ctx *ctx, knh_bytes_t kscript, int urid, int line)
 {
 	knh_cwb_t cwb = new_cwb(ctx);
 	knh_Bytes_write(ctx, cwb.ba, kscript);
 	knh_Bytes_putc(ctx, cwb.ba, ';');
 	InputStream *in = new_BytesInputStream(ctx, cwb.ba, cwb.pos, knh_Bytes_size(cwb.ba));
-	DP(in)->resid = (knh_resid_t)resid;
+	DP(in)->urid = (knh_urid_t)urid;
 	DP(in)->line = line;
 	Stmt *stmt = knh_InputStream_parseStmt(ctx, in, 0/*isData*/);
 	knh_cwb_clear(cwb);
@@ -799,25 +799,25 @@ void knh_Asm_openlib(Ctx *ctx, Asm *abr, knh_bytes_t fpath)
 /* [loaded] */
 
 static
-void knh_NameSpace_loaded(Ctx *ctx, NameSpace *o, knh_resid_t resid)
+void knh_NameSpace_loaded(Ctx *ctx, NameSpace *o, knh_urid_t urid)
 {
 	KNH_ASSERT(IS_NameSpace(o));
 	if(IS_NULL(DP(o)->lconstDictMap)) {
 		KNH_SETv(ctx, DP(o)->lconstDictMap, new_DictMap0(ctx, 16));
 	}
 	char buf[40];
-	knh_snprintf(buf, sizeof(buf), "_LOADED_%d", (int)resid);
-	knh_DictMap_set(ctx, DP(o)->lconstDictMap, new_String(ctx, B(buf), NULL), UP(knh_getResourceName(ctx, resid)));
+	knh_snprintf(buf, sizeof(buf), "_LOADED_%d", (int)urid);
+	knh_DictMap_set(ctx, DP(o)->lconstDictMap, new_String(ctx, B(buf), NULL), UP(knh_getResourceName(ctx, urid)));
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-int knh_NameSpace_isLoaded(Ctx *ctx, NameSpace *o, knh_resid_t resid)
+int knh_NameSpace_isLoaded(Ctx *ctx, NameSpace *o, knh_urid_t urid)
 {
 	if(IS_NOTNULL(DP(o)->lconstDictMap)) {
 		char buf[40];
-		knh_snprintf(buf, sizeof(buf), "_LOADED_%d", (int)resid);
+		knh_snprintf(buf, sizeof(buf), "_LOADED_%d", (int)urid);
 		return (knh_DictMap_index__b(DP(o)->lconstDictMap, B(buf)) != -1);
 	}
 	return 0;
@@ -827,8 +827,8 @@ int knh_NameSpace_isLoaded(Ctx *ctx, NameSpace *o, knh_resid_t resid)
 
 int knh_NameSpace_loadScript(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isEval)
 {
-	knh_resid_t resid = knh_getResourceId(ctx, fpath);
-	if(knh_NameSpace_isLoaded(ctx, ns, resid)) {
+	knh_urid_t urid = knh_getResourceId(ctx, fpath);
+	if(knh_NameSpace_isLoaded(ctx, ns, urid)) {
 		KNH_WARNING(ctx, "Already imported: %s", (char*)fpath.buf);
 		if(!knh_ask(ctx, "Do you want to reload it [y/N] ?", 0)) {
 			return 1;
@@ -838,7 +838,7 @@ int knh_NameSpace_loadScript(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isE
 		knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 		InputStream *in = new_FileInputStream(ctx, fpath, 1);
 		KNH_LPUSH(ctx, in);
-		DP(in)->resid = resid;
+		DP(in)->urid = urid;
 		knh_InputStream_setEncoding(ctx, in, KNH_ENC);
 		Stmt *stmt = knh_InputStream_parseStmt(ctx, in, 0/*isData*/);
 		KNH_LPUSH(ctx, stmt);
@@ -847,7 +847,7 @@ int knh_NameSpace_loadScript(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isE
 		}
 		knh_Stmt_compile(ctx, stmt, DP(ns)->nsname, isEval);
 		KNH_LOCALBACK(ctx, lsfp);
-		knh_NameSpace_loaded(ctx, ns, resid);
+		knh_NameSpace_loaded(ctx, ns, urid);
 		return 1;
 	}
 }

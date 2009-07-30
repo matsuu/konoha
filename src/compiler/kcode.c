@@ -47,11 +47,11 @@ extern "C" {
 /* ======================================================================== */
 /* [constructors] */
 
-KLRCode* new_KLRCode(Ctx *ctx, knh_resid_t resid, knh_bytes_t elf, knh_bytes_t dwarf)
+KLRCode* new_KLRCode(Ctx *ctx, knh_urid_t urid, knh_bytes_t elf, knh_bytes_t dwarf)
 {
 	knh_KLRCode_t *o = (KLRCode*)new_Object_bcid(ctx, CLASS_KLRCode, 0);
 
-	DP(o)->resid = resid;
+	DP(o)->urid = urid;
 	DP(o)->code = (knh_code_t*)KNH_MALLOC(ctx, KNH_SIZE(elf.len));
 	DP(o)->size = elf.len;
 	knh_memcpy(DP(o)->code, elf.buf, elf.len);
@@ -113,7 +113,7 @@ char *knh_Method_file(Ctx *ctx, Method *mtd)
 		return "(naitive)";
 	}
 	KLRCode *o = (KLRCode*)DP(mtd)->code;
-	return FILEIDN(DP(o)->resid);
+	return URIDN(DP(o)->urid);
 }
 
 /* ------------------------------------------------------------------------ */

@@ -51,21 +51,19 @@ static METHOD knh__System_getIn(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN(ctx, sfp, DP(ctx->sys)->in);
 }
 
-/* ------------------------------------------------------------------------ */
-/* @method[STATIC] void System.setIn(InputStream in) */
-
-static METHOD knh__System_setIn(Ctx *ctx, knh_sfp_t *sfp)
-{
-	if(knh_Context_isTrusted(ctx)) {
-		if(IS_NULL(sfp[1].o)) {
-			KNH_SETv(ctx, DP(ctx->sys)->in, knh_getClassDefaultValue(ctx, CLASS_InputStream));
-		}
-		else {
-			KNH_SETv(ctx, DP(ctx->sys)->in, sfp[1].o);
-		}
-	}
-	KNH_RETURN_void(ctx, sfp);
-}
+///* ------------------------------------------------------------------------ */
+///* @　method[STATIC] void System.setIn(InputStream in) */
+//
+//static METHOD knh__System_setIn(Ctx *ctx, knh_sfp_t *sfp)
+//{
+//	if(IS_NULL(sfp[1].o)) {
+//		KNH_SETv(ctx, DP(ctx->sys)->in, knh_getClassDefaultValue(ctx, CLASS_InputStream));
+//	}
+//	else {
+//		KNH_SETv(ctx, DP(ctx->sys)->in, sfp[1].o);
+//	}
+//	KNH_RETURN_void(ctx, sfp);
+//}
 
 /* ------------------------------------------------------------------------ */
 /* @method[STATIC] OutputStream! System.getOut() */
@@ -75,21 +73,21 @@ static METHOD knh__System_getOut(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN(ctx, sfp, DP(ctx->sys)->out);
 }
 
-/* ------------------------------------------------------------------------ */
-/* @method[STATIC] void System.setOut(OutputStream out) */
-
-static METHOD knh__System_setOut(Ctx *ctx, knh_sfp_t *sfp)
-{
-	if(knh_Context_isTrusted(ctx)) {
-		if(IS_NULL(sfp[1].o)) {
-			KNH_SETv(ctx, DP(ctx->sys)->out, knh_getClassDefaultValue(ctx, CLASS_OutputStream));
-		}
-		else {
-			KNH_SETv(ctx, DP(ctx->sys)->out, sfp[1].o);
-		}
-	}
-	KNH_RETURN_void(ctx, sfp);
-}
+///* ------------------------------------------------------------------------ */
+///* @　method[STATIC] void System.setOut(OutputStream out) */
+//
+//static METHOD knh__System_setOut(Ctx *ctx, knh_sfp_t *sfp)
+//{
+//	if(knh_Context_isTrusted(ctx)) {
+//		if(IS_NULL(sfp[1].o)) {
+//			KNH_SETv(ctx, DP(ctx->sys)->out, knh_getClassDefaultValue(ctx, CLASS_OutputStream));
+//		}
+//		else {
+//			KNH_SETv(ctx, DP(ctx->sys)->out, sfp[1].o);
+//		}
+//	}
+//	KNH_RETURN_void(ctx, sfp);
+//}
 
 /* ------------------------------------------------------------------------ */
 /* @method[STATIC] OutputStream! System.getErr() */
@@ -99,21 +97,21 @@ static METHOD knh__System_getErr(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN(ctx, sfp, DP(ctx->sys)->err);
 }
 
-/* ------------------------------------------------------------------------ */
-/* @method[STATIC] void System.setStdErr(OutputStream out) */
-
-static METHOD knh__System_setErr(Ctx *ctx, knh_sfp_t *sfp)
-{
-	if(knh_Context_isTrusted(ctx)) {
-		if(IS_NULL(sfp[1].o)) {
-			KNH_SETv(ctx, DP(ctx->sys)->err, knh_getClassDefaultValue(ctx, CLASS_OutputStream));
-		}
-		else {
-			KNH_SETv(ctx, DP(ctx->sys)->err, sfp[1].o);
-		}
-	}
-	KNH_RETURN_void(ctx, sfp);
-}
+///* ------------------------------------------------------------------------ */
+///* @　method[STATIC] void System.setStdErr(OutputStream out) */
+//
+//static METHOD knh__System_setErr(Ctx *ctx, knh_sfp_t *sfp)
+//{
+//	if(knh_Context_isTrusted(ctx)) {
+//		if(IS_NULL(sfp[1].o)) {
+//			KNH_SETv(ctx, DP(ctx->sys)->err, knh_getClassDefaultValue(ctx, CLASS_OutputStream));
+//		}
+//		else {
+//			KNH_SETv(ctx, DP(ctx->sys)->err, sfp[1].o);
+//		}
+//	}
+//	KNH_RETURN_void(ctx, sfp);
+//}
 
 /* ------------------------------------------------------------------------ */
 /* @method[STATIC] Boolean! System.hasLib(String! lib, String func) */
@@ -152,11 +150,11 @@ METHOD knh__System_setRandomSeed(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__System_exit(Ctx *ctx, knh_sfp_t *sfp)
 {
-#ifndef KONOHA_ON_LKM
-	knh_intptr_t status = IS_NULL(sfp[1].o) ? 0 : p_int(sfp[1]);
-	KNH_SECURE(ctx);
+#ifndef KNH_USING_STDC
+	int status = IS_NULL(sfp[1].o) ? 0 : p_int(sfp[1]);
+	KNH_SECURE(ctx, sfp);
 	KNH_NOTICE(ctx, "exiting by a user");
-	exit((int)status);
+	exit(status);
 #endif
 	KNH_RETURN_void(ctx, sfp);
 }

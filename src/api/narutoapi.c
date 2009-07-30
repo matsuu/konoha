@@ -62,16 +62,16 @@ METHOD knh__Script_eval(Ctx *ctx, knh_sfp_t *sfp)
 		InputStream *in = new_BytesInputStream(ctx, cwb.ba, cwb.pos, knh_Bytes_size(cwb.ba));
 		KNH_LPUSH(ctx, in);
 		if(IS_NULL(sfp[2].o)) {
-			DP(in)->resid = knh_getResourceId(ctx, STEXT("(eval)"));
+			DP(in)->urid = knh_getResourceId(ctx, STEXT("(eval)"));
 		}
 		else {
-			DP(in)->resid = knh_getResourceId(ctx, knh_String_tobytes(sfp[2].s));
+			DP(in)->urid = knh_getResourceId(ctx, knh_String_tobytes(sfp[2].s));
 		}
 		if(IS_NULL(sfp[3].o)) {
 			DP(in)->line = 0;
 		}
 		else {
-			DP(in)->resid = (knh_resid_t)p_int(sfp[3]);
+			DP(in)->urid = (knh_urid_t)p_int(sfp[3]);
 		}
 		konohac_eval(ctx, TS_main, in);
 		knh_cwb_clear(cwb);

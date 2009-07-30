@@ -564,7 +564,7 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
         return new_Token__NAME(ctx, flag, in, t);
     }
     else {
-        Token *tk = new_Token(ctx, flag, DP(in)->resid, DP(in)->line, tt);
+        Token *tk = new_Token(ctx, flag, DP(in)->urid, DP(in)->line, tt);
         if(tt == TT_METAN) {
             KNH_SETv(ctx, DP(tk)->data, new_String(ctx, t, NULL));
         }

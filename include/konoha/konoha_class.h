@@ -460,22 +460,19 @@ typedef struct knh_MethodField_t {
 /* @flag Method.NullBase MF DP((Method*)%s)->flag 'is:*:is:*' */
 /* @flag Method.VarArgs MF DP((Method*)%s)->flag 'is:set:is:*' */
 /* @flag Method.Generator MF DP((Method*)%s)->flag 'is:set:*:*' */
-/* @flag Method.Aspect MF DP((Method*)%s)->flag 'is:set:is:*' */
+/* @flag Method.Aspect MF DP((Method*)%s)->flag 'is:set:*:*' */
 /* @flag Method.ObjectCode MF DP((Method*)%s)->flag 'is:set:*:*' */
-/* @flag Method.Generated MF DP((Method*)%s)->flag 'is:set:*:*' */
-
-typedef knh_uint64_t   knh_proftime_t;
+/* @flag Method.Hidden MF DP((Method*)%s)->flag 'is:set:*:*' */
 
 typedef struct {
-	knh_flag_t     flag;  knh_class_t    cid;
-	knh_methodn_t  mn;    knh_ushort_t   delta;
+	knh_flag_t     flag;  knh_ushort_t   delta;
+	knh_class_t    cid;   knh_methodn_t  mn;
 	struct knh_MethodField_t* mf;
 	knh_fmethod       fproceed;
 	void*             code;
-#ifdef KNH_USING_KONOHA_PROF
-	knh_uintptr_t     prof_count;  /*recode how many times called */
-	knh_proftime_t    prof_time;   /*recode how long spending */
-#endif
+	knh_urid_t     urid;  knh_urid_t    sline;
+	knh_uintptr_t    prof_count;  /*recode how many times called */
+	knh_uintptr_t    prof_time;   /*recode how long spending */
 } knh_Method_struct;
 
 /* ------------------------------------------------------------------------ */
@@ -665,7 +662,7 @@ typedef struct knh_InputStream {
 	knh_String_t *enc;
 	struct knh_BytesConv_t* bconv;
 	knh_String_t*  urn;
-	knh_resid_t  resid;
+	knh_urid_t  urid;
 	knh_ushort_t  prev;
 	size_t line;
 	size_t size;
@@ -855,7 +852,6 @@ typedef struct knh_System {
 /* @flag Context.Debug  CTXF ((Context*)%s)->flag 'is:set:is:set' */
 /* @flag Context.Verbose CTXF ((Context*)%s)->flag 'is:set:is:set' */
 
-/* @flag Context.Trusted CTXF ((Context*)%s)->flag 'is:set:is:*' */
 /* @flag Context.Interactive CTXF ((Context*)%s)->flag 'is:set:is:*' */
 /* @flag Context.Compiling CTXF ((Context*)%s)->flag 'is:set:*:*' */
 
@@ -1061,7 +1057,7 @@ typedef struct knh_Asm {
 	knh_Array_t*          lstacks;
 	struct knh_Stmt_t*    finallyStmt;
 
-	knh_resid_t           resid;
+	knh_urid_t           urid;
 	knh_sline_t            line;
 	struct knh_Bytes_t* elf;
 	struct knh_Bytes_t* dwarf;
@@ -1086,7 +1082,7 @@ typedef struct {
 typedef struct knh_KLRCode {
 	knh_code_t* code;
 	size_t size;
-	knh_resid_t resid;
+	knh_urid_t urid;
 //	knh_nsid_t nsid;
 	knh_dwarf_t* dwarf;
 	size_t dsize;
