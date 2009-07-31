@@ -100,7 +100,7 @@ METHOD System_getPPid(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD System_kill(Ctx *ctx, knh_sfp_t *sfp)
 {
-    KNH_SECURE(ctx);
+  KNH_SECURE(ctx,sfp);
     if(kill(p_int(sfp[1]), p_int(sfp[2])) == -1) {
         KNH_PERRNO(ctx, "OS!!", "kill", knh_Context_isStrict(ctx));
     }
@@ -112,7 +112,7 @@ METHOD System_kill(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD System_system(Ctx *ctx, knh_sfp_t *sfp)
 {
-//    KNH_SECURE(ctx);
+    KNH_SECURE(ctx,sfp);
     int ret = system(p_char(sfp[1]));
     if(ret  == -1) {
         KNH_PERRNO(ctx, "OS!!", "system", knh_Context_isStrict(ctx));
@@ -132,30 +132,6 @@ METHOD System_sleep(Ctx *ctx, knh_sfp_t *sfp)
 
 /* ======================================================================== */
 /* [FILESYSTEM] */
-
-/* ------------------------------------------------------------------------ */
-/* @method String[] System.listDir(String dirname) */
-
-METHOD System_listDir(Ctx *ctx, knh_sfp_t *sfp)
-{
-	DIR *dirptr;
-	struct dirent *direntp;
-	char dirname[FILEPATH_BUFSIZ];
-	knh_format_ospath(ctx, dirname, sizeof(dirname), knh_StringNULL_tobytes(sfp[1].s, STEXT(".")));
-	Array *a = new_Array(ctx, CLASS_String, 0);
-
-	if ((dirptr = opendir(dirname)) == NULL) {
-		KNH_PERRNO(ctx, "OS!!", "opendir", knh_Context_isStrict(ctx));
-	} else {
-		while ((direntp = readdir(dirptr)) != NULL) {
-			char *p = direntp->d_name;
-			if(p[0] == '.' && (p[1] == 0 || p[1] == '.')) continue;
-			knh_Array_add(ctx, a, UP(new_String(ctx, B(p), NULL)));
-		}
-		closedir(dirptr);
-	}
-	KNH_RETURN(ctx, sfp, a);
-}
 
 /* ------------------------------------------------------------------------ */
 // >>> String! System.getCwd();
@@ -180,7 +156,7 @@ METHOD System_getCwd(Ctx *ctx, knh_sfp_t *sfp)
 METHOD System_chDir(Ctx *ctx, knh_sfp_t *sfp)
 {
     char dirname[FILEPATH_BUFSIZ];
-    knh_format_ospath(ctx, dirname, sizeof(dirname), knh_StringNULL_tobytes(sfp[1].s, STEXT(".")));
+    knh_format_ospath(ctx, dirname, sizeof(dirname), knh_String_tobytes(sfp[1].s));
     if(chdir(dirname) == -1) {
         KNH_PERRNO(ctx, "OS!!", "chdir", knh_Context_isStrict(ctx));
     }
@@ -196,7 +172,7 @@ knh_io_t knh_iodrv_open__PIPE(Ctx *ctx, knh_bytes_t file, char *mode, int isThro
     char *cmd = (char*)knh_bytes_skipscheme(file).buf;
     FILE *fp = NULL;
     KNH_WARNING(ctx, "opening pipe '%s'", cmd);
-    KNH_SECURE(ctx);
+    //KNH_SECURE(ctx);
     if(mode != NULL && mode[0] == 'r') {
         fp = popen(cmd, "r");
     }
