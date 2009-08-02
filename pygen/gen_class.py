@@ -273,11 +273,11 @@ def gen_class_h(bdir, data):
 			if c.cname == 'Mapper':   op = '\tknh_fmapper fmap_1;\n'
 			if c.cname == 'Iterator': op = '\tknh_fitrnext fnext_1;\n'
 			if c.cname == 'Closure': op = '\tknh_fmethod finvoke_1;\n\tknh_fmethod fcallcc_2;\n'
-			if c.cname == 'Token':    op = '\tknh_urid_t urid;\n\tknh_ushort_t line;\n\tknh_flag_t flag;\n\tknh_token_t  tt;\n'
-			if c.cname == 'Stmt':     op = '\tknh_urid_t urid;\n\tknh_ushort_t line;\n\tknh_flag_t flag;\n\tknh_stmt_t  stt;\n'
-			if c.cname == 'Asm':    op = '\tknh_urid_t urid;\n\tknh_ushort_t line;\n'
-			if c.cname == 'KLRCode':     op = '\tknh_urid_t urid;\n\tknh_ushort_t line;\n'
-			#if c.cname == 'Asm': op = '\tknh_urid_t urid;\n\tknh_ushort_t line;\n\tknh_flag_t flag;\n\tknh_ushort_t dummy;\n'
+			if c.cname == 'Token':    op = '\tknh_uri_t uri;\n\tknh_ushort_t line;\n\tknh_flag_t flag;\n\tknh_token_t  tt;\n'
+			if c.cname == 'Stmt':     op = '\tknh_uri_t uri;\n\tknh_ushort_t line;\n\tknh_flag_t flag;\n\tknh_stmt_t  stt;\n'
+			if c.cname == 'Asm':    op = '\tknh_uri_t uri;\n\tknh_ushort_t line;\n'
+			if c.cname == 'KLRCode':     op = '\tknh_uri_t uri;\n\tknh_ushort_t line;\n'
+			#if c.cname == 'Asm': op = '\tknh_uri_t uri;\n\tknh_ushort_t line;\n\tknh_flag_t flag;\n\tknh_ushort_t dummy;\n'
 			f.write('''
 typedef struct knh_%s_t {
 \tknh_hObject_t h;

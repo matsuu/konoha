@@ -471,7 +471,7 @@ typedef struct {
 	struct knh_MethodField_t* mf;
 	knh_fmethod       fproceed;
 	void*             code;
-	knh_urid_t     urid;  knh_urid_t    sline;
+	knh_uri_t     uri;  knh_uri_t    sline;
 	knh_uintptr_t    prof_count;  /*recode how many times called */
 	knh_uintptr_t    prof_time;   /*recode how long spending */
 } knh_Method_struct;
@@ -663,7 +663,7 @@ typedef struct knh_InputStream {
 	knh_String_t *enc;
 	struct knh_BytesConv_t* bconv;
 	knh_String_t*  urn;
-	knh_urid_t  urid;
+	knh_uri_t  uri;
 	knh_ushort_t  prev;
 	size_t line;
 	size_t size;
@@ -1062,7 +1062,7 @@ typedef struct knh_Asm {
 	knh_Array_t*          lstacks;
 	struct knh_Stmt_t*    finallyStmt;
 
-	knh_urid_t           urid;
+	knh_uri_t           uri;
 	knh_sline_t            line;
 	struct knh_Bytes_t* elf;
 	struct knh_Bytes_t* dwarf;
@@ -1087,7 +1087,7 @@ typedef struct {
 typedef struct knh_KLRCode {
 	knh_code_t* code;
 	size_t size;
-	knh_urid_t urid;
+	knh_uri_t uri;
 //	knh_nsid_t nsid;
 	knh_dwarf_t* dwarf;
 	size_t dsize;

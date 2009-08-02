@@ -41,7 +41,7 @@
 #include<dlfcn.h>
 #include<time.h>
 #include<sys/time.h>
-
+#include<sys/param.h>
 #ifdef KONOHA_ON_MACOSX
 #include <mach-o/dyld.h>
 #endif
@@ -210,12 +210,19 @@ char* knh_cwb_ospath(Ctx *ctx, knh_cwb_t* cwb)
 char* knh_cwb_realpath(Ctx *ctx, knh_cwb_t *cwb)
 {
 	char *p = knh_cwb_tochar(ctx, cwb);
+#if defined(PATH_MAX)
+	char buf[PATH_MAX];
+#else
+	char *buf = NULL;
+#endif
 #if defined(KNH_USING_POSIX)
-	p = realpath(p, NULL);
+	p = realpath(p, buf);
 	if(p != NULL) {
 		knh_cwb_subclear(cwb, 0);
 		knh_Bytes_write(ctx, cwb->ba, B(p));
+#if defined(PATH_MAX)
 		free(p);
+#endif
 		p = knh_cwb_tochar(ctx, cwb);
 	}
 #else
@@ -504,9 +511,10 @@ void knh_System_initPath(Ctx *ctx, System *o)
 	}
 #elif defined(KONOHA_ON_MACOSX)
 	{
+		char buf[PATH_MAX];
 		char *s = (char*)_dyld_get_image_name(0);
-		s = realpath(s, NULL);
-		knh_cwb_write(ctx, cwb, B(s));
+		s = realpath(s, buf);
+		knh_cwb_write(ctx, cwb, B(buf));
 		knh_DictMap_set(ctx, sys->props,
 			T("konoha.bin.path"), UP(new_String__cwb(ctx, cwb)));
 		if(homepath == NULL) {
@@ -517,7 +525,7 @@ void knh_System_initPath(Ctx *ctx, System *o)
 			knh_DictMap_set(ctx, sys->props,
 				T("konoha.path"), UP(new_String__cwb(ctx, cwb)));
 		}
-		free(s);
+		//free(s);
 	}
 #else
 	homepath = "/konoha"

@@ -213,7 +213,7 @@ knh_cwb_t *knh_cwb_openinit(Ctx* ctx, knh_cwb_t *cwb, knh_bytes_t t)
 	cwb->ba = ctx->bufa;
 	cwb->w  = ctx->bufw;
 	cwb->pos = knh_Bytes_size(ctx->bufa);
-	KNH_ASSERT(t.buf < cwb->ba->buf || (cwb->ba->buf + cwb->pos) < t.buf);
+	KNH_ASSERT(!(cwb->ba->buf <= t.buf && t.buf < (cwb->ba->buf + cwb->pos)));
 	knh_Bytes_write(ctx, (cwb->ba), t);
 	return cwb;
 }
@@ -229,7 +229,7 @@ void knh_cwb_putc(Ctx *ctx, knh_cwb_t *cwb, int ch)
 
 void knh_cwb_write(Ctx *ctx, knh_cwb_t *cwb, knh_bytes_t t)
 {
-	KNH_ASSERT(t.buf < cwb->ba->buf || (cwb->ba->buf + cwb->pos) < t.buf);
+	KNH_ASSERT(!(cwb->ba->buf <= t.buf && t.buf < (cwb->ba->buf + cwb->pos)));
 	knh_Bytes_write(ctx, (cwb->ba), t);
 }
 
