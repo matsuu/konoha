@@ -365,6 +365,7 @@ Ctx *knh_createRootContext(size_t stacksize)
 	Ctx *ctx = new_Context0(NULL);
 	knh_initSharedData((Context*)ctx);
 	knh_Context_initCommon(ctx, (Context*)ctx, stacksize);
+	knh_System_initPath(ctx, ctx->sys);
 	return ctx;
 }
 

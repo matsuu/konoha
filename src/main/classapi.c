@@ -2013,7 +2013,6 @@ void knh_System_init(Ctx *ctx, System *o, int init)
 	KNH_INITv(sys->NameSpaceTableDictMap, new_DictMap0(ctx, 8));
 	KNH_INITv(sys->URNAliasDictMap, new_DictMap0(ctx, 8));
 	KNH_INITv(sys->UsingResources, new_Array0(ctx, 0));
-	knh_System_initPath(ctx, o);
 	//KNH_INITv(sys->sysnsDictMap_UNUSED, new_DictMap0(ctx, 16));
 	//KNH_INITv(sys->funcDictSet_UNUSED, new_DictSet(ctx, 16));
 }
@@ -2039,7 +2038,7 @@ static void knh_System_traverse(Ctx *ctx, System *o, knh_ftraverse ftr)
 	ftr(ctx, UP(sys->MethodFieldHashMap));
 	ftr(ctx, UP(sys->NameSpaceTableDictMap));
 	ftr(ctx, UP(sys->URNAliasDictMap));
-	ftr(ctx, UP(sys->homeDir));
+
 	ftr(ctx, UP(sys->DriversTableDictSet));
 	ftr(ctx, UP(sys->SpecFuncDictSet));
 	ftr(ctx, UP(sys->UsingResources));

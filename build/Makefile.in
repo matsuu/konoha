@@ -90,9 +90,9 @@ am_libkonoha_la_OBJECTS = anyapi.lo arrayapi.lo bytesapi.lo dbapi.lo \
 	thread.lo time.lo mt19937-64.lo mt19937ar.lo qsort.lo \
 	strerror.lo codetemplate.lo fibo.lo konoha_klr_.lo konohac_.lo \
 	method_.lo konohadev_main.lo b4.lo classapi.lo exports.lo \
-	glue.lo knh_cwb_t.lo konoha_api.lo konoha_ext.lo logging.lo \
-	memory.lo metadata.lo objectdbms.lo security.lo stack.lo \
-	system.lo systemtable.lo typesystem.lo
+	glue.lo konoha_api.lo konoha_ext.lo logging.lo memory.lo \
+	metadata.lo objectdbms.lo security.lo stack.lo system.lo \
+	systemtable.lo typesystem.lo
 libkonoha_la_OBJECTS = $(am_libkonoha_la_OBJECTS)
 libkonoha_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -299,13 +299,12 @@ libkonoha_la_SOURCES = ../src/api/anyapi.c ../src/api/arrayapi.c \
 	../src/gen/konoha_klr_.c ../src/gen/konohac_.c \
 	../src/gen/method_.c ../src/konohadev_main.c ../src/labs/b4.c \
 	../src/main/classapi.c ../src/main/exports.c \
-	../src/main/glue.c ../src/main/knh_cwb_t.c \
-	../src/main/konoha_api.c ../src/main/konoha_ext.c \
-	../src/main/logging.c ../src/main/memory.c \
-	../src/main/metadata.c ../src/main/objectdbms.c \
-	../src/main/security.c ../src/main/stack.c \
-	../src/main/system.c ../src/main/systemtable.c \
-	../src/main/typesystem.c
+	../src/main/glue.c ../src/main/konoha_api.c \
+	../src/main/konoha_ext.c ../src/main/logging.c \
+	../src/main/memory.c ../src/main/metadata.c \
+	../src/main/objectdbms.c ../src/main/security.c \
+	../src/main/stack.c ../src/main/system.c \
+	../src/main/systemtable.c ../src/main/typesystem.c
 libkonoha_la_includedir = $(includedir)
 libkonoha_la_include_HEADERS = ../include/konoha.h
 libkonoha_la_includekonohadir = $(includedir)/../include/konoha
@@ -559,7 +558,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_String_mbytes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_System.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_bytes_t.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_cwb_t.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_type_t.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_write.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/konoha.Po@am__quote@
@@ -1126,13 +1124,6 @@ glue.lo: ../src/main/glue.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/glue.c' object='glue.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o glue.lo `test -f '../src/main/glue.c' || echo '$(srcdir)/'`../src/main/glue.c
-
-knh_cwb_t.lo: ../src/main/knh_cwb_t.c
-@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_cwb_t.lo -MD -MP -MF $(DEPDIR)/knh_cwb_t.Tpo -c -o knh_cwb_t.lo `test -f '../src/main/knh_cwb_t.c' || echo '$(srcdir)/'`../src/main/knh_cwb_t.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/knh_cwb_t.Tpo $(DEPDIR)/knh_cwb_t.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/knh_cwb_t.c' object='knh_cwb_t.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_cwb_t.lo `test -f '../src/main/knh_cwb_t.c' || echo '$(srcdir)/'`../src/main/knh_cwb_t.c
 
 konoha_api.lo: ../src/main/konoha_api.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT konoha_api.lo -MD -MP -MF $(DEPDIR)/konoha_api.Tpo -c -o konoha_api.lo `test -f '../src/main/konoha_api.c' || echo '$(srcdir)/'`../src/main/konoha_api.c

@@ -88,7 +88,6 @@ libkonoha_la_SOURCES += ../src/labs/b4.c
 libkonoha_la_SOURCES += ../src/main/classapi.c
 libkonoha_la_SOURCES += ../src/main/exports.c
 libkonoha_la_SOURCES += ../src/main/glue.c
-libkonoha_la_SOURCES += ../src/main/knh_cwb_t.c
 libkonoha_la_SOURCES += ../src/main/konoha_api.c
 libkonoha_la_SOURCES += ../src/main/konoha_ext.c
 libkonoha_la_SOURCES += ../src/main/logging.c
