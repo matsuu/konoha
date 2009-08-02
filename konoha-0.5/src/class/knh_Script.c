@@ -71,7 +71,7 @@ Script *new_Script(Ctx *ctx, knh_bytes_t nsname)
 	knh_setClassDefaultValue(ctx, cid, UP(o), NULL);
 
 	Method *mtd = new_Method(ctx, 0, cid, METHODN_lambda, NULL);
-	KNH_SETv(ctx, DP(mtd)->mf, konoha_findMethodField0(ctx, TYPE_Any));
+	KNH_SETv(ctx, DP(mtd)->mf, knh_findMethodField0(ctx, TYPE_Any));
 	knh_Class_addMethod(ctx, cid, mtd);
 	return o;
 }
@@ -117,7 +117,7 @@ knh_sfp_t *knh_invokeScriptFunc(Ctx *ctx, char *fmt, va_list args)
 		knh_methodn_t mn = knh_getmn(ctx, fname, METHODN_NONAME);
 		NameSpace *ns = ctx->share->mainns;
 		Script *scr = knh_NameSpace_getScript(ctx, ns);
-		Method *mtd = konoha_lookupMethod(ctx, knh_Object_cid(scr), mn);
+		Method *mtd = knh_lookupMethod(ctx, knh_Object_cid(scr), mn);
 		int n = knh_stack_vpush(ctx, lsfp + 1, fmt, args);
 		KNH_MOV(ctx, lsfp[2].o, scr);
 		KNH_SCALL(ctx, lsfp, 1, mtd, /* args*/ n);

@@ -167,7 +167,7 @@ void knh_write_floatx(Ctx *ctx, OutputStream *w, ClassSpec *u, knh_float_t v);
 void knh_ClassSpec_reuse(Ctx *ctx, ClassSpec *u, knh_class_t cid);
 knh_bytes_t knh_getURNAlias(Ctx *ctx, knh_bytes_t aurn);
 ClassSpec *knh_getClassSpec(Ctx *ctx, knh_class_t cid);
-knh_class_t konoha_findcidx(Ctx *ctx, knh_bytes_t lname);
+knh_class_t knh_findcidx(Ctx *ctx, knh_bytes_t lname);
 /* ../src/class/knh_Closure.c */
 METHOD knh__Closure_invoke(Ctx *ctx, knh_sfp_t *sfp);
 int knh_stack_vpush(Ctx *ctx, knh_sfp_t *sfp, const char *fmt, va_list args);
@@ -271,7 +271,7 @@ void knh_addMapperFunc(Ctx *ctx, knh_flag_t flag, knh_type_t stype, knh_type_t t
 MAPPER knh_Mapper_fasis(Ctx *ctx, knh_sfp_t *sfp);
 MAPPER knh_fmapper_null(Ctx *ctx, knh_sfp_t *sfp);
 knh_bool_t knh_Mapper_isNoSuchMapping(Mapper *mpr);
-Mapper *konoha_findMapper_(Ctx *ctx, knh_class_t scid, knh_class_t tcid, int isgen);
+Mapper *knh_findMapper_(Ctx *ctx, knh_class_t scid, knh_class_t tcid, int isgen);
 /* ../src/class/knh_Method.c */
 MethodField* new_MethodField(Ctx *ctx, knh_type_t rtype, size_t psize);
 knh_hcode_t knh_mparam_hcode(knh_hcode_t h, knh_type_t type, knh_fieldn_t fn);
@@ -298,11 +298,11 @@ int knh_Method_canWeave(Ctx *ctx, Method *mtd, Method *aspect);
 void knh_Method_weave(Ctx *ctx, Method *aspect, Method *mtd);
 void knh_Class_addMethod(Ctx *ctx, knh_class_t cid, Method *mtd);
 void knh_addMethodFieldTable(Ctx *ctx, MethodField *mf);
-MethodField *konoha_findMethodField0(Ctx *ctx, knh_type_t rtype);
-MethodField *konoha_findMethodField1(Ctx *ctx, knh_type_t rtype, knh_type_t p1, knh_fieldn_t fn1);
+MethodField *knh_findMethodField0(Ctx *ctx, knh_type_t rtype);
+MethodField *knh_findMethodField1(Ctx *ctx, knh_type_t rtype, knh_type_t p1, knh_fieldn_t fn1);
 Method* knh_Class_getMethod__(Ctx *ctx, knh_class_t this_cid, knh_methodn_t mn, knh_bool_t gen);
-Method *konoha_lookupMethod(Ctx *ctx, knh_class_t cid, knh_methodn_t mn);
-Method *konoha_lookupFormatter(Ctx *ctx, knh_class_t cid, knh_methodn_t mn);
+Method *knh_lookupMethod(Ctx *ctx, knh_class_t cid, knh_methodn_t mn);
+Method *knh_lookupFormatter(Ctx *ctx, knh_class_t cid, knh_methodn_t mn);
 /* ../src/class/knh_NameSpace.c */
 NameSpace* new_NameSpace(Ctx *ctx, String *nsname);
 void knh_NameSpace_importNameSpace(Ctx *ctx, NameSpace *ns, NameSpace *other);

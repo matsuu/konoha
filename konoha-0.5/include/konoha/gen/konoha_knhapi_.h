@@ -76,8 +76,8 @@ extern "C" {
 	}\
 
 
-#define konoha_findMapper(ctx, scid, tcid) konoha_findMapper_(ctx, scid, tcid, 1)
-#define knh_Class_getMapper(ctx, scid, tcid)  konoha_findMapper_(ctx, scid, tcid, 0)
+#define knh_findMapper(ctx, scid, tcid) knh_findMapper_(ctx, scid, tcid, 1)
+#define knh_Class_getMapper(ctx, scid, tcid)  knh_findMapper_(ctx, scid, tcid, 0)
 #define knh_Method_mn(mtd)    DP(mtd)->mn
 #define knh_Method_mf(mtd)    DP(mtd)->mf
 #define knh_MethodField_rztype(mf)   ((mf)->rtype)
@@ -196,7 +196,7 @@ KNHAPI(Iterator*) new_Iterator(Ctx *ctx, knh_class_t p1, Any *source, knh_fitrne
 KNHAPI(Iterator*) new_GlueIterator(Ctx *ctx, knh_class_t p1, void *ref, knh_fitrnext fnext, knh_ffree ffree);
 KNHAPI(Mapper*) new_Mapper(Ctx *ctx, knh_flag_t flag, knh_class_t scid, knh_class_t tcid, knh_fmapper fmap, Object *mapdata);
 KNHAPI(void) knh_addMapper(Ctx *ctx, Mapper *mpr);
-KNHAPI(knh_class_t) konoha_findcid(Ctx *ctx, knh_bytes_t lname);
+KNHAPI(knh_class_t) knh_findcid(Ctx *ctx, knh_bytes_t lname);
 KNHAPI(Int*) new_Int(Ctx *ctx, knh_int_t value);
 KNHAPI(Int*) new_IntX__fast(Ctx *ctx, knh_class_t cid, knh_int_t value);
 KNHAPI(Int*) new_IntX(Ctx *ctx, knh_class_t cid, knh_int_t value);

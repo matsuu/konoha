@@ -78,7 +78,7 @@ ClassSpec *unit_Temperature(Ctx *ctx, knh_bytes_t urn)
 	}
 	else if(ISB(t, "MyRoom")) {
 		ClassSpec *u = new_Vocab(ctx, "", urn, 0, MyRoom);
-		knh_class_t scid = konoha_findcid(ctx, STEXT("Float{http://konoha/Temperature/Celsius}"));
+		knh_class_t scid = knh_findcid(ctx, STEXT("Float{http://konoha/Temperature/Celsius}"));
 		Mapper *mpr = new_Mapper(ctx,
 				KNH_FLAG_MMF_TOTAL|KNH_FLAG_MMF_CONST|KNH_FLAG_MMF_FINAL, scid, DP(u)->ucid,
 				knh_fmapper_myroom, (Object*)u);

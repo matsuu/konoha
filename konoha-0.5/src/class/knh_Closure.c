@@ -201,7 +201,7 @@ Closure* new_ClosureDEFAULT(Ctx *ctx, knh_type_t rtype, knh_class_t cid)
 	Closure *cc = (Closure*)new_Object_init(ctx, FLAG_Closure, cid, 0);
 	Method *mtd = new_Method(ctx, 0, cid, METHODN_lambda, knh_fmethod_closureDEFAULT);
 	KNH_INITv((cc)->mtd, mtd);
-	KNH_SETv(ctx, DP(mtd)->mf, konoha_findMethodField0(ctx, rtype));
+	KNH_SETv(ctx, DP(mtd)->mf, knh_findMethodField0(ctx, rtype));
 	knh_Method_setVarArgs(mtd, 1);
 	KNH_INITv((cc)->base, KNH_NULL);
 	(cc)->envsfp = NULL;

@@ -1190,7 +1190,7 @@ void knh_Method_init(Ctx *ctx, Method *mtd, int init)
 	b->cid    = CLASS_Object;
 	b->mn     = METHODN_NONAME;
 	b->fproceed  = knh_fmethod_abstract;
-	KNH_INITv(b->mf, konoha_findMethodField0(ctx, TYPE_Any));
+	KNH_INITv(b->mf, knh_findMethodField0(ctx, TYPE_Any));
 	b->code  = NULL;
 	b->uri  = 0;  b->sline = 0;
 	b->prof_count = 0;
@@ -2510,7 +2510,7 @@ extern "C" {
 /* ======================================================================== */
 /* [load] */
 
-char *konoha_geStructTableName(Ctx *ctx, knh_struct_t sid)
+char *knh_getStructTableName(Ctx *ctx, knh_struct_t sid)
 {
 	if(sid < (sizeof(StructName) / sizeof(char*))) {
 		return StructName[sid];

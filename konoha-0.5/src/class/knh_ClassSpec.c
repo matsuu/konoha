@@ -503,7 +503,7 @@ KNHAPI(ClassSpec*) new_Vocab(Ctx *ctx, char *tag, knh_bytes_t urn, int base, cha
 //KNHAPI(void) knh_addVocabularyMapper(Ctx *ctx, knh_class_t scid, char *text)
 //{
 //	KNH_ASSERT_cid(scid);
-//	knh_class_t tcid = konoha_findcid(ctx, B(text));
+//	knh_class_t tcid = knh_findcid(ctx, B(text));
 //
 //	if(tcid != CLASS_unknown || ctx->share->ClassTable[tcid].bcid != tcid) {
 ////		ClassSpec *u = knh_getClassSpec(ctx, scid].cspec;
@@ -734,7 +734,7 @@ knh_class_t knh_addSpecializedType(Ctx *ctx, knh_class_t cid, knh_class_t bcid, 
 /* ------------------------------------------------------------------------ */
 
 static
-ClassSpec* konoha_findClassSpecNULL(Ctx *ctx, knh_bytes_t lname)
+ClassSpec* knh_findClassSpecNULL(Ctx *ctx, knh_bytes_t lname)
 {
 	knh_index_t loc = knh_bytes_index(lname, '{');
 	if(loc != -1) {
@@ -761,9 +761,9 @@ ClassSpec* konoha_findClassSpecNULL(Ctx *ctx, knh_bytes_t lname)
 
 /* ------------------------------------------------------------------------ */
 
-knh_class_t konoha_findcidx(Ctx *ctx, knh_bytes_t lname)
+knh_class_t knh_findcidx(Ctx *ctx, knh_bytes_t lname)
 {
-	ClassSpec *u = 	konoha_findClassSpecNULL(ctx, lname);
+	ClassSpec *u = 	knh_findClassSpecNULL(ctx, lname);
 	if(u != NULL) {
 		knh_index_t loc = knh_bytes_index(lname, '{');
 		knh_class_t bcid = knh_getcid(ctx, knh_bytes_first(lname, loc));

@@ -51,7 +51,7 @@ MAPPER knh_fmapper_method(Ctx *ctx, knh_sfp_t *sfp)
 /* ------------------------------------------------------------------------ */
 
 static
-knh_fmapper konoha_findMapperFunc(Ctx *ctx, Object *mapdata, knh_class_t scid, knh_class_t tcid)
+knh_fmapper knh_findMapperFunc(Ctx *ctx, Object *mapdata, knh_class_t scid, knh_class_t tcid)
 {
 	if(IS_Method(mapdata)) return knh_fmapper_method;
 	return knh_fmapper_null;
@@ -73,7 +73,7 @@ KNHAPI(Mapper*) new_Mapper(Ctx *ctx, knh_flag_t flag, knh_class_t scid, knh_clas
 	DP(o)->scid = scid;
 	DP(o)->tcid = tcid;
 	if(fmap == NULL) {
-		o->fmap_1 = konoha_findMapperFunc(ctx, mapdata, scid, tcid);
+		o->fmap_1 = knh_findMapperFunc(ctx, mapdata, scid, tcid);
 		KNH_ASSERT(fmap != NULL);
 	}else {
 		o->fmap_1 = fmap;
@@ -227,10 +227,10 @@ knh_bool_t knh_Mapper_isNoSuchMapping(Mapper *mpr)
 
 /* ======================================================================== */
 
-#define _konoha_findMapper(ctx, scid, tcid) konoha_findMapper_(ctx, scid, tcid, 1)
-#define _knh_Class_getMapper(ctx, scid, tcid)  konoha_findMapper_(ctx, scid, tcid, 0)
+#define _knh_findMapper(ctx, scid, tcid) knh_findMapper_(ctx, scid, tcid, 1)
+#define _knh_Class_getMapper(ctx, scid, tcid)  knh_findMapper_(ctx, scid, tcid, 0)
 
-Mapper *konoha_findMapper_(Ctx *ctx, knh_class_t scid, knh_class_t tcid, int isgen)
+Mapper *knh_findMapper_(Ctx *ctx, knh_class_t scid, knh_class_t tcid, int isgen)
 {
 	KNH_ASSERT_cid(scid);
 	KNH_ASSERT_cid(tcid);
