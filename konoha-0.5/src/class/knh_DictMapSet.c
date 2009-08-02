@@ -46,6 +46,7 @@ typedef struct {
 	void (*fdict_init)(Ctx *ctx, knh_dict_t *);
 	void (*fdict_traverse)(Ctx *ctx, knh_dict_t *, knh_ftraverse ftr);
 	int  (*fdict_compar)(const void *, const void *);
+	void *dummy;
 } knh_hdict_t ;
 
 /* ------------------------------------------------------------------------ */
@@ -94,7 +95,10 @@ knh_dict_t *knh_dict_malloc(Ctx *ctx, size_t capacity,
 		void (*fdict_init)(Ctx *, knh_dict_t*), void (*fdict_traverse)(Ctx*, knh_dict_t*, knh_ftraverse),
 		int (*fdict_compar)(const void*, const void*))
 {
-	if(capacity > 0) {
+	if(!(capacity > 0)) {
+		capacity = (KONOHA_SMALLPAGESIZE - sizeof(knh_hdict_t)) / sizeof(knh_dict_t);
+	}
+	{
 		knh_hdict_t *h = (knh_hdict_t*)KNH_MALLOC(ctx, (capacity * sizeof(knh_dict_t)) + sizeof(knh_hdict_t));
 		h->capacity = capacity;
 		h->sorted = 0;
@@ -109,9 +113,6 @@ knh_dict_t *knh_dict_malloc(Ctx *ctx, size_t capacity,
 			}
 			return a;
 		}
-	}
-	else {
-		return NULL;
 	}
 }
 
