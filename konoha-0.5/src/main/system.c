@@ -229,15 +229,16 @@ knh_fieldn_t knh_System_getfn(Ctx *ctx, knh_bytes_t n, knh_fieldn_t def)
 		if(def == FIELDN_NEWID) {
 			String *s = new_String(ctx, n, NULL);
 			idx = knh_DictIdx_add__fast(ctx, DP(ctx->sys)->FieldNameDictIdx, s);
+			if(!(idx < KNH_FLAG_MN_SETTER)) {  /* Integer overflowed */
+				DBG2_P("idx=%d < %d", idx, KNH_FLAG_MN_SETTER);
+				KNH_THROWs(ctx, "OutOfMemory!!: Too many field names");
+			}
 		}
 		else {
 			idx = def;
 		}
 	}
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-	if(!(idx < KNH_FLAG_MN_SETTER)) {  /* Integer overflowed */
-		KNH_THROWs(ctx, "OutOfMemory!!: Too many field names");
-	}
 	return (knh_fieldn_t)idx;
 }
 
@@ -351,16 +352,16 @@ knh_fieldn_t knh_getfnq(Ctx *ctx, knh_bytes_t tname, knh_fieldn_t def)
 			if(def == FIELDN_NEWID) {
 				String *s = new_String(ctx, tname, NULL);
 				idx = knh_DictIdx_add__fast(ctx, DP(ctx->sys)->FieldNameDictIdx, s);
+				if((idx < KNH_FLAG_FN_U2)) {
+					DBG2_P("idx=%d < %d", idx, KNH_FLAG_FN_U2);
+					KNH_THROWs(ctx, "OutOfMemory!!: Too many field names");
+				}
 			}
 			else {
 				idx = def;
 			}
 		}
 		KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-
-		if(!(idx < KNH_FLAG_FN_U2)) {
-			KNH_THROWs(ctx, "OutOfMemory!!: Too many field names");
-		}
 		return ((knh_fieldn_t)idx | mask);
 	}
 }
