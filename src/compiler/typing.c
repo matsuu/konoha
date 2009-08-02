@@ -422,7 +422,7 @@ v[0] = (IS_NULL(value)) ? 0.0 : ((Float*)value)->n.fvalue;
 #endif
 		}
 		else if(IS_ubxboolean(type)) {
-			knh_boolean_t *v = (knh_boolean_t*)(scr->fields + idx);
+			knh_bool_t *v = (knh_bool_t*)(scr->fields + idx);
 			v[0] = (IS_NULL(value)) ? 0 : ((Int*)value)->n.bvalue;
 		}
 		else {

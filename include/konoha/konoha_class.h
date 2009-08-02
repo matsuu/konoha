@@ -104,7 +104,7 @@ typedef knh_Glue_t knh_Any3_t;
 
 typedef struct {
 	union {
-		knh_boolean_t bvalue;
+		knh_bool_t bvalue;
 		knh_int_t ivalue;
 		knh_float_t   fvalue;
 		knh_uint64_t  data;

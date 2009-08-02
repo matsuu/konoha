@@ -203,6 +203,9 @@ KNHAPI(int) konoha_parseopt(konoha_t konoha, int argc, char **argv)
 			}
 		}
 	}
+#if defined(KNH_DBGMODE2)
+	knh_Context_setVerbose(konoha.ctx, 1);
+#endif
 	return n;
 }
 
@@ -328,13 +331,16 @@ KNHAPI(void) konoha_loadScript(konoha_t konoha, char *fpath)
 {
 	KONOHA_CHECK_(konoha);
 	Ctx *ctx = knh_beginContext(konoha.ctx);
+	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 	InputStream *in = new_ScriptInputStream(ctx, B(fpath), NULL, ctx->share->mainns, 0);
+	KNH_LPUSH(ctx, in);
 	if(!knh_InputStream_isClosed(ctx, in)) {
 		knh_NameSpace_load(ctx, ctx->share->mainns, in, 1/*isEval*/,0/*isThrowable*/);
 	}
 	else {
 		knh_setRuntimeError(ctx, T("script file doesn't exists"));
 	}
+	KNH_LOCALBACK(ctx, lsfp);
 	knh_Context_clearstack(ctx);
 	knh_endContext(ctx);
 }
@@ -858,38 +864,40 @@ static
 void knh_clearScriptLine(Ctx *ctx)
 {
 	if(ctx->lines != NULL) {
-		char buff[FILEPATH_BUFSIZ];
-		int i, pid = knh_getpid();
-		//knh_snprintf(buff, sizeof(buff), "\nDo you want to save 'myscript%d.k'? [Y/n]: ", pid);
-		fprintf(stdout, "\nThank you for joining 'Konoha User Experience Program'.\n");
-		fprintf(stdout, "All your activity have been sent to our project server.\n");
-		L_AGAIN:;
-		knh_snprintf(buff, sizeof(buff), "\nDo you want to report your experience? [Y/n]: ");
-		if(knh_ask(ctx, buff, 1)) {
-			knh_sfp_t *lsfp = KNH_LOCAL(ctx);
-			OutputStream *w;
-			knh_snprintf(buff, sizeof(buff), "myscript%d.k", pid);
-			w = new_FileOutputStream(ctx, B(buff), "w", 0);
-			KNH_LPUSH(ctx, w);
-			for(i = 0; i < knh_Array_size(ctx->lines); i++) {
-				knh_bytes_t line = knh_String_tobytes((String*)knh_Array_n(ctx->lines, i));
-				if(knh_bytes_startsWith(line, STEXT("man ")) || knh_bytes_startsWith(line, STEXT("dump "))) {
-					knh_write(ctx, w, STEXT("// "));
+		if(knh_getenv("I_LOVE_KONOHA") == NULL) {
+			char buff[FILEPATH_BUFSIZ];
+			int i, pid = knh_getpid();
+			//knh_snprintf(buff, sizeof(buff), "\nDo you want to save 'myscript%d.k'? [Y/n]: ", pid);
+			fprintf(stdout, "\nThank you for joining 'Konoha User Experience Program'.\n");
+			fprintf(stdout, "All your activity have been sent to our project server.\n");
+			L_AGAIN:;
+			knh_snprintf(buff, sizeof(buff), "\nDo you want to report your experience? [Y/n]: ");
+			if(knh_ask(ctx, buff, 1)) {
+				knh_sfp_t *lsfp = KNH_LOCAL(ctx);
+				OutputStream *w;
+				knh_snprintf(buff, sizeof(buff), "myscript%d.k", pid);
+				w = new_FileOutputStream(ctx, B(buff), "w", 0);
+				KNH_LPUSH(ctx, w);
+				for(i = 0; i < knh_Array_size(ctx->lines); i++) {
+					knh_bytes_t line = knh_String_tobytes((String*)knh_Array_n(ctx->lines, i));
+					if(knh_bytes_startsWith(line, STEXT("man ")) || knh_bytes_startsWith(line, STEXT("dump "))) {
+						knh_write(ctx, w, STEXT("// "));
+					}
+					knh_println(ctx, w, line);
 				}
-				knh_println(ctx, w, line);
+				knh_OutputStream_close(ctx, w);
+				KNH_LOCALBACK(ctx, lsfp);
 			}
-			knh_OutputStream_close(ctx, w);
-			KNH_LOCALBACK(ctx, lsfp);
+			else {
+				fprintf(stdout, "Your experience will improve the future version of Konoha.\n");
+				fprintf(stdout, "Think about it, AGAIN.\n");
+				goto L_AGAIN;
+			}
+			fprintf(stdout, "\nOpps!! The server isn't working.\n");
+			fprintf(stdout, "(Don't report the server malfunction. It's a joke.)\n");
+			fprintf(stdout, "More importantly, your script was saved at '%s'\n\n", buff);
+			fprintf(stdout, "See you.\n");
 		}
-		else {
-			fprintf(stdout, "Your experience will improve the future version of Konoha.\n");
-			fprintf(stdout, "Think about it, AGAIN.\n");
-			goto L_AGAIN;
-		}
-		fprintf(stdout, "\nOpps!! The server isn't working.\n");
-		fprintf(stdout, "(Don't report the server malfunction. It's a joke.)\n");
-		fprintf(stdout, "More importantly, your script was saved at '%s'\n\n", buff);
-		fprintf(stdout, "See you.\n");
 		KNH_FINALv(ctx, ((Context*)ctx)->lines);
 		((Context*)ctx)->lines = NULL;
 	}

@@ -346,7 +346,7 @@ void knh_OutputStream_write_indent(Ctx *ctx, OutputStream *o);
 void knh_OutputStream_print_(Ctx *ctx, OutputStream *o, knh_bytes_t str, knh_bool_t isnl);
 /* ../src/class/knh_ResultSet.c */
 ResultSet* new_ResultSet(Ctx *ctx);
-knh_boolean_t knh_ResultSet_next(Ctx *ctx, ResultSet *o);
+knh_bool_t knh_ResultSet_next(Ctx *ctx, ResultSet *o);
 METHOD knh__ResultSet_next(Ctx *ctx, knh_sfp_t *sfp);
 void knh_ResultSet_close(Ctx *ctx, ResultSet *o);
 void knh_ResultSet_initTargetClass(ResultSet *o, knh_class_t tcid);
@@ -533,7 +533,7 @@ OutputStream *new_OutputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
 /* ../src/deps/filesystem.c */
 char* knh_cwb_ospath(Ctx *ctx, knh_cwb_t* cwb);
 char* knh_cwb_realpath(Ctx *ctx, knh_cwb_t *cwb);
-knh_boolean_t knh_cwb_isfile(Ctx *ctx, knh_cwb_t *cwb);
+knh_bool_t knh_cwb_isfile(Ctx *ctx, knh_cwb_t *cwb);
 knh_bool_t knh_cwb_isdir(Ctx *ctx, knh_cwb_t *cwb);
 knh_bool_t knh_cwb_parentpath(Ctx *ctx, knh_cwb_t *cwb, char *subbuf);
 knh_bool_t knh_mkdir(Ctx *ctx, knh_bytes_t path, int isThrowable);

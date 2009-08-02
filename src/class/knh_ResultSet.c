@@ -46,7 +46,7 @@ ResultSet* new_ResultSet(Ctx *ctx)
 
 /* ------------------------------------------------------------------------ */
 
-knh_boolean_t knh_ResultSet_next(Ctx *ctx, ResultSet *o)
+knh_bool_t knh_ResultSet_next(Ctx *ctx, ResultSet *o)
 {
 	if(DP(o)->dbcur != NULL) {
 		if(DP(DP(o)->conn)->df->dbcurnext(ctx, DP(o)->dbcur, o)) {

@@ -224,7 +224,7 @@ for line in INSTRUCTIONS.split('\n'):
 CTYPE = {
 	'sfi' : 'knh_sfi_t', 
 	'sfx' : 'knh_sfx_t',
-	'boolean': 'knh_boolean_t',
+	'boolean': 'knh_bool_t',
 	'integer': 'knh_int_t',
 	'float': 'knh_float_t',
 	'intptr': 'knh_intptr_t',
