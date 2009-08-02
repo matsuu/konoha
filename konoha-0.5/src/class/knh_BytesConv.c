@@ -208,21 +208,21 @@ String *new_String__bconv(Ctx *ctx, knh_bytes_t t, BytesConv *bc)
 
 /* ------------------------------------------------------------------------ */
 
-String *new_String__cwbconv(Ctx *ctx, knh_cwb_t cwb, BytesConv *bc)
+String *new_String__cwbconv(Ctx *ctx, knh_cwb_t *cwb, BytesConv *bc)
 {
 	if(knh_cwb_size(cwb) == 0) {
 		return TS_EMPTY;
 	}
 	else if(IS_NULL(bc)) {
 		String *s = new_String(ctx, knh_cwb_tobytes(cwb), NULL);
-		knh_cwb_clear(cwb);
+		knh_cwb_close(cwb);
 		return s;
 	}else {
 		Bytes *ba = knh_Context_openBConvBuf(ctx);
 		bc->fbconv(ctx, bc, knh_cwb_tobytes(cwb), ba);
 		String *s = new_String(ctx, knh_Bytes_tobytes(ba), NULL);
 		knh_Context_closeBConvBuf(ctx, ba);
-		knh_cwb_clear(cwb);
+		knh_cwb_close(cwb);
 		return s;
 	}
 }

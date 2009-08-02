@@ -51,20 +51,6 @@ static METHOD knh__System_getIn(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN(ctx, sfp, DP(ctx->sys)->in);
 }
 
-///* ------------------------------------------------------------------------ */
-///* @　method[STATIC] void System.setIn(InputStream in) */
-//
-//static METHOD knh__System_setIn(Ctx *ctx, knh_sfp_t *sfp)
-//{
-//	if(IS_NULL(sfp[1].o)) {
-//		KNH_SETv(ctx, DP(ctx->sys)->in, knh_getClassDefaultValue(ctx, CLASS_InputStream));
-//	}
-//	else {
-//		KNH_SETv(ctx, DP(ctx->sys)->in, sfp[1].o);
-//	}
-//	KNH_RETURN_void(ctx, sfp);
-//}
-
 /* ------------------------------------------------------------------------ */
 /* @method[STATIC] OutputStream! System.getOut() */
 
@@ -72,22 +58,6 @@ static METHOD knh__System_getOut(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN(ctx, sfp, DP(ctx->sys)->out);
 }
-
-///* ------------------------------------------------------------------------ */
-///* @　method[STATIC] void System.setOut(OutputStream out) */
-//
-//static METHOD knh__System_setOut(Ctx *ctx, knh_sfp_t *sfp)
-//{
-//	if(knh_Context_isTrusted(ctx)) {
-//		if(IS_NULL(sfp[1].o)) {
-//			KNH_SETv(ctx, DP(ctx->sys)->out, knh_getClassDefaultValue(ctx, CLASS_OutputStream));
-//		}
-//		else {
-//			KNH_SETv(ctx, DP(ctx->sys)->out, sfp[1].o);
-//		}
-//	}
-//	KNH_RETURN_void(ctx, sfp);
-//}
 
 /* ------------------------------------------------------------------------ */
 /* @method[STATIC] OutputStream! System.getErr() */
@@ -97,42 +67,32 @@ static METHOD knh__System_getErr(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN(ctx, sfp, DP(ctx->sys)->err);
 }
 
-///* ------------------------------------------------------------------------ */
-///* @　method[STATIC] void System.setStdErr(OutputStream out) */
-//
-//static METHOD knh__System_setErr(Ctx *ctx, knh_sfp_t *sfp)
-//{
-//	if(knh_Context_isTrusted(ctx)) {
-//		if(IS_NULL(sfp[1].o)) {
-//			KNH_SETv(ctx, DP(ctx->sys)->err, knh_getClassDefaultValue(ctx, CLASS_OutputStream));
-//		}
-//		else {
-//			KNH_SETv(ctx, DP(ctx->sys)->err, sfp[1].o);
-//		}
-//	}
-//	KNH_RETURN_void(ctx, sfp);
-//}
-
 /* ------------------------------------------------------------------------ */
 /* @method[STATIC] Boolean! System.hasLib(String! lib, String func) */
 
 METHOD knh__System_hasLib(Ctx *ctx, knh_sfp_t *sfp)
 {
+	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
 	knh_bytes_t libname = knh_String_tobytes(sfp[1].s);
-	void *p = knh_dlopen(ctx, libname);
+	knh_cwb_write(ctx, cwb, libname);
+	knh_cwb_ospath(ctx, cwb);
+	void *p = knh_cwb_dlopen(ctx, cwb);
+	int res = 0;
 	if(p == NULL && !knh_bytes_startsWith(libname, STEXT("lib"))) {
-		char buff[FILEPATH_BUFSIZ];
-		knh_snprintf(buff, sizeof(buff), "lib%s", (char*)libname.buf);
-		p = knh_dlopen(ctx, B(buff));
+		knh_cwb_subclear(cwb, 0);
+		knh_cwb_write(ctx, cwb, STEXT("lib"));
+		knh_cwb_write(ctx, cwb, libname);
+		p = knh_cwb_dlopen(ctx, cwb);
 	}
-	{
-		int b = (p != NULL);
-		if(p != NULL && IS_NOTNULL(sfp[2].o)) {
+	if(p != NULL) {
+		res = 1;
+		if(IS_NOTNULL(sfp[2].o)) {
 			void *f = knh_dlsym(ctx, p, p_char(sfp[2]));
-			b = (f != NULL);
+			res = (f != NULL);
 		}
-		KNH_RETURN_Boolean(ctx, sfp, b);
 	}
+	knh_cwb_close(cwb);
+	KNH_RETURN_Boolean(ctx, sfp, res);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -146,11 +106,11 @@ METHOD knh__System_setRandomSeed(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[STATIC] void System.exit(Int status) */
+/* @method[STATIC] void System.exit(Int status) @Tricky */
 
 static METHOD knh__System_exit(Ctx *ctx, knh_sfp_t *sfp)
 {
-#ifndef KNH_USING_STDC
+#ifdef KNH_USING_STDC
 	int status = IS_NULL(sfp[1].o) ? 0 : p_int(sfp[1]);
 	KNH_SECURE(ctx, sfp);
 	KNH_NOTICE(ctx, "exiting by a user");
@@ -163,30 +123,28 @@ static METHOD knh__System_exit(Ctx *ctx, knh_sfp_t *sfp)
 /* @method String[] System.listDir(String dirname) */
 METHOD knh__System_listDir(Ctx *ctx, knh_sfp_t *sfp)
 {
-    //FIXME cant treat in kernel mode.
-#if !defined(KONOHA_ON_LKM) && !defined(KNH_USING_BTRON)
-    DIR *dirptr;
-    struct dirent *direntp;
-    char dirname[FILEPATH_BUFSIZ];
-    knh_bytes_t t = (IS_NULL(sfp[1].s)) ? STEXT(".") : knh_String_tobytes(sfp[1].s);
-
-    knh_format_ospath(ctx, dirname, sizeof(dirname), t);
-    String* str = (String *) sfp[1].s;
-    knh_bytes_t bt = {str->str, str->size};
-    knh_format_ospath(ctx, dirname, sizeof(dirname), bt);
-    Array *a = new_Array(ctx, CLASS_String, 0);
-
-    if ((dirptr = opendir(dirname)) == NULL) {
-        KNH_PERRNO(ctx, "OS!!", "opendir", knh_Context_isStrict(ctx));
-    } else {
-        while ((direntp = readdir(dirptr)) != NULL) {
-            char *p = direntp->d_name;
-            if(p[0] == '.' && (p[1] == 0 || p[1] == '.')) continue;
-            knh_Array_add(ctx, a, UP(new_String(ctx, B(p), NULL)));
-        }
-        closedir(dirptr);
-    }
-    KNH_RETURN(ctx, sfp, a);
+#if defined(KONOHA_USING_POSIX)
+	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf)
+	Array *a = new_Array(ctx, CLASS_String, 0);
+	knh_bytes_t t = (IS_NULL(sfp[1].s)) ? STEXT(".") : knh_String_tobytes(sfp[1].s);
+	knh_cwb_write(ctx, cwb, t);
+	knh_cwb_ospath(ctx, cwb);
+	Array *a = new_Array(ctx, CLASS_String, 0);
+	KNH_SETv(ctx, sfp[2].o, a);
+	DIR *dirptr;
+	if ((dirptr = opendir(dirname)) == NULL) {
+		KNH_PERRNO(ctx, cwb, "OS!!", "opendir", knh_Context_isStrict(ctx));
+	} else {
+		struct dirent *direntp;
+		while ((direntp = readdir(dirptr)) != NULL) {
+			char *p = direntp->d_name;
+			if(p[0] == '.' && (p[1] == 0 || p[1] == '.')) continue;
+			knh_Array_add(ctx, a, UP(new_String(ctx, B(p), NULL)));
+		}
+		closedir(dirptr);
+	}
+	knh_cwb_close(cwb);
+	KNH_RETURN(ctx, sfp, a);
 #endif
 }
 
@@ -195,7 +153,11 @@ METHOD knh__System_listDir(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__System_hasDir(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Boolean(ctx,sfp, knh_isdir(ctx, knh_String_tobytes(sfp[1].s)));
+	knh_cwb_t cwbbuf, *cwb = knh_cwb_openinit(ctx, &cwbbuf, knh_String_tobytes(sfp[1].s));
+	knh_cwb_ospath(ctx, cwb);
+	knh_bool_t res = knh_cwb_isdir(ctx, cwb);
+	knh_cwb_close(cwb);
+	KNH_RETURN_Boolean(ctx,sfp, res);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -203,34 +165,41 @@ static METHOD knh__System_hasDir(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__System_hasFile(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Boolean(ctx,sfp, knh_isfile(ctx, knh_String_tobytes(sfp[1].s)));
+	knh_cwb_t cwbbuf, *cwb = knh_cwb_openinit(ctx, &cwbbuf, knh_String_tobytes(sfp[1].s));
+	knh_cwb_ospath(ctx, cwb);
+	knh_bool_t res = knh_cwb_isfile(ctx, cwb);
+	knh_cwb_close(cwb);
+	KNH_RETURN_Boolean(ctx,sfp, res);
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Boolean! System.mkdir(String! filename) */
+/* @method Boolean! System.mkdir(String! filename) @Tricky */
 
 static METHOD knh__System_mkdir(Ctx *ctx, knh_sfp_t *sfp)
 {
+	KNH_SECURE(ctx, sfp);
 	KNH_RETURN_Boolean(ctx, sfp,
 		knh_mkdir(ctx, knh_String_tobytes(sfp[1].s), knh_Context_isStrict(ctx))
 	);
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Boolean! System.unlink(String! filename) */
+/* @method Boolean! System.unlink(String! filename) @Tricky */
 
 static METHOD knh__System_unlink(Ctx *ctx, knh_sfp_t *sfp)
 {
+	KNH_SECURE(ctx, sfp);
 	KNH_RETURN_Boolean(ctx, sfp,
 		knh_unlink(ctx, knh_String_tobytes(sfp[1].s), knh_Context_isStrict(ctx))
 	);
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Boolean! System.rename(String oldname, String newname) */
+/* @method Boolean! System.rename(String oldname, String newname) @Tricky */
 
 static METHOD knh__System_rename(Ctx *ctx, knh_sfp_t *sfp)
 {
+	KNH_SECURE(ctx, sfp);
 	KNH_RETURN_Boolean(ctx, sfp,
 		knh_rename(ctx, knh_String_tobytes(sfp[1].s), knh_String_tobytes(sfp[2].s), knh_Context_isStrict(ctx))
 	);
@@ -364,11 +333,11 @@ static METHOD knh__Exception_new(Ctx *ctx, knh_sfp_t *sfp)
 	DP(o)->eid  = EXPT_Exception;
 	DP(o)->flag = ctx->share->ExptTable[EXPT_Exception].flag;
 
-	knh_cwb_t cwb = new_cwb(ctx);
-	knh_write_char(ctx, cwb.w, "Exception!!");
+	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
+	knh_write_char(ctx, cwb->w, "Exception!!");
 	if(IS_NOTNULL(sfp[1].o)) {
-		knh_write_char(ctx, cwb.w, ": ");
-		knh_write(ctx, cwb.w, knh_String_tobytes(sfp[1].s));
+		knh_write_char(ctx, cwb->w, ": ");
+		knh_write(ctx, cwb->w, knh_String_tobytes(sfp[1].s));
 	}
 	KNH_SETv(ctx, DP(o)->msg, new_String__cwb(ctx, cwb));
 	KNH_SETv(ctx, DP(o)->bag, sfp[2].o);

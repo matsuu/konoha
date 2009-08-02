@@ -102,17 +102,18 @@ ITRNEXT knh_InputStream_line_next(Ctx *ctx, knh_sfp_t *sfp, int n)
 	Iterator *it = sfp[0].it;
 	InputStream *in = (InputStream*)DP(it)->source;
 	int ch;
-	knh_cwb_t cb = new_cwb(ctx);
+	knh_cwb_t cwbbuf;
+	knh_cwb_t *cwb = knh_cwb_open(ctx, &cwbbuf);
 
 	while((ch = knh_InputStream_getc(ctx, in)) != EOF) {
 		if(ch == 13) continue;
 		if(ch == 10) {
-			KNH_ITRNEXT(ctx, sfp, n, new_String__cwbconv(ctx, cb, DP(in)->bconv));
+			KNH_ITRNEXT(ctx, sfp, n, new_String__cwbconv(ctx, cwb, DP(in)->bconv));
 		}
-		knh_Bytes_putc(ctx, cb.ba, ch);
+		knh_Bytes_putc(ctx, cwb->ba, ch);
 	}
-	if(knh_cwb_size(cb) != 0) {
-		KNH_ITRNEXT(ctx, sfp, n, new_String__cwbconv(ctx, cb, DP(in)->bconv));
+	if(knh_cwb_size(cwb) != 0) {
+		KNH_ITRNEXT(ctx, sfp, n, new_String__cwbconv(ctx, cwb, DP(in)->bconv));
 	}
 	KNH_ITREND(ctx, sfp, n);
 }

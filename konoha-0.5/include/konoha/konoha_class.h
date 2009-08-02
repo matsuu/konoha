@@ -457,12 +457,13 @@ typedef struct knh_MethodField_t {
 /* @flag Method.Release!Debug MF DP((Method*)%s)->flag 'is:set:*:*' */
 /* @flag Method.Const  MF DP((Method*)%s)->flag 'is:*:is:*' */
 /* @flag Method.Static MF DP((Method*)%s)->flag 'is:*:is:*' */
-/* @flag Method.NullBase MF DP((Method*)%s)->flag 'is:*:is:*' */
+/* @flag Method.NullBase MF DP((Method*)%s)->flag 'is:*:*:*' */
 /* @flag Method.VarArgs MF DP((Method*)%s)->flag 'is:set:is:*' */
 /* @flag Method.Generator MF DP((Method*)%s)->flag 'is:set:*:*' */
 /* @flag Method.Aspect MF DP((Method*)%s)->flag 'is:set:*:*' */
 /* @flag Method.ObjectCode MF DP((Method*)%s)->flag 'is:set:*:*' */
 /* @flag Method.Hidden MF DP((Method*)%s)->flag 'is:set:*:*' */
+/* @flag Method.Tricky MF DP((Method*)%s)->flag 'is:set:*:*' */
 
 typedef struct {
 	knh_flag_t     flag;  knh_ushort_t   delta;
@@ -809,9 +810,13 @@ typedef struct knh_NameSpace {
 	knh_Array_t*            importedNameSpaces;
 	struct knh_DictSet_t*   name2cidDictSet;
 	struct knh_DictSet_t*   func2cidDictSet;
+	struct knh_DictSet_t*   pathTrustDictSet;
 	struct knh_DictMap_t*   lconstDictMap;
 	struct knh_DictMap_t*   tag2urnDictMap;
 } knh_NameSpace_struct;
+
+#define KNH_PATH_TRUSTED      1
+#define KNH_PATH_UNTRUSTED    2
 
 /* ------------------------------------------------------------------------ */
 /* @class System Object knh_System_struct @Singleton */

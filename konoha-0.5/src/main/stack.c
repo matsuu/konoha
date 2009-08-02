@@ -134,8 +134,8 @@ void knh_sfp_typecheck(Ctx *ctx, knh_sfp_t *sfp, Method *mtd, knh_code_t *pc)
 
 	L_THROWERR:
 	{
-		knh_cwb_t cwb = new_cwb(ctx);
-		knh_printf(ctx, cwb.w, emsg, (knh_intptr_t)i, DP(mtd)->mn);
+		knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
+		knh_printf(ctx, cwb->w, emsg, (knh_intptr_t)i, DP(mtd)->mn);
 		String *s = new_String__cwb(ctx, cwb);
 		knh_throw(ctx, (Object*)s, knh_Method_file(ctx, sfp[-1].mtd), knh_Method_pctoline(sfp[-1].mtd, pc));
 	}
@@ -221,44 +221,44 @@ String *knh_stack_newStackTrace(Ctx *ctx, knh_sfp_t *sfp, Exception *e)
 			return (String*)KNH_NULL;
 		}
 	}
-	knh_cwb_t cwb = new_cwb(ctx);
-	knh_write_fline(ctx, cwb.w, file, line);
-	knh_putc(ctx, cwb.w, ':');
-	knh_write_cid(ctx, cwb.w, DP(mtd)->cid);
+	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
+	knh_write_fline(ctx, cwb->w, file, line);
+	knh_putc(ctx, cwb->w, ':');
+	knh_write_cid(ctx, cwb->w, DP(mtd)->cid);
 	if(DP(mtd)->mn != METHODN_lambda) {
 		int i = 0;
-		knh_putc(ctx, cwb.w, '.');
-		knh_write_mn(ctx, cwb.w, DP(mtd)->mn);
-		knh_putc(ctx, cwb.w, '(');
+		knh_putc(ctx, cwb->w, '.');
+		knh_write_mn(ctx, cwb->w, DP(mtd)->mn);
+		knh_putc(ctx, cwb->w, '(');
 		for(i = 0; i < knh_Method_psize(mtd); i++) {
 			knh_mparam_t p = knh_Method_param(mtd, i);
 			p.type = knh_Method_ptype(ctx, mtd, knh_Object_cid(sfp[0].o), i);
 			if(i > 0) {
-				knh_putc(ctx, cwb.w, ',');
+				knh_putc(ctx, cwb->w, ',');
 			}
-			knh_write_fn(ctx, cwb.w, p.fn);
-			knh_putc(ctx, cwb.w, '=');
+			knh_write_fn(ctx, cwb->w, p.fn);
+			knh_putc(ctx, cwb->w, '=');
 			if(p.type == NNTYPE_Int) {
-				knh_write_ifmt(ctx, cwb.w, KNH_INT_FMT, sfp[1+i].ivalue);
+				knh_write_ifmt(ctx, cwb->w, KNH_INT_FMT, sfp[1+i].ivalue);
 			}
 			else if (p.type == NNTYPE_Float) {
-				knh_write_ffmt(ctx, cwb.w, KNH_FLOAT_FMT, sfp[1+i].fvalue);
+				knh_write_ffmt(ctx, cwb->w, KNH_FLOAT_FMT, sfp[1+i].fvalue);
 			}
 			else if (p.type == NNTYPE_Boolean) {
-				if(sfp[1+i].bvalue) knh_write(ctx, cwb.w, STEXT("true"));
-				else knh_write(ctx, cwb.w, STEXT("false"));
+				if(sfp[1+i].bvalue) knh_write(ctx, cwb->w, STEXT("true"));
+				else knh_write(ctx, cwb->w, STEXT("false"));
 			}
 			else if (IS_NULL(sfp[1+i].o)) {
-				knh_write(ctx, cwb.w, STEXT("null"));
+				knh_write(ctx, cwb->w, STEXT("null"));
 			}
 			else {
 				knh_sfp_t *esp1 = ctx->esp + 1;
 				KNH_SETv(ctx, esp1[0].o, sfp[1+i].o);
 				esp1[0].data = sfp[1+i].data;
-				knh_esp1_format(ctx, METHODN__k, cwb.w, KNH_NULL);
+				knh_esp1_format(ctx, METHODN__k, cwb->w, KNH_NULL);
 			}
 		}
-		knh_putc(ctx, cwb.w, ')');
+		knh_putc(ctx, cwb->w, ')');
 	}
 	String *s = new_String__cwb(ctx, cwb);
 	//DBG2_P("stacktrace=%s", knh_String_tochar(s));

@@ -185,10 +185,10 @@ Exception* knh_Exception_new__init(Ctx *ctx, Exception *o, String *e, String *ms
 	{
 		if(IS_NOTNULL(msg)) {
 			KNH_RCSETv(ctx, DP(o)->bag, msg);
-			knh_cwb_t cwb = new_cwb(ctx);
-			knh_write_char(ctx, cwb.w, EXPTN(DP(o)->eid));
-			knh_write_char(ctx, cwb.w, "!!: ");
-			knh_write(ctx, cwb.w, knh_String_tobytes(msg));
+			knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
+			knh_write_char(ctx, cwb->w, EXPTN(DP(o)->eid));
+			knh_write_char(ctx, cwb->w, "!!: ");
+			knh_write(ctx, cwb->w, knh_String_tobytes(msg));
 			KNH_SETv(ctx, DP(o)->msg, new_String__cwb(ctx, cwb));
 		}
 		else {
@@ -197,12 +197,12 @@ Exception* knh_Exception_new__init(Ctx *ctx, Exception *o, String *e, String *ms
 				KNH_SETv(ctx, DP(o)->msg, e);
 				return o;
 			}
-			knh_cwb_t cwb = new_cwb(ctx);
-			knh_write_char(ctx, cwb.w, EXPTN(DP(o)->eid));
-			knh_write_char(ctx, cwb.w, "!!");
+			knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
+			knh_write_char(ctx, cwb->w, EXPTN(DP(o)->eid));
+			knh_write_char(ctx, cwb->w, "!!");
 			if(loc > 0) {
-				knh_write_char(ctx, cwb.w, ": ");
-				knh_write(ctx, cwb.w, knh_bytes_last(knh_String_tobytes(e), loc+3));
+				knh_write_char(ctx, cwb->w, ": ");
+				knh_write(ctx, cwb->w, knh_bytes_last(knh_String_tobytes(e), loc+3));
 			}
 			KNH_SETv(ctx, DP(o)->msg, new_String__cwb(ctx, cwb));
 		}
@@ -251,13 +251,13 @@ Exception* new_NullException (Ctx *ctx, Object *o)
 
 /* ------------------------------------------------------------------------ */
 
-#define _KNH_PERRNO(ctx, emsg, func, isThrowable) { \
-		knh_perrno(ctx, emsg, func, __FILE__, __LINE__, isThrowable); \
+#define _KNH_PERRNO(ctx, cwb, emsg, func, isThrowable) { \
+		knh_cwb_perrno(ctx, cwb, emsg, func, __FILE__, __LINE__, isThrowable); \
 	}\
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) knh_perrno(Ctx *ctx, char *emsg, char *func, char *file, int line, int isThrowable)
+KNHAPI(void) knh_cwb_perrno(Ctx *ctx, knh_cwb_t *cwb, char *emsg, char *func, char *file, int line, int isThrowable)
 {
 	if(emsg == NULL) emsg = "Exception!!";
 	if(errno == 13) {
@@ -271,27 +271,33 @@ KNHAPI(void) knh_perrno(Ctx *ctx, char *emsg, char *func, char *file, int line, 
 #endif
 	if(isThrowable) {
 		char buf[256];
-		knh_snprintf(buf, sizeof(buf), "%s: func=%s, errno=%d: %s", emsg, func, errno, emsg2);
+		knh_snprintf(buf, sizeof(buf), "%s: %s at %s (errno=%d)", emsg, emsg2, func, errno);
+		if(cwb != NULL) {
+			knh_cwb_close(cwb);
+		}
 		knh_throwException(ctx, new_Exception__b(ctx, B(buf)), KNH_SAFEFILE(file), line);
 	}
 	else {
-		KNH_NOTICE(ctx, "%s() says errno=%d: %s", func, errno, emsg2);
+		KNH_NOTICE(ctx, "%s() says %s (errno=%d)", func, emsg2, errno);
 	}
 }
 
 /* ------------------------------------------------------------------------ */
 
-#define _KNH_NOAPI(ctx, isThrowable) { \
-		knh_throw_Unsupported(ctx, __FUNCTION__, __FILE__, __LINE__, isThrowable); \
+#define _KNH_NOAPI(ctx, cwb, isThrowable) { \
+		knh_throw_Unsupported(ctx, cwb, __FUNCTION__, __FILE__, __LINE__, isThrowable); \
 	}\
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) knh_throw_Unsupported(Ctx *ctx,const char *func, char *file, int line, int isThrowable)
+KNHAPI(void) knh_throw_Unsupported(Ctx *ctx, knh_cwb_t *cwb, const char *func, char *file, int line, int isThrowable)
 {
 	if(isThrowable) {
 		char buf[256];
 		knh_snprintf(buf, sizeof(buf), "Unsupported!!: func=%s", func);
+		if(cwb != NULL) {
+			knh_cwb_close(cwb);
+		}
 		knh_throwException(ctx, new_Exception__b(ctx, B(buf)), KNH_SAFEFILE(file), line);
 	}
 	else {

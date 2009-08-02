@@ -1,6 +1,7 @@
 #ifndef COMMONS_H_
 #define COMMONS_H_
 
+#define KONOHA_MACROS
 #include<konoha/konoha_dev.h>
 #include<konoha/gen/konohac_klr_.h>
 

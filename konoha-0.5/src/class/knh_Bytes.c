@@ -119,6 +119,18 @@ KNHAPI(void) knh_Bytes_ensureSize(Ctx *ctx, Bytes *o, size_t len)
 
 /* ------------------------------------------------------------------------ */
 
+void knh_Bytes_ensureZero(Ctx *ctx, Bytes *o)
+{
+	if(o->size == o->capacity) {
+		knh_Bytes_expands(ctx, o, o->capacity * 2);
+	}
+	if(o->buf[o->size] != 0) {
+		o->buf[o->size] = 0;
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
 KNHAPI(void) knh_Bytes_putc(Ctx *ctx, Bytes *o, int ch)
 {
 	if(o->size == o->capacity) {
@@ -144,6 +156,16 @@ KNHAPI(void) knh_Bytes_write(Ctx *ctx, Bytes *o, knh_bytes_t v)
 
 /* ------------------------------------------------------------------------ */
 
+void knh_Bytes_remove(Ctx *ctx, Bytes *o, size_t offset, size_t len)
+{
+	KNH_ASSERT(offset + len < o->size);
+	memmove(o->buf + offset + len, o->buf + offset, len);
+	knh_bzero(o->buf + (o->size - len), len);
+	o->size = o->size - len;
+}
+
+/* ------------------------------------------------------------------------ */
+
 void knh_Bytes_unputc(Bytes *o)
 {
 	if(o->size > 0) {
@@ -152,29 +174,130 @@ void knh_Bytes_unputc(Bytes *o)
 	}
 }
 
-///* ======================================================================== */
-///* [malloc] */
-//
-//void *knh_Context_mallocOnce(Ctx* ctx, size_t n)
-//{
-//	KNH_ASSERT(knh_Bytes_size(ctx->bconvbuf) == 0);
-//	KNH_ASSERT(n > 0);
-//	Bytes *o = ctx->bconvbuf;
-//	if(o->size + n >= o->capacity) {
-//		size_t newsize = o->capacity * 2;
-//		if(newsize < o->size + n) newsize = knh_bytes_initsize(o->size + n);
-//		knh_Bytes_expands(ctx, o, newsize);
-//	}
-//	return (void*)o->buf;
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//void knh_Context_freeOnce(Ctx* ctx, void *p)
-//{
-//	KNH_ASSERT(p == (void*)ctx->bconvbuf->buf);
-//	knh_Bytes_clear(ctx->bconvbuf);
-//}
+/* ------------------------------------------------------------------------ */
+
+void knh_Bytes_update(Ctx *ctx, Bytes *o, size_t pos, knh_bytes_t t)
+{
+	if(pos + t.len + 1 > o->size) {
+		if(o->size < o->capacity && o->buf[o->size] != 0) {
+			DBG2_P("extending buffer %p", o->buf);
+			knh_Bytes_clear(o, pos);
+			knh_Bytes_write(ctx, o, t);
+			return;
+		}
+		DBG2_P("buffer overflow %p", o->buf);
+		KNH_ABORT();
+	}
+	else {
+		DBG2_P("rewrite buffer %p", o->buf);
+		knh_memcpy(&o->buf[pos], t.buf, t.len);
+		knh_bzero(&(o->buf[pos+t.len]), o->size - pos - t.len);
+	}
+}
+
+/* ======================================================================== */
+/* [cwb] */
+
+knh_cwb_t *knh_cwb_open(Ctx* ctx, knh_cwb_t *cwb)
+{
+	cwb->ba = ((Context*)ctx)->bufa;
+	cwb->w  = ((Context*)ctx)->bufw;
+	cwb->pos = knh_Bytes_size(((Context*)ctx)->bufa);
+	return cwb;
+}
+
+/* ------------------------------------------------------------------------ */
+
+knh_cwb_t *knh_cwb_openinit(Ctx* ctx, knh_cwb_t *cwb, knh_bytes_t t)
+{
+	cwb->ba = ctx->bufa;
+	cwb->w  = ctx->bufw;
+	cwb->pos = knh_Bytes_size(ctx->bufa);
+	KNH_ASSERT(t.buf < cwb->ba->buf || (cwb->ba->buf + cwb->pos) < t.buf);
+	knh_Bytes_write(ctx, (cwb->ba), t);
+	return cwb;
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_cwb_putc(Ctx *ctx, knh_cwb_t *cwb, int ch)
+{
+	knh_Bytes_putc(ctx, (cwb->ba), ch);
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_cwb_write(Ctx *ctx, knh_cwb_t *cwb, knh_bytes_t t)
+{
+	KNH_ASSERT(t.buf < cwb->ba->buf || (cwb->ba->buf + cwb->pos) < t.buf);
+	knh_Bytes_write(ctx, (cwb->ba), t);
+}
+
+/* ------------------------------------------------------------------------ */
+
+size_t knh_cwb_size(knh_cwb_t *cwb)
+{
+	return (cwb->ba)->size - cwb->pos;
+}
+
+/* ------------------------------------------------------------------------ */
+
+knh_bytes_t knh_cwb_tobytes(knh_cwb_t *cwb)
+{
+	knh_bytes_t t = {(cwb->ba)->buf + cwb->pos, (cwb->ba)->size - cwb->pos};
+	return t;
+}
+
+/* ------------------------------------------------------------------------ */
+
+char *knh_cwb_tochar(Ctx *ctx, knh_cwb_t *cwb)
+{
+	knh_bytes_t t = {(cwb->ba)->buf + cwb->pos, (cwb->ba)->size - cwb->pos};
+	knh_Bytes_ensureZero(ctx, cwb->ba);
+	return (char*)t.buf;
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_cwb_close(knh_cwb_t *cwb)
+{
+	knh_Bytes_clear(cwb->ba, cwb->pos);
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_cwb_subclear(knh_cwb_t *cwb, size_t len)
+{
+	knh_Bytes_clear(cwb->ba, cwb->pos + len);
+}
+
+/* ------------------------------------------------------------------------ */
+/* [String] */
+
+String *new_String__cwb(Ctx *ctx, knh_cwb_t *cwb)
+{
+	if(cwb->pos == (cwb->ba)->size) {
+		return TS_EMPTY;
+	}
+	else {
+		knh_bytes_t t = knh_cwb_tobytes(cwb);
+		String *s = new_String(ctx, t, NULL);
+		knh_cwb_close(cwb);
+		return s;
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+String *new_StringX__cwb(Ctx *ctx, knh_class_t cid, knh_cwb_t *cwb)
+{
+	knh_bytes_t t = knh_cwb_tobytes(cwb);
+	String *s = new_StringX(ctx, cid, t, NULL);
+	knh_cwb_close(cwb);
+	return s;
+}
+
+/* ------------------------------------------------------------------------ */
 
 /* ------------------------------------------------------------------------ */
 

@@ -72,9 +72,9 @@ METHOD knh__Script_hook(Ctx *ctx, knh_sfp_t *sfp)
 //    knh_setCurrentContext(ctx);
 //    knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 //
-//    knh_cwb_t cwb = new_cwb(ctx);
-//    knh_Bytes_write(ctx, cwb.ba, B(method));
-//    InputStream *in = new_BytesInputStream(ctx, cwb.ba, cwb.pos, knh_Bytes_size(cwb.ba));
+//    knh_cwb_t *cwb = new_cwb(ctx);
+//    knh_Bytes_write(ctx, cwb->ba, B(method));
+//    InputStream *in = new_BytesInputStream(ctx, cwb->ba, cwb->pos, knh_Bytes_size(cwb->ba));
 //
 //    KNH_LPUSH(ctx, in);
 //    knh_InputStream_setEncoding(ctx, in, KNH_ENC);

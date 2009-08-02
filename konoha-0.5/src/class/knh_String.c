@@ -102,8 +102,6 @@ KNHAPI(String*) new_String(Ctx *ctx, knh_bytes_t t, String *orign)
 
 /* ------------------------------------------------------------------------ */
 
-#define _new_String__T(ctx, text)    new_StringX__T(ctx, CLASS_String, text)
-
 knh_String_t *new_StringX__T(Ctx *ctx, knh_class_t cid, const char *text)
 {
 	knh_String_t *o = (knh_String_t*)new_hObject(ctx, FLAG_String, CLASS_String, cid);
@@ -114,7 +112,6 @@ knh_String_t *new_StringX__T(Ctx *ctx, knh_class_t cid, const char *text)
 	knh_String_checkASCII(o);
 	return o;
 }
-
 
 /* ------------------------------------------------------------------------ */
 

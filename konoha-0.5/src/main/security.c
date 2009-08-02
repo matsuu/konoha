@@ -37,7 +37,29 @@ extern "C" {
 
 /* ======================================================================== */
 /* [password] */
+
+static int secureMode = 0;
+
 /* ------------------------------------------------------------------------ */
+
+void knh_setSecureMode(void)
+{
+	secureMode = 1;
+}
+
+/* ------------------------------------------------------------------------ */
+
+knh_bool_t knh_isTrustedPath(Ctx *ctx, knh_bytes_t path)
+{
+	DBG2_P("check: %s", (char*)path.buf);
+	if(knh_bytes_startsWith(path, STEXT("http:"))) {
+		return 0;
+	}
+	return (secureMode != 1);
+}
+
+/* ======================================================================== */
+/* [password] */
 
 KNHAPI(char*) knh_getPassword(Ctx *ctx, knh_bytes_t url)
 {

@@ -1025,6 +1025,24 @@ int knh_bytes_findMT(Ctx *ctx, knh_bytes_t text, knh_bytes_t *mt, knh_bytes_t *e
 /* ------------------------------------------------------------------------ */
 
 static
+Stmt *knh_bytes_parseExpr(Ctx *ctx, knh_bytes_t expr, int urid, int line)
+{
+	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
+	knh_Bytes_write(ctx, cwb->ba, expr);
+	knh_Bytes_putc(ctx, cwb->ba, ';');
+	{
+		InputStream *in = new_BytesInputStream(ctx, cwb->ba, cwb->pos, knh_Bytes_size(cwb->ba));
+		DP(in)->urid = (knh_urid_t)urid;
+		DP(in)->line = line;
+		Stmt *stmt = knh_InputStream_parseStmt(ctx, in, 0/*isData*/);
+		knh_cwb_close(cwb);
+		return stmt;
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
 Term *knh_TokenESTR_toTerm(Ctx *ctx, Token *tk, Asm *abr)
 {
 	knh_bytes_t text = knh_Token_tobytes(ctx, tk);
@@ -1048,7 +1066,7 @@ Term *knh_TokenESTR_toTerm(Ctx *ctx, Token *tk, Asm *abr)
 			if(text.len > 0) {
 				knh_Stmt_add(ctx, stmt, new_TermCONST(ctx, FL(tk), UP(new_String(ctx, text, NULL))));
 			}
-			Stmt *stmt_expr = knh_bytes_parseStmt(ctx, expr, SP(tk)->urid, SP(tk)->line);
+			Stmt *stmt_expr = knh_bytes_parseExpr(ctx, expr, SP(tk)->urid, SP(tk)->line);
 			KNH_SETv(ctx, lsfp[0].o, stmt_expr);
 			if(knh_stmt_isExpr(SP(stmt_expr)->stt)) {
 				Stmt *stmt_mt = new_Stmt(ctx, 0, STT_MT);
@@ -3679,8 +3697,8 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	return TM(stmt);
 
 	//	L_PERROR:;
-	//	knh_cwb_t cwb = new_cwb(ctx);
-	//	knh_Method__k(ctx, mtd, cwb.w, (String*)KNH_NULL);
+	//	knh_cwb_t *cwb = new_cwb(ctx);
+	//	knh_Method__k(ctx, mtd, cwb->w, (String*)KNH_NULL);
 	//	knh_Asm_perror(ctx, abr, pe, knh_cwb_tochar(cwb));
 	//	knh_cwb_clear(cwb);
 	//	return NULL;

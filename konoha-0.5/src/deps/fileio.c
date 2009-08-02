@@ -55,11 +55,11 @@ KNHAPI(FILE*) knh_fopen(Ctx *ctx, char *filename, char *mode, int isThrowable)
 #elif defined(KNH_USING_STDC) || defined(KNH_USING_POSIX)
 	FILE *fp = fopen(filename, mode);
 	if(fp == NULL) {
-		KNH_PERRNO(ctx, "IO!!", "fopen", isThrowable);
+		KNH_PERRNO(ctx, NULL, "IO!!", "fopen", isThrowable);
 	}
 	return fp;
 #else
-	KNH_NOAPI(ctx, isThrowable);
+	KNH_NOAPI(ctx, NULL, isThrowable);
 	return NULL;
 #endif
 }
@@ -171,13 +171,12 @@ static void knh_iodrv_close__NOP(Ctx *ctx, knh_io_t fd)
 
 static knh_io_t knh_iodrv_open__FILE(Ctx *ctx, knh_bytes_t file, char *mode, int isThrowable)
 {
-	char buf[FILEPATH_BUFSIZ];
 	FILE *fp;
-	knh_format_ospath(ctx, buf, sizeof(buf), file);
-	fp = knh_fopen(ctx, buf, mode, isThrowable);
+	fp = knh_fopen(ctx, (char*)file.buf, mode, isThrowable);
 	if(fp == NULL) {
 		return (knh_io_t)-1;
 	}
+	TODO();
 	return (knh_io_t)fp;
 }
 

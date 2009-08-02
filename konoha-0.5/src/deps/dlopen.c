@@ -55,51 +55,96 @@ extern "C" {
 /* ======================================================================== */
 /* [dlopen] */
 
-void *knh_dlopen(Ctx *ctx, knh_bytes_t libname)
+//void *knh_dlopen(Ctx *ctx, knh_bytes_t libname)
+//{
+//#if defined(KNH_USING_WINDOWS)
+//	char buff[FILEPATH_BUFSIZ];
+//	if(knh_bytes_endsWith(libname, STEXT(KONOHA_OS_DLLEXT))) {
+//		knh_format_ospath(ctx, buff, sizeof(buff), libname);
+//	}
+//	else {
+//		knh_format_ospath2(ctx, buff, sizeof(buff), libname, KONOHA_OS_DLLEXT);
+//	}
+//	DBG_P("knh_dlopen .. '%s'\n", buff);
+//	return (void*)LoadLibraryA((LPCTSTR)buff);
+//#elif defined(KNH_USING_POSIX)
+//	char buff[FILEPATH_BUFSIZ];
+//	if(knh_bytes_endsWith(libname, STEXT(KONOHA_OS_DLLEXT))) {
+//		knh_format_ospath(ctx, buff, sizeof(buff), libname);
+//	}
+//	else {
+//		knh_format_ospath2(ctx, buff, sizeof(buff), libname, KONOHA_OS_DLLEXT);
+//	}
+//	DBG_P("knh_dlopen .. '%s'\n", buff);
+//	return dlopen(buff, RTLD_LAZY);
+//#elif defined(KNH_USING_BTRON)
+//        char buff[FILEPATH_BUFSIZ];
+//        TC buff_tc[FILEPATH_BUFSIZ];
+//        LINK lnk;
+//        W err;
+//	if(knh_bytes_endsWith(libname, STEXT(KONOHA_OS_DLLEXT))) {
+//		knh_format_ospath(ctx, buff, sizeof(buff), libname);
+//	}
+//	else {
+//		knh_format_ospath2(ctx, buff, sizeof(buff), libname, KONOHA_OS_DLLEXT);
+//	}
+//	DBG_P("knh_dlopen .. '%s'\n", buff);
+//        eucstotcs(buff_tc, buff);
+//        err = b_get_lnk(buff_tc, &lnk, F_NORM);
+//        if (err < 0) {
+//            return NULL;
+//        }
+//        err = b_dlopen(&lnk, DL_LAZY);
+//        if (err <= 0) {
+//            return NULL;
+//        }
+//        // Be careful that BTRON dlopen handles are of type W, not void*!
+//        return (void*)err;
+//#else
+//	return NULL;
+//#endif
+//}
+
+/* ------------------------------------------------------------------------ */
+
+void *knh_cwb_dlopen(Ctx *ctx, knh_cwb_t *cwb)
 {
+	char *file;
+	if(!knh_bytes_endsWith(knh_cwb_tobytes(cwb), STEXT(KONOHA_OS_DLLEXT))) {
+		knh_Bytes_putc(ctx, cwb->ba, '.');
+		knh_Bytes_write(ctx, cwb->ba, STEXT(KONOHA_OS_DLLEXT));
+	}
+	file = knh_cwb_ospath(ctx, cwb);
 #if defined(KNH_USING_WINDOWS)
-	char buff[FILEPATH_BUFSIZ];
-	if(knh_bytes_endsWith(libname, STEXT(KONOHA_OS_DLLEXT))) {
-		knh_format_ospath(ctx, buff, sizeof(buff), libname);
-	}
-	else {
-		knh_format_ospath2(ctx, buff, sizeof(buff), libname, KONOHA_OS_DLLEXT);
-	}
-	DBG_P("knh_dlopen .. '%s'\n", buff);
-	return (void*)LoadLibraryA((LPCTSTR)buff);
+	DBG_P("knh_dlopen .. '%s'\n", file);
+	return (void*)LoadLibraryA((LPCTSTR)file);
 #elif defined(KNH_USING_POSIX)
-	char buff[FILEPATH_BUFSIZ];
-	if(knh_bytes_endsWith(libname, STEXT(KONOHA_OS_DLLEXT))) {
-		knh_format_ospath(ctx, buff, sizeof(buff), libname);
-	}
-	else {
-		knh_format_ospath2(ctx, buff, sizeof(buff), libname, KONOHA_OS_DLLEXT);
-	}
-	DBG_P("knh_dlopen .. '%s'\n", buff);
-	return dlopen(buff, RTLD_LAZY);
+	DBG_P("knh_dlopen .. '%s'\n", file);
+	return dlopen(file, RTLD_LAZY);
 #elif defined(KNH_USING_BTRON)
-        char buff[FILEPATH_BUFSIZ];
-        TC buff_tc[FILEPATH_BUFSIZ];
-        LINK lnk;
-        W err;
-	if(knh_bytes_endsWith(libname, STEXT(KONOHA_OS_DLLEXT))) {
-		knh_format_ospath(ctx, buff, sizeof(buff), libname);
-	}
-	else {
-		knh_format_ospath2(ctx, buff, sizeof(buff), libname, KONOHA_OS_DLLEXT);
-	}
-	DBG_P("knh_dlopen .. '%s'\n", buff);
-        eucstotcs(buff_tc, buff);
-        err = b_get_lnk(buff_tc, &lnk, F_NORM);
-        if (err < 0) {
-            return NULL;
-        }
-        err = b_dlopen(&lnk, DL_LAZY);
-        if (err <= 0) {
-            return NULL;
-        }
-        // Be careful that BTRON dlopen handles are of type W, not void*!
-        return (void*)err;
+//	// YASHORO KUN ZENZEN WAKARIMASEN
+//        char buff[FILEPATH_BUFSIZ];
+//        TC buff_tc[FILEPATH_BUFSIZ];
+//        LINK lnk;
+//        W err;
+//	if(knh_bytes_endsWith(libname, STEXT(KONOHA_OS_DLLEXT))) {
+//		knh_format_ospath(ctx, buff, sizeof(buff), libname);
+//	}
+//	else {
+//		knh_format_ospath2(ctx, buff, sizeof(buff), libname, KONOHA_OS_DLLEXT);
+//	}
+//	DBG_P("knh_dlopen .. '%s'\n", buff);
+//        eucstotcs(buff_tc, buff);
+//        err = b_get_lnk(buff_tc, &lnk, F_NORM);
+//        if (err < 0) {
+//            return NULL;
+//        }
+//        err = b_dlopen(&lnk, DL_LAZY);
+//        if (err <= 0) {
+//            return NULL;
+//        }
+//        // Be careful that BTRON dlopen handles are of type W, not void*!
+//        return (void*)err;
 #else
 	return NULL;
 #endif

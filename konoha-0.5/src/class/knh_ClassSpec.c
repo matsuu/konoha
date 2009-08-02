@@ -330,7 +330,7 @@ KNHAPI(ClassSpec*) new_Enum(Ctx *ctx, char *tag, knh_bytes_t urn, knh_int_t min,
 	DP(u)->ubcid = CLASS_Int;
 	KNH_SETv(ctx, DP(u)->urn, new_String(ctx, urn, NULL));
 	if(tag != NULL || tag[0] != 0) {
-		KNH_SETv(ctx, DP(u)->tag, new_String__T(ctx, tag));
+		KNH_SETv(ctx, DP(u)->tag, T(tag));
 	}
 	knh_ClassSpec_initIntRange(ctx, u, min, max);
 	if(!DP(u)->fichk(u, 0)) {
@@ -353,7 +353,7 @@ KNHAPI(ClassSpec*) new_Unit(Ctx *ctx, char *tag, knh_bytes_t urn, knh_float_t mi
 	DP(u)->ubcid = CLASS_Float;
 	KNH_SETv(ctx, DP(u)->urn, new_String(ctx, urn, NULL));
 	if(tag != NULL || tag[0] != 0) {
-		KNH_SETv(ctx, DP(u)->tag, new_String__T(ctx, tag));
+		KNH_SETv(ctx, DP(u)->tag, T(tag));
 
 	}
 	knh_ClassSpec_initFloatRange(ctx, u, min, max, step);
@@ -452,14 +452,14 @@ KNHAPI(ClassSpec*) new_Vocab(Ctx *ctx, char *tag, knh_bytes_t urn, int base, cha
 	DP(u)->ubcid = CLASS_String;
 	KNH_SETv(ctx, DP(u)->urn, new_String(ctx, urn, NULL));
 	if(tag != NULL || tag[0] != 0) {
-		KNH_SETv(ctx, DP(u)->tag, new_String__T(ctx, tag));
+		KNH_SETv(ctx, DP(u)->tag, T(tag));
 	}
 	DP(u)->fsnew = knh_fsnew__dict;
 	DP(u)->fscmp = knh_fscmp__dict;
 	{
 		Array *a = new_Array0(ctx, 0);
 		while(*terms != NULL) {
-			String *s = new_String__T(ctx, *terms);
+			String *s = T(*terms);
 			knh_Array_add(ctx, a, UP(s));
 			s->h.cid = cid;
 			terms++;
@@ -578,8 +578,8 @@ KNHAPI(void) knh_loadURNAliasData(Ctx *ctx, knh_StringConstData_t *data)
 	}
 	d = data;
 	while(d->name != NULL) {
-		String *n = new_String__T(ctx, d->name);
-		knh_DictMap_append(ctx, map, n, UP(new_String__T(ctx, d->value)));
+		String *n = T(d->name);
+		knh_DictMap_append(ctx, map, n, UP(T(d->value)));
 		d++;
 	}
 }
@@ -592,7 +592,7 @@ KNHAPI(void) knh_loadClassSpecFuncData(Ctx *ctx, knh_NamedPointerData_t *data)
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 	while(data->name != NULL) {
 		DBG2_P("adding.. '%s'", data->name);
-		String *n = new_String__T(ctx, data->name);
+		String *n = T(data->name);
 		knh_DictSet_set(ctx, ds, n, (knh_uintptr_t)data->ptr);
 		data++;
 	}

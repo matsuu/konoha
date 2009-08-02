@@ -104,7 +104,21 @@ void knh_Array_remove(Ctx *ctx, Array *o, size_t n);
 Any* knh_Array_pop(Ctx *ctx, Array *o);
 /* ../src/class/knh_Bytes.c */
 size_t knh_bytes_newsize(size_t s);
+void knh_Bytes_ensureZero(Ctx *ctx, Bytes *o);
+void knh_Bytes_remove(Ctx *ctx, Bytes *o, size_t offset, size_t len);
 void knh_Bytes_unputc(Bytes *o);
+void knh_Bytes_update(Ctx *ctx, Bytes *o, size_t pos, knh_bytes_t t);
+knh_cwb_t *knh_cwb_open(Ctx* ctx, knh_cwb_t *cwb);
+knh_cwb_t *knh_cwb_openinit(Ctx* ctx, knh_cwb_t *cwb, knh_bytes_t t);
+void knh_cwb_putc(Ctx *ctx, knh_cwb_t *cwb, int ch);
+void knh_cwb_write(Ctx *ctx, knh_cwb_t *cwb, knh_bytes_t t);
+size_t knh_cwb_size(knh_cwb_t *cwb);
+knh_bytes_t knh_cwb_tobytes(knh_cwb_t *cwb);
+char *knh_cwb_tochar(Ctx *ctx, knh_cwb_t *cwb);
+void knh_cwb_close(knh_cwb_t *cwb);
+void knh_cwb_subclear(knh_cwb_t *cwb, size_t len);
+String *new_String__cwb(Ctx *ctx, knh_cwb_t *cwb);
+String *new_StringX__cwb(Ctx *ctx, knh_class_t cid, knh_cwb_t *cwb);
 /* ../src/class/knh_bytes_t.c */
 size_t knh_size(size_t s);
 knh_bytes_t knh_bytes_subset(knh_bytes_t t, size_t s, size_t e);
@@ -120,7 +134,7 @@ BytesConv* new_BytesConv__iconv(Ctx *ctx, char *from, char *to);
 BytesConv* new_BytesConv__in(Ctx *ctx, char *from);
 BytesConv* new_BytesConv__out(Ctx *ctx, char *to);
 String *new_String__bconv(Ctx *ctx, knh_bytes_t t, BytesConv *bc);
-String *new_String__cwbconv(Ctx *ctx, knh_cwb_t cwb, BytesConv *bc);
+String *new_String__cwbconv(Ctx *ctx, knh_cwb_t *cwb, BytesConv *bc);
 void knh_OutputStream_write__bconv(Ctx *ctx, OutputStream *w, knh_bytes_t t);
 /* ../src/class/knh_Class.c */
 knh_struct_t knh_StructTable_newId(Ctx *ctx);
@@ -170,14 +184,6 @@ Connection* new_Connection(Ctx *ctx, String *urn);
 void knh_Connection_close(Ctx *ctx, Connection *o);
 /* ../src/class/knh_Context.c */
 void knh_Context_clearstack(Ctx *ctx);
-/* ../src/class/knh_cwb_t.c */
-knh_cwb_t new_cwb(Ctx* ctx);
-size_t knh_cwb_size(knh_cwb_t cwb);
-knh_bytes_t knh_cwb_tobytes(knh_cwb_t cwb);
-char *knh_cwb_tochar(knh_cwb_t cwb);
-void knh_cwb_clear(knh_cwb_t cwb);
-String *new_String__cwb(Ctx *ctx, knh_cwb_t cwb);
-String *new_StringX__cwb(Ctx *ctx, knh_class_t cid, knh_cwb_t cwb);
 /* ../src/class/knh_DictIdx.c */
 DictIdx* new_DictIdx0(Ctx *ctx, size_t init, knh_intptr_t offset);
 DictIdx* new_DictIdx0__ignoreCase(Ctx *ctx, size_t init, knh_intptr_t offset);
@@ -442,16 +448,10 @@ void knh_Asm_genMethod(Ctx *ctx, Asm *abr, OutputStream *w);
 void knh_Asm_loadCompiledMethod(Ctx *ctx, Asm *abr);
 knh_fmethod knh_Asm_getCompiledMethod(Ctx *ctx, Asm *abr, knh_bytes_t cname, knh_bytes_t mname);
 /* ../src/compiler/konohac.c */
-knh_bool_t knh_bytes_isSystemScript(knh_bytes_t path);
-char *knh_lookupSystemScript(Ctx *ctx, knh_bytes_t path, char *buf, size_t bufsiz);
-int knh_Stmt_compile(Ctx *ctx, Stmt *stmt, String *nsname, int isEval);
+InputStream* new_ScriptInputStream(Ctx *ctx, knh_bytes_t path, knh_cwb_t *cwb, NameSpace *ns, int isThrowable);
+Stmt *knh_InputStream_parseStmt(Ctx *ctx, InputStream *in, int isData);
+int knh_NameSpace_load(Ctx *ctx, NameSpace *ns, InputStream *in, int isEval, int isThrowable);
 Object *knh_Stmt_toData(Ctx *ctx, Stmt *stmt, knh_class_t reqc);
-Stmt *knh_bytes_parseStmt(Ctx *ctx, knh_bytes_t kscript, int urid, int line);
-void konohac_eval(Ctx *ctx, String *nsname, InputStream *in);
-Object *konohac_data(Ctx *ctx, InputStream *in, knh_class_t reqc);
-void knh_Asm_openlib(Ctx *ctx, Asm *abr, knh_bytes_t fpath);
-int knh_NameSpace_loadScript(Ctx *ctx, NameSpace *ns, knh_bytes_t fpath, int isEval);
-void konoha_compile(Ctx *ctx, String *nsname, knh_bytes_t fpath);
 /* ../src/compiler/parser.c */
 Stmt *new_StmtINSTMT(Ctx *ctx, Token *tk, int isData);
 void knh_Stmt_add_PEACH(Ctx *ctx, Stmt *o, knh_tokens_t *tc);
@@ -518,7 +518,7 @@ Term *knh_StmtFORMAT_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns);
 Term *knh_StmtCLASS_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns);
 int knh_Stmt_typingBLOCK(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int isIteration);
 /* ../src/deps/dlopen.c */
-void *knh_dlopen(Ctx *ctx, knh_bytes_t libname);
+void *knh_cwb_dlopen(Ctx *ctx, knh_cwb_t *cwb);
 void *knh_dlsym(Ctx *ctx, void* hdr, const char* symbol);
 const char *knh_dlerror(Ctx *ctx);
 int knh_dlclose(Ctx *ctx, void* hdr);
@@ -529,15 +529,15 @@ void  init_IO(Ctx *ctx);
 InputStream *new_InputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
 OutputStream *new_OutputStream__stdio(Ctx *ctx, FILE *fp, String *enc);
 /* ../src/deps/filesystem.c */
-char * knh_format_parentpath(char *buf, size_t bufsiz, knh_bytes_t path, int n);
-char * knh_format_nzpath(char *buf, size_t bufsiz, knh_bytes_t path);
-char * knh_format_catpath(char *buf, size_t bufsiz, knh_bytes_t path, knh_bytes_t file);
-knh_boolean_t knh_isfile(Ctx *ctx, knh_bytes_t path);
-knh_boolean_t knh_isdir(Ctx *ctx, knh_bytes_t path);
-knh_boolean_t knh_mkdir(Ctx *ctx, knh_bytes_t path, int isThrowable);
-knh_boolean_t knh_unlink(Ctx *ctx, knh_bytes_t f, int isThrowable);
-knh_boolean_t knh_rename(Ctx *ctx, knh_bytes_t on, knh_bytes_t nn, int isThrowable);
-char *knh_format_homepath(char *buf, size_t bufsiz);
+char* knh_cwb_ospath(Ctx *ctx, knh_cwb_t* cwb);
+char* knh_cwb_realpath(Ctx *ctx, knh_cwb_t *cwb);
+knh_boolean_t knh_cwb_isfile(Ctx *ctx, knh_cwb_t *cwb);
+knh_bool_t knh_cwb_isdir(Ctx *ctx, knh_cwb_t *cwb);
+knh_bool_t knh_cwb_parentpath(Ctx *ctx, knh_cwb_t *cwb, char *subbuf);
+knh_bool_t knh_mkdir(Ctx *ctx, knh_bytes_t path, int isThrowable);
+knh_bool_t knh_unlink(Ctx *ctx, knh_bytes_t path, int isThrowable);
+knh_bool_t knh_rename(Ctx *ctx, knh_bytes_t on, knh_bytes_t nn, int isThrowable);
+void knh_System_initPath(Ctx *ctx, System *o);
 /* ../src/deps/locale.c */
 char *konoha_encoding(void);
 char *knh_format_lang(char *buf, size_t bufsiz);
@@ -627,6 +627,8 @@ void knh_System_gc(Ctx *ctx);
 void knh_Object_RCsweep(Ctx *ctx, Object *o);
 knh_ftraverse knh_getDefaultSweepFunc(void);
 /* ../src/main/security.c */
+void knh_setSecureMode(void);
+knh_bool_t knh_isTrustedPath(Ctx *ctx, knh_bytes_t path);
 knh_bool_t knh_isTrustedHost(Ctx *ctx, knh_bytes_t host);
 /* ../src/main/stack.c */
 int knh_sfp_argc(Ctx *ctx, knh_sfp_t *v);
@@ -647,10 +649,10 @@ knh_methodn_t knh_getmn(Ctx *ctx, knh_bytes_t tname, knh_methodn_t def);
 char *knh_format_methodn(Ctx *ctx, char *buf, size_t bufsiz, knh_methodn_t mn);
 char * knh_format_cmethodn(Ctx *ctx, char *buf, size_t bufsiz, knh_class_t cid, knh_methodn_t mn);
 knh_urid_t knh_getResourceId(Ctx *ctx, knh_bytes_t t);
+knh_urid_t knh_cwb_getResourceId(Ctx *ctx, knh_cwb_t *cwb);
 String *knh_getResourceName(Ctx *ctx, knh_urid_t urid);
 void knh_addDriverAPI(Ctx *ctx, char *alias, knh_drvapi_t* p);
 knh_drvapi_t *knh_getDriverAPI(Ctx *ctx, int type, knh_bytes_t name);
-NameSpace *knh_loadPackage(Ctx *ctx, knh_bytes_t pkgname);
 NameSpace *knh_getNameSpace(Ctx *ctx, knh_bytes_t name);
 /* ../src/main/systemtable.c */
 void knh_lockID(Ctx *ctx, knh_lock_t lockid, Object *ref, char *filename, int lineno);
