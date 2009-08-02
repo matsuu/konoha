@@ -60,7 +60,7 @@ METHOD knh__Script_eval(Ctx *ctx, knh_sfp_t *sfp)
 		knh_cwb_putc(ctx, cwb, '\n');
 		InputStream *in = new_BytesInputStream(ctx, cwb->ba, cwb->pos, knh_Bytes_size(cwb->ba));
 		KNH_LPUSH(ctx, in);
-		DP(in)->urid = knh_getResourceId(ctx, STEXT("(eval)"));
+		DP(in)->uri = URI_EVAL;
 		DP(in)->line = 0;
 		knh_NameSpace_load(ctx, ctx->share->mainns, in, 1/*isEval*/,0/*isThrowable*/);
 		knh_cwb_close(cwb);

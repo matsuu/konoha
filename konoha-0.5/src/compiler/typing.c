@@ -290,7 +290,7 @@ int knh_Token_toSYSVAL(Ctx *ctx, Token *tk, Asm *abr)
 		return 1;
 	}
 	else if(IS_SYSVAL(t, "__file__")) {
-		knh_Token_setCONST(ctx, tk, UP(knh_getResourceName(ctx, SP(tk)->urid)));
+		knh_Token_setCONST(ctx, tk, UP(knh_getResourceName(ctx, SP(tk)->uri)));
 		return 1;
 	}
 	else if(IS_SYSVAL(t, "__method__") || IS_SYSVAL(t, "__function__")) {
@@ -1025,14 +1025,14 @@ int knh_bytes_findMT(Ctx *ctx, knh_bytes_t text, knh_bytes_t *mt, knh_bytes_t *e
 /* ------------------------------------------------------------------------ */
 
 static
-Stmt *knh_bytes_parseExpr(Ctx *ctx, knh_bytes_t expr, int urid, int line)
+Stmt *knh_bytes_parseExpr(Ctx *ctx, knh_bytes_t expr, int uri, int line)
 {
 	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
 	knh_Bytes_write(ctx, cwb->ba, expr);
 	knh_Bytes_putc(ctx, cwb->ba, ';');
 	{
 		InputStream *in = new_BytesInputStream(ctx, cwb->ba, cwb->pos, knh_Bytes_size(cwb->ba));
-		DP(in)->urid = (knh_urid_t)urid;
+		DP(in)->uri = (knh_uri_t)uri;
 		DP(in)->line = line;
 		Stmt *stmt = knh_InputStream_parseStmt(ctx, in, 0/*isData*/);
 		knh_cwb_close(cwb);
@@ -1056,7 +1056,7 @@ Term *knh_TokenESTR_toTerm(Ctx *ctx, Token *tk, Asm *abr)
 		knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 		KNH_LPUSH(ctx, KNH_NULL);   // lsfp[0]
 		Stmt *stmt = new_Stmt(ctx, 0, STT_OP);
-		Token *tkop = new_Token(ctx, 0, SP(tk)->urid, SP(tk)->line, TT_ADD);
+		Token *tkop = new_Token(ctx, 0, SP(tk)->uri, SP(tk)->line, TT_ADD);
 		knh_Stmt_add(ctx, stmt, TM(tkop));
 		while(res) {
 			//DBG2_P("mt='%s', len=%d", mt.buf, mt.len);
@@ -1066,12 +1066,12 @@ Term *knh_TokenESTR_toTerm(Ctx *ctx, Token *tk, Asm *abr)
 			if(text.len > 0) {
 				knh_Stmt_add(ctx, stmt, new_TermCONST(ctx, FL(tk), UP(new_String(ctx, text, NULL))));
 			}
-			Stmt *stmt_expr = knh_bytes_parseExpr(ctx, expr, SP(tk)->urid, SP(tk)->line);
+			Stmt *stmt_expr = knh_bytes_parseExpr(ctx, expr, SP(tk)->uri, SP(tk)->line);
 			KNH_SETv(ctx, lsfp[0].o, stmt_expr);
 			if(knh_stmt_isExpr(SP(stmt_expr)->stt)) {
 				Stmt *stmt_mt = new_Stmt(ctx, 0, STT_MT);
 				knh_Stmt_add(ctx, stmt, TM(stmt_mt));
-				tkop = new_Token(ctx, 0, SP(tk)->urid, SP(tk)->line, TT_MT);
+				tkop = new_Token(ctx, 0, SP(tk)->uri, SP(tk)->line, TT_MT);
 				KNH_SETv(ctx, DP(tkop)->data, new_String(ctx, mt, NULL));
 				knh_Stmt_add(ctx, stmt_mt, TM(tkop));
 				knh_Stmt_add(ctx, stmt_mt, TM(stmt_expr));
@@ -1202,13 +1202,13 @@ void TERMs_perrorTYPE(Ctx *ctx, Stmt *stmt, size_t n, knh_type_t reqt)
 	{
 		Method *mtd = DP(DP(stmt)->tokens[0])->mtd;
 		DBG2_ASSERT(IS_Method(mtd));
-		knh_perror(ctx, SP(stmt)->urid, SP(stmt)->line,
+		knh_perror(ctx, SP(stmt)->uri, SP(stmt)->line,
 				KERR_ERROR, _("type error: %T must be %T at the parameter %d of %M"), type, reqt, n - 1, DP(mtd)->mn);
 	}
 	break;
 	case STT_DECL:
 	case STT_LET:
-		knh_perror(ctx, SP(stmt)->urid, SP(stmt)->line,
+		knh_perror(ctx, SP(stmt)->uri, SP(stmt)->line,
 				KERR_ERROR, _("type error: %T must be %T at the assignment"), type, reqt);
 		break;
 		//	case STT_FOREACH:
@@ -1222,7 +1222,7 @@ void TERMs_perrorTYPE(Ctx *ctx, Stmt *stmt, size_t n, knh_type_t reqt)
 		//		}
 		//		break;
 	default :
-		knh_perror(ctx, SP(stmt)->urid, SP(stmt)->line,
+		knh_perror(ctx, SP(stmt)->uri, SP(stmt)->line,
 				KERR_ERROR, _("type error: %T must be %T at %s(%d)"), type, reqt, knh_stmt_tochar(SP(stmt)->stt), n);
 	}
 }
@@ -2269,13 +2269,13 @@ int knh_Stmt_checkOPSIZE(Ctx *ctx,Stmt *stmt, size_t n)
 {
 	if(DP(stmt)->size == n + 1) return 1;
 	if(n == 1) {
-		knh_perror(ctx, SP(stmt)->urid, SP(stmt)->line, KERR_ERROR, _("must be uniary operator"));
+		knh_perror(ctx, SP(stmt)->uri, SP(stmt)->line, KERR_ERROR, _("must be uniary operator"));
 	}
 	else if(n == 2) {
-		knh_perror(ctx, SP(stmt)->urid, SP(stmt)->line, KERR_ERROR, _("must be binary operator"));
+		knh_perror(ctx, SP(stmt)->uri, SP(stmt)->line, KERR_ERROR, _("must be binary operator"));
 	}
 	else {
-		knh_perror(ctx, SP(stmt)->urid, SP(stmt)->line, KERR_ERROR, _("syntax error"));
+		knh_perror(ctx, SP(stmt)->uri, SP(stmt)->line, KERR_ERROR, _("syntax error"));
 	}
 	return 0;
 }
@@ -3539,7 +3539,7 @@ int knh_Stmt_checkLastReturn(Ctx *ctx, Stmt *stmt, Method *mtd)
 
 	}
 	else { /* return default value */
-		knh_perror(ctx, SP(last_stmt)->urid, SP(last_stmt)->line, KERR_ERRATA, _("added return value"));
+		knh_perror(ctx, SP(last_stmt)->uri, SP(last_stmt)->line, KERR_ERRATA, _("added return value"));
 		knh_StmtRETURN_addValue(ctx, rstmt, knh_Method_rtype(ctx, mtd, DP(mtd)->cid));
 	}
 	KNH_ASSERT(last_stmt != NULL);

@@ -480,9 +480,9 @@ knh_format_cmethodn(Ctx *ctx, char *buf, size_t bufsiz, knh_class_t cid, knh_met
 }
 
 /* ======================================================================== */
-/* [urid] */
+/* [uri] */
 
-knh_urid_t knh_getResourceId(Ctx *ctx, knh_bytes_t t)
+knh_uri_t knh_getResourceId(Ctx *ctx, knh_bytes_t t)
 {
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 	knh_index_t idx = knh_DictIdx_index(ctx, DP(ctx->sys)->ResourceDictIdx, t);
@@ -491,12 +491,12 @@ knh_urid_t knh_getResourceId(Ctx *ctx, knh_bytes_t t)
 		idx = knh_DictIdx_add__fast(ctx, DP(ctx->sys)->ResourceDictIdx, s);
 	}
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-	return (knh_urid_t)idx;
+	return (knh_uri_t)idx;
 }
 
 /* ------------------------------------------------------------------------ */
 
-knh_urid_t knh_cwb_getResourceId(Ctx *ctx, knh_cwb_t *cwb)
+knh_uri_t knh_cwb_getResourceId(Ctx *ctx, knh_cwb_t *cwb)
 {
 	knh_bytes_t t = knh_cwb_tobytes(cwb);
 	if(!knh_bytes_startsWith(t, STEXT("http://"))) {
@@ -510,28 +510,28 @@ knh_urid_t knh_cwb_getResourceId(Ctx *ctx, knh_cwb_t *cwb)
 		idx = knh_DictIdx_add__fast(ctx, DP(ctx->sys)->ResourceDictIdx, s);
 	}
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-	return (knh_urid_t)idx;
+	return (knh_uri_t)idx;
 }
 
 /* ------------------------------------------------------------------------ */
 
-String *knh_getResourceName(Ctx *ctx, knh_urid_t urid)
+String *knh_getResourceName(Ctx *ctx, knh_uri_t uri)
 {
 	String *s;
-	urid = URID_UNMASK(urid);
+	uri = URI_UNMASK(uri);
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-	s = (String*)knh_DictIdx_get__fast(DP(ctx->sys)->ResourceDictIdx, urid);
+	s = (String*)knh_DictIdx_get__fast(DP(ctx->sys)->ResourceDictIdx, uri);
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
 	DBG_(
 		if(IS_NULL(s)) {
-			DBG_P("unknown urid=%d", (int)urid);
+			DBG_P("unknown uri=%d", (int)uri);
 			return TS_EMPTY;
 		}
 	)
 	return s;
 }
 
-#define _URIDN(urid) knh_String_tochar(knh_getResourceName(ctx, urid))
+#define _URIDN(uri) knh_String_tochar(knh_getResourceName(ctx, uri))
 
 /* ======================================================================== */
 /* [tPackage] */

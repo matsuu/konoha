@@ -90,7 +90,7 @@ static METHOD knh__InputStream_getEncoding(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__InputStream_isClosed(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Boolean(ctx, sfp, knh_InputStream_isClosed((InputStream*)sfp[0].o));
+	KNH_RETURN_Boolean(ctx, sfp, knh_InputStream_isClosed(ctx, (InputStream*)sfp[0].o));
 }
 
 /* ======================================================================== */

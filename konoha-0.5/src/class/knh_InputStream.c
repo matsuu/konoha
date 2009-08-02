@@ -204,13 +204,14 @@ void knh_InputStream_close(Ctx *ctx, InputStream *o)
 	DP(o)->driver = knh_getDefaultIODriver();
 	f(ctx, DP(o)->fd);
 	DP(o)->fd = -1;
+	KNH_SETv(ctx, DP(o)->ba, KNH_NULL);
 }
 
 /* ------------------------------------------------------------------------ */
 
-int knh_InputStream_isClosed(InputStream *o)
+int knh_InputStream_isClosed(Ctx *ctx, InputStream *o)
 {
-	return (DP(o)->fd == -1);
+	return (DP(o)->fd == -1 && IS_NULL(DP(o)->ba));
 }
 
 /* ======================================================================== */
@@ -325,7 +326,7 @@ int knh_bytes_checkStmtLine(knh_bytes_t line)
 //	{
 //		InputStream *bin = new_BytesInputStream(ctx, cwb->ba, cwb->pos, knh_Bytes_size(cwb->ba));
 //		Object *value = NULL;
-//		DP(bin)->urid = knh_getResourceId(ctx, STEXT("(eval)"));
+//		DP(bin)->uri = URI_EVAL;
 //		DP(bin)->line = linenum;
 //		knh_InputStream_setEncoding(ctx, bin, DP(in)->enc);
 //		value = konohac_data(ctx, bin, reqc);

@@ -259,7 +259,7 @@ int knh_InputStream_getc(Ctx *ctx, InputStream *o);
 size_t knh_InputStream_read(Ctx *ctx, InputStream *o, char *buf, size_t bufsiz);
 String* knh_InputStream_readLine(Ctx *ctx, InputStream *in);
 void knh_InputStream_close(Ctx *ctx, InputStream *o);
-int knh_InputStream_isClosed(InputStream *o);
+int knh_InputStream_isClosed(Ctx *ctx, InputStream *o);
 MAPPER knh_Bytes_InputStream(Ctx *ctx, knh_sfp_t *sfp);
 int knh_bytes_checkStmtLine(knh_bytes_t line);
 /* ../src/class/knh_Iterator.c */
@@ -358,6 +358,8 @@ knh_float_t knh_ResultSet_getFloat(Ctx *ctx, ResultSet *o, size_t n);
 String* knh_ResultSet_getString(Ctx *ctx, ResultSet *o, size_t n);
 /* ../src/class/knh_Script.c */
 Script *new_Script(Ctx *ctx, knh_bytes_t nsname);
+knh_bool_t knh_hasScriptFunc(Ctx *ctx, char *fmt);
+knh_sfp_t *knh_invokeScriptFunc(Ctx *ctx, char *fmt, va_list args);
 void knh_Script__k(Ctx *ctx, Script *o, OutputStream *w, String *m);
 void knh_Script__dump(Ctx *ctx, Script *o, OutputStream *w, String *m);
 /* ../src/class/knh_String.c */
@@ -433,7 +435,7 @@ void knh_StmtMETHOD_asm(Ctx *ctx, Stmt *stmt, Asm *abr);
 void knh_StmtFORMAT_asm(Ctx *ctx, Stmt *stmt, Asm *abr);
 void knh_StmtCLASS_asm(Ctx *ctx, Stmt *stmt, Asm *abr);
 /* ../src/compiler/kcode.c */
-KLRCode* new_KLRCode(Ctx *ctx, knh_urid_t urid, knh_bytes_t elf, knh_bytes_t dwarf);
+KLRCode* new_KLRCode(Ctx *ctx, knh_uri_t uri, knh_bytes_t elf, knh_bytes_t dwarf);
 void knh_Method_setKLRCode(Ctx *ctx, Method *mtd, KLRCode *code);
 knh_code_t* knh_Method_pcstartNULL(Method *mtd);
 knh_bytes_t knh_KLRCode_tobytes(KLRCode *o);
@@ -456,8 +458,8 @@ Object *knh_Stmt_toData(Ctx *ctx, Stmt *stmt, knh_class_t reqc);
 Stmt *new_StmtINSTMT(Ctx *ctx, Token *tk, int isData);
 void knh_Stmt_add_PEACH(Ctx *ctx, Stmt *o, knh_tokens_t *tc);
 /* ../src/compiler/perror.c */
-void knh_vperror(Ctx *ctx, knh_urid_t urid, int line, int pe, char *fmt, va_list ap);
-void knh_perror(Ctx *ctx, knh_urid_t urid, int line, int pe, char *fmt, ...);
+void knh_vperror(Ctx *ctx, knh_uri_t uri, int line, int pe, char *fmt, va_list ap);
+void knh_perror(Ctx *ctx, knh_uri_t uri, int line, int pe, char *fmt, ...);
 void knh_Token_perror(Ctx *ctx, Token *tk, int pe, char *fmt, ...);
 void knh_Asm_perror(Ctx *ctx, Asm *abr, int pe, char *fmt, ...);
 /* ../src/compiler/stmt.c */
@@ -475,7 +477,7 @@ int knh_StmtMETA_is(Ctx *ctx, Stmt *stmt, knh_bytes_t name);
 void knh_Stmt__s(Ctx *ctx, Stmt *o, OutputStream *w, String *m);
 void knh_Stmt__dump(Ctx *ctx, Stmt *o, OutputStream *w, String *m);
 /* ../src/compiler/token.c */
-Token* new_Token(Ctx *ctx, knh_flag_t flag, knh_urid_t urid, knh_sline_t line, knh_token_t tt);
+Token* new_Token(Ctx *ctx, knh_flag_t flag, knh_uri_t uri, knh_sline_t line, knh_token_t tt);
 void knh_Token_setFL(Token *o, Any *fln);
 Token *new_TokenASIS(Ctx *ctx, Any *fln);
 Token *new_TokenCID(Ctx *ctx, Any *fln, knh_class_t cid);
@@ -648,9 +650,9 @@ String *new_String__mn(Ctx *ctx, knh_methodn_t mn);
 knh_methodn_t knh_getmn(Ctx *ctx, knh_bytes_t tname, knh_methodn_t def);
 char *knh_format_methodn(Ctx *ctx, char *buf, size_t bufsiz, knh_methodn_t mn);
 char * knh_format_cmethodn(Ctx *ctx, char *buf, size_t bufsiz, knh_class_t cid, knh_methodn_t mn);
-knh_urid_t knh_getResourceId(Ctx *ctx, knh_bytes_t t);
-knh_urid_t knh_cwb_getResourceId(Ctx *ctx, knh_cwb_t *cwb);
-String *knh_getResourceName(Ctx *ctx, knh_urid_t urid);
+knh_uri_t knh_getResourceId(Ctx *ctx, knh_bytes_t t);
+knh_uri_t knh_cwb_getResourceId(Ctx *ctx, knh_cwb_t *cwb);
+String *knh_getResourceName(Ctx *ctx, knh_uri_t uri);
 void knh_addDriverAPI(Ctx *ctx, char *alias, knh_drvapi_t* p);
 knh_drvapi_t *knh_getDriverAPI(Ctx *ctx, int type, knh_bytes_t name);
 NameSpace *knh_getNameSpace(Ctx *ctx, knh_bytes_t name);

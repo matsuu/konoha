@@ -75,9 +75,9 @@ KNHAPI(void) knh_stack_checkSecurityManager(Ctx *ctx, knh_sfp_t *sfp)
 	knh_sfp_t *sp = sfp - 2;
 	while(ctx->stack < sp) {
 		if(IS_Method(sp[0].mtd)) {
-			if(!URID_ISTRUSTED(DP(sp[0].mtd)->urid)) {
+			if(!URI_ISTRUSTED(DP(sp[0].mtd)->uri)) {
 				char buf[FILEPATH_BUFSIZ];
-				knh_snprintf(buf, sizeof(buf), "Security!!: untrusted domain='%s'", URIDN(DP(sp[0].mtd)->urid));
+				knh_snprintf(buf, sizeof(buf), "Security!!: untrusted domain='%s'", URIDN(DP(sp[0].mtd)->uri));
 				KNH_THROWs(ctx, buf);
 			}
 		}

@@ -133,7 +133,7 @@ extern "C" {
 #define KNH_SYS_OS     4
 #define KNH_SYS_SCRIPT 5
 #define FIELDN(fn) knh_String_tochar(knh_getFieldName(ctx, fn))
-#define URIDN(urid) knh_String_tochar(knh_getResourceName(ctx, urid))
+#define URIDN(uri) knh_String_tochar(knh_getResourceName(ctx, uri))
 
 /* ======================================================================== */
 /* [PROTOTYPE] */
@@ -256,13 +256,14 @@ KNHAPI(int) konoha_debugLevel(void);
 KNHAPI(int) konoha_isSystemDump2(void);
 KNHAPI(int) konoha_parseopt(konoha_t konoha, int argc, char **argv);
 KNHAPI(int) konoha_hasRuntimeError(konoha_t konoha);
-KNHAPI(char*) knh_getRuntimeError(konoha_t konoha);
-KNHAPI(void) knh_setOutputStreamBuffer(konoha_t konoha, size_t osize, size_t esize);
-KNHAPI(char*) knh_getSTDOUTBuffer(konoha_t konoha);
-KNHAPI(char*) knh_getSTDERRBuffer(konoha_t konoha);
+KNHAPI(char*) konoha_getRuntimeError(konoha_t konoha);
+KNHAPI(void) konoha_setOutputStreamBuffer(konoha_t konoha, size_t osize, size_t esize);
+KNHAPI(char*) konoha_getStdOutBufferText(konoha_t konoha);
+KNHAPI(char*) knh_getStdErrBufferText(konoha_t konoha);
 KNHAPI(void) konoha_evalScript(konoha_t konoha, char *script);
 KNHAPI(void) konoha_loadScript(konoha_t konoha, char *fpath);
 KNHAPI(int) konoha_runMain(konoha_t konoha, int argc, char **argv);
+KNHAPI(int) konoha_hasScriptFunc(konoha_t konoha, char *fmt);
 KNHAPI(void) konoha_invokeScriptFunc(konoha_t konoha, char *fmt, ...);
 KNHAPI(knh_int_t) konoha_invokeIntFunc(konoha_t konoha, char *fmt, ...);
 KNHAPI(knh_float_t) konoha_invokeFloatFunc(konoha_t konoha, char *fmt, ...);

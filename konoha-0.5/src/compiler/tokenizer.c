@@ -49,7 +49,7 @@ void knh_InputStream_perror(Ctx *ctx, InputStream *in, int pe, char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
-	knh_vperror(ctx, DP(in)->urid, DP(in)->line, pe, fmt, ap);
+	knh_vperror(ctx, DP(in)->uri, DP(in)->line, pe, fmt, ap);
 	va_end(ap);
 }
 
@@ -106,7 +106,7 @@ Token *new_Token__NAME(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t
 	}
 	else {
 		knh_InputStream_perror(ctx, in, KERR_ERROR, _("unknown token: %B"), t);
-		return new_Token(ctx, flag, DP(in)->urid, DP(in)->line, TT_ERR);
+		return new_Token(ctx, flag, DP(in)->uri, DP(in)->line, TT_ERR);
 	}
 
 	CLASS_PART:
@@ -240,7 +240,7 @@ Token *new_Token__NAME(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t
 				tt = TT_TYPEN;
 			}
 		}
-		Token *o = new_Token(ctx, flag, DP(in)->urid, DP(in)->line, tt);
+		Token *o = new_Token(ctx, flag, DP(in)->uri, DP(in)->line, tt);
 //		DBG2_(
 //		if(!knh_bytes_equals(t, B(name))) {
 //			DBG2_P("(%s) '%s' ==> '%s'", knh_token_tochar(tt), (char*)t.buf, name);
@@ -269,7 +269,7 @@ knh_bool_t knh_Bytes_isTripleQuote(Bytes *o, knh_intptr_t ch)
 static
 Token *new_Token__buffer(Ctx *ctx, knh_token_t tt, knh_cwb_t *cwb, InputStream *in)
 {
-	Token *tk = new_Token(ctx, 0, DP(in)->urid, DP(in)->line, tt);
+	Token *tk = new_Token(ctx, 0, DP(in)->uri, DP(in)->line, tt);
 	knh_bytes_t t = knh_cwb_tobytes(cwb);
 	//DBG2_P("tt=%s, '%s', len=%d", knh_token_tochar(tt), t.buf, t.len);
 	if(tt == TT_METAN && islower(t.buf[0])) {
@@ -728,7 +728,7 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 			if(tkl < (TKSTACK_MAXSIZ - 1)) {
 				Token *intk = new_Token(ctx,
 						(equote == 2) ? KNH_FLAG_TKF_TAILWILDCARD : 0,
-								DP(in)->urid, DP(in)->line, knh_char_totoken(ch));
+								DP(in)->uri, DP(in)->line, knh_char_totoken(ch));
 				knh_Token_padd(ctx, tks[tkl], &BOL, intk);
 				tkl++;
 				tks[tkl] = intk;
@@ -809,13 +809,13 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 
 		case ';':
 			knh_Token_add_space(ctx, tks[tkl], &BOL, cwb, in);
-			knh_Token_padd(ctx, tks[tkl], &BOL, new_Token(ctx, 0, DP(in)->urid, DP(in)->line, knh_char_totoken(ch)));
+			knh_Token_padd(ctx, tks[tkl], &BOL, new_Token(ctx, 0, DP(in)->uri, DP(in)->line, knh_char_totoken(ch)));
 			equote = 1;
 			break;
 
 		case ',':
 			knh_Token_add_space(ctx, tks[tkl], &BOL, cwb, in);
-			knh_Token_padd(ctx, tks[tkl], &BOL, new_Token(ctx, 0, DP(in)->urid, DP(in)->line, knh_char_totoken(ch)));
+			knh_Token_padd(ctx, tks[tkl], &BOL, new_Token(ctx, 0, DP(in)->uri, DP(in)->line, knh_char_totoken(ch)));
 			equote = 1;
 			break;
 

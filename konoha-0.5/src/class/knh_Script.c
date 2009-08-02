@@ -76,58 +76,61 @@ Script *new_Script(Ctx *ctx, knh_bytes_t nsname)
 	return o;
 }
 
-///* ------------------------------------------------------------------------ */
-//
-//static
-//void knh_Script_restart(Ctx *ctx, Script *o)
-//{
-//	knh_class_t cid = o->h.cid;
-//	knh_ClassTable_t *TC = (knh_ClassTable_t*)(&ClassTable(cid));
-//	int i;
-//	for(i = 0; i < KNH_SCRIPT_FIELDSIZE; i++) {
-//		KNH_SETv(ctx, o->fields[i], KNH_NULL);
-//	}
-//	KNH_ASSERT(TC->lname != NULL);
-//	DBG2_P("%s", knh_String_tochar(TC->lname));
-//	KNH_SETv(ctx, TC->cstruct, new_ClassStruct0(ctx, TC->sid));
-//	DBG2_P("refc=%d", (int)o->h.refc);
-//	KNH_ASSERT(o->h.refc == 2);
-//	{
-//		Method *mtd = new_Method(ctx, 0, cid, METHODN_lambda, NULL);
-//		KNH_SETv(ctx, DP(mtd)->mf, MF_Any);
-//		knh_Class_addMethod__fast(ctx, cid, mtd);
-//	}
-//}
+/* ------------------------------------------------------------------------ */
 
+knh_bool_t knh_hasScriptFunc(Ctx *ctx, char *fmt)
+{
+	knh_bytes_t fname = B(fmt);
+	knh_index_t loc = knh_bytes_index(fname, '(');
+	if(loc > 0) {
+		fname = knh_bytes_first(fname, loc);
+		fmt = fmt + loc + 1;
+	}
+	{
+		knh_methodn_t mn = knh_getmn(ctx, fname, METHODN_NONAME);
+		NameSpace *ns = ctx->share->mainns;
+		Script *scr = knh_NameSpace_getScript(ctx, ns);
+		Method *mtd = knh_Class_getMethod(ctx, knh_Object_cid(scr), mn);
+		return IS_Method(mtd);
+	}
+}
 
-/* ======================================================================== */
-/* [method] */
+/* ------------------------------------------------------------------------ */
 
-//
-//void knh_Script_set(Ctx *ctx, Script *b, knh_index_t idx, Object *value)
-//{
-//	KNH_ASSERT(0 <= idx && idx < KNH_PROTOTYPE_FIELDSIZE);
-//	knh_Class_fields_set_value(ctx, knh_Object_cid(b), idx, value);
-//	KNH_SETv(ctx, b->fields[idx], value);
-//}
-//
-///* ------------------------------------------------------------------------ */
-//
-//
-//Object *knh_Script_get(Ctx *ctx, Script *b, knh_index_t idx)
-//{
-//	KNH_ASSERT(0 <= idx && idx < KNH_PROTOTYPE_FIELDSIZE);
-//	return b->fields[idx];
-//}
+knh_sfp_t *knh_invokeScriptFunc(Ctx *ctx, char *fmt, va_list args)
+{
+	knh_bytes_t fname = B(fmt);
+	knh_index_t loc = knh_bytes_index(fname, '(');
+	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
+	if(loc == -1) {
+		knh_setRuntimeError(ctx, T("needs ()"));
+		return lsfp+1;
+	}
+	else {
+		fname = knh_bytes_first(fname, loc);
+		fmt = fmt + loc + 1;
+	}
 
-///* ======================================================================== */
-///* [Object] */
-//
-//knh_bool_t knh_Class_isScript(Ctx *ctx, knh_class_t cid)
-//{
-//	return (cid > KONOHA_TSTRUCT_SIZE && knh_tclass_topsid(cid) == STRUCT_Script);
-//}
+	KNH_MOV(ctx, lsfp[0].o, new_ExceptionHandler(ctx));
+	KNH_TRY(ctx, L_CATCH, lsfp, 0);
+	{
+		knh_methodn_t mn = knh_getmn(ctx, fname, METHODN_NONAME);
+		NameSpace *ns = ctx->share->mainns;
+		Script *scr = knh_NameSpace_getScript(ctx, ns);
+		Method *mtd = konoha_lookupMethod(ctx, knh_Object_cid(scr), mn);
+		int n = knh_stack_vpush(ctx, lsfp + 1, fmt, args);
+		KNH_MOV(ctx, lsfp[2].o, scr);
+		KNH_SCALL(ctx, lsfp, 1, mtd, /* args*/ n);
+	}
+	knh_Context_clearstack(ctx);
+	((Context*)ctx)->hasError = 0;
+	return lsfp + 1;
 
+	/* catch */
+	L_CATCH:;
+	KNH_PRINT_STACKTRACE(ctx, lsfp, 0);
+	return lsfp + 1;
+}
 
 /* ======================================================================== */
 /* [movabletext] */
