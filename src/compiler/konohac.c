@@ -633,7 +633,7 @@ int knh_StmtXCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_class
 	char bufcu[CLASSNAME_BUFSIZ];
 	knh_format_classurn(ctx, bufcu, sizeof(bufcu), bcid, knh_getURNAlias(ctx, knh_Token_tobytes(ctx, tkurn)));
 
-	knh_class_t cid = konoha_findcid(ctx, B(bufcu));
+	knh_class_t cid = knh_findcid(ctx, B(bufcu));
 	if(cid == bcid || cid == CLASS_unknown) {
 		knh_Token_perror(ctx, tkurn, KERR_EWARN, _("resource not found: %s"), sToken(tkurn));
 		cid = bcid;

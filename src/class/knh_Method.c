@@ -223,7 +223,7 @@ Method* new_Method(Ctx *ctx, knh_flag_t flag, knh_class_t cid, knh_methodn_t mn,
 	DP(o)->cid    = cid;
 	DP(o)->mn     = mn;
 	if(METHODN_IS_MOVTEXT(mn)) {
-		KNH_SETv(ctx, DP(o)->mf, konoha_findMethodField0(ctx, TYPE_void));
+		KNH_SETv(ctx, DP(o)->mf, knh_findMethodField0(ctx, TYPE_void));
 	}
 	func = (func == NULL) ? knh_fmethod_abstract : func;
 	knh_Method_syncFunc(o, func);
@@ -416,7 +416,7 @@ void knh_addMethodFieldTable(Ctx *ctx, MethodField *mf)
 
 /* ------------------------------------------------------------------------ */
 
-MethodField *konoha_findMethodField0(Ctx *ctx, knh_type_t rtype)
+MethodField *knh_findMethodField0(Ctx *ctx, knh_type_t rtype)
 {
 	HashMap *hmap = DP(ctx->sys)->MethodFieldHashMap;
 	if(IS_NOTNULL(hmap)) {
@@ -437,7 +437,7 @@ MethodField *konoha_findMethodField0(Ctx *ctx, knh_type_t rtype)
 
 /* ------------------------------------------------------------------------ */
 
-MethodField *konoha_findMethodField1(Ctx *ctx, knh_type_t rtype, knh_type_t p1, knh_fieldn_t fn1)
+MethodField *knh_findMethodField1(Ctx *ctx, knh_type_t rtype, knh_type_t p1, knh_fieldn_t fn1)
 {
 	HashMap *hmap = DP(ctx->sys)->MethodFieldHashMap;
 	if(IS_NOTNULL(hmap)) {
@@ -611,7 +611,7 @@ Method *new_Method_getter(Ctx *ctx, knh_class_t cid, knh_methodn_t mn, knh_type_
 	}
 	Method *mtd = new_Method(ctx, /*KNH_FLAG_MF_GENERATED*/0, cid, mn, f);
 	DP(mtd)->delta = idx;
-	KNH_SETv(ctx, DP(mtd)->mf, konoha_findMethodField0(ctx, type));
+	KNH_SETv(ctx, DP(mtd)->mf, knh_findMethodField0(ctx, type));
 	return mtd;
 }
 
@@ -638,7 +638,7 @@ Method *new_Method_setter(Ctx *ctx, knh_class_t cid, knh_methodn_t mn, knh_type_
 	}
 	Method *mtd = new_Method(ctx, /*KNH_FLAG_MF_GENERATED*/0, cid, mn, f);
 	DP(mtd)->delta = idx;
-	KNH_SETv(ctx, DP(mtd)->mf, konoha_findMethodField1(ctx, TYPE_void, type, FIELDN_v));
+	KNH_SETv(ctx, DP(mtd)->mf, knh_findMethodField1(ctx, TYPE_void, type, FIELDN_v));
 	return mtd;
 }
 
@@ -733,7 +733,7 @@ knh_Class_getMethod__(Ctx *ctx, knh_class_t this_cid, knh_methodn_t mn, knh_bool
 /* ======================================================================== */
 /* [utils] */
 
-Method *konoha_lookupMethod(Ctx *ctx, knh_class_t cid, knh_methodn_t mn)
+Method *knh_lookupMethod(Ctx *ctx, knh_class_t cid, knh_methodn_t mn)
 {
 	KNH_ASSERT(!METHODN_IS_MOVTEXT(mn));
 	knh_hcode_t h = ((((knh_hcode_t)cid) << (sizeof(knh_class_t) * 8)) + mn) % ctx->cachesize;
@@ -759,7 +759,7 @@ Method *konoha_lookupMethod(Ctx *ctx, knh_class_t cid, knh_methodn_t mn)
 
 /* ------------------------------------------------------------------------ */
 
-Method *konoha_lookupFormatter(Ctx *ctx, knh_class_t cid, knh_methodn_t mn)
+Method *knh_lookupFormatter(Ctx *ctx, knh_class_t cid, knh_methodn_t mn)
 {
 	DBG2_ASSERT(METHODN_IS_MOVTEXT(mn));
 	knh_hcode_t h = ((((knh_hcode_t)cid) << (sizeof(knh_class_t) * 8)) + mn) % ctx->cachesize;

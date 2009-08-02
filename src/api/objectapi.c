@@ -368,7 +368,7 @@ static
 MAPPER knh_Object_String(Ctx *ctx, knh_sfp_t *sfp)
 {
 	Object *o = sfp[0].o;
-	Method *mtd = konoha_lookupFormatter(ctx, knh_Object_cid(o), METHODN__s);
+	Method *mtd = knh_lookupFormatter(ctx, knh_Object_cid(o), METHODN__s);
 	if(IS_NULL(mtd)) {
 		KNH_MAPPED(ctx, sfp, TS_EMPTY);
 	}

@@ -79,7 +79,7 @@ KNHAPI(void) knh_esp1_sformat(Ctx *ctx, Method *mtd, OutputStream *w, Any *m)
 KNHAPI(void) knh_esp1_format(Ctx *ctx, knh_methodn_t mn, OutputStream *w, Any *m)
 {
 	knh_sfp_t *esp = KNH_LOCAL(ctx);
-	Method *mtd = konoha_lookupFormatter(ctx, knh_Object_cid(esp[1].o), mn);
+	Method *mtd = knh_lookupFormatter(ctx, knh_Object_cid(esp[1].o), mn);
 	DBG2_ASSERT(esp == ctx->esp);
 	KNH_SETv(ctx, esp[2].o, w);
 	KNH_SETv(ctx, esp[3].o, m);

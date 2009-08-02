@@ -100,7 +100,7 @@ knh_class_t knh_getcid(Ctx *ctx, knh_bytes_t lname)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(knh_class_t) konoha_findcid(Ctx *ctx, knh_bytes_t lname)
+KNHAPI(knh_class_t) knh_findcid(Ctx *ctx, knh_bytes_t lname)
 {
 	knh_class_t cid = knh_getcid(ctx, lname);
 	if(cid != CLASS_unknown) {
@@ -123,7 +123,7 @@ KNHAPI(knh_class_t) konoha_findcid(Ctx *ctx, knh_bytes_t lname)
 		return knh_class_Iterator(ctx, cid);
 	}
 	if(lname.buf[lname.len-1] == '}') {
-		return konoha_findcidx(ctx, lname);
+		return knh_findcidx(ctx, lname);
 	}
 	return cid;
 }

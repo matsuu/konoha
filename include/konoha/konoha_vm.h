@@ -435,7 +435,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 	} \
 
 #define KLR_CALL(ctx, n, shift, mn) { \
-		KLR_MOV(ctx, sfp[n].o, konoha_lookupMethod(ctx, knh_Object_cid(sfp[n+1].o), mn)); \
+		KLR_MOV(ctx, sfp[n].o, knh_lookupMethod(ctx, knh_Object_cid(sfp[n+1].o), mn)); \
 		DBG2_ASSERT(IS_Method(sfp[n].o)); \
 		((Context*)ctx)->esp = &(sfp[n + shift]); \
 		sfp[n].pc = (sfp[n].mtd)->pc_start; \
@@ -445,7 +445,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 	} \
 
 #define KLR_ACALL(ctx, n, shift, mn) { \
-		Method *mtd_ = konoha_lookupMethod(ctx, knh_Object_cid(sfp[n+1].o), mn);\
+		Method *mtd_ = knh_lookupMethod(ctx, knh_Object_cid(sfp[n+1].o), mn);\
 		KLR_MOV(ctx, sfp[n].o, mtd_); \
 		((Context*)ctx)->esp = &(sfp[n + shift]); \
 		knh_sfp_typecheck(ctx, sfp + n + 1, mtd_, pc); \
@@ -489,7 +489,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		KLR_SWAP(ctx, n, n+1); \
 		KLR_MOV(ctx, sfp[n+2].o, cwb->w);\
 		KLR_MOV(ctx, sfp[n+3].o, fmt);\
-		Method *mtd_ = konoha_lookupFormatter(ctx, knh_Object_cid(sfp[n+1].o), mn);\
+		Method *mtd_ = knh_lookupFormatter(ctx, knh_Object_cid(sfp[n+1].o), mn);\
 		KLR_SCALL(ctx, n, 4, mtd_);\
 		KNH_SETv(ctx, sfp[n].o, new_String__cwb(ctx, cwb)); \
 	}\
@@ -511,13 +511,13 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 	} \
 
 #define KLR_MAP(ctx, n, tcid)  { \
-		KLR_MOV(ctx, sfp[n+1].o, konoha_findMapper(ctx, knh_Object_cid(sfp[n].o), tcid)); \
+		KLR_MOV(ctx, sfp[n+1].o, knh_findMapper(ctx, knh_Object_cid(sfp[n].o), tcid)); \
 		(sfp[n+1].mpr)->fmap_1(ctx, sfp + n); \
 	} \
 
 #define KLR_MAPnc(ctx, n, tcid)  { \
 		if(likely(IS_NOTNULL(sfp[n].o))) {\
-			KLR_MOV(ctx, sfp[n+1].o, konoha_findMapper(ctx, knh_Object_cid(sfp[n].o), tcid)); \
+			KLR_MOV(ctx, sfp[n+1].o, knh_findMapper(ctx, knh_Object_cid(sfp[n].o), tcid)); \
 			(sfp[n+1].mpr)->fmap_1(ctx, sfp + n); \
 		}\
 	}\
@@ -525,7 +525,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 #define KLR_AMAP(ctx, n, tcid)  { \
 		knh_class_t scid = knh_Object_cid(sfp[n].o);\
 		if(scid != ((knh_class_t)tcid) && !knh_class_instanceof(ctx, scid, tcid) && IS_NOTNULL(sfp[n].o)) { \
-			KLR_MOV(ctx, sfp[n+1].o, konoha_findMapper(ctx, scid, tcid)); \
+			KLR_MOV(ctx, sfp[n+1].o, knh_findMapper(ctx, scid, tcid)); \
 			(sfp[n+1].mpr)->fmap_1(ctx, sfp + n); \
 		} \
 	} \
@@ -615,7 +615,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 			} \
 			ncid_ = knh_Object_cid(sfp[na].o); \
 			if(ncid_ == reqc || knh_class_instanceof(ctx, reqc, ncid_)) break;\
-			KNH_SETv(ctx, esp0_[1].o, konoha_findMapper(ctx, ncid_, reqc));\
+			KNH_SETv(ctx, esp0_[1].o, knh_findMapper(ctx, ncid_, reqc));\
 			KLR_MOV(ctx, esp0_[0].o, sfp[na].o); esp0_[0].data = sfp[na].data;\
 			(esp0_[1].mpr)->fmap_1(ctx, esp0_); \
 			KLR_MOV(ctx, sfp[na].o, esp0_[0].o); sfp[na].data = esp0_[0].data;\

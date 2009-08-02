@@ -95,25 +95,24 @@ knh_dict_t *knh_dict_malloc(Ctx *ctx, size_t capacity,
 		void (*fdict_init)(Ctx *, knh_dict_t*), void (*fdict_traverse)(Ctx*, knh_dict_t*, knh_ftraverse),
 		int (*fdict_compar)(const void*, const void*))
 {
+	knh_hdict_t *h;
+	knh_dict_t *a;
+	size_t i;
 	if(!(capacity > 0)) {
 		capacity = (KONOHA_SMALLPAGESIZE - sizeof(knh_hdict_t)) / sizeof(knh_dict_t);
 	}
-	{
-		knh_hdict_t *h = (knh_hdict_t*)KNH_MALLOC(ctx, (capacity * sizeof(knh_dict_t)) + sizeof(knh_hdict_t));
-		h->capacity = capacity;
-		h->sorted = 0;
-		h->fdict_init = fdict_init;
-		h->fdict_traverse = fdict_traverse;
-		h->fdict_compar = fdict_compar;
-		{
-			knh_dict_t *a = (knh_dict_t*)(h+1);
-			size_t i;
-			for(i = 0; i < capacity; i++) {
-				fdict_init(ctx, a + i);
-			}
-			return a;
-		}
+
+	h = (knh_hdict_t*)KNH_MALLOC(ctx, (capacity * sizeof(knh_dict_t)) + sizeof(knh_hdict_t));
+	h->capacity = capacity;
+	h->sorted = 0;
+	h->fdict_init = fdict_init;
+	h->fdict_traverse = fdict_traverse;
+	h->fdict_compar = fdict_compar;
+	a = (knh_dict_t*)(h+1);
+	for(i = 0; i < capacity; i++) {
+		fdict_init(ctx, a + i);
 	}
+	return a;
 }
 
 /* ------------------------------------------------------------------------ */

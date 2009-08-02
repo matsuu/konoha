@@ -246,7 +246,7 @@ void knh_Asm_genMethod(Ctx *ctx, Asm *abr, OutputStream *w)
 		}
 	}
 
-	knh_println(ctx, w, STEXT("knh_fmethod konoha_findCompiledFunc(Ctx *ctx, knh_bytes_t cname, knh_bytes_t mname)"));
+	knh_println(ctx, w, STEXT("knh_fmethod knh_findCompiledFunc(Ctx *ctx, knh_bytes_t cname, knh_bytes_t mname)"));
 	knh_println(ctx, w, STEXT("{"));
 	knh_println(ctx, w, STEXT("\tsize_t delta = (DP(ctx->sys)->constPools)->size;"));
 	if(IS_NOTNULL(DP(abr)->exportsMethods)) {

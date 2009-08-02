@@ -50,7 +50,7 @@ int knh_fcallback_cmpr(Object *obj, Object *obj2)
 
 /* ------------------------------------------------------------------------ */
 
-void *konoha_generateCallBackFunc(Ctx *ctx, void *func, Closure *c)
+void *knh_generateCallBackFunc(Ctx *ctx, void *func, Closure *c)
 {
 	// (1) duplicate func;
 	// (2) replace (-1) with c

@@ -542,8 +542,8 @@ typedef struct knh_sfp_t {
 #define STRUCT_newid         ((knh_struct_t)-1)
 #define SIZEOF_TSTRUCT       (KNH_TSTRUCT_SIZE * sizeof(knh_StructTable_t))
 
-char *konoha_geStructTableName(Ctx *ctx, knh_struct_t sid);
-#define STRUCTN(sid)         konoha_geStructTableName(ctx, sid)
+char *knh_getStructTableName(Ctx *ctx, knh_struct_t sid);
+#define STRUCTN(sid)         knh_getStructTableName(ctx, sid)
 
 typedef void (*knh_fgchook)(Ctx *ctx);
 typedef void (*knh_ftraverse)(Ctx *ctx, Object *);
