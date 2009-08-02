@@ -111,7 +111,7 @@ InputStream* new_ScriptInputStream(Ctx *ctx, knh_bytes_t path, knh_cwb_t *cwb, N
 			}
 		}
 		spath = (String*)knh_Context_getProperty(ctx, (Context*)ctx, STEXT("user.script.path"));
-		if(IS_bString(spath) && uri != 0) {
+		if(IS_bString(spath) && uri == 0) {
 			knh_cwb_subclear(cwb, 0);
 			knh_cwb_write(ctx, cwb, knh_String_tobytes(spath));
 			knh_cwb_putc(ctx, cwb, '/');
@@ -122,6 +122,10 @@ InputStream* new_ScriptInputStream(Ctx *ctx, knh_bytes_t path, knh_cwb_t *cwb, N
 				DBG2_ASSERT(uri != 0);
 				uri = URI_TRUSTED(uri);
 			}
+		}
+		if(uri == 0) {
+			knh_cwb_subclear(cwb, 0);
+			knh_cwb_write(ctx, cwb, path);
 		}
 	}
 	if(uri == 0) {
@@ -138,7 +142,7 @@ InputStream* new_ScriptInputStream(Ctx *ctx, knh_bytes_t path, knh_cwb_t *cwb, N
 	}
 	{
 		String *spath = knh_getResourceName(ctx, uri);
-		knh_iodrv_t *drv = knh_getIODriver(ctx, STEXT("file:"));
+		knh_iodrv_t *drv = knh_getIODriver(ctx, STEXT("file"));
 		path = knh_String_tobytes(spath);
 		KNH_NOTICE(ctx, "importing script: %s", path.buf);
 		if(knh_bytes_startsWith(path, STEXT("http://"))) {
@@ -307,8 +311,10 @@ NameSpace *knh_NameSpace_newPackageNULL(Ctx *ctx, knh_bytes_t pkgname)
 			ns = new_NameSpace(ctx, nsname);
 			knh_DictMap_set(ctx, DP(ctx->sys)->NameSpaceTableDictMap, nsname, UP(ns));
 			KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+			knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 			NameSpace *curns = knh_switchCurrentNameSpace(ctx, ns);
 			InputStream *in = new_ScriptInputStream(ctx, B(fpath), NULL, ctx->share->mainns, 0);
+			KNH_LPUSH(ctx, in);
 			if(!knh_InputStream_isClosed(ctx, in)) {
 				knh_NameSpace_load(ctx, ctx->share->mainns, in, 1/*isEval*/,0/*isThrowable*/);
 			}
@@ -316,6 +322,7 @@ NameSpace *knh_NameSpace_newPackageNULL(Ctx *ctx, knh_bytes_t pkgname)
 				ns = NULL;
 			}
 			knh_switchCurrentNameSpace(ctx, curns);
+			KNH_LOCALBACK(ctx, lsfp);
 		}
 		else {
 			KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
@@ -539,13 +546,16 @@ int knh_StmtIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	knh_cwb_putc(ctx, cwb, '/');
 	knh_cwb_write(ctx, cwb, path);
 	{
+		knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 		InputStream *in = new_ScriptInputStream(ctx, path, cwb, ctx->share->mainns, 0);
+		KNH_LPUSH(ctx, in);
 		if(!knh_InputStream_isClosed(ctx, in)) {
 			res = knh_NameSpace_load(ctx, ctx->share->mainns, in, 1/*isEval*/,0/*isThrowable*/);
 		}
 		else {
 			res = 0;
 		}
+		KNH_LOCALBACK(ctx, lsfp);
 	}
 	knh_cwb_close(cwb);
 	return res;

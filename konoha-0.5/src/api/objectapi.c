@@ -303,7 +303,7 @@ void knh_Object__k(Ctx *ctx, Object *o, OutputStream *w, String *m)
 					continue;
 				}
 				else if(IS_ubxboolean(cf->type)) {
-					knh_boolean_t *data = (knh_boolean_t*)(v + i);
+					knh_bool_t *data = (knh_bool_t*)(v + i);
 					if(data[0]) knh_write(ctx, w, STEXT("true"));
 					else knh_write(ctx, w, STEXT("false"));
 					continue;
