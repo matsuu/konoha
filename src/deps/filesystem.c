@@ -305,15 +305,16 @@ void knh_System_initPath(Ctx *ctx, System *o)
 	}
 #if defined(KNH_USING_WINDOWS)
 	{
-		char bufl[FILEPATH_BUFSIZ];
+		char buf[FILEPATH_BUFSIZ];
+		int bufsiz = FILEPATH_BUFSIZ;
 		HMODULE h = LoadLibrary(NULL);
 		GetModuleFileNameA(h, buf, bufsiz);
-		knh_cwb_write(ctx, cwb, B(bufl));
+		knh_cwb_write(ctx, cwb, B(buf));
 		knh_DictMap_set(ctx, sys->props,
 			T("konoha.bin.path"), UP(new_String__cwb(ctx, cwb)));
 		if(homepath == NULL) {
 			GetModuleFileNameA(h, buf, bufsiz);
-			knh_cwb_write(ctx, cwb, B(bufl));
+			knh_cwb_write(ctx, cwb, B(buf));
 			knh_cwb_parentpath(ctx, cwb, NULL);
 			knh_cwb_parentpath(ctx, cwb, NULL);
 			shome = new_String__cwb(ctx, cwb);
@@ -325,14 +326,15 @@ void knh_System_initPath(Ctx *ctx, System *o)
 	// @url(http://shinh.skr.jp/binary/b2con.html)
 	// http://doc.trolltech.com/3.3/qapplication.html#applicationDirPath
 	{
-		char bufl[FILEPATH_BUFSIZ];
+		char buf[FILEPATH_BUFSIZ];
+		int bufsiz = FILEPATH_BUFSIZ;
 		readlink("/proc/self/exe", buf, bufsiz);
-		knh_cwb_write(ctx, cwb, B(bufl));
+		knh_cwb_write(ctx, cwb, B(buf));
 		knh_DictMap_set(ctx, sys->props,
 			T("konoha.bin.path"), UP(new_String__cwb(ctx, cwb)));
 		if(homepath == NULL) {
 			readlink("/proc/self/exe", buf, bufsiz);
-			knh_cwb_write(ctx, cwb, B(bufl));
+			knh_cwb_write(ctx, cwb, B(buf));
 			knh_cwb_parentpath(ctx, cwb, NULL);
 			knh_cwb_parentpath(ctx, cwb, NULL);
 			shome = new_String__cwb(ctx, cwb);
