@@ -830,7 +830,7 @@ typedef struct knh_System {
 	struct knh_OutputStream_t* out;
 	struct knh_OutputStream_t* err;
 	struct knh_String_t*       enc;
-	knh_String_t              *homeDir;
+//	knh_String_t              *homeDir;
 
 	struct knh_DictIdx_t *ResourceDictIdx;
 	struct knh_DictIdx_t *FieldNameDictIdx;
