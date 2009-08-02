@@ -79,7 +79,7 @@ void knh_addConstData(Ctx *ctx, char *dname, Object *value)
 {
 	knh_bytes_t n = B(dname);
 	knh_index_t loc = knh_bytes_rindex(n, '.');
-	String *name = new_String__T(ctx, dname + (loc+1));
+	String *name = T(dname + (loc+1));
 	knh_class_t cid = CLASS_Any;
 	if(loc != -1) {
 		if(ctx->abr != NULL && IS_Asm(ctx->abr)) {
@@ -124,7 +124,7 @@ KNHAPI(void) knh_loadFloatConstData(Ctx *ctx, knh_FloatConstData_t *data)
 KNHAPI(void) knh_loadStringConstData(Ctx *ctx, knh_StringConstData_t *data)
 {
 	while(data->name != NULL) {
-		Object *value = UP(new_String__T(ctx, data->value));
+		Object *value = UP(T(data->value));
 		knh_addConstData(ctx, data->name, value);
 		data++;
 	}
@@ -496,10 +496,31 @@ knh_urid_t knh_getResourceId(Ctx *ctx, knh_bytes_t t)
 
 /* ------------------------------------------------------------------------ */
 
+knh_urid_t knh_cwb_getResourceId(Ctx *ctx, knh_cwb_t *cwb)
+{
+	knh_bytes_t t = knh_cwb_tobytes(cwb);
+	if(!knh_bytes_startsWith(t, STEXT("http://"))) {
+		knh_cwb_realpath(ctx, cwb);
+		t = knh_cwb_tobytes(cwb);
+	}
+	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+	knh_index_t idx = knh_DictIdx_index(ctx, DP(ctx->sys)->ResourceDictIdx, t);
+	if(idx == -1) {
+		String *s = new_String(ctx, t, NULL);
+		idx = knh_DictIdx_add__fast(ctx, DP(ctx->sys)->ResourceDictIdx, s);
+	}
+	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+	return (knh_urid_t)idx;
+}
+
+/* ------------------------------------------------------------------------ */
+
 String *knh_getResourceName(Ctx *ctx, knh_urid_t urid)
 {
+	String *s;
+	urid = URID_UNMASK(urid);
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-	String *s = (String*)knh_DictIdx_get__fast(DP(ctx->sys)->ResourceDictIdx, urid);
+	s = (String*)knh_DictIdx_get__fast(DP(ctx->sys)->ResourceDictIdx, urid);
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
 	DBG_(
 		if(IS_NULL(s)) {
@@ -552,111 +573,22 @@ knh_drvapi_t *knh_getDriverAPI(Ctx *ctx, int type, knh_bytes_t name)
 	return p;
 }
 
-/* ======================================================================== */
-/* [namespace] */
-
-static
-char *knh_lookupPackageScript(Ctx *ctx, char *buf, size_t bufsiz, knh_bytes_t pkgname)
-{
-	char pbuf[40], fbuf[40], *file1 = NULL, *file2 = NULL, *rootdir;
-	knh_index_t loc = knh_bytes_rindex(pkgname, '.');
-	String *path = NULL;
-	knh_format_bytes(pbuf, sizeof(pbuf), pkgname);
-	if(loc == -1) {
-		file1 = pbuf;
-	}
-	else {
-		file1 = pbuf + loc + 1;
-		knh_format_bytes(fbuf, sizeof(fbuf), knh_bytes_first(pkgname, loc));
-		file2 = fbuf;
-	}
-
-	rootdir = knh_getenv("KONOHA_PACKAGE");
-	if(rootdir != NULL) {
-		knh_snprintf(buf, bufsiz, "%s/%s/%s.k", rootdir, pbuf, file1);
-		if(knh_isfile(ctx, B(buf))) return buf;
-	}
-
-	path = (String*)knh_Context_getProperty(ctx, (Context*)ctx, STEXT("konoha.path.package"));
-	if(IS_bString(path)){
-		knh_snprintf(buf, bufsiz, "%s/%s/%s.k", knh_String_tochar(path), pbuf, file1);
-		if(knh_isfile(ctx, B(buf))) return buf;
-	}
-
-	path = (String*)knh_Context_getProperty(ctx, (Context*)ctx, STEXT("konoha.path.user.package"));
-	if(IS_bString(path)){
-		knh_snprintf(buf, bufsiz, "%s/%s/%s.k", knh_String_tochar(path), pbuf, file1);
-		if(knh_isfile(ctx, B(buf))) return buf;
-	}
-
-	if(ctx->cwd == NULL) rootdir = ".";
-	else rootdir = ctx->cwd;
-	knh_snprintf(buf, bufsiz, "%s/.konoha/package/%s/%s.k", rootdir, pbuf, file1);
-	if(knh_isfile(ctx, B(buf))) return buf;
-	return NULL;
-}
-
-/* ------------------------------------------------------------------------ */
-
-NameSpace *knh_loadPackage(Ctx *ctx, knh_bytes_t pkgname)
-{
-	char buff[FILEPATH_BUFSIZ];
-	char *fpath = knh_lookupPackageScript(ctx, buff, sizeof(buff), pkgname);
-//#ifdef KNH_USING_KONOHAGET
-//	if(fpath == NULL && knh_Context_isInteractive(ctx)) {
-//		fprintf(stdout,
-//				"Package '%s' isn't found on your computer.\n"
-//				"Would you like to fetch from web?\n", (char*)pkgname.buf);
-//		if(!knh_readline_askYesNo("Please enter [y/N]: ", 0)) return 0;
-//		if(konohaget(ctx, pkgname)) {
-//			fpath = knh_lookup_packageScript(ctx, buff, sizeof(buff), pkgname);
-//		}
-//	}
-//#endif
-	if(fpath != NULL) {
-		KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-		NameSpace *ns = (NameSpace*)knh_DictMap_get__b(ctx,  DP(ctx->sys)->NameSpaceTableDictMap, pkgname);
-		KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-		if(IS_NULL(ns)) {
-			String *nsname = new_String(ctx, pkgname, NULL);
-			ns = new_NameSpace(ctx, nsname);
-			KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-			knh_DictMap_set(ctx, DP(ctx->sys)->NameSpaceTableDictMap, nsname, UP(ns));
-			KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-
-			NameSpace *curns = knh_switchCurrentNameSpace(ctx, ns);
-			knh_NameSpace_loadScript(ctx, ns, B(fpath), 1 /* isEval */);
-			knh_switchCurrentNameSpace(ctx, curns);
-		}
-		return ns;
-	}
-	return NULL;
-}
-
 /* ------------------------------------------------------------------------ */
 /* [NameSpace] */
 
 NameSpace *knh_getNameSpace(Ctx *ctx, knh_bytes_t name)
 {
-	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-	NameSpace *ns = (NameSpace*)knh_DictMap_get__b(ctx,  DP(ctx->sys)->NameSpaceTableDictMap, name);
 	if(knh_bytes_equals(name, STEXT("main"))) {
 		KNH_ASSERT(IS_NameSpace(ctx->share->mainns));
-		ns = ctx->share->mainns;
-		goto L_UNLOCK;
+		return ctx->share->mainns;
 	}
-	if(IS_NULL(ns)) {
-		ns = knh_loadPackage(ctx, name);
-		if(ns != NULL) goto L_UNLOCK;
+	else {
+		NameSpace *ns;
+		KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+		ns = (NameSpace*)knh_DictMap_get__b(ctx,  DP(ctx->sys)->NameSpaceTableDictMap, name);
+		KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+		return ns;
 	}
-	{
-		String *nsname = new_String(ctx, name, NULL);
-		ns = new_NameSpace(ctx, nsname);
-		knh_DictMap_set(ctx, DP(ctx->sys)->NameSpaceTableDictMap, nsname, UP(ns));
-	}
-	L_UNLOCK:
-	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-	return ns;
 }
 
 /* ------------------------------------------------------------------------ */

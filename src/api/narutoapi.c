@@ -49,32 +49,21 @@ METHOD knh__Script_isStmt(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method void Script.eval(String! script, String file, Int line) @Static */
+/* @method void Script.eval(String script) @Static */
 
 METHOD knh__Script_eval(Ctx *ctx, knh_sfp_t *sfp)
 {
 	if(IS_NOTNULL(sfp[1].s)) {
 		knh_sfp_t *lsfp = KNH_LOCAL(ctx);
-		knh_cwb_t cwb = new_cwb(ctx);
-		knh_Bytes_write(ctx, cwb.ba, knh_String_tobytes(sfp[1].s));
-		knh_Bytes_putc(ctx, cwb.ba, ';');
-		knh_Bytes_putc(ctx, cwb.ba, '\n');
-		InputStream *in = new_BytesInputStream(ctx, cwb.ba, cwb.pos, knh_Bytes_size(cwb.ba));
+		knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
+		knh_cwb_write(ctx, cwb, knh_String_tobytes(sfp[1].s));
+		knh_cwb_putc(ctx, cwb, '\n');
+		InputStream *in = new_BytesInputStream(ctx, cwb->ba, cwb->pos, knh_Bytes_size(cwb->ba));
 		KNH_LPUSH(ctx, in);
-		if(IS_NULL(sfp[2].o)) {
-			DP(in)->urid = knh_getResourceId(ctx, STEXT("(eval)"));
-		}
-		else {
-			DP(in)->urid = knh_getResourceId(ctx, knh_String_tobytes(sfp[2].s));
-		}
-		if(IS_NULL(sfp[3].o)) {
-			DP(in)->line = 0;
-		}
-		else {
-			DP(in)->urid = (knh_urid_t)p_int(sfp[3]);
-		}
-		konohac_eval(ctx, TS_main, in);
-		knh_cwb_clear(cwb);
+		DP(in)->urid = knh_getResourceId(ctx, STEXT("(eval)"));
+		DP(in)->line = 0;
+		knh_NameSpace_load(ctx, ctx->share->mainns, in, 1/*isEval*/,0/*isThrowable*/);
+		knh_cwb_close(cwb);
 		KNH_LOCALBACK(ctx, lsfp);
 	}
 	KNH_RETURN_void(ctx, sfp);
@@ -90,7 +79,7 @@ METHOD knh__Script_readLine(Ctx *ctx, knh_sfp_t *sfp)
 		line = knh_readline("");
 	}
 	else {
-		line = knh_readline(knh_String_tochar(sfp[1].s));
+		line = knh_readline(knh_String_text(ctx, sfp[1].s));
 	}
 	if(line == NULL) {
 		KNH_RETURN(ctx, sfp, KNH_NULL);

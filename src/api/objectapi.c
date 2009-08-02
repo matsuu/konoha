@@ -372,9 +372,9 @@ MAPPER knh_Object_String(Ctx *ctx, knh_sfp_t *sfp)
 	if(IS_NULL(mtd)) {
 		KNH_MAPPED(ctx, sfp, TS_EMPTY);
 	}
-	knh_cwb_t cwb = new_cwb(ctx);
+	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
 	KNH_MOV(ctx, sfp[2].o, o);
-	KNH_MOV(ctx, sfp[3].o, cwb.w);
+	KNH_MOV(ctx, sfp[3].o, cwb->w);
 	KNH_MOV(ctx, sfp[4].o, KNH_NULL);
 	KNH_SCALL(ctx, sfp, 1, mtd, 2);
 	KNH_MAPPED(ctx, sfp, new_String__cwb(ctx, cwb));
@@ -591,7 +591,7 @@ void knh_Class__man(Ctx *ctx, Class *o, OutputStream *w, String *m)
 			else {
 				knh_bytes_t name = B(op);
 				if(IS_NULL(knh_DictMap_get__b(ctx,  dm, name))) {
-					knh_DictMap_set(ctx, dm, new_String__T(ctx, op), UP(mtd));
+					knh_DictMap_set(ctx, dm, T(op), UP(mtd));
 				}
 			}
 		}

@@ -178,7 +178,7 @@ knh_InputStream_read(Ctx *ctx, InputStream *o, char *buf, size_t bufsiz)
 String* knh_InputStream_readLine(Ctx *ctx, InputStream *in)
 {
 	int ch;
-	knh_cwb_t cwb = new_cwb(ctx);
+	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
 	while((ch = knh_InputStream_getc(ctx, in)) != EOF) {
 		if(ch == '\r') {
 			return new_String__cwbconv(ctx, cwb, DP(in)->bconv);
@@ -187,7 +187,7 @@ String* knh_InputStream_readLine(Ctx *ctx, InputStream *in)
 			if(DP(in)->prev == '\r') continue;
 			return new_String__cwbconv(ctx, cwb, DP(in)->bconv);
 		}
-		knh_Bytes_putc(ctx, cwb.ba, ch);
+		knh_Bytes_putc(ctx, cwb->ba, ch);
 	}
 	if(knh_cwb_size(cwb) != 0) {
 		return new_String__cwbconv(ctx, cwb, DP(in)->bconv);
@@ -300,40 +300,40 @@ int knh_bytes_checkStmtLine(knh_bytes_t line)
 	return 1;
 }
 
-/* ------------------------------------------------------------------------ */
-
-KNHAPI(Object*) knh_InputStream_readData(Ctx *ctx, InputStream *in, knh_class_t reqc)
-{
-	int ch, linenum = DP(in)->line;
-	knh_cwb_t cwb = new_cwb(ctx);
-	L_AGAIN:;
-	while((ch = knh_InputStream_getc(ctx, in)) != EOF) {
-		if(ch == '\r' || ch == '`') {
-			int prev = DP(in)->prev;
-			if(prev == '\r' || prev == '\n') continue;
-			if(prev == ']' || prev == '}' || knh_bytes_checkStmtLine(knh_cwb_tobytes(cwb)) == 0) {
-				break;
-			}
-		}
-		knh_Bytes_putc(ctx, cwb.ba, ch);
-	}
-	if(knh_cwb_size(cwb) == 0) {
-		if(ch == EOF) return KNH_NULL;
-		goto L_AGAIN;
-	}
-
-	{
-		InputStream *bin = new_BytesInputStream(ctx, cwb.ba, cwb.pos, knh_Bytes_size(cwb.ba));
-		Object *value = NULL;
-		DP(bin)->urid = knh_getResourceId(ctx, STEXT("(eval)"));
-		DP(bin)->line = linenum;
-		knh_InputStream_setEncoding(ctx, bin, DP(in)->enc);
-		value = konohac_data(ctx, bin, reqc);
-		knh_cwb_clear(cwb);
-		if(IS_NULL(value)) goto L_AGAIN;
-		return value;
-	}
-}
+///* ------------------------------------------------------------------------ */
+//
+//KNHAPI(Object*) knh_InputStream_readData(Ctx *ctx, InputStream *in, knh_class_t reqc)
+//{
+//	int ch, linenum = DP(in)->line;
+//	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
+//	L_AGAIN:;
+//	while((ch = knh_InputStream_getc(ctx, in)) != EOF) {
+//		if(ch == '\r' || ch == '`') {
+//			int prev = DP(in)->prev;
+//			if(prev == '\r' || prev == '\n') continue;
+//			if(prev == ']' || prev == '}' || knh_bytes_checkStmtLine(knh_cwb_tobytes(cwb)) == 0) {
+//				break;
+//			}
+//		}
+//		knh_Bytes_putc(ctx, cwb->ba, ch);
+//	}
+//	if(knh_cwb_size(cwb) == 0) {
+//		if(ch == EOF) return KNH_NULL;
+//		goto L_AGAIN;
+//	}
+//
+//	{
+//		InputStream *bin = new_BytesInputStream(ctx, cwb->ba, cwb->pos, knh_Bytes_size(cwb->ba));
+//		Object *value = NULL;
+//		DP(bin)->urid = knh_getResourceId(ctx, STEXT("(eval)"));
+//		DP(bin)->line = linenum;
+//		knh_InputStream_setEncoding(ctx, bin, DP(in)->enc);
+//		value = konohac_data(ctx, bin, reqc);
+//		knh_cwb_close(cwb);
+//		if(IS_NULL(value)) goto L_AGAIN;
+//		return value;
+//	}
+//}
 
 /* ------------------------------------------------------------------------ */
 

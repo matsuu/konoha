@@ -75,7 +75,7 @@ KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port, int i
 	if ((addr.s_addr = inet_addr(ip_or_host)) == -1) {
 		host = gethostbyname(ip_or_host);
 		if (host == NULL) {
-			KNH_PERRNO(ctx, "Socket!!", "gethostbyname", isThrowable);
+			KNH_PERRNO(ctx, NULL, "Socket!!", "gethostbyname", isThrowable);
 			return -1;
 		}
 		memcpy(&addr, (struct in_addr *)*host->h_addr_list, sizeof(struct in_addr));
@@ -85,11 +85,11 @@ KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port, int i
 	server.sin_port = htons(port);
 
 	if((sd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-		KNH_PERRNO(ctx, "Socket!!", "socket", isThrowable);
+		KNH_PERRNO(ctx, NULL, "Socket!!", "socket", isThrowable);
 		return -1;
 	}
 	if (connect(sd, (struct sockaddr *)&server, sizeof(server)) == -1) {
-		KNH_PERRNO(ctx, "Socket!!", "connect", isThrowable);
+		KNH_PERRNO(ctx, NULL, "Socket!!", "connect", isThrowable);
 		return -1;
 	}
 	return sd;
@@ -101,7 +101,7 @@ KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port, int i
 
         err = so_gethostbyname(ip_or_host, &host, tmp);
         if (err < 0) {
-            KNH_PERRNO(ctx, "Socket!!", "gethostbyname", isThrowable);
+            KNH_PERRNO(ctx, NULL, "Socket!!", "gethostbyname", isThrowable);
             return -1;
         }
 
@@ -111,14 +111,14 @@ KNHAPI(knh_intptr_t) knh_socket_open(Ctx *ctx, char *ip_or_host, int port, int i
 
         err = so_socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
         if (err < 0) {
-            KNH_PERRNO(ctx, "Socket!!", "socket", isThrowable);
+            KNH_PERRNO(ctx, NULL, "Socket!!", "socket", isThrowable);
             return -1;
         }
         sd = err;
 
         err = so_connect(sd, (struct sockaddr*)&server, sizeof(server));
         if (err < 0) {
-            KNH_PERRNO(ctx, "Socket!!", "connect", isThrowable);
+            KNH_PERRNO(ctx, NULL, "Socket!!", "connect", isThrowable);
             so_close(sd);
             return -1;
         }
@@ -142,7 +142,7 @@ KNHAPI(int) knh_socket_send(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz,
         if (res < 0) res = -1;
 #endif
 	if(res == -1) {
-		KNH_PERRNO(ctx, "Socket!!", "send", knh_Context_isStrict(ctx));
+		KNH_PERRNO(ctx, NULL, "Socket!!", "send", knh_Context_isStrict(ctx));
 	}
 	return res;
 }
@@ -160,7 +160,7 @@ KNHAPI(int) knh_socket_recv(Ctx *ctx, knh_intptr_t sd, char *buf, size_t bufsiz,
         if (res < 0) res = -1;
 #endif
 	if(res == -1) {
-		KNH_PERRNO(ctx, "Socket!!", "recv", knh_Context_isStrict(ctx));
+		KNH_PERRNO(ctx, NULL, "Socket!!", "recv", knh_Context_isStrict(ctx));
 	}
 	return res;
 }

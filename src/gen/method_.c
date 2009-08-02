@@ -199,12 +199,6 @@ METHOD knh__Method_isStatic(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 static 
-METHOD knh__Method_isNullBase(Ctx *ctx, knh_sfp_t *sfp)
-{
-	KNH_RETURN_Boolean(ctx, sfp, knh_Method_isNullBase((knh_Method_t*)sfp[0].o));
-}
-
-static 
 METHOD knh__Method_isVarArgs(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Method_isVarArgs((knh_Method_t*)sfp[0].o));

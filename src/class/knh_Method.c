@@ -176,9 +176,9 @@ int knh_MethodField_equalsType(MethodField *o, MethodField *o2)
 METHOD knh_fmethod_abstract(Ctx *ctx, knh_sfp_t *sfp)
 {
 	Method *mtd = sfp[-1].mtd;
-	knh_cwb_t cb = new_cwb(ctx);
-	knh_printf(ctx, cb.w, "AbstractMethod!!: %C.%M", knh_Object_cid(sfp[0].o), DP(mtd)->mn);
-	String *s = new_String__cwb(ctx, cb);
+	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
+	knh_printf(ctx, cwb->w, "AbstractMethod!!: %C.%M", knh_Object_cid(sfp[0].o), DP(mtd)->mn);
+	String *s = new_String__cwb(ctx, cwb);
 	KNH_THROW(ctx, s);
 }
 
@@ -238,11 +238,11 @@ Method* new_Method(Ctx *ctx, knh_flag_t flag, knh_class_t cid, knh_methodn_t mn,
 static
 METHOD knh_fmethod_NoSuchMethod(Ctx *ctx, knh_sfp_t *sfp)
 {
-	knh_cwb_t cwb = new_cwb(ctx);
-	knh_Bytes_write(ctx, cwb.ba, STEXT("NoSuchMethod!!: "));
-	knh_write_cid(ctx, cwb.w, knh_Object_cid(sfp[0].o));
-	knh_putc(ctx, cwb.w, '.');
-	knh_write_mn(ctx, cwb.w, DP(sfp[-1].mtd)->mn);
+	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
+	knh_Bytes_write(ctx, cwb->ba, STEXT("NoSuchMethod!!: "));
+	knh_write_cid(ctx, cwb->w, knh_Object_cid(sfp[0].o));
+	knh_putc(ctx, cwb->w, '.');
+	knh_write_mn(ctx, cwb->w, DP(sfp[-1].mtd)->mn);
 	String *s = new_String__cwb(ctx, cwb);
 	KNH_THROW(ctx, s);
 }

@@ -1938,6 +1938,8 @@ void knh_NameSpace_init(Ctx *ctx, NameSpace *ns, int init)
 	KNH_INITv(b->lconstDictMap, KNH_NULL);
 	KNH_INITv(b->tag2urnDictMap, KNH_NULL);
 	KNH_INITv(b->func2cidDictSet, KNH_NULL);
+	KNH_INITv(b->pathTrustDictSet, KNH_NULL);
+
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1953,6 +1955,7 @@ void knh_NameSpace_traverse(Ctx *ctx, NameSpace *ns, knh_ftraverse ftr)
 	ftr(ctx, UP(b->name2cidDictSet));
 	ftr(ctx, UP(b->tag2urnDictMap));
 	ftr(ctx, UP(b->func2cidDictSet));
+	ftr(ctx, UP(b->pathTrustDictSet));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1974,45 +1977,7 @@ String *knh_NameSpace_getkey(Ctx *ctx, knh_sfp_t *lsfp)
 #define knh_System_newClass NULL
 #define knh_System_getkey NULL
 
-
 static knh_uintptr_t knh_autoSystemId = 0;
-
-/* ------------------------------------------------------------------------ */
-
-static void knh_System_initProp(Ctx *ctx, System *o)
-{
-	char buf[FILEPATH_BUFSIZ];
-	knh_System_struct *sys = DP(o);
-	KNH_INITv(sys->homeDir, new_String(ctx, B(knh_format_homepath(buf,sizeof(buf))), NULL));
-	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.encoding"), UP(sys->enc));
-	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.locale"),
-			UP(new_String(ctx, B(knh_format_lang(buf, sizeof(buf))), NULL)));
-
-	knh_DictMap_set(ctx, sys->props, new_String__T(ctx, "konoha.path"), UP(sys->homeDir));
-
-#ifdef KNH_PREFIX
-	knh_snprintf(buf, sizeof(buf), "%s/konoha/package", KNH_PREFIX);
-#else
-	knh_snprintf(buf, sizeof(buf), "%s/package", knh_String_tochar(sys->homeDir));
-#endif
-	knh_DictMap_set(ctx, sys->props,
-		new_String__T(ctx, "konoha.path.package"), UP(new_String(ctx, B(buf), NULL)));
-
-	{
-		char *rootdir = knh_getenv("HOME");
-		if(rootdir != NULL) {
-			knh_snprintf(buf, sizeof(buf), "%s/" KONOHA_FOLDER, rootdir);
-			knh_DictMap_set(ctx, sys->props,
-				new_String__T(ctx, "konoha.path.folder"), UP(new_String(ctx, B(buf), NULL)));
-			knh_snprintf(buf, sizeof(buf), "%s/" KONOHA_FOLDER "/package", rootdir);
-			knh_DictMap_set(ctx, sys->props,
-				new_String__T(ctx, "konoha.path.user.package"), UP(new_String(ctx, B(buf), NULL)));
-			knh_snprintf(buf, sizeof(buf), "%s/" KONOHA_FOLDER "/temp", rootdir);
-			knh_DictMap_set(ctx, sys->props,
-				new_String__T(ctx, "konoha.path.temp"), UP(new_String(ctx, B(buf), NULL)));
-		}
-	}
-}
 
 /* ------------------------------------------------------------------------ */
 
@@ -2026,7 +1991,7 @@ void knh_System_init(Ctx *ctx, System *o, int init)
 	KNH_INITv(sys->ClassNameDictSet, new_DictSet(ctx, KNH_TCLASS_SIZE/2));
 	KNH_INITv(sys->ExptNameDictSet, new_DictSet(ctx, KNH_TEXPT_SIZE/2));
 
-	KNH_INITv(sys->enc,   new_String__T(ctx, konoha_encoding()));
+	KNH_INITv(sys->enc,   T(konoha_encoding()));
 #ifdef KNH_USING_NOFILE
 	KNH_INITv(sys->in,    new_InputStream__stdio(ctx, NULL, sys->enc));
 	KNH_INITv(sys->out,   new_OutputStream__stdio(ctx, NULL, sys->enc));
@@ -2040,15 +2005,15 @@ void knh_System_init(Ctx *ctx, System *o, int init)
 	KNH_INITv(sys->props, new_DictMap0(ctx, 64));
 	KNH_INITv(sys->FieldNameDictIdx, new_DictIdx0__ignoreCase(ctx, KNH_TFIELDN_SIZE * 2, 0));
 	KNH_INITv(sys->ResourceDictIdx, new_DictIdx0(ctx, 32, 0));
-	knh_DictIdx_add__fast(ctx, sys->ResourceDictIdx, new_String__T(ctx, "(unknown)"));
+	knh_DictIdx_add__fast(ctx, sys->ResourceDictIdx, T("(unknown)"));
 	KNH_INITv(sys->MethodFieldHashMap, new_HashMap(ctx, "System.MethodField", (KNH_TCLASS_SIZE * 2) + 31 ));
 	KNH_INITv(sys->DriversTableDictSet, new_DictSet(ctx, 32));
 	KNH_INITv(sys->SpecFuncDictSet, new_DictSet(ctx, 32));
 
 	KNH_INITv(sys->NameSpaceTableDictMap, new_DictMap0(ctx, 8));
 	KNH_INITv(sys->URNAliasDictMap, new_DictMap0(ctx, 8));
-	knh_System_initProp(ctx, o);
 	KNH_INITv(sys->UsingResources, new_Array0(ctx, 0));
+	knh_System_initPath(ctx, o);
 	//KNH_INITv(sys->sysnsDictMap_UNUSED, new_DictMap0(ctx, 16));
 	//KNH_INITv(sys->funcDictSet_UNUSED, new_DictSet(ctx, 16));
 }
@@ -2564,7 +2529,7 @@ void knh_loadStringData(Ctx *ctx, knh_StringData_t *data)
 	while(data->name != NULL) {
 		KNH_ASSERT(ctx->share->tString[data->index] == NULL);
 		KNH_ASSERT(data->index < (SIZEOF_TSTRING / sizeof(String*)));
-		KNH_INITv(ctx->share->tString[data->index], new_String__T(ctx, data->name));
+		KNH_INITv(ctx->share->tString[data->index], T(data->name));
 		data++;
 	}
 }
@@ -2674,7 +2639,7 @@ void knh_loadClassData(Ctx *ctx, knh_ClassData_t *data)
 		if(cid + 1 == ctx->share->ClassTableSize) {
 			((knh_SharedData_t*)ctx->share)->ClassTableSize = cid;
 		}
-		knh_setClassName(ctx, cid, new_String__T(ctx, data->name));
+		knh_setClassName(ctx, cid, T(data->name));
 		{
 			knh_ClassTable_t *t = (knh_ClassTable_t*)(ctx->share->ClassTable + cid);
 			t->cflag  = data->flag;
@@ -2731,7 +2696,7 @@ static
 void knh_loadGenericsData(Ctx *ctx, knh_GenericsData_t *data)
 {
 	while(data->name != NULL) {
-		knh_addGenericsClass(ctx, data->cid, new_String__T(ctx, data->name), data->bcid, data->p1, data->p2);
+		knh_addGenericsClass(ctx, data->cid, T(data->name), data->bcid, data->p1, data->p2);
 		data++;
 	}
 }
@@ -2742,7 +2707,7 @@ static
 void knh_loadClosureData(Ctx *ctx, knh_ClosureData_t *data)
 {
 	while(data->name != NULL) {
-		knh_addClosureClass(ctx, data->cid, new_String__T(ctx, data->name), data->r0, data->p1, data->p2, data->p3);
+		knh_addClosureClass(ctx, data->cid, T(data->name), data->r0, data->p1, data->p2, data->p3);
 		data++;
 	}
 }
@@ -2753,7 +2718,7 @@ static
 void knh_loadExptData(Ctx *ctx, knh_ExptData_t *data)
 {
 	while(data->name != NULL) {
-		knh_addException(ctx, data->flag, data->eid, new_String__T(ctx, data->name), data->parent);
+		knh_addException(ctx, data->flag, data->eid, T(data->name), data->parent);
 		data++;
 	}
 }
@@ -2764,7 +2729,7 @@ static
 void knh_loadFuncData(Ctx *ctx, knh_FuncData_t *data)
 {
 	while(data->name != NULL) {
-		knh_DictSet_set(ctx, DP(ctx->sys)->funcDictSet_UNUSED, new_String__T(ctx, data->name), (knh_uintptr_t)data->func);
+		knh_DictSet_set(ctx, DP(ctx->sys)->funcDictSet_UNUSED, T(data->name), (knh_uintptr_t)data->func);
 		data++;
 	}
 }
@@ -2775,7 +2740,7 @@ static
 void knh_loadFieldNameData(Ctx *ctx, knh_FieldNameData_t *data)
 {
 	while(data->name != NULL) {
-		String *name = new_String__T(ctx, data->name);
+		String *name = T(data->name);
 #if defined(KNH_DBGMODE2)
 		knh_fieldn_t fn = (knh_fieldn_t)knh_DictIdx_add__fast(ctx, DP(ctx->sys)->FieldNameDictIdx, name);
 			//DEBUG("'%s' %d %d", knh_String_tochar(name), fn, fn2);
@@ -2868,8 +2833,8 @@ static void knh_loadStringPropertyData(Ctx *ctx, knh_StringConstData_t *data)
 {
 	DictMap *pmap = DP(ctx->sys)->props;
 	while(data->name != NULL) {
-		String *n = new_String__T(ctx, data->name);
-		knh_DictMap_append(ctx, pmap, n, UP(new_String__T(ctx, data->value)));
+		String *n = T(data->name);
+		knh_DictMap_append(ctx, pmap, n, UP(T(data->value)));
 		data++;
 	}
 }

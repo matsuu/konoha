@@ -484,10 +484,10 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 /* ------------------------------------------------------------------------- */
 
 #define KLR_TOSTRf(ctx, n, mn, fmt) { \
+		knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);\
 		DBG2_ASSERT(ctx->esp <= (sfp + n));\
 		KLR_SWAP(ctx, n, n+1); \
-		knh_cwb_t cwb = new_cwb(ctx);\
-		KLR_MOV(ctx, sfp[n+2].o, cwb.w);\
+		KLR_MOV(ctx, sfp[n+2].o, cwb->w);\
 		KLR_MOV(ctx, sfp[n+3].o, fmt);\
 		Method *mtd_ = konoha_lookupFormatter(ctx, knh_Object_cid(sfp[n+1].o), mn);\
 		KLR_SCALL(ctx, n, 4, mtd_);\
@@ -849,6 +849,12 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		KNH_ASSERT(IS_Mapper(m)); \
 		(lsfp[n+1].mpr)->fmap_1(ctx, lsfp + n); \
 	} \
+
+#define KNH_THROW_AGAIN(ctx, lsfp, hn) {\
+		Exception *e_ = DP(lsfp[hn].hdr)->caught;\
+		KNH_ASSERT(IS_ExceptionHandler(lsfp[hn].hdr));\
+		knh_throwException(ctx, e_, __FILE__, __LINE__);\
+	}\
 
 #define KNH_PRINT_STACKTRACE(ctx, lsfp, hn) {\
 		Exception *e_ = DP(lsfp[hn].hdr)->caught;\
