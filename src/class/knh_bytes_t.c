@@ -623,6 +623,21 @@ KNHAPI(int) knh_bytes_parseURL(knh_bytes_t url, char *buf, size_t bufsiz)
 
 /* ------------------------------------------------------------------------ */
 
+KNHAPI(knh_bytes_t) knh_bytes_substringURLpath(knh_bytes_t url)
+{
+	knh_index_t loc = knh_bytes_index(url, ':');
+	if(loc > 0 && url.buf[loc+1] == '/' && url.buf[loc+2] == '/') {
+		knh_bytes_t t = knh_bytes_last(url, loc+3);
+		loc = knh_bytes_index(t, '@');
+		if(loc > 0) t = knh_bytes_last(t, loc+1);
+		loc = knh_bytes_index(t, '/');
+		return knh_bytes_last(t, loc);
+	}
+	return STEXT("/");
+}
+
+/* ------------------------------------------------------------------------ */
+
 KNHAPI(int) knh_bytes_parseURLpath(knh_bytes_t url, char *buf, size_t bufsiz)
 {
 	knh_index_t loc = knh_bytes_index(url, ':');

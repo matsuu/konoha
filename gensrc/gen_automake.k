@@ -21,7 +21,7 @@ int main(String[] args)
 # shinpei@ynu(c)2008-09
 
 # make target for libtool.
-AM_CFLAGS = -g3 -O3 -pipe
+AM_CFLAGS = -g -pipe
 lib_LTLIBRARIES = libkonoha.la
 
 libkonoha_la_LDFLAGS = -no-undefined -release 0 -version-info 5:0:0

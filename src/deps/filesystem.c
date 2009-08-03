@@ -100,7 +100,7 @@ char* knh_cwb_realpath(Ctx *ctx, knh_cwb_t *cwb)
 	if(p != NULL) {
 		knh_cwb_subclear(cwb, 0);
 		knh_Bytes_write(ctx, cwb->ba, B(p));
-#if defined(PATH_MAX)
+#if !defined(PATH_MAX)
 		free(p);
 #endif
 		p = knh_cwb_tochar(ctx, cwb);

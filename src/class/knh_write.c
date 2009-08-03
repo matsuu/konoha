@@ -559,7 +559,7 @@ void knh_setverbose(int v)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) konoha_says(Ctx *ctx, int type, char *fmt, ...)
+KNHAPI(void) knh_says(Ctx *ctx, int type, char *fmt, ...)
 {
 #ifndef KONOHA_ON_LKM
 // TODO_LKM
