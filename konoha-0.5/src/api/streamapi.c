@@ -225,7 +225,7 @@ static METHOD knh__OutputStream_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 {
 	OutputStream *out = (OutputStream*)sfp[0].o;
 	knh_sfp_t *v = sfp + 1, *esp1 = ctx->esp + 1;
-	int ac = knh_sfp_argc(ctx, v);
+	int ac = knh_stack_argc(ctx, v);
 	size_t i;
 	for(i = 0; i < ac; i++) {
 		if(IS_bString(v[i].o)) {

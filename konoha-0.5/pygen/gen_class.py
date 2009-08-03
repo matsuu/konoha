@@ -489,7 +489,7 @@ METHOD %s(Ctx *ctx, knh_sfp_t *sfp)
 		n = 'sfp[%d].o' % (ki + 1)
 		if p.type == 'int':
 			f.write(''',
-\t\tknh_sfp_argc(ctx, sfp + %d),
+\t\tknh_stack_argc(ctx, sfp + %d),
 \t\tsfp + %d''' % ((ki + 1), (ki + 1)))
 			break
 		if p.type == 'knh_hcode_t':

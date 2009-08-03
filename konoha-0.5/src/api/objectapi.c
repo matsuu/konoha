@@ -47,7 +47,7 @@ static METHOD knh__Object_new__init(Ctx *ctx, knh_sfp_t *sfp)
 	Object *o = sfp[0].o;
 //	knh_class_t cid = knh_Object_cid(o);
 //	knh_sfp_t *v = sfp + 1;
-//	int ac = knh_sfp_argc(ctx, v);
+//	int ac = knh_stack_argc(ctx, v);
 //	size_t i;
 //	for(i = 0; i < ac; i+= 2) {
 //		if(IS_bString(v[i].s)) {

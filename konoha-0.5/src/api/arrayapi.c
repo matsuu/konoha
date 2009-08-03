@@ -77,7 +77,7 @@ static METHOD knh__Array_new__init(Ctx *ctx, knh_sfp_t *sfp)
 {
 	Array *o = (Array*)sfp[0].o;
 	knh_sfp_t *v = sfp + 1;
-	int i, ac = knh_sfp_argc(ctx, v);
+	int i, ac = knh_stack_argc(ctx, v);
 	if(ac > 0) {
 		knh_Array_grow(ctx, o, ac, KNH_NULL);
 	}
@@ -160,7 +160,7 @@ static METHOD knh__IArray_new__init(Ctx *ctx, knh_sfp_t *sfp)
 {
 	IArray *o = (IArray*)sfp[0].o;
 	knh_sfp_t *v = sfp + 1;
-	int i, ac = knh_sfp_argc(ctx, v);
+	int i, ac = knh_stack_argc(ctx, v);
 	if(ac > 0) {
 		knh_IArray_grow(ctx, o, ac, 0);
 	}
@@ -242,7 +242,7 @@ static METHOD knh__FArray_new__init(Ctx *ctx, knh_sfp_t *sfp)
 {
 	FArray *o = (FArray*)sfp[0].o;
 	knh_sfp_t *v = sfp + 1;
-	int i, ac = knh_sfp_argc(ctx, v);
+	int i, ac = knh_stack_argc(ctx, v);
 	if(ac > 0) {
 		knh_FArray_grow(ctx, o, ac, 0.0);
 	}
@@ -279,7 +279,7 @@ static METHOD knh__Array_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 	if(IS_IMM(sfp[0].o)) {
 		Array *o = (Array*)sfp[0].o;
 		knh_sfp_t *v = sfp + 1;
-		int i, ac = knh_sfp_argc(ctx, v);
+		int i, ac = knh_stack_argc(ctx, v);
 		for(i = 0; i < ac; i++) {
 			knh_sfp_boxing(ctx, v + i);
 			knh_Array_add(ctx, o, v[i].o);
@@ -312,7 +312,7 @@ static METHOD knh__IArray_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 	if(IS_IMM(sfp[0].o)) {;
 	IArray *o = (IArray*)sfp[0].o;
 	knh_sfp_t *v = sfp + 1;
-	int i, ac = knh_sfp_argc(ctx, v);
+	int i, ac = knh_stack_argc(ctx, v);
 	for(i = 0; i < ac; i++) {
 		knh_IArray_add(ctx, o, v[i].ivalue);
 	}
@@ -344,7 +344,7 @@ static METHOD knh__FArray_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 	if(IS_IMM(sfp[0].o)) {;
 	FArray *o = (FArray*)sfp[0].o;
 	knh_sfp_t *v = sfp + 1;
-	int i, ac = knh_sfp_argc(ctx, v);
+	int i, ac = knh_stack_argc(ctx, v);
 	for(i = 0; i < ac; i++) {
 		knh_FArray_add(ctx, o, v[i].fvalue);
 	}

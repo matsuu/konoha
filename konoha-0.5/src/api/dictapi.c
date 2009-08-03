@@ -61,7 +61,7 @@ static METHOD knh__DictMap_new__init(Ctx *ctx, knh_sfp_t *sfp)
 {
 	DictMap *o = (DictMap*)sfp[0].o;
 	knh_sfp_t *v = sfp + 1;
-	int ac = knh_sfp_argc(ctx, v);
+	int ac = knh_stack_argc(ctx, v);
 	size_t i;
 	for(i = 0; i < ac; i+=2) {
 		if(IS_bString(v[i].s)) {
@@ -252,7 +252,7 @@ static METHOD knh__DictMap_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 	DictMap *o = (DictMap*)sfp[0].o;
 	if(!knh_Object_isImmutable(o)) {
 		knh_sfp_t *v = sfp + 1;
-		int ac = knh_sfp_argc(ctx, v);
+		int ac = knh_stack_argc(ctx, v);
 		size_t i;
 		for(i = 0; i < ac; i++) {
 			if(IS_NULL(v[1].o)) continue;
@@ -530,7 +530,7 @@ static METHOD knh__DictSet_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 	DictSet *o = (DictSet*)sfp[0].o;
 	if(!knh_Object_isImmutable(o)) {
 		knh_sfp_t *v = sfp + 1;
-		int ac = knh_sfp_argc(ctx, v);
+		int ac = knh_stack_argc(ctx, v);
 		size_t i;
 		for(i = 0; i < ac; i++) {
 			if(IS_NULL(v[1].o)) continue;

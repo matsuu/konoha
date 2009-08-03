@@ -99,7 +99,7 @@ static METHOD knh__Bytes_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 	Bytes *o = (Bytes*)sfp[0].o;
 	if(!knh_Object_isImmutable(o)) {
 		knh_sfp_t *v = sfp + 1;
-		int i, ac = knh_sfp_argc(ctx, v);
+		int i, ac = knh_stack_argc(ctx, v);
 		for(i = 0; i < ac; i++) {
 			knh_Bytes_putc(ctx, o, p_int(v[i]));
 		}

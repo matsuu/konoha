@@ -633,7 +633,7 @@ void knh_setSecureMode(void);
 knh_bool_t knh_isTrustedPath(Ctx *ctx, knh_bytes_t path);
 knh_bool_t knh_isTrustedHost(Ctx *ctx, knh_bytes_t host);
 /* ../src/main/stack.c */
-int knh_sfp_argc(Ctx *ctx, knh_sfp_t *v);
+int knh_stack_argc(Ctx *ctx, knh_sfp_t *v);
 METHOD knh__System_stackdump(Ctx *ctx, knh_sfp_t *sfp);
 void knh_sfp_typecheck(Ctx *ctx, knh_sfp_t *sfp, Method *mtd, knh_code_t *pc);
 /* ../src/main/system.c */

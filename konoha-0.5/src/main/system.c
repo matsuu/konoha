@@ -502,18 +502,29 @@ knh_uri_t knh_getResourceId(Ctx *ctx, knh_bytes_t t)
 knh_uri_t knh_cwb_getResourceId(Ctx *ctx, knh_cwb_t *cwb)
 {
 	knh_bytes_t t = knh_cwb_tobytes(cwb);
+	knh_uri_t uri = 0;
 	if(!knh_bytes_startsWith(t, STEXT("http://"))) {
 		knh_cwb_realpath(ctx, cwb);
 		t = knh_cwb_tobytes(cwb);
 	}
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-	knh_index_t idx = knh_DictIdx_index(ctx, DP(ctx->sys)->ResourceDictIdx, t);
-	if(idx == -1) {
-		String *s = new_String(ctx, t, NULL);
-		idx = knh_DictIdx_add__fast(ctx, DP(ctx->sys)->ResourceDictIdx, s);
+	{
+		knh_index_t idx = knh_DictIdx_index(ctx, DP(ctx->sys)->ResourceDictIdx, t);
+		if(idx == -1) {
+			String *s = new_String__cwb(ctx, cwb);
+			idx = knh_DictIdx_add__fast(ctx, DP(ctx->sys)->ResourceDictIdx, s);
+			t = knh_String_tobytes(s);
+			knh_cwb_write(ctx, cwb, t);
+		}
+		uri = (knh_uri_t)idx;
 	}
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-	return (knh_uri_t)idx;
+	DBG_P("uri=%d,%d '%s'", uri, URI_UNTRUSTED(uri), t.buf);
+	if(!knh_isTrustedPath(ctx, t)) {
+		uri = URI_UNTRUSTED(uri);
+	}
+	DBG_P("uri=%d,%d '%s'", uri, URI_UNTRUSTED(uri), t.buf);
+	return uri;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -531,6 +542,7 @@ String *knh_getResourceName(Ctx *ctx, knh_uri_t uri)
 			return TS_EMPTY;
 		}
 	)
+	DBG_P("uri=%d, '%s'", uri, knh_String_tochar(s));
 	return s;
 }
 

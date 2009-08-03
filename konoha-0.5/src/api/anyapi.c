@@ -96,7 +96,7 @@ extern "C" {
 //
 //METHOD knh__Any_opAdd(Ctx *ctx, knh_sfp_t *sfp)
 //{
-//	int ac = knh_sfp_argc(ctx, sfp);
+//	int ac = knh_stack_argc(ctx, sfp);
 //	knh_int_t i, n = ARG_int(sfp[0]);
 //	for(i = 1; i < ac; i++) {
 //		n += ARG_int(sfp[i]);
@@ -109,7 +109,7 @@ extern "C" {
 //
 //METHOD knh__Any_opSub(Ctx *ctx, knh_sfp_t *sfp)
 //{
-//	int ac = knh_sfp_argc(ctx, sfp);
+//	int ac = knh_stack_argc(ctx, sfp);
 //	knh_int_t i, n = ARG_int(sfp[0]);
 //	for(i = 1; i < ac; i++) {
 //		n -= ARG_int(sfp[i]);
@@ -122,7 +122,7 @@ extern "C" {
 //
 //METHOD knh__Any_opMul(Ctx *ctx, knh_sfp_t *sfp)
 //{
-//	int ac = knh_sfp_argc(ctx, sfp);
+//	int ac = knh_stack_argc(ctx, sfp);
 //	knh_int_t i, n = ARG_int(sfp[0]);
 //	for(i = 1; i < ac; i++) {
 //		n *= ARG_int(sfp[i]);
@@ -135,7 +135,7 @@ extern "C" {
 //
 //METHOD knh__Any_opDiv(Ctx *ctx, knh_sfp_t *sfp)
 //{
-//	int ac = knh_sfp_argc(ctx, sfp);
+//	int ac = knh_stack_argc(ctx, sfp);
 //	knh_int_t i, n = ARG_int(sfp[0]);
 //	for(i = 1; i < ac; i++) {
 //		n /= ARG_int(sfp[i]);
