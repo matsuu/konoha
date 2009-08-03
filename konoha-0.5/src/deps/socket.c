@@ -300,8 +300,15 @@ void knh_iodrv_init__HTTP(Ctx *ctx, Object *stream, char *mode)
 		knh_sfp_t *esp = ctx->esp + 1;
 		do {
 			String *s = knh_InputStream_readLine(ctx, in);
-			KNH_SETv(ctx, esp[0].o, s);
-			DBG2_P("line='%s'", knh_String_tochar(s));
+			KNH_SETv(ctx, esp[0].o, s);  // TO AVOID GC
+			knh_bytes_t t = knh_String_tobytes(s);
+			int loc = knh_bytes_indexOf(t, STEXT("charset="));
+			if(loc > 0) {
+				DBG2_P("charset='%s'", t.buf + 8);
+			}
+			if(knh_bytes_startsWith(t, STEXT("Location: "))) {
+				TODO();
+			}
 		}while((esp[0].s)->size > 0);
 	}
 }
