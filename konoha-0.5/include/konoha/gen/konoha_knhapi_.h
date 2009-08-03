@@ -113,15 +113,15 @@ extern "C" {
 #define KNH_FLAG_PF_FUNC        KNH_FLAG_T3
 #define KNH_FLAG_PF_NAME        KNH_FLAG_T4
 #define KNH_FLAG_PF_BOL         KNH_FLAG_T7
-#define KNH_THROW(ctx, e) knh_throw(ctx, UP(e), KNH_SAFEFILE(__FILE__), __LINE__)
+#define KNH_THROW(ctx, e) knh_throw(ctx, UP(e), knh_safefile(__FILE__), __LINE__)
 #define KNH_THROWs(ctx, s) \
-	knh_throwException(ctx, new_Exception__b(ctx, B(s)), KNH_SAFEFILE(__FILE__), __LINE__); \
+	knh_throwException(ctx, new_Exception__b(ctx, B(s)), knh_safefile(__FILE__), __LINE__); \
 
 
 #define KNH_THROWf(ctx, fmt, ...) \
 	char throcwb_[256]; \
 	knh_snprintf(throcwb_, sizeof(throcwb_), fmt, ## __VA_ARGS__); \
-	knh_throwException(ctx, new_Exception__b(ctx, B(throcwb_)), KNH_SAFEFILE(__FILE__), __LINE__); \
+	knh_throwException(ctx, new_Exception__b(ctx, B(throcwb_)), knh_safefile(__FILE__), __LINE__); \
 
 
 #define TODO_THROW(ctx) knh_throw_TODO(ctx, (char*)__FILE__, __LINE__, (char*)__FUNCTION__)
@@ -272,7 +272,7 @@ KNHAPI(int) konoha_invokeBooleanFunc(konoha_t konoha, char *fmt, ...);
 KNHAPI(char*) konoha_invokeStringFunc(konoha_t konoha, char *fmt, ...);
 KNHAPI(int) konoha_setMethodFunc(konoha_t konoha, char *name, knh_fmethod func);
 KNHAPI(void) konoha_shell(konoha_t konoha);
-KNHAPI(char*) KNH_SAFEFILE(char *file);
+KNHAPI(char*) knh_safefile(char *file);
 KNHAPI(Object*) new_Object_boxing(Ctx *ctx, knh_class_t cid, knh_sfp_t *sfp);
 KNHAPI(char*) knh_getPassword(Ctx *ctx, knh_bytes_t url);
 KNHAPI(void) knh_stack_checkSecurityManager(Ctx *ctx, knh_sfp_t *sfp);

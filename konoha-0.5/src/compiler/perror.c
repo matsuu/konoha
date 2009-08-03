@@ -60,7 +60,7 @@ void knh_vperror(Ctx *ctx, knh_uri_t uri, int line, int pe, char *fmt, va_list a
 	L_PRINT:;
 	{
 		OutputStream *w = KNH_STDERR;
-		knh_printf(ctx, w, " - [%s:%d]:%s ", URIDN(uri), (knh_intptr_t)line, KERR_MSG[pe]);
+		knh_printf(ctx, w, " - [%s:%d]:%s ", knh_safefile(URIDN(uri)), (knh_intptr_t)line, KERR_MSG[pe]);
 		knh_vprintf(ctx, w, fmt, ap);
 		knh_write_EOL(ctx, w);
 	}
@@ -101,20 +101,7 @@ void knh_Asm_perror(Ctx *ctx, Asm *abr, int pe, char *fmt, ...)
 	va_end(ap);
 }
 
-///* ======================================================================== */
-///* [Asm] */
-//
-//
-///* ------------------------------------------------------------------------ */
-//
-//void
-//knh_Asm_assert(Ctx *ctx, Asm *abr, int c)
-//{
-//	knh_perror0(ctx, DP(abr)->uri, (int)DP(abr)->line, KMSG_EABORT, NULL);
-//	knh_Asm_setCancelled(abr, 1);
-//}
-//
-///* ------------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------ */
 
 #ifdef __cplusplus
 }

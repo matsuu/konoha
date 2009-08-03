@@ -138,7 +138,7 @@ int knh_verbose(void)
 /* ======================================================================== */
 /* [file] */
 
-KNHAPI(char*) KNH_SAFEFILE(char *file)
+KNHAPI(char*) knh_safefile(char *file)
 {
 	if(file == NULL) return "(unknown)";
 	knh_bytes_t t = B(file);

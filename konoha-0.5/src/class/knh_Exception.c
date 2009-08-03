@@ -275,7 +275,7 @@ KNHAPI(void) knh_cwb_perrno(Ctx *ctx, knh_cwb_t *cwb, char *emsg, char *func, ch
 		if(cwb != NULL) {
 			knh_cwb_close(cwb);
 		}
-		knh_throwException(ctx, new_Exception__b(ctx, B(buf)), KNH_SAFEFILE(file), line);
+		knh_throwException(ctx, new_Exception__b(ctx, B(buf)), knh_safefile(file), line);
 	}
 	else {
 		KNH_NOTICE(ctx, "%s() says %s (errno=%d)", func, emsg2, errno);
@@ -298,7 +298,7 @@ KNHAPI(void) knh_throw_Unsupported(Ctx *ctx, knh_cwb_t *cwb, const char *func, c
 		if(cwb != NULL) {
 			knh_cwb_close(cwb);
 		}
-		knh_throwException(ctx, new_Exception__b(ctx, B(buf)), KNH_SAFEFILE(file), line);
+		knh_throwException(ctx, new_Exception__b(ctx, B(buf)), knh_safefile(file), line);
 	}
 	else {
 		KNH_NOTICE(ctx, "unsupported: %s", func);
@@ -311,7 +311,7 @@ KNHAPI(void) knh_throw_OutOfIndex(Ctx *ctx, knh_int_t n, size_t max, char *file,
 {
 	char buf[80];
 	knh_snprintf(buf, sizeof(buf), "OutOfIndex!!: %d <%d", (int)n, (int)max);
-	knh_throwException(ctx, new_Exception__b(ctx, B(buf)), KNH_SAFEFILE(file), line);
+	knh_throwException(ctx, new_Exception__b(ctx, B(buf)), knh_safefile(file), line);
 }
 
 #define _KNH_THROW_OUTOFINDEX(ctx, n, max) { \

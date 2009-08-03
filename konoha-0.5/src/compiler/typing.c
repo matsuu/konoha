@@ -3190,11 +3190,11 @@ Term *knh_StmtASSERT_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 
 	if(TERMs_isCONST(stmt, 0)) {
 		if(IS_TRUE(TERMs_const(stmt, 0))) {
-			knh_Stmt_done(ctx, DP(stmt)->stmts[2]);
+			knh_Stmt_done(ctx, stmt);
 			return TM(stmt);
 		}
 		if(IS_FALSE(TERMs_const(stmt, 0))) {
-			TODO(); /* Always throw Assert!! */
+			knh_Asm_perror(ctx, abr, KERR_EWARN, _("always throw Assert!!"));
 		}
 	}
 	TERMs_typingBLOCK(ctx, stmt, 1, abr, ns);
