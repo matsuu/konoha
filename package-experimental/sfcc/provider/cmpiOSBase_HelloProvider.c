@@ -193,24 +193,101 @@ CMPIStatus OSBase_HelloProviderInvokeMethod(
     //val = args->ft->getArgAt(args,0,NULL,&rc);
     CMPIString* str = val.value.string;
     */
+    int argc = args->ft->getArgCount(args,&rc);
+    int i;
+    char c[64] = {0};
+    char **argv;
+    char mName[128] = {0};
+    //char name[128] = {0};
+    CMPIData val;
+    CMPIString *str;
+    argv = (char **)alloca(argc * sizeof(char*));
+    for(i=0;i<argc;i++){
+      snprintf(c,64,"a%d",i);
+      val = args->ft->getArg(args,c,&rc);
+      str = val.value.string;
+      argv[i] = str->ft->getCharPtr(str,NULL);
+    }
+    if(argc!=0){
+      snprintf(mName,128,"%s(%%s",methodName);
+    }
+    else{
+      snprintf(mName,128,"%s(",methodName);
+    }    
+    for(i=1;i<argc;i++){
+      //snprintf(name,128,"%s",mName);
+      //snprintf(mName,128,"%s,%%s",name);
+      strncat(mName,",%s",3);
+    }
+    //snprintf(name,128,"%s",mName);
+    //snprintf(mName,128,"%s)",name);
+    strncat(mName,")",1);
+    /* //hope this format
+      if(argc!=0){
+      snprintf(mName,128,"%s(%s",methodName,argv[0]);
+      }
+      else{
+      snprintf(mName,128,"%s(",methodName);
+      }    
+      for(i=1;i<argc;i++){
+      strncat(mName,",",1);
+      strncat(mName,argv[i],strlen(argv[i]));
+      }
+      strncat(mName,")",1);
+     */
 
     char path[128];
     snprintf(path, sizeof(path), "/usr/local/share/konoha/script/%s.k",className);
-
+    
     konoha_t konoha = konoha_open(4096);
     knh_setOutputStreamBuffer(konoha, 256,256);
-    knh_loadScript(konoha,path);
-    konoha_invokeScriptFunc(konoha, methodName);
-
+    konoha_loadScript(konoha,path);
+    //snprintf(methodName,128,"%s",mName);
+    printf("%s %d\n",mName,__LINE__);
+    char* retval;
+    
+    switch(argc){
+    case 0:
+      retval = konoha_invokeStringFunc(konoha, mName);
+      break;
+    case 1:
+      retval = konoha_invokeStringFunc(konoha, mName,argv[0]);
+      break;
+    case 2:
+      retval = konoha_invokeStringFunc(konoha, mName, argv[0], argv[1]);
+      break;
+    case 3:
+      retval = konoha_invokeStringFunc(konoha, mName, argv[0], argv[1], argv[2]);
+      break; 
+    case 4:
+      retval = konoha_invokeStringFunc(konoha, mName, argv[0], argv[1], argv[2], argv[3]);
+      break;
+    case 5:
+      retval = konoha_invokeStringFunc(konoha, mName, argv[0], argv[1], argv[2], argv[3], argv[4]);
+      break;
+    default:
+      retval = "Too many args!!";
+      konoha_invokeStringFunc(konoha, methodName); // segmentasionfault
+      break;
+    }
+    
+  
+    
+    printf("%s %d\n",mName,__LINE__);
+    printf("%s %d\n",retval,__LINE__);
     if (konoha_hasRuntimeError(konoha)) {
         /* runtime error */
-        // fprintf(stderr, "O::%s\n",knh_getSTDOUTBuffer(konoha));
-        // fprintf(stderr, "E::%s\n",knh_getSTDERRBuffer(konoha));
+      char err[128] = {0};
+      fprintf(stderr, "O::%s\n",knh_getSTDOUTBuffer(konoha));
+      fprintf(stderr, "E::123 %s456\n",knh_getSTDERRBuffer(konoha));
+      snprintf(err,128,"%s%s",retval,knh_getSTDERRBuffer(konoha));
+      retval = err;
+      printf("%s %d\n",retval,__LINE__);
     } else {
-        // fprintf(stderr, "O::%s\n",knh_getSTDOUTBuffer(konoha));
+      fprintf(stderr, "O::%s\n",knh_getSTDOUTBuffer(konoha));
     }
 
-    char* retval = knh_getSTDOUTBuffer(konoha);
+    //char* retval = knh_getSTDOUTBuffer(konoha);
     CMPIValue value;
     value.string = CMNewString(_broker, retval, &rc);
 
@@ -231,6 +308,7 @@ CMPIStatus OSBase_HelloProviderInvokeMethod(
 
     return rc;
 }
+
 
 CMInstanceMIStub( OSBase_HelloProvider, OSBase_HelloProvider, _broker,CMNoHook);
 CMMethodMIStub  ( OSBase_HelloProvider, OSBase_HelloProvider, _broker,CMNoHook);
