@@ -18,6 +18,7 @@
 #endif
 
 #include <konoha.h>
+#include <konoha/gen/konoha_knhapi_.h>
 
 
 MODULE_LICENSE("GPL");
@@ -102,7 +103,7 @@ static ssize_t knh_dev_read (struct file* filp, char __user *user_buf,
 static ssize_t knh_dev_write(struct file *filp,const char __user *user_buf,
         size_t count,loff_t *offset) {
     char buf[MAXCOPYBUF];
-    char* konoha_ret = NULL;
+    char* knh_ret = NULL;
     struct konohadev_t *dev = filp->private_data;
     long len;
 
@@ -119,9 +120,8 @@ static ssize_t knh_dev_write(struct file *filp,const char __user *user_buf,
     //printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "int fib(int n) { if (n==3) { return 1;}}"));
     //printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "fib(10);"));
     konoha_evalScript(dev->konoha,buf);
-    konoha_ret = konoha_getSTDOUTBuffer(dev->konoha);
-
-    snprintf(dev->buffer,MAXCOPYBUF,"%s",konoha_ret);
+    knh_ret = konoha_getStdOutBufferText(dev->konoha);
+    snprintf(dev->buffer,MAXCOPYBUF,"%s",knh_ret);
     printk(KERN_DEBUG "[%s][dev->buffer=%s]\n",__FUNCTION__ ,dev->buffer);
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
@@ -143,7 +143,7 @@ static void knh_dev_setup(struct konohadev_t *dev){
     cdev_init(&dev->cdev,&knh_fops);
     dev->cdev.owner = THIS_MODULE;
     dev->konoha = konoha_open(128);
-    knh_setOutputStreamBuffer(dev->konoha, 128,128);
+    konoha_setOutputStreamBuffer(dev->konoha, 128,128);
     dev->buffer = kmalloc(sizeof(char)*MAXCOPYBUF,GFP_KERNEL);
     memset(dev->buffer,0,sizeof(char)*MAXCOPYBUF);
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))

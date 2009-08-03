@@ -273,7 +273,7 @@ knh_bool_t knh_rename(Ctx *ctx, knh_bytes_t on, knh_bytes_t nn, int isThrowable)
 		res = 0;
 	}
 #else
-	KNH_NOAPI(ctx, isThrowable);
+	KNH_NOAPI(ctx, cwb, isThrowable);
 #endif
 	knh_cwb_close(cwb);
 	return res;
@@ -361,7 +361,7 @@ void knh_System_initPath(Ctx *ctx, System *o)
 		//free(s);
 	}
 #else
-	home = STEXT("/konoha")
+	home = STEXT("/konoha");
 	knh_DictMap_set(ctx, sys->props, T("konoha.path"), UP(T("/konoha")));
 #endif
 	KNH_ASSERT(home. buf != NULL);
