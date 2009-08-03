@@ -27,7 +27,7 @@
 
 #define DBG2_P(fmt, ...) \
 	fflush(stdout); \
-	fprintf(stderr, "DBG2[%s:%d/%s]: ", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
+	fprintf(stderr, "DBG2[%s:%d/%s]: ", knh_safefile(__FILE__), __LINE__, __FUNCTION__); \
 	fprintf(stderr, fmt, ## __VA_ARGS__); \
 	fprintf(stderr, "\n"); \
 
@@ -38,7 +38,7 @@
 	fprintf(stdout, "\n"); \
 
 #define TODO2(msg) \
-	fprintf(stdout, "TODO2[%s:%d/%s]: %s\n", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__, msg); \
+	fprintf(stdout, "TODO2[%s:%d/%s]: %s\n", knh_safefile(__FILE__), __LINE__, __FUNCTION__, msg); \
 
 #define DBG2_RESIZE(o, p, os, ns) \
 	DBG2_P("RESIZE %s(%p) %d => %d\n\tOLD_BLOCK(%p-%p)", STRUCTN((o->h.bcid)), o, (int)os, (int)ns, p, (p + os)); \
@@ -79,7 +79,7 @@
 
 #define DBG_P(fmt, ...) \
 	fflush(stdout); \
-	fprintf(stderr, "DBG[%s:%d/%s]: ", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
+	fprintf(stderr, "DBG[%s:%d/%s]: ", knh_safefile(__FILE__), __LINE__, __FUNCTION__); \
 	fprintf(stderr, fmt, ## __VA_ARGS__); \
 	fprintf(stderr, "\n"); \
 
@@ -90,12 +90,12 @@
 	fprintf(stdout, "\n"); \
 
 #define TODO() \
-	fprintf(stderr, "TODO[%s:%d/%s]:\n", KNH_SAFEFILE(__FILE__) , __LINE__, __FUNCTION__); \
+	fprintf(stderr, "TODO[%s:%d/%s]:\n", knh_safefile(__FILE__) , __LINE__, __FUNCTION__); \
 
 #define DBG_ASSERT(c, fmt, ...) \
 	if(!(c)) { \
 		fflush(stdout); \
-		fprintf(stderr, "DBG!![%s:%d/%s]:\n\t", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
+		fprintf(stderr, "DBG!![%s:%d/%s]:\n\t", knh_safefile(__FILE__), __LINE__, __FUNCTION__); \
 		fprintf(stderr, fmt, ## __VA_ARGS__); \
 		fprintf(stderr, "\n"); \
 		KNH_ASSERT(c); \
@@ -103,7 +103,7 @@
 
 #define KNH_CTXASSERT(ctx, c, fmt, ...) \
 	if(!(c)) { \
-		fprintf(stderr, "DEBUG[%s:%d/%s]: ", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
+		fprintf(stderr, "DEBUG[%s:%d/%s]: ", knh_safefile(__FILE__), __LINE__, __FUNCTION__); \
 		fprintf(stderr, fmt, ## __VA_ARGS__); \
 		fprintf(stderr, "\n"); \
 		KNH_ASSERT(c); \
@@ -115,7 +115,7 @@
 #define DBG_P(fmt, ...) \
 	if(konoha_isSystemDump2()) {\
 		fflush(stdout); \
-		fprintf(stderr, "DBG[%s:%d/%s]: ", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
+		fprintf(stderr, "DBG[%s:%d/%s]: ", knh_safefile(__FILE__), __LINE__, __FUNCTION__); \
 		fprintf(stderr, fmt, ## __VA_ARGS__); \
 		fprintf(stderr, "\n"); \
 	}\
@@ -145,7 +145,7 @@
 /* [STUPID] */
 
 #define KNH_FUTURE(msg) {\
-		fprintf(stderr, "FUTURE[%s:%d] %s will be supported in the near future.\n", KNH_SAFEFILE(__FILE__), __LINE__, msg); \
+		fprintf(stderr, "FUTURE[%s:%d] %s will be supported in the near future.\n", knh_safefile(__FILE__), __LINE__, msg); \
 	}\
 
 /* ======================================================================== */
@@ -162,10 +162,10 @@
 #ifdef KNH_USING_THREAD
 
 #define TODO_LOCK() \
-	fprintf(stderr, "TODO[%s:%d/%s]: LOCK\n", KNH_SAFEFILE(__FILE__) , __LINE__, __FUNCTION__); \
+	fprintf(stderr, "TODO[%s:%d/%s]: LOCK\n", knh_safefile(__FILE__) , __LINE__, __FUNCTION__); \
 
 #define TODO_UNLOCK() \
-	fprintf(stderr, "TODO[%s:%d/%s]: UNLOCK\n", KNH_SAFEFILE(__FILE__) , __LINE__, __FUNCTION__); \
+	fprintf(stderr, "TODO[%s:%d/%s]: UNLOCK\n", knh_safefile(__FILE__) , __LINE__, __FUNCTION__); \
 
 #else
 

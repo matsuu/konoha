@@ -144,15 +144,15 @@ void knh_sfp_typecheck(Ctx *ctx, knh_sfp_t *sfp, Method *mtd, knh_code_t *pc)
 /* ======================================================================== */
 /* [macros] */
 
-#define _KNH_THROW(ctx, e) knh_throw(ctx, UP(e), KNH_SAFEFILE(__FILE__), __LINE__)
+#define _KNH_THROW(ctx, e) knh_throw(ctx, UP(e), knh_safefile(__FILE__), __LINE__)
 
 #define _KNH_THROWs(ctx, s) \
-	knh_throwException(ctx, new_Exception__b(ctx, B(s)), KNH_SAFEFILE(__FILE__), __LINE__); \
+	knh_throwException(ctx, new_Exception__b(ctx, B(s)), knh_safefile(__FILE__), __LINE__); \
 
 #define _KNH_THROWf(ctx, fmt, ...) \
 	char throcwb_[256]; \
 	knh_snprintf(throcwb_, sizeof(throcwb_), fmt, ## __VA_ARGS__); \
-	knh_throwException(ctx, new_Exception__b(ctx, B(throcwb_)), KNH_SAFEFILE(__FILE__), __LINE__); \
+	knh_throwException(ctx, new_Exception__b(ctx, B(throcwb_)), knh_safefile(__FILE__), __LINE__); \
 
 #define DEBUG_THROWf(ctx, fmt, ...) \
 	fprintf(stderr, "THROW?[%s:%d]: ", __FUNCTION__, __LINE__); \
@@ -173,14 +173,14 @@ KNHAPI(void) knh_throw_TODO(Ctx *ctx, char *file, int line, char *func)
 	fprintf(stderr, "We will appliciate if you help us implementing this function. Thank you\n");
 	fprintf(stderr, "for your cooperation.\n");
 	fprintf(stderr, "**************************************************************************\n");
-	knh_throwException(ctx, new_Exception__b(ctx, STEXT("UnsupportedOperation!!")), KNH_SAFEFILE(file), line);
+	knh_throwException(ctx, new_Exception__b(ctx, STEXT("UnsupportedOperation!!")), knh_safefile(file), line);
 }
 
 /* ------------------------------------------------------------------------ */
 
 KNHAPI(void) knh_throw_bugstop(Ctx *ctx, char *file, int line, char *func)
 {
-	knh_throwException(ctx, new_Exception__b(ctx, STEXT("ReportedBugStop!!")), KNH_SAFEFILE(file), line);
+	knh_throwException(ctx, new_Exception__b(ctx, STEXT("ReportedBugStop!!")), knh_safefile(file), line);
 }
 
 /* ======================================================================== */

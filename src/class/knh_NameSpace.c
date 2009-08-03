@@ -386,7 +386,7 @@ knh_type_t knh_NameSpace_tagcid(Ctx *ctx, NameSpace *o, knh_class_t cid, knh_byt
 {
 	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
 	knh_class_t bcid = ClassTable(cid).bcid;
-	//DBG2_P("%s:'%s'", CLASSN(bcid), tag.buf);
+	DBG2_P("*** %s:'%s'", CLASSN(bcid), tag.buf);
 	knh_printf(ctx, cwb->w, "%C:%B", bcid, tag);
 	cid = knh_NameSpace_getcid(ctx, o, knh_cwb_tobytes(cwb));
 	knh_cwb_close(cwb);

@@ -64,7 +64,7 @@ typedef intptr_t FILE;
 #define DBG2_(stmt)  stmt
 
 #define DBG2_P(fmt, ...) \
-    printk(KERN_DEBUG "DBG2[%s:%d/%s]: ", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
+    printk(KERN_DEBUG "DBG2[%s:%d/%s]: ", knh_safefile(__FILE__), __LINE__, __FUNCTION__); \
     printk(KERN_DEBUG fmt, ## __VA_ARGS__); \
     printk(KERN_DEBUG "\n"); \
 
@@ -74,7 +74,7 @@ typedef intptr_t FILE;
     printk(KERN_DEBUG "\n"); \
 
 #define TODO2(msg) \
-    printk(KERN_DEBUG "TODO2[%s:%d/%s]: %s\n", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__, msg); \
+    printk(KERN_DEBUG "TODO2[%s:%d/%s]: %s\n", knh_safefile(__FILE__), __LINE__, __FUNCTION__, msg); \
     printk(KERN_DEBUG "\n"); \
 
 #define DBG2_RESIZE(o, p, os, ns) \

@@ -62,24 +62,24 @@ extern "C" {
 
 #define DEBUG3(fmt, ...) \
 	fflush(stdout); \
-	fprintf(stderr, "\nDEBUG3[%s:%d/%s]: ", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
+	fprintf(stderr, "\nDEBUG3[%s:%d/%s]: ", knh_safefile(__FILE__), __LINE__, __FUNCTION__); \
 	fprintf(stderr, fmt, ## __VA_ARGS__); \
 	fprintf(stderr, "\n"); \
 
 #define TODO3(fmt, ...) \
 	fflush(stdout); \
-	fprintf(stderr, "\nTODO3[%s:%d/%s]: ", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
+	fprintf(stderr, "\nTODO3[%s:%d/%s]: ", knh_safefile(__FILE__), __LINE__, __FUNCTION__); \
 	fprintf(stderr, fmt, ## __VA_ARGS__); \
 	fprintf(stderr, "\n"); \
 
 #define DEBUG3_PTC(name, tc) \
 	fflush(stdout); \
-	fprintf(stderr, "\nDEBUG3[%s:%d/%s]: ", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
+	fprintf(stderr, "\nDEBUG3[%s:%d/%s]: ", knh_safefile(__FILE__), __LINE__, __FUNCTION__); \
 	fprintf(stderr, "%s: c=%d, e=%d\n", name, (tc)->c, (tc)->e); \
 
 #define DEBUG3_STC(name, tc) \
 	fflush(stdout); \
-	fprintf(stderr, "\nDEBUG3[%s:%d/%s]: ", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
+	fprintf(stderr, "\nDEBUG3[%s:%d/%s]: ", knh_safefile(__FILE__), __LINE__, __FUNCTION__); \
 	fprintf(stderr, "%s: c=%d, e=%d\n", name, (tc).c, (tc).e); \
 
 #else

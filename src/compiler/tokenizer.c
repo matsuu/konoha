@@ -1061,7 +1061,16 @@ void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in)
 				break;
 
 				default:
-					if(unit > 0 || isalnum(ch) || ch > 127) {  /* 1.0a */
+					if(unit > 0) {
+						if(ch == '<' || ch == '(') {
+							knh_InputStream_perror(ctx, in, KERR_DWARN, _("illegal character in tag"));
+						}
+						else {
+							prev = ch;
+							knh_Bytes_putc(ctx, cwb->ba, ch);
+						}
+					}
+					else if(isalnum(ch) || ch > 127) {  /* 1.0a */
 						prev = ch;
 						knh_Bytes_putc(ctx, cwb->ba, ch);
 					}

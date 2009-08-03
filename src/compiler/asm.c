@@ -48,7 +48,7 @@ static knh_labelid_t knh_Asm_newLabelId(Ctx *ctx, Asm *abr, Token *tk);
 
 #define KNH_ASM_PANIC(ctx, abr, fmt, ...) {\
 		knh_Asm_setCancelled(abr, 1);\
-		fprintf(stderr, "PANIC[%s:%d/%s]: ", KNH_SAFEFILE(__FILE__), __LINE__, __FUNCTION__); \
+		fprintf(stderr, "PANIC[%s:%d/%s]: ", knh_safefile(__FILE__), __LINE__, __FUNCTION__); \
 		fprintf(stderr, fmt, ## __VA_ARGS__); \
 		fprintf(stderr, "\n"); \
 	}\
