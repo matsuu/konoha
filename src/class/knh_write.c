@@ -658,6 +658,20 @@ METHOD knh_fmethod_movableText(Ctx *ctx, knh_sfp_t *sfp)
 
 /* ------------------------------------------------------------------------ */
 
+knh_bool_t knh_stack_isRecuriveFormatting(Ctx *ctx, knh_sfp_t *sfp, Object *o, OutputStream *w, void *mtdcode)
+{
+	knh_sfp_t *sp = sfp - 1;
+	while(ctx->stack < sp) {
+		if(sp[0].o == o && sp[1].w == w && IS_Method(sp[-1].mtd)) {
+			if(DP(sp[-1].mtd)->code == mtdcode) return 1;
+		}
+		sp--;
+	}
+	return 0;
+}
+
+/* ------------------------------------------------------------------------ */
+
 #ifdef __cplusplus
 }
 #endif

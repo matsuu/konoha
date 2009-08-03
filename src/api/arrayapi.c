@@ -857,12 +857,17 @@ static METHOD knh__FArray_shuffle(Ctx *ctx, knh_sfp_t *sfp)
 void knh_Array__k(Ctx *ctx, Array *o, OutputStream *w, String *m)
 {
 	knh_putc(ctx, w, '[');
-	size_t c;
-	for(c = 0; c < o->size; c++) {
-		if(c > 0) {
-			knh_write_delim(ctx,w);
+	if(knh_stack_isRecuriveFormatting(ctx, ctx->esp - 3, UP(o), w, knh_Array__k)) {
+		knh_write_dots(ctx,w);
+	}
+	else {
+		size_t c;
+		for(c = 0; c < o->size; c++) {
+			if(c > 0) {
+				knh_write_delim(ctx,w);
+			}
+			knh_format(ctx, w, METHODN__k, o->list[c], KNH_NULL);
 		}
-		knh_format(ctx, w, METHODN__k, o->list[c], KNH_NULL);
 	}
 	knh_putc(ctx, w, ']');
 }
@@ -872,8 +877,8 @@ void knh_Array__k(Ctx *ctx, Array *o, OutputStream *w, String *m)
 
 void knh_IArray__k(Ctx *ctx, IArray *o, OutputStream *w, String *m)
 {
-	knh_putc(ctx, w, '[');
 	size_t c;
+	knh_putc(ctx, w, '[');
 	for(c = 0; c < o->size; c++) {
 		if(c > 0) {
 			knh_write_delim(ctx,w);
