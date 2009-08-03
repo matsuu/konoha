@@ -156,7 +156,7 @@ static
 void knh_glut_display(void)
 {
 #ifndef KNH_USING_PTHREAD
-  Ctx *lctx = konoha_getCurrentContext();
+  Ctx *lctx = knh_getCurrentContext();
 #else
   Ctx *lctx = &gl_ctx;
 #endif
@@ -168,12 +168,12 @@ void knh_glut_display(void)
 void init (void)
 {
   if (initfunc == NULL) {
-	konoha_loadIntConstData(konoha_getCurrentContext(), IntConstData);
+	knh_loadIntConstData(knh_getCurrentContext(), IntConstData);
 	return;
   }
   
 #ifndef KNH_USING_PTHREAD
-  Ctx *lctx = konoha_getCurrentContext();
+  Ctx *lctx = knh_getCurrentContext();
 #else
   Ctx *lctx = &gl_ctx;
 #endif
@@ -184,7 +184,7 @@ void init (void)
 void knh_glut_reshape(int w, int h)
 {
 #ifndef KNH_USING_PTHREAD
-  Ctx *lctx = konoha_getCurrentContext();
+  Ctx *lctx = knh_getCurrentContext();
 #else
   Ctx *lctx = &gl_ctx;
 #endif
@@ -200,7 +200,7 @@ void knh_glut_idle (void)
 {
   
 #ifndef KNH_USING_PTHREAD
-  Ctx *lctx = konoha_getCurrentContext();
+  Ctx *lctx = knh_getCurrentContext();
 #else
   Ctx *lctx = &gl_ctx;
 #endif
@@ -213,7 +213,7 @@ void knh_glut_idle (void)
 void knh_glut_timer (int value)
 {
 #ifndef KNH_USING_PTHREAD
-  Ctx *lctx = konoha_getCurrentContext();
+  Ctx *lctx = knh_getCurrentContext();
 #else
   Ctx *lctx = &gl_ctx;
 #endif
@@ -226,7 +226,7 @@ void knh_glut_timer (int value)
 void knh_glut_mouse(int button, int state, int x, int y)
 {
 #ifndef KNH_USING_PTHREAD
-  Ctx *lctx = konoha_getCurrentContext();
+  Ctx *lctx = knh_getCurrentContext();
 #else
   Ctx *lctx = &gl_ctx;
 #endif
@@ -246,7 +246,7 @@ void knh_glut_mouse(int button, int state, int x, int y)
 void knh_glut_keyboard(unsigned char key, int x, int y)
 {
 #ifndef KNH_USING_PTHREAD
-  Ctx *lctx = konoha_getCurrentContext();
+  Ctx *lctx = knh_getCurrentContext();
 #else
   Ctx *lctx = &gl_ctx;
 #endif
@@ -263,7 +263,7 @@ void knh_glut_keyboard(unsigned char key, int x, int y)
 void knh_glut_special(int key, int x, int y)
 {
 #ifndef KNH_USING_PTHREAD
-  Ctx *lctx = konoha_getCurrentContext();
+  Ctx *lctx = knh_getCurrentContext();
 #else
   Ctx *lctx = &gl_ctx;
 #endif

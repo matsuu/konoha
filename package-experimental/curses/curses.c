@@ -1361,7 +1361,7 @@ knh_IntConstData_t IntConstData[] = {
 KNH_EXPORTS(int) init(Ctx *ctx)
 {
 	KNH_NOTICE(ctx, "loading curses..");
-	konoha_loadIntConstData(ctx, IntConstData);
+	knh_loadIntConstData(ctx, IntConstData);
 
 	return 1;
 }

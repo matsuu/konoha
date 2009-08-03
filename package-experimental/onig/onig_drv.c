@@ -64,17 +64,17 @@ int knh_onig_regexec(Ctx *ctx,knh_regex_t *reg, char *str,size_t nmatch,
 }
 
 static knh_regex_drvapi_t RE__onig = {
-    KNH_DRVAPI_TYPE__REGEX, 
+    KNH_DRVAPI_TYPE__REGEX,
     "onig", // ドライバー名
     knh_onig_malloc, // 作成した関数
-    knh_onig_regcomp, 
+    knh_onig_regcomp,
     knh_onig_regexec,
     knh_onig_regfree
 };
 
 int init(Ctx *ctx){
     onig_init();
-    konoha_addRegexDriver(ctx, "onig", &RE__onig);
-    konoha_addRegexDriver(ctx, "re", &RE__onig);
+    knh_addRegexDriver(ctx, "onig", &RE__onig);
+    knh_addRegexDriver(ctx, "re", &RE__onig);
     return 0;
 }

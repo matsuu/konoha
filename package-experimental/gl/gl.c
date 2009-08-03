@@ -28,131 +28,131 @@ Ctx gl_ctx;
 
 static
 knh_IntConstData_t IntConstData[] = {
-  {"GL.GL_POLYGON", GL_POLYGON},
-  {"GL.GL_COLOR_BUFFER_BIT", GL_COLOR_BUFFER_BIT},
-  {"GL.GL_DEPTH_BUFFER_BIT", GL_DEPTH_BUFFER_BIT},
-  {"GL.GLUT_RGBA", GLUT_RGBA},
-  {"GL.GL_LINE_LOOP", GL_LINE_LOOP},
-  {"GL.GL_PROJECTION", GL_PROJECTION},
-  {"GL.GL_POLYGON", GL_POLYGON},
-  {"GL.GLUT_SINGLE", GLUT_SINGLE},
-  {"GL.GLUT_RGB", GLUT_RGB},
-  {"GL.GL_MODELVIEW", GL_MODELVIEW},
-  {"GL.GL_FLAT", GL_FLAT},
-  {"GL.GL_LINES", GL_LINES},
-  {"GL.GLUT_DOUBLE", GLUT_DOUBLE},
-  {"GL.GL_POSITION", GL_POSITION},
-  {"GL.GLUT_LEFT_BUTTON", GLUT_LEFT_BUTTON},
-  {"GL.GLUT_RIGHT_BUTTON", GLUT_RIGHT_BUTTON},
-  {"GL.GLUT_MIDDLE_BUTTON", GLUT_MIDDLE_BUTTON},
-  {"GL.GLUT_DOWN", GLUT_DOWN},
-  {"GL.GL_QUADS", GL_QUADS},
-  {"GL.GL_MODELVIEW", GL_MODELVIEW},
-  {"GL.GL_DEPTH_TEST", GL_DEPTH_TEST},
-  {"GL.GLUT_DEPTH", GLUT_DEPTH},
-  {"GL.GL_FRONT", GL_FRONT},
-  {"GL.GL_LIGHTING", GL_LIGHTING},
-  {"GL.GL_LIGHT0", GL_LIGHT0},
-  {"GL.GL_LIGHT1", GL_LIGHT1},
-  {"GL.GL_CULL_FACE", GL_CULL_FACE},
-  {"GL.GL_DIFFUSE", GL_DIFFUSE},
-  {"GL.GL_SPECULAR", GL_SPECULAR},
-  {"GL.GL_FRONT_AND_BACK", GL_FRONT_AND_BACK},
-  {"GL.GL_TEXTURE_2D", GL_TEXTURE_2D},
-  {"GL.GL_TEXTURE_GEN_S", GL_TEXTURE_GEN_S},
-  {"GL.GL_TEXTURE_GEN_T", GL_TEXTURE_GEN_T},
-  {"GL.GL_FALSE", GL_FALSE},
-  {"GL.GL_TRUE", GL_TRUE},
-  {"GL.GL_S", GL_S},
-  {"GL.GL_T", GL_T},
-  {"GL.GL_TEXTURE_GEN_MODE", GL_TEXTURE_GEN_MODE},
-  {"GL.GL_SPHERE_MAP", GL_SPHERE_MAP},
-  {"GL.GL_FOG", GL_FOG},
-  // FOGs
-  {"GL.GL_FOG_END", GL_FOG_END},
-  {"GL.GL_FOG_MODE", GL_FOG_MODE},
-  {"GL.GL_FOG_START", GL_FOG_START},
-  {"GL.GL_FOG_COLOR", GL_FOG_COLOR},
-  {"GL.GL_LINEAR", GL_LINEAR},
-  {"GL.GL_TEXTURE", GL_TEXTURE},
-  // GL_Texture
-  {"GL.GL_ALPHA", GL_ALPHA},
-  {"GL.GL_ALPHA4", GL_ALPHA4},
-  {"GL.GL_ALPHA8", GL_ALPHA8},
-  {"GL.GL_ALPHA12", GL_ALPHA12},
-  {"GL.GL_ALPHA16", GL_ALPHA16},
-  {"GL.GL_LUMINANCE", GL_LUMINANCE},
-  {"GL.GL_LUMINANCE4", GL_LUMINANCE4},
-  {"GL.GL_LUMINANCE8", GL_LUMINANCE8},
-  {"GL.GL_LUMINANCE12", GL_LUMINANCE12},
-  {"GL.GL_LUMINANCE16", GL_LUMINANCE16},
-  {"GL.GL_LUMINANCE_ALPHA", GL_LUMINANCE_ALPHA},
-  {"GL.GL_LUMINANCE4_ALPHA4", GL_LUMINANCE4_ALPHA4},
-  {"GL.GL_LUMINANCE6_ALPHA2", GL_LUMINANCE6_ALPHA2},
-  {"GL.GL_LUMINANCE8_ALPHA8", GL_LUMINANCE8_ALPHA8},
-  {"GL.GL_LUMINANCE12_ALPHA4", GL_LUMINANCE12_ALPHA4},
-  {"GL.GL_LUMINANCE12_ALPHA12", GL_LUMINANCE12_ALPHA12},
-  {"GL.GL_LUMINANCE16_ALPHA16", GL_LUMINANCE16_ALPHA16},
-  {"GL.GL_INTENSITY", GL_INTENSITY},
-  {"GL.GL_INTENSITY4", GL_INTENSITY4},
-  {"GL.GL_INTENSITY8", GL_INTENSITY8},
-  {"GL.GL_INTENSITY12", GL_INTENSITY12},
-  {"GL.GL_INTENSITY16", GL_INTENSITY16},
-  {"GL.GL_R3_G3_B2", GL_R3_G3_B2},
-  {"GL.GL_RGB", GL_RGB},
-  {"GL.GL_RGB4", GL_RGB4},
-  {"GL.GL_RGB5", GL_RGB5},
-  {"GL.GL_RGB8", GL_RGB8},
-  {"GL.GL_RGB10", GL_RGB10},
-  {"GL.GL_RGB12", GL_RGB12},
-  {"GL.GL_RGB16", GL_RGB16},
-  {"GL.GL_RGBA", GL_RGBA},
-  {"GL.GL_RGBA2", GL_RGBA2},
-  {"GL.GL_RGBA4", GL_RGBA4},
-  {"GL.GL_RGB5_A1", GL_RGB5_A1},
-  {"GL.GL_RGBA8", GL_RGBA8},
-  {"GL.GL_RGB10_A2", GL_RGB10_A2},
-  {"GL.GL_RGBA12", GL_RGBA12},
-  {"GL.GL_RGBA16", GL_RGBA16},
-  //keyboard
-  {"GL.GLUT_KEY_F1", GLUT_KEY_F1},
-  {"GL.GLUT_KEY_F2", GLUT_KEY_F2},
-  {"GL.GLUT_KEY_F3", GLUT_KEY_F3},
-  {"GL.GLUT_KEY_F4", GLUT_KEY_F4},
-  {"GL.GLUT_KEY_F5", GLUT_KEY_F5},
-  {"GL.GLUT_KEY_F6", GLUT_KEY_F6},
-  {"GL.GLUT_KEY_F7", GLUT_KEY_F7},
-  {"GL.GLUT_KEY_F8", GLUT_KEY_F8},
-  {"GL.GLUT_KEY_F9", GLUT_KEY_F9},
-  {"GL.GLUT_KEY_F10", GLUT_KEY_F10},
-  {"GL.GLUT_KEY_F11", GLUT_KEY_F11},
-  {"GL.GLUT_KEY_F12", GLUT_KEY_F12},
-  {"GL.GLUT_KEY_LEFT", GLUT_KEY_LEFT},
-  {"GL.GLUT_KEY_UP", GLUT_KEY_UP},
-  {"GL.GLUT_KEY_RIGHT", GLUT_KEY_RIGHT},
-  {"GL.GLUT_KEY_DOWN", GLUT_KEY_DOWN},
-  {"GL.GLUT_KEY_PAGE_UP", GLUT_KEY_PAGE_UP},
-  {"GL.GLUT_KEY_PAGE_DOWN", GLUT_KEY_PAGE_DOWN},
-  {"GL.GLUT_KEY_HOME", GLUT_KEY_HOME},
-  {"GL.GLUT_KEY_END", GLUT_KEY_END},
-  {"GL.GLUT_KEY_INSERT", GLUT_KEY_INSERT},
-  // anti ailas
-  {"GL.GL_POLYGON_SMOOTH", GL_POLYGON_SMOOTH},
-  {"GL.GL_LINE_SMOOTH", GL_LINE_SMOOTH},
-  {"GL.GL_BLEND", GL_BLEND},
-  {"GL.GL_SRC_ALPHA", GL_SRC_ALPHA},
-  {"GL.GL_ONE_MINUS_SRC_ALPHA", GL_ONE_MINUS_SRC_ALPHA},
-  // unkonwn
-  {"GL.GL_LEQUAL", GL_LEQUAL},
-  {"GL.GL_UNPACK_ALIGNMENT", GL_UNPACK_ALIGNMENT},
-  {"GL.GL_TEXTURE_WRAP_S", GL_TEXTURE_WRAP_S},
-  {"GL.GL_TEXTURE_WRAP_T", GL_TEXTURE_WRAP_T},
-  {"GL.GL_REPEAT", GL_REPEAT},
-  {"GL.GL_TEXTURE_MAG_FILTER", GL_TEXTURE_MAG_FILTER},
-  {"GL.GL_NEAREST", GL_NEAREST},
-  {"GL.GL_TEXTURE_MIN_FILTER", GL_TEXTURE_MIN_FILTER},
-  {"GL.GL_UNSIGNED_BYTE", GL_UNSIGNED_BYTE},
-  {NULL} // end of const
+		{"GL.GL_POLYGON", GL_POLYGON},
+		{"GL.GL_COLOR_BUFFER_BIT", GL_COLOR_BUFFER_BIT},
+		{"GL.GL_DEPTH_BUFFER_BIT", GL_DEPTH_BUFFER_BIT},
+		{"GL.GLUT_RGBA", GLUT_RGBA},
+		{"GL.GL_LINE_LOOP", GL_LINE_LOOP},
+		{"GL.GL_PROJECTION", GL_PROJECTION},
+		{"GL.GL_POLYGON", GL_POLYGON},
+		{"GL.GLUT_SINGLE", GLUT_SINGLE},
+		{"GL.GLUT_RGB", GLUT_RGB},
+		{"GL.GL_MODELVIEW", GL_MODELVIEW},
+		{"GL.GL_FLAT", GL_FLAT},
+		{"GL.GL_LINES", GL_LINES},
+		{"GL.GLUT_DOUBLE", GLUT_DOUBLE},
+		{"GL.GL_POSITION", GL_POSITION},
+		{"GL.GLUT_LEFT_BUTTON", GLUT_LEFT_BUTTON},
+		{"GL.GLUT_RIGHT_BUTTON", GLUT_RIGHT_BUTTON},
+		{"GL.GLUT_MIDDLE_BUTTON", GLUT_MIDDLE_BUTTON},
+		{"GL.GLUT_DOWN", GLUT_DOWN},
+		{"GL.GL_QUADS", GL_QUADS},
+		{"GL.GL_MODELVIEW", GL_MODELVIEW},
+		{"GL.GL_DEPTH_TEST", GL_DEPTH_TEST},
+		{"GL.GLUT_DEPTH", GLUT_DEPTH},
+		{"GL.GL_FRONT", GL_FRONT},
+		{"GL.GL_LIGHTING", GL_LIGHTING},
+		{"GL.GL_LIGHT0", GL_LIGHT0},
+		{"GL.GL_LIGHT1", GL_LIGHT1},
+		{"GL.GL_CULL_FACE", GL_CULL_FACE},
+		{"GL.GL_DIFFUSE", GL_DIFFUSE},
+		{"GL.GL_SPECULAR", GL_SPECULAR},
+		{"GL.GL_FRONT_AND_BACK", GL_FRONT_AND_BACK},
+		{"GL.GL_TEXTURE_2D", GL_TEXTURE_2D},
+		{"GL.GL_TEXTURE_GEN_S", GL_TEXTURE_GEN_S},
+		{"GL.GL_TEXTURE_GEN_T", GL_TEXTURE_GEN_T},
+		{"GL.GL_FALSE", GL_FALSE},
+		{"GL.GL_TRUE", GL_TRUE},
+		{"GL.GL_S", GL_S},
+		{"GL.GL_T", GL_T},
+		{"GL.GL_TEXTURE_GEN_MODE", GL_TEXTURE_GEN_MODE},
+		{"GL.GL_SPHERE_MAP", GL_SPHERE_MAP},
+		{"GL.GL_FOG", GL_FOG},
+		// FOGs
+		{"GL.GL_FOG_END", GL_FOG_END},
+		{"GL.GL_FOG_MODE", GL_FOG_MODE},
+		{"GL.GL_FOG_START", GL_FOG_START},
+		{"GL.GL_FOG_COLOR", GL_FOG_COLOR},
+		{"GL.GL_LINEAR", GL_LINEAR},
+		{"GL.GL_TEXTURE", GL_TEXTURE},
+		// GL_Texture
+		{"GL.GL_ALPHA", GL_ALPHA},
+		{"GL.GL_ALPHA4", GL_ALPHA4},
+		{"GL.GL_ALPHA8", GL_ALPHA8},
+		{"GL.GL_ALPHA12", GL_ALPHA12},
+		{"GL.GL_ALPHA16", GL_ALPHA16},
+		{"GL.GL_LUMINANCE", GL_LUMINANCE},
+		{"GL.GL_LUMINANCE4", GL_LUMINANCE4},
+		{"GL.GL_LUMINANCE8", GL_LUMINANCE8},
+		{"GL.GL_LUMINANCE12", GL_LUMINANCE12},
+		{"GL.GL_LUMINANCE16", GL_LUMINANCE16},
+		{"GL.GL_LUMINANCE_ALPHA", GL_LUMINANCE_ALPHA},
+		{"GL.GL_LUMINANCE4_ALPHA4", GL_LUMINANCE4_ALPHA4},
+		{"GL.GL_LUMINANCE6_ALPHA2", GL_LUMINANCE6_ALPHA2},
+		{"GL.GL_LUMINANCE8_ALPHA8", GL_LUMINANCE8_ALPHA8},
+		{"GL.GL_LUMINANCE12_ALPHA4", GL_LUMINANCE12_ALPHA4},
+		{"GL.GL_LUMINANCE12_ALPHA12", GL_LUMINANCE12_ALPHA12},
+		{"GL.GL_LUMINANCE16_ALPHA16", GL_LUMINANCE16_ALPHA16},
+		{"GL.GL_INTENSITY", GL_INTENSITY},
+		{"GL.GL_INTENSITY4", GL_INTENSITY4},
+		{"GL.GL_INTENSITY8", GL_INTENSITY8},
+		{"GL.GL_INTENSITY12", GL_INTENSITY12},
+		{"GL.GL_INTENSITY16", GL_INTENSITY16},
+		{"GL.GL_R3_G3_B2", GL_R3_G3_B2},
+		{"GL.GL_RGB", GL_RGB},
+		{"GL.GL_RGB4", GL_RGB4},
+		{"GL.GL_RGB5", GL_RGB5},
+		{"GL.GL_RGB8", GL_RGB8},
+		{"GL.GL_RGB10", GL_RGB10},
+		{"GL.GL_RGB12", GL_RGB12},
+		{"GL.GL_RGB16", GL_RGB16},
+		{"GL.GL_RGBA", GL_RGBA},
+		{"GL.GL_RGBA2", GL_RGBA2},
+		{"GL.GL_RGBA4", GL_RGBA4},
+		{"GL.GL_RGB5_A1", GL_RGB5_A1},
+		{"GL.GL_RGBA8", GL_RGBA8},
+		{"GL.GL_RGB10_A2", GL_RGB10_A2},
+		{"GL.GL_RGBA12", GL_RGBA12},
+		{"GL.GL_RGBA16", GL_RGBA16},
+		//keyboard
+		{"GL.GLUT_KEY_F1", GLUT_KEY_F1},
+		{"GL.GLUT_KEY_F2", GLUT_KEY_F2},
+		{"GL.GLUT_KEY_F3", GLUT_KEY_F3},
+		{"GL.GLUT_KEY_F4", GLUT_KEY_F4},
+		{"GL.GLUT_KEY_F5", GLUT_KEY_F5},
+		{"GL.GLUT_KEY_F6", GLUT_KEY_F6},
+		{"GL.GLUT_KEY_F7", GLUT_KEY_F7},
+		{"GL.GLUT_KEY_F8", GLUT_KEY_F8},
+		{"GL.GLUT_KEY_F9", GLUT_KEY_F9},
+		{"GL.GLUT_KEY_F10", GLUT_KEY_F10},
+		{"GL.GLUT_KEY_F11", GLUT_KEY_F11},
+		{"GL.GLUT_KEY_F12", GLUT_KEY_F12},
+		{"GL.GLUT_KEY_LEFT", GLUT_KEY_LEFT},
+		{"GL.GLUT_KEY_UP", GLUT_KEY_UP},
+		{"GL.GLUT_KEY_RIGHT", GLUT_KEY_RIGHT},
+		{"GL.GLUT_KEY_DOWN", GLUT_KEY_DOWN},
+		{"GL.GLUT_KEY_PAGE_UP", GLUT_KEY_PAGE_UP},
+		{"GL.GLUT_KEY_PAGE_DOWN", GLUT_KEY_PAGE_DOWN},
+		{"GL.GLUT_KEY_HOME", GLUT_KEY_HOME},
+		{"GL.GLUT_KEY_END", GLUT_KEY_END},
+		{"GL.GLUT_KEY_INSERT", GLUT_KEY_INSERT},
+		// anti ailas
+		{"GL.GL_POLYGON_SMOOTH", GL_POLYGON_SMOOTH},
+		{"GL.GL_LINE_SMOOTH", GL_LINE_SMOOTH},
+		{"GL.GL_BLEND", GL_BLEND},
+		{"GL.GL_SRC_ALPHA", GL_SRC_ALPHA},
+		{"GL.GL_ONE_MINUS_SRC_ALPHA", GL_ONE_MINUS_SRC_ALPHA},
+		// unkonwn
+		{"GL.GL_LEQUAL", GL_LEQUAL},
+		{"GL.GL_UNPACK_ALIGNMENT", GL_UNPACK_ALIGNMENT},
+		{"GL.GL_TEXTURE_WRAP_S", GL_TEXTURE_WRAP_S},
+		{"GL.GL_TEXTURE_WRAP_T", GL_TEXTURE_WRAP_T},
+		{"GL.GL_REPEAT", GL_REPEAT},
+		{"GL.GL_TEXTURE_MAG_FILTER", GL_TEXTURE_MAG_FILTER},
+		{"GL.GL_NEAREST", GL_NEAREST},
+		{"GL.GL_TEXTURE_MIN_FILTER", GL_TEXTURE_MIN_FILTER},
+		{"GL.GL_UNSIGNED_BYTE", GL_UNSIGNED_BYTE},
+		{NULL} // end of const
 };
 
 
@@ -160,192 +160,192 @@ static
 void knh_glut_display(void)
 {
 #ifndef KNH_USING_PTHREAD
-  Ctx *lctx = knh_getCurrentContext();
+	Ctx *lctx = knh_getCurrentContext();
 #else
-  Ctx *lctx = &gl_ctx;
+	Ctx *lctx = &gl_ctx;
 #endif
-  knh_sfp_t *lsfp = KNH_LOCAL(lctx);
+	knh_sfp_t *lsfp = KNH_LOCAL(lctx);
 
-  knh_Closure_invokesfp(lctx, displayfunc, lsfp, 0);
+	knh_Closure_invokesfp(lctx, displayfunc, lsfp, 0);
 }
 
 void init (void)
 {
-  if (initfunc == NULL) {
-	knh_loadIntConstData(knh_getCurrentContext(), IntConstData);
-	return;
-  }
-  
+	if (initfunc == NULL) {
+		knh_loadIntConstData(knh_getCurrentContext(), IntConstData);
+		return;
+	}
+
 #ifndef KNH_USING_PTHREAD
-  Ctx *lctx = knh_getCurrentContext();
+	Ctx *lctx = knh_getCurrentContext();
 #else
-  Ctx *lctx = &gl_ctx;
+	Ctx *lctx = &gl_ctx;
 #endif
-  knh_sfp_t *lsfp = KNH_LOCAL(lctx);
-  knh_Closure_invokesfp(lctx, initfunc, lsfp, 0);
+	knh_sfp_t *lsfp = KNH_LOCAL(lctx);
+	knh_Closure_invokesfp(lctx, initfunc, lsfp, 0);
 }
 
 void knh_glut_reshape(int w, int h)
 {
 #ifndef KNH_USING_PTHREAD
-  Ctx *lctx = knh_getCurrentContext();
+	Ctx *lctx = knh_getCurrentContext();
 #else
-  Ctx *lctx = &gl_ctx;
+	Ctx *lctx = &gl_ctx;
 #endif
-  knh_sfp_t *lsfp = KNH_LOCAL(lctx);
-  Int *arg1 = new_Int(lctx, w);
-  Int *arg2 = new_Int(lctx, h);
-  knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
-  knh_putsfp(lctx, lsfp, 3, (Object *)arg2);
-  knh_Closure_invokesfp(lctx, reshapefunc, lsfp, 2);
+	knh_sfp_t *lsfp = KNH_LOCAL(lctx);
+	Int *arg1 = new_Int(lctx, w);
+	Int *arg2 = new_Int(lctx, h);
+	knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
+	knh_putsfp(lctx, lsfp, 3, (Object *)arg2);
+	knh_Closure_invokesfp(lctx, reshapefunc, lsfp, 2);
 }
 
 void knh_glut_idle (void)
 {
-  
+
 #ifndef KNH_USING_PTHREAD
-  Ctx *lctx = knh_getCurrentContext();
+	Ctx *lctx = knh_getCurrentContext();
 #else
-  Ctx *lctx = &gl_ctx;
+	Ctx *lctx = &gl_ctx;
 #endif
-  knh_sfp_t *lsfp = KNH_LOCAL(lctx);
-  //  pthread_mutex_lock(&mytex);
-  knh_Closure_invokesfp(lctx, idlefunc, lsfp, 0);
-  //  pthread_mutex_unlock(&mytex);
+	knh_sfp_t *lsfp = KNH_LOCAL(lctx);
+	//  pthread_mutex_lock(&mytex);
+	knh_Closure_invokesfp(lctx, idlefunc, lsfp, 0);
+	//  pthread_mutex_unlock(&mytex);
 }
 
 void knh_glut_timer (int value)
 {
 #ifndef KNH_USING_PTHREAD
-  Ctx *lctx = knh_getCurrentContext();
+	Ctx *lctx = knh_getCurrentContext();
 #else
-  Ctx *lctx = &gl_ctx;
+	Ctx *lctx = &gl_ctx;
 #endif
-  knh_sfp_t *lsfp = KNH_LOCAL(lctx);
-  Int *arg1 = new_Int(lctx, value);
-  knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
-  knh_Closure_invokesfp(lctx, timerfunc, lsfp, 1);
+	knh_sfp_t *lsfp = KNH_LOCAL(lctx);
+	Int *arg1 = new_Int(lctx, value);
+	knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
+	knh_Closure_invokesfp(lctx, timerfunc, lsfp, 1);
 }
 
 void knh_glut_mouse(int button, int state, int x, int y)
 {
 #ifndef KNH_USING_PTHREAD
-  Ctx *lctx = knh_getCurrentContext();
+	Ctx *lctx = knh_getCurrentContext();
 #else
-  Ctx *lctx = &gl_ctx;
+	Ctx *lctx = &gl_ctx;
 #endif
-  knh_sfp_t *lsfp = KNH_LOCAL(lctx);
-  Int *arg1 = new_Int(lctx, button);
-  Int *arg2 = new_Int(lctx, state);
-  Int *arg3 = new_Int(lctx, x);
-  Int *arg4 = new_Int(lctx, y);
-  knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
-  knh_putsfp(lctx, lsfp, 3, (Object *)arg2);
-  knh_putsfp(lctx, lsfp, 4, (Object *)arg3);
-  knh_putsfp(lctx, lsfp, 5, (Object *)arg4);
-  
-  knh_Closure_invokesfp(lctx, mousefunc, lsfp, 4);
+	knh_sfp_t *lsfp = KNH_LOCAL(lctx);
+	Int *arg1 = new_Int(lctx, button);
+	Int *arg2 = new_Int(lctx, state);
+	Int *arg3 = new_Int(lctx, x);
+	Int *arg4 = new_Int(lctx, y);
+	knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
+	knh_putsfp(lctx, lsfp, 3, (Object *)arg2);
+	knh_putsfp(lctx, lsfp, 4, (Object *)arg3);
+	knh_putsfp(lctx, lsfp, 5, (Object *)arg4);
+
+	knh_Closure_invokesfp(lctx, mousefunc, lsfp, 4);
 }
 
 void knh_glut_keyboard(unsigned char key, int x, int y)
 {
 #ifndef KNH_USING_PTHREAD
-  Ctx *lctx = knh_getCurrentContext();
+	Ctx *lctx = knh_getCurrentContext();
 #else
-  Ctx *lctx = &gl_ctx;
+	Ctx *lctx = &gl_ctx;
 #endif
-  knh_sfp_t *lsfp = KNH_LOCAL(lctx);
-  Int *arg1 = new_Int(lctx, (int)key);
-  Int *arg2 = new_Int(lctx, x);
-  Int *arg3 = new_Int(lctx, y);
-  knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
-  knh_putsfp(lctx, lsfp, 3, (Object *)arg2);
-  knh_putsfp(lctx, lsfp, 4, (Object *)arg3);
-  knh_Closure_invokesfp(lctx, keyboardfunc, lsfp, 3);
+	knh_sfp_t *lsfp = KNH_LOCAL(lctx);
+	Int *arg1 = new_Int(lctx, (int)key);
+	Int *arg2 = new_Int(lctx, x);
+	Int *arg3 = new_Int(lctx, y);
+	knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
+	knh_putsfp(lctx, lsfp, 3, (Object *)arg2);
+	knh_putsfp(lctx, lsfp, 4, (Object *)arg3);
+	knh_Closure_invokesfp(lctx, keyboardfunc, lsfp, 3);
 }
 
 void knh_glut_special(int key, int x, int y)
 {
 #ifndef KNH_USING_PTHREAD
-  Ctx *lctx = knh_getCurrentContext();
+	Ctx *lctx = knh_getCurrentContext();
 #else
-  Ctx *lctx = &gl_ctx;
+	Ctx *lctx = &gl_ctx;
 #endif
-  knh_sfp_t *lsfp = KNH_LOCAL(lctx);
-  Int *arg1 = new_Int(lctx, key);
-  Int *arg2 = new_Int(lctx, x);
-  Int *arg3 = new_Int(lctx, y);
-  knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
-  knh_putsfp(lctx, lsfp, 3, (Object *)arg2);
-  knh_putsfp(lctx, lsfp, 4, (Object *)arg3);
-  knh_Closure_invokesfp(lctx, specialfunc, lsfp, 3);
+	knh_sfp_t *lsfp = KNH_LOCAL(lctx);
+	Int *arg1 = new_Int(lctx, key);
+	Int *arg2 = new_Int(lctx, x);
+	Int *arg3 = new_Int(lctx, y);
+	knh_putsfp(lctx, lsfp, 2, (Object *)arg1);
+	knh_putsfp(lctx, lsfp, 3, (Object *)arg2);
+	knh_putsfp(lctx, lsfp, 4, (Object *)arg3);
+	knh_Closure_invokesfp(lctx, specialfunc, lsfp, 3);
 }
 
 METHOD GL_glutInit(Ctx *ctx, knh_sfp_t *sfp)
 {
-  int i, argc;
-  char **argv;
-  Array *a = (Array *)sfp[1].o;
-  argc = knh_Array_size(a);
-  argv = (char **)alloca(argc * sizeof(char*));
-  for (i = 0; i < argc; i++) {
-	argv[i] = knh_String_tochar((String *)knh_Array_n(a, i));
-  }
-  glutInit(&argc, argv);
-  KNH_RETURN_void(ctx, sfp);
+	int i, argc;
+	char **argv;
+	Array *a = (Array *)sfp[1].o;
+	argc = knh_Array_size(a);
+	argv = (char **)alloca(argc * sizeof(char*));
+	for (i = 0; i < argc; i++) {
+		argv[i] = knh_String_tochar((String *)knh_Array_n(a, i));
+	}
+	glutInit(&argc, argv);
+	KNH_RETURN_void(ctx, sfp);
 }
 
 
 METHOD GL_glutMainLoop(Ctx *ctx, knh_sfp_t *sfp)
 {
 #ifndef KNH_USING_PTHREAD
-  glutMainLoop();
+	glutMainLoop();
 #else
-  fprintf(stderr, "thread");
-  pthread_t thread;
-  memcpy(&gl_ctx, ctx, sizeof(Ctx));
+	fprintf(stderr, "thread");
+	pthread_t thread;
+	memcpy(&gl_ctx, ctx, sizeof(Ctx));
 
-  if (pthread_create(&thread, NULL, thread_func, NULL))
-	  perror("cannot create thread");
-  //  pthread_join(thread, NULL);
+	if (pthread_create(&thread, NULL, thread_func, NULL))
+		perror("cannot create thread");
+	//  pthread_join(thread, NULL);
 #endif
 
-  KNH_RETURN_void(ctx, sfp);
+	KNH_RETURN_void(ctx, sfp);
 }
 
 METHOD GL_glutDisplayFunc(Ctx *ctx, knh_sfp_t *sfp)
 {
-  displayfunc = sfp[1].cc;
-  glutDisplayFunc(knh_glut_display);
-  KNH_RETURN_void(ctx, sfp);
+	displayfunc = sfp[1].cc;
+	glutDisplayFunc(knh_glut_display);
+	KNH_RETURN_void(ctx, sfp);
 }
 
 METHOD GL_glutInitFunc(Ctx *ctx, knh_sfp_t *sfp)
 {
-  initfunc = sfp[1].cc;
-  KNH_RETURN_void(ctx, sfp);
+	initfunc = sfp[1].cc;
+	KNH_RETURN_void(ctx, sfp);
 }
 
 METHOD GL_glutReshapeFunc(Ctx *ctx, knh_sfp_t *sfp)
 {
-  reshapefunc = sfp[1].cc;
-  glutReshapeFunc(knh_glut_reshape);
-  KNH_RETURN_void(ctx, sfp);
+	reshapefunc = sfp[1].cc;
+	glutReshapeFunc(knh_glut_reshape);
+	KNH_RETURN_void(ctx, sfp);
 }
 
 METHOD GL_glutTimerFunc(Ctx *ctx, knh_sfp_t *sfp)
 {
-  int msec = p_int(sfp[1]);
-  timerfunc = sfp[2].cc;
-  int value = p_int(sfp[3]);
-  
-  glutTimerFunc(msec, knh_glut_timer, value);
-  KNH_RETURN_void(ctx, sfp);
+	int msec = p_int(sfp[1]);
+	timerfunc = sfp[2].cc;
+	int value = p_int(sfp[3]);
+
+	glutTimerFunc(msec, knh_glut_timer, value);
+	KNH_RETURN_void(ctx, sfp);
 }
 
 METHOD GL_glutIdleFunc(Ctx *ctx, knh_sfp_t *sfp)
 {
-  /*  if (idle_lock == 0) {
+	/*  if (idle_lock == 0) {
 	pthread_mutex_lock(&mytex);
 	idlefunc = sfp[1].cc;
 	pthread_mutex_unlock(&mytex);
@@ -358,41 +358,41 @@ METHOD GL_glutIdleFunc(Ctx *ctx, knh_sfp_t *sfp)
 	glutIdleFunc(knh_glut_idle_switch);
 	idle_lock = 0;
   }
-  */
-  //  pthread_mutex_lock(&mytex);
-  idlefunc = sfp[1].cc;
-  //  pthread_mutex_unlock(&mytex);
-  glutIdleFunc(knh_glut_idle);
-  KNH_RETURN_void(ctx, sfp);
+	 */
+	//  pthread_mutex_lock(&mytex);
+	idlefunc = sfp[1].cc;
+	//  pthread_mutex_unlock(&mytex);
+	glutIdleFunc(knh_glut_idle);
+	KNH_RETURN_void(ctx, sfp);
 }
 
 
 METHOD GL_glutMouseFunc(Ctx *ctx, knh_sfp_t *sfp)
 {
-  mousefunc = sfp[1].cc;
-  glutMouseFunc(knh_glut_mouse);
-  KNH_RETURN_void(ctx, sfp);
+	mousefunc = sfp[1].cc;
+	glutMouseFunc(knh_glut_mouse);
+	KNH_RETURN_void(ctx, sfp);
 }
 
 METHOD GL_glutKeyboardFunc(Ctx *ctx, knh_sfp_t *sfp)
 {
-  keyboardfunc = sfp[1].cc;
-  glutKeyboardFunc(knh_glut_keyboard);
-  KNH_RETURN_void(ctx, sfp);
+	keyboardfunc = sfp[1].cc;
+	glutKeyboardFunc(knh_glut_keyboard);
+	KNH_RETURN_void(ctx, sfp);
 }
 
 METHOD GL_glutSpecialFunc(Ctx *ctx, knh_sfp_t *sfp)
 {
-  specialfunc = sfp[1].cc;
-  glutSpecialFunc(knh_glut_special);
-  KNH_RETURN_void(ctx, sfp);
+	specialfunc = sfp[1].cc;
+	glutSpecialFunc(knh_glut_special);
+	KNH_RETURN_void(ctx, sfp);
 }
 
 METHOD GL_glClear(Ctx *ctx, knh_sfp_t *sfp)
 {
-  int flag = p_int(sfp[1]);
-  glClear(flag);
-  KNH_RETURN_void(ctx, sfp);
+	int flag = p_int(sfp[1]);
+	glClear(flag);
+	KNH_RETURN_void(ctx, sfp);
 }
 
 METHOD GL_glViewport(Ctx *ctx, knh_sfp_t* sfp)
@@ -400,7 +400,7 @@ METHOD GL_glViewport(Ctx *ctx, knh_sfp_t* sfp)
 	int i0 = p_int(sfp[1]);
 	int i1 = p_int(sfp[2]);
 	int i2 = p_int(sfp[3]);
-	int i3 = p_int(sfp[4]);	
+	int i3 = p_int(sfp[4]);
 	glViewport(i0 ,i1, (GLsizei)i2, (GLsizei)i3);
 
 	KNH_RETURN_void(ctx, sfp);

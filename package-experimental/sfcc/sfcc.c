@@ -75,16 +75,16 @@ static CIMCEnv *getCIMCEnv(Ctx *ctx)
   }
   return knh_sharedCIMEnv;
 }
-  
+
 /* ======================================================================== */
 /* [CIMObjectPath] */
-  
+
 static void knh_fgfree_CIMCObjectPath(Ctx *ctx, knh_Glue_t *g)
 {
   CIMCObjectPath *op = (CIMCObjectPath*)g->ptr;
   op->ft->release(op);
 }
-  
+
 /* ------------------------------------------------------------------------ */
 /* @method CIMObjectPath CIMObjectPath.new(String! path,String packname) */
 
@@ -104,7 +104,7 @@ METHOD CIMObjectPath_new(Ctx *ctx, knh_sfp_t *sfp)
   knh_Glue_init(ctx, sfp[0].glue, op, knh_fgfree_CIMCObjectPath);
   KNH_RETURN(ctx, sfp, sfp[0].o);
 }
-  
+
 /* ------------------------------------------------------------------------ */
 /* @method CIMObjectPath CIMObjectPath.addKey(String! path,String packname) */
 METHOD CIMObjectPath_addKey(Ctx *ctx, knh_sfp_t *sfp)
@@ -157,7 +157,7 @@ METHOD CIMClient_new(Ctx *ctx, knh_sfp_t *sfp)
   CIMCStatus status;
   /*
   if(IS_NULL(sfp[0].s)) {
-  char *pwd = konoha_getPassword(ctx, STEXT("konoha"));
+  char *pwd = knh_getPassword(ctx, STEXT("konoha"));
   cc = env->ft->connect(env, "localhost", "http", "5988", "konoha", pwd, &status);
   }
   else {
@@ -170,16 +170,16 @@ METHOD CIMClient_new(Ctx *ctx, knh_sfp_t *sfp)
     knh_bytes_parseURLuname(url, bfuname, sizeof(bfuname));
     knh_bytes_parseURLport(url, &port);
     knh_snprintf(bfport, sizeof(bfport), "%d", port);
-    cc = env->ft->connect(env, bfhost, bfscheme, bfport, bfuname, konoha_getPassword(ctx, url), &status);
+    cc = env->ft->connect(env, bfhost, bfscheme, bfport, bfuname, knh_getPassword(ctx, url), &status);
     }
   */
-  
+
   char *cimhost = p_char(sfp[1]);
   char *s3 = "5988";
   char *s4 = "root";
   char *s5 = "password";
   cc = env->ft->connect(env, cimhost, "http", s3, s4, s5, &status);
-  
+
   if(cc == NULL || status.rc != 0) {
     knh_throw_CIMCStatus(ctx, &status);
   }
@@ -268,7 +268,7 @@ METHOD CIMClient_invokeMethod(Ctx *ctx, knh_sfp_t *sfp)
   CIMCStatus status;
   char c[64] = {0};
   argc = knh_Array_size(a);
- 
+
   argv = (char **)alloca(argc * sizeof(char*));
   for (i = 0; i < argc; i++) {
 	argv[i] = knh_String_tochar((String *)knh_Array_n(a, i));
@@ -278,7 +278,7 @@ METHOD CIMClient_invokeMethod(Ctx *ctx, knh_sfp_t *sfp)
     if(strncmp(argv[i],"",1) != 0){
       snprintf(c,64,"a%d",i);
       ((CMPIArgs*)inargs)->ft->addArg((CMPIArgs*)inargs, c, (CMPIValue*)argv[i], CMPI_chars);
-    } 
+    }
   }
   if(cc != NULL && op != NULL) {
     data = cc->ft->invokeMethod(cc, op, name, inargs, outargs, &status);
@@ -360,7 +360,7 @@ METHOD CIMInstance_new(Ctx *ctx, knh_sfp_t *sfp)
   CIMCClient *cc = ((sfp[1].glue)->ptr);
   CIMCObjectPath *op = ((sfp[2].glue)->ptr);
   CIMCStatus status;
-  CIMCInstance *ins; 
+  CIMCInstance *ins;
   ins = cc->ft->getInstance(cc, op, 0, NULL, &status);
   if(ins == NULL || status.rc != 0) {
     knh_throw_CIMCStatus(ctx, &status);
@@ -428,7 +428,7 @@ METHOD CIMInstance_getProperty(Ctx *ctx, knh_sfp_t *sfp)
 	    knh_Array_add(ctx, a, UP(new_String(ctx, B(ret), NULL)));
 	    free (valuestr);
 	  }
-	}         
+	}
       }
       CMRelease(propertyname);
     }
