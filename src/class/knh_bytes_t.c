@@ -631,7 +631,9 @@ KNHAPI(knh_bytes_t) knh_bytes_substringURLpath(knh_bytes_t url)
 		loc = knh_bytes_index(t, '@');
 		if(loc > 0) t = knh_bytes_last(t, loc+1);
 		loc = knh_bytes_index(t, '/');
-		return knh_bytes_last(t, loc);
+		if(loc > 0) {
+			return t = knh_bytes_last(t, loc);
+		}
 	}
 	return STEXT("/");
 }

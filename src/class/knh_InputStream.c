@@ -139,7 +139,6 @@ int knh_InputStream_getc(Ctx *ctx, InputStream *o)
 		}else if(ch == '\r') {
 			DP(o)->line++;
 		}
-		DP(o)->prev = ch;
 	}
 	return ch;
 }
@@ -181,13 +180,17 @@ String* knh_InputStream_readLine(Ctx *ctx, InputStream *in)
 	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
 	while((ch = knh_InputStream_getc(ctx, in)) != EOF) {
 		if(ch == '\r') {
+			DP(in)->prev = ch;
 			return new_String__cwbconv(ctx, cwb, DP(in)->bconv);
 		}
-		if(ch == '\n') {
+		else if(ch == '\n') {
 			if(DP(in)->prev == '\r') continue;
+			DP(in)->prev = ch;
 			return new_String__cwbconv(ctx, cwb, DP(in)->bconv);
 		}
-		knh_Bytes_putc(ctx, cwb->ba, ch);
+		else {
+			knh_Bytes_putc(ctx, cwb->ba, ch);
+		}
 	}
 	if(knh_cwb_size(cwb) != 0) {
 		return new_String__cwbconv(ctx, cwb, DP(in)->bconv);
