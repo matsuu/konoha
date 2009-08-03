@@ -410,6 +410,7 @@ void knh_write_fline(Ctx *ctx, OutputStream *w, char *file, int line);
 void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap);
 void knh_setverbose(int v);
 METHOD knh_fmethod_movableText(Ctx *ctx, knh_sfp_t *sfp);
+knh_bool_t knh_stack_isRecuriveFormatting(Ctx *ctx, knh_sfp_t *sfp, Object *o, OutputStream *w, void *mtdcode);
 /* ../src/compiler/asm.c */
 void knh_Context_initAsm(Ctx *ctx);
 NameSpace *knh_getCurrentNameSpace(Ctx *ctx);
