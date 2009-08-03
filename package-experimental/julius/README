@@ -1,0 +1,17 @@
+
+make information (linux)
+========================
+
+$ make -f linux_32.mk
+
+needs library
+=============
+
+julius (Recently version)
+dictation-kit(Word Library) "put: ~/.konoha/package/julius/"
+fast.jconf(Configure file) "put:~/.konoha/package/julius/"
+
+How to use
+==========
+
+$ konoha sample/sample.k
