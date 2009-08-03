@@ -262,30 +262,30 @@ knh_iodrv_t *knh_getSocketDriver(void)
 static
 knh_io_t knh_iodrv_open__HTTP(Ctx *ctx, knh_bytes_t url, char *mode, int isThrowable)
 {
-	knh_bytes_t host = knh_bytes_last(url, 7);
-	knh_index_t loc = knh_bytes_index(host, '/');
-	knh_bytes_t path = STEXT("/");
-	if(loc != -1) {
-		path = knh_bytes_last(host, loc);
-		host = knh_bytes_first(host, loc);
-	}
-	int port = 80; /* default */
-	loc = knh_bytes_index(host, ':');
-	if(loc != -1) {
-		port = (int)knh_bytes_toint(knh_bytes_last(host, loc+1));
-		host = knh_bytes_first(host, loc);
-	}
-	char host_or_ip[128];
-	knh_format_bytes(host_or_ip, sizeof(host_or_ip), host);
-
-	DBG2_P("socket host='%s', port=%d, path='%s'", host_or_ip, port, path.buf);
-	knh_intptr_t sd = knh_socket_open(ctx, host_or_ip, port, isThrowable);
+	char bfscheme[20], bfhost[80];
+	char bfuname[20];
+	int port = 80;
+	knh_bytes_t path;
+	knh_bytes_parseURLscheme(url, bfscheme, sizeof(bfscheme));
+	knh_bytes_parseURLhost(url, bfhost, sizeof(bfhost));
+	knh_bytes_parseURLuname(url, bfuname, sizeof(bfuname));
+	knh_bytes_parseURLport(url, &port);
+	path = knh_bytes_substringURLpath(url);
+	DBG2_P("socket host='%s', port=%d, path='%s'", bfhost, port, path.buf);
+	knh_intptr_t sd = knh_socket_open(ctx, bfhost, port, isThrowable);
 	if(sd != -1) {
-		char msgbuf[512];
-		knh_snprintf(msgbuf, sizeof(msgbuf),
-			"GET %s HTTP/1.1\r\nHost: %s\r\n\r\n", (char*)path.buf, host_or_ip);
-		DBG2_P("MSG='%s'", msgbuf);
-		knh_socket_send(ctx, sd, msgbuf, knh_strlen(msgbuf), 0);
+		knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
+		knh_bytes_t msg;
+		knh_cwb_write(ctx, cwb, STEXT("GET "));
+		knh_cwb_write(ctx, cwb, path);
+		knh_cwb_write(ctx, cwb, STEXT(" HTTP/1.1\r\n"));
+		knh_cwb_write(ctx, cwb, STEXT("Host: "));
+		knh_cwb_write(ctx, cwb, B(bfhost));
+		knh_cwb_write(ctx, cwb, STEXT("\r\n"));
+		knh_cwb_write(ctx, cwb, STEXT("\r\n"));
+		msg = knh_cwb_tobytes(cwb);
+		knh_socket_send(ctx, sd, (char*)msg.buf, msg.len, 0);
+		knh_cwb_subclear(cwb, 0);
 	}
 	return sd;
 }
@@ -299,7 +299,9 @@ void knh_iodrv_init__HTTP(Ctx *ctx, Object *stream, char *mode)
 		InputStream *in = (InputStream*)stream;
 		knh_sfp_t *esp = ctx->esp + 1;
 		do {
-			KNH_SETv(ctx, esp[0].o, knh_InputStream_readLine(ctx, in));
+			String *s = knh_InputStream_readLine(ctx, in);
+			KNH_SETv(ctx, esp[0].o, s);
+			DBG2_P("line='%s'", knh_String_tochar(s));
 		}while((esp[0].s)->size > 0);
 	}
 }

@@ -16,10 +16,10 @@
 #define _(s)          s
 
 #define KNH_NOTICE(ctx, fmt, ...) \
-	konoha_says(ctx, KONOHA_NOTICE, fmt, ## __VA_ARGS__) \
+	knh_says(ctx, KONOHA_NOTICE, fmt, ## __VA_ARGS__) \
 
 #define KNH_WARNING(ctx, fmt, ...) \
-	konoha_says(ctx, KONOHA_WARNING, fmt, ## __VA_ARGS__) \
+	knh_says(ctx, KONOHA_WARNING, fmt, ## __VA_ARGS__) \
 
 #define KNH_EXIT(fmt, ...) {\
 		fprintf(stderr, "konoha: Emergency Exit at %s\n\t", __FUNCTION__); \

@@ -591,7 +591,7 @@ void knh_Stmt_done(Ctx *ctx, Stmt *o);
 /* ../src/main/exports.c */
 /* ../src/main/glue.c */
 int knh_fcallback_cmpr(Object *obj, Object *obj2);
-void *konoha_generateCallBackFunc(Ctx *ctx, void *func, Closure *c);
+void *knh_generateCallBackFunc(Ctx *ctx, void *func, Closure *c);
 /* ../src/main/konoha_api.c */
 void konoha_init(void);
 int knh_isUserExperienceProgram(Ctx *ctx);

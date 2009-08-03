@@ -313,12 +313,13 @@ NameSpace *knh_NameSpace_newPackageNULL(Ctx *ctx, knh_bytes_t pkgname)
 			KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
 			knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 			NameSpace *curns = knh_switchCurrentNameSpace(ctx, ns);
-			InputStream *in = new_ScriptInputStream(ctx, B(fpath), NULL, ctx->share->mainns, 0);
+			InputStream *in = new_ScriptInputStream(ctx, knh_cwb_tobytes(cwb), cwb, ctx->share->mainns, 0);
 			KNH_LPUSH(ctx, in);
 			if(!knh_InputStream_isClosed(ctx, in)) {
-				knh_NameSpace_load(ctx, ctx->share->mainns, in, 1/*isEval*/,0/*isThrowable*/);
+				knh_NameSpace_load(ctx, ns, in, 1/*isEval*/,0/*isThrowable*/);
 			}
 			else {
+				KNH_WARNING(ctx, "package script does not exist");
 				ns = NULL;
 			}
 			knh_switchCurrentNameSpace(ctx, curns);
@@ -462,7 +463,6 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 {
 	char bufn[CLASSNAME_BUFSIZ];
 	knh_snprintf(bufn, sizeof(bufn), "%s.%s", knh_String_tochar(DP(ns)->nsname), sToken(StmtCLASS_class(stmt)));
-
 	knh_class_t cid  = knh_NameSpace_getcid(ctx, ns, B(bufn));
 	if(cid == CLASS_unknown) {
 		cid = knh_ClassTable_newId(ctx);
