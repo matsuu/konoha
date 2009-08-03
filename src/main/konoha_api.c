@@ -270,7 +270,7 @@ KNHAPI(char*) konoha_getStdOutBufferText(konoha_t konoha)
 	knh_OutputStream_flush(ctx, out);
 	if(IS_Bytes(DP(out)->ba)) {
 		Bytes *ba = DP(out)->ba;
-		DBG_P("malloc(%ld)", ba->size + 1);
+		DBG_P("malloc(%zd)", ba->size + 1);
 		char *p = (char*)malloc(ba->size + 1);
 		if(p != NULL) {
 			knh_memcpy(p, ba->buf, ba->size);
@@ -292,7 +292,7 @@ KNHAPI(char*) knh_getStdErrBufferText(konoha_t konoha)
 	knh_OutputStream_flush(ctx, out);
 	if(IS_Bytes(DP(out)->ba)) {
 		Bytes *ba = DP(out)->ba;
-		DBG_P("malloc(%ld)", ba->size + 1);
+		DBG_P("malloc(%zd)", ba->size + 1);
 		char *p = (char*)malloc(ba->size + 1);
 		if(p != NULL) {
 			knh_memcpy(p, ba->buf, ba->size);

@@ -434,7 +434,7 @@ MAPPER knh_fmapper_vocab(Ctx *ctx, knh_sfp_t *sfp)
 {
 	ClassSpec *u = (ClassSpec*)DP(sfp[1].mpr)->mapdata;
 	size_t n = (size_t)(sfp[0].ivalue - DP(u)->imin);
-	DBG2_P("n = %ld", n);
+	DBG2_P("n = %zd", n);
 	Array *a = (DP(u)->vocabDictIdx)->terms;
 	Object *s = KNH_NULL;
 	if(n < knh_Array_size(a)) {
