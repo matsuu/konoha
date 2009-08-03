@@ -91,20 +91,26 @@ char* knh_cwb_realpath(Ctx *ctx, knh_cwb_t *cwb)
 {
 	char *p = knh_cwb_tochar(ctx, cwb);
 #if defined(PATH_MAX)
-	char buf[PATH_MAX];
+	char buf[PATH_MAX] = {0};
 #else
 	char *buf = NULL;
 #endif
 #if defined(KNH_USING_POSIX)
 	p = realpath(p, buf);
-	if(p != NULL) {
+	// FIXME realpath is always return NULL . if file isnt exsists.
+	// if "p" isnt exsists , p is always NULL.
+	// so, we cant create realpath for unexsist file.
+	// 
+	// imasahiro
+	//if(p != NULL) {
 		knh_cwb_subclear(cwb, 0);
-		knh_Bytes_write(ctx, cwb->ba, B(p));
+		knh_Bytes_write(ctx, cwb->ba, B(buf));
 #if !defined(PATH_MAX)
 		free(p);
 #endif
 		p = knh_cwb_tochar(ctx, cwb);
-	}
+	// FIXME realpath is always return NULL . if file isnt exsists.
+	//}
 #else
 	TODO();
 #endif
@@ -187,7 +193,7 @@ knh_bool_t knh_cwb_mkdir(Ctx *ctx, knh_cwb_t *cwb, char *subpath, int isThrowabl
 	if(!knh_cwb_isdir(ctx, cwb)) {
 		char subbuf[SUBPATH_BUFSIZ];
 		if(knh_cwb_parentpath(ctx, cwb, subbuf)) {
-			if(knh_cwb_mkdir(ctx, cwb, subpath, isThrowable)) {
+			if(knh_cwb_mkdir(ctx, cwb, subpath, isThrowable) == 0) {
 				knh_cwb_write(ctx, cwb, B(subbuf));
 			}
 			else {
