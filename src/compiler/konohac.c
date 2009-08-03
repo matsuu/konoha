@@ -35,7 +35,6 @@
 extern "C" {
 #endif
 
-
 /* ======================================================================== */
 /* [main] */
 
@@ -91,48 +90,52 @@ int knh_NameSpace_isLoaded(Ctx *ctx, NameSpace *ns, knh_uri_t uri)
 InputStream* new_ScriptInputStream(Ctx *ctx, knh_bytes_t path, knh_cwb_t *cwb, NameSpace *ns, int isThrowable)
 {
 	knh_uri_t uri = 0;
+	knh_iodrv_t *drv = NULL;
 	knh_cwb_t cwbbuf;
 	if(cwb == NULL) {
 		cwb = knh_cwb_openinit(ctx, &cwbbuf, path);
 	}
-	knh_cwb_ospath(ctx, cwb);
-	if(!knh_cwb_isfile(ctx, cwb) && knh_bytes_isSystemScript(path)) {
-		String *spath = (String*)knh_Context_getProperty(ctx, (Context*)ctx, STEXT("konoha.script.path"));
-		if(IS_bString(spath)) {
-			knh_cwb_subclear(cwb, 0);
-			knh_cwb_write(ctx, cwb, knh_String_tobytes(spath));
-			knh_cwb_putc(ctx, cwb, '/');
-			knh_cwb_write(ctx, cwb, path);
-			knh_cwb_ospath(ctx, cwb);
-			if(knh_cwb_isfile(ctx, cwb)) {
-				uri = knh_cwb_getResourceId(ctx, cwb);
-				DBG2_ASSERT(uri != 0);
-				uri = URI_TRUSTED(uri);
+	if(knh_bytes_startsWith(path, STEXT("http://"))) {
+		drv = knh_getIODriver(ctx, STEXT("http"));
+	}
+	else {
+		drv = knh_getIODriver(ctx, STEXT("file"));
+		knh_cwb_ospath(ctx, cwb);
+		if(!knh_cwb_isfile(ctx, cwb) && knh_bytes_isSystemScript(path)) {
+			String *spath = (String*)knh_Context_getProperty(ctx, (Context*)ctx, STEXT("konoha.script.path"));
+			if(IS_bString(spath)) {
+				knh_cwb_subclear(cwb, 0);
+				knh_cwb_write(ctx, cwb, knh_String_tobytes(spath));
+				knh_cwb_putc(ctx, cwb, '/');
+				knh_cwb_write(ctx, cwb, path);
+				knh_cwb_ospath(ctx, cwb);
+				if(knh_cwb_isfile(ctx, cwb)) {
+					uri = knh_cwb_getResourceId(ctx, cwb);
+					DBG2_ASSERT(uri != 0);
+					uri = URI_TRUSTED(uri);
+				}
 			}
-		}
-		spath = (String*)knh_Context_getProperty(ctx, (Context*)ctx, STEXT("user.script.path"));
-		if(IS_bString(spath) && uri == 0) {
-			knh_cwb_subclear(cwb, 0);
-			knh_cwb_write(ctx, cwb, knh_String_tobytes(spath));
-			knh_cwb_putc(ctx, cwb, '/');
-			knh_cwb_write(ctx, cwb, path);
-			knh_cwb_ospath(ctx, cwb);
-			if(knh_cwb_isfile(ctx, cwb)) {
-				uri = knh_cwb_getResourceId(ctx, cwb);
-				DBG2_ASSERT(uri != 0);
-				uri = URI_TRUSTED(uri);
+			spath = (String*)knh_Context_getProperty(ctx, (Context*)ctx, STEXT("user.script.path"));
+			if(IS_bString(spath) && uri == 0) {
+				knh_cwb_subclear(cwb, 0);
+				knh_cwb_write(ctx, cwb, knh_String_tobytes(spath));
+				knh_cwb_putc(ctx, cwb, '/');
+				knh_cwb_write(ctx, cwb, path);
+				knh_cwb_ospath(ctx, cwb);
+				if(knh_cwb_isfile(ctx, cwb)) {
+					uri = knh_cwb_getResourceId(ctx, cwb);
+					DBG2_ASSERT(uri != 0);
+					uri = URI_TRUSTED(uri);
+				}
 			}
-		}
-		if(uri == 0) {
-			knh_cwb_subclear(cwb, 0);
-			knh_cwb_write(ctx, cwb, path);
+			if(uri == 0) {
+				knh_cwb_subclear(cwb, 0);
+				knh_cwb_write(ctx, cwb, path);
+			}
 		}
 	}
 	if(uri == 0) {
 		uri = knh_cwb_getResourceId(ctx, cwb);
-		if(!knh_isTrustedPath(ctx, knh_cwb_tobytes(cwb))) {
-			uri = URI_UNTRUSTED(uri);
-		}
 	}
 	if(knh_NameSpace_isLoaded(ctx, ns, uri)) {
 		KNH_WARNING(ctx, "Already imported: %s", (char*)path.buf);
@@ -142,12 +145,8 @@ InputStream* new_ScriptInputStream(Ctx *ctx, knh_bytes_t path, knh_cwb_t *cwb, N
 	}
 	{
 		String *spath = knh_getResourceName(ctx, uri);
-		knh_iodrv_t *drv = knh_getIODriver(ctx, STEXT("file"));
 		path = knh_String_tobytes(spath);
 		KNH_NOTICE(ctx, "importing script: %s", path.buf);
-		if(knh_bytes_startsWith(path, STEXT("http://"))) {
-			drv = knh_getIODriver(ctx, path);
-		}
 		knh_io_t fd = drv->fopen(ctx, path, "r", isThrowable);
 		InputStream *in = new_InputStream__io(ctx, spath, fd, drv);
 		if(!knh_InputStream_isClosed(ctx, in)) {
@@ -178,7 +177,7 @@ static
 void knh_Asm_openDynamicLinkLibrary(Ctx *ctx, Asm *abr, knh_uri_t uri)
 {
 	knh_bytes_t path = knh_String_tobytes(knh_getResourceName(ctx, uri));
-	if(path.buf[0] != '(') {  // check "(eval)", "(shell)", or o
+	if(path.buf[0] != '(' && !knh_bytes_startsWith(path, STEXT("http://"))) {  // check "(eval)", "(shell)", or o
 		knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
 		knh_index_t idx = knh_bytes_rindex(path, '.');
 		if(idx > 0) path = knh_bytes_first(path, idx);
@@ -519,7 +518,7 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 				continue;
 			}
 			if(!knh_class_isInterface(icid)) {
-				knh_Token_perror(ctx, tk, KERR_EWARN, _("cannot implements %C: this class is not @Interfac"), icid);
+				knh_Token_perror(ctx, tk, KERR_EWARN, _("cannot implements %C: this class is not @Interface"), icid);
 				continue;
 			}
 			knh_class_addInterface(ctx, cid, icid);
@@ -541,9 +540,11 @@ int knh_StmtIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	int res = 1;
 	knh_bytes_t path = knh_String_tobytes(DP(StmtIMPORT_file(stmt))->text);
 	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
-	knh_cwb_write(ctx, cwb, knh_String_tobytes(knh_getResourceName(ctx, SP(stmt)->uri)));
-	knh_cwb_parentpath(ctx, cwb, NULL);
-	knh_cwb_putc(ctx, cwb, '/');
+	if(path.buf[0] != '/' && path.buf[0] != '\\' && !knh_bytes_startsWith(path, STEXT("http://"))) {
+		knh_cwb_write(ctx, cwb, knh_String_tobytes(knh_getResourceName(ctx, SP(stmt)->uri)));
+		knh_cwb_parentpath(ctx, cwb, NULL);
+		knh_cwb_putc(ctx, cwb, '/');
+	}
 	knh_cwb_write(ctx, cwb, path);
 	{
 		knh_sfp_t *lsfp = KNH_LOCAL(ctx);

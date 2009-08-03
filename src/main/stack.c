@@ -41,7 +41,7 @@ extern "C" {
 
 /* ------------------------------------------------------------------------ */
 
-int knh_sfp_argc(Ctx *ctx, knh_sfp_t *v)
+int knh_stack_argc(Ctx *ctx, knh_sfp_t *v)
 {
 	return (((Context*)ctx)->esp - v);
 }

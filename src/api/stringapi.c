@@ -321,7 +321,7 @@ static METHOD knh__String_opMul(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__String_concat(Ctx *ctx, knh_sfp_t *sfp)
 {
-	int i, ac = knh_sfp_argc(ctx, sfp);
+	int i, ac = knh_stack_argc(ctx, sfp);
 	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
 	knh_sfp_t *esp = KNH_LOCAL(ctx);
 	for(i = 0; i < ac; i++) {
@@ -392,7 +392,7 @@ static METHOD knh__String_format(Ctx *ctx, knh_sfp_t *sfp)
 {
 	knh_bytes_t fmt = knh_String_tobytes(sfp[0].s);
 	knh_sfp_t *param = sfp + 1;
-	int ac = knh_sfp_argc(ctx, param);
+	int ac = knh_stack_argc(ctx, param);
 	knh_bytes_t mt, expr, next;
 
 	if(!knh_bytes_findMT(ctx, fmt, &mt, &expr, &next)) {

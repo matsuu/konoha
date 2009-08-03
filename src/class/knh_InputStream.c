@@ -55,6 +55,7 @@ KNHAPI(InputStream*) new_InputStream__io(Ctx *ctx, String *urn, knh_io_t fd, knh
 		}
 		DP(o)->bufpos = 0;
 		DP(o)->bufend = 0;  /* empty */
+		DP(o)->driver->finit(ctx, (Object*)o, "r");
 	}
 	return o;
 }

@@ -2518,6 +2518,7 @@ void KNH_ASM_METHOD(Ctx *ctx, Asm *abr, Method *mtd, Stmt *params, Stmt *body, i
 	NameSpace *ns = DP(abr)->ns;
 	KNH_ASSERT(IS_Method(mtd));
 	knh_Method_toAbstract(ctx, mtd);
+	DP(mtd)->uri = SP(body)->uri;
 
 	knh_Asm_prepare(ctx, abr, mtd, body);
 	knh_Asm_initThis(ctx, abr, DP(abr)->this_cid);
@@ -2542,6 +2543,7 @@ void KNH_ASM_METHOD(Ctx *ctx, Asm *abr, Method *mtd, Stmt *params, Stmt *body, i
 	}
 
 	knh_Asm_finish(ctx, abr);
+	DP(mtd)->sline = SP(body)->line;
 	DP(abr)->this_cid = prev_cid;
 }
 

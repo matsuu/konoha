@@ -421,7 +421,7 @@ typedef knh_ushort_t              knh_uri_t;
 #define KNH_FLAG_URI_UNTRUSTED    KNH_FLAG_T0
 #define URI_UNMASK(uri)           (uri & (~(KNH_FLAG_URI_UNTRUSTED)))
 #define URI_TRUSTED(uri)          (uri & (~(KNH_FLAG_URI_UNTRUSTED)))
-#define URI_UNTRUSTED(uri)        (uri & KNH_FLAG_URI_UNTRUSTED)
+#define URI_UNTRUSTED(uri)        (uri | KNH_FLAG_URI_UNTRUSTED)
 #define URI_ISTRUSTED(uri)        ((uri & KNH_FLAG_URI_UNTRUSTED) == 0)
 #define URI_EVAL                  URI_UNTRUSTED((knh_uri_t)0)
 
