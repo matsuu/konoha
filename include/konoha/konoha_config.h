@@ -49,15 +49,17 @@
 #define KONOHA_VERSION   PACKAGE_VERSION
 #else
 #define KONOHA_NAME     "konoha"
-#define KONOHA_MAJOR_VERSION "0.5"
-#define KONOHA_VERSION  "0.5rc3"
+#define KONOHA_MAJOR_VERSION  0
+#define KONOHA_MIDDLE_VERSION 5
+#define KONOHA_MINER_VERSION  0
+#define KONOHA_VERSION  "0.5"
 #endif
 
 #define KONOHA_XCODE    "toguro"
 #define KONOHA_URL		"http://konoha.sourceforge.jp/"
 #define KONOHA_URLBASE  "kttp://konoha.sourceforge.jp/wiki/"
 
-#define KONOHA_BUILDID_TOOOLD  545
+#define KONOHA_BUILDID_TOOOLD  615
 #define KNH_CHECK_VERSION(id)  ((id) <= KONOHA_BUILDID_TOOOLD)
 
 /* ======================================================================== */
