@@ -1,7 +1,7 @@
 /****************************************************************************
  * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
  *
- * Copyright (c) 2005-2008, Kimio Kuramitsu <kimio at ynu.ac.jp>
+ * Copyright (c) 2005-2009, Kimio Kuramitsu <kimio at ynu.ac.jp>
  *           (c) 2008-      Konoha Software Foundation
  * All rights reserved.
  *
