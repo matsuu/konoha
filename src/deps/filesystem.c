@@ -100,7 +100,7 @@ char* knh_cwb_realpath(Ctx *ctx, knh_cwb_t *cwb)
 	// FIXME realpath is always return NULL . if file isnt exsists.
 	// if "p" isnt exsists , p is always NULL.
 	// so, we cant create realpath for unexsist file.
-	// 
+	//
 	// imasahiro
 	//if(p != NULL) {
 		knh_cwb_subclear(cwb, 0);
@@ -301,8 +301,9 @@ void knh_System_initPath(Ctx *ctx, System *o)
 	String *shome;
 	knh_bytes_t home = {NULL, 0};
 #if defined(KNH_PREFIX)
-	if(homepath != NULL) {
+	if(homepath == NULL) {
 		homepath = KNH_PREFIX "/kohoha";
+		DBG_P("homepath='%s'", homepath);
 	}
 #endif
 	if(homepath != NULL) {
