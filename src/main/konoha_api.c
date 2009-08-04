@@ -284,7 +284,7 @@ KNHAPI(char*) konoha_getStdOutBufferText(konoha_t konoha)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(char*) knh_getStdErrBufferText(konoha_t konoha)
+KNHAPI(char*) konoha_getStdErrBufferText(konoha_t konoha)
 {
 	KONOHA_CHECK(konoha, "");
 	Ctx *ctx = knh_beginContext(konoha.ctx);
