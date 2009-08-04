@@ -63,8 +63,12 @@ main(int argc, char **argv)
         konoha_shell(konoha);
     }
     else {
-        konoha_loadScript(konoha, args[n]);
-        konoha_runMain(konoha, argc - n, args + n);
+    	if(konoha_loadScript(konoha, args[n]) != -1) {;
+			konoha_runMain(konoha, argc - n, args + n);
+    	}
+    	else {
+    		fprintf(stderr, "[konoha] cannot open: %s\n", args[n]);
+    	}
     }
     konoha_close(konoha);
     return 0;

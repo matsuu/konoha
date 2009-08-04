@@ -59,7 +59,8 @@
 #define KONOHA_URL		"http://konoha.sourceforge.jp/"
 #define KONOHA_URLBASE  "kttp://konoha.sourceforge.jp/wiki/"
 
-#define KONOHA_BUILDID_TOOOLD  615
+#define KONOHA_BUILDID_LATEST  625
+#define KONOHA_BUILDID_TOOOLD  625
 #define KNH_CHECK_VERSION(id)  ((id) <= KONOHA_BUILDID_TOOOLD)
 
 /* ======================================================================== */

@@ -327,9 +327,10 @@ KNHAPI(void) konoha_evalScript(konoha_t konoha, char *script)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(void) konoha_loadScript(konoha_t konoha, char *fpath)
+KNHAPI(int) konoha_loadScript(konoha_t konoha, char *fpath)
 {
 	KONOHA_CHECK_(konoha);
+	int res = 0;
 	Ctx *ctx = knh_beginContext(konoha.ctx);
 	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 	InputStream *in = new_ScriptInputStream(ctx, B(fpath), NULL, ctx->share->mainns, 0);
@@ -339,10 +340,12 @@ KNHAPI(void) konoha_loadScript(konoha_t konoha, char *fpath)
 	}
 	else {
 		knh_setRuntimeError(ctx, T("script file doesn't exists"));
+		res = -1;
 	}
 	KNH_LOCALBACK(ctx, lsfp);
 	knh_Context_clearstack(ctx);
 	knh_endContext(ctx);
+	return res;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -864,14 +867,15 @@ static
 void knh_clearScriptLine(Ctx *ctx)
 {
 	if(ctx->lines != NULL) {
+#if KONOHA_BUILDID > KONOHA_BUILDID_LATEST
 		if(knh_getenv("I_LOVE_KONOHA") == NULL) {
 			char buff[FILEPATH_BUFSIZ];
 			int i, pid = knh_getpid();
 			//knh_snprintf(buff, sizeof(buff), "\nDo you want to save 'myscript%d.k'? [Y/n]: ", pid);
 			fprintf(stdout, "\nThank you for joining 'Konoha User Experience Program'.\n");
-			fprintf(stdout, "All your activity have been sent to our project server.\n");
+			fprintf(stdout, "All your cooperation will help the future version of konoha.\n");
 			L_AGAIN:;
-			knh_snprintf(buff, sizeof(buff), "\nDo you want to report your experience? [Y/n]: ");
+			knh_snprintf(buff, sizeof(buff), "\nDo you want to save your script? [Y/n]: ");
 			if(knh_ask(ctx, buff, 1)) {
 				knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 				OutputStream *w;
@@ -887,17 +891,12 @@ void knh_clearScriptLine(Ctx *ctx)
 				}
 				knh_OutputStream_close(ctx, w);
 				KNH_LOCALBACK(ctx, lsfp);
+				fprintf(stdout, "More importantly, your script was saved at '%s.'\n", buff);
+				fprintf(stdout, "We appliciate when you send us your found problems.\n");
+				fprintf(stdout, "Thank you, again.\n");
 			}
-			else {
-				fprintf(stdout, "Your experience will improve the future version of Konoha.\n");
-				fprintf(stdout, "Think about it, AGAIN.\n");
-				goto L_AGAIN;
-			}
-			fprintf(stdout, "\nOpps!! The server isn't working.\n");
-			fprintf(stdout, "(Don't report the server malfunction. It's a joke.)\n");
-			fprintf(stdout, "More importantly, your script was saved at '%s'\n\n", buff);
-			fprintf(stdout, "See you.\n");
 		}
+#endif
 		KNH_FINALv(ctx, ((Context*)ctx)->lines);
 		((Context*)ctx)->lines = NULL;
 	}
