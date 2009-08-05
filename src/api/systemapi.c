@@ -123,15 +123,15 @@ static METHOD knh__System_exit(Ctx *ctx, knh_sfp_t *sfp)
 /* @method String[] System.listDir(String dirname) */
 METHOD knh__System_listDir(Ctx *ctx, knh_sfp_t *sfp)
 {
-#if defined(KONOHA_USING_POSIX)
-	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf)
+#if defined(KNH_USING_POSIX)
+	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
 	Array *a = new_Array(ctx, CLASS_String, 0);
 	knh_bytes_t t = (IS_NULL(sfp[1].s)) ? STEXT(".") : knh_String_tobytes(sfp[1].s);
 	knh_cwb_write(ctx, cwb, t);
 	knh_cwb_ospath(ctx, cwb);
-	Array *a = new_Array(ctx, CLASS_String, 0);
 	KNH_SETv(ctx, sfp[2].o, a);
 	DIR *dirptr;
+	char *dirname = knh_cwb_tochar(ctx, cwb);
 	if ((dirptr = opendir(dirname)) == NULL) {
 		KNH_PERRNO(ctx, cwb, "OS!!", "opendir", knh_Context_isStrict(ctx));
 	} else {
