@@ -35,7 +35,6 @@
 
 #ifdef KNH_USING_WINDOWS
 #include <windows.h>
-#include <winsock2.h>
 #endif
 
 #ifdef KNH_USING_POSIX

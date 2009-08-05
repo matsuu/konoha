@@ -28,7 +28,7 @@
 /* ************************************************************************ */
 
 #include"commons.h"
-#if !defined(KONOHA_ON_LKM) && !defined(KNH_USING_BTRON)
+#if !defined(KONOHA_ON_LKM) && !defined(KNH_USING_BTRON) && !defined(KNH_USING_WINDOWS)
 #include <dirent.h>
 #endif
 
