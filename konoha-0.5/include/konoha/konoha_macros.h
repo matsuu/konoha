@@ -36,8 +36,8 @@
 /* ------------------------------------------------------------------------ */
 
 #ifdef KONOHA_MACROS
-#define T(msg)          new_StringX__T(ctx, CLASS_String, msg)
-#define S(msg)          new_String(ctx, B(msg), NULL)
+#define T__(msg)          new_StringX__T(ctx, CLASS_String, msg)
+#define S__(msg)          new_String(ctx, B(msg), NULL)
 #endif
 
 /* ------------------------------------------------------------------------ */

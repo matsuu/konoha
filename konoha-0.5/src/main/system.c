@@ -79,7 +79,7 @@ void knh_addConstData(Ctx *ctx, char *dname, Object *value)
 {
 	knh_bytes_t n = B(dname);
 	knh_index_t loc = knh_bytes_rindex(n, '.');
-	String *name = T(dname + (loc+1));
+	String *name = T__(dname + (loc+1));
 	knh_class_t cid = CLASS_Any;
 	if(loc != -1) {
 		if(ctx->abr != NULL && IS_Asm(ctx->abr)) {
@@ -124,7 +124,7 @@ KNHAPI(void) knh_loadFloatConstData(Ctx *ctx, knh_FloatConstData_t *data)
 KNHAPI(void) knh_loadStringConstData(Ctx *ctx, knh_StringConstData_t *data)
 {
 	while(data->name != NULL) {
-		Object *value = UP(T(data->value));
+		Object *value = UP(T__(data->value));
 		knh_addConstData(ctx, data->name, value);
 		data++;
 	}

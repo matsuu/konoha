@@ -89,12 +89,12 @@
 #define     KNH_USING_MATH     1
 #define 	KONOHA_OS_LINEFEED "\r\n"
 #ifdef KNHAPI_IMPORTS
-#define 	KNHAPI(T)     __declspec(dllimport) T __cdecl
+#define 	KNHAPI(T__)     __declspec(dllimport) T__ __cdecl
 #else
-#define 	KNHAPI(T)     __declspec(dllexport) T __cdecl
+#define 	KNHAPI(T__)     __declspec(dllexport) T__ __cdecl
 #endif
 
-#define 	KNH_EXPORTS(T)     __declspec(dllexport) T __cdecl
+#define 	KNH_EXPORTS(T__)     __declspec(dllexport) T__ __cdecl
 
 #define 	KONOHA_OS_DLLEXT ".dll"
 #define		KONOHA_OS_FILE_SEPARATOR '\\'
@@ -106,11 +106,11 @@
 #define 	KNH_USING_WINDOWS  1
 #define 	KONOHA_OS_LINEFEED "\r\n"
 #ifdef KNHAPI_IMPORTS
-#define 	KNHAPI(T) __declspec(dllimport) T __cdecl
+#define 	KNHAPI(T__) __declspec(dllimport) T__ __cdecl
 #else
-#define 	KNHAPI(T) __declspec(dllexport) T __cdecl
+#define 	KNHAPI(T__) __declspec(dllexport) T__ __cdecl
 #endif
-#define 	KNH_EXPORTS(T)  __declspec(dllexport) T __cdecl
+#define 	KNH_EXPORTS(T__)  __declspec(dllexport) T__ __cdecl
 #define 	KONOHA_OS_DLLEXT ".dll"
 #define		KONOHA_OS_FILE_SEPARATOR '\\'
 #ifndef HAVE_CONFIG_H
@@ -145,7 +145,7 @@
 
 #ifndef KNHAPI_
 #ifdef KNHAPI
-#define KNHAPI_(T)       KNHAPI(T)
+#define KNHAPI_(T__)       KNHAPI(T__)
 #else
 #define KNHAPI_(T)       T KNH_CC_FASTCALL
 #endif
@@ -157,7 +157,7 @@
 
 #ifndef KNHAPI
 #ifdef  KONOHA_ON_WINDOWS
-#define KNHAPI(T)         T __declspec(dllexport)
+#define KNHAPI(T__)         T__ __declspec(dllexport)
 #else
 #define KNHAPI(T)         T
 #endif
@@ -166,8 +166,8 @@
 
 #ifdef KONOHA_MONOLITHIC
 #undef KNHAPI
-#define KNHAPI(T)        T
-#define KNH_EXPORTS(T)   T
+#define KNHAPI(T__)        T__
+#define KNH_EXPORTS(T__)   T__
 #endif
 
 #ifndef KONOHA_OS_FILE_SEPARATOR

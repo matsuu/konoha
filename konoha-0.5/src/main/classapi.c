@@ -1991,7 +1991,7 @@ void knh_System_init(Ctx *ctx, System *o, int init)
 	KNH_INITv(sys->ClassNameDictSet, new_DictSet(ctx, KNH_TCLASS_SIZE/2));
 	KNH_INITv(sys->ExptNameDictSet, new_DictSet(ctx, KNH_TEXPT_SIZE/2));
 
-	KNH_INITv(sys->enc,   T(konoha_encoding()));
+	KNH_INITv(sys->enc,   T__(konoha_encoding()));
 #ifdef KNH_USING_NOFILE
 	KNH_INITv(sys->in,    new_InputStream__stdio(ctx, NULL, sys->enc));
 	KNH_INITv(sys->out,   new_OutputStream__stdio(ctx, NULL, sys->enc));
@@ -2005,7 +2005,7 @@ void knh_System_init(Ctx *ctx, System *o, int init)
 	KNH_INITv(sys->props, new_DictMap0(ctx, 64));
 	KNH_INITv(sys->FieldNameDictIdx, new_DictIdx0__ignoreCase(ctx, KNH_TFIELDN_SIZE * 2, 0));
 	KNH_INITv(sys->ResourceDictIdx, new_DictIdx0(ctx, 32, 0));
-	knh_DictIdx_add__fast(ctx, sys->ResourceDictIdx, T("(unknown)"));
+	knh_DictIdx_add__fast(ctx, sys->ResourceDictIdx, T__("(unknown)"));
 	KNH_INITv(sys->MethodFieldHashMap, new_HashMap(ctx, "System.MethodField", (KNH_TCLASS_SIZE * 2) + 31 ));
 	KNH_INITv(sys->DriversTableDictSet, new_DictSet(ctx, 32));
 	KNH_INITv(sys->SpecFuncDictSet, new_DictSet(ctx, 32));
@@ -2527,7 +2527,7 @@ void knh_loadStringData(Ctx *ctx, knh_StringData_t *data)
 	while(data->name != NULL) {
 		KNH_ASSERT(ctx->share->tString[data->index] == NULL);
 		KNH_ASSERT(data->index < (SIZEOF_TSTRING / sizeof(String*)));
-		KNH_INITv(ctx->share->tString[data->index], T(data->name));
+		KNH_INITv(ctx->share->tString[data->index], T__(data->name));
 		data++;
 	}
 }
@@ -2637,7 +2637,7 @@ void knh_loadClassData(Ctx *ctx, knh_ClassData_t *data)
 		if(cid + 1 == ctx->share->ClassTableSize) {
 			((knh_SharedData_t*)ctx->share)->ClassTableSize = cid;
 		}
-		knh_setClassName(ctx, cid, T(data->name));
+		knh_setClassName(ctx, cid, T__(data->name));
 		{
 			knh_ClassTable_t *t = (knh_ClassTable_t*)(ctx->share->ClassTable + cid);
 			t->cflag  = data->flag;
@@ -2694,7 +2694,7 @@ static
 void knh_loadGenericsData(Ctx *ctx, knh_GenericsData_t *data)
 {
 	while(data->name != NULL) {
-		knh_addGenericsClass(ctx, data->cid, T(data->name), data->bcid, data->p1, data->p2);
+		knh_addGenericsClass(ctx, data->cid, T__(data->name), data->bcid, data->p1, data->p2);
 		data++;
 	}
 }
@@ -2705,7 +2705,7 @@ static
 void knh_loadClosureData(Ctx *ctx, knh_ClosureData_t *data)
 {
 	while(data->name != NULL) {
-		knh_addClosureClass(ctx, data->cid, T(data->name), data->r0, data->p1, data->p2, data->p3);
+		knh_addClosureClass(ctx, data->cid, T__(data->name), data->r0, data->p1, data->p2, data->p3);
 		data++;
 	}
 }
@@ -2716,7 +2716,7 @@ static
 void knh_loadExptData(Ctx *ctx, knh_ExptData_t *data)
 {
 	while(data->name != NULL) {
-		knh_addException(ctx, data->flag, data->eid, T(data->name), data->parent);
+		knh_addException(ctx, data->flag, data->eid, T__(data->name), data->parent);
 		data++;
 	}
 }
@@ -2727,7 +2727,7 @@ static
 void knh_loadFuncData(Ctx *ctx, knh_FuncData_t *data)
 {
 	while(data->name != NULL) {
-		knh_DictSet_set(ctx, DP(ctx->sys)->funcDictSet_UNUSED, T(data->name), (knh_uintptr_t)data->func);
+		knh_DictSet_set(ctx, DP(ctx->sys)->funcDictSet_UNUSED, T__(data->name), (knh_uintptr_t)data->func);
 		data++;
 	}
 }
@@ -2738,7 +2738,7 @@ static
 void knh_loadFieldNameData(Ctx *ctx, knh_FieldNameData_t *data)
 {
 	while(data->name != NULL) {
-		String *name = T(data->name);
+		String *name = T__(data->name);
 #if defined(KNH_DBGMODE2)
 		knh_fieldn_t fn = (knh_fieldn_t)knh_DictIdx_add__fast(ctx, DP(ctx->sys)->FieldNameDictIdx, name);
 			//DEBUG("'%s' %d %d", knh_String_tochar(name), fn, fn2);
@@ -2831,8 +2831,8 @@ static void knh_loadStringPropertyData(Ctx *ctx, knh_StringConstData_t *data)
 {
 	DictMap *pmap = DP(ctx->sys)->props;
 	while(data->name != NULL) {
-		String *n = T(data->name);
-		knh_DictMap_append(ctx, pmap, n, UP(T(data->value)));
+		String *n = T__(data->name);
+		knh_DictMap_append(ctx, pmap, n, UP(T__(data->value)));
 		data++;
 	}
 }

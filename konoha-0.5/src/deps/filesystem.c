@@ -307,7 +307,7 @@ void knh_System_initPath(Ctx *ctx, System *o)
 	}
 #endif
 	if(homepath != NULL) {
-		knh_DictMap_set(ctx, sys->props, T("konoha.path"), UP(T(homepath)));
+		knh_DictMap_set(ctx, sys->props, T__("konoha.path"), UP(T__(homepath)));
 		home = B(homepath);
 	}
 #if defined(KNH_USING_WINDOWS)
@@ -318,7 +318,7 @@ void knh_System_initPath(Ctx *ctx, System *o)
 		GetModuleFileNameA(h, buf, bufsiz);
 		knh_cwb_write(ctx, cwb, B(buf));
 		knh_DictMap_set(ctx, sys->props,
-			T("konoha.bin.path"), UP(new_String__cwb(ctx, cwb)));
+			T__("konoha.bin.path"), UP(new_String__cwb(ctx, cwb)));
 		if(homepath == NULL) {
 			GetModuleFileNameA(h, buf, bufsiz);
 			knh_cwb_write(ctx, cwb, B(buf));
@@ -326,7 +326,7 @@ void knh_System_initPath(Ctx *ctx, System *o)
 			knh_cwb_parentpath(ctx, cwb, NULL);
 			shome = new_String__cwb(ctx, cwb);
 			home = knh_String_tobytes(shome);
-			knh_DictMap_set(ctx, sys->props, T("konoha.path"), UP(shome));
+			knh_DictMap_set(ctx, sys->props, T__("konoha.path"), UP(shome));
 		}
 	}
 #elif defined(KONOHA_ON_LINUX)
@@ -338,7 +338,7 @@ void knh_System_initPath(Ctx *ctx, System *o)
 		readlink("/proc/self/exe", buf, bufsiz);
 		knh_cwb_write(ctx, cwb, B(buf));
 		knh_DictMap_set(ctx, sys->props,
-			T("konoha.bin.path"), UP(new_String__cwb(ctx, cwb)));
+			T__("konoha.bin.path"), UP(new_String__cwb(ctx, cwb)));
 		if(homepath == NULL) {
 			readlink("/proc/self/exe", buf, bufsiz);
 			knh_cwb_write(ctx, cwb, B(buf));
@@ -346,7 +346,7 @@ void knh_System_initPath(Ctx *ctx, System *o)
 			knh_cwb_parentpath(ctx, cwb, NULL);
 			shome = new_String__cwb(ctx, cwb);
 			home = knh_String_tobytes(shome);
-			knh_DictMap_set(ctx, sys->props, T("konoha.path"), UP(shome));
+			knh_DictMap_set(ctx, sys->props, T__("konoha.path"), UP(shome));
 		}
 	}
 #elif defined(KONOHA_ON_MACOSX)
@@ -356,20 +356,20 @@ void knh_System_initPath(Ctx *ctx, System *o)
 		s = realpath(s, buf);
 		knh_cwb_write(ctx, cwb, B(buf));
 		knh_DictMap_set(ctx, sys->props,
-			T("konoha.bin.path"), UP(new_String__cwb(ctx, cwb)));
+			T__("konoha.bin.path"), UP(new_String__cwb(ctx, cwb)));
 		if(homepath == NULL) {
 			knh_cwb_write(ctx, cwb, B(s));
 			knh_cwb_parentpath(ctx, cwb, NULL);
 			knh_cwb_parentpath(ctx, cwb, NULL);
 			shome = new_String__cwb(ctx, cwb);
 			home = knh_String_tobytes(shome);
-			knh_DictMap_set(ctx, sys->props, T("konoha.path"), UP(shome));
+			knh_DictMap_set(ctx, sys->props, T__("konoha.path"), UP(shome));
 		}
 		//free(s);
 	}
 #else
 	home = STEXT("/konoha");
-	knh_DictMap_set(ctx, sys->props, T("konoha.path"), UP(T("/konoha")));
+	knh_DictMap_set(ctx, sys->props, T__("konoha.path"), UP(T__("/konoha")));
 #endif
 	KNH_ASSERT(home. buf != NULL);
 	/* $konoha.package.path {$konoha.path}/package */
@@ -377,12 +377,12 @@ void knh_System_initPath(Ctx *ctx, System *o)
 	knh_cwb_write(ctx, cwb, home);
 	knh_cwb_write(ctx, cwb, STEXT("/package"));
 	knh_DictMap_set(ctx, sys->props,
-		T("konoha.package.path"), UP(new_String__cwb(ctx, cwb)));
+		T__("konoha.package.path"), UP(new_String__cwb(ctx, cwb)));
 
 	/* $konoha.script.path {$konoha.path}/script */
 	knh_cwb_write(ctx, cwb, home);
 	knh_cwb_write(ctx, cwb, STEXT("/script"));
-	knh_DictMap_set(ctx, sys->props, T("konoha.script.path"), UP(new_String__cwb(ctx, cwb)));
+	knh_DictMap_set(ctx, sys->props, T__("konoha.script.path"), UP(new_String__cwb(ctx, cwb)));
 
 	homepath = knh_getenv("HOME");
 	if(homepath != NULL) {
@@ -392,21 +392,21 @@ void knh_System_initPath(Ctx *ctx, System *o)
 		knh_cwb_write(ctx, cwb, STEXT(KONOHA_FOLDER));
 		shome = new_String__cwb(ctx, cwb);
 		home = knh_String_tobytes(shome);
-		knh_DictMap_set(ctx, sys->props, T("user.path"), UP(shome));
+		knh_DictMap_set(ctx, sys->props, T__("user.path"), UP(shome));
 		/* $konoha.temp.path ${user.path}/temp */
 		knh_cwb_write(ctx, cwb, home);
 		knh_cwb_write(ctx, cwb, STEXT("/temp"));
-		knh_DictMap_set(ctx, sys->props, T("konoha.temp.path"), UP(new_String__cwb(ctx, cwb)));
+		knh_DictMap_set(ctx, sys->props, T__("konoha.temp.path"), UP(new_String__cwb(ctx, cwb)));
 
 		/* $user.package.path ${user.path}/package */
 		knh_cwb_write(ctx, cwb, home);
 		knh_cwb_write(ctx, cwb, STEXT("/package"));
-		knh_DictMap_set(ctx, sys->props, T("user.package.path"), UP(new_String__cwb(ctx, cwb)));
+		knh_DictMap_set(ctx, sys->props, T__("user.package.path"), UP(new_String__cwb(ctx, cwb)));
 
 		/* $user.script.path ${user.path}/script */
 		knh_cwb_write(ctx, cwb, home);
 		knh_cwb_write(ctx, cwb, STEXT("/script"));
-		knh_DictMap_set(ctx, sys->props, T("user.script.path"), UP(new_String__cwb(ctx, cwb)));
+		knh_DictMap_set(ctx, sys->props, T__("user.script.path"), UP(new_String__cwb(ctx, cwb)));
 	}
 	else {
 #if defined(KONOHA_ON_WINDOWS)
@@ -414,7 +414,7 @@ void knh_System_initPath(Ctx *ctx, System *o)
 #else
 		knh_cwb_write(ctx, cwb, STEXT("/tmp"));
 #endif
-		knh_DictMap_set(ctx, sys->props, T("konoha.temp.path"), UP(new_String__cwb(ctx, cwb)));
+		knh_DictMap_set(ctx, sys->props, T__("konoha.temp.path"), UP(new_String__cwb(ctx, cwb)));
 	}
 }
 

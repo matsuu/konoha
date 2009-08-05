@@ -103,7 +103,7 @@ knh_sfp_t *knh_invokeScriptFunc(Ctx *ctx, char *fmt, va_list args)
 	knh_index_t loc = knh_bytes_index(fname, '(');
 	knh_sfp_t *lsfp = KNH_LOCAL(ctx);
 	if(loc == -1) {
-		knh_setRuntimeError(ctx, T("needs ()"));
+		knh_setRuntimeError(ctx, T__("needs ()"));
 		return lsfp+1;
 	}
 	else {
