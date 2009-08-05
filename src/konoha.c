@@ -55,7 +55,6 @@ main(int argc, char **argv)
 #else
     char** args = (char**) argv;
 #endif
-
     konoha_t konoha = konoha_open(4096);
     int n = konoha_parseopt(konoha, argc, args);
     if(argc - n == 0) {

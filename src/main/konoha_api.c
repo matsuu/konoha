@@ -339,7 +339,7 @@ KNHAPI(int) konoha_loadScript(konoha_t konoha, char *fpath)
 		knh_NameSpace_load(ctx, ctx->share->mainns, in, 1/*isEval*/,0/*isThrowable*/);
 	}
 	else {
-		knh_setRuntimeError(ctx, T("script file doesn't exists"));
+		knh_setRuntimeError(ctx, T__("script file doesn't exists"));
 		res = -1;
 	}
 	KNH_LOCALBACK(ctx, lsfp);
@@ -367,14 +367,14 @@ KNHAPI(int) konoha_runMain(konoha_t konoha, int argc, char **argv)
 		if(knh_Method_psize(mtd) == 1) {
 			knh_type_t ptype = knh_Method_pztype(mtd, 0);
 			if(ptype != ATYPE_String && ptype != NNATYPE_String) {
-				knh_setRuntimeError(ctx, T("Type!!: main()"));
+				knh_setRuntimeError(ctx, T__("Type!!: main()"));
 				goto L_END_TRY;
 			}
 			else {
 				Array *a = new_Array(ctx, CLASS_String, argc);
 				int i;
 				for(i = 0; i < argc; i++) {
-					knh_Array_add(ctx, a, UP(T(argv[i])));
+					knh_Array_add(ctx, a, UP(T__(argv[i])));
 				}
 				//KNH_MOV(ctx, lsfp[1].o, mtd);
 				KNH_MOV(ctx, lsfp[2].o, scr);
@@ -383,7 +383,7 @@ KNHAPI(int) konoha_runMain(konoha_t konoha, int argc, char **argv)
 			}
 		}
 		else {
-			knh_setRuntimeError(ctx, T("Type!!: main()"));
+			knh_setRuntimeError(ctx, T__("Type!!: main()"));
 			goto L_END_TRY;
 		}
 	}
@@ -485,7 +485,7 @@ KNHAPI(char*) konoha_invokeStringFunc(konoha_t konoha, char *fmt, ...)
 		String *s = lsfp[0].s;
 		char *p = (char*)malloc(s->size+1);
 		if(p == NULL) {
-			knh_setRuntimeError(ctx, T("out of memory"));
+			knh_setRuntimeError(ctx, T__("out of memory"));
 		}
 		else {
 			knh_memcpy(p, s->str, s->size);
@@ -532,7 +532,7 @@ KNHAPI(int) konoha_setMethodFunc(konoha_t konoha, char *name, knh_fmethod func)
 	return 0;
 
 	L_ERROR:
-	knh_setRuntimeError(ctx, T("method not found"));
+	knh_setRuntimeError(ctx, T__("method not found"));
 	knh_endContext(ctx);
 	return -1;
 }
@@ -783,7 +783,7 @@ void knh_Context_initSymbolTable(Ctx *ctx)
 		}
 	}
 	for(i = 0; keywords[i] != NULL; i++) {
-		String *s = T(keywords[i]);
+		String *s = T__(keywords[i]);
 		knh_DictMap_set(ctx, symbolDictMap, s, UP(s));
 	}
 }

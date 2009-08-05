@@ -591,7 +591,7 @@ void knh_Class__man(Ctx *ctx, Class *o, OutputStream *w, String *m)
 			else {
 				knh_bytes_t name = B(op);
 				if(IS_NULL(knh_DictMap_get__b(ctx,  dm, name))) {
-					knh_DictMap_set(ctx, dm, T(op), UP(mtd));
+					knh_DictMap_set(ctx, dm, T__(op), UP(mtd));
 				}
 			}
 		}

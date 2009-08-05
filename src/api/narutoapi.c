@@ -98,9 +98,8 @@ METHOD knh__Script_addHistory(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_void(ctx, sfp);
 }
 
+
 /* ------------------------------------------------------------------------ */
-
-
 
 #endif/* KNH_CC_METHODAPI*/
 

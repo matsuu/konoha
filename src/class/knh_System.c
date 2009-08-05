@@ -94,8 +94,8 @@ void knh_System_setProperty(Ctx *ctx, System *o, String *key, Any *value)
 
 KNHAPI(void) knh_setSystemPropertyText(Ctx *ctx, char *key, char *value)
 {
-	String *k = T(key);
-	String *v = T(value);
+	String *k = T__(key);
+	String *v = T__(value);
 	knh_DictMap_set(ctx, DP(ctx->sys)->props, k, UP(v));
 }
 
