@@ -3600,10 +3600,11 @@ knh_fmethod knh_Asm_loadMethodFunc(Ctx *ctx, Asm *abr, knh_class_t cid, knh_meth
 
 Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 {
+	Method *mtd;
+
 	int level = DP(abr)->level;
 	knh_flag_t flag   = knh_StmtMETHOD_flag(ctx, stmt);
 	knh_type_t rztype = knh_StmtMETHOD_rtype(ctx, stmt, ns);
-
 	knh_class_t mtd_cid = knh_StmtMETHOD_class(ctx, stmt, abr, ns, level);
 	knh_methodn_t mn = knh_StmtMETHOD_name(ctx, stmt, abr, level);
 
@@ -3611,7 +3612,7 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		return NULL;
 	}
 
-	Method *mtd = knh_Class_getMethod(ctx, mtd_cid, mn);
+	mtd = knh_Class_getMethod(ctx, mtd_cid, mn);
 
 	/* Check the type of Constructor */
 	if(knh_methodn_isNew(ctx, mn) &&
@@ -3621,7 +3622,7 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	}
 
 	/* New method, and constructors are always new */
-	if(IS_NULL(mtd) || knh_methodn_isNew(ctx, mn)) {
+	if(IS_NULL(mtd) || knh_Method_isPrivate(mtd) || knh_methodn_isNew(ctx, mn)) {
 		size_t i, mfsize = DP(abr)->vars_size;
 		MethodField *mf = knh_tMethodField_find(ctx, abr, rztype, mfsize);
 		if(mf == NULL) {
@@ -3647,8 +3648,7 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		//DBG2_P("(mtd)->cid=%s, mtd_cid=%s", CLASSN(DP(mtd)->cid), CLASSN(mtd_cid));
 		if(DP(mtd)->cid != mtd_cid) { /* Overriding */
 			if(knh_Method_isFinal(mtd)) { /* CHECK @Final */
-				knh_Asm_perror(ctx, abr, KERR_ERROR,
-						_("%C.%M is final; add @Virtual %C.%M"),
+				knh_Asm_perror(ctx, abr, KERR_ERROR, _("%C.%M is final; add @Virtual %C.%M"),
 						DP(mtd)->cid, mn, ctx->share->ClassTable[DP(mtd)->cid].supcid, mn);
 				return NULL;
 			}
@@ -3694,6 +3694,7 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 			knh_Stmt_checkLastReturn(ctx, StmtMETHOD_instmt(stmt), mtd);
 		}
 	}
+	knh_invokeMethodTypingListener(ctx, DP(stmt)->metaDictMap, mtd);
 	{
 		knh_fmethod func = knh_Asm_loadMethodFunc(ctx, abr, mtd_cid, DP(mtd)->mn, knh_StmtMETA_is(ctx, stmt, STEXT("Naitive")));
 		if(func != NULL) {
@@ -3701,7 +3702,6 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 			knh_Stmt_done(ctx, stmt);
 		}
 	}
-	knh_invokeMethodTypingListener(ctx, DP(stmt)->metaDictMap, mtd);
 	return TM(stmt);
 }
 
