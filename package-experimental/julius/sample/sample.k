@@ -1,7 +1,6 @@
 using julius.*;
 
 String str;
-Julius julius;
 
 void statusRecready(Recog recog,String dummy){
    if(recog.speechInput() == 1){
@@ -77,13 +76,11 @@ void outputResult(Recog recog,String dummy){
 	    r.outputWordScore(n);
 	} 
     }while(r.getNext());
-    julius.fflush();
+    Julius.fflush();
 }
 
 int main(String[] args){
 
-    julius = new Julius();
- 
     jconf = new Jconf();
     recog = new Recog(jconf);
     

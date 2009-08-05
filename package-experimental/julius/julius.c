@@ -269,7 +269,7 @@ METHOD Jconf_openInputStream(Ctx *ctx,knh_sfp_t *sfp)
       fprintf(stderr, "failed to begin input stream\n");
       exit(1);
     }
-    memcpy(&julius_ctx, ctx, sizeof(Ctx)+1);
+     memcpy((void *)&julius_ctx, ctx, sizeof(Ctx)+1);
     ret = j_recognize_stream(recog);
     if (ret == -1) exit(1);	
   }
@@ -769,7 +769,7 @@ METHOD Processlm_multigramAddWordsToGrammarById(Ctx *ctx ,knh_sfp_t *sfp)
 KNH_EXPORTS(int) init(Ctx *ctx)
 {
    KNH_NOTICE(ctx, "loading sample..");
-   konoha_loadIntConstData(ctx,IntConstData);
+   knh_loadIntConstData(ctx,IntConstData);
    return 1;
 }
 

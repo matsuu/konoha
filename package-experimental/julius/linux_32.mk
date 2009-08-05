@@ -3,8 +3,8 @@ LIBSENT=libsent
 LIBJULIUS=libjulius
 
 CC = gcc
-CPPFLAGS= -g3 -O0 -Wall -fmessage-length=0 -fPIC -I$(LIBJULIUS)/include -I$(LIBSENT)/include  `$(LIBSENT)/libsent-config --cflags` `$(LIBJULIUS)/libjulius-config --cflags`
-LDFLAGS= -L$(LIBJULIUS) `$(LIBJULIUS)/libjulius-config --libs` -L$(LIBSENT) `$(LIBSENT)/libsent-config --libs`
+CPPFLAGS= -g3 -O0 -Wall -fmessage-length=0 -fPIC -I$(LIBJULIUS)/include -I$(LIBSENT)/include  `libsent-config --cflags` `libjulius-config --cflags`
+LDFLAGS= -L$(LIBJULIUS) `libjulius-config --libs` -L$(LIBSENT) `libsent-config --libs`
 
 LDLIBS = -lkonoha $(LDFLAGS)
 
