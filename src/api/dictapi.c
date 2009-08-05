@@ -89,7 +89,7 @@ static METHOD knh__DictMap_get(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__DictMap_opHas(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Boolean(ctx, sfp, knh_DictMap_index__b((DictMap*)sfp[0].o, knh_String_tobytes(sfp[1].s)) != -1);
+	KNH_RETURN_Boolean(ctx, sfp, knh_DictMap_index((DictMap*)sfp[0].o, knh_String_tobytes(sfp[1].s)) != -1);
 }
 
 /* ------------------------------------------------------------------------ */

@@ -329,7 +329,7 @@ KNHAPI(void) konoha_evalScript(konoha_t konoha, char *script)
 
 KNHAPI(int) konoha_loadScript(konoha_t konoha, char *fpath)
 {
-	KONOHA_CHECK_(konoha);
+	KONOHA_CHECK(konoha, 0);
 	int res = 0;
 	Ctx *ctx = knh_beginContext(konoha.ctx);
 	knh_sfp_t *lsfp = KNH_LOCAL(ctx);

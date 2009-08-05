@@ -845,8 +845,8 @@ typedef struct knh_System {
 	struct knh_DictSet_t *SpecFuncDictSet;
 	struct knh_Array_t   *UsingResources;
 
-	struct knh_DictMap_t *sysnsDictMap_UNUSED;
-	struct knh_DictSet_t *funcDictSet_UNUSED;
+	struct knh_DictMap_t *listenerDictMap;
+	struct knh_DictMap_t *trustedPathDictSet;
 
 } knh_System_struct;
 

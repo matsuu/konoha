@@ -221,7 +221,7 @@ knh_bool_t knh_StmtMETA_isOverride(Ctx *ctx, Stmt *o)
 		Object *v = knh_DictMap_get__b(ctx, DP(o)->metaDictMap, STEXT("Override"));
 		if(IS_NOTNULL(v)) return 1;
 	}
-	return 0;  /* @Historic */
+	return 0;
 }
 
 /* ------------------------------------------------------------------------ */

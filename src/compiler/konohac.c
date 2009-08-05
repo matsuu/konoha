@@ -972,6 +972,101 @@ Object *knh_Stmt_toData(Ctx *ctx, Stmt *stmt, knh_class_t reqc)
 }
 
 
+
+/* ------------------------------------------------------------------------ */
+/* [Extension] */
+
+static
+Array* knh_DictMap_makeArray(Ctx *ctx, DictMap *o, knh_bytes_t key)
+{
+
+	knh_index_t idx = knh_DictMap_firstIndex(o, key);
+	if(idx != -1) {
+		Array *a = new_Array0(ctx, 0);
+		int i;
+		for(i = idx; i < knh_DictMap_size(o); i++) {
+			String *k = knh_DictMap_keyAt(o, i);
+			Object *v = knh_DictMap_valueAt(o, i);
+			if(knh_String_startsWith(k, key) && IS_NOTNULL(v)) {
+				knh_Array_add(ctx, a, UP(k));
+				knh_Array_add(ctx, a, v);
+			}
+		}
+		return a;
+	}
+	return (Array*)KNH_NULL;
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+void knh_invokeMethodListener(Ctx *ctx, DictMap *meta, Method *mtd, knh_bytes_t key1, knh_bytes_t key2)
+{
+	Closure *cc;
+	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+	{
+		DictMap *dm = DP(ctx->sys)->listenerDictMap;
+		cc = (Closure*)knh_DictMap_get__b(ctx, dm, key1);
+	}
+	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+	if(IS_NOTNULL(cc)) {
+		knh_sfp_t *lsfp = KNH_LOCAL(ctx);
+		if(IS_NOTNULL(meta)) {
+			KNH_SETv(ctx, lsfp[2].o, meta);   /* cc(DictMap, Method) */
+			KNH_SETv(ctx, lsfp[3].o, mtd);
+			knh_Closure_invokesfp(ctx, cc, lsfp, /*argc*/2);
+		}
+		else {
+			DictMap *dmeta = (DictMap*)KNH_DEF(ctx, CLASS_DictMap);
+			KNH_SETv(ctx, lsfp[2].o, dmeta);
+			KNH_SETv(ctx, lsfp[3].o, mtd);
+			knh_Closure_invokesfp(ctx, cc, lsfp, /*argc*/2);
+			knh_DictMap_clear(ctx, dmeta);
+		}
+	}
+	if(IS_NOTNULL(meta)) {
+		int i;
+		Array *a;
+		knh_sfp_t *lsfp = KNH_LOCAL(ctx);
+		KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+		{
+			DictMap *dm = DP(ctx->sys)->listenerDictMap;
+			a = knh_DictMap_makeArray(ctx, dm, key2);
+		}
+		KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+		if(IS_NULL(a)) return;
+
+		KNH_LPUSH(ctx, a); // TO AVOID GC;
+		for(i = 0; i < knh_Array_size(a); i+=2) {
+			String *key = (String*)knh_Array_n(a, i);
+			knh_bytes_t anno = knh_bytes_rmod(knh_String_tobytes(key), '@');
+			if(IS_NOTNULL(knh_DictMap_get__b(ctx, meta, anno))) {
+				cc = (Closure*)knh_Array_n(a, i+1);
+				KNH_SETv(ctx, lsfp[3].o, meta);   /* cc(DictMap, Method) */
+				KNH_SETv(ctx, lsfp[4].o, mtd);
+				knh_Closure_invokesfp(ctx, cc, lsfp+1, /*argc*/2);
+			}
+		}
+		KNH_LOCALBACK(ctx, lsfp);
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_invokeMethodTypingListener(Ctx *ctx, DictMap *meta, Method *mtd)
+{
+	knh_invokeMethodListener(ctx, meta, mtd, STEXT("MethodT"), STEXT("MethodT@"));
+}
+
+/* ------------------------------------------------------------------------ */
+
+void knh_invokeMethodCompilationListener(Ctx *ctx, DictMap *meta, Method *mtd)
+{
+	knh_invokeMethodListener(ctx, meta, mtd, STEXT("MethodC"), STEXT("MethodC@"));
+}
+
+/* ------------------------------------------------------------------------ */
+
 /* ------------------------------------------------------------------------ */
 
 #ifdef __cplusplus

@@ -60,7 +60,7 @@ static
 String *new_String__NAME(Ctx *ctx, knh_bytes_t tname)
 {
 	DictMap *symbolDictMap = DP((ctx)->abr)->symbolDictMap;
-	knh_index_t idx = knh_DictMap_index__b(symbolDictMap, tname);
+	knh_index_t idx = knh_DictMap_index(symbolDictMap, tname);
 	if(idx == -1) {
 		String *s = new_String(ctx, tname, NULL);
 		knh_DictMap_set(ctx, symbolDictMap, s, UP(s));
@@ -412,7 +412,7 @@ void knh_Token_addTypeParam(Ctx *ctx, Token *tkt, Array *a, size_t s)
 		knh_Array_remove(ctx, a, i);
 	}
 	knh_putc(ctx, cwb->w, '>');
-	KNH_SETv(ctx, DP(tkt)->data, new_String__cwb(ctx, cwb));
+	KNH_SETv(ctx, DP(tkt)->data, knh_cwb_newString(ctx, cwb));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -469,7 +469,7 @@ int knh_Token_toClosureType(Ctx *ctx, Token *tkt, Token *tkp)
 		return 0;
 	}
 	knh_putc(ctx, cwb->w, ')');
-	KNH_SETv(ctx, DP(tkt)->data, new_String__cwb(ctx, cwb));
+	KNH_SETv(ctx, DP(tkt)->data, knh_cwb_newString(ctx, cwb));
 	//DBG2_P("closure='%s'", knh_String_tochar(DP(tkt)->text));
 	return 1;
 }
@@ -555,7 +555,7 @@ void knh_Token_join(Ctx *ctx, Token *o)
 				tkp = tkn;
 				knh_Array_remove(ctx, a, next);
 			}while(next < knh_Array_size(a));
-			KNH_SETv(ctx, DP(tk)->data, new_String__cwb(ctx, cwb));
+			KNH_SETv(ctx, DP(tk)->data, knh_cwb_newString(ctx, cwb));
 			size = knh_Array_size(a) - 1;
 		} /* "a" "b" "c" */
 		else if(SP(tk)->tt == TT_FORMAT && DP(tk)->tt_next == TT_PARENTHESIS) {

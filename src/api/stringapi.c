@@ -258,7 +258,7 @@ static METHOD knh__String_opAdd(Ctx *ctx, knh_sfp_t *sfp)
 		KNH_SETv(ctx, esp[1].o, sfp[1].o); esp[1].data = sfp[1].data;
 		knh_esp1_format(ctx, METHODN__s, cwb->w, KNH_NULL);
 	}
-	KNH_RETURN(ctx, sfp, new_String__cwb(ctx, cwb));
+	KNH_RETURN(ctx, sfp, knh_cwb_newString(ctx, cwb));
 }
 
 
@@ -290,7 +290,7 @@ static METHOD knh__String_opSub(Ctx *ctx, knh_sfp_t *sfp)
 		KNH_RETURN(ctx, sfp, sfp[0].o);
 	}
 	else {
-		KNH_RETURN(ctx, sfp, new_String__cwb(ctx, cwb));
+		KNH_RETURN(ctx, sfp, knh_cwb_newString(ctx, cwb));
 	}
 }
 
@@ -312,7 +312,7 @@ static METHOD knh__String_opMul(Ctx *ctx, knh_sfp_t *sfp)
 		for(i = 0; i < n; i++) {
 			knh_Bytes_write(ctx, cwb->ba, base);
 		}
-		KNH_RETURN(ctx, sfp, new_String__cwb(ctx, cwb));
+		KNH_RETURN(ctx, sfp, knh_cwb_newString(ctx, cwb));
 	}
 }
 
@@ -334,7 +334,7 @@ static METHOD knh__String_concat(Ctx *ctx, knh_sfp_t *sfp)
 			knh_esp1_format(ctx, METHODN__s, cwb->w, KNH_NULL);
 		}
 	}
-	KNH_RETURN(ctx, sfp, new_String__cwb(ctx, cwb));
+	KNH_RETURN(ctx, sfp, knh_cwb_newString(ctx, cwb));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -478,7 +478,7 @@ static METHOD knh__String_replace(Ctx *ctx, knh_sfp_t *sfp)
 	else {
 		knh_bytes_t leftover = {base.buf + i, base.len - i};
 		knh_Bytes_write(ctx, cwb->ba, leftover);
-		KNH_RETURN(ctx, sfp, new_String__cwb(ctx, cwb));
+		KNH_RETURN(ctx, sfp, knh_cwb_newString(ctx, cwb));
 	}
 }
 

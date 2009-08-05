@@ -63,6 +63,8 @@ METHOD knh__Script_isStmt(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_eval(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_readLine(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Script_addHistory(Ctx *ctx, knh_sfp_t *sfp);
+METHOD knh__System_setMethodTypingListener(Ctx *ctx, knh_sfp_t *sfp);
+METHOD knh__System_setMethodCompilationListener(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/api/objectapi.c */
 void knh_Method__s(Ctx *ctx, Method *o, OutputStream *w, String *m);
 void knh_Method__k(Ctx *ctx, Method *o, OutputStream *w, String *m);
@@ -117,7 +119,7 @@ knh_bytes_t knh_cwb_tobytes(knh_cwb_t *cwb);
 char *knh_cwb_tochar(Ctx *ctx, knh_cwb_t *cwb);
 void knh_cwb_close(knh_cwb_t *cwb);
 void knh_cwb_subclear(knh_cwb_t *cwb, size_t len);
-String *new_String__cwb(Ctx *ctx, knh_cwb_t *cwb);
+String *knh_cwb_newString(Ctx *ctx, knh_cwb_t *cwb);
 String *new_StringX__cwb(Ctx *ctx, knh_class_t cid, knh_cwb_t *cwb);
 /* ../src/class/knh_bytes_t.c */
 size_t knh_size(size_t s);
@@ -210,7 +212,8 @@ size_t knh_DictMap_size(DictMap *o);
 String* knh_DictMap_keyAt(DictMap *o, size_t n);
 Object* knh_DictMap_valueAt(DictMap *o, size_t n);
 void knh_DictMap_removeAt(Ctx *ctx, DictMap *o, size_t n);
-knh_index_t knh_DictMap_index__b(DictMap *o, knh_bytes_t key);
+knh_index_t knh_DictMap_index(DictMap *o, knh_bytes_t key);
+knh_index_t knh_DictMap_firstIndex(DictMap *o, knh_bytes_t key);
 String *new_String__DictMap(Ctx *ctx, DictMap *o, knh_bytes_t key);
 Object *knh_DictMap_get__b(Ctx *ctx, DictMap *o, knh_bytes_t key);
 Object *knh_DictMap_get(Ctx *ctx, DictMap *o, String *key);
@@ -455,6 +458,8 @@ InputStream* new_ScriptInputStream(Ctx *ctx, knh_bytes_t path, knh_cwb_t *cwb, N
 Stmt *knh_InputStream_parseStmt(Ctx *ctx, InputStream *in, int isData);
 int knh_NameSpace_load(Ctx *ctx, NameSpace *ns, InputStream *in, int isEval, int isThrowable);
 Object *knh_Stmt_toData(Ctx *ctx, Stmt *stmt, knh_class_t reqc);
+void knh_invokeMethodTypingListener(Ctx *ctx, DictMap *meta, Method *mtd);
+void knh_invokeMethodCompilationListener(Ctx *ctx, DictMap *meta, Method *mtd);
 /* ../src/compiler/parser.c */
 Stmt *new_StmtINSTMT(Ctx *ctx, Token *tk, int isData);
 void knh_Stmt_add_PEACH(Ctx *ctx, Stmt *o, knh_tokens_t *tc);

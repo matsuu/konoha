@@ -189,7 +189,7 @@ Exception* knh_Exception_new__init(Ctx *ctx, Exception *o, String *e, String *ms
 			knh_write_char(ctx, cwb->w, EXPTN(DP(o)->eid));
 			knh_write_char(ctx, cwb->w, "!!: ");
 			knh_write(ctx, cwb->w, knh_String_tobytes(msg));
-			KNH_SETv(ctx, DP(o)->msg, new_String__cwb(ctx, cwb));
+			KNH_SETv(ctx, DP(o)->msg, knh_cwb_newString(ctx, cwb));
 		}
 		else {
 			int loc = knh_bytes_indexOf(knh_String_tobytes(e), STEXT("!!:"));
@@ -204,7 +204,7 @@ Exception* knh_Exception_new__init(Ctx *ctx, Exception *o, String *e, String *ms
 				knh_write_char(ctx, cwb->w, ": ");
 				knh_write(ctx, cwb->w, knh_bytes_last(knh_String_tobytes(e), loc+3));
 			}
-			KNH_SETv(ctx, DP(o)->msg, new_String__cwb(ctx, cwb));
+			KNH_SETv(ctx, DP(o)->msg, knh_cwb_newString(ctx, cwb));
 		}
 	}
 	KNH_SETv(ctx, DP(o)->bag, bag);

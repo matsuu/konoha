@@ -377,7 +377,7 @@ MAPPER knh_Object_String(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_MOV(ctx, sfp[3].o, cwb->w);
 	KNH_MOV(ctx, sfp[4].o, KNH_NULL);
 	KNH_SCALL(ctx, sfp, 1, mtd, 2);
-	KNH_MAPPED(ctx, sfp, new_String__cwb(ctx, cwb));
+	KNH_MAPPED(ctx, sfp, knh_cwb_newString(ctx, cwb));
 }
 
 /* ------------------------------------------------------------------------ */
