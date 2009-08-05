@@ -3550,43 +3550,50 @@ int knh_Stmt_checkLastReturn(Ctx *ctx, Stmt *stmt, Method *mtd)
 /* ------------------------------------------------------------------------ */
 
 static
-char *knh_format_funcname(Ctx *ctx, char *buf, size_t bufsiz, knh_class_t cid, knh_methodn_t mn)
+void *knh_Asm_loadFunc(Ctx *ctx, Asm *abr, char *funcname, int isNaitive)
 {
-	KNH_ASSERT_cid(cid);
-	char *cname = knh_String_tochar(ClassTable(cid).sname);
-	if(METHODN_IS_MOVTEXT(mn)) {
-		knh_snprintf(buf, bufsiz, "%s__%s", cname, FIELDN(METHODN_TOFIELDN(mn)));
-		return buf;
+	if(DP(abr)->dlhdr != NULL) {
+		void *f = knh_dlsym(ctx, DP(abr)->dlhdr, funcname);
+		if(f != NULL) return f;
 	}
-	if(METHODN_IS_GETTER(mn)) {
-		int off = knh_strlen(cname)+4;
-		knh_snprintf(buf, bufsiz, "%s_get%s", cname, FIELDN(METHODN_TOFIELDN(mn)));
-		if(islower(buf[off])) buf[off] = toupper(buf[off]);
-		return buf;
+	if(isNaitive) {
+		knh_Asm_perror(ctx, abr, KERR_EWARN, _("cannot bind %s"), funcname);
 	}
-	if(METHODN_IS_SETTER(mn)) {
-		int off = knh_strlen(cname)+4;
-		knh_snprintf(buf, bufsiz, "%s_set%s", cname, FIELDN(METHODN_TOFIELDN(mn)));
-		if(islower(buf[off])) buf[off] = toupper(buf[off]);
-		return buf;
-	}
-	knh_snprintf(buf, bufsiz, "%s_%s", cname, FIELDN(mn));
-	return buf;
+	return NULL;
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-knh_fmethod knh_Asm_loadMethodFunc(Ctx *ctx, Asm *abr, knh_class_t cid, knh_methodn_t mn)
+char *knh_format_funcname(Ctx *ctx, char *buf, size_t bufsiz, knh_class_t cid, knh_methodn_t mn)
 {
-	if(DP(abr)->dlhdr != NULL) {
-		char buf[80];
-		knh_format_funcname(ctx, buf, sizeof(buf), cid, mn);
-		void *f = knh_dlsym(ctx, DP(abr)->dlhdr, buf);
-		if(f != NULL) return (knh_fmethod)f;
-		DBG2_P("Function not found: %s", buf);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+knh_fmethod knh_Asm_loadMethodFunc(Ctx *ctx, Asm *abr, knh_class_t cid, knh_methodn_t mn, int isNaitive)
+{
+	KNH_ASSERT_cid(cid);
+	char buf[80];
+	char *cname = knh_String_tochar(ClassTable(cid).sname);
+	if(METHODN_IS_MOVTEXT(mn)) {
+		knh_snprintf(buf, sizeof(buf), "%s__%s", cname, FIELDN(METHODN_TOFIELDN(mn)));
 	}
-	return NULL;
+	else if(METHODN_IS_GETTER(mn)) {
+		int off = knh_strlen(cname)+4;
+		knh_snprintf(buf, sizeof(buf), "%s_get%s", cname, FIELDN(METHODN_TOFIELDN(mn)));
+		if(islower(buf[off])) buf[off] = toupper(buf[off]);
+	}
+	else if(METHODN_IS_SETTER(mn)) {
+		int off = knh_strlen(cname)+4;
+		knh_snprintf(buf, sizeof(buf), "%s_set%s", cname, FIELDN(METHODN_TOFIELDN(mn)));
+		if(islower(buf[off])) buf[off] = toupper(buf[off]);
+	}
+	else {
+		knh_snprintf(buf, sizeof(buf), "%s_%s", cname, FIELDN(mn));
+	}
+	return (knh_fmethod)knh_Asm_loadFunc(ctx, abr, buf, isNaitive);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -3688,20 +3695,14 @@ Term * knh_StmtMETHOD_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 		}
 	}
 	{
-		knh_fmethod func = knh_Asm_loadMethodFunc(ctx, abr, mtd_cid, DP(mtd)->mn);
+		knh_fmethod func = knh_Asm_loadMethodFunc(ctx, abr, mtd_cid, DP(mtd)->mn, knh_StmtMETA_is(ctx, stmt, STEXT("Naitive")));
 		if(func != NULL) {
 			knh_Method_syncFunc(mtd, func);
 			knh_Stmt_done(ctx, stmt);
 		}
 	}
+	knh_invokeMethodTypingListener(ctx, DP(stmt)->metaDictMap, mtd);
 	return TM(stmt);
-
-	//	L_PERROR:;
-	//	knh_cwb_t *cwb = new_cwb(ctx);
-	//	knh_Method__k(ctx, mtd, cwb->w, (String*)KNH_NULL);
-	//	knh_Asm_perror(ctx, abr, pe, knh_cwb_tochar(cwb));
-	//	knh_cwb_clear(cwb);
-	//	return NULL;
 }
 
 

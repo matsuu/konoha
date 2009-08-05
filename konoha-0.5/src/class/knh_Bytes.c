@@ -274,7 +274,7 @@ void knh_cwb_subclear(knh_cwb_t *cwb, size_t len)
 /* ------------------------------------------------------------------------ */
 /* [String] */
 
-String *new_String__cwb(Ctx *ctx, knh_cwb_t *cwb)
+String *knh_cwb_newString(Ctx *ctx, knh_cwb_t *cwb)
 {
 	if(cwb->pos == (cwb->ba)->size) {
 		return TS_EMPTY;

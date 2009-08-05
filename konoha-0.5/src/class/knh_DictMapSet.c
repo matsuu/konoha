@@ -253,6 +253,7 @@ knh_index_t knh_dict_index_b(knh_dict_t *a, size_t size, knh_fbytescmp fcmp, knh
 	}
 }
 
+
 /* ------------------------------------------------------------------------ */
 
 void knh_DictMap_sort(DictMap *o)
@@ -427,10 +428,48 @@ void knh_DictMap_removeAt(Ctx *ctx, DictMap *o, size_t n)
 
 /* ------------------------------------------------------------------------ */
 
-knh_index_t knh_DictMap_index__b(DictMap *o, knh_bytes_t key)
+knh_index_t knh_DictMap_index(DictMap *o, knh_bytes_t key)
 {
 	KNH_ASSERT(IS_bDictMap(o));
 	return knh_dict_index_b(o->_list, o->size, o->fcmp, key);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+knh_index_t knh_dict_first(knh_dict_t *a, knh_fbytescmp fcmp, knh_bytes_t key, size_t sp, size_t ep)
+{
+	L_TAIL:;
+	if(ep - sp < UNSORTED_MAXSIZ) {
+		size_t i;
+		for(i = sp; i < ep; i++) {
+			int res = fcmp(knh_String_tobytes(a[i].key), key);
+			if(res >= 0) return i;
+		}
+		return -1;
+	}
+	else {
+		size_t cp = KNH_MID(sp, ep);
+		int i = fcmp(key, knh_String_tobytes(a[cp].key));
+		if(i == 0) {
+			return cp;
+		}
+		else if(i < 0) {
+			ep = cp;
+		}else {
+			sp = cp + 1;
+		}
+		goto L_TAIL;
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+
+knh_index_t knh_DictMap_firstIndex(DictMap *o, knh_bytes_t key)
+{
+	KNH_ASSERT(IS_bDictMap(o));
+	knh_DictMap_sort(o);
+	return knh_dict_first(o->_list, o->fcmp, key, 0, o->size);
 }
 
 /* ------------------------------------------------------------------------ */

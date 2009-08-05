@@ -98,12 +98,65 @@ METHOD knh__Script_addHistory(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_void(ctx, sfp);
 }
 
+/* ------------------------------------------------------------------------ */
+/* @method void System.setMethodTypingListener(Closure c, String anno) @Static */
+
+METHOD knh__System_setMethodTypingListener(Ctx *ctx, knh_sfp_t *sfp)
+{
+	String *key;
+	if(IS_NULL(sfp[2].s)) {
+		key = T__("MethodT");
+	}
+	else {
+		knh_cwb_t cwbbuf, *cwb = knh_cwb_openinit(ctx, &cwbbuf, STEXT("MethodT"));
+		knh_bytes_t anno = knh_String_tobytes(sfp[2].s);
+		if(anno.buf[0] != '@') {
+			knh_cwb_putc(ctx, cwb, '@');
+		}
+		knh_cwb_write(ctx, cwb, anno);
+		key = knh_cwb_newString(ctx, cwb);
+	}
+	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+	{
+		DictMap *dm = DP(ctx->sys)->listenerDictMap;
+		knh_DictMap_set(ctx, dm, key, sfp[1].o);
+	}
+	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+	KNH_RETURN_void(ctx, sfp);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method void System.setMethodCompilationListener(Closure c, String anno) @Static */
+
+METHOD knh__System_setMethodCompilationListener(Ctx *ctx, knh_sfp_t *sfp)
+{
+	String *key;
+	if(IS_NULL(sfp[2].s)) {
+		key = T__("MethodC");
+	}
+	else {
+		knh_cwb_t cwbbuf, *cwb = knh_cwb_openinit(ctx, &cwbbuf, STEXT("MethodC"));
+		knh_bytes_t anno = knh_String_tobytes(sfp[2].s);
+		if(anno.buf[0] != '@') {
+			knh_cwb_putc(ctx, cwb, '@');
+		}
+		knh_cwb_write(ctx, cwb, anno);
+		key = knh_cwb_newString(ctx, cwb);
+	}
+	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+	{
+		DictMap *dm = DP(ctx->sys)->listenerDictMap;
+		knh_DictMap_set(ctx, dm, key, sfp[1].o);
+	}
+	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+	KNH_RETURN_void(ctx, sfp);
+}
 
 /* ------------------------------------------------------------------------ */
 
 #endif/* KNH_CC_METHODAPI*/
 
-/* ------------------------------------------------------------------------ */
+
 
 #ifdef __cplusplus
 }

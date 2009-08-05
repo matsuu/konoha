@@ -339,7 +339,7 @@ static METHOD knh__Exception_new(Ctx *ctx, knh_sfp_t *sfp)
 		knh_write_char(ctx, cwb->w, ": ");
 		knh_write(ctx, cwb->w, knh_String_tobytes(sfp[1].s));
 	}
-	KNH_SETv(ctx, DP(o)->msg, new_String__cwb(ctx, cwb));
+	KNH_SETv(ctx, DP(o)->msg, knh_cwb_newString(ctx, cwb));
 	KNH_SETv(ctx, DP(o)->bag, sfp[2].o);
 	KNH_RETURN(ctx, sfp, o);
 }

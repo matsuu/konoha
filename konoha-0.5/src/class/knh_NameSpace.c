@@ -320,14 +320,14 @@ knh_NameSpace_getConstNULL(Ctx *ctx, NameSpace *ns, knh_bytes_t name)
 	}
 	if(knh_bytes_index(name, '_') == -1) {
 		if(IS_NOTNULL(DP(ns)->lconstDictMap)) {
-			idx = knh_DictMap_index__b(DP(ns)->lconstDictMap, name);
+			idx = knh_DictMap_index(DP(ns)->lconstDictMap, name);
 			if(idx != -1) return knh_DictMap_valueAt(DP(ns)->lconstDictMap, idx);
 		}
 		size_t i = 0;
 		NameSpace *ins = NULL;
 		while((ins = knh_NameSpace_getImportedNameSpace(ctx, ns, i++)) != NULL) {
 			if(IS_NOTNULL(DP(ins)->lconstDictMap)) {
-				idx = knh_DictMap_index__b(DP(ins)->lconstDictMap, name);
+				idx = knh_DictMap_index(DP(ins)->lconstDictMap, name);
 				if(idx != -1) return knh_DictMap_valueAt(DP(ins)->lconstDictMap, idx);
 			}
 		}

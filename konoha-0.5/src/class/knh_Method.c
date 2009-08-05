@@ -178,7 +178,7 @@ METHOD knh_fmethod_abstract(Ctx *ctx, knh_sfp_t *sfp)
 	Method *mtd = sfp[-1].mtd;
 	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
 	knh_printf(ctx, cwb->w, "AbstractMethod!!: %C.%M", knh_Object_cid(sfp[0].o), DP(mtd)->mn);
-	String *s = new_String__cwb(ctx, cwb);
+	String *s = knh_cwb_newString(ctx, cwb);
 	KNH_THROW(ctx, s);
 }
 
@@ -243,7 +243,7 @@ METHOD knh_fmethod_NoSuchMethod(Ctx *ctx, knh_sfp_t *sfp)
 	knh_write_cid(ctx, cwb->w, knh_Object_cid(sfp[0].o));
 	knh_putc(ctx, cwb->w, '.');
 	knh_write_mn(ctx, cwb->w, DP(sfp[-1].mtd)->mn);
-	String *s = new_String__cwb(ctx, cwb);
+	String *s = knh_cwb_newString(ctx, cwb);
 	KNH_THROW(ctx, s);
 }
 

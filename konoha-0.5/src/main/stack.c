@@ -136,7 +136,7 @@ void knh_sfp_typecheck(Ctx *ctx, knh_sfp_t *sfp, Method *mtd, knh_code_t *pc)
 	{
 		knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
 		knh_printf(ctx, cwb->w, emsg, (knh_intptr_t)i, DP(mtd)->mn);
-		String *s = new_String__cwb(ctx, cwb);
+		String *s = knh_cwb_newString(ctx, cwb);
 		knh_throw(ctx, (Object*)s, knh_Method_file(ctx, sfp[-1].mtd), knh_Method_pctoline(sfp[-1].mtd, pc));
 	}
 }
@@ -260,7 +260,7 @@ String *knh_stack_newStackTrace(Ctx *ctx, knh_sfp_t *sfp, Exception *e)
 		}
 		knh_putc(ctx, cwb->w, ')');
 	}
-	String *s = new_String__cwb(ctx, cwb);
+	String *s = knh_cwb_newString(ctx, cwb);
 	//DBG2_P("stacktrace=%s", knh_String_tochar(s));
 	return s;
 }

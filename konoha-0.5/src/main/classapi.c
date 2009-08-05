@@ -2005,7 +2005,6 @@ void knh_System_init(Ctx *ctx, System *o, int init)
 	KNH_INITv(sys->props, new_DictMap0(ctx, 64));
 	KNH_INITv(sys->FieldNameDictIdx, new_DictIdx0__ignoreCase(ctx, KNH_TFIELDN_SIZE * 2, 0));
 	KNH_INITv(sys->ResourceDictIdx, new_DictIdx0(ctx, 32, 0));
-	knh_DictIdx_add__fast(ctx, sys->ResourceDictIdx, T__("(unknown)"));
 	KNH_INITv(sys->MethodFieldHashMap, new_HashMap(ctx, "System.MethodField", (KNH_TCLASS_SIZE * 2) + 31 ));
 	KNH_INITv(sys->DriversTableDictSet, new_DictSet(ctx, 32));
 	KNH_INITv(sys->SpecFuncDictSet, new_DictSet(ctx, 32));
@@ -2013,8 +2012,9 @@ void knh_System_init(Ctx *ctx, System *o, int init)
 	KNH_INITv(sys->NameSpaceTableDictMap, new_DictMap0(ctx, 8));
 	KNH_INITv(sys->URNAliasDictMap, new_DictMap0(ctx, 8));
 	KNH_INITv(sys->UsingResources, new_Array0(ctx, 0));
-	//KNH_INITv(sys->sysnsDictMap_UNUSED, new_DictMap0(ctx, 16));
-	//KNH_INITv(sys->funcDictSet_UNUSED, new_DictSet(ctx, 16));
+
+	KNH_INITv(sys->listenerDictMap, new_DictMap0(ctx, 0));
+	KNH_INITv(sys->trustedPathDictSet, new_DictSet(ctx, 0));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2042,8 +2042,8 @@ static void knh_System_traverse(Ctx *ctx, System *o, knh_ftraverse ftr)
 	ftr(ctx, UP(sys->DriversTableDictSet));
 	ftr(ctx, UP(sys->SpecFuncDictSet));
 	ftr(ctx, UP(sys->UsingResources));
-	//ftr(ctx, UP(sys->sysnsDictMap_UNUSED));
-	//ftr(ctx, UP(sys->funcDictSet_UNUSED));
+	ftr(ctx, UP(sys->listenerDictMap));
+	ftr(ctx, UP(sys->trustedPathDictSet));
 }
 
 /* ======================================================================== */
@@ -2726,10 +2726,11 @@ void knh_loadExptData(Ctx *ctx, knh_ExptData_t *data)
 static
 void knh_loadFuncData(Ctx *ctx, knh_FuncData_t *data)
 {
-	while(data->name != NULL) {
-		knh_DictSet_set(ctx, DP(ctx->sys)->funcDictSet_UNUSED, T__(data->name), (knh_uintptr_t)data->func);
-		data++;
-	}
+	TODO();
+//	while(data->name != NULL) {
+//		knh_DictSet_set(ctx, DP(ctx->sys)->funcDictSet_UNUSED, T__(data->name), (knh_uintptr_t)data->func);
+//		data++;
+//	}
 }
 
 /* ------------------------------------------------------------------------ */

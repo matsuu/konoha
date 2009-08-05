@@ -48,7 +48,7 @@ int knh_addClassConst(Ctx *ctx, knh_class_t cid, String* name, Object *value)
 	DictMap *cmap = ClassTable(cid).constPool;
 	KNH_ASSERT(IS_DictMap(cmap));
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-	int res = knh_DictMap_index__b(cmap, knh_String_tobytes(name));
+	int res = knh_DictMap_index(cmap, knh_String_tobytes(name));
 	if(res != -1) return 0;
 	knh_DictMap_append(ctx, cmap, name, value);
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
@@ -64,7 +64,7 @@ Object *knh_getClassConstNULL(Ctx *ctx, knh_class_t cid, knh_bytes_t name)
 	DictMap *cmap = ClassTable(cid).constPool;
 	Object *value = NULL;
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-	int res = knh_DictMap_index__b(cmap, name);
+	int res = knh_DictMap_index(cmap, name);
 	if(res != -1) {
 		value = knh_DictMap_valueAt(cmap, res);
 	}
@@ -511,7 +511,7 @@ knh_uri_t knh_cwb_getResourceId(Ctx *ctx, knh_cwb_t *cwb)
 	{
 		knh_index_t idx = knh_DictIdx_index(ctx, DP(ctx->sys)->ResourceDictIdx, t);
 		if(idx == -1) {
-			String *s = new_String__cwb(ctx, cwb);
+			String *s = knh_cwb_newString(ctx, cwb);
 			idx = knh_DictIdx_add__fast(ctx, DP(ctx->sys)->ResourceDictIdx, s);
 			t = knh_String_tobytes(s);
 			knh_cwb_write(ctx, cwb, t);
