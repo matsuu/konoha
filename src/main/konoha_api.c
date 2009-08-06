@@ -874,7 +874,6 @@ void knh_clearScriptLine(Ctx *ctx)
 			//knh_snprintf(buff, sizeof(buff), "\nDo you want to save 'myscript%d.k'? [Y/n]: ", pid);
 			fprintf(stdout, "\nThank you for joining 'Konoha User Experience Program'.\n");
 			fprintf(stdout, "All your cooperation will help the future version of konoha.\n");
-			L_AGAIN:;
 			knh_snprintf(buff, sizeof(buff), "\nDo you want to save your script? [Y/n]: ");
 			if(knh_ask(ctx, buff, 1)) {
 				knh_sfp_t *lsfp = KNH_LOCAL(ctx);
