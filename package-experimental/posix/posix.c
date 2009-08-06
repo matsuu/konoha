@@ -28,6 +28,7 @@
 /* ************************************************************************ */
 
 #include<konoha.h>
+#include <konoha/gen/konoha_proto_.h>
 
 #include <unistd.h>
 #include <signal.h>
@@ -76,7 +77,7 @@ METHOD System_getHostName(Ctx *ctx, knh_sfp_t *sfp)
 {
     char buf[256];
     if(gethostname(buf, sizeof(buf)) == -1) {
-        KNH_PERRNO(ctx, "OS!!", "gethostname", 1);
+        KNH_PERRNO(ctx, NULL,"OS!!", "gethostname", 1);
     }
     KNH_RETURN(ctx, sfp, new_String(ctx, B(buf), NULL));
 }
@@ -118,9 +119,9 @@ METHOD System_getPPid(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD System_kill(Ctx *ctx, knh_sfp_t *sfp)
 {
-    KNH_SECURE(ctx);
+    KNH_SECURE(ctx, sfp);
     if(kill(p_int(sfp[1]), p_int(sfp[2])) == -1) {
-        KNH_PERRNO(ctx, "OS!!", "kill", knh_Context_isStrict(ctx));
+        KNH_PERRNO(ctx, NULL,"OS!!", "kill", knh_Context_isStrict(ctx));
     }
     KNH_RETURN_void(ctx, sfp);
 }
@@ -130,10 +131,10 @@ METHOD System_kill(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD System_system(Ctx *ctx, knh_sfp_t *sfp)
 {
-    //    KNH_SECURE(ctx);
+    //    KNH_SECURE(ctx, sfp);
     int ret = system(p_char(sfp[1]));
     if(ret  == -1) {
-        KNH_PERRNO(ctx, "OS!!", "system", knh_Context_isStrict(ctx));
+        KNH_PERRNO(ctx, NULL,"OS!!", "system", knh_Context_isStrict(ctx));
     }
     KNH_RETURN_Int(ctx, sfp,ret);
 }
@@ -254,7 +255,7 @@ METHOD System_getCwd(Ctx *ctx, knh_sfp_t *sfp)
     char tmpbuf[FILEPATH_BUFSIZ];
     res = getcwd(tmpbuf, sizeof(tmpbuf));
     if (res == NULL) {
-        KNH_PERRNO(ctx, "OS!!", "getcwd", knh_Context_isStrict(ctx));
+        KNH_PERRNO(ctx, NULL,"OS!!", "getcwd", knh_Context_isStrict(ctx));
     }
     String *s = new_String(ctx, B(tmpbuf), NULL);
     KNH_RETURN(ctx, sfp, s);
@@ -266,14 +267,18 @@ METHOD System_getCwd(Ctx *ctx, knh_sfp_t *sfp)
 METHOD System_chDir(Ctx *ctx, knh_sfp_t *sfp)
 {
     char dirname[FILEPATH_BUFSIZ];
+    knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
     knh_bytes_t t = (IS_NULL(sfp[1].s)) ? STEXT(".") : knh_String_tobytes(sfp[1].s);
+    knh_cwb_write(ctx, cwb, t);
+    knh_cwb_ospath(ctx, cwb);
 
-    knh_format_ospath(ctx, dirname, sizeof(dirname), t);
+    //knh_format_ospath(ctx, dirname, sizeof(dirname), t);
     String* str = (String *) sfp[1].s;
     knh_bytes_t bt = {str->str, str->size};
-    knh_format_ospath(ctx, dirname, sizeof(dirname), bt);
+    knh_cwb_write(ctx, cwb, bt);
+    snprintf(dirname,sizeof(dirname),knh_cwb_tochar(ctx, cwb));
     if(chdir(dirname) == -1) {
-        KNH_PERRNO(ctx, "OS!!", "chdir", knh_Context_isStrict(ctx));
+        KNH_PERRNO(ctx, NULL,"OS!!", "chdir", knh_Context_isStrict(ctx));
     }
     KNH_RETURN_void(ctx, sfp);
 }
@@ -286,8 +291,9 @@ knh_io_t knh_iodrv_open__PIPE(Ctx *ctx, knh_bytes_t file, char *mode, int isThro
 {
     char *cmd = (char*)knh_bytes_skipscheme(file).buf;
     FILE *fp = NULL;
+    
     KNH_WARNING(ctx, "opening pipe '%s'", cmd);
-    KNH_SECURE(ctx);
+    //KNH_SECURE(ctx, sfp);
     if(mode != NULL && mode[0] == 'r') {
         fp = popen(cmd, "r");
     }
@@ -295,7 +301,7 @@ knh_io_t knh_iodrv_open__PIPE(Ctx *ctx, knh_bytes_t file, char *mode, int isThro
         fp = popen(cmd, "w");
     }
     if(fp == NULL) {
-        KNH_PERRNO(ctx, "IO!!", "popen", isThrowable);
+        KNH_PERRNO(ctx, NULL,"IO!!", "popen", isThrowable);
         return (knh_io_t)-1;
     }
     return (knh_io_t)fp;

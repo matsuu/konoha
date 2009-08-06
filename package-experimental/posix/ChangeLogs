@@ -1,3 +1,6 @@
+2009-08-07 Masahiro Ide <imasahiro@users.sourceforge.jp>
+    * posix.c       fix some APIs.
+
 2009-06-29 Masahiro Ide <imasahiro@users.sourceforge.jp>
     * posix.c       support signal and raise.
 
