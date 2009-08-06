@@ -171,6 +171,7 @@ knh_bytes_t knh_getURNAlias(Ctx *ctx, knh_bytes_t aurn);
 ClassSpec *knh_getClassSpec(Ctx *ctx, knh_class_t cid);
 knh_class_t knh_findcidx(Ctx *ctx, knh_bytes_t lname);
 /* ../src/class/knh_Closure.c */
+METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp);
 METHOD knh__Closure_invoke(Ctx *ctx, knh_sfp_t *sfp);
 int knh_stack_vpush(Ctx *ctx, knh_sfp_t *sfp, const char *fmt, va_list args);
 knh_class_t knh_addClosureClass(Ctx *ctx, knh_class_t cid, String *name, knh_type_t r0, knh_type_t p1, knh_type_t p2, knh_type_t p3);
