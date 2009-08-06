@@ -4,6 +4,8 @@
  * kindofbrown(c)2009
  */
 
+using posix.*;
+
 class MethodInfo {
 	String name;
 	String classname;
@@ -43,7 +45,7 @@ class ScriptParser {
 	 */
 	void parseOneLine(String line) {
 		re = @'re:[A-Za-z0-9.[]+[] \n]+[A-Za-z0-9]+[.][A-Za-z0-9]+[(]';
-		classn = ''
+		classn = '';
 		if (javadocflag == true) {
 			if (annotation == "") annotation = "/**" + EOL;
 			if ("*/" in? line) {
@@ -104,14 +106,15 @@ class ScriptParser {
 		}
 	}
 
-	void genJava () {
+	void genJava (String filename) {
+		os = new OutputStream(filename, "w");
 		foreach(String cls in clsdefined) {
-			OUT << %("public class %s{0} {", cls) << EOL;
+			os << %("public class %s{0} {", cls) << EOL;
 			
 			  foreach (MethodInfo mi in methods) {
 				if (mi.classname == cls) {
 					/* replace Method new with Constructor */
-					OUT << mi.annotation << EOL;
+					os << mi.annotation << EOL;
 					if (mi.name == 'new') {
 						line = mi.defs.replace("new", "");
 					} else {
@@ -119,15 +122,16 @@ class ScriptParser {
 					}
 					line = line.replace(%("%s{0}.", cls), "");
 					line = line.replace(";", "");
-					line = line.replace("?", "");
+					line = line.replace("?", "<Nullable>");
 					//TODO iterator transform
 					line = line.replace("..", "");
-					OUT << %("\tpublic %s{0} { }", line) << EOL;
+					os << %("\tpublic %s{0} { }", line) << EOL;
 				}
 			}
 			
-			OUT << "}" << EOL;
+			os << "}" << EOL;
 		}
+		os.close();
 	}
 	
 }
@@ -139,18 +143,9 @@ int main (String[] args)
 		return 0;
 	}
 
-/*
-	KonohaDocGenerator kdg = new KonohaDocGenerator();
-
-	kdg.importing(args[1]);
-	kdg.showdiff();
-//	kdg.showClasses();
-	kdg.showMethods();
-	kdg.showModSigs();
-	*/
-
 	ScriptParser p = new ScriptParser();
 	lines = [];
+	/* Cutout comments from script */
 	foreach(String line from new InputStream(args[1], "r")) {	
 		line = line.trim();
 		if (line.startsWith(@"//")) {
@@ -164,6 +159,11 @@ int main (String[] args)
 	}
 //	p.showclasses();
 //	p.showmethods();
-	p.genJava();
+	packagename = args[1].replace(".k", "");
+	filename = args[1].replace(".k", ".java");
+	p.genJava(filename);
+	System.system(%("javadoc -d %s{0} %s{0}.java", packagename));
+
+	System.system(%("konoha javadoc2konoha.k %s{0}", packagename));
 	
 }

@@ -1,0 +1,19 @@
+#####################
+Javadoc Generator
+#####################
+
+1. Usage
+  > konoha javadoc.k pkg.k
+
+2. Generation Flow
+ Javadoc Generater consist from 2 scripts. 
+  - javadoc.k : parse .k file and generate .java file with javadoc annotations. Afterwards, it invoke javadoc and let javadoc generate.
+  - javadoc2konoha.k : parse generated javadoc files (csses, htmls), replace java object to konoha object.
+
+ javadoc2konoha.k will automatically invoked from javadoc.k, main script. Javadoc.k generates disposable java interface file, pkg.java, which has completed its job.
+
+3. TODOs
+ There are still some TODOs, and I listed below.
+ - Typed Array -> Generics
+ - "extends" keyword
+ - "package" keyword
