@@ -64,49 +64,48 @@ knh_fieldn_t knh_Token_getfnq(Ctx *ctx, Token *o)
 /* ------------------------------------------------------------------------ */
 
 static
-knh_methodn_t knh_Token_getmn(Ctx *ctx, Token *o)
+knh_methodn_t knh_Token_getmn(Ctx *ctx, Token *tk)
 {
-	DBG2_ASSERT(IS_Token(o));
-	if(SP(o)->tt == TT_MN) {
-		return DP(o)->mn;
+	DBG2_ASSERT(IS_Token(tk));
+	if(SP(tk)->tt == TT_MN) {
+		return DP(tk)->mn;
 	}
-	else if(SP(o)->tt == TT_FN) {
-		knh_methodn_t mn = FIELDN_UNMASK(DP(o)->fn);
-		if(knh_Token_isGetter(o)) {
+	else if(SP(tk)->tt == TT_FN) {
+		knh_methodn_t mn = FIELDN_UNMASK(DP(tk)->fn);
+		if(knh_Token_isGetter(tk)) {
 			return mn | KNH_FLAG_MN_GETTER;
 		}
-		else if(knh_Token_isSetter(o)) {
+		else if(knh_Token_isSetter(tk)) {
 			return mn | KNH_FLAG_MN_SETTER;
 		}
 		return mn;
 	}
-
-	knh_bytes_t name = knh_Token_tobytes(ctx, o);
-	if(SP(o)->tt == TT_NAME) {
-		knh_methodn_t mn = knh_getmn(ctx, name, METHODN_NEWID);
-		if(knh_Token_isGetter(o)) {
-			return mn | KNH_FLAG_MN_GETTER;
+	else {
+		knh_bytes_t name = knh_Token_tobytes(ctx, tk);
+		if(SP(tk)->tt == TT_NAME) {
+			knh_methodn_t mn = knh_getmn(ctx, name, METHODN_NEWID);
+			if(knh_Token_isGetter(tk)) {
+				return mn | KNH_FLAG_MN_GETTER;
+			}
+			if(knh_Token_isSetter(tk)) {
+				return mn | KNH_FLAG_MN_SETTER;
+			}
+			return mn;
 		}
-		if(knh_Token_isSetter(o)) {
-			return mn | KNH_FLAG_MN_SETTER;
+		else if(SP(tk)->tt == TT_CMETHODN) {
+			knh_index_t idx = knh_bytes_rindex(name, '.');
+			if(idx != -1) {
+				name = knh_bytes_last(name, idx+1);
+			}
+			knh_methodn_t mn = knh_getmn(ctx, name, METHODN_NEWID);
+			return mn;
 		}
-		return mn;
-	}
-	else if(SP(o)->tt == TT_CMETHODN) {
-		knh_index_t idx = knh_bytes_rindex(name, '.');
-		if(idx != -1) {
-			name = knh_bytes_last(name, idx+1);
+		else if(SP(tk)->tt == TT_MT) {
+			return knh_getmn(ctx, name, METHODN_NEWID) | KNH_FLAG_MN_MOVTEXT;
 		}
-		knh_methodn_t mn = knh_getmn(ctx, name, METHODN_NEWID);
-		return mn;
+		//DBG2_P("SP(o)->tt=%s, '%s'", knh_token_tochar(SP(tk)->tt), (char*)name.buf);
+		return METHODN_NONAME;
 	}
-	else if(SP(o)->tt == TT_MT) {
-		return knh_getmn(ctx, name, METHODN_NEWID) | KNH_FLAG_MN_MOVTEXT;
-	}
-	DBG2_P("SP(o)->tt=%s, '%s'", knh_token_tochar(SP(o)->tt), (char*)name.buf);
-	TODO();
-	return METHODN_NONAME;
-	//return knh_tName_getMethodn(ctx, name, METHODN_NEWID);
 }
 
 /* ======================================================================== */
@@ -3423,11 +3422,6 @@ knh_methodn_t knh_StmtMETHOD_name(Ctx *ctx, Stmt *stmt, Asm *abr, int level)
 		}
 	}
 	else {
-		knh_bytes_t name = knh_Token_tobytes(ctx, tk);
-		knh_index_t idx = knh_bytes_rindex(name, '.');
-		if(idx != -1) {
-			name = knh_bytes_last(name, idx);
-		}
 		return knh_Token_getmn(ctx, tk);
 	}
 }
