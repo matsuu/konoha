@@ -192,6 +192,7 @@ METHOD CIMClient_new(Ctx *ctx, knh_sfp_t *sfp)
 static
 ITRNEXT knh_enumClassNames(Ctx *ctx, knh_sfp_t *sfp, int n)
 {
+  //asm("int3");
   CIMCEnumeration *enm = (CIMCEnumeration *)DP(sfp[0].it)->ref;
   if(enm != NULL) {
     if(enm->ft->hasNext(enm, NULL)) {
@@ -224,9 +225,6 @@ METHOD CIMClient_enumClassNames(Ctx *ctx, knh_sfp_t *sfp)
   CIMCClient *cc = ((sfp[0].glue)->ptr);
   CIMCObjectPath *op = ((sfp[1].glue)->ptr);
   CIMCEnumeration *enm;
-  //CIMCData data;
-  //CIMCString *path;
-  //Array *a = new_Array(ctx, CLASS_String, 0);
   if(cc != NULL && op != NULL) {
     CIMCStatus status;
     enm = cc->ft->enumClassNames(cc, op, 0, &status);
@@ -234,18 +232,7 @@ METHOD CIMClient_enumClassNames(Ctx *ctx, knh_sfp_t *sfp)
       knh_throw_CIMCStatus(ctx, &status);
     }
   }
-  /*
-  while (enm->ft->hasNext(enm, NULL)){
-    data = enm->ft->getNext(enm, NULL);
-    op = data.value.ref;
-    path = op->ft->toString(op, NULL);
-    char *p = (char*)path->hdl;
-    knh_Array_add(ctx, a, UP(new_String(ctx, B(p), NULL)));
-    //printf("result: %s\n", (char*)path->hdl);
-  }
-  */
   KNH_RETURN(ctx, sfp,new_GlueIterator(ctx, CLASS_String, enm, knh_enumClassNames, knh_ffree_CIMCEnumeration));
-  //KNH_RETURN(ctx, sfp, a);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -285,7 +272,7 @@ METHOD CIMClient_invokeMethod(Ctx *ctx, knh_sfp_t *sfp)
     if(status.rc != 0) {
       knh_throw_CIMCStatus(ctx, &status);
     }
-  }
+  };
   ret = value2Chars(data.type,&data.value);
   KNH_RETURN(ctx,sfp,new_String(ctx,B(ret),NULL));
 }
@@ -310,16 +297,13 @@ ITRNEXT knh_enumInstanceNames(Ctx *ctx, knh_sfp_t *sfp, int n)
 
 
 /* ------------------------------------------------------------------------ */
-/* @method String[]??.. CIMClient.enumInstanceNames(CIMObjectPath! path) */
+/* @method String.. CIMClient.enumInstanceNames(CIMObjectPath! path) */
 
 METHOD CIMClient_enumInstanceNames(Ctx *ctx, knh_sfp_t *sfp)
 {
   CIMCClient *cc = ((sfp[0].glue)->ptr);
   CIMCObjectPath *op = ((sfp[1].glue)->ptr);
   CIMCEnumeration *enm;
-  //CIMCData data;
-  //CIMCString *path;
-  //Array *a = new_Array(ctx, CLASS_String, 0);
   if(cc != NULL && op != NULL) {
     CIMCStatus status;
     enm = cc->ft->enumInstanceNames(cc, op, &status);
@@ -327,18 +311,46 @@ METHOD CIMClient_enumInstanceNames(Ctx *ctx, knh_sfp_t *sfp)
       knh_throw_CIMCStatus(ctx, &status);
     }
   }
-  /*
-  while (enm->ft->hasNext(enm, NULL)){
-    data = enm->ft->getNext(enm, NULL);
-    op = data.value.ref;
-    path = op->ft->toString(op, NULL);
-    char *p = (char*)path->hdl;
-    knh_Array_add(ctx, a, UP(new_String(ctx, B(p), NULL)));
-    //printf("result: %s\n", (char*)path->hdl);
-  }
-  */
   KNH_RETURN(ctx, sfp,new_GlueIterator(ctx, CLASS_String, enm, knh_enumInstanceNames, knh_ffree_CIMCEnumeration));
-  //KNH_RETURN(ctx, sfp, a);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+ITRNEXT knh_referenceNames(Ctx *ctx, knh_sfp_t *sfp, int n)
+{
+  asm("int3");
+  CIMCEnumeration *enm = (CIMCEnumeration *)DP(sfp[0].it)->ref;
+  if(enm != NULL) {
+    if(enm->ft->hasNext(enm, NULL)) {
+      CIMCData data = enm->ft->getNext(enm, NULL);
+      CIMCObjectPath *op = data.value.ref;
+      CIMCString *path = op->ft->toString(op, NULL);
+      String *s = new_String(ctx, B((char*)path->hdl), NULL);
+      KNH_ITRNEXT(ctx, sfp, n, s);
+    }
+  }
+  KNH_ITREND(ctx, sfp, n);
+}
+
+
+/* ------------------------------------------------------------------------ */
+/* @method String.. CIMClient.referenceNames(CIMObjectPath! path) */
+
+METHOD CIMClient_referenceNames(Ctx *ctx, knh_sfp_t *sfp)
+{
+  //asm("int3");
+  CIMCClient *cc = ((sfp[0].glue)->ptr);
+  CIMCObjectPath *op = ((sfp[1].glue)->ptr);
+  CIMCEnumeration *enm;
+  if(cc != NULL && op != NULL) {
+    CIMCStatus status;
+    enm = cc->ft->referenceNames(cc, op, NULL, NULL, &status);
+    if(status.rc != 0) {
+      knh_throw_CIMCStatus(ctx, &status);
+    }
+  }
+  KNH_RETURN(ctx, sfp,new_GlueIterator(ctx, CLASS_String, enm, knh_referenceNames, knh_ffree_CIMCEnumeration));
 }
 
 /* ======================================================================== */

@@ -4,8 +4,6 @@ String.. s1;
 
 String[] s2;
 
-enm = new CIMEnumeration();
-
 op = new CIMObjectPath("root/cimv2","Linux_RpmPackage");
 
 op.addKey("CreationClassName","Linux_RpmPackage");

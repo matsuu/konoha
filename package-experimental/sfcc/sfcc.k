@@ -11,7 +11,6 @@ if(!System.hasLib("cimcclient")) {
 class CIMObjectPath;
 class CIMClient;
 class CIMInstance;
-class CIMEnumeration;
 
 /* ------------------------------------------------------------------------ */
 /* CIMObjectPath */
@@ -38,25 +37,6 @@ void CIMObjectPath.addKey(String name, String value);
 
 String CIMObjectPath.toString();
 
-
-/**
- * NameSpace を得る
- */
-
-//String CIMObjectPath.getNameSpace();
-
-/**
- * ClassName を得る
- */
-
-//String CIMObjectPath.getClassName();
-
-/**
- * KeyCount を得る
- */
-
-//int CIMObjectPath.getKeyCount();
-
 /* ------------------------------------------------------------------------ */
 /* CIMClient */
 
@@ -72,7 +52,6 @@ CIMClient CIMClient.new(String url);
  * @param op CIMObjectPath
  * @param flag フラグ（省略可能)
  * @return クラス名の一覧
- * とりあえず前の感じで
  */
 
 String.. CIMClient.enumClassNames(CIMObjectPath op, Int? flag);
@@ -81,8 +60,8 @@ String.. CIMClient.enumClassNames(CIMObjectPath op, Int? flag);
   * invokeMethod
   * @param op CIMObjectPath 
   * @param name Method name
-  * @param arg Input parameter
-  * @return Method return value.
+  * @param arg Input parameter(s)
+  * @return Method value.
   */
 String CIMClient.invokeMethod(CIMObjectPath op, String name, String[] arg);
 
@@ -90,10 +69,17 @@ String CIMClient.invokeMethod(CIMObjectPath op, String name, String[] arg);
  * インスタンス名の一覧をイテレータとしてえる
  * @param op CIMObjectPath
  * @return インスタンス名の一覧
- * とりあえず前の感じで
  */
 
 String.. CIMClient.enumInstanceNames(CIMObjectPath op);
+
+/**
+ * リファレンス名の一覧をイテレータとしてえる
+ * @param op CIMObjectPath
+ * @return リファレンス名の一覧
+ */
+
+String.. CIMClient.referenceNames(CIMObjectPath op);
 
 /*------------------------------------------------------------------------ */
 /* CIMInstance */
@@ -119,14 +105,3 @@ CIMObjectPath CIMInstance.getObjectPath();
 
 String[] CIMInstance.getProperty();
 
-/**
- * PropertyCount を得る
- */
-
-//int CIMInstance.getPropertyCount();
-
-
-/*------------------------------------------------------------------------ */
-/* CIMEnmumeration */
-
-//void CIMEnumeration.printEnm(CIMObjectPath op);

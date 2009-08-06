@@ -2,7 +2,7 @@ using sfcc.*;
 
 String s;
 
-enm = new CIMEnumeration();
+enm =  new CIMEnumeration();
 
 op = new CIMObjectPath("root/cimv2","Linux_Hello");
 
