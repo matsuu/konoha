@@ -6,8 +6,6 @@ String[] s2;
 
 op = new CIMObjectPath("root/cimv2","Linux_RpmPackage");
 
-op.addKey("CreationClassName","Linux_RpmPackage");
-
 op.addKey("Name","libxml2");
 
 cc = new CIMClient("192.168.59.202");

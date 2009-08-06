@@ -236,7 +236,7 @@ METHOD CIMClient_enumClassNames(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method String CIMClient.invokeMethod(CIMObjectPath op, String name, String in, String out) */
+/* @method String CIMClient.invokeMethod(CIMObjectPath op, String name, String arg) */
 
 METHOD CIMClient_invokeMethod(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -244,29 +244,29 @@ METHOD CIMClient_invokeMethod(Ctx *ctx, knh_sfp_t *sfp)
   CIMCClient *cc = ((sfp[0].glue)->ptr);
   CIMCObjectPath *op = ((sfp[1].glue)->ptr);
   char *name =  p_char(sfp[2]);
-  Array *a = (Array*)sfp[3].o;
-  int i,argc;
+  char *arg = p_char(sfp[3]);
+  //int i,argc;
   char *ret;
-  char **argv;
+  //char **argv;
   CIMCStatus check;
   CIMCArgs *inargs = env->ft->newArgs(env,&check);
   CIMCArgs *outargs = NULL;
   CIMCData data;
   CIMCStatus status;
-  char c[64] = {0};
-  argc = knh_Array_size(a);
+  //char c[64] = {0};
+  //argc = knh_Array_size(a);
 
-  argv = (char **)alloca(argc * sizeof(char*));
-  for (i = 0; i < argc; i++) {
-	argv[i] = knh_String_tochar((String *)knh_Array_n(a, i));
-  }
+  //argv = (char **)alloca(argc * sizeof(char*));
+  //for (i = 0; i < argc; i++) {
+  //argv[i] = knh_String_tochar((String *)knh_Array_n(a, i));
+  //}
 
-  for(i=0;i<argc;i++){
-    if(strncmp(argv[i],"",1) != 0){
-      snprintf(c,64,"a%d",i);
-      ((CMPIArgs*)inargs)->ft->addArg((CMPIArgs*)inargs, c, (CMPIValue*)argv[i], CMPI_chars);
-    }
-  }
+  //for(i=0;i<argc;i++){
+  //if(strncmp(argv[i],"",1) != 0){
+  //snprintf(c,64,"a%d",i);
+  ((CMPIArgs*)inargs)->ft->addArg((CMPIArgs*)inargs, "a0", (CMPIValue*)arg, CMPI_chars);
+  //}
+  //}
   if(cc != NULL && op != NULL) {
     data = cc->ft->invokeMethod(cc, op, name, inargs, outargs, &status);
     if(status.rc != 0) {

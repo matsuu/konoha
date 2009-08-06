@@ -12,7 +12,7 @@ op.addKey("CLASS","Test");
 
 cc = new CIMClient("192.168.59.202");
 
-s = cc.invokeMethod(op, "func4", ["32"]);
+s = cc.invokeMethod(op, "func4", "32");
 
 OUT << s << EOL;
 
