@@ -491,7 +491,7 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 		KLR_MOV(ctx, sfp[n+3].o, fmt);\
 		Method *mtd_ = knh_lookupFormatter(ctx, knh_Object_cid(sfp[n+1].o), mn);\
 		KLR_SCALL(ctx, n, 4, mtd_);\
-		KNH_SETv(ctx, sfp[n].o, new_String__cwb(ctx, cwb)); \
+		KNH_SETv(ctx, sfp[n].o, knh_cwb_newString(ctx, cwb)); \
 	}\
 
 #define KLR_TOSTR(ctx, n, mn)  KLR_TOSTRf(ctx, n, mn, KNH_NULL)

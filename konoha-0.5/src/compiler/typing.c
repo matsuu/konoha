@@ -3565,13 +3565,6 @@ void *knh_Asm_loadFunc(Ctx *ctx, Asm *abr, char *funcname, int isNaitive)
 /* ------------------------------------------------------------------------ */
 
 static
-char *knh_format_funcname(Ctx *ctx, char *buf, size_t bufsiz, knh_class_t cid, knh_methodn_t mn)
-{
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
 knh_fmethod knh_Asm_loadMethodFunc(Ctx *ctx, Asm *abr, knh_class_t cid, knh_methodn_t mn, int isNaitive)
 {
 	KNH_ASSERT_cid(cid);
