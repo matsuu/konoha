@@ -519,11 +519,9 @@ knh_uri_t knh_cwb_getResourceId(Ctx *ctx, knh_cwb_t *cwb)
 		uri = (knh_uri_t)idx;
 	}
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-	DBG_P("uri=%d,%d '%s'", uri, URI_UNTRUSTED(uri), t.buf);
 	if(!knh_isTrustedPath(ctx, t)) {
 		uri = URI_UNTRUSTED(uri);
 	}
-	DBG_P("uri=%d,%d '%s'", uri, URI_UNTRUSTED(uri), t.buf);
 	return uri;
 }
 
@@ -542,7 +540,6 @@ String *knh_getResourceName(Ctx *ctx, knh_uri_t uri)
 			return TS_EMPTY;
 		}
 	)
-	DBG_P("uri=%d, '%s'", uri, knh_String_tochar(s));
 	return s;
 }
 

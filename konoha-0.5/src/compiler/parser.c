@@ -1346,10 +1346,8 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int isData)
 	int oc = tc->c, e = tc->e;
 	int fc = 0, pc = 0;
 	Stmt *stmt = NULL;
-//	DBG2_P("tt='%s'[%d] .. tt='%s'[%d]",
-//			knh_token_tochar(ts[oc]->tt), oc, knh_token_tochar(ts[e-1]->tt), e-1);
 	if(!(oc < e)) {
-		DBG2_P("tc->c=%d, tc->e=%d", (int)oc, (int)e);
+		DBG_P("tc->c=%d, tc->e=%d", (int)oc, (int)e);
 		DBG2_ASSERT(oc < e);
 		Token *tke = new_Token(ctx, 0, SP(tc->ts[e-1])->uri, SP(tc->ts[e-1])->line, TT_ERR);
 		if(!isData) {
@@ -1605,11 +1603,11 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tokens_t *tc, int isData)
 	{
 		knh_tokens_t ptc;
 		knh_Token_tc(ctx, ts[pc], &ptc);
-        DBG2_P("size=%d, ptc=%d", DP(stmt)->size, ptc.e);
+		//DBG2_P("size=%d, ptc=%d", DP(stmt)->size, ptc.e);
 		knh_Stmt_add_EXPRs(ctx, stmt, &ptc, isData);
 	}
 	if(DP(stmt)->size == 1) {
-        DBG2_P("size=%d", DP(stmt)->size);
+        //DBG2_P("size=%d", DP(stmt)->size);
 		knh_perror(ctx, SP(ts[pc])->uri, SP(ts[pc])->line, KERR_ERRATA, _("empty: () == > (void)"));
 		knh_Stmt_add(ctx, stmt, TM(new_TokenCONST(ctx, FL(ts[oc]), KNH_NULL)));
 	}
@@ -2837,7 +2835,7 @@ void knh_Stmt_add_CMETHOD(Ctx *ctx, Stmt *o, knh_tokens_t *tc)
 			tc->c += 1;
 			goto L_PARAMS;
 		}
-		else if(SP(tkc)->tt == TT_NAME /* && knh_Token_isMETHODN(tkc) */) {
+		else if(SP(tkc)->tt == TT_NAME || SP(tkc)->tt == TT_MT) {
 			knh_Stmt_add_ASIS(ctx, o);
 			knh_Stmt_add(ctx, o, TM(tkc));
 			tc->c += 1;
@@ -2921,18 +2919,31 @@ Stmt* new_StmtFUNCEXPR(Ctx *ctx, knh_tokens_t *tc, int isData)
 	int c = tc->c;
 	KNH_ASSERT(c < tc->e);
 
-	if(SP(ts[c])->tt == TT_TYPEN) {  /* @TEST int func(n) { ... } */
-		if(DP(ts[c])->tt_next == TT_NAME && DP(ts[c+1])->tt_next == TT_PARENTHESIS) {
-			return new_StmtMETHOD(ctx, tc);
-		}
-		if(DP(ts[c])->tt_next == TT_CMETHODN && DP(ts[c+1])->tt_next == TT_PARENTHESIS) { /* @TEST float Math.abs() */
-			return new_StmtMETHOD(ctx, tc);
+	if(SP(ts[c])->tt == TT_TYPEN) {
+		if(DP(ts[c])->tt_next != TT_EOT && DP(ts[c+1])->tt_next == TT_PARENTHESIS) {
+			Token *tkN = ts[c+1];
+			/* @TEST int func(n) { ... } */   /* @TEST float Math.abs() */
+			if(SP(tkN)->tt == TT_TYPEN) {
+				SP(tkN)->tt = TT_NAME;
+			}
+			else if(SP(tkN)->tt == TT_CONSTN) {
+				knh_bytes_t t = knh_String_tobytes(DP(tkN)->text);
+				if(knh_bytes_index(t, '.') > 0) {
+					SP(tkN)->tt = TT_CMETHODN;
+				}
+				else {
+					SP(tkN)->tt = TT_NAME;
+				}
+			}
+			if(SP(tkN)->tt == TT_NAME || SP(tkN)->tt == TT_CMETHODN) {
+				return new_StmtMETHOD(ctx, tc);
+			}
 		}
 		if(DP(ts[c])->tt_next == TT_NAME && knh_Token_isVARN(ts[c+1])) {  /* @TEST int name; */
-			Token *tk_TYPEN = ts[c]; tc->c += 1;
+			Token *tkT = ts[c]; tc->c += 1;
 			knh_tokens_t expr_tc;
 			knh_tokens_splitSTMT(ctx, tc, &expr_tc, 1/*needs*/);
-			return new_StmtDECL(ctx, tk_TYPEN, &expr_tc);
+			return new_StmtDECL(ctx, tkT, &expr_tc);
 		}
 		if(DP(ts[c])->tt_next == TT_PARENTHESIS && DP(ts[c+1])->tt_next== TT_BRACE) { /* @TEST int (n) {...} */
 			return new_StmtMETHOD(ctx, tc);

@@ -167,7 +167,7 @@ Stmt *knh_InputStream_parseStmt(Ctx *ctx, InputStream *in, int isData)
 	KNH_LPUSH(ctx, tk);
 	KNH_LPUSH(ctx, in);
 	knh_Token_parse(ctx, tk, in);
-	//DBG2_DUMP(ctx, tk, KNH_NULL, "tokens");
+	DBG2_DUMP(ctx, tk, KNH_NULL, "tokens");
 	return new_StmtINSTMT(ctx, tk, isData);
 }
 
@@ -541,9 +541,12 @@ int knh_StmtIMPORT_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	knh_bytes_t path = knh_String_tobytes(DP(StmtIMPORT_file(stmt))->text);
 	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
 	if(path.buf[0] != '/' && path.buf[0] != '\\' && !knh_bytes_startsWith(path, STEXT("http://"))) {
-		knh_cwb_write(ctx, cwb, knh_String_tobytes(knh_getResourceName(ctx, SP(stmt)->uri)));
-		knh_cwb_parentpath(ctx, cwb, NULL);
-		knh_cwb_putc(ctx, cwb, '/');
+		knh_bytes_t t = knh_String_tobytes(knh_getResourceName(ctx, SP(stmt)->uri));
+		if(t.buf[0] != '(') {  /* NOT (eval) */
+			knh_cwb_write(ctx, cwb, t);
+			knh_cwb_parentpath(ctx, cwb, NULL);
+			knh_cwb_putc(ctx, cwb, '/');
+		}
 	}
 	knh_cwb_write(ctx, cwb, path);
 	{
