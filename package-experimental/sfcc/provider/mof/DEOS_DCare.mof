@@ -1,0 +1,9 @@
+#pragma locale ("en_US")
+#pragma namespace ("root/cimv2")
+
+[ Provider("cmpi:cmpiOSBase_DCareProvider"),
+  Description("DCare Class. It is the SoftwareElement for Linux RPMs.")
+]
+class DEOS_DCare : CIM_SoftwareElement
+{ };
+
