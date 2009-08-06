@@ -25,6 +25,13 @@ METHOD GV_agSafeset(Ctx *ctx,knh_sfp_t *sfp)
   agsafeset(obj,name,value,def);
   KNH_RETURN_void(ctx,sfp);
 }
+METHOD GV_copyAttr(Ctx *ctx,knh_sfp_t *sfp)
+{
+  void *oldobj = (sfp[1].glue)->ptr;
+  void *newobj = (sfp[2].glue)->ptr;
+  agcopyattr(oldobj,newobj);
+  KNH_RETURN_void(ctx,sfp);
+}
 
   /*---------------------Class GVC------------------------*/
 
@@ -37,14 +44,15 @@ METHOD GVC_new(Ctx *ctx,knh_sfp_t *sfp)
 METHOD GVC_gvParseArgs(Ctx *ctx,knh_sfp_t *sfp)
 {
   GVC_t *gvc = (sfp[0].glue)->ptr;
-  int i,argc;
   char **argv;
+  int i,argc;
   Array *a = (Array *)sfp[1].o;
   argc = knh_Array_size(a);
   argv = (char **)alloca(argc * sizeof(char*));
   for (i = 0; i < argc; i++) {
 	argv[i] = knh_String_tochar((String *)knh_Array_n(a, i));
-  }
+  }  
+  // fprintf(stderr,"argv[1] = [%s],argv[2] = [%s]\n",argv[1],argv[2]);
   gvParseArgs(gvc,argc,argv);
   KNH_RETURN_void(ctx,sfp);
 }

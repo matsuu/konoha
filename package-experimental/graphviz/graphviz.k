@@ -1,7 +1,7 @@
 /****************************************************************************
  * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
  *
- * Copyright (c) 2005-2008, Kimio Kuramitsu <kimio at ynu.ac.jp>
+ * Copyright (c) 2005-2008, Masaaki Goshima <goccy@user.sourceforge.jp>
  *           (c) 2008-      Konoha Software Foundation
  * All rights reserved.
  *
@@ -48,6 +48,7 @@ class Agedge;
 
 void GV.agSafeset(Any obj,String name,String value,String deff);
 
+void GV.copyAttr(Any oldobj,Any newobj);
 /*-----------------------------------------------------------------------------*/
 /*GVC*/
 
@@ -59,10 +60,10 @@ GVC GVC.new();
 
 /**
  * 描画エンジンを起動する
- * @param argv コマンドラインからの引数 
+ * @param args:第１要素は何でもよい、第２要素はformat、第３要素は生成するファイル名
  */
 
-void GVC.gvParseArgs(String[] argv);
+void GVC.gvParseArgs(String[] args);
 
 /**
  * 描画エンジンを用いて描く
@@ -108,6 +109,14 @@ Agraph Agraph.new(String name,int kind);
 
 void Agraph.agclose();
 
+/**
+ * サブグラフを作る
+ *@param name サブグラフの名前( cluster〜 と書くと特殊表記になる)
+ */
+
+Agraph Agraph.agSubGraph(String name);
+
+
 /*------------------------------------------------------------------------*/
 /*Agnode*/
 
@@ -118,6 +127,7 @@ void Agraph.agclose();
  */
 
 Agnode Agnode.new(Agraph g,String name);
+
 
 /*------------------------------------------------------------------------*/
 /*Agedge*/
