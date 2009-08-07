@@ -40,7 +40,7 @@ extern "C" {
 
 #define TKSTACK_MAXSIZ 32
 #ifndef KONOHA_NAME_BUFSIZ
-#define KONOHA_NAME_BUFSIZ  256
+#define KONOHA_NAME_BUFSIZ  80
 #endif
 
 #ifndef KONOHA_NAME_MAXSIZ
@@ -63,12 +63,12 @@ void knh_InputStream_perror(Ctx *ctx, InputStream *in, int pe, char *fmt, ...)
 /* [SYMBOL] */
 
 static
-String *new_String__SYMBOL(Ctx *ctx, knh_bytes_t tname)
+String *new_String__SYMBOL(Ctx *ctx, knh_bytes_t t)
 {
 	DictMap *symbolDictMap = DP((ctx)->abr)->symbolDictMap;
-	knh_index_t idx = knh_DictMap_index(symbolDictMap, tname);
+	knh_index_t idx = knh_DictMap_index(symbolDictMap, t);
 	if(idx == -1) {
-		String *s = new_String(ctx, tname, NULL);
+		String *s = new_String(ctx, t, NULL);
 		knh_DictMap_set(ctx, symbolDictMap, s, UP(s));
 		return s;
 	}
@@ -79,11 +79,12 @@ String *new_String__SYMBOL(Ctx *ctx, knh_bytes_t tname)
 
 /* ------------------------------------------------------------------------ */
 
-Token *new_TokenSYMBOL(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t)
+Token *knh_cwb_newTokenSYMBOL(Ctx *ctx, knh_cwb_t *cwb, knh_flag_t flag, InputStream *in)
 {
+	knh_bytes_t t = knh_cwb_tobytes(cwb);
 	knh_token_t tt = TT_NAME;
-	char namebuf[KONOHA_NAME_BUFSIZ], *chp = namebuf;
-	int i;
+	char namebuf[KONOHA_NAME_BUFSIZ];
+	size_t i, size;
 	if(t.buf[0] == '.' && islower(t.buf[1])) {   /* .name   => name */
 		flag |= KNH_FLAG_TKF_TOPDOT;
 		t.buf++; t.len--;
@@ -91,159 +92,99 @@ Token *new_TokenSYMBOL(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t
 	if(t.len > 0 && t.buf[t.len-1] == '.') {
 		/* name. => name */
 		t.len--;
-		knh_InputStream_perror(ctx, in, KERR_ERRATA, _("ommit tailed noize: '%B.' ==> '%B'"), t, t);
 	}
-	if(isupper(t.buf[0])) { /* CLASS */
-		tt = TT_TYPEN;
-		goto CLASS_PART;
+	for(i = 0; i < KONOHA_NAME_BUFSIZ - 1; i++) {
+		if(i < t.len) namebuf[i] = t.buf[i];
+		else break;
 	}
-	else if(islower(t.buf[0]) || t.buf[0] == '_'){
-		tt = TT_NAME;
-		goto NAME_PART;
-	}
-	else {
-		knh_InputStream_perror(ctx, in, KERR_ERROR, _("unknown token: %B"), t);
-		return new_Token(ctx, flag, DP(in)->uri, DP(in)->line, TT_ERR);
-	}
-
-	CLASS_PART:
-	{
-		int has_lower = 0;
-		for(; i < t.len; i++) {
-			if(chp - namebuf >= KONOHA_NAME_MAXSIZ) {
-				goto WLENGTH_PART;
-			}
-			if(t.buf[i] == '.') {
-				if(isupper(t.buf[i+1])) { /* Class.CONST */
-					tt = TT_CONSTN;
-					*chp = '.'; chp++; i++;
-					goto CONSTN_PART;
-				}
-				else if(islower(t.buf[i+1])){ /* Class.name */
-					tt = TT_CMETHODN;
-					*chp = '.'; chp++; i++;
-					goto NAME_PART;
-				}
-			}
-			if(t.buf[i] == '_') {
-				if(!has_lower) { /* CLASS_NAME */
-					tt = TT_CONSTN;
-					*chp = t.buf[i]; chp++; i++;
-					goto CONSTN_PART;
-				}
-				continue; /* ignoring '_' */
-			}
-			if(t.buf[i] == '?') {
-				flag |= KNH_FLAG_TKF_NULLABLETYPE;
-				goto TOKEN_PART;
-			}
-			if(!isalnum(t.buf[i]) && t.buf[i] != ':') {
-				knh_InputStream_perror(ctx, in, KERR_DWARN, _("included illegal character: '%B'"), t);
-				goto TOKEN_PART;
-			}
-			if(islower(t.buf[i])) has_lower = 1;
-			*chp = t.buf[i]; chp++;
-		}
-		goto TOKEN_PART;
-	}
-
-	CONSTN_PART:
-	{
-		for(; i < t.len; i++) {
-			if(chp - namebuf >= KONOHA_NAME_MAXSIZ) {
-				goto WLENGTH_PART;
-			}
-			if(isupper(t.buf[i]) || isdigit(t.buf[i]) || t.buf[i] == '_') {
-				*chp = t.buf[i]; chp++;
-			}
-			else if(t.buf[i] == '.' && islower(t.buf[i+1])) {
-				tt = TT_NAME;
-				*chp = '.'; chp++; i++;
-				goto NAME_PART;
-			}
-			else {
-				knh_InputStream_perror(ctx, in, KERR_DWARN, _("included strange character: '%B'"), t);
-				goto TOKEN_PART;
-			}
-		}
-		goto TOKEN_PART;
-	}
-
-	NAME_PART:
-	{
-		int upper = 0;
-		for(; t.buf[i] == '_'; i++) {
-			if(chp - namebuf >= KONOHA_NAME_MAXSIZ) {
-				goto WLENGTH_PART;
-			}
-			*chp = t.buf[i]; chp++;
-		}
-
-		for(; i < t.len; i++) {
-			if(chp - namebuf >= KONOHA_NAME_MAXSIZ) {
-				goto WLENGTH_PART;
-			}
-			if(t.buf[i] == '_') {
-				if(upper) {
-					*chp = '_'; chp++;
-					*chp = '_'; chp++;
-				}
-				upper = 1;
-				continue;
-			}
-			if(!isalnum(t.buf[i]) && t.buf[i] != ':') {
-				if(t.buf[i] == '.'/* && tt == TT_CMETHODN*/) {
-					*chp = '.'; chp++;
-					continue;
-				}
-				else {
-					knh_InputStream_perror(ctx, in, KERR_DWARN, _("included strange character: '%B'"), t);
-					goto TOKEN_PART;
-				}
-			}
-			if(upper) {
-				upper = 0;
-				if(islower(t.buf[i])) {
-					*chp = t.buf[i] - ('a' - 'A'); chp++;
-				}
-				else {
-					*chp = t.buf[i]; chp++;
-				}
-			}
-			else {
-				*chp = t.buf[i]; chp++;
-			}
-		}
-		goto TOKEN_PART;
-	}
-
-
-	WLENGTH_PART: {
-		*chp = 0;
+	size = i;
+	namebuf[size] = 0;
+	if(KONOHA_NAME_BUFSIZ < t.len) {
 		knh_InputStream_perror(ctx, in, KERR_ERRATA, "too long name: '%B' => '%s'", t, namebuf);
 	}
-
-	TOKEN_PART: {
-		*chp = 0;
-		if(tt == TT_NAME) {
-			if(namebuf[0] == 'v' && namebuf[1] == 'o' && namebuf[2] == 'i' && namebuf[3] == 'd' && namebuf[4] == 0) {
-				tt = TT_TYPEN;
+	knh_cwb_subclear(cwb, 0);
+	{
+		size_t s = 0, dots = 0;
+		knh_token_t tt_prev = TT_EOT;
+		while(s < size) {
+			if(islower(namebuf[s]) || namebuf[s] == '_') {
+				while(namebuf[s] == '_') {
+					knh_cwb_putc(ctx, cwb, '_');
+					s++;
+				}
+				for(i = s; i < size; i++) {
+					if(namebuf[i] == '_' && isalnum(namebuf[i+1])) {
+						i++;
+						if(islower(namebuf[i])) {
+							knh_cwb_putc(ctx, cwb, toupper(namebuf[i]));
+							continue;
+						}
+					}
+					knh_cwb_putc(ctx, cwb, namebuf[i]);
+					if(namebuf[i] == '.') {
+						dots++;
+						break;
+					}
+				}
+				tt_prev = tt; tt = TT_NAME;
+				s = i + 1;
 			}
-			if(namebuf[0] == 'v' && namebuf[1] == 'a' && namebuf[2] == 'r' && namebuf[3] == 0) {
-				tt = TT_TYPEN;
+			else {
+				int hasLower = 0, hasScore = 0, alphac = 0;
+				for(i = s; i < size; i++) {
+					if(namebuf[i] == '_') {
+						if(hasLower) continue;
+						hasScore = 1;
+					}
+					else if(islower(namebuf[i])) {
+						hasLower = 1;
+						alphac++;
+					}
+					else if(isupper(namebuf[i])) {
+						alphac++;
+					}
+					knh_cwb_putc(ctx, cwb, namebuf[i]);
+					if(namebuf[i] == '.') {
+						dots++;
+						break;
+					}
+				}
+				tt_prev = tt;
+				tt = (hasLower || alphac == 1) ? TT_TYPEN : TT_CONSTN;
+				s = i + 1;
 			}
-			if(namebuf[0] == 'a' && namebuf[1] == 'n' && namebuf[2] == 'y' && namebuf[3] == 0) {
-				namebuf[0] = 'A';
-				tt = TT_TYPEN;
+			if(s < size) {
+				while(namebuf[s] == '_') s++;
 			}
 		}
-		Token *o = new_Token(ctx, flag, DP(in)->uri, DP(in)->line, tt);
+		DBG2_P("dots=%d, '%s'.'%s'", dots, knh_token_tochar(tt_prev), knh_token_tochar(tt));
+		if(dots > 0) {
+			if(tt_prev == TT_TYPEN) {
+				if(tt == TT_NAME) tt = TT_CMETHODN; else tt = TT_CCONSTN;
+			}
+		}
+		else {
+			if(tt == TT_NAME) {
+				if(namebuf[0] == 'v' && namebuf[1] == 'o' && namebuf[2] == 'i' && namebuf[3] == 'd' && namebuf[4] == 0) {
+					tt = TT_TYPEN;
+				}
+				if(namebuf[0] == 'v' && namebuf[1] == 'a' && namebuf[2] == 'r' && namebuf[3] == 0) {
+					tt = TT_TYPEN;
+				}
+			}
+		}
+		{
+			Token *tk = new_Token(ctx, flag, DP(in)->uri, DP(in)->line, tt);
+			knh_bytes_t t = knh_cwb_tobytes(cwb);
 //		DBG2_(
 //		if(!knh_bytes_equals(t, B(name))) {
 //			DBG2_P("(%s) '%s' ==> '%s'", knh_token_tochar(tt), (char*)t.buf, name);
 //		});
-		KNH_SETv(ctx, DP(o)->data, new_String__SYMBOL(ctx, B(namebuf)));
-		return o;
+			DBG2_P("(%d) '%s' ==> '%s'", tt, namebuf, (char*)t.buf);
+			KNH_SETv(ctx, DP(tk)->data, new_String__SYMBOL(ctx, t));
+			knh_cwb_close(cwb);
+			return tk;
+		}
 	}
 }
 
@@ -502,9 +443,8 @@ void knh_Token_padd(Ctx *ctx, Token *ptk, int *BOL, Token *tk)
 static
 void knh_Token_add_space(Ctx *ctx, Token *tk, int *BOL, knh_cwb_t* cwb, InputStream *in)
 {
-	knh_bytes_t t = knh_cwb_tobytes(cwb);
-	if(t.len == 0) return;
-	knh_Token_padd(ctx, tk, BOL, new_Token__parse(ctx, 0, in, t));
+	if(knh_cwb_size(cwb) == 0) return;
+	knh_Token_padd(ctx, tk, BOL, knh_cwb_parseToken(ctx, cwb, 0, in));
 	knh_cwb_close(cwb);
 }
 
@@ -623,6 +563,7 @@ void knh_Token_join(Ctx *ctx, Token *o)
 			}
 			else if(SP(tk1)->tt == TT_BRANCET && IS_NULL(DP(tk1)->data)) { /* T[] */
 				knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
+				DBG2_P("@@@@@ tk0='%s'", sToken(tk0));
 				knh_Bytes_write(ctx, cwb->ba, knh_String_tobytes(DP(tk0)->text));
 				knh_Bytes_write(ctx, cwb->ba, STEXT("[]"));
 				KNH_SETv(ctx, DP(tk0)->data, knh_cwb_newString(ctx, cwb));

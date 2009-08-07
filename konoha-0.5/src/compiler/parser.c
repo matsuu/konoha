@@ -1445,6 +1445,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tkc_t *tc, int isData)
 				knh_Stmt_add(ctx, stmt, TM(ts[oc+1]));
 				{
 					Token *tk0 = ts[oc+1];
+					DBG2_P("@@@@@ tk0='%s'", sToken(tk0));
 					knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
 					knh_Bytes_write(ctx, cwb->ba, knh_String_tobytes(DP(tk0)->text));
 					knh_Bytes_write(ctx, cwb->ba, STEXT("[]"));

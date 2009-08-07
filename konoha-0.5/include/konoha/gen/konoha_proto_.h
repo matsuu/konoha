@@ -500,7 +500,7 @@ void knh_Token__s(Ctx *ctx, Token *o, OutputStream *w, String *m);
 void knh_Token__k(Ctx *ctx, Token *o, OutputStream *w, String *m);
 void knh_Token__dump(Ctx *ctx, Token *o, OutputStream *w, String *m);
 /* ../src/compiler/tokenizer.c */
-Token *new_TokenSYMBOL(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t);
+Token *knh_cwb_newTokenSYMBOL(Ctx *ctx, knh_cwb_t *cwb, knh_flag_t flag, InputStream *in);
 void knh_InputStream_parseToken(Ctx *ctx, InputStream *in, Token *tk);
 /* ../src/compiler/typing.c */
 Token* new_TokenCONST(Ctx *ctx, Any *fln, Any *data);
