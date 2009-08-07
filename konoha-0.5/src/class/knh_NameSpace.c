@@ -301,7 +301,7 @@ knh_type_t knh_NameSpace_gettype(Ctx *ctx, NameSpace *ns, knh_bytes_t name, int 
 	{
 		knh_class_t cid = knh_NameSpace_getcid(ctx, ns, name);
 		if(cid==CLASS_Any) return cid;
-		if(cid != CLASS_unknown && !isNullable) return NNTYPE_cid(cid);
+		if(cid != CLASS_unknown && isNullable) return NATYPE_cid(cid);
 		return cid;
 	}
 }

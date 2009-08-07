@@ -85,7 +85,7 @@ knh_class_t knh_pmztype_toclass(Ctx *ctx, knh_type_t t, knh_class_t this_cid)
 
 knh_type_t knh_pmztype_totype(Ctx *ctx, knh_type_t t, knh_class_t this_cid)
 {
-	knh_class_t cid = CLASS_type(t), mask = (t & KNH_FLAG_TF_NN);
+	knh_class_t cid = CLASS_type(t), mask = (t & KNH_FLAG_TF_NA);
 	KNH_ASSERT_cid(cid);
 	KNH_ASSERT_cid(this_cid);
 	if(cid == CLASS_This) {
