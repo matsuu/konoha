@@ -880,8 +880,6 @@ typedef knh_ushort_t   knh_stmt_t;
 
 /* @flag Token.ExceptionType TKF SP(%s)->flag 'is:set:*:*' */
 /* @flag Token.NotNullType TKF SP(%s)->flag 'is:set:*:*' */
-/* @flag Token.IteratorType TKF SP(%s)->flag 'is:set:*:*' */
-/* @flag Token.ArrayType TKF SP(%s)->flag 'is:set:*:*' */
 /* @flag Token.NullableType TKF SP(%s)->flag 'is:set:*:*' */
 
 #define knh_Token_isUnsafeType(o)  knh_Token_isTailWildCard(o)
@@ -917,14 +915,13 @@ typedef struct knh_Token {
 	};
 } knh_Token_struct;
 
-typedef struct knh_tokens_t {
+
+typedef struct {
 	struct knh_Token_t** ts;
 	int meta;
 	int c;
 	int e;
-} knh_tokens_t;
-
-//#define TT_RAW   TT_CONST
+} knh_tkc_t;
 
 /* ------------------------------------------------------------------------ */
 /* @class Stmt Object knh_Stmt_struct */

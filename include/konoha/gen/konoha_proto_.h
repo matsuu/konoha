@@ -463,7 +463,7 @@ void knh_invokeMethodTypingListener(Ctx *ctx, DictMap *meta, Method *mtd);
 void knh_invokeMethodCompilationListener(Ctx *ctx, DictMap *meta, Method *mtd);
 /* ../src/compiler/parser.c */
 Stmt *new_StmtINSTMT(Ctx *ctx, Token *tk, int isData);
-void knh_Stmt_add_PEACH(Ctx *ctx, Stmt *o, knh_tokens_t *tc);
+void knh_Stmt_add_PEACH(Ctx *ctx, Stmt *o, knh_tkc_t *tc);
 /* ../src/compiler/perror.c */
 void knh_vperror(Ctx *ctx, knh_uri_t uri, int line, int pe, char *fmt, va_list ap);
 void knh_perror(Ctx *ctx, knh_uri_t uri, int line, int pe, char *fmt, ...);
@@ -491,7 +491,7 @@ Token *new_TokenCID(Ctx *ctx, Any *fln, knh_class_t cid);
 Token *new_TokenMN(Ctx *ctx, Any *fln, knh_methodn_t mn);
 Token *new_TokenFN(Ctx *ctx, Any *fln, knh_fieldn_t fn);
 Token *new_Token__S(Ctx *ctx, Any *fln, knh_token_t tt, String *t);
-void knh_Token_tc(Ctx *ctx, Token *o, knh_tokens_t *tc);
+knh_tkc_t* knh_Token_tc(Ctx *ctx, Token *o, knh_tkc_t *tc);
 void knh_Token_tokens_add(Ctx *ctx, Token *o, Token *tk);
 void knh_Token_tokens_empty(Ctx *ctx, Token *o);
 char *knh_Token_tochar(Ctx *ctx, Token *o);
@@ -500,9 +500,8 @@ void knh_Token__s(Ctx *ctx, Token *o, OutputStream *w, String *m);
 void knh_Token__k(Ctx *ctx, Token *o, OutputStream *w, String *m);
 void knh_Token__dump(Ctx *ctx, Token *o, OutputStream *w, String *m);
 /* ../src/compiler/tokenizer.c */
-Token *new_Token__NAME(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t);
-knh_token_t knh_char_totoken(int ch);
-void knh_Token_parse(Ctx *ctx, Token *tk, InputStream *in);
+Token *new_TokenSYMBOL(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t t);
+void knh_InputStream_parseToken(Ctx *ctx, InputStream *in, Token *tk);
 /* ../src/compiler/typing.c */
 Token* new_TokenCONST(Ctx *ctx, Any *fln, Any *data);
 void knh_Token_setCONST(Ctx *ctx, Token *o, Any *data);

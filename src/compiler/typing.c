@@ -147,16 +147,6 @@ knh_type_t knh_Token_gettype(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t def
 		}
 		knh_Token_perror(ctx, tk, KERR_ERRATA, _("unknown class: %s ==> %C"), sToken(tk), defc);
 	}
-
-	if(knh_Token_isIteratorType(tk)) {
-		knh_class_t cid = knh_class_Generics(ctx, CLASS_Iterator, CLASS_type(type), CLASS_unknown);
-		return NNTYPE_cid(cid);
-	}
-	else if(knh_Token_isArrayType(tk)) {
-		knh_class_t cid = knh_class_Generics(ctx, CLASS_Array, CLASS_type(type), CLASS_unknown);
-		if(!knh_Token_isNullableType(tk)) return NNTYPE_cid(cid);
-		return cid;
-	}
 	return type;
 }
 
@@ -176,12 +166,6 @@ knh_class_t knh_Token_getcid(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t def
 		if(defc == CLASS_unknown) return cid;
 		cid = defc;
 		knh_Token_perror(ctx, tk, KERR_ERRATA, _("unknown class: %s ==> %C"), sToken(tk), defc);
-	}
-	if(knh_Token_isIteratorType(tk)) {
-		cid = knh_class_Generics(ctx, CLASS_Iterator, cid, CLASS_unknown);
-	}
-	else if(knh_Token_isArrayType(tk)) {
-		cid = knh_class_Generics(ctx, CLASS_Array, cid, CLASS_unknown);
 	}
 	return cid;
 }
