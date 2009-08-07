@@ -1,0 +1,13 @@
+libvirt for konoha
+
+
+
+
+make informaiton
+
+Linux 32bit
+======
+
+	$ make -f linux_32.mk
+
+

@@ -1,0 +1,3 @@
+2009-08-07 Masahiro Ide <imasahiro@users.sourceforge.jp>
+    * libvirt.{c,k}     make libvirt package.
+
