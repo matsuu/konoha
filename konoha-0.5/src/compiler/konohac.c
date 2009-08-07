@@ -163,10 +163,10 @@ InputStream* new_ScriptInputStream(Ctx *ctx, knh_bytes_t path, knh_cwb_t *cwb, N
 
 Stmt *knh_InputStream_parseStmt(Ctx *ctx, InputStream *in, int isData)
 {
-	Token *tk = new_Token(ctx, 0, DP(in)->uri, 0, knh_char_totoken('{'));
+	Token *tk = new_Token(ctx, 0, DP(in)->uri, 0, TT_BRACE);
 	KNH_LPUSH(ctx, tk);
 	KNH_LPUSH(ctx, in);
-	knh_Token_parse(ctx, tk, in);
+	knh_InputStream_parseToken(ctx, in, tk);
 	DBG2_DUMP(ctx, tk, KNH_NULL, "tokens");
 	return new_StmtINSTMT(ctx, tk, isData);
 }

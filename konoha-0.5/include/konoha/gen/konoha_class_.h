@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-#define KONOHA_BUILDID                  629
+#define KONOHA_BUILDID                  630
 
 /* ======================================================================== */
 
@@ -723,23 +723,7 @@ extern "C" {
 #define knh_Token_setNotNullType(o,b)  \
 	if(b) SP(o)->flag |= KNH_FLAG_TKF_NOTNULLTYPE; else SP(o)->flag &= ~(KNH_FLAG_TKF_NOTNULLTYPE);
 
-#define KNH_FLAG_TKF_ITERATORTYPE       KNH_FLAG_T7
-
-#define knh_Token_isIteratorType(o)  \
-	((SP(o)->flag & KNH_FLAG_TKF_ITERATORTYPE) == KNH_FLAG_TKF_ITERATORTYPE)
-
-#define knh_Token_setIteratorType(o,b)  \
-	if(b) SP(o)->flag |= KNH_FLAG_TKF_ITERATORTYPE; else SP(o)->flag &= ~(KNH_FLAG_TKF_ITERATORTYPE);
-
-#define KNH_FLAG_TKF_ARRAYTYPE          KNH_FLAG_T8
-
-#define knh_Token_isArrayType(o)  \
-	((SP(o)->flag & KNH_FLAG_TKF_ARRAYTYPE) == KNH_FLAG_TKF_ARRAYTYPE)
-
-#define knh_Token_setArrayType(o,b)  \
-	if(b) SP(o)->flag |= KNH_FLAG_TKF_ARRAYTYPE; else SP(o)->flag &= ~(KNH_FLAG_TKF_ARRAYTYPE);
-
-#define KNH_FLAG_TKF_NULLABLETYPE       KNH_FLAG_T9
+#define KNH_FLAG_TKF_NULLABLETYPE       KNH_FLAG_T7
 
 #define knh_Token_isNullableType(o)  \
 	((SP(o)->flag & KNH_FLAG_TKF_NULLABLETYPE) == KNH_FLAG_TKF_NULLABLETYPE)

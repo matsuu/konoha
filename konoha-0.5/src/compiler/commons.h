@@ -19,6 +19,10 @@ extern "C" {
 #define IS_Stmt(o)       (((Stmt*)o)->h.cid == CLASS_Stmt)
 #define STMTNo(o)         knh_stmt_tochar(SP(o)->stt)
 
+
+#define knh_token_isNested(tt)  \
+	(tt == TT_BRACE || tt == TT_PARENTHESIS || tt == TT_BRANCET)
+
 /* ------------------------------------------------------------------------ */
 
 #define FL(o)            ((Object*)o)

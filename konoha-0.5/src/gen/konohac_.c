@@ -75,6 +75,7 @@ static char* knh_token_array_tochar[] = {
     "{",  /* BRACE */ 
     "(",  /* PARENTHESIS */ 
     "[",  /* BRANCET */ 
+    ">>>",  /* PROMPT */ 
     "...",  /* DOTS */ 
     ";",  /* SEMICOLON */ 
     ",",  /* COMMA */ 
@@ -131,6 +132,7 @@ static char* knh_token_array_tochar[] = {
     "TSTR",  /* TSTR */ 
     "ESTR",  /* ESTR */ 
     "LABEL",  /* LABEL */ 
+    "DOC",  /* DOC */ 
     "METAN",  /* METAN */ 
     "PROPN",  /* PROPN */ 
     "URN",  /* URN */ 
@@ -138,6 +140,7 @@ static char* knh_token_array_tochar[] = {
     "CONSTN",  /* CONSTN */ 
     "TYPEN",  /* TYPEN */ 
     "CMETHODN",  /* CMETHODN */ 
+    "CCONSTN",  /* CCONSTN */ 
     "NAME",  /* NAME */ 
     "ERR",  /* ERR */ 
     "MN",  /* MN */ 
@@ -204,6 +207,7 @@ static knh_methodn_t knh_token_array_tomethodn[] = {
     METHODN_NONAME,  /* BRACE */ 
     METHODN_NONAME,  /* PARENTHESIS */ 
     METHODN_NONAME,  /* BRANCET */ 
+    METHODN_NONAME,  /* PROMPT */ 
     METHODN_NONAME,  /* DOTS */ 
     METHODN_NONAME,  /* SEMICOLON */ 
     METHODN_NONAME,  /* COMMA */ 
@@ -260,6 +264,7 @@ static knh_methodn_t knh_token_array_tomethodn[] = {
     METHODN_NONAME,  /* TSTR */ 
     METHODN_NONAME,  /* ESTR */ 
     METHODN_NONAME,  /* LABEL */ 
+    METHODN_NONAME,  /* DOC */ 
     METHODN_NONAME,  /* METAN */ 
     METHODN_NONAME,  /* PROPN */ 
     METHODN_NONAME,  /* URN */ 
@@ -267,6 +272,7 @@ static knh_methodn_t knh_token_array_tomethodn[] = {
     METHODN_NONAME,  /* CONSTN */ 
     METHODN_NONAME,  /* TYPEN */ 
     METHODN_NONAME,  /* CMETHODN */ 
+    METHODN_NONAME,  /* CCONSTN */ 
     METHODN_NONAME,  /* NAME */ 
     METHODN_NONAME,  /* ERR */ 
     METHODN_NONAME,  /* MN */ 
@@ -333,6 +339,7 @@ static int knh_token_array_getOpPriority[] = {
     99,  /* BRACE */ 
     99,  /* PARENTHESIS */ 
     99,  /* BRANCET */ 
+    0,  /* PROMPT */ 
     0,  /* DOTS */ 
     0,  /* SEMICOLON */ 
     0,  /* COMMA */ 
@@ -389,6 +396,7 @@ static int knh_token_array_getOpPriority[] = {
     99,  /* TSTR */ 
     99,  /* ESTR */ 
     0,  /* LABEL */ 
+    0,  /* DOC */ 
     0,  /* METAN */ 
     99,  /* PROPN */ 
     99,  /* URN */ 
@@ -396,6 +404,7 @@ static int knh_token_array_getOpPriority[] = {
     99,  /* CONSTN */ 
     99,  /* TYPEN */ 
     99,  /* CMETHODN */ 
+    99,  /* CCONSTN */ 
     99,  /* NAME */ 
     0,  /* ERR */ 
     99,  /* MN */ 
@@ -462,6 +471,7 @@ static int knh_token_array_getOpSize[] = {
     0,  /* BRACE */ 
     0,  /* PARENTHESIS */ 
     0,  /* BRANCET */ 
+    0,  /* PROMPT */ 
     0,  /* DOTS */ 
     0,  /* SEMICOLON */ 
     0,  /* COMMA */ 
@@ -518,6 +528,7 @@ static int knh_token_array_getOpSize[] = {
     0,  /* TSTR */ 
     0,  /* ESTR */ 
     0,  /* LABEL */ 
+    0,  /* DOC */ 
     0,  /* METAN */ 
     0,  /* PROPN */ 
     0,  /* URN */ 
@@ -525,6 +536,7 @@ static int knh_token_array_getOpSize[] = {
     0,  /* CONSTN */ 
     0,  /* TYPEN */ 
     0,  /* CMETHODN */ 
+    0,  /* CCONSTN */ 
     0,  /* NAME */ 
     0,  /* ERR */ 
     0,  /* MN */ 
@@ -553,7 +565,7 @@ int knh_token_getOpSize(knh_token_t t)
 
 /* ------------------------------------------------------------------------ */
 
-static knh_bool_t knh_token_array_isEndOfStmt[] = {
+static knh_bool_t knh_token_array_isBeginOfStmt[] = {
     1,  /* namespace */ 
     1,  /* import */ 
     1,  /* pragma */ 
@@ -591,6 +603,7 @@ static knh_bool_t knh_token_array_isEndOfStmt[] = {
     0,  /* BRACE */ 
     0,  /* PARENTHESIS */ 
     0,  /* BRANCET */ 
+    0,  /* PROMPT */ 
     0,  /* DOTS */ 
     1,  /* SEMICOLON */ 
     0,  /* COMMA */ 
@@ -647,6 +660,7 @@ static knh_bool_t knh_token_array_isEndOfStmt[] = {
     0,  /* TSTR */ 
     0,  /* ESTR */ 
     0,  /* LABEL */ 
+    0,  /* DOC */ 
     1,  /* METAN */ 
     0,  /* PROPN */ 
     0,  /* URN */ 
@@ -654,6 +668,7 @@ static knh_bool_t knh_token_array_isEndOfStmt[] = {
     0,  /* CONSTN */ 
     0,  /* TYPEN */ 
     0,  /* CMETHODN */ 
+    0,  /* CCONSTN */ 
     0,  /* NAME */ 
     0,  /* ERR */ 
     0,  /* MN */ 
@@ -674,10 +689,10 @@ static knh_bool_t knh_token_array_isEndOfStmt[] = {
     //(knh_bool_t)0
 };
 
-knh_bool_t knh_token_isEndOfStmt(knh_token_t t)
+knh_bool_t knh_token_isBeginOfStmt(knh_token_t t)
 {
     KNH_ASSERT(t < KNH_TOKEN_MAXSIZ);
-    return knh_token_array_isEndOfStmt[t];
+    return knh_token_array_isBeginOfStmt[t];
 }
 
 /* ------------------------------------------------------------------------ */
@@ -692,10 +707,6 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
     knh_token_t tt = ((knh_token_t)-1);
     L_TAIL:;
     if(isalpha(t.buf[0])) {
-        if(t.buf[t.len-2]=='.' && t.buf[t.len-1]=='.') {
-            flag |= KNH_FLAG_TKF_ITERATORTYPE;
-            t.len -= 2;
-        }
         if(t.buf[t.len-2]=='.' && t.buf[t.len-1]=='*') {
             flag |= KNH_FLAG_TKF_TAILWILDCARD;
             t.len -= 2;
@@ -704,14 +715,14 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
             flag |= (KNH_FLAG_TKF_EXCEPTIONTYPE|KNH_FLAG_TKF_NOTNULLTYPE);
             t.len -= 9;
         }
-        else if(t.buf[t.len-2]=='!' && t.buf[t.len-1]=='!') {
-            flag |= (KNH_FLAG_TKF_EXCEPTIONTYPE|KNH_FLAG_TKF_NOTNULLTYPE);
-            t.len -= 2;
-        }
-        else if(t.buf[t.len-1]=='!') {
-            flag |= KNH_FLAG_TKF_NOTNULLTYPE;
-            t.len -= 1;
-        }
+//        else if(t.buf[t.len-2]=='!' && t.buf[t.len-1]=='!') {
+//            flag |= (KNH_FLAG_TKF_EXCEPTIONTYPE|KNH_FLAG_TKF_NOTNULLTYPE);
+//            t.len -= 2;
+//        }
+//        else if(t.buf[t.len-1]=='!') {
+//            flag |= KNH_FLAG_TKF_NOTNULLTYPE;
+//            t.len -= 1;
+//        }
     }
 
     switch(t.buf[0]) {
@@ -780,6 +791,7 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
         if(ISB(t, "=~")) { tt = TT_MATCH; break; }
     break;
     case '>':
+        if(ISB(t, ">>>")) { tt = TT_PROMPT; break; }
         if(ISB(t, ">>=")) { tt = TT_RSHIFTE; break; }
         if(ISB(t, ">")) { tt = TT_GT; break; }
         if(ISB(t, ">=")) { tt = TT_GTE; break; }
@@ -923,7 +935,7 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
     /* built-in */
     }
     if(tt == ((knh_token_t)-1)) {
-        return new_Token__NAME(ctx, flag, in, t);
+        return new_TokenSYMBOL(ctx, flag, in, t);
     }
     else {
         Token *tk = new_Token(ctx, flag, DP(in)->uri, DP(in)->line, tt);
@@ -978,6 +990,7 @@ int knh_bytes_istoken(knh_bytes_t t, int ch)
         if(ISB(t, ">")) { return 1; }
         return 0; 
     case '>':
+        if(ISB(t, ">>")) { return 1; }
         if(ISB(t, "=")) { return 1; }
         if(ISB(t, "--")) { return 1; }
         if(ISB(t, ">")) { return 1; }
