@@ -157,7 +157,7 @@ Token *knh_cwb_newTokenSYMBOL(Ctx *ctx, knh_cwb_t *cwb, knh_flag_t flag, InputSt
 				while(namebuf[s] == '_') s++;
 			}
 		}
-		DBG2_P("dots=%d, '%s'.'%s'", dots, knh_token_tochar(tt_prev), knh_token_tochar(tt));
+		//DBG2_P("dots=%d, '%s'.'%s'", dots, knh_token_tochar(tt_prev), knh_token_tochar(tt));
 		if(dots > 0) {
 			if(tt_prev == TT_TYPEN) {
 				if(tt == TT_NAME) tt = TT_CMETHODN; else tt = TT_CCONSTN;
@@ -180,7 +180,6 @@ Token *knh_cwb_newTokenSYMBOL(Ctx *ctx, knh_cwb_t *cwb, knh_flag_t flag, InputSt
 //		if(!knh_bytes_equals(t, B(name))) {
 //			DBG2_P("(%s) '%s' ==> '%s'", knh_token_tochar(tt), (char*)t.buf, name);
 //		});
-			DBG2_P("(%d) '%s' ==> '%s'", tt, namebuf, (char*)t.buf);
 			KNH_SETv(ctx, DP(tk)->data, new_String__SYMBOL(ctx, t));
 			knh_cwb_close(cwb);
 			return tk;

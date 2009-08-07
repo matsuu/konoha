@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-#define KONOHA_BUILDID                  630
+#define KONOHA_BUILDID                  632
 
 /* ======================================================================== */
 
@@ -812,7 +812,8 @@ extern "C" {
 #define IS_Object(o)            ((o)->h.cid == CLASS_Object)
 #define ASSERT_Object(o)        DEBUG_ASSERT(((o)->h.cid == CLASS_Object))
 #define TYPE_Object             CLASS_Object
-#define NNTYPE_Object           TYPE_TONNTYPE(CLASS_Object)
+#define NNTYPE_Object           NNTYPE_cid(CLASS_Object)
+#define NATYPE_Object           NATYPE_cid(CLASS_Object)
 #define CFLAG_Object            ((knh_flag_t)KNH_FLAG_CF_CYCLIC)
 #define FLAG_Object             KNH_FLAG_CF2OF(CFLAG_Object)
 
@@ -828,8 +829,9 @@ extern "C" {
 #endif
 #define IS_Any(o)               ((o)->h.cid == CLASS_Any)
 #define ASSERT_Any(o)           DEBUG_ASSERT(((o)->h.cid == CLASS_Any))
-#define TYPE_Any                CLASS_Any
-#define NNTYPE_Any              TYPE_TONNTYPE(CLASS_Any)
+#define TYPE_Any                NATYPE_cid(CLASS_Any)
+#define NNTYPE_Any              NATYPE_cid(CLASS_Any)
+#define NATYPE_Any              NATYPE_cid(CLASS_Any)
 #define CFLAG_Any               ((knh_flag_t)KNH_FLAG_CF_CYCLIC)
 #define FLAG_Any                KNH_FLAG_CF2OF(CFLAG_Any)
 
@@ -845,7 +847,8 @@ extern "C" {
 #define IS_This(o)              ((o)->h.cid == CLASS_This)
 #define ASSERT_This(o)          DEBUG_ASSERT(((o)->h.cid == CLASS_This))
 #define TYPE_This               CLASS_This
-#define NNTYPE_This             TYPE_TONNTYPE(CLASS_This)
+#define NNTYPE_This             NNTYPE_cid(CLASS_This)
+#define NATYPE_This             NATYPE_cid(CLASS_This)
 #define CFLAG_This              ((knh_flag_t)KNH_FLAG_CF_CYCLIC|KNH_FLAG_CF_PRIVATE)
 #define FLAG_This               KNH_FLAG_CF2OF(CFLAG_This)
 
@@ -861,7 +864,8 @@ extern "C" {
 #define IS_Any0(o)              ((o)->h.cid == CLASS_Any0)
 #define ASSERT_Any0(o)          DEBUG_ASSERT(((o)->h.cid == CLASS_Any0))
 #define TYPE_Any0               CLASS_Any0
-#define NNTYPE_Any0             TYPE_TONNTYPE(CLASS_Any0)
+#define NNTYPE_Any0             NNTYPE_cid(CLASS_Any0)
+#define NATYPE_Any0             NATYPE_cid(CLASS_Any0)
 #define CFLAG_Any0              ((knh_flag_t)KNH_FLAG_CF_CYCLIC|KNH_FLAG_CF_PRIVATE)
 #define FLAG_Any0               KNH_FLAG_CF2OF(CFLAG_Any0)
 
@@ -877,7 +881,8 @@ extern "C" {
 #define IS_Any1(o)              ((o)->h.cid == CLASS_Any1)
 #define ASSERT_Any1(o)          DEBUG_ASSERT(((o)->h.cid == CLASS_Any1))
 #define TYPE_Any1               CLASS_Any1
-#define NNTYPE_Any1             TYPE_TONNTYPE(CLASS_Any1)
+#define NNTYPE_Any1             NNTYPE_cid(CLASS_Any1)
+#define NATYPE_Any1             NATYPE_cid(CLASS_Any1)
 #define CFLAG_Any1              ((knh_flag_t)KNH_FLAG_CF_CYCLIC|KNH_FLAG_CF_PRIVATE)
 #define FLAG_Any1               KNH_FLAG_CF2OF(CFLAG_Any1)
 
@@ -893,7 +898,8 @@ extern "C" {
 #define IS_Any2(o)              ((o)->h.cid == CLASS_Any2)
 #define ASSERT_Any2(o)          DEBUG_ASSERT(((o)->h.cid == CLASS_Any2))
 #define TYPE_Any2               CLASS_Any2
-#define NNTYPE_Any2             TYPE_TONNTYPE(CLASS_Any2)
+#define NNTYPE_Any2             NNTYPE_cid(CLASS_Any2)
+#define NATYPE_Any2             NATYPE_cid(CLASS_Any2)
 #define CFLAG_Any2              ((knh_flag_t)KNH_FLAG_CF_CYCLIC|KNH_FLAG_CF_PRIVATE)
 #define FLAG_Any2               KNH_FLAG_CF2OF(CFLAG_Any2)
 
@@ -909,7 +915,8 @@ extern "C" {
 #define IS_Any3(o)              ((o)->h.cid == CLASS_Any3)
 #define ASSERT_Any3(o)          DEBUG_ASSERT(((o)->h.cid == CLASS_Any3))
 #define TYPE_Any3               CLASS_Any3
-#define NNTYPE_Any3             TYPE_TONNTYPE(CLASS_Any3)
+#define NNTYPE_Any3             NNTYPE_cid(CLASS_Any3)
+#define NATYPE_Any3             NATYPE_cid(CLASS_Any3)
 #define CFLAG_Any3              ((knh_flag_t)KNH_FLAG_CF_CYCLIC|KNH_FLAG_CF_PRIVATE)
 #define FLAG_Any3               KNH_FLAG_CF2OF(CFLAG_Any3)
 
@@ -925,7 +932,8 @@ extern "C" {
 #define IS_AnyVar(o)            ((o)->h.cid == CLASS_AnyVar)
 #define ASSERT_AnyVar(o)        DEBUG_ASSERT(((o)->h.cid == CLASS_AnyVar))
 #define TYPE_AnyVar             CLASS_AnyVar
-#define NNTYPE_AnyVar           TYPE_TONNTYPE(CLASS_AnyVar)
+#define NNTYPE_AnyVar           NNTYPE_cid(CLASS_AnyVar)
+#define NATYPE_AnyVar           NATYPE_cid(CLASS_AnyVar)
 #define CFLAG_AnyVar            ((knh_flag_t)KNH_FLAG_CF_CYCLIC|KNH_FLAG_CF_PRIVATE)
 #define FLAG_AnyVar             KNH_FLAG_CF2OF(CFLAG_AnyVar)
 
@@ -942,7 +950,8 @@ extern "C" {
 #define IS_Boolean(o)           ((o)->h.cid == CLASS_Boolean)
 #define ASSERT_Boolean(o)       DEBUG_ASSERT(((o)->h.cid == CLASS_Boolean))
 #define TYPE_Boolean            CLASS_Boolean
-#define NNTYPE_Boolean          TYPE_TONNTYPE(CLASS_Boolean)
+#define NNTYPE_Boolean          NNTYPE_cid(CLASS_Boolean)
+#define NATYPE_Boolean          NATYPE_cid(CLASS_Boolean)
 #define CFLAG_Boolean           ((knh_flag_t)KNH_FLAG_CF_IMMUTABLE)
 #define FLAG_Boolean            KNH_FLAG_CF2OF(CFLAG_Boolean)
 
@@ -959,7 +968,8 @@ extern "C" {
 #define IS_Number(o)            ((o)->h.cid == CLASS_Number)
 #define ASSERT_Number(o)        DEBUG_ASSERT(((o)->h.cid == CLASS_Number))
 #define TYPE_Number             CLASS_Number
-#define NNTYPE_Number           TYPE_TONNTYPE(CLASS_Number)
+#define NNTYPE_Number           NNTYPE_cid(CLASS_Number)
+#define NATYPE_Number           NATYPE_cid(CLASS_Number)
 #define CFLAG_Number            ((knh_flag_t)KNH_FLAG_CF_IMMUTABLE)
 #define FLAG_Number             KNH_FLAG_CF2OF(CFLAG_Number)
 
@@ -976,7 +986,8 @@ extern "C" {
 #define IS_Int(o)               ((o)->h.cid == CLASS_Int)
 #define ASSERT_Int(o)           DEBUG_ASSERT(((o)->h.cid == CLASS_Int))
 #define TYPE_Int                CLASS_Int
-#define NNTYPE_Int              TYPE_TONNTYPE(CLASS_Int)
+#define NNTYPE_Int              NNTYPE_cid(CLASS_Int)
+#define NATYPE_Int              NATYPE_cid(CLASS_Int)
 #define CFLAG_Int               ((knh_flag_t)KNH_FLAG_CF_IMMUTABLE)
 #define FLAG_Int                KNH_FLAG_CF2OF(CFLAG_Int)
 
@@ -993,7 +1004,8 @@ extern "C" {
 #define IS_Float(o)             ((o)->h.cid == CLASS_Float)
 #define ASSERT_Float(o)         DEBUG_ASSERT(((o)->h.cid == CLASS_Float))
 #define TYPE_Float              CLASS_Float
-#define NNTYPE_Float            TYPE_TONNTYPE(CLASS_Float)
+#define NNTYPE_Float            NNTYPE_cid(CLASS_Float)
+#define NATYPE_Float            NATYPE_cid(CLASS_Float)
 #define CFLAG_Float             ((knh_flag_t)KNH_FLAG_CF_IMMUTABLE)
 #define FLAG_Float              KNH_FLAG_CF2OF(CFLAG_Float)
 
@@ -1010,7 +1022,8 @@ extern "C" {
 #define IS_String(o)            ((o)->h.cid == CLASS_String)
 #define ASSERT_String(o)        DEBUG_ASSERT(((o)->h.cid == CLASS_String))
 #define TYPE_String             CLASS_String
-#define NNTYPE_String           TYPE_TONNTYPE(CLASS_String)
+#define NNTYPE_String           NNTYPE_cid(CLASS_String)
+#define NATYPE_String           NATYPE_cid(CLASS_String)
 #define CFLAG_String            ((knh_flag_t)KNH_FLAG_CF_IMMUTABLE)
 #define FLAG_String             KNH_FLAG_CF2OF(CFLAG_String)
 
@@ -1027,7 +1040,8 @@ extern "C" {
 #define IS_Bytes(o)             ((o)->h.cid == CLASS_Bytes)
 #define ASSERT_Bytes(o)         DEBUG_ASSERT(((o)->h.cid == CLASS_Bytes))
 #define TYPE_Bytes              CLASS_Bytes
-#define NNTYPE_Bytes            TYPE_TONNTYPE(CLASS_Bytes)
+#define NNTYPE_Bytes            NNTYPE_cid(CLASS_Bytes)
+#define NATYPE_Bytes            NATYPE_cid(CLASS_Bytes)
 #define CFLAG_Bytes             ((knh_flag_t)0)
 #define FLAG_Bytes              KNH_FLAG_CF2OF(CFLAG_Bytes)
 
@@ -1044,7 +1058,8 @@ extern "C" {
 #define IS_Tuple2(o)            ((o)->h.cid == CLASS_Tuple2)
 #define ASSERT_Tuple2(o)        DEBUG_ASSERT(((o)->h.cid == CLASS_Tuple2))
 #define TYPE_Tuple2             CLASS_Tuple2
-#define NNTYPE_Tuple2           TYPE_TONNTYPE(CLASS_Tuple2)
+#define NNTYPE_Tuple2           NNTYPE_cid(CLASS_Tuple2)
+#define NATYPE_Tuple2           NATYPE_cid(CLASS_Tuple2)
 #define CFLAG_Tuple2            ((knh_flag_t)KNH_FLAG_CF_IMMUTABLE)
 #define FLAG_Tuple2             KNH_FLAG_CF2OF(CFLAG_Tuple2)
 
@@ -1061,7 +1076,8 @@ extern "C" {
 #define IS_Range(o)             ((o)->h.cid == CLASS_Range)
 #define ASSERT_Range(o)         DEBUG_ASSERT(((o)->h.cid == CLASS_Range))
 #define TYPE_Range              CLASS_Range
-#define NNTYPE_Range            TYPE_TONNTYPE(CLASS_Range)
+#define NNTYPE_Range            NNTYPE_cid(CLASS_Range)
+#define NATYPE_Range            NATYPE_cid(CLASS_Range)
 #define CFLAG_Range             ((knh_flag_t)KNH_FLAG_CF_IMMUTABLE)
 #define FLAG_Range              KNH_FLAG_CF2OF(CFLAG_Range)
 
@@ -1078,7 +1094,8 @@ extern "C" {
 #define IS_Array(o)             ((o)->h.cid == CLASS_Array)
 #define ASSERT_Array(o)         DEBUG_ASSERT(((o)->h.cid == CLASS_Array))
 #define TYPE_Array              CLASS_Array
-#define NNTYPE_Array            TYPE_TONNTYPE(CLASS_Array)
+#define NNTYPE_Array            NNTYPE_cid(CLASS_Array)
+#define NATYPE_Array            NATYPE_cid(CLASS_Array)
 #define CFLAG_Array             ((knh_flag_t)KNH_FLAG_CF_CYCLIC)
 #define FLAG_Array              KNH_FLAG_CF2OF(CFLAG_Array)
 
@@ -1095,7 +1112,8 @@ extern "C" {
 #define IS_IArray(o)            ((o)->h.cid == CLASS_IArray)
 #define ASSERT_IArray(o)        DEBUG_ASSERT(((o)->h.cid == CLASS_IArray))
 #define TYPE_IArray             CLASS_IArray
-#define NNTYPE_IArray           TYPE_TONNTYPE(CLASS_IArray)
+#define NNTYPE_IArray           NNTYPE_cid(CLASS_IArray)
+#define NATYPE_IArray           NATYPE_cid(CLASS_IArray)
 #define CFLAG_IArray            ((knh_flag_t)KNH_FLAG_CF_CYCLIC)
 #define FLAG_IArray             KNH_FLAG_CF2OF(CFLAG_IArray)
 
@@ -1112,7 +1130,8 @@ extern "C" {
 #define IS_FArray(o)            ((o)->h.cid == CLASS_FArray)
 #define ASSERT_FArray(o)        DEBUG_ASSERT(((o)->h.cid == CLASS_FArray))
 #define TYPE_FArray             CLASS_FArray
-#define NNTYPE_FArray           TYPE_TONNTYPE(CLASS_FArray)
+#define NNTYPE_FArray           NNTYPE_cid(CLASS_FArray)
+#define NATYPE_FArray           NATYPE_cid(CLASS_FArray)
 #define CFLAG_FArray            ((knh_flag_t)KNH_FLAG_CF_CYCLIC)
 #define FLAG_FArray             KNH_FLAG_CF2OF(CFLAG_FArray)
 
@@ -1129,7 +1148,8 @@ extern "C" {
 #define IS_Iterator(o)          ((o)->h.cid == CLASS_Iterator)
 #define ASSERT_Iterator(o)      DEBUG_ASSERT(((o)->h.cid == CLASS_Iterator))
 #define TYPE_Iterator           CLASS_Iterator
-#define NNTYPE_Iterator         TYPE_TONNTYPE(CLASS_Iterator)
+#define NNTYPE_Iterator         NNTYPE_cid(CLASS_Iterator)
+#define NATYPE_Iterator         NATYPE_cid(CLASS_Iterator)
 #define CFLAG_Iterator          ((knh_flag_t)0)
 #define FLAG_Iterator           KNH_FLAG_CF2OF(CFLAG_Iterator)
 
@@ -1146,7 +1166,8 @@ extern "C" {
 #define IS_DictMap(o)           ((o)->h.cid == CLASS_DictMap)
 #define ASSERT_DictMap(o)       DEBUG_ASSERT(((o)->h.cid == CLASS_DictMap))
 #define TYPE_DictMap            CLASS_DictMap
-#define NNTYPE_DictMap          TYPE_TONNTYPE(CLASS_DictMap)
+#define NNTYPE_DictMap          NNTYPE_cid(CLASS_DictMap)
+#define NATYPE_DictMap          NATYPE_cid(CLASS_DictMap)
 #define CFLAG_DictMap           ((knh_flag_t)KNH_FLAG_CF_CYCLIC)
 #define FLAG_DictMap            KNH_FLAG_CF2OF(CFLAG_DictMap)
 
@@ -1163,7 +1184,8 @@ extern "C" {
 #define IS_DictSet(o)           ((o)->h.cid == CLASS_DictSet)
 #define ASSERT_DictSet(o)       DEBUG_ASSERT(((o)->h.cid == CLASS_DictSet))
 #define TYPE_DictSet            CLASS_DictSet
-#define NNTYPE_DictSet          TYPE_TONNTYPE(CLASS_DictSet)
+#define NNTYPE_DictSet          NNTYPE_cid(CLASS_DictSet)
+#define NATYPE_DictSet          NATYPE_cid(CLASS_DictSet)
 #define CFLAG_DictSet           ((knh_flag_t)KNH_FLAG_CF_CYCLIC)
 #define FLAG_DictSet            KNH_FLAG_CF2OF(CFLAG_DictSet)
 
@@ -1180,7 +1202,8 @@ extern "C" {
 #define IS_HashMap(o)           ((o)->h.cid == CLASS_HashMap)
 #define ASSERT_HashMap(o)       DEBUG_ASSERT(((o)->h.cid == CLASS_HashMap))
 #define TYPE_HashMap            CLASS_HashMap
-#define NNTYPE_HashMap          TYPE_TONNTYPE(CLASS_HashMap)
+#define NNTYPE_HashMap          NNTYPE_cid(CLASS_HashMap)
+#define NATYPE_HashMap          NATYPE_cid(CLASS_HashMap)
 #define CFLAG_HashMap           ((knh_flag_t)0)
 #define FLAG_HashMap            KNH_FLAG_CF2OF(CFLAG_HashMap)
 
@@ -1197,7 +1220,8 @@ extern "C" {
 #define IS_HashSet(o)           ((o)->h.cid == CLASS_HashSet)
 #define ASSERT_HashSet(o)       DEBUG_ASSERT(((o)->h.cid == CLASS_HashSet))
 #define TYPE_HashSet            CLASS_HashSet
-#define NNTYPE_HashSet          TYPE_TONNTYPE(CLASS_HashSet)
+#define NNTYPE_HashSet          NNTYPE_cid(CLASS_HashSet)
+#define NATYPE_HashSet          NATYPE_cid(CLASS_HashSet)
 #define CFLAG_HashSet           ((knh_flag_t)0)
 #define FLAG_HashSet            KNH_FLAG_CF2OF(CFLAG_HashSet)
 
@@ -1214,7 +1238,8 @@ extern "C" {
 #define IS_DictIdx(o)           ((o)->h.cid == CLASS_DictIdx)
 #define ASSERT_DictIdx(o)       DEBUG_ASSERT(((o)->h.cid == CLASS_DictIdx))
 #define TYPE_DictIdx            CLASS_DictIdx
-#define NNTYPE_DictIdx          TYPE_TONNTYPE(CLASS_DictIdx)
+#define NNTYPE_DictIdx          NNTYPE_cid(CLASS_DictIdx)
+#define NATYPE_DictIdx          NATYPE_cid(CLASS_DictIdx)
 #define CFLAG_DictIdx           ((knh_flag_t)KNH_FLAG_CF_PRIVATE)
 #define FLAG_DictIdx            KNH_FLAG_CF2OF(CFLAG_DictIdx)
 
@@ -1231,7 +1256,8 @@ extern "C" {
 #define IS_Class(o)             ((o)->h.cid == CLASS_Class)
 #define ASSERT_Class(o)         DEBUG_ASSERT(((o)->h.cid == CLASS_Class))
 #define TYPE_Class              CLASS_Class
-#define NNTYPE_Class            TYPE_TONNTYPE(CLASS_Class)
+#define NNTYPE_Class            NNTYPE_cid(CLASS_Class)
+#define NATYPE_Class            NATYPE_cid(CLASS_Class)
 #define CFLAG_Class             ((knh_flag_t)0)
 #define FLAG_Class              KNH_FLAG_CF2OF(CFLAG_Class)
 
@@ -1248,7 +1274,8 @@ extern "C" {
 #define IS_ClassStruct(o)       ((o)->h.cid == CLASS_ClassStruct)
 #define ASSERT_ClassStruct(o)   DEBUG_ASSERT(((o)->h.cid == CLASS_ClassStruct))
 #define TYPE_ClassStruct        CLASS_ClassStruct
-#define NNTYPE_ClassStruct      TYPE_TONNTYPE(CLASS_ClassStruct)
+#define NNTYPE_ClassStruct      NNTYPE_cid(CLASS_ClassStruct)
+#define NATYPE_ClassStruct      NATYPE_cid(CLASS_ClassStruct)
 #define CFLAG_ClassStruct       ((knh_flag_t)KNH_FLAG_CF_PRIVATE)
 #define FLAG_ClassStruct        KNH_FLAG_CF2OF(CFLAG_ClassStruct)
 
@@ -1265,7 +1292,8 @@ extern "C" {
 #define IS_MethodField(o)       ((o)->h.cid == CLASS_MethodField)
 #define ASSERT_MethodField(o)   DEBUG_ASSERT(((o)->h.cid == CLASS_MethodField))
 #define TYPE_MethodField        CLASS_MethodField
-#define NNTYPE_MethodField      TYPE_TONNTYPE(CLASS_MethodField)
+#define NNTYPE_MethodField      NNTYPE_cid(CLASS_MethodField)
+#define NATYPE_MethodField      NATYPE_cid(CLASS_MethodField)
 #define CFLAG_MethodField       ((knh_flag_t)KNH_FLAG_CF_PRIVATE)
 #define FLAG_MethodField        KNH_FLAG_CF2OF(CFLAG_MethodField)
 
@@ -1282,7 +1310,8 @@ extern "C" {
 #define IS_Method(o)            ((o)->h.cid == CLASS_Method)
 #define ASSERT_Method(o)        DEBUG_ASSERT(((o)->h.cid == CLASS_Method))
 #define TYPE_Method             CLASS_Method
-#define NNTYPE_Method           TYPE_TONNTYPE(CLASS_Method)
+#define NNTYPE_Method           NNTYPE_cid(CLASS_Method)
+#define NATYPE_Method           NATYPE_cid(CLASS_Method)
 #define CFLAG_Method            ((knh_flag_t)0)
 #define FLAG_Method             KNH_FLAG_CF2OF(CFLAG_Method)
 
@@ -1299,7 +1328,8 @@ extern "C" {
 #define IS_Mapper(o)            ((o)->h.cid == CLASS_Mapper)
 #define ASSERT_Mapper(o)        DEBUG_ASSERT(((o)->h.cid == CLASS_Mapper))
 #define TYPE_Mapper             CLASS_Mapper
-#define NNTYPE_Mapper           TYPE_TONNTYPE(CLASS_Mapper)
+#define NNTYPE_Mapper           NNTYPE_cid(CLASS_Mapper)
+#define NATYPE_Mapper           NATYPE_cid(CLASS_Mapper)
 #define CFLAG_Mapper            ((knh_flag_t)0)
 #define FLAG_Mapper             KNH_FLAG_CF2OF(CFLAG_Mapper)
 
@@ -1316,7 +1346,8 @@ extern "C" {
 #define IS_ClassMap(o)          ((o)->h.cid == CLASS_ClassMap)
 #define ASSERT_ClassMap(o)      DEBUG_ASSERT(((o)->h.cid == CLASS_ClassMap))
 #define TYPE_ClassMap           CLASS_ClassMap
-#define NNTYPE_ClassMap         TYPE_TONNTYPE(CLASS_ClassMap)
+#define NNTYPE_ClassMap         NNTYPE_cid(CLASS_ClassMap)
+#define NATYPE_ClassMap         NATYPE_cid(CLASS_ClassMap)
 #define CFLAG_ClassMap          ((knh_flag_t)KNH_FLAG_CF_PRIVATE)
 #define FLAG_ClassMap           KNH_FLAG_CF2OF(CFLAG_ClassMap)
 
@@ -1333,7 +1364,8 @@ extern "C" {
 #define IS_Closure(o)           ((o)->h.cid == CLASS_Closure)
 #define ASSERT_Closure(o)       DEBUG_ASSERT(((o)->h.cid == CLASS_Closure))
 #define TYPE_Closure            CLASS_Closure
-#define NNTYPE_Closure          TYPE_TONNTYPE(CLASS_Closure)
+#define NNTYPE_Closure          NNTYPE_cid(CLASS_Closure)
+#define NATYPE_Closure          NATYPE_cid(CLASS_Closure)
 #define CFLAG_Closure           ((knh_flag_t)0)
 #define FLAG_Closure            KNH_FLAG_CF2OF(CFLAG_Closure)
 
@@ -1350,7 +1382,8 @@ extern "C" {
 #define IS_AffineConv(o)        ((o)->h.cid == CLASS_AffineConv)
 #define ASSERT_AffineConv(o)    DEBUG_ASSERT(((o)->h.cid == CLASS_AffineConv))
 #define TYPE_AffineConv         CLASS_AffineConv
-#define NNTYPE_AffineConv       TYPE_TONNTYPE(CLASS_AffineConv)
+#define NNTYPE_AffineConv       NNTYPE_cid(CLASS_AffineConv)
+#define NATYPE_AffineConv       NATYPE_cid(CLASS_AffineConv)
 #define CFLAG_AffineConv        ((knh_flag_t)KNH_FLAG_CF_PRIVATE)
 #define FLAG_AffineConv         KNH_FLAG_CF2OF(CFLAG_AffineConv)
 
@@ -1367,7 +1400,8 @@ extern "C" {
 #define IS_Regex(o)             ((o)->h.cid == CLASS_Regex)
 #define ASSERT_Regex(o)         DEBUG_ASSERT(((o)->h.cid == CLASS_Regex))
 #define TYPE_Regex              CLASS_Regex
-#define NNTYPE_Regex            TYPE_TONNTYPE(CLASS_Regex)
+#define NNTYPE_Regex            NNTYPE_cid(CLASS_Regex)
+#define NATYPE_Regex            NATYPE_cid(CLASS_Regex)
 #define CFLAG_Regex             ((knh_flag_t)KNH_FLAG_CF_IMMUTABLE)
 #define FLAG_Regex              KNH_FLAG_CF2OF(CFLAG_Regex)
 
@@ -1384,7 +1418,8 @@ extern "C" {
 #define IS_BytesConv(o)         ((o)->h.cid == CLASS_BytesConv)
 #define ASSERT_BytesConv(o)     DEBUG_ASSERT(((o)->h.cid == CLASS_BytesConv))
 #define TYPE_BytesConv          CLASS_BytesConv
-#define NNTYPE_BytesConv        TYPE_TONNTYPE(CLASS_BytesConv)
+#define NNTYPE_BytesConv        NNTYPE_cid(CLASS_BytesConv)
+#define NATYPE_BytesConv        NATYPE_cid(CLASS_BytesConv)
 #define CFLAG_BytesConv         ((knh_flag_t)KNH_FLAG_CF_PRIVATE)
 #define FLAG_BytesConv          KNH_FLAG_CF2OF(CFLAG_BytesConv)
 
@@ -1401,7 +1436,8 @@ extern "C" {
 #define IS_ClassSpec(o)         ((o)->h.cid == CLASS_ClassSpec)
 #define ASSERT_ClassSpec(o)     DEBUG_ASSERT(((o)->h.cid == CLASS_ClassSpec))
 #define TYPE_ClassSpec          CLASS_ClassSpec
-#define NNTYPE_ClassSpec        TYPE_TONNTYPE(CLASS_ClassSpec)
+#define NNTYPE_ClassSpec        NNTYPE_cid(CLASS_ClassSpec)
+#define NATYPE_ClassSpec        NATYPE_cid(CLASS_ClassSpec)
 #define CFLAG_ClassSpec         ((knh_flag_t)KNH_FLAG_CF_PRIVATE)
 #define FLAG_ClassSpec          KNH_FLAG_CF2OF(CFLAG_ClassSpec)
 
@@ -1418,7 +1454,8 @@ extern "C" {
 #define IS_InputStream(o)       ((o)->h.cid == CLASS_InputStream)
 #define ASSERT_InputStream(o)   DEBUG_ASSERT(((o)->h.cid == CLASS_InputStream))
 #define TYPE_InputStream        CLASS_InputStream
-#define NNTYPE_InputStream      TYPE_TONNTYPE(CLASS_InputStream)
+#define NNTYPE_InputStream      NNTYPE_cid(CLASS_InputStream)
+#define NATYPE_InputStream      NATYPE_cid(CLASS_InputStream)
 #define CFLAG_InputStream       ((knh_flag_t)0)
 #define FLAG_InputStream        KNH_FLAG_CF2OF(CFLAG_InputStream)
 
@@ -1435,7 +1472,8 @@ extern "C" {
 #define IS_OutputStream(o)      ((o)->h.cid == CLASS_OutputStream)
 #define ASSERT_OutputStream(o)  DEBUG_ASSERT(((o)->h.cid == CLASS_OutputStream))
 #define TYPE_OutputStream       CLASS_OutputStream
-#define NNTYPE_OutputStream     TYPE_TONNTYPE(CLASS_OutputStream)
+#define NNTYPE_OutputStream     NNTYPE_cid(CLASS_OutputStream)
+#define NATYPE_OutputStream     NATYPE_cid(CLASS_OutputStream)
 #define CFLAG_OutputStream      ((knh_flag_t)0)
 #define FLAG_OutputStream       KNH_FLAG_CF2OF(CFLAG_OutputStream)
 
@@ -1452,7 +1490,8 @@ extern "C" {
 #define IS_Socket(o)            ((o)->h.cid == CLASS_Socket)
 #define ASSERT_Socket(o)        DEBUG_ASSERT(((o)->h.cid == CLASS_Socket))
 #define TYPE_Socket             CLASS_Socket
-#define NNTYPE_Socket           TYPE_TONNTYPE(CLASS_Socket)
+#define NNTYPE_Socket           NNTYPE_cid(CLASS_Socket)
+#define NATYPE_Socket           NATYPE_cid(CLASS_Socket)
 #define CFLAG_Socket            ((knh_flag_t)0)
 #define FLAG_Socket             KNH_FLAG_CF2OF(CFLAG_Socket)
 
@@ -1469,7 +1508,8 @@ extern "C" {
 #define IS_Connection(o)        ((o)->h.cid == CLASS_Connection)
 #define ASSERT_Connection(o)    DEBUG_ASSERT(((o)->h.cid == CLASS_Connection))
 #define TYPE_Connection         CLASS_Connection
-#define NNTYPE_Connection       TYPE_TONNTYPE(CLASS_Connection)
+#define NNTYPE_Connection       NNTYPE_cid(CLASS_Connection)
+#define NATYPE_Connection       NATYPE_cid(CLASS_Connection)
 #define CFLAG_Connection        ((knh_flag_t)0)
 #define FLAG_Connection         KNH_FLAG_CF2OF(CFLAG_Connection)
 
@@ -1486,7 +1526,8 @@ extern "C" {
 #define IS_ResultSet(o)         ((o)->h.cid == CLASS_ResultSet)
 #define ASSERT_ResultSet(o)     DEBUG_ASSERT(((o)->h.cid == CLASS_ResultSet))
 #define TYPE_ResultSet          CLASS_ResultSet
-#define NNTYPE_ResultSet        TYPE_TONNTYPE(CLASS_ResultSet)
+#define NNTYPE_ResultSet        NNTYPE_cid(CLASS_ResultSet)
+#define NATYPE_ResultSet        NATYPE_cid(CLASS_ResultSet)
 #define CFLAG_ResultSet         ((knh_flag_t)0)
 #define FLAG_ResultSet          KNH_FLAG_CF2OF(CFLAG_ResultSet)
 
@@ -1503,7 +1544,8 @@ extern "C" {
 #define IS_Exception(o)         ((o)->h.cid == CLASS_Exception)
 #define ASSERT_Exception(o)     DEBUG_ASSERT(((o)->h.cid == CLASS_Exception))
 #define TYPE_Exception          CLASS_Exception
-#define NNTYPE_Exception        TYPE_TONNTYPE(CLASS_Exception)
+#define NNTYPE_Exception        NNTYPE_cid(CLASS_Exception)
+#define NATYPE_Exception        NATYPE_cid(CLASS_Exception)
 #define CFLAG_Exception         ((knh_flag_t)0)
 #define FLAG_Exception          KNH_FLAG_CF2OF(CFLAG_Exception)
 
@@ -1520,7 +1562,8 @@ extern "C" {
 #define IS_ExceptionHandler(o)  ((o)->h.cid == CLASS_ExceptionHandler)
 #define ASSERT_ExceptionHandler(o) DEBUG_ASSERT(((o)->h.cid == CLASS_ExceptionHandler))
 #define TYPE_ExceptionHandler   CLASS_ExceptionHandler
-#define NNTYPE_ExceptionHandler TYPE_TONNTYPE(CLASS_ExceptionHandler)
+#define NNTYPE_ExceptionHandler NNTYPE_cid(CLASS_ExceptionHandler)
+#define NATYPE_ExceptionHandler NATYPE_cid(CLASS_ExceptionHandler)
 #define CFLAG_ExceptionHandler  ((knh_flag_t)KNH_FLAG_CF_PRIVATE)
 #define FLAG_ExceptionHandler   KNH_FLAG_CF2OF(CFLAG_ExceptionHandler)
 
@@ -1537,7 +1580,8 @@ extern "C" {
 #define IS_Script(o)            ((o)->h.cid == CLASS_Script)
 #define ASSERT_Script(o)        DEBUG_ASSERT(((o)->h.cid == CLASS_Script))
 #define TYPE_Script             CLASS_Script
-#define NNTYPE_Script           TYPE_TONNTYPE(CLASS_Script)
+#define NNTYPE_Script           NNTYPE_cid(CLASS_Script)
+#define NATYPE_Script           NATYPE_cid(CLASS_Script)
 #define CFLAG_Script            ((knh_flag_t)KNH_FLAG_CF_PRIVATE)
 #define FLAG_Script             KNH_FLAG_CF2OF(CFLAG_Script)
 
@@ -1554,7 +1598,8 @@ extern "C" {
 #define IS_NameSpace(o)         ((o)->h.cid == CLASS_NameSpace)
 #define ASSERT_NameSpace(o)     DEBUG_ASSERT(((o)->h.cid == CLASS_NameSpace))
 #define TYPE_NameSpace          CLASS_NameSpace
-#define NNTYPE_NameSpace        TYPE_TONNTYPE(CLASS_NameSpace)
+#define NNTYPE_NameSpace        NNTYPE_cid(CLASS_NameSpace)
+#define NATYPE_NameSpace        NATYPE_cid(CLASS_NameSpace)
 #define CFLAG_NameSpace         ((knh_flag_t)KNH_FLAG_CF_PRIVATE)
 #define FLAG_NameSpace          KNH_FLAG_CF2OF(CFLAG_NameSpace)
 
@@ -1571,7 +1616,8 @@ extern "C" {
 #define IS_System(o)            ((o)->h.cid == CLASS_System)
 #define ASSERT_System(o)        DEBUG_ASSERT(((o)->h.cid == CLASS_System))
 #define TYPE_System             CLASS_System
-#define NNTYPE_System           TYPE_TONNTYPE(CLASS_System)
+#define NNTYPE_System           NNTYPE_cid(CLASS_System)
+#define NATYPE_System           NATYPE_cid(CLASS_System)
 #define CFLAG_System            ((knh_flag_t)KNH_FLAG_CF_SINGLETON)
 #define FLAG_System             KNH_FLAG_CF2OF(CFLAG_System)
 
@@ -1588,7 +1634,8 @@ extern "C" {
 #define IS_Context(o)           ((o)->h.cid == CLASS_Context)
 #define ASSERT_Context(o)       DEBUG_ASSERT(((o)->h.cid == CLASS_Context))
 #define TYPE_Context            CLASS_Context
-#define NNTYPE_Context          TYPE_TONNTYPE(CLASS_Context)
+#define NNTYPE_Context          NNTYPE_cid(CLASS_Context)
+#define NATYPE_Context          NATYPE_cid(CLASS_Context)
 #define CFLAG_Context           ((knh_flag_t)0)
 #define FLAG_Context            KNH_FLAG_CF2OF(CFLAG_Context)
 
@@ -1605,7 +1652,8 @@ extern "C" {
 #define IS_Token(o)             ((o)->h.cid == CLASS_Token)
 #define ASSERT_Token(o)         DEBUG_ASSERT(((o)->h.cid == CLASS_Token))
 #define TYPE_Token              CLASS_Token
-#define NNTYPE_Token            TYPE_TONNTYPE(CLASS_Token)
+#define NNTYPE_Token            NNTYPE_cid(CLASS_Token)
+#define NATYPE_Token            NATYPE_cid(CLASS_Token)
 #define CFLAG_Token             ((knh_flag_t)0)
 #define FLAG_Token              KNH_FLAG_CF2OF(CFLAG_Token)
 
@@ -1622,7 +1670,8 @@ extern "C" {
 #define IS_Stmt(o)              ((o)->h.cid == CLASS_Stmt)
 #define ASSERT_Stmt(o)          DEBUG_ASSERT(((o)->h.cid == CLASS_Stmt))
 #define TYPE_Stmt               CLASS_Stmt
-#define NNTYPE_Stmt             TYPE_TONNTYPE(CLASS_Stmt)
+#define NNTYPE_Stmt             NNTYPE_cid(CLASS_Stmt)
+#define NATYPE_Stmt             NATYPE_cid(CLASS_Stmt)
 #define CFLAG_Stmt              ((knh_flag_t)0)
 #define FLAG_Stmt               KNH_FLAG_CF2OF(CFLAG_Stmt)
 
@@ -1639,7 +1688,8 @@ extern "C" {
 #define IS_Asm(o)               ((o)->h.cid == CLASS_Asm)
 #define ASSERT_Asm(o)           DEBUG_ASSERT(((o)->h.cid == CLASS_Asm))
 #define TYPE_Asm                CLASS_Asm
-#define NNTYPE_Asm              TYPE_TONNTYPE(CLASS_Asm)
+#define NNTYPE_Asm              NNTYPE_cid(CLASS_Asm)
+#define NATYPE_Asm              NATYPE_cid(CLASS_Asm)
 #define CFLAG_Asm               ((knh_flag_t)KNH_FLAG_CF_PRIVATE)
 #define FLAG_Asm                KNH_FLAG_CF2OF(CFLAG_Asm)
 
@@ -1656,7 +1706,8 @@ extern "C" {
 #define IS_KLRCode(o)           ((o)->h.cid == CLASS_KLRCode)
 #define ASSERT_KLRCode(o)       DEBUG_ASSERT(((o)->h.cid == CLASS_KLRCode))
 #define TYPE_KLRCode            CLASS_KLRCode
-#define NNTYPE_KLRCode          TYPE_TONNTYPE(CLASS_KLRCode)
+#define NNTYPE_KLRCode          NNTYPE_cid(CLASS_KLRCode)
+#define NATYPE_KLRCode          NATYPE_cid(CLASS_KLRCode)
 #define CFLAG_KLRCode           ((knh_flag_t)0)
 #define FLAG_KLRCode            KNH_FLAG_CF2OF(CFLAG_KLRCode)
 
@@ -1664,42 +1715,51 @@ extern "C" {
 #define ACLASS_Int              CLASS_IArray
 #define ATYPE_Int               CLASS_IArray
 #define NNATYPE_Int             NNTYPE_cid(CLASS_IArray)
+#define NAATYPE_Int             NATYPE_cid(CLASS_IArray)
 #define ACLASS_Float            CLASS_FArray
 #define ATYPE_Float             CLASS_FArray
 #define NNATYPE_Float           NNTYPE_cid(CLASS_FArray)
+#define NAATYPE_Float           NATYPE_cid(CLASS_FArray)
 
 /* ======================================================================== */
 /* [Array<X>] */
 #define ACLASS_String           ((knh_class_t)(KNH_TCLASS_SIZE-(6+1)))
 #define ATYPE_String            ACLASS_String
 #define NNATYPE_String          NNTYPE_cid(ACLASS_String)
+#define NAATYPE_String          NATYPE_cid(ACLASS_String)
 
 /* ======================================================================== */
 /* [Iterator<X>] */
 #define ICLASS_String           ((knh_class_t)(KNH_TCLASS_SIZE-(7+1)))
 #define ITYPE_String            NNTYPE_cid(ICLASS_String)
 #define NNITYPE_String          NNTYPE_cid(ICLASS_String)
+#define NAITYPE_String          NNTYPE_cid(ICLASS_String)
 #define ICLASS_Any1             ((knh_class_t)(KNH_TCLASS_SIZE-(8+1)))
 #define ITYPE_Any1              NNTYPE_cid(ICLASS_Any1)
 #define NNITYPE_Any1            NNTYPE_cid(ICLASS_Any1)
+#define NAITYPE_Any1            NNTYPE_cid(ICLASS_Any1)
 #define ICLASS_Int              ((knh_class_t)(KNH_TCLASS_SIZE-(9+1)))
 #define ITYPE_Int               NNTYPE_cid(ICLASS_Int)
 #define NNITYPE_Int             NNTYPE_cid(ICLASS_Int)
+#define NAITYPE_Int             NNTYPE_cid(ICLASS_Int)
 #define ICLASS_This             ((knh_class_t)(KNH_TCLASS_SIZE-(10+1)))
 #define ITYPE_This              NNTYPE_cid(ICLASS_This)
 #define NNITYPE_This            NNTYPE_cid(ICLASS_This)
+#define NAITYPE_This            NNTYPE_cid(ICLASS_This)
 
 /* ======================================================================== */
 /* [Generics] */
 #define CLASS_ArrayCmp          ((knh_class_t)(KNH_TCLASS_SIZE-(11+1)))
 #define TYPE_ArrayCmp           CLASS_ArrayCmp
-#define NNTYPE_ArrayCmp         NNTYPE_cid(CLASS_This)
+#define NNTYPE_ArrayCmp         NNTYPE_cid(CLASS_ArrayCmp)
+#define NATYPE_ArrayCmp         NATYPE_cid(CLASS_ArrayCmp)
 
 /* ======================================================================== */
 /* [Object:X] */
 #define CLASS_String__urn       ((knh_class_t)(KNH_TCLASS_SIZE-(12+1)))
 #define TYPE_String__urn        CLASS_String__urn
 #define NNTYPE_String__urn      NNTYPE_cid(CLASS_String__urn)
+#define NATYPE_String__urn      NATYPE_cid(CLASS_String__urn)
 
 /* ======================================================================== */
 /* [tString] */

@@ -81,7 +81,7 @@ METHOD knh__Object_opInstanceof(Ctx *ctx, knh_sfp_t *sfp)
 knh_bool_t knh_Object_opTypeOf(Ctx *ctx, Object *o, knh_type_t t)
 {
 	if(IS_NULL(o)) {
-		return TYPE_ISNULLABLE(t);
+		return IS_NATYPE(t);
 	}
 	return knh_class_instanceof(ctx, o->h.cid, CLASS_type(t));
 }
@@ -171,7 +171,7 @@ knh_bool_t knh_Object_opTypeOf(Ctx *ctx, Object *o, knh_type_t t)
 //			VM_MAP(ctx, tcid);
 //			o = ctx->esp[0].o;
 //			KNH_LOCALBACK(ctx, lsfp);
-//			if(IS_NOTNULL(o) || TYPE_ISNULLABLE(reqt)) {
+//			if(IS_NOTNULL(o) || IS_NATYPE(reqt)) {
 //				return o;
 //			}
 //			else {

@@ -289,7 +289,7 @@ knh_type_t knh_rtti_type(Asm *abr, knh_type_t type, int a)
 			return NNTYPE_cid(type);
 		}
 	}
-	return type;
+	return NATYPE_cid(type);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1161,7 +1161,7 @@ knh_type_t knh_Method_reqtTERMs(Method *mtd, knh_class_t mtd_cid, Stmt *stmt, si
 		return TYPE_Any;  // boxing
 	}
 	if(n == 1) { // base
-		return knh_Method_isNullBase(mtd) ? mtd_cid : NNTYPE_cid(mtd_cid);
+		return knh_Method_isNullBase(mtd) ? NATYPE_cid(mtd_cid) : NNTYPE_cid(mtd_cid);
 	}
 	else {
 		knh_type_t ptype = knh_Method_pztype(mtd, n - 2);

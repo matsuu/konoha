@@ -303,7 +303,6 @@ typedef knh_uint16_t       knh_expt_t;    /* knh_expt_t */
 
 #define CLASS_newid                ((knh_class_t)-1)
 #define CLASS_unknown              ((knh_class_t)-2)
-#define CLASS_type(t)              (t&(~KNH_FLAG_TF_NN))
 
 #define KNH_ASSERT_cid(cid)        KNH_ASSERT(cid < KNH_TCLASS_SIZE)
 #define CLASSN(cid)                knh_ClassTable_CLASSN(ctx, cid)
@@ -311,11 +310,12 @@ typedef knh_uint16_t       knh_expt_t;    /* knh_expt_t */
 
 /* knh_type_t */
 
-#define KNH_FLAG_TF_NN      KNH_FLAG_T0
-#define TYPE_ISNULLABLE(t)  ((t & KNH_FLAG_TF_NN)==0)
-#define IS_NNTYPE(t)        ((t & KNH_FLAG_TF_NN)==KNH_FLAG_TF_NN)
-#define NNTYPE_cid(c)       (c|KNH_FLAG_TF_NN)
-#define TYPE_TONNTYPE(t)    (t|KNH_FLAG_TF_NN)
+#define KNH_FLAG_TF_NA      KNH_FLAG_T0
+#define CLASS_type(t)       (t&(~KNH_FLAG_TF_NA))
+#define IS_NNTYPE(t)        ((t & KNH_FLAG_TF_NA)==0)
+#define IS_NATYPE(t)        ((t & KNH_FLAG_TF_NA)==KNH_FLAG_TF_NA)
+#define NATYPE_cid(t)       (t|KNH_FLAG_TF_NA)
+#define NNTYPE_cid(t)       (t)
 
 #define IS_ubxint(t)        (IS_NNTYPE(t) && ClassTable(CLASS_type(t)).bcid == CLASS_Int)
 #define IS_ubxfloat(t)      (IS_NNTYPE(t) && ClassTable(CLASS_type(t)).bcid == CLASS_Float)
@@ -329,7 +329,6 @@ typedef knh_uint16_t       knh_expt_t;    /* knh_expt_t */
 
 #define TYPE_var                      CLASS_AnyVar
 #define TYPE_void                     NNTYPE_cid(CLASS_Any)
-#define NNTYPE_void                   NNTYPE_cid(CLASS_Any)
 
 /* ------------------------------------------------------------------------ */
 

@@ -125,29 +125,32 @@ int knh_Token_isNullable(Ctx *ctx, Token *o)
 static
 knh_type_t knh_Token_gettype(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t defc)
 {
-	KNH_ASSERT(IS_Token(tk));
+	DBG2_ASSERT(IS_Token(tk));
+	knh_type_t type;
 	if(SP(tk)->tt == TT_ASIS) {
-		return defc;
-	}
-	if(SP(tk)->tt == TT_CID) {
-		if(DP(tk)->cid == CLASS_Any) return DP(tk)->cid;
-		return NNTYPE_cid(DP(tk)->cid);
-	}
-	if(knh_Token_isExceptionType(tk)) {
-		if(!knh_Token_isNullable(ctx, tk)) return NNTYPE_Exception;
-		return CLASS_Exception;
-	}
-
-	knh_bytes_t name = knh_Token_tobytes(ctx, tk);
-	knh_type_t type = knh_NameSpace_gettype(ctx, ns, name, knh_Token_isNullable(ctx, tk));
-	if(type == CLASS_unknown) {
 		type = defc;
-		if(defc != CLASS_Any) {
-			if(!knh_Token_isNullable(ctx, tk)) type = NNTYPE_cid(defc);
-		}
-		knh_Token_perror(ctx, tk, KERR_ERRATA, _("unknown class: %s ==> %C"), sToken(tk), defc);
 	}
-	return type;
+	else if(SP(tk)->tt == TT_CID) {
+		type = DP(tk)->cid;
+	}
+	else if(knh_Token_isExceptionType(tk)) {
+		type = TYPE_Exception;
+	}
+	else {
+		knh_bytes_t name = knh_Token_tobytes(ctx, tk);
+		type = knh_NameSpace_gettype(ctx, ns, name, knh_Token_isNullable(ctx, tk));
+		if(type == CLASS_unknown) {
+			type = defc;
+			knh_Token_perror(ctx, tk, KERR_ERRATA, _("unknown type: %s ==> %T"), sToken(tk), defc);
+		}
+	}
+	if(CLASS_type(type) == CLASS_Any) return NATYPE_Any;
+	if(knh_Token_isNullable(ctx, tk)) {
+		return NATYPE_cid(type);
+	}
+	else {
+		return NNTYPE_cid(type);
+	}
 }
 
 /* ------------------------------------------------------------------------ */
@@ -197,9 +200,7 @@ Token* knh_Token_toCONST(Ctx *ctx, Token *o)
 {
 	SP(o)->tt = TT_CONST;
 	DP(o)->type = knh_Object_cid(DP(o)->data);
-	if(IS_NOTNULL(DP(o)->data)) {
-		DP(o)->type = NNTYPE_cid(DP(o)->type);
-	}
+	if(IS_NULL(DP(o)->data)) DP(o)->type = NATYPE_Any;
 	return o;
 }
 
@@ -220,11 +221,11 @@ Token* knh_Token_toDEFVAL(Token *o, knh_class_t cid)
 {
 	SP(o)->tt = TT_DEFVAL;
 	DP(o)->cid = cid;
-	if(cid != CLASS_Any) {
-		DP(o)->type = NNTYPE_cid(cid);
+	if(cid == CLASS_Any) {
+		DP(o)->type = NATYPE_Any;
 	}
 	else {
-		DP(o)->type = cid;
+		DP(o)->type = NNTYPE_cid(cid);
 	}
 	return o;
 }
@@ -1330,10 +1331,10 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 			value = TERMs_const(stmt, 2);
 			if(IS_NOTNULL(value)) {
 				if(TERMs_isASIS(stmt, 0)) {  /* (a = 1) ==> Int a = 1 */
-					type = knh_Object_cid(value);
+					type = NATYPE_cid(knh_Object_cid(value));
 				}
 				else {  /* Int! a = 1 ==> Int a = 1 */
-					type = CLASS_type(type);
+					type = NATYPE_cid(type);
 				}
 				if(level == -2) {
 					type = NNTYPE_cid(type);  // a = 1 ==> Int! if inner
@@ -2457,10 +2458,10 @@ void knh_Token_toMPR(Ctx *ctx, Token *tk, knh_class_t cid, Mapper *mpr)
 	DP(tk)->cid = cid;
 	KNH_SETv(ctx, DP(tk)->data, mpr);
 	if(IS_NULL(mpr)) {
-		DP(tk)->type = cid;
+		DP(tk)->type = NATYPE_cid(cid);
 	}
 	else {
-		DP(tk)->type = knh_Mapper_isTotal(mpr) ? NNTYPE_cid(DP(mpr)->tcid) : DP(mpr)->tcid;
+		DP(tk)->type = knh_Mapper_isTotal(mpr) ? NNTYPE_cid(DP(mpr)->tcid) : NATYPE_cid(DP(mpr)->tcid);
 	}
 }
 
@@ -2489,7 +2490,7 @@ Term *knh_StmtMAPCAST_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_
 	knh_class_t exprc = CLASS_type(exprt);
 	int isNonNullCast = (knh_Token_isNotNullType(tk0) || (!knh_Token_isNullableType(tk0) && IS_NNTYPE(reqt)));
 	DBG2_P("MAPCAST %s => %s isNonNullCast=%d", CLASSN(exprc), CLASSN(mprcid), isNonNullCast);
-	knh_Stmt_setType(ctx, stmt, isNonNullCast ? NNTYPE_cid(mprcid) : mprcid);
+	knh_Stmt_setType(ctx, stmt, isNonNullCast ? NNTYPE_cid(mprcid) : NATYPE_cid(mprcid));
 	if(isNonNullCast) {
 		knh_Stmt_setNNCAST(stmt, 1);
 	}
@@ -2660,6 +2661,9 @@ Term *knh_StmtTRI_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type
 	knh_type_t type2 = TERMs_gettype(stmt, 2);
 	if(IS_NNTYPE(type) && IS_NNTYPE(type2)) {
 		reqt = NNTYPE_cid(reqt);
+	}
+	else {
+		reqt = NATYPE_cid(reqt);
 	}
 	knh_Stmt_setType(ctx, stmt, reqt);
 	return TM(stmt);
@@ -3758,7 +3762,7 @@ Term *knh_StmtCLASS_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 			knh_Stmt_done(ctx, instmt);
 		}
 		else if(SP(instmt)->stt == STT_LET) {
-			knh_StmtLET_typing(ctx, instmt, abr, ns, NNTYPE_void);
+			knh_StmtLET_typing(ctx, instmt, abr, ns, TYPE_void);
 			knh_Stmt_done(ctx, instmt);
 		}
 		instmt = DP(instmt)->next;
