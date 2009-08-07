@@ -749,7 +749,7 @@ knh_methodn_t knh_token_tomethodn(knh_token_t t);
 int knh_token_getOpPriority(knh_token_t t);
 int knh_token_getOpSize(knh_token_t t);
 knh_bool_t knh_token_isBeginOfStmt(knh_token_t t);
-Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t token);
+Token *knh_cwb_parseToken(Ctx *ctx, knh_cwb_t *cwb, knh_flag_t flag, InputStream *in);
 int knh_bytes_istoken(knh_bytes_t t, int ch);
 char* knh_stmt_tochar(knh_stmt_t t);
 size_t knh_stmt_size(knh_stmt_t t);

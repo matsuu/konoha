@@ -701,9 +701,9 @@ knh_bool_t knh_token_isBeginOfStmt(knh_token_t t)
 /* [token parser] */
 
 
-Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t token)
+Token *knh_cwb_parseToken(Ctx *ctx, knh_cwb_t *cwb, knh_flag_t flag, InputStream *in)
 {
-    knh_bytes_t t = token;
+    knh_bytes_t t = knh_cwb_tobytes(cwb);
     knh_token_t tt = ((knh_token_t)-1);
     L_TAIL:;
     if(isalpha(t.buf[0])) {
@@ -715,14 +715,6 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
             flag |= (KNH_FLAG_TKF_EXCEPTIONTYPE|KNH_FLAG_TKF_NOTNULLTYPE);
             t.len -= 9;
         }
-//        else if(t.buf[t.len-2]=='!' && t.buf[t.len-1]=='!') {
-//            flag |= (KNH_FLAG_TKF_EXCEPTIONTYPE|KNH_FLAG_TKF_NOTNULLTYPE);
-//            t.len -= 2;
-//        }
-//        else if(t.buf[t.len-1]=='!') {
-//            flag |= KNH_FLAG_TKF_NOTNULLTYPE;
-//            t.len -= 1;
-//        }
     }
 
     switch(t.buf[0]) {
@@ -833,7 +825,7 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
     break;
     case 'b':
         if(ISB(t, "break")) { tt = TT_BREAK; break; }
-        if(ISB(t, "boolean")) { t = STEXT("Boolean!"); goto L_TAIL; }
+        if(ISB(t, "boolean")) { t = STEXT("Boolean"); goto L_TAIL; }
     break;
     case 'c':
         if(ISB(t, "class")) { tt = TT_CLASS; break; }
@@ -841,12 +833,12 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
         if(ISB(t, "continue")) { tt = TT_CONTINUE; break; }
         if(ISB(t, "catch")) { tt = TT_CATCH; break; }
         if(ISB(t, "const")) { tt = TT_METAN; break; }
-        if(ISB(t, "char")) { t = STEXT("Int!"); goto L_TAIL; }
+        if(ISB(t, "char")) { t = STEXT("Int"); goto L_TAIL; }
     break;
     case 'd':
         if(ISB(t, "do")) { tt = TT_DO; break; }
-        if(ISB(t, "double")) { t = STEXT("Float!"); goto L_TAIL; }
-        if(ISB(t, "def")) { t = STEXT("Any"); goto L_TAIL; }
+        if(ISB(t, "double")) { t = STEXT("Float"); goto L_TAIL; }
+        if(ISB(t, "def")) { t = STEXT("var"); goto L_TAIL; }
     break;
     case 'e':
         if(ISB(t, "extends")) { tt = TT_EXTENDS; break; }
@@ -860,7 +852,7 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
         if(ISB(t, "from")) { tt = TT_FROM; break; }
         if(ISB(t, "finally")) { tt = TT_FINALLY; break; }
         if(ISB(t, "final")) { tt = TT_METAN; break; }
-        if(ISB(t, "float")) { t = STEXT("Float!"); goto L_TAIL; }
+        if(ISB(t, "float")) { t = STEXT("Float"); goto L_TAIL; }
     break;
     case 'i':
         if(ISB(t, "import")) { tt = TT_IMPORT; break; }
@@ -871,10 +863,10 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
         if(ISB(t, "isa")) { tt = TT_ISA; break; }
         if(ISB(t, "in?")) { tt = TT_HAS; break; }
         if(ISB(t, "is?")) { tt = TT_IS; break; }
-        if(ISB(t, "int")) { t = STEXT("Int!"); goto L_TAIL; }
+        if(ISB(t, "int")) { t = STEXT("Int"); goto L_TAIL; }
     break;
     case 'l':
-        if(ISB(t, "long")) { t = STEXT("Int!"); goto L_TAIL; }
+        if(ISB(t, "long")) { t = STEXT("Int"); goto L_TAIL; }
     break;
     case 'm':
         if(ISB(t, "method")) { tt = TT_METHOD; break; }
@@ -901,8 +893,8 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
     case 's':
         if(ISB(t, "switch")) { tt = TT_SWITCH; break; }
         if(ISB(t, "static")) { tt = TT_METAN; break; }
-        if(ISB(t, "short")) { t = STEXT("Int!"); goto L_TAIL; }
-        if(ISB(t, "string")) { t = STEXT("String!"); goto L_TAIL; }
+        if(ISB(t, "short")) { t = STEXT("Int"); goto L_TAIL; }
+        if(ISB(t, "string")) { t = STEXT("String"); goto L_TAIL; }
     break;
     case 't':
         if(ISB(t, "try")) { tt = TT_TRY; break; }
@@ -935,7 +927,11 @@ Token *new_Token__parse(Ctx *ctx, knh_flag_t flag, InputStream *in, knh_bytes_t 
     /* built-in */
     }
     if(tt == ((knh_token_t)-1)) {
-        return new_TokenSYMBOL(ctx, flag, in, t);
+        if(t.buf != knh_cwb_tobytes(cwb).buf) {
+            knh_cwb_subclear(cwb, 0);
+            knh_cwb_write(ctx, cwb, t);
+        }
+        return knh_cwb_newTokenSYMBOL(ctx, cwb, flag, in);
     }
     else {
         Token *tk = new_Token(ctx, flag, DP(in)->uri, DP(in)->line, tt);
