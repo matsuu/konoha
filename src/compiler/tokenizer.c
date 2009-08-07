@@ -551,6 +551,11 @@ void knh_Token_join(Ctx *ctx, Token *o)
 	for(i = 0; i < size ; i++) {
 		Token *tk0 =  (Token*)knh_Array_n(a, i);
 		Token *tk1 = (Token*)knh_Array_n(a, i+1);
+		DP(tk0)->tt_next = SP(tk1)->tt;
+	}
+	for(i = 0; i < size ; i++) {
+		Token *tk0 =  (Token*)knh_Array_n(a, i);
+		Token *tk1 = (Token*)knh_Array_n(a, i+1);
 		if(SP(tk0)->tt == TT_TYPEN) {
 			if(SP(tk1)->tt == TT_LT) {  /* T<T> */
 				knh_Token_addTypeParam(ctx, tk0, a, i+1);
@@ -562,7 +567,6 @@ void knh_Token_join(Ctx *ctx, Token *o)
 			}
 			else if(SP(tk1)->tt == TT_BRANCET && IS_NULL(DP(tk1)->data)) { /* T[] */
 				knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
-				DBG2_P("@@@@@ tk0='%s'", sToken(tk0));
 				knh_Bytes_write(ctx, cwb->ba, knh_String_tobytes(DP(tk0)->text));
 				knh_Bytes_write(ctx, cwb->ba, STEXT("[]"));
 				KNH_SETv(ctx, DP(tk0)->data, knh_cwb_newString(ctx, cwb));
@@ -578,7 +582,6 @@ void knh_Token_join(Ctx *ctx, Token *o)
 					knh_Token_setExceptionType(tk0, 1);
 					knh_Array_remove(ctx, a, i+2);
 					knh_Array_remove(ctx, a, i+1);
-					DP(tk0)->tt_next = SP((Token*)knh_Array_n(a, i+1))->tt;
 					i--; size = knh_Array_size(a) - 1;
 					continue;
 				}
@@ -636,8 +639,25 @@ void knh_Token_join(Ctx *ctx, Token *o)
 			knh_Token_setBOL(tk0, 0);
 			KNH_SETv(ctx, DP(tk0)->data, new_String__SYMBOL(ctx, STEXT("format")));
 		}
+		else if(SP(tk1)->tt == TT_DOTS && SP(tk0)->tt != TT_COMMA) {
+			DP(tk0)->tt_next = DP(tk1)->tt_next;
+			knh_Array_remove(ctx, a, i+1);
+			size = knh_Array_size(a) - 1;
+		}
+		else if(SP(tk1)->tt == TT_PROMPT) {
+			DP(tk0)->tt_next = DP(tk1)->tt_next;
+			knh_Array_remove(ctx, a, i+1);
+			size = knh_Array_size(a) - 1;
+		}
 	}
-	//DBG2_DUMP(ctx, o, KNH_NULL, "joined");
+
+	size = knh_Array_size(a) - 1;
+	for(i = 0; i < size ; i++) {
+		Token *tk0 =  (Token*)knh_Array_n(a, i);
+		Token *tk1 = (Token*)knh_Array_n(a, i+1);
+		DP(tk0)->tt_next = SP(tk1)->tt;
+	}
+	DP((Token*)knh_Array_n(a, size))->tt_next = TT_EOT;
 }
 
 /* ------------------------------------------------------------------------ */

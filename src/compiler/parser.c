@@ -138,8 +138,13 @@ static
 void knh_tokens_ignore(Ctx *ctx, knh_tkc_t *tc)
 {
 	if(tc->c < tc->e) {
-		Token *tk = tc->ts[tc->c];
-		knh_Token_perror(ctx, tk, KERR_DWARN, "ignored %s ..", sToken(tk));
+		Token *tkS = tc->ts[tc->c], *tkE = tc->ts[tc->e-1];
+		if(tkS != tkE) {
+			knh_Token_perror(ctx, tkS, KERR_DWARN, _("ignored %s .. %s"), sToken(tkS), sToken(tkE));
+		}
+		else {
+			knh_Token_perror(ctx, tkS, KERR_DWARN, _("ignored %s"), sToken(tkS));
+		}
 		tc->c = tc->e;
 	}
 }
@@ -1347,12 +1352,11 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tkc_t *tc, int isData)
 	int fc = 0, pc = 0;
 	Stmt *stmt = NULL;
 	if(!(oc < e)) {
-		DBG_P("tc->c=%d, tc->e=%d", (int)oc, (int)e);
-		DBG2_ASSERT(oc < e);
 		Token *tke = new_Token(ctx, 0, SP(tc->ts[e-1])->uri, SP(tc->ts[e-1])->line, TT_ERR);
 		if(!isData) {
-			knh_perror(ctx, SP(tc->ts[e-1])->uri, SP(tc->ts[e-1])->line, KERR_ERROR, _("syntax error"));
+			knh_perror(ctx, SP(tc->ts[e-1])->uri, SP(tc->ts[e-1])->line, KERR_ERROR, _("syntax error: empty expression"));
 		}
+		DBG_P("tc->c=%d, tc->e=%d", (int)oc, (int)e);
 		return TM(tke);
 	}
 
@@ -1445,7 +1449,6 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tkc_t *tc, int isData)
 				knh_Stmt_add(ctx, stmt, TM(ts[oc+1]));
 				{
 					Token *tk0 = ts[oc+1];
-					DBG2_P("@@@@@ tk0='%s'", sToken(tk0));
 					knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
 					knh_Bytes_write(ctx, cwb->ba, knh_String_tobytes(DP(tk0)->text));
 					knh_Bytes_write(ctx, cwb->ba, STEXT("[]"));
