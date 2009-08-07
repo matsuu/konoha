@@ -9,9 +9,11 @@
 #include <cmpi/cmpimacs.h>
 #include <konoha.h>
 #include <pthread.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 static const CMPIBroker * _broker;
-static char* _Name = "DEOS_DCare";
+//static char* _Name = "DEOS_DCare";
 
 CMPIStatus OSBase_DCareProviderCleanup(
         CMPIInstanceMI * mi, 
@@ -51,7 +53,7 @@ CMPIStatus OSBase_DCareProviderInvokeMethod(
 
     char *c = "a0";
     char *argv;
-    char *mName = "receive(%%s)";
+    char *mName = "receive(%s)";
     CMPIData val;
     CMPIString *str;
     argv = (char *)alloca(sizeof(char*));
@@ -70,6 +72,7 @@ CMPIStatus OSBase_DCareProviderInvokeMethod(
     char* retval;
    
     retval = konoha_invokeStringFunc(konoha, mName,argv);
+    retval = "";
 
     printf("%s %d\n",mName,__LINE__);
     printf("%s %d\n",retval,__LINE__);
@@ -77,8 +80,8 @@ CMPIStatus OSBase_DCareProviderInvokeMethod(
       /* runtime error */
       char err[128] = {0};
       fprintf(stderr, "O::%s\n",konoha_getStdOutBufferText(konoha));
-      fprintf(stderr, "E::%d\n",konoha_getStdErrBufferText(konoha));
-      snprintf(err,128,"%d",konoha_getStdErrBufferText(konoha));
+      fprintf(stderr, "E::%s\n",konoha_getStdErrBufferText(konoha));
+      snprintf(err,128,"%s",konoha_getStdErrBufferText(konoha));
       retval = err;
       printf("%s %d\n",retval,__LINE__);
     }
@@ -97,4 +100,4 @@ CMPIStatus OSBase_DCareProviderInvokeMethod(
     return rc;
 }
 
-CMMethodMIStub  ( OSBase_DCareProvider, OSBase_DCareProvider, _broker,CMNoHook);
+CMMethodMIStub  ( OSBase_DCareProvider, OSBase_DCareProvider, _broker,setuid(0));

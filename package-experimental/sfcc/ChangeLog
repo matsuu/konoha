@@ -1,3 +1,7 @@
-invokeMethod(op,mName,String[]) @revision 568 sfcc.c @239
+2009-08-07 Masahiro Ide <imasahiro@users.sourceforge.jp>
+    * ./sample/DC*.k     make deos sample source.
 
-invokeMethod(op,mName,String)   @revision 569
+2009-08-01
+    * libvirt.c     fix API
+				invokeMethod(op,mName,String[]) @revision 568 sfcc.c @239
+				invokeMethod(op,mName,String)   @revision 569
