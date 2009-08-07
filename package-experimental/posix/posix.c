@@ -231,6 +231,13 @@ METHOD System_setSigInt(Ctx *ctx, knh_sfp_t *sfp)
     KNH_RETURN_void(ctx, sfp);
 }
 
+
+/* ------------------------------------------------------------------------ */
+// void System.raise(int signal);
+METHOD System_reboot(Ctx *ctx, knh_sfp_t *sfp)
+{
+  system("reboot");
+}  
 /* ------------------------------------------------------------------------ */
 // void System.raise(int signal);
 METHOD System_raise(Ctx *ctx, knh_sfp_t *sfp)

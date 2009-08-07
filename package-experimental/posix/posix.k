@@ -35,7 +35,7 @@ void System.sleep(Int sec);
 int System.system(String! cmd);
 String! System.getCwd();
 void System.chDir(String dirname);
-
+void System.reboot();
 void System.setSigSegv(Closure c);
 void System.setSigBus(Closure c);
 void System.setSigKill(Closure c);
