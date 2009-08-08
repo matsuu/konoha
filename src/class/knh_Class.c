@@ -77,12 +77,44 @@ knh_class_t knh_ClassTable_newId(Ctx *ctx)
 
 /* ------------------------------------------------------------------------ */
 
-static knh_Class_t *new_Class(Ctx *ctx, knh_class_t cid)
+knh_Class_t *new_Class(Ctx *ctx, knh_class_t cid)
 {
-	knh_Class_t *o = (knh_Class_t*)new_hObject(ctx, FLAG_Class, CLASS_Class, CLASS_Class);
-	o->cid = cid;
-	o->type = cid;
-	return o;
+	KNH_ASSERT_cid(cid);
+	knh_ClassTable_t *t = pClassTable(cid);
+	if(t->class_cid == NULL) {
+		knh_Class_t *o = (knh_Class_t*)new_hObject(ctx, FLAG_Class, CLASS_Class, CLASS_Class);
+		o->cid = cid;
+		o->type = cid;
+		KNH_INITv(t->class_cid, o);
+	}
+	return t->class_cid;
+}
+
+/* ------------------------------------------------------------------------ */
+
+knh_Class_t *new_Type(Ctx *ctx, knh_type_t type)
+{
+	knh_class_t cid = CLASS_type(type);
+	KNH_ASSERT_cid(cid);
+	knh_ClassTable_t *t = pClassTable(cid);
+	if(IS_NATYPE(type)) {
+		if(t->class_natype == NULL) {
+			knh_Class_t *o = (knh_Class_t*)new_hObject(ctx, FLAG_Class, CLASS_Class, CLASS_Class);
+			o->cid = cid;
+			o->type = type;
+			KNH_INITv(t->class_natype, o);
+		}
+		return t->class_natype;
+	}
+	else {
+		if(t->class_cid == NULL) {
+			knh_Class_t *o = (knh_Class_t*)new_hObject(ctx, FLAG_Class, CLASS_Class, CLASS_Class);
+			o->cid = cid;
+			o->type = type;
+			KNH_INITv(t->class_cid, o);
+		}
+		return t->class_cid;
+	}
 }
 
 /* ------------------------------------------------------------------------ */
@@ -93,7 +125,7 @@ void knh_setClassName(Ctx *ctx, knh_class_t cid, String *lname)
 	knh_ClassTable_t *t = pClassTable(cid);
 	//KNH_NOTICE(ctx, _("added new class: %s"), knh_String_tochar(lname));
 	KNH_ASSERT(ClassTable(cid).class_cid == NULL);
-	KNH_INITv(t->class_cid, new_Class(ctx, cid));
+	//KNH_INITv(t->class_cid, new_Class(ctx, cid));
 	KNH_INITv(t->lname, lname);
 	{
 		knh_bytes_t n = knh_String_tobytes(lname);
@@ -520,12 +552,14 @@ void knh_ClassMap__man(Ctx *ctx, ClassMap *o, OutputStream *w, knh_class_t cid)
 static Array* knh_Class_domain(Ctx *ctx)
 {
 	Array *a = new_Array(ctx, CLASS_Class, 0);
-	int i = 0;
-	for(i = 0; i < ctx->share->StructTableSize; i++) {
-		knh_Array_add(ctx, a, UP(ClassTable(i).class_cid));
+	int cid = 0;
+	for(cid = 0; cid < ctx->share->StructTableSize; cid++) {
+		if(knh_class_isPrivate(cid)) continue;
+		knh_Array_add(ctx, a, UP(new_Class(ctx, cid)));
 	}
-	for(i = ctx->share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
-		knh_Array_add(ctx, a, UP(ClassTable(i).class_cid));
+	for(cid = ctx->share->ClassTableSize; cid < KNH_TCLASS_SIZE; cid++) {
+		if(knh_class_isPrivate(cid)) continue;
+		knh_Array_add(ctx, a, UP(new_Class(ctx, cid)));
 	}
 	return a;
 }

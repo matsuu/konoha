@@ -141,6 +141,8 @@ void knh_OutputStream_write__bconv(Ctx *ctx, OutputStream *w, knh_bytes_t t);
 /* ../src/class/knh_Class.c */
 knh_struct_t knh_StructTable_newId(Ctx *ctx);
 knh_class_t knh_ClassTable_newId(Ctx *ctx);
+knh_Class_t *new_Class(Ctx *ctx, knh_class_t cid);
+knh_Class_t *new_Type(Ctx *ctx, knh_type_t type);
 void knh_setClassName(Ctx *ctx, knh_class_t cid, String *lname);
 char *knh_ClassTable_CLASSN(Ctx *ctx, knh_class_t cid);
 void knh_setClassDefaultValue(Ctx *ctx, knh_class_t cid, Object *value, knh_fdefault fdefault);

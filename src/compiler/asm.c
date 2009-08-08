@@ -1165,10 +1165,10 @@ knh_type_t knh_Method_reqtTERMs(Method *mtd, knh_class_t mtd_cid, Stmt *stmt, si
 	}
 	else {
 		knh_type_t ptype = knh_Method_pztype(mtd, n - 2);
-		if(ptype == TYPE_Object || ptype == TYPE_Any1 || ptype == TYPE_Any2) {
+		if(ptype == TYPE_Object || ptype == TYPE_T1 || ptype == TYPE_T2) {
 			return TYPE_Any; // boxing
 		}
-		if(ptype == NNTYPE_Object || ptype == NNTYPE_Any1 || ptype == NNTYPE_Any2) {
+		if(ptype == NNTYPE_Object || ptype == NNTYPE_T1 || ptype == NNTYPE_T2) {
 			return NNTYPE_Any; // boxing
 		}
 		if(ptype == NNTYPE_This) return NNTYPE_cid(mtd_cid);

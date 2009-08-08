@@ -55,7 +55,7 @@ static METHOD knh__DictMap_new(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[VARARGS] This! DictMap.new:init(Any1 value) @VARARGS */
+/* @method[VARARGS] This! DictMap.new:init(T1 value) @VARARGS */
 
 static METHOD knh__DictMap_new__init(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -77,7 +77,7 @@ static METHOD knh__DictMap_new__init(Ctx *ctx, knh_sfp_t *sfp)
 /* [method] */
 
 /* ------------------------------------------------------------------------ */
-/* @method Any1 DictMap.get(String! key) */
+/* @method T1 DictMap.get(String! key) */
 
 static METHOD knh__DictMap_get(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -93,7 +93,7 @@ static METHOD knh__DictMap_opHas(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method void DictMap.set(String! key, Any1 value) */
+/* @method void DictMap.set(String! key, T1 value) */
 
 static METHOD knh__DictMap_set(Ctx *ctx, knh_sfp_t *sfp)
 {

@@ -48,7 +48,7 @@ Script *new_Script(Ctx *ctx, knh_bytes_t nsname)
 	knh_ClassTable_t *TC = (knh_ClassTable_t*)(&ClassTable(cid));
 	knh_snprintf(buf, sizeof(buf), "%s.Script", (char*)nsname.buf);
 
-	KNH_ASSERT(ClassTable(cid).class_cid == NULL);
+	KNH_ASSERT(ClassTable(cid).sname == NULL);
 
 	TC->cflag  = CFLAG_Script;
 	TC->oflag  = FLAG_Script;

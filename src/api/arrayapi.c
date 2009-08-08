@@ -71,7 +71,7 @@ static METHOD knh__Array_new__array(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[VARARGS] This! Array.new:init(Any1 value) @VARARGS */
+/* @method[VARARGS] This! Array.new:init(T1 value) @VARARGS */
 
 static METHOD knh__Array_new__init(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -255,7 +255,7 @@ static METHOD knh__FArray_new__init(Ctx *ctx, knh_sfp_t *sfp)
 /* ======================================================================== */
 /* [add] */
 
-/* @method void Array.add(Any1! value) */
+/* @method void Array.add(T1! value) */
 
 static METHOD knh__Array_add(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -272,7 +272,7 @@ static METHOD knh__Array_add(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[VARARGS] void Array.opLshift(Any1! v) */
+/* @method[VARARGS] void Array.opLshift(T1! v) */
 
 static METHOD knh__Array_opLshift(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -364,7 +364,7 @@ static METHOD knh__Array_getSize(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Any1! Array.get(Int! n) */
+/* @method T1! Array.get(Int! n) */
 
 static METHOD knh__Array_get(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -394,7 +394,7 @@ static METHOD knh__FArray_get(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method void Array.set(Int! n, Any1! v) */
+/* @method void Array.set(Int! n, T1! v) */
 
 static METHOD knh__Array_set(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -434,7 +434,7 @@ static METHOD knh__FArray_set(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method void Array.setAll(Any1 v) */
+/* @method void Array.setAll(T1 v) */
 
 static METHOD knh__Array_setAll(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -512,7 +512,7 @@ static METHOD knh__Array_opOffset(Ctx *ctx, knh_sfp_t *sfp)
 /* ======================================================================== */
 
 /* ------------------------------------------------------------------------ */
-/* @method void Array.insert(Int! n, Any1 v) */
+/* @method void Array.insert(Int! n, T1 v) */
 
 static METHOD knh__Array_insert(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -548,7 +548,7 @@ static METHOD knh__Array_remove(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Any1 Array.pop() */
+/* @method T1 Array.pop() */
 
 static METHOD knh__Array_pop(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -576,7 +576,7 @@ void knh_Array_clear(Ctx *ctx, Array *o)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Int! Array.indexOf(Any1 v) */
+/* @method Int! Array.indexOf(T1 v) */
 
 static METHOD knh__Array_indexOf(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -592,7 +592,7 @@ static METHOD knh__Array_indexOf(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Int! Array.lastIndexOf(Any1 v) */
+/* @method Int! Array.lastIndexOf(T1 v) */
 
 static METHOD knh__Array_lastIndexOf(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -609,7 +609,7 @@ static METHOD knh__Array_lastIndexOf(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Boolean! Array.opHas(Any1 v) */
+/* @method Boolean! Array.opHas(T1 v) */
 
 static METHOD knh__Array_opHas(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -917,7 +917,7 @@ MAPPER knh_Array_Iterator(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Any1.. Array.opItr() */
+/* @method T1.. Array.opItr() */
 
 static METHOD knh__Array_opItr(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -1016,7 +1016,7 @@ MAPPER knh_FArray_Iterator(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Any1.. FArray.opItr() */
+/* @method T1.. FArray.opItr() */
 
 static METHOD knh__FArray_opItr(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -1128,7 +1128,7 @@ static METHOD knh__Array_new__array3D(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Any1 Array.get2D(Int! x, Int! y) */
+/* @method T1 Array.get2D(Int! x, Int! y) */
 
 static METHOD knh__Array_get2D(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -1140,7 +1140,7 @@ static METHOD knh__Array_get2D(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Any1 Array.get3D(Int! x, Int! y, Int! z) */
+/* @method T1 Array.get3D(Int! x, Int! y, Int! z) */
 
 static METHOD knh__Array_get3D(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -1153,7 +1153,7 @@ static METHOD knh__Array_get3D(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method void Array.set2D(Int! x, Int! y, Any1 v) */
+/* @method void Array.set2D(Int! x, Int! y, T1 v) */
 
 static METHOD knh__Array_set2D(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -1169,7 +1169,7 @@ static METHOD knh__Array_set2D(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method void Array.set3D(Int! x, Int! y, Int! z, Any1 v) */
+/* @method void Array.set3D(Int! x, Int! y, Int! z, T1 v) */
 
 static METHOD knh__Array_set3D(Ctx *ctx, knh_sfp_t *sfp)
 {

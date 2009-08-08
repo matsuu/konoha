@@ -48,10 +48,10 @@ knh_class_t knh_pmztype_toclass(Ctx *ctx, knh_type_t t, knh_class_t this_cid)
 	if(cid == CLASS_This) {
 		return this_cid;
 	}
-	if(cid == CLASS_Any1) {
+	if(cid == CLASS_T1) {
 		return ctx->share->ClassTable[this_cid].p1;
 	}
-	if(cid == CLASS_Any2) {
+	if(cid == CLASS_T2) {
 		return ctx->share->ClassTable[this_cid].p2;
 	}
 	if(ClassTable(cid).bcid == CLASS_Closure) {
@@ -91,10 +91,10 @@ knh_type_t knh_pmztype_totype(Ctx *ctx, knh_type_t t, knh_class_t this_cid)
 	if(cid == CLASS_This) {
 		return this_cid | mask;
 	}
-	if(cid == CLASS_Any1) {
+	if(cid == CLASS_T1) {
 		return ctx->share->ClassTable[this_cid].p1 | mask;
 	}
-	if(cid == CLASS_Any2) {
+	if(cid == CLASS_T2) {
 		return ctx->share->ClassTable[this_cid].p2 | mask;
 	}
 	if(ClassTable(cid).bcid == CLASS_Closure) {
