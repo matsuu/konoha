@@ -289,7 +289,7 @@ knh_type_t knh_rtti_type(Asm *abr, knh_type_t type, int a)
 			return NNTYPE_cid(type);
 		}
 	}
-	return NATYPE_cid(type);
+	return type;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -457,7 +457,7 @@ void KNH_ASM_SMOVx(Ctx *ctx, Asm *abr, knh_type_t atype, int a, knh_type_t btype
 	}
 #endif
 	if(IS_NNTYPE(atype) && !IS_NNTYPE(btype)) {
-		KNH_ASM_ISNULLx_(ctx, abr, bx);
+		KNH_ASM_CHECKNULLx_(ctx, abr, bx);
 		btype = NNTYPE_cid(btype);
 	}
 	knh_rtti_async(abr, a);
@@ -483,8 +483,8 @@ void KNH_ASM_SMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, Token *tkb)
 		case TT_STACK: {
 			int b = (int)DP(tkb)->index;
 			knh_type_t btype = knh_rtti_type(abr, DP(tkb)->type, b);
-			if(IS_NNTYPE(atype) && !IS_NNTYPE(btype)) {
-				KNH_ASM_ISNULL_(ctx, abr, b);
+			if(IS_NNTYPE(atype) && IS_NATYPE(btype)) {
+				KNH_ASM_CHECKNULL_(ctx, abr, b);
 				knh_rtti_nullChecked(abr, b);
 				btype = NNTYPE_cid(btype);
 			}
@@ -567,7 +567,7 @@ static
 void KNH_ASM_XMOVx(Ctx *ctx, Asm *abr, knh_type_t atype, knh_sfx_t ax, knh_type_t btype, knh_sfx_t bx)
 {
 	if(IS_NNTYPE(atype) && !IS_NNTYPE(btype)) {
-		KNH_ASM_ISNULLx_(ctx, abr, bx);
+		KNH_ASM_CHECKNULLx_(ctx, abr, bx);
 	}
 	if(IS_ubxint(atype)) {
 		if(IS_ubxint(btype)) {
@@ -635,7 +635,7 @@ void KNH_ASM_XMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, size_t an, Token 
 		case TT_STACK: {
 			int b = (int)DP(tkb)->index;
 			if(IS_NNTYPE(atype) && !IS_NNTYPE(btype)) {
-				KNH_ASM_ISNULL_(ctx, abr, b);
+				KNH_ASM_CHECKNULL_(ctx, abr, b);
 				knh_rtti_nullChecked(abr, b);
 			}
 #ifdef KNH_USING_UNBOXFIELD
@@ -813,14 +813,14 @@ void KNH_ASM_CALL(Ctx *ctx, Asm *abr, knh_type_t reqt, int sfpidx, Token *tkb, s
 		}
 		rtype = knh_Method_rztype(mtd);
 		if(IS_NNTYPE(reqt) && !IS_NNTYPE(rtype)) {
-			KNH_ASM_ISNULL_(ctx, abr, sfpidx);
+			KNH_ASM_CHECKNULL_(ctx, abr, sfpidx);
 			knh_rtti_nullChecked(abr, sfpidx);
 		}
 	}
 	else if(SP(tkb)->tt == TT_MN) {
 		KNH_ASM_ACALL_(ctx, abr, sfpidx, args + 2, DP(tkb)->mn);
 		if(IS_NNTYPE(reqt) && !IS_NNTYPE(rtype)) {
-			KNH_ASM_ISNULL_(ctx, abr, sfpidx);
+			KNH_ASM_CHECKNULL_(ctx, abr, sfpidx);
 			knh_rtti_nullChecked(abr, sfpidx);
 		}
 	}
@@ -843,7 +843,7 @@ void KNH_ASM_NEW(Ctx *ctx, Asm *abr, knh_type_t reqt, int sfpidx, Token *tkb,
 
 	knh_type_t rtype = knh_Method_rztype(mtd);
 	if(IS_NNTYPE(reqt) && !IS_NNTYPE(rtype)) {
-		KNH_ASM_ISNULL_(ctx, abr, sfpidx);
+		KNH_ASM_CHECKNULL_(ctx, abr, sfpidx);
 		knh_rtti_nullChecked(abr, sfpidx);
 	}
 }
@@ -907,7 +907,7 @@ void KNH_ASM_MAP(Ctx *ctx, Asm *abr, knh_type_t reqt, int sfpidx, Token *tkb, kn
 		KNH_ASM_NNMAP_(ctx, abr, sfpidx, DP(tkb)->cid);
 	}
 	else if(IS_NNTYPE(reqt)) {
-		KNH_ASM_ISNULL_(ctx, abr, sfpidx);
+		KNH_ASM_CHECKNULL_(ctx, abr, sfpidx);
 	}
 }
 
@@ -1186,7 +1186,7 @@ int TERMs_putSTACK(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_type_t reqt, in
 	if(IS_Token(tk) && SP(tk)->tt == TT_STACK) {
 		int a = DP(tk)->index;
 		if(!IS_NNTYPE(knh_rtti_type(abr, DP(tk)->type, a))) {
-			KNH_ASM_ISNULL_(ctx, abr, a);
+			KNH_ASM_CHECKNULL_(ctx, abr, a);
 			knh_rtti_nullChecked(abr, a);
 		}
 		return a;
@@ -1587,7 +1587,7 @@ void knh_StmtCALL_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpid
 		knh_type_t reqt2 = knh_Method_reqtTERMs(mtd, cid, stmt, 1);
 		knh_type_t vart2 = knh_rtti_type(abr, TERMs_gettype(stmt, 1), a);
 		if(IS_NNTYPE(reqt2) && !IS_NNTYPE(vart2)) {
-			KNH_ASM_ISNULL_(ctx, abr, sfi_(a));
+			KNH_ASM_CHECKNULL_(ctx, abr, sfi_(a));
 			knh_rtti_nullChecked(abr, a);
 		}
 		for(i = 2; i < DP(stmt)->size; i++) {
@@ -1848,7 +1848,7 @@ knh_StmtEXPR_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 		KNH_ASM_NNBOX(ctx, abr, DP(stmt)->type, sfpidx);
 	}
 	else if(IS_NNTYPE(reqt) && !IS_NNTYPE(DP(stmt)->type)) {
-		KNH_ASM_ISNULL_(ctx, abr, sfpidx);
+		KNH_ASM_CHECKNULL_(ctx, abr, sfpidx);
 	}
 }
 
