@@ -372,24 +372,24 @@ int knh_Method_pctoline(Method *mtd, knh_code_t *pc);
 
 /* ======================================================================== */
 
-#define KLR_ISNULL(ctx, n) \
-	if(IS_NULL(sfp[n].o)) { \
-		knh_throwException(ctx, new_NullException (ctx, sfp[n].o), _HERE_); \
+#define KLR_CHECKNULL(ctx, n) \
+	if(unlikely(IS_NULL(sfp[n].o))) { \
+		knh_throwException(ctx, new_NullException(ctx, sfp[n].o), _HERE_); \
 	} \
 
-#define KLR_ISNULLx(ctx, n) \
-	if(IS_NULL(SFXo(n))) { \
-		knh_throwException(ctx, new_NullException (ctx, SFXo(n)), _HERE_); \
+#define KLR_CHECKNULLx(ctx, n) \
+	if(unlikely(IS_NULL(SFXo(n)))) { \
+		knh_throwException(ctx, new_NullException(ctx, SFXo(n)), _HERE_); \
 	} \
 
-#define KLR_ISTYPE(ctx, n, cid) \
+#define KLR_CHECKTYPE(ctx, n, cid) \
 	if(!knh_Object_opTypeOf(ctx, sfp[n].o, cid)) { \
 		knh_throwException(ctx, new_Exception__type(ctx, sfp[n].o, cid), _HERE_); \
 	} \
 
-#define KLR_ISNNTYPE(ctx, n, cid) {\
-		KLR_ISTYPE(ctx, n, cid);\
-		KLR_ISNULL(ctx, n);\
+#define KLR_CHECKNNTYPE(ctx, n, cid) {\
+		KLR_CHECKTYPE(ctx, n, cid);\
+		KLR_CHECKNULL(ctx, n);\
 	}\
 
 /* ======================================================================== */

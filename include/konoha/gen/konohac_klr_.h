@@ -84,10 +84,10 @@ knh_code_t* KNH_ASM_BOXnc_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_class_t a2);
 knh_code_t* KNH_ASM_NNBOX_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_class_t a2);
 knh_code_t* KNH_ASM_NNBOXnc_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_class_t a2);
 knh_code_t* KNH_ASM_UNBOX_(Ctx *ctx, Asm *o,knh_sfi_t a1);
-knh_code_t* KNH_ASM_ISNULL_(Ctx *ctx, Asm *o,knh_sfi_t a1);
-knh_code_t* KNH_ASM_ISNULLx_(Ctx *ctx, Asm *o,knh_sfx_t a1);
-knh_code_t* KNH_ASM_ISTYPE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_class_t a2);
-knh_code_t* KNH_ASM_ISNNTYPE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_type_t a2);
+knh_code_t* KNH_ASM_CHECKNULL_(Ctx *ctx, Asm *o,knh_sfi_t a1);
+knh_code_t* KNH_ASM_CHECKNULLx_(Ctx *ctx, Asm *o,knh_sfx_t a1);
+knh_code_t* KNH_ASM_CHECKTYPE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_class_t a2);
+knh_code_t* KNH_ASM_CHECKNNTYPE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_type_t a2);
 knh_code_t* KNH_ASM_FCALL_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_ushort_t a2,knh_sfi_t a3,Object* a4);
 knh_code_t* KNH_ASM_SCALL_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_ushort_t a2,Object* a3);
 knh_code_t* KNH_ASM_AINVOKE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_ushort_t a2);
@@ -806,7 +806,7 @@ typedef struct {
 
 #define OPSIZE_UNBOX  (sizeof(klr_unbox_t)-sizeof(void*))
 
-#define OPCODE_ISNULL ((knh_opcode_t)48)
+#define OPCODE_CHECKNULL ((knh_opcode_t)48)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -814,11 +814,11 @@ typedef struct {
 	knh_opcode_t opcode;
 	knh_sfi_t a1;
 	void *nextaddr;
-} klr_isnull_t;
+} klr_checknull_t;
 
-#define OPSIZE_ISNULL  (sizeof(klr_isnull_t)-sizeof(void*))
+#define OPSIZE_CHECKNULL  (sizeof(klr_checknull_t)-sizeof(void*))
 
-#define OPCODE_ISNULLX ((knh_opcode_t)49)
+#define OPCODE_CHECKNULLX ((knh_opcode_t)49)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -826,11 +826,11 @@ typedef struct {
 	knh_opcode_t opcode;
 	knh_sfx_t a1;
 	void *nextaddr;
-} klr_isnullx_t;
+} klr_checknullx_t;
 
-#define OPSIZE_ISNULLX  (sizeof(klr_isnullx_t)-sizeof(void*))
+#define OPSIZE_CHECKNULLX  (sizeof(klr_checknullx_t)-sizeof(void*))
 
-#define OPCODE_ISTYPE ((knh_opcode_t)50)
+#define OPCODE_CHECKTYPE ((knh_opcode_t)50)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -839,11 +839,11 @@ typedef struct {
 	knh_sfi_t a1;
 	knh_class_t a2;
 	void *nextaddr;
-} klr_istype_t;
+} klr_checktype_t;
 
-#define OPSIZE_ISTYPE  (sizeof(klr_istype_t)-sizeof(void*))
+#define OPSIZE_CHECKTYPE  (sizeof(klr_checktype_t)-sizeof(void*))
 
-#define OPCODE_ISNNTYPE ((knh_opcode_t)51)
+#define OPCODE_CHECKNNTYPE ((knh_opcode_t)51)
 typedef struct {
 #ifdef KNH_USING_THREADEDCODE
 	void *codeaddr;
@@ -852,9 +852,9 @@ typedef struct {
 	knh_sfi_t a1;
 	knh_type_t a2;
 	void *nextaddr;
-} klr_isnntype_t;
+} klr_checknntype_t;
 
-#define OPSIZE_ISNNTYPE  (sizeof(klr_isnntype_t)-sizeof(void*))
+#define OPSIZE_CHECKNNTYPE  (sizeof(klr_checknntype_t)-sizeof(void*))
 
 #define OPCODE_FCALL ((knh_opcode_t)52)
 typedef struct {
