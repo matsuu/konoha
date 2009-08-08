@@ -544,6 +544,7 @@ String *knh_getResourceName(Ctx *ctx, knh_uri_t uri)
 }
 
 #define _URIDN(uri) knh_String_tochar(knh_getResourceName(ctx, uri))
+#define _FILEN(uri) knh_safefile(URIDN(uri))
 
 /* ======================================================================== */
 /* [tPackage] */

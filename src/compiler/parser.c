@@ -45,9 +45,9 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tkc_t *tc, int isData);
 static Stmt *new_StmtDECL(Ctx *ctx, Token *tkT, knh_tkc_t *tc);
 static Term *new_TermEXPR(Ctx *ctx, knh_tkc_t *tc, int level);
 static Stmt *new_StmtMETA(Ctx *ctx,  knh_tkc_t *tc, knh_stmt_t stt);
-static void knh_Stmt_addMETA(Ctx *ctx, Stmt *o, knh_tkc_t *tc);
-static void knh_Stmt_add_STMT1(Ctx *ctx, Stmt *o, knh_tkc_t *tc);
-static void knh_Stmt_add_SEMICOLON(Ctx *ctx, Stmt *o, knh_tkc_t *tc);
+static void knh_Stmt_addMETA(Ctx *ctx, Stmt *stmt, knh_tkc_t *tc);
+static void knh_Stmt_add_STMT1(Ctx *ctx, Stmt *stmt, knh_tkc_t *tc);
+static void knh_Stmt_add_SEMICOLON(Ctx *ctx, Stmt *stmt, knh_tkc_t *tc);
 static int knh_Token_isLVALUE(Ctx *ctx, Token *tkL);
 static void knh_Stmt_toLVALUE(Ctx *ctx, Stmt *stmt, int pe, char *fmt);
 
@@ -1356,7 +1356,7 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tkc_t *tc, int isData)
 		if(!isData) {
 			knh_perror(ctx, SP(tc->ts[e-1])->uri, SP(tc->ts[e-1])->line, KERR_ERROR, _("syntax error: empty expression"));
 		}
-		DBG_P("tc->c=%d, tc->e=%d", (int)oc, (int)e);
+		//DBG_P("tc->c=%d, tc->e=%d", (int)oc, (int)e);
 		return TM(tke);
 	}
 
@@ -1854,55 +1854,71 @@ Stmt* new_StmtLETEXPR(Ctx *ctx, knh_tkc_t *tc, int isData)
 /* [new_Stmt] */
 
 static
-void knh_StmtMETA_addLabel(Ctx *ctx, Stmt *o, Token *tkL)
+void knh_StmtMETA_addLabel(Ctx *ctx, Stmt *stmt, Token *tkL)
 {
-	if(IS_NULL(DP(o)->metaDictMap)) {
-		KNH_SETv(ctx, DP(o)->metaDictMap, new_DictMap0(ctx, 2));
+	if(IS_NULL(DP(stmt)->metaDictMap)) {
+		KNH_SETv(ctx, DP(stmt)->metaDictMap, new_DictMap0(ctx, 2));
 	}
-	DBG2_P("label: %s", sToken(tkL))
-	if(IS_DictMap(DP(o)->metaDictMap)) {
-		knh_DictMap_set(ctx, DP(o)->metaDictMap, TS_ATlabel, UP(tkL));
+	if(IS_DictMap(DP(stmt)->metaDictMap)) {
+		knh_DictMap_set(ctx, DP(stmt)->metaDictMap, TS_ATlabel, UP(tkL));
 	}
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_StmtMETA_addMeta(Ctx *ctx, Stmt *o, String *p)
+void knh_StmtMETA_addComment(Ctx *ctx, Stmt *stmt, String *comment)
 {
-	if(IS_NULL(DP(o)->metaDictMap)) {
-		KNH_SETv(ctx, DP(o)->metaDictMap, new_DictMap0(ctx, 2));
+	if(IS_NULL(DP(stmt)->metaDictMap)) {
+		KNH_SETv(ctx, DP(stmt)->metaDictMap, new_DictMap0(ctx, 2));
 	}
-	if(IS_DictMap(DP(o)->metaDictMap)) {
-		KNH_ASSERT(IS_String(p));
-		knh_DictMap_set(ctx, DP(o)->metaDictMap, p, UP(p));
+	if(IS_DictMap(DP(stmt)->metaDictMap)) {
+		knh_DictMap_set(ctx, DP(stmt)->metaDictMap, TS_Comment, UP(comment));
 	}
 }
 
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_StmtMETA_addMeta2(Ctx *ctx, Stmt *o, String *k, Token *p)
+void knh_StmtMETA_addMeta(Ctx *ctx, Stmt *stmt, String *k, Token *tkP)
 {
-	if(IS_NULL(DP(o)->metaDictMap)) {
-		KNH_SETv(ctx, DP(o)->metaDictMap, new_DictMap0(ctx, 2));
+	if(IS_NULL(DP(stmt)->metaDictMap)) {
+		KNH_SETv(ctx, DP(stmt)->metaDictMap, new_DictMap0(ctx, 2));
 	}
-	if(IS_DictMap(DP(o)->metaDictMap)) {
-		knh_tkc_t tc;
-		knh_Token_tc(ctx, p, &tc);
-		if(tc.e == 0) {
-			knh_DictMap_set(ctx, DP(o)->metaDictMap, k, UP(k));
-		}
-		else if(tc.e == 1) {
-			if(IS_String(DP(tc.ts[0])->data)) {
-				knh_DictMap_set(ctx, DP(o)->metaDictMap, k, DP(tc.ts[0])->data);
-			}
-			else {
-				knh_DictMap_set(ctx, DP(o)->metaDictMap, k, UP(new_String(ctx, knh_Token_tobytes(ctx, tc.ts[0]), NULL)));
-			}
+	if(IS_DictMap(DP(stmt)->metaDictMap)) {
+		if(tkP == NULL) {
+			knh_DictMap_set(ctx, DP(stmt)->metaDictMap, k, UP(k));
 		}
 		else {
-			TODO();
+			knh_tkc_t tcbuf, *tc = knh_Token_tc(ctx, tkP, &tcbuf);
+			Token **ts = tc->ts;
+			if(tc->e == 0) {
+				knh_DictMap_set(ctx, DP(stmt)->metaDictMap, k, UP(k));
+			}
+			else if(tc->e == 1) {
+				if(IS_String(DP(tc->ts[0])->data)) {
+					knh_DictMap_set(ctx, DP(stmt)->metaDictMap, k, DP(ts[0])->data);
+				}
+				else {
+					knh_bytes_t t = knh_Token_tobytes(ctx, tc->ts[0]);
+					knh_DictMap_set(ctx, DP(stmt)->metaDictMap, k, UP(new_String(ctx, t, NULL)));
+				}
+			}
+			else {
+				Array *a = new_Array(ctx, CLASS_String, tc->e);
+				int c = 0;
+				for(c = 0; c < tc->e; c++) {
+					if(SP(ts[c])->tt == TT_COMMA) continue;
+					if(IS_String(DP(tc->ts[0])->data)) {
+						knh_Array_add(ctx, a, DP(ts[0])->data);
+					}
+					else {
+						knh_bytes_t t = knh_Token_tobytes(ctx, tc->ts[0]);
+						knh_Array_add(ctx, a, UP(new_String(ctx, t, NULL)));
+					}
+				}
+				knh_DictMap_set(ctx, DP(stmt)->metaDictMap, k, UP(a));
+			}
 		}
 	}
 }
@@ -1910,53 +1926,33 @@ void knh_StmtMETA_addMeta2(Ctx *ctx, Stmt *o, String *k, Token *p)
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_Stmt_addMETA(Ctx *ctx, Stmt *o, knh_tkc_t *tc)
+void knh_Stmt_addMETA(Ctx *ctx, Stmt *stmt, knh_tkc_t *tc)
 {
-	//DBG2_P("stt=%s, meta=%d", knh_stmt_tochar(o->stt), tc->meta);
-	if(tc->meta == -1 || SP(o)->stt == STT_DONE || SP(o)->stt == STT_ERR) {
+	int i, e;
+	Token **ts = tc->ts;
+	if(tc->meta == -1 || SP(stmt)->stt == STT_DONE || SP(stmt)->stt == STT_ERR) {
 		return ;
 	}
-	Token **ts = tc->ts;
-	int i;
-	if(tc->meta < tc->c) {
-		for(i = tc->meta; i < tc->c; i++) {
-			if(SP(ts[i])->tt == TT_LABEL) {
-				knh_StmtMETA_addLabel(ctx, o, ts[i]);
-			}
-			else if(SP(ts[i])->tt == TT_METAN) {
-				if(DP(ts[i])->tt_next == TT_PARENTHESIS) {
-					knh_StmtMETA_addMeta2(ctx, o, (String*)DP(ts[i-1])->data, ts[i]);
-					i++;
-				}
-				else {
-					//DBG2_P("META!! %s", sToken(ts[i]));
-					knh_StmtMETA_addMeta(ctx, o, (String*)DP(ts[i])->data);
-				}
-			}
+	e = (tc->meta < tc->c) ? tc->c : tc->e;
+	for(i = tc->meta; i < e; i++) {
+		if(SP(ts[i])->tt == TT_LABEL) {
+			knh_StmtMETA_addLabel(ctx, stmt, ts[i]);
 		}
-		tc->meta = -1;
-	}
-	else {
-		for(i = tc->meta; i < tc->e; i++) {
-			if(SP(ts[i])->tt == TT_LABEL) {
-				knh_StmtMETA_addLabel(ctx, o, ts[i]);
-			}
-			else if(SP(ts[i])->tt == TT_METAN) {
-				if(DP(ts[i])->tt_next == TT_PARENTHESIS) {
-					knh_StmtMETA_addMeta2(ctx, o, (String*)DP(ts[i-1])->data, ts[i]);
-					i++;
-				}
-				else {
-					knh_StmtMETA_addMeta(ctx, o, (String*)DP(ts[i])->data);
-				}
+		if(SP(ts[i])->tt == TT_DOC) {
+			knh_StmtMETA_addComment(ctx, stmt, DP(ts[i])->text);
+		}
+		else if(SP(ts[i])->tt == TT_METAN) {
+			if(DP(ts[i])->tt_next == TT_PARENTHESIS) {
+				knh_StmtMETA_addMeta(ctx, stmt, DP(ts[i])->text, ts[i+1]);
+				i++;
 			}
 			else {
-				break;
+				knh_StmtMETA_addMeta(ctx, stmt, DP(ts[i])->text, NULL);
 			}
 		}
-		tc->meta = -1;
-		tc->c = i;
 	}
+	if(e == tc->e) tc->c = i;
+	tc->meta = -1;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1964,43 +1960,43 @@ void knh_Stmt_addMETA(Ctx *ctx, Stmt *o, knh_tkc_t *tc)
 static
 Stmt *new_StmtMETA(Ctx *ctx,  knh_tkc_t *tc, knh_stmt_t stt)
 {
-	Stmt *o = new_Stmt(ctx, 0, stt);
-	knh_Stmt_addMETA(ctx, o, tc);
+	Stmt *stmt = new_Stmt(ctx, 0, stt);
+	knh_Stmt_addMETA(ctx, stmt, tc);
 	int c = tc->c - 1;
 	if(c < 0) c = 0;
-	SP(o)->line = SP(tc->ts[c])->line;
-	SP(o)->uri = SP(tc->ts[c])->uri;
-	return o;
+	SP(stmt)->line = SP(tc->ts[c])->line;
+	SP(stmt)->uri = SP(tc->ts[c])->uri;
+	return stmt;
 }
 
 
 /* ======================================================================== */
 /* [COMMONS] */
 
-static void knh_Stmt_add_STMT1(Ctx *ctx, Stmt *o, knh_tkc_t *tc)
+static void knh_Stmt_add_STMT1(Ctx *ctx, Stmt *stmt, knh_tkc_t *tc)
 {
-	if(SP(o)->stt == STT_ERR) return;
+	if(SP(stmt)->stt == STT_ERR) return;
 	if(tc->c < tc->e && SP(tc->ts[tc->c])->tt == TT_BRACE) {
-		knh_Stmt_add(ctx, o, TM(new_StmtINSTMT(ctx, tc->ts[tc->c], 0/*isData*/)));
+		knh_Stmt_add(ctx, stmt, TM(new_StmtINSTMT(ctx, tc->ts[tc->c], 0/*isData*/)));
 		tc->c += 1;
 	}
 	else {
-		knh_Stmt_add(ctx, o, TM(new_StmtSTMT1(ctx, tc, 0/*isData*/)));
+		knh_Stmt_add(ctx, stmt, TM(new_StmtSTMT1(ctx, tc, 0/*isData*/)));
 	}
 }
 
 /* ------------------------------------------------------------------------ */
 
-static void knh_Stmt_add_SEMICOLON(Ctx *ctx, Stmt *o, knh_tkc_t *tc)
+static void knh_Stmt_add_SEMICOLON(Ctx *ctx, Stmt *stmt, knh_tkc_t *tc)
 {
-	if(SP(o)->stt == STT_ERR) return;
+	if(SP(stmt)->stt == STT_ERR) return;
 	if(tc->c < tc->e && SP(tc->ts[tc->c])->tt == TT_SEMICOLON) {
 		tc->c += 1;
 	}
 	else {
 		int c = tc->c - 1;
 		if(c >= tc->e || SP(tc->ts[c])->tt != TT_SEMICOLON) {
-			knh_perror(ctx, SP(o)->uri, SP(o)->line, KERR_INFO, _("needs ;"));
+			knh_perror(ctx, SP(stmt)->uri, SP(stmt)->line, KERR_INFO, _("needs ;"));
 		}
 	}
 }
@@ -3096,7 +3092,7 @@ static Stmt *new_StmtSTMT1(Ctx *ctx, knh_tkc_t *tc, int isData)
 	}
 
 	switch(SP(tkc)->tt) {
-	case TT_LABEL:
+	case TT_LABEL: case TT_DOC:
 	{
 		if(tc->meta == -1) tc->meta = tc->c - 1;
 		goto L_TAIL;

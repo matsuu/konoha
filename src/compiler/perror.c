@@ -60,7 +60,7 @@ void knh_vperror(Ctx *ctx, knh_uri_t uri, int line, int pe, char *fmt, va_list a
 	L_PRINT:;
 	{
 		OutputStream *w = KNH_STDERR;
-		knh_printf(ctx, w, " - [%s:%d]:%s ", knh_safefile(URIDN(uri)), (knh_intptr_t)line, KERR_MSG[pe]);
+		knh_printf(ctx, w, " - [%s:%d]:%s ", FILEN(uri), (knh_intptr_t)line, KERR_MSG[pe]);
 		knh_vprintf(ctx, w, fmt, ap);
 		knh_write_EOL(ctx, w);
 	}

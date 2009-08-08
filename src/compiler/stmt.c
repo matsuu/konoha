@@ -67,7 +67,7 @@ void knh_Stmt_toERR(Ctx *ctx, Stmt *stmt, Term *tm)
 	}
 	{
 		char buf[256];
-		knh_snprintf(buf, sizeof(buf), "Script!!: running errors at %s:%d", URIDN(SP(stmt)->uri), SP(stmt)->line);
+		knh_snprintf(buf, sizeof(buf), "Script!!: you'll have to fix bugs at %s:%d", FILEN(SP(stmt)->uri), SP(stmt)->line);
 		KNH_SETv(ctx, DP(stmt)->errMsg, new_String(ctx, B(buf), NULL));
 		KNH_SETv(ctx, DP(stmt)->next, KNH_NULL);
 	}
