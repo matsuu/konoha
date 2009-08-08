@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 /* ======================================================================== */
-#define KONOHA_BUILDID                  632
+#define KONOHA_BUILDID                  633
 
 /* ======================================================================== */
 
@@ -1795,23 +1795,25 @@ extern "C" {
 #define TS_DEVSTDOUT                    ((ctx)->share->tString[TSN_DEVSTDOUT])
 #define TSN_ATlabel             15
 #define TS_ATlabel                      ((ctx)->share->tString[TSN_ATlabel])
-#define TSN_SecurityException   16
+#define TSN_Comment             16
+#define TS_Comment                      ((ctx)->share->tString[TSN_Comment])
+#define TSN_SecurityException   17
 #define TS_SecurityException            ((ctx)->share->tString[TSN_SecurityException])
-#define TSN_AssertionException  17
+#define TSN_AssertionException  18
 #define TS_AssertionException           ((ctx)->share->tString[TSN_AssertionException])
-#define TSN_LP                  18
+#define TSN_LP                  19
 #define TS_LP                           ((ctx)->share->tString[TSN_LP])
-#define TSN_RP                  19
+#define TSN_RP                  20
 #define TS_RP                           ((ctx)->share->tString[TSN_RP])
-#define TSN_LB                  20
+#define TSN_LB                  21
 #define TS_LB                           ((ctx)->share->tString[TSN_LB])
-#define TSN_RB                  21
+#define TSN_RB                  22
 #define TS_RB                           ((ctx)->share->tString[TSN_RB])
-#define TSN_LS                  22
+#define TSN_LS                  23
 #define TS_LS                           ((ctx)->share->tString[TSN_LS])
-#define TSN_RS                  23
+#define TSN_RS                  24
 #define TS_RS                           ((ctx)->share->tString[TSN_RS])
-#define KNH_TSTRING_SIZE        24
+#define KNH_TSTRING_SIZE        25
 
 /* ======================================================================== */
 /* [field] */

@@ -1426,17 +1426,26 @@ void knh_InputStream_parseToken(Ctx *ctx, InputStream *in, Token *tk)
 
 	BLOCK_COMMENT:
 	{
-		int nest = 1;
+		int nest = 1, line = DP(in)->line;
+		knh_cwb_write(ctx, cwb, STEXT("/*"));
 		while((ch = knh_InputStream_getc(ctx, in)) != EOF) {
+			knh_cwb_putc(ctx, cwb, ch);
 			if(prev == '*' && ch == '/') {
 				nest--;
-				if(nest == 0) goto MAIN_PART;
+				if(nest == 0) {
+					//DBG2_P("line=%d, isBeginOfLine=%d", DP(in)->line - line, isBeginOfLine);
+					if(DP(in)->line - line > 2) {
+						knh_Token_padd(ctx, tks[tkslevel], &isBeginOfLine, knh_cwb_newToken(ctx, cwb, TT_DOC, in));
+					}
+					knh_cwb_close(cwb);
+					goto MAIN_PART;
+				}
 			}else if(prev == '/' && ch == '*') {
-				DBG2_P("nesting /* ");
 				nest++;
 			}
 			prev = ch;
 		}
+		knh_cwb_close(cwb);
 	}
 	goto L_EOF; /* EOF */
 

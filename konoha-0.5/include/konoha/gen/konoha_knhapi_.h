@@ -134,6 +134,7 @@ extern "C" {
 #define KNH_SYS_SCRIPT 5
 #define FIELDN(fn) knh_String_tochar(knh_getFieldName(ctx, fn))
 #define URIDN(uri) knh_String_tochar(knh_getResourceName(ctx, uri))
+#define FILEN(uri) knh_safefile(URIDN(uri))
 
 /* ======================================================================== */
 /* [PROTOTYPE] */

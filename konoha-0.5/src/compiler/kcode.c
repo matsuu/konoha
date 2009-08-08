@@ -113,7 +113,7 @@ char *knh_Method_file(Ctx *ctx, Method *mtd)
 		return "(naitive)";
 	}
 	KLRCode *o = (KLRCode*)DP(mtd)->code;
-	return URIDN(DP(o)->uri);
+	return FILEN(DP(o)->uri);
 }
 
 /* ------------------------------------------------------------------------ */
