@@ -2378,7 +2378,6 @@ void knh_KLRCode_traverse(Ctx *ctx, KLRCode *o, knh_ftraverse ftr)
 #define knh_MethodField_fdefault NULL
 #define knh_Method_fdefault NULL
 #define knh_Mapper_fdefault NULL
-#define knh_ClassMap_fdefault NULL
 #define knh_Closure_fdefault NULL
 #define knh_AffineConv_fdefault NULL
 #define knh_ClassSpec_fdefault NULL
@@ -2443,16 +2442,6 @@ Object *knh_Float_fdefault(Ctx *ctx, knh_class_t cid)
 	return (Object*)KNH_FLOAT0;
 }
 
-///* ------------------------------------------------------------------------ */
-//
-//static
-//Object *knh_FloatX_fdefault(Ctx *ctx, knh_class_t cid)
-//{
-//	ClassSpec *o = knh_getClassSpec(ctx, cid].cspec;
-//	KNH_ASSERT(IS_ClassSpec(o));
-//	return UP(DP(o)->fvalue);
-//}
-
 /* ------------------------------------------------------------------------ */
 
 static
@@ -2461,16 +2450,6 @@ Object *knh_Int_fdefault(Ctx *ctx, knh_class_t cid)
 	return (Object*)KNH_INT0;
 }
 
-///* ------------------------------------------------------------------------ */
-//
-//static
-//Object *knh_IntX_fdefault(Ctx *ctx, knh_class_t cid)
-//{
-//	ClassSpec *o = knh_getClassSpec(ctx, cid].cspec;
-//	KNH_ASSERT(IS_ClassSpec(o));
-//	return UP(DP(o)->ivalue);
-//}
-
 /* ------------------------------------------------------------------------ */
 
 static
@@ -2478,16 +2457,6 @@ Object *knh_String_fdefault(Ctx *ctx, knh_class_t cid)
 {
 	return (Object*)TS_EMPTY;
 }
-
-///* ------------------------------------------------------------------------ */
-//
-//static
-//Object *knh_StringX_fdefault(Ctx *ctx, knh_class_t cid)
-//{
-//	ClassSpec *u = knh_getClassSpec(ctx, cid].cspec;
-//	KNH_ASSERT(IS_ClassSpec(u));
-//	return UP(DP(u)->svalue);
-//}
 
 /* ------------------------------------------------------------------------ */
 
@@ -2707,13 +2676,8 @@ void knh_loadClassData(Ctx *ctx, knh_ClassData_t *data)
 			else {
 				KNH_INITv(t->cstruct, ClassTable(data->supcid).cstruct);
 			}
-			KNH_ASSERT(t->cmap == NULL);
-			{
-				ClassMap *cm = ClassTable(CLASS_Any).cmap;
-				if((data->flag & KNH_FLAG_CF_PRIVATE) == 0 || cid == CLASS_Any) {
-					cm = new_ClassMap0(ctx, data->mapper_size);
-				}
-				KNH_INITv(t->cmap, cm);
+			if(t->cmap == NULL) {
+				KNH_INITv(t->cmap, knh_ClassMap_fdefault(ctx, CLASS_ClassMap));
 			}
 			knh_setClassDefaultValue(ctx, cid, KNH_NULL, data->fdefault);
 		}
