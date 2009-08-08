@@ -636,10 +636,10 @@ static knh_ClassData_t ClassData[] = {
 };
 
 static knh_GenericsData_t GenericsData[] = {
-	{"String..", ICLASS_String, CLASS_Iterator, CLASS_String, CLASS_unknown},
-	{"T1..", ICLASS_T1, CLASS_Iterator, CLASS_T1, CLASS_unknown},
-	{"Int..", ICLASS_Int, CLASS_Iterator, CLASS_Int, CLASS_unknown},
-	{"This..", ICLASS_This, CLASS_Iterator, CLASS_This, CLASS_unknown},
+	{"Iterator<String>", ICLASS_String, CLASS_Iterator, CLASS_String, CLASS_unknown},
+	{"Iterator<T1>", ICLASS_T1, CLASS_Iterator, CLASS_T1, CLASS_unknown},
+	{"Iterator<Int>", ICLASS_Int, CLASS_Iterator, CLASS_Int, CLASS_unknown},
+	{"Iterator<This>", ICLASS_This, CLASS_Iterator, CLASS_This, CLASS_unknown},
 	{"String[]", ACLASS_String, CLASS_Array, CLASS_String, CLASS_unknown},
 	{NULL}
 };

@@ -163,10 +163,11 @@ void knh_Context_initCommon(Ctx *ctx, knh_Context_t *o, size_t stacksize)
 			o->mprCache[i] = mprInit;
 		}
 	}
-
-	KNH_INITv(o->bufa, new_Bytes(ctx, o->stacksize * 4));
-	KNH_INITv(o->bufw, new_BytesOutputStream(ctx, o->bufa));
-	KNH_INITv(o->bconvbuf, new_Bytes(ctx, 256));
+	if(o->bufa == NULL) {
+		KNH_INITv(o->bufa, new_Bytes(ctx, KONOHA_PAGESIZE));
+		KNH_INITv(o->bufw, new_BytesOutputStream(ctx, o->bufa));
+	}
+	KNH_INITv(o->bconvbuf, new_Bytes(ctx, KONOHA_PAGESIZE));
 	KNH_INITv(o->props, new_DictMap0(ctx, 16));
 
 	o->ctxlock = (knh_mutex_t*)KNH_MALLOC(ctx, sizeof(knh_mutex_t));
@@ -353,6 +354,8 @@ void knh_initSharedData(Context *ctx)
 	knh_loadSystemString(ctx);
 
 	KNH_INITv(ctx->sys, new_System(ctx));
+	KNH_INITv(ctx->bufa, new_Bytes(ctx, KONOHA_PAGESIZE));
+	KNH_INITv(ctx->bufw, new_BytesOutputStream(ctx, ctx->bufa));
 	knh_loadSystemData(ctx);
 	KNH_INITv(share->mainns, new_NameSpace(ctx, TS_main));
 }

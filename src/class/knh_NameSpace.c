@@ -91,7 +91,7 @@ Script *knh_NameSpace_getScript(Ctx *ctx, NameSpace *ns)
 /* ======================================================================== */
 /* [class] */
 
-knh_class_t knh_getcid(Ctx *ctx, knh_bytes_t lname)
+knh_class_t knh_getcid(Ctx *ctx, knh_bytes_t /*don't use cwb*/ lname)
 {
 	knh_uintptr_t cid = knh_DictSet_get__b(DP(ctx->sys)->ClassNameDictSet, lname);
 	if(cid > 0) return (knh_class_t)(cid-1);

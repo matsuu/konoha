@@ -135,15 +135,17 @@ knh_type_t knh_pmztype_totype(Ctx *ctx, knh_type_t t, knh_class_t this_cid)
 
 knh_class_t knh_class_Array(Ctx *ctx, knh_class_t p1)
 {
-	char buf[CLASSNAME_BUFSIZ];
+	knh_class_t cid = CLASS_unknown;
+	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
 	if(p1 == CLASS_Any) return CLASS_Array;
-	knh_snprintf(buf, sizeof(buf), "%s[]", CLASSN(p1));
-	knh_class_t cid = knh_getcid(ctx, B(buf));
+	knh_write_ltype(ctx, cwb->w, p1);
+	knh_write(ctx, cwb->w, STEXT("[]"));
+	/* knh_class_t*/ cid = knh_getcid(ctx, knh_cwb_tobytes(cwb));
 	if(cid == CLASS_unknown) {
-		DBG_P("Generating %s", buf);
-		return knh_addGenericsClass(ctx, CLASS_newid, new_String(ctx, B(buf), NULL), CLASS_Array, p1, CLASS_unknown);
+		cid = knh_addGenericsClass(ctx, CLASS_newid, knh_cwb_newString(ctx, cwb), CLASS_Array, p1, CLASS_unknown);
+	} else {
+		knh_cwb_close(cwb);
 	}
-	//DBG2_P("cid=%d, %s", cid, buf);
 	return cid;
 }
 
@@ -151,13 +153,17 @@ knh_class_t knh_class_Array(Ctx *ctx, knh_class_t p1)
 
 knh_class_t knh_class_Iterator(Ctx *ctx, knh_class_t p1)
 {
-	char buf[CLASSNAME_BUFSIZ];
-	if(p1 == CLASS_Any) return CLASS_Iterator;
-	knh_snprintf(buf, sizeof(buf), "%s..", CLASSN(p1));
-	knh_class_t cid = knh_getcid(ctx, B(buf));
+	knh_class_t cid = CLASS_unknown;
+	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
+	if(p1 == CLASS_Any) return CLASS_Array;
+	knh_write(ctx, cwb->w, STEXT("Iterator<"));
+	knh_write_ltype(ctx, cwb->w, p1);
+	knh_putc(ctx, cwb->w, '>');
+	/* knh_class_t*/ cid = knh_getcid(ctx, knh_cwb_tobytes(cwb));
 	if(cid == CLASS_unknown) {
-		DBG_P("Generating %s", buf);
-		return knh_addGenericsClass(ctx, CLASS_newid, new_String(ctx, B(buf), NULL), CLASS_Iterator, p1, CLASS_unknown);
+		cid = knh_addGenericsClass(ctx, CLASS_newid, knh_cwb_newString(ctx, cwb), CLASS_Iterator, p1, CLASS_unknown);
+	} else {
+		knh_cwb_close(cwb);
 	}
 	return cid;
 }
@@ -177,56 +183,28 @@ knh_class_t knh_class_Generics(Ctx *ctx, knh_class_t bcid, knh_class_t p1, knh_c
 		return bcid;
 	}
 	else {
-		char buf[CLASSNAME_BUFSIZ];
-		if(p2 == CLASS_unknown) {
-			knh_snprintf(buf, sizeof(buf), "%s<%s>", CLASSN(bcid), CLASSN(p1));
+		knh_class_t cid;
+		knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
+		knh_write_ltype(ctx, cwb->w, bcid);
+		knh_putc(ctx, cwb->w, '<');
+		knh_write_ltype(ctx, cwb->w, p1);
+		if(p2 != CLASS_unknown) {
+			knh_putc(ctx, cwb->w, ',');
+			knh_write_ltype(ctx, cwb->w, p2);
+
 		}
-		else {
-			knh_snprintf(buf, sizeof(buf), "%s<%s,%s>", CLASSN(bcid), CLASSN(p1), CLASSN(p2));
-		}
-		knh_class_t cid = knh_getcid(ctx, B(buf));
+		knh_putc(ctx, cwb->w, '>');
+		/* knh_class_t*/ cid = knh_getcid(ctx, knh_cwb_tobytes(cwb));
 		if(cid == CLASS_unknown) {
-			DBG_P("Generating %s", buf);
-			return knh_addGenericsClass(ctx, CLASS_newid, new_String(ctx, B(buf), NULL), bcid, p1, p2);
+			cid = knh_addGenericsClass(ctx, CLASS_newid, knh_cwb_newString(ctx, cwb), CLASS_Array, p1, CLASS_unknown);
+		} else {
+			knh_cwb_close(cwb);
 		}
 		return cid;
 	}
 }
 
 /* ------------------------------------------------------------------------ */
-
-char* knh_format_type(Ctx *ctx, char *buf, size_t bufsiz, knh_type_t type)
-{
-	if(type == TYPE_void) {
-		knh_snprintf(buf, bufsiz, "void");
-		return buf;
-	}
-	if(type == TYPE_void) {
-		knh_snprintf(buf, bufsiz, "var");
-		return buf;
-	}
-	knh_class_t cid = CLASS_type(type);
-	if(!(cid < ctx->share->ClassTableSize)) {
-		cid = CLASS_Any;
-		type = cid;
-	}
-	KNH_ASSERT_cid(cid);
-	char *cname = knh_ClassTable_CLASSN(ctx, cid);
-	if(IS_ubxtype(type)) {
-		knh_snprintf(buf, bufsiz, "%s", cname);
-		buf[0] = tolower(buf[0]);
-		return buf;
-	}
-	if(IS_NNTYPE(type)) {
-		knh_snprintf(buf, bufsiz, "%s", cname);
-	}
-	else {
-		knh_snprintf(buf, bufsiz, "%s?", cname);
-	}
-	return buf;
-}
-
-/* ======================================================================== */
 /* [movabletext] */
 
 char *TYPEQ(knh_type_t type)

@@ -272,15 +272,21 @@ void knh_setClassParam(Ctx *ctx, knh_class_t cid, knh_class_t p1, knh_class_t p2
 knh_class_t
 knh_addGenericsClass(Ctx *ctx, knh_class_t cid, String *name, knh_class_t bcid, knh_class_t p1, knh_class_t p2)
 {
+	knh_ClassTable_t *t;
+	knh_flag_t mask = 0;
 	if(cid == CLASS_newid) {
 		cid = knh_ClassTable_newId(ctx);
 	}else {
 		//KNH_ASSERT(cid + 1 == ctx->share->ClassTableSize);
 		((knh_SharedData_t*)ctx->share)->ClassTableSize = cid;
 	}
-	knh_ClassTable_t *t = pClassTable(cid);
-	KNH_ASSERT(bcid < cid);
-	KNH_ASSERT(t->class_cid == NULL);
+	/* knh_ClassTable_t */t = pClassTable(cid);
+	DBG2_ASSERT(bcid < cid);
+	KNH_ASSERT(t->sname == NULL);
+	if(knh_class_isTypeVariable(CLASS_type(p1)) ||
+			(p2 != CLASS_unknown && knh_class_isTypeVariable(CLASS_type(p2)))) {
+		mask = KNH_FLAG_CF_TYPEVARIABLE;
+	}
 
 	t->cflag  = ClassTable(bcid).cflag;
 	t->oflag  = ClassTable(bcid).oflag;
@@ -566,11 +572,11 @@ static Array* knh_Class_domain(Ctx *ctx)
 	Array *a = new_Array(ctx, CLASS_Class, 0);
 	int cid = 0;
 	for(cid = 0; cid < ctx->share->StructTableSize; cid++) {
-		if(knh_class_isPrivate(cid)) continue;
+		if(knh_class_isPrivate(cid) || knh_class_isTypeVariable(cid)) continue;
 		knh_Array_add(ctx, a, UP(new_Class(ctx, cid)));
 	}
 	for(cid = ctx->share->ClassTableSize; cid < KNH_TCLASS_SIZE; cid++) {
-		if(knh_class_isPrivate(cid)) continue;
+		if(knh_class_isPrivate(cid) || knh_class_isTypeVariable(cid)) continue;
 		knh_Array_add(ctx, a, UP(new_Class(ctx, cid)));
 	}
 	return a;
