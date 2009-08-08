@@ -194,7 +194,7 @@ static METHOD knh__Object_opTo(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Object_getClass(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN(ctx, sfp, ctx->share->ClassTable[(sfp[0].o)->h.cid].class_cid);
+	KNH_RETURN(ctx, sfp, new_Class(ctx, (sfp[0].o)->h.cid));
 }
 
 /* ------------------------------------------------------------------------ */

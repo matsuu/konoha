@@ -327,7 +327,7 @@ typedef knh_uint16_t       knh_expt_t;    /* knh_expt_t */
 // @NOUSE
 #define TYPEQN(t)                     TYPEN(t), TYPEQ(t)
 
-#define TYPE_var                      CLASS_AnyVar
+#define TYPE_var                      CLASS_TVar
 #define TYPE_void                     NNTYPE_cid(CLASS_Any)
 
 /* ------------------------------------------------------------------------ */
@@ -407,8 +407,8 @@ typedef struct knh_Object_t {
 #define ObjectNULL      Object
 #define Any             knh_Object_t
 #define This            knh_Object_t
-#define Any1            knh_Object_t
-#define Any2            knh_Object_t
+#define T1            knh_Object_t
+#define T2            knh_Object_t
 #define UP(o)           (Object*)(o)
 
 #define KNH_FIELDn(v,n)            ((Script*)(v))->fields[(n)]
@@ -602,6 +602,7 @@ typedef struct {
 	struct knh_String_t       *sname;
 	struct knh_String_t       *lname;
 	struct knh_Class_t        *class_cid;
+	struct knh_Class_t        *class_natype;
 	struct knh_ClassStruct_t  *cstruct;
 	struct knh_ClassMap_t     *cmap;
 	struct knh_Object_t       *cspec;

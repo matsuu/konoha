@@ -53,7 +53,7 @@ METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Any0 Closure.invoke(Any1 x, Any2 y, Any3 z) @VarArgs */
+/* @method T0 Closure.invoke(T1 x, T2 y, T3 z) @VarArgs */
 
 METHOD knh__Closure_invoke(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -220,7 +220,7 @@ knh_addClosureClass(Ctx *ctx, knh_class_t cid, String *name, knh_type_t r0, knh_
 		((knh_SharedData_t*)ctx->share)->ClassTableSize = cid;
 	}
 	knh_ClassTable_t *t = pClassTable(cid);
-	KNH_ASSERT(ClassTable(cid).class_cid == NULL);
+	KNH_ASSERT(ClassTable(cid).sname == NULL);
 
 	t->cflag  = ClassTable(CLASS_Closure).cflag;
 	t->oflag  = ClassTable(CLASS_Closure).oflag;

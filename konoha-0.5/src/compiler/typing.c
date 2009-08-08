@@ -622,7 +622,7 @@ void knh_Token_toCLASSID(Ctx *ctx, Token *o, knh_class_t cid)
 	SP(o)->tt = TT_CLASSID;
 	DP(o)->cid = cid;
 	DP(o)->type = NNTYPE_Class;
-	KNH_SETv(ctx, DP(o)->data, ClassTable(cid).class_cid);
+	KNH_SETv(ctx, DP(o)->data, new_Class(ctx, cid));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -1889,7 +1889,7 @@ Term *knh_StmtCALLBASE_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh
 				cid1 = TERMs_getcid(stmt, 2);
 			}
 			KNH_ASSERT_cid(cid1);
-			knh_Token_setCONST(ctx, tk1, UP(ctx->share->ClassTable[cid1].class_cid));
+			knh_Token_setCONST(ctx, tk1, UP(new_Class(ctx, cid1)));
 			DP(stmt)->size = 2;
 			knh_Token_toMTD(ctx, DP(stmt)->tokens[0], METHODN_domain,
 					knh_Class_getMethod(ctx, CLASS_Class, METHODN_domain));

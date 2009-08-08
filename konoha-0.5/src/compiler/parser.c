@@ -723,7 +723,7 @@ Term *new_TermTUPLE(Ctx *ctx, Token *tk, int isData)
 		knh_Stmt_add_EXPRs(ctx, stmt, &tc, isData);
 		c = DP(stmt)->size - 2;
 		if(c == 2) {
-			KNH_SETv(ctx, DP(stmt)->terms[1], new_TokenCID(ctx, FL(tk), CLASS_Tuple2));
+			KNH_SETv(ctx, DP(stmt)->terms[1], new_TokenCID(ctx, FL(tk), CLASS_Pair));
 		}
 #ifdef CLASS_Triple
 		else if(c == 3){

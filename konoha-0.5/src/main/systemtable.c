@@ -437,7 +437,10 @@ void knh_traverseSharedData(Ctx *ctx, knh_SharedData_t *share, knh_ftraverse ftr
 
 	for(i = 0; i < share->StructTableSize; i++) {
 		DBG2_ASSERT(ClassTable(i).sname != NULL);
-		ftr(ctx, UP(ClassTable(i).class_cid));
+		if(ClassTable(i).class_cid != NULL)
+			ftr(ctx, UP(ClassTable(i).class_cid));
+		if(ClassTable(i).class_natype != NULL)
+			ftr(ctx, UP(ClassTable(i).class_natype));
 		ftr(ctx, UP(ClassTable(i).cmap));
 		ftr(ctx, UP(ClassTable(i).cspec));
 		if(ClassTable(i).constPool != NULL) {
@@ -454,7 +457,10 @@ void knh_traverseSharedData(Ctx *ctx, knh_SharedData_t *share, knh_ftraverse ftr
 
 	for(i = share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
 		DBG2_ASSERT(ClassTable(i).sname != NULL);
-		ftr(ctx, UP(ClassTable(i).class_cid));
+		if(ClassTable(i).class_cid != NULL)
+			ftr(ctx, UP(ClassTable(i).class_cid));
+		if(ClassTable(i).class_natype != NULL)
+			ftr(ctx, UP(ClassTable(i).class_natype));
 		ftr(ctx, UP(ClassTable(i).cmap));
 		ftr(ctx, UP(ClassTable(i).cspec));
 		if(ClassTable(i).constPool != NULL) {

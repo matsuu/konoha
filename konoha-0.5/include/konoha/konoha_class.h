@@ -45,7 +45,7 @@ extern "C" {
 /* @flag Object.Cyclic OF (%s)->h.flag 'is:set:*:*' */
 /* @flag Object.Undefined OF (%s)->h.flag 'is:*:is:*' */
 /* @flag Object.Modified OF (%s)->h.flag 'is:set:is:set' */
-/* @flag Object.Formatted OF (%s)->h.flag 'is:set:is:set' */
+/* @ flag Object.Formatted OF (%s)->h.flag 'is:set:is:set' */
 /* @flag Object.Shared OF (%s)->h.flag 'is:set:is:set' */
 /* @flag Object.Local4 OF (%s)->h.flag 'is:set:*:*' */
 /* @flag Object.Local3 OF (%s)->h.flag 'is:set:*:*' */
@@ -68,36 +68,6 @@ typedef struct knh_ObjectField_t {
 /* ------------------------------------------------------------------------ */
 
 #define IS_IMM(o) (!knh_Object_isImmutable(o))
-
-/* ------------------------------------------------------------------------ */
-/* @class Any Object knh_Any_t @Cyclic */
-/* @class This Any knh_Any_t @Cyclic  @Private */
-/* @class Any0 Any knh_Any_t @Cyclic  @Private */
-/* @class Any1 Any knh_Any_t @Cyclic  @Private */
-/* @class Any2 Any knh_Any_t @Cyclic  @Private */
-/* @class Any3 Any knh_Any_t @Cyclic  @Private */
-/* @class AnyVar Any knh_Any_t @Cyclic  @Private */
-
-struct knh_Glue_t;
-typedef void (*knh_fgfree)(Ctx *, struct knh_Glue_t *o);
-
-typedef struct knh_Glue_t {
-	knh_hObject_t h;
-	void *ptr;
-	knh_fgfree gfree;
-} knh_Glue_t ;
-
-#define CLASS_Glue    CLASS_Any
-
-typedef knh_Glue_t knh_Any_t;
-typedef knh_Glue_t knh_This_t;
-typedef knh_Glue_t knh_Any0_t;
-typedef knh_Glue_t knh_Any1_t;
-typedef knh_Glue_t knh_Any2_t;
-typedef knh_Glue_t knh_Any3_t;
-
-#define IS_NULL(o)            ((ctx)->share->constNull == UP(o))
-#define IS_NOTNULL(o)         ((ctx)->share->constNull != UP(o))
 
 /* ------------------------------------------------------------------------ */
 /* @class Boolean Object knh_Boolean_t @Immutable */
@@ -132,8 +102,7 @@ typedef struct knh_Number_t {
 } knh_Number_t;
 
 /* ------------------------------------------------------------------------ */
-/* @class Int Number  knh_Int_t @Immutable */
-/* @ class IntX Number knh_Int_t @Immutable */
+/* @class Int Number knh_Int_t @Immutable */
 
 typedef struct knh_Int_t {
 	knh_hObject_t h;
@@ -144,7 +113,6 @@ typedef knh_Int_t knh_IntX_t;
 
 /* ------------------------------------------------------------------------ */
 /* @class Float Number knh_Float_t @Immutable */
-/* @ class FloatX Number knh_Float_t @Immutable */
 
 typedef struct knh_Float_t {
 	knh_hObject_t h;
@@ -155,7 +123,6 @@ typedef knh_Float_t knh_FloatX_t;
 
 /* ------------------------------------------------------------------------ */
 /* @class String Object knh_String_t @Immutable */
-/* @ class StringX String knh_String_t @Immutable */
 /* @flag String.TextSgm STRING:1 (%s)->h.flag 'is:set:*:*' */
 /* @flag String.ASCII STRING:2 (%s)->h.flag 'is:set:*:*' */
 
@@ -180,13 +147,23 @@ typedef struct knh_Bytes_t {
 } knh_Bytes_t ;
 
 /* ------------------------------------------------------------------------ */
-/* @class Tuple2 Object knh_Tuple2_t @Immutable @Param2 */
+/* @class Pair Object knh_Pair_t @Immutable @Param2 */
 
-typedef struct knh_Tuple2_t {
+typedef struct knh_Pair_t {
 	knh_hObject_t h;
 	knh_Object_t  *first;
 	knh_Object_t  *second;
-} knh_Tuple2_t;
+} knh_Pair_t;
+
+/* ------------------------------------------------------------------------ */
+/* @class Triple Object knh_Triple_t @Immutable */
+
+typedef struct knh_Triple_t {
+	knh_hObject_t h;
+	knh_Object_t  *first;
+	knh_Object_t  *second;
+	knh_Object_t  *third;
+} knh_Triple_t;
 
 /* ------------------------------------------------------------------------ */
 /* @class Range Object knh_Range_t @Immutable */
@@ -200,7 +177,7 @@ typedef struct knh_Range_t {
 /* ------------------------------------------------------------------------ */
 /* @class Array Object knh_Array_t @Cyclic @Param1 */
 /* @flag Array.Dim ARY:1 (%s)->h.flag 'is:set:*:*' */
-/* @generics ArrayCmp int(Any1!,Any1!) Int! Any1! Any1! void */
+/* @generics ArrayCmp int(T1!,T1!) Int! T1! T1! void */
 
 #define KNH_ARRAY_INITSIZE  (KNH_FASTMALLOC_SIZE / sizeof(knh_Object_t*))
 
@@ -381,11 +358,12 @@ typedef struct knh_DictIdx_t {
 /* @flag Class.Release!Debug CF (pClassTable(%s))->cflag 'is:*:is:*' */
 /* @flag Class.Immutable CF (pClassTable(%s))->cflag 'is:*:is:*' */
 /* @flag Class.Cyclic CF (pClassTable(%s))->cflag 'is:set:*:*' */
-/* @flag Class.MetaExtensible CF (pClassTable(%s))->cflag 'is:*:is:*' */
+/* @flag Class.MetaClass CF (pClassTable(%s))->cflag 'is:*:is:*' */
 /* @flag Class.Private!Public CF (pClassTable(%s))->cflag 'is:*:is:*' */
 /* @flag Class.Final CF (pClassTable(%s))->cflag 'is:*:is:*' */
-/* @flag Class.Singleton CF (pClassTable(%s))->cflag 'is:*:*:*' */
+/* @flag Class.Singleton CF (pClassTable(%s))->cflag 'is:*:is:*' */
 /* @flag Class.Interface  CF (pClassTable(%s))->cflag 'is:*:is:*' */
+/* @flag Class.TypeVariable CF (pClassTable(%s))->cflag 'is:set:*:*' */
 
 typedef struct knh_Class_t {
 	knh_hObject_t h;
@@ -397,7 +375,6 @@ typedef struct knh_Class_t {
 #define KNH_FLAG_CF_PARAM1 0
 #define KNH_FLAG_CF_PARAM2 0
 #define KNH_FLAG_CF_PARAM4 0
-
 
 /* class */
 
@@ -425,7 +402,6 @@ typedef struct knh_cfield_t {
 typedef struct knh_ClassStruct_t {
 	knh_hObject_t h;
 	knh_cfield_t* fields;
-	/* knh_struct_t sid; knh_ushort_t fsize; */
 	size_t fsize;
 	knh_Array_t*  methods;
 } knh_ClassStruct_t;
@@ -1089,6 +1065,37 @@ typedef struct knh_KLRCode {
 	knh_dwarf_t* dwarf;
 	size_t dsize;
 } knh_KLRCode_struct;
+
+
+/* ------------------------------------------------------------------------ */
+/* @class Any Object knh_Any_t @Cyclic */
+/* @class This Any knh_Any_t @Cyclic  @TypeVariable */
+/* @class T0   Any knh_Any_t @Cyclic  @TypeVariable */
+/* @class T1   Any knh_Any_t @Cyclic  @TypeVariable */
+/* @class T2   Any knh_Any_t @Cyclic  @TypeVariable */
+/* @class T3   Any knh_Any_t @Cyclic  @TypeVariable */
+/* @class TVar Any knh_Any_t @Cyclic  @TypeVariable */
+
+struct knh_Glue_t;
+typedef void (*knh_fgfree)(Ctx *, struct knh_Glue_t *o);
+
+typedef struct knh_Glue_t {
+	knh_hObject_t h;
+	void *ptr;
+	knh_fgfree gfree;
+} knh_Glue_t ;
+
+#define CLASS_Glue    CLASS_Any
+
+typedef knh_Glue_t knh_Any_t;
+typedef knh_Glue_t knh_This_t;
+typedef knh_Glue_t knh_T0_t;
+typedef knh_Glue_t knh_T1_t;
+typedef knh_Glue_t knh_T2_t;
+typedef knh_Glue_t knh_T3_t;
+
+#define IS_NULL(o)            ((ctx)->share->constNull == UP(o))
+#define IS_NOTNULL(o)         ((ctx)->share->constNull != UP(o))
 
 /* ======================================================================== */
 
