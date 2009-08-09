@@ -39,6 +39,19 @@ static int knh_Asm_inTry(Asm *abr);
 void knh_code_traverse(Ctx *ctx, knh_code_t *pc, knh_ftraverse ftr);
 void knh_Asm_writeAddress(Ctx *ctx, Asm *o, knh_code_t *pc_start);
 
+#define ASML(abr, idx)   (idx < DP(abr)->stack) ? DP(abr)->stack : idx
+#define MOVL(ctx, abr, local, idx) {\
+		if(idx < DP(abr)->stack) { \
+			KNH_ASM_MOVa_(ctx, abr, sfi_(idx), sfi_(local));\
+		}\
+	}\
+
+#define nMOVL(ctx, abr, local, idx) {\
+		if(idx < DP(abr)->stack) { \
+			KNH_ASM_MOVn_(ctx, abr, sfi_(idx), sfi_(local));\
+		}\
+	}\
+
 /* ======================================================================== */
 /* [structs] */
 
@@ -547,6 +560,27 @@ void KNH_ASM_SMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, Token *tkb)
 			return;
 		}
 
+		case TT_CLOSURE: {
+			int local = ASML(abr, a);
+			Method *mtd = DP(tkb)->mtd;
+			knh_class_t cid = DP(mtd)->cid;
+			if(cid == DP(abr)->this_cid || knh_class_instanceof(ctx, DP(abr)->this_cid, cid)) {
+				KNH_ASM_MOVa_(ctx, abr, sfi_(local+1), sfi_(0));
+			}
+			else if(cid == knh_Object_cid(knh_getCurrentScript(ctx))) {
+				KNH_ASM_MOVo_(ctx, abr, sfi_(local+1), UP(knh_getCurrentScript(ctx)));
+			}
+			else {
+				KNH_ASM_MOVDEF_(ctx, abr, sfi_(local+1), cid);
+			}
+			KNH_ASM_MOVo_(ctx, abr, sfi_(local+2), UP(mtd));
+			mtd = knh_Class_getMethod(ctx, CLASS_Closure, METHODN_new);
+			DBG2_ASSERT(IS_Method(mtd));
+			KNH_ASM_NEW_(ctx, abr, local, 0, CLASS_type(DP(tkb)->type), 2, UP(mtd));
+			MOVL(ctx, abr, local, a);
+			break;
+		}
+
 		default: {
 			DBG2_P("unknown TT=%s", knh_token_tochar(SP(tkb)->tt));
 			KNH_ASSERT(ctx == NULL);
@@ -703,6 +737,27 @@ void KNH_ASM_XMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, size_t an, Token 
 		case TT_SYSVAL: {
 			knh_ushort_t sysid = DP(tkb)->index;
 			KNH_ASM_XMOVSYS_(ctx, abr, ax, sysid);
+			break;
+		}
+
+		case TT_CLOSURE: {
+			int local = DP(abr)->stack;
+			Method *mtd = DP(tkb)->mtd;
+			knh_class_t cid = DP(mtd)->cid;
+			if(cid == DP(abr)->this_cid || knh_class_instanceof(ctx, DP(abr)->this_cid, cid)) {
+				KNH_ASM_MOVa_(ctx, abr, sfi_(local+1), sfi_(0));
+			}
+			else if(cid == knh_Object_cid(knh_getCurrentScript(ctx))) {
+				KNH_ASM_MOVo_(ctx, abr, sfi_(local+1), UP(knh_getCurrentScript(ctx)));
+			}
+			else {
+				KNH_ASM_MOVDEF_(ctx, abr, sfi_(local+1), cid);
+			}
+			KNH_ASM_MOVo_(ctx, abr, sfi_(local+2), UP(mtd));
+			mtd = knh_Class_getMethod(ctx, CLASS_Closure, METHODN_new);
+			DBG2_ASSERT(IS_Method(mtd));
+			KNH_ASM_NEW_(ctx, abr, local, 0, CLASS_type(DP(tkb)->type), 2, UP(mtd));
+			KNH_ASM_XMOVs_(ctx, abr, ax, sfi_(local));
 			break;
 		}
 
@@ -1138,20 +1193,6 @@ void TERMs_ASM_THROW(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr)
 /* [EXPR] */
 /* ------------------------------------------------------------------------ */
 /* @data */
-
-#define ASML(abr, idx)   (idx < DP(abr)->stack) ? DP(abr)->stack : idx
-#define MOVL(ctx, abr, local, idx) {\
-		if(idx < DP(abr)->stack) { \
-			KNH_ASM_MOVa_(ctx, abr, sfi_(idx), sfi_(local));\
-		}\
-	}\
-
-#define nMOVL(ctx, abr, local, idx) {\
-		if(idx < DP(abr)->stack) { \
-			KNH_ASM_MOVn_(ctx, abr, sfi_(idx), sfi_(local));\
-		}\
-	}\
-
 /* ------------------------------------------------------------------------ */
 
 static
