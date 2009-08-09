@@ -359,21 +359,31 @@ void knh_NameSpace_addConst(Ctx *ctx, NameSpace *ns, String *name, Object *value
 void knh_NameSpace_setFuncClass(Ctx *ctx, NameSpace *o, knh_methodn_t mn, knh_class_t c)
 {
 	KNH_ASSERT(IS_NameSpace(o));
+	if(METHODN_IS_MOVTEXT(mn) || METHODN_IS_GETTER(mn) || METHODN_IS_SETTER(mn)) {
+		return;
+	}
 	if(IS_NULL(DP(o)->func2cidDictSet)) {
 		KNH_SETv(ctx, DP(o)->func2cidDictSet, new_DictSet(ctx, 16));
 	}
-	knh_DictSet_set(ctx, DP(o)->func2cidDictSet, new_String__mn(ctx, mn), (knh_uintptr_t)(c+1));
+	knh_DictSet_set(ctx, DP(o)->func2cidDictSet,
+			knh_getFieldName(ctx, METHODN_TOFIELDN(mn)), (knh_uintptr_t)(c+1));
 }
 
 /* ------------------------------------------------------------------------ */
 
 knh_class_t
-knh_NameSpace_getFuncClass(Ctx *ctx, NameSpace *o, knh_bytes_t funcname)
+knh_NameSpace_getFuncClass(Ctx *ctx, NameSpace *o, knh_methodn_t mn)
 {
-	if(IS_NOTNULL(DP(o)->func2cidDictSet)) {
-		knh_uintptr_t cid = knh_DictSet_get__b(DP(o)->func2cidDictSet, funcname);
-		if(cid != 0) {
-			return (knh_class_t)(cid-1);
+	if(METHODN_IS_MOVTEXT(mn) || METHODN_IS_GETTER(mn) || METHODN_IS_SETTER(mn)) {
+
+	}
+	else {
+		knh_bytes_t name = knh_String_tobytes(knh_getFieldName(ctx, METHODN_TOFIELDN(mn)));
+		if(IS_NOTNULL(DP(o)->func2cidDictSet)) {
+			knh_uintptr_t cid = knh_DictSet_get__b(DP(o)->func2cidDictSet, name);
+			if(cid != 0) {
+				return (knh_class_t)(cid-1);
+			}
 		}
 	}
 	return CLASS_unknown; /* if it isn't found */

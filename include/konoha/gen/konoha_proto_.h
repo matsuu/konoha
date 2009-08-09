@@ -323,7 +323,7 @@ knh_type_t knh_NameSpace_gettype(Ctx *ctx, NameSpace *ns, knh_bytes_t name, int 
 Object * knh_NameSpace_getConstNULL(Ctx *ctx, NameSpace *ns, knh_bytes_t name);
 void knh_NameSpace_addConst(Ctx *ctx, NameSpace *ns, String *name, Object *value);
 void knh_NameSpace_setFuncClass(Ctx *ctx, NameSpace *o, knh_methodn_t mn, knh_class_t c);
-knh_class_t knh_NameSpace_getFuncClass(Ctx *ctx, NameSpace *o, knh_bytes_t funcname);
+knh_class_t knh_NameSpace_getFuncClass(Ctx *ctx, NameSpace *o, knh_methodn_t mn);
 knh_type_t knh_NameSpace_tagcid(Ctx *ctx, NameSpace *o, knh_class_t cid, knh_bytes_t tag);
 /* ../src/class/knh_Number.c */
 knh_int_t knh_Number_tointeger(Any *o);
@@ -653,7 +653,6 @@ knh_bytes_t knh_bytes_mtoption(knh_bytes_t t);
 char *knh_format_newFMT(char *buf, size_t bufsiz, knh_bytes_t t, int dot, char *fmt);
 String *knh_getFieldName(Ctx *ctx, knh_fieldn_t fn);
 knh_fieldn_t knh_getfnq(Ctx *ctx, knh_bytes_t tname, knh_fieldn_t def);
-String *new_String__mn(Ctx *ctx, knh_methodn_t mn);
 knh_methodn_t knh_getmn(Ctx *ctx, knh_bytes_t tname, knh_methodn_t def);
 char *knh_format_methodn(Ctx *ctx, char *buf, size_t bufsiz, knh_methodn_t mn);
 char * knh_format_cmethodn(Ctx *ctx, char *buf, size_t bufsiz, knh_class_t cid, knh_methodn_t mn);

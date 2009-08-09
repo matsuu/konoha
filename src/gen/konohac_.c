@@ -156,6 +156,7 @@ static char* knh_token_array_tochar[] = {
     "GLOBAL",  /* GLOBAL */ 
     "MEMBER",  /* MEMBER */ 
     "CLASSID",  /* CLASSID */ 
+    "CLOSURE",  /* CLOSURE */ 
     "_",  /* ASIS */ 
     "NOP",  /* NOP */ 
     //(char*)0
@@ -288,6 +289,7 @@ static knh_methodn_t knh_token_array_tomethodn[] = {
     METHODN_NONAME,  /* GLOBAL */ 
     METHODN_NONAME,  /* MEMBER */ 
     METHODN_NONAME,  /* CLASSID */ 
+    METHODN_NONAME,  /* CLOSURE */ 
     METHODN_NONAME,  /* ASIS */ 
     METHODN_NONAME,  /* NOP */ 
     //(knh_methodn_t)0
@@ -420,6 +422,7 @@ static int knh_token_array_getOpPriority[] = {
     99,  /* GLOBAL */ 
     99,  /* MEMBER */ 
     99,  /* CLASSID */ 
+    99,  /* CLOSURE */ 
     99,  /* ASIS */ 
     99,  /* NOP */ 
     //(int)0
@@ -552,6 +555,7 @@ static int knh_token_array_getOpSize[] = {
     0,  /* GLOBAL */ 
     0,  /* MEMBER */ 
     0,  /* CLASSID */ 
+    0,  /* CLOSURE */ 
     0,  /* ASIS */ 
     0,  /* NOP */ 
     //(int)0
@@ -684,6 +688,7 @@ static knh_bool_t knh_token_array_isBeginOfStmt[] = {
     0,  /* GLOBAL */ 
     0,  /* MEMBER */ 
     0,  /* CLASSID */ 
+    0,  /* CLOSURE */ 
     0,  /* ASIS */ 
     0,  /* NOP */ 
     //(knh_bool_t)0

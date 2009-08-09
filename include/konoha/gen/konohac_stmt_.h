@@ -187,11 +187,13 @@ extern "C" {
 #define knh_Token_isMEMBER(tk_)         (SP(tk_)->tt == TT_MEMBER)
 #define TT_CLASSID                      ((knh_token_t)117)
 #define knh_Token_isCLASSID(tk_)        (SP(tk_)->tt == TT_CLASSID)
-#define TT_ASIS                         ((knh_token_t)118)
+#define TT_CLOSURE                      ((knh_token_t)118)
+#define knh_Token_isCLOSURE(tk_)        (SP(tk_)->tt == TT_CLOSURE)
+#define TT_ASIS                         ((knh_token_t)119)
 #define knh_Token_isASIS(tk_)           (SP(tk_)->tt == TT_ASIS)
-#define TT_NOP                          ((knh_token_t)119)
+#define TT_NOP                          ((knh_token_t)120)
 #define knh_Token_isNOP(tk_)            (SP(tk_)->tt == TT_NOP)
-#define KNH_TOKEN_MAXSIZ                ((knh_token_t)120)
+#define KNH_TOKEN_MAXSIZ                ((knh_token_t)121)
 
 /* ------------------------------------------------------------------------ */
 #ifndef METHODN_opItr
