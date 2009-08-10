@@ -379,9 +379,9 @@ typedef knh_ushort_t          knh_methodn_t;
 typedef knh_ushort_t knh_lock_t;
 
 #ifdef KNH_OBJECT_MAGIC
-	#define KNH_ASSERT_ISOBJECT(o)        DBG2_ASSERT((o)->h.magic == KNH_OBJECT_MAGIC)
+	#define DBG2_ASSERT_ISOBJECT(o)        DBG2_ASSERT((o)->h.magic == KNH_OBJECT_MAGIC)
 #else/*KONOHA_OBJECT_MAGIC*/
-	#define KNH_ASSERT_ISOBJECT(o)
+	#define DBG2_ASSERT_ISOBJECT(o)
 #endif/*KONOHA_OBJECT_MAGIC*/
 
 typedef struct knh_hObject_t {

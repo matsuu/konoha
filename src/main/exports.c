@@ -40,8 +40,8 @@ extern "C" {
 
 KNHAPI(void) konoha_SETv(Ctx *ctx, Object **v, Object *o)
 {
-	KNH_ASSERT_ISOBJECT(o);
-	KNH_ASSERT_ISOBJECT(v[0]);
+	DBG2_ASSERT_ISOBJECT(o);
+	DBG2_ASSERT_ISOBJECT(v[0]);
 	knh_Object_RCinc(o);
 	knh_Object_sweep(ctx, v[0]);
 	v[0] = o;
@@ -51,7 +51,7 @@ KNHAPI(void) konoha_SETv(Ctx *ctx, Object **v, Object *o)
 
 KNHAPI(void) konoha_FINALv(Ctx *ctx, Object **v)
 {
-	KNH_ASSERT_ISOBJECT(v[0]);
+	DBG2_ASSERT_ISOBJECT(v[0]);
 	knh_Object_sweep(ctx, v[0]);
 	v[0] = NULL;
 }

@@ -46,6 +46,8 @@ extern "C" {
 
 METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp)
 {
+	DBG2_ASSERT(IS_bClosure(sfp[0].cc));
+	DBG2_ASSERT(IS_bMethod(sfp[2].mtd));
 	KNH_INITv((sfp[0].cc)->base, sfp[1].o);
 	KNH_INITv((sfp[0].cc)->mtd, sfp[2].mtd);
 	(sfp[0].cc)->envsfp = NULL;
@@ -57,7 +59,7 @@ METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp)
 
 METHOD knh__Closure_invoke(Ctx *ctx, knh_sfp_t *sfp)
 {
-	//DBG2_ASSERT(IS_bClosure(sfp[0].cc));
+	DBG2_ASSERT(IS_bClosure(sfp[0].cc));
 	KNH_INVOKE(ctx, sfp);
 }
 
