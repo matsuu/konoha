@@ -565,15 +565,15 @@ void KNH_ASM_SMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, Token *tkb)
 			Method *mtd = DP(tkb)->mtd;
 			knh_class_t cid = DP(mtd)->cid;
 			if(cid == DP(abr)->this_cid || knh_class_instanceof(ctx, DP(abr)->this_cid, cid)) {
-				KNH_ASM_MOVa_(ctx, abr, sfi_(local+1), sfi_(0));
+				KNH_ASM_MOVa_(ctx, abr, sfi_(local+2), sfi_(0));
 			}
 			else if(cid == knh_Object_cid(knh_getCurrentScript(ctx))) {
-				KNH_ASM_MOVo_(ctx, abr, sfi_(local+1), UP(knh_getCurrentScript(ctx)));
+				KNH_ASM_MOVo_(ctx, abr, sfi_(local+2), UP(knh_getCurrentScript(ctx)));
 			}
 			else {
-				KNH_ASM_MOVDEF_(ctx, abr, sfi_(local+1), cid);
+				KNH_ASM_MOVDEF_(ctx, abr, sfi_(local+2), cid);
 			}
-			KNH_ASM_MOVo_(ctx, abr, sfi_(local+2), UP(mtd));
+			KNH_ASM_MOVo_(ctx, abr, sfi_(local+3), UP(mtd));
 			mtd = knh_Class_getMethod(ctx, CLASS_Closure, METHODN_new);
 			DBG2_ASSERT(IS_Method(mtd));
 			KNH_ASM_NEW_(ctx, abr, local, 0, CLASS_type(DP(tkb)->type), 2, UP(mtd));
@@ -745,17 +745,17 @@ void KNH_ASM_XMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, size_t an, Token 
 			Method *mtd = DP(tkb)->mtd;
 			knh_class_t cid = DP(mtd)->cid;
 			if(cid == DP(abr)->this_cid || knh_class_instanceof(ctx, DP(abr)->this_cid, cid)) {
-				KNH_ASM_MOVa_(ctx, abr, sfi_(local+1), sfi_(0));
+				KNH_ASM_MOVa_(ctx, abr, sfi_(local+2), sfi_(0));
 			}
 			else if(cid == knh_Object_cid(knh_getCurrentScript(ctx))) {
-				KNH_ASM_MOVo_(ctx, abr, sfi_(local+1), UP(knh_getCurrentScript(ctx)));
+				KNH_ASM_MOVo_(ctx, abr, sfi_(local+2), UP(knh_getCurrentScript(ctx)));
 			}
 			else {
-				KNH_ASM_MOVDEF_(ctx, abr, sfi_(local+1), cid);
+				KNH_ASM_MOVDEF_(ctx, abr, sfi_(local+2), cid);
 			}
-			KNH_ASM_MOVo_(ctx, abr, sfi_(local+2), UP(mtd));
+			KNH_ASM_MOVo_(ctx, abr, sfi_(local+3), UP(mtd));
 			mtd = knh_Class_getMethod(ctx, CLASS_Closure, METHODN_new);
-			DBG2_ASSERT(IS_Method(mtd));
+			KNH_ASSERT(IS_Method(mtd));
 			KNH_ASM_NEW_(ctx, abr, local, 0, CLASS_type(DP(tkb)->type), 2, UP(mtd));
 			KNH_ASM_XMOVs_(ctx, abr, ax, sfi_(local));
 			break;
