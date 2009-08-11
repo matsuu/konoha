@@ -2483,7 +2483,7 @@ Object *knh_System_fdefault(Ctx *ctx, knh_class_t cid)
 
 #define KNH_CC_METHODAPI
 #include"../gen/method_.c"
-#include"../api/objectapi.c"
+#include"../api/oprapi.c"
 #include"../api/numberapi.c"
 #include"../api/stringapi.c"
 
