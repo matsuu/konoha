@@ -492,9 +492,9 @@ char *knh_methodop_tochar(knh_methodn_t mn)
 	case METHODN_get: return "x[n]";
 	case METHODN_set: return "x[n]=y";
 	case METHODN_setAll: return "x[]=y";
-	case METHODN_opSubsete: return "x[m..n]";
+	case METHODN_opTo: return "x[m..n]";
 	case METHODN_opOffset: return "x[m..+n]";
-	case METHODN_opSubset: return "x[m..<n]";
+	case METHODN_opUntil: return "x[m..<n]";
 	}
 	return NULL;
 }
