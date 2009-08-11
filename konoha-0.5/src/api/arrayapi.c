@@ -476,9 +476,9 @@ Array *new_Array__subset(Ctx *ctx, Array *a, size_t s, size_t e)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method This! Array.opSubset(Int s, Int e) @Debug */
+/* @method This! Array.opUntil(Int s, Int e) @Debug */
 
-static METHOD knh__Array_opSubset(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__Array_opUntil(Ctx *ctx, knh_sfp_t *sfp)
 {
 	Array *o = (Array*)sfp[0].o;
 	size_t s = IS_NULL(sfp[1].o) ? 0 : knh_array_index(ctx, p_int(sfp[1]), o->size);
@@ -487,9 +487,9 @@ static METHOD knh__Array_opSubset(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method This! Array.opSubsete(Int s, Int e) @Debug */
+/* @method This! Array.opTo(Int s, Int e) @Debug */
 
-static METHOD knh__Array_opSubsete(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__Array_opTo(Ctx *ctx, knh_sfp_t *sfp)
 {
 	Array *o = (Array*)sfp[0].o;
 	size_t s = IS_NULL(sfp[1].o) ? 0 : knh_array_index(ctx, p_int(sfp[1]), o->size);

@@ -206,17 +206,17 @@ static METHOD knh__DictMap_getSize(Ctx *ctx, knh_sfp_t *sfp)
 //}
 //
 ///* ------------------------------------------------------------------------ */
-///* @method This! DictMap.opSubsete(String s, String e) */
+///* @method This! DictMap.opTo(String s, String e) */
 //
-//static METHOD knh__DictMap_opSubsete(Ctx *ctx, knh_sfp_t *sfp)
+//static METHOD knh__DictMap_opTo(Ctx *ctx, knh_sfp_t *sfp)
 //{
 //	knh__DictMap_subset(ctx, sfp, OPSUBSETE);
 //}
 //
 ///* ------------------------------------------------------------------------ */
-///* @method This! DictMap.opSubset(String s, String e) */
+///* @method This! DictMap.opUntil(String s, String e) */
 //
-//static METHOD knh__DictMap_opSubset(Ctx *ctx, knh_sfp_t *sfp)
+//static METHOD knh__DictMap_opUntil(Ctx *ctx, knh_sfp_t *sfp)
 //{
 //	knh__DictMap_subset(ctx, sfp, OPSUBSET);
 //}
@@ -499,17 +499,17 @@ static METHOD knh__DictSet_getSize(Ctx *ctx, knh_sfp_t *sfp)
 //}
 //
 ///* ------------------------------------------------------------------------ */
-///* @method This! DictSet.opSubsete(String s, String e) */
+///* @method This! DictSet.opTo(String s, String e) */
 //
-//static METHOD knh__DictSet_opSubsete(Ctx *ctx, knh_sfp_t *sfp)
+//static METHOD knh__DictSet_opTo(Ctx *ctx, knh_sfp_t *sfp)
 //{
 //	knh__DictSet_subset(ctx, sfp, OPSUBSETE);
 //}
 //
 ///* ------------------------------------------------------------------------ */
-///* @method This! DictSet.opSubset(String s, String e) */
+///* @method This! DictSet.opUntil(String s, String e) */
 //
-//static METHOD knh__DictSet_opSubset(Ctx *ctx, knh_sfp_t *sfp)
+//static METHOD knh__DictSet_opUntil(Ctx *ctx, knh_sfp_t *sfp)
 //{
 //	knh__DictSet_subset(ctx, sfp, OPSUBSET);
 //}

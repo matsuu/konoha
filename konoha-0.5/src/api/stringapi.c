@@ -573,9 +573,9 @@ static METHOD knh__String_opOffset(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[CONST] String! String.opSubset(Int s, Int e) */
+/* @method[CONST] String! String.opUntil(Int s, Int e) */
 
-static METHOD knh__String_opSubset(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__String_opUntil(Ctx *ctx, knh_sfp_t *sfp)
 {
   if(IS_NOTNULL(sfp[2].o)) {
 		size_t offset = IS_NULL(sfp[1].o) ? 0 : (size_t)sfp[1].ivalue;
@@ -585,9 +585,9 @@ static METHOD knh__String_opSubset(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[CONST] String! String.opSubsete(Int s, Int e) */
+/* @method[CONST] String! String.opTo(Int s, Int e) */
 
-static METHOD knh__String_opSubsete(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__String_opTo(Ctx *ctx, knh_sfp_t *sfp)
 {
   if(IS_NOTNULL(sfp[2].o)) {
 	  size_t offset = IS_NULL(sfp[1].o) ? 0 : (size_t)sfp[1].ivalue;
