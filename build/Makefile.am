@@ -3,7 +3,7 @@
 # shinpei@ynu(c)2008-09
 
 # make target for libtool.
-AM_CFLAGS = -g3 -O3 -pipe
+AM_CFLAGS = -g -pipe
 lib_LTLIBRARIES = libkonoha.la
 
 libkonoha_la_LDFLAGS = -no-undefined -release 0 -version-info 5:0:0
@@ -128,7 +128,6 @@ sampledir = /usr/local/share/konoha/sample
 dist_sample_SCRIPTS =
 dist_sample_SCRIPTS += ../dist/sample/ao.k
 dist_sample_SCRIPTS += ../dist/sample/counter.k
-dist_sample_SCRIPTS += ../dist/sample/err.k
 dist_sample_SCRIPTS += ../dist/sample/fib.k
 dist_sample_SCRIPTS += ../dist/sample/helloworld.k
 dist_sample_SCRIPTS += ../dist/sample/http.k
@@ -162,10 +161,22 @@ dist_pkgdemo_DATA += ../dist/package/demo/demo.k
 dist_pkgdemo_DATA += ../dist/package/demo/demo_macosx_32.dylib
 scriptklipdir = /usr/local/share/konoha/script/klip
 dist_scriptklip_SCRIPTS = ../dist/bin/klip.k
+
 klipdir = /usr/local/bin
 dist_klip_SCRIPTS = ../dist/bin/klip
 
-
+## test
+check: test
+test: ./konoha
+	./konoha ../test/array.k
+	./konoha ../test/dictmap.k
+	./konoha ../test/dictset.k
+	./konoha ../test/float.k
+	./konoha ../test/hashmap.k
+	./konoha ../test/integer.k
+	./konoha ../test/string.k
+	./konoha ../test/syntax.k
+	./konoha ../test/trycatch.k
 
 bin_PROGRAMS = konoha
 konoha_SOURCES = ../src/konoha.c
