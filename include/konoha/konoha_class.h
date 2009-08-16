@@ -860,6 +860,8 @@ typedef struct knh_System {
 /* @flag Context.Interactive CTXF ((Context*)%s)->flag 'is:set:is:*' */
 /* @flag Context.Compiling CTXF ((Context*)%s)->flag 'is:set:*:*' */
 
+/* @flag Context.Profile CTXF ((Context*)%s)->flag 'is:set:is:set' */
+/* @flag Context.Eval CTXF ((Context*)%s)->flag 'is:set:is:set' */
 /* ------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------ */
 /* konohac.h */

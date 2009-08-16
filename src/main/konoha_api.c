@@ -202,6 +202,13 @@ KNHAPI(int) konoha_parseopt(konoha_t konoha, int argc, char **argv)
 				userExperienceProgram = 1;
 			}
 		}
+		else if(t[1] == 'p' && t[2] == 0) {
+			knh_Context_setProfile(konoha.ctx, 1);
+		}
+		else if(t[1] == 'e' && t[2] == 0) {
+			knh_Context_setEval(konoha.ctx, 1);
+		}
+	
 	}
 #if defined(KNH_DBGMODE2)
 	knh_Context_setVerbose(konoha.ctx, 1);
