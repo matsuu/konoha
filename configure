@@ -918,12 +918,14 @@ enable_libtool_lock
 enable_rcgc
 enable_debug
 enable_int32
+enable_profiler
 enable_fastmode
 with_iconv
+with_iconv_dir
 with_readline
 with_socket
 with_sqlite3
-enable_thread
+with_thread
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1574,8 +1576,8 @@ Optional Features:
   --enable-rcgc           referencing counting mode [default=no]
   --enable-debug          debug mode [default=no]
   --enable-int32          int32 mode [default=no]
+  --enable-profiler turn off profiler default=no
   --enable-fastmode       if you like fast-things [default=no]
-  --with-thread           enable multithreading.. [default=detect]
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1584,9 +1586,11 @@ Optional Packages:
                           both]
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
   --with-iconv            iconv support [default=detect]
+  --with-iconv-dir        path to libiconv's dir
   --with-readline         readline support [default=detect]
   --with-socket           socket support [default=detect]
   --with-sqlite3          sqlite3 support [default=detect]
+  --with-thread           enable multithreading.. [default=detect]
 
 Some influential environment variables:
   CC          C compiler command
@@ -4822,13 +4826,13 @@ if test "${lt_cv_nm_interface+set}" = set; then
 else
   lt_cv_nm_interface="BSD nm"
   echo "int some_variable = 0;" > conftest.$ac_ext
-  (eval echo "\"\$as_me:4825: $ac_compile\"" >&5)
+  (eval echo "\"\$as_me:4829: $ac_compile\"" >&5)
   (eval "$ac_compile" 2>conftest.err)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:4828: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+  (eval echo "\"\$as_me:4832: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
   cat conftest.err >&5
-  (eval echo "\"\$as_me:4831: output\"" >&5)
+  (eval echo "\"\$as_me:4835: output\"" >&5)
   cat conftest.out >&5
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
@@ -6031,7 +6035,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6034 "configure"' > conftest.$ac_ext
+  echo '#line 6038 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7852,11 +7856,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:7855: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:7859: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:7859: \$? = $ac_status" >&5
+   echo "$as_me:7863: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8191,11 +8195,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8194: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8198: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:8198: \$? = $ac_status" >&5
+   echo "$as_me:8202: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings other than the usual output.
@@ -8296,11 +8300,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8299: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8303: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8303: \$? = $ac_status" >&5
+   echo "$as_me:8307: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -8351,11 +8355,11 @@ else
    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:8354: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:8358: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:8358: \$? = $ac_status" >&5
+   echo "$as_me:8362: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -10203,10 +10207,13 @@ rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
   # before this can be enabled.
   hardcode_into_libs=yes
 
+  # Add ABI-specific directories to the system library path.
+  sys_lib_dlsearch_path_spec="/lib64 /usr/lib64 /lib /usr/lib"
+
   # Append ld.so.conf contents to the search path
   if test -f /etc/ld.so.conf; then
     lt_ld_extra=`awk '/^include / { system(sprintf("cd /etc; cat %s 2>/dev/null", \$2)); skip = 1; } { if (!skip) print \$0; skip = 0; }' < /etc/ld.so.conf | $SED -e 's/#.*//;/^[	 ]*hwcap[	 ]/d;s/[:,	]/ /g;s/=[^=]*$//;s/=[^= ]* / /g;/^$/d' | tr '\n' ' '`
-    sys_lib_dlsearch_path_spec="/lib /usr/lib $lt_ld_extra"
+    sys_lib_dlsearch_path_spec="$sys_lib_dlsearch_path_spec $lt_ld_extra"
   fi
 
   # We used to test for /lib/ld.so.1 and disable shared libraries on
@@ -11151,7 +11158,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11154 "configure"
+#line 11161 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11247,7 +11254,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11250 "configure"
+#line 11257 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12894,8 +12901,30 @@ _ACEOF
 
 fi
 
+# ADDED for profiler
+# Masahiro Ide
+# copy from mosh-0.2.0
+# Check whether --enable-profiler was given.
+if test "${enable_profiler+set}" = set; then
+  enableval=$enable_profiler;
+else
+  enable_profiler=no
+fi
+
+{ $as_echo "$as_me:$LINENO: checking whether to enable profiler" >&5
+$as_echo_n "checking whether to enable profiler... " >&6; }
+if test "$enable_profiler" = "yes"; then
+
+cat >>confdefs.h <<\_ACEOF
+#define KNH_WITH_PROFILER 1
+_ACEOF
+
+fi
+
+
 # ADDED for mtune ############################################################
 # Kimio Kuramitsu
+
 
 # Check whether --enable-fastmode was given.
 if test "${enable_fastmode+set}" = set; then
@@ -13110,6 +13139,14 @@ if test $use_iconv = yes; then
 
   LIBS="$LIBS -liconv"
 fi
+
+
+# Check whether --with-iconv-dir was given.
+if test "${with_iconv_dir+set}" = set; then
+  withval=$with_iconv_dir; LIBS="$LIBS $withval"
+fi
+
+
 
 # ADDED for readline #########################################################
 # Kimio Kuramitsu
@@ -13661,6 +13698,7 @@ else
 fi
 
 
+
 use_socket=$with_socket
 if test $with_socket = detect; then
   use_socket=no
@@ -13932,9 +13970,10 @@ fi
 # ADDED for thread ###########################################################
 # Kimio Kuramitsu
 
-# Check whether --enable-thread was given.
-if test "${enable_thread+set}" = set; then
-  enableval=$enable_thread; case $withval in
+
+# Check whether --with-thread was given.
+if test "${with_thread+set}" = set; then
+  withval=$with_thread; case $withval in
 yes|no|detect) ;;
 *) { { $as_echo "$as_me:$LINENO: error: bad value $withval for --with-thread, need yes/no/detect" >&5
 $as_echo "$as_me: error: bad value $withval for --with-thread, need yes/no/detect" >&2;}
@@ -13944,6 +13983,9 @@ else
   with_thread=detect
 fi
 
+
+{ $as_echo "$as_me:$LINENO: result: $with_thread" >&5
+$as_echo "$with_thread" >&6; }
 
 use_thread=$with_thread
 if test $with_thread = detect; then

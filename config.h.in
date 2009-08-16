@@ -112,6 +112,9 @@
 /* Using thread */
 #undef KNH_USING_THREAD
 
+/* enable -p option for profiling */
+#undef KNH_WITH_PROFILER
+
 /* mtune option */
 #undef KONOHA_CC_CPU
 
