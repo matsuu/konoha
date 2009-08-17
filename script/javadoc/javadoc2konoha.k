@@ -31,13 +31,14 @@ usage : konoha javadoc2konoha.k dir
 void htmlFormat (String path) {
 	file = [];
 	foreach (String line from new InputStream(path, "r")) {
-		if ("java.lang.String" in? line) {
-			file << line.replace("java.lang.String", "String") << EOL;
-		} else if ("java.lang.Object" in? line) {
-			file << line.replace("java.lang.Object", "Object") << EOL;
-		} else {
-			file << line << EOL;
+		buf = line;
+		if ("java.lang." in? buf){
+			buf = buf.replace("java.lang.", "");
 		}
+		if ("java.util." in? buf) {
+			buf = buf.replace("java.util.","");
+		}
+		file << buf << EOL;
 	}
 	os = new OutputStream(path, "w");
 	foreach (String line in file) {

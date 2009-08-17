@@ -4,6 +4,9 @@
  * kindofbrown(c)2009
  */
 
+MAJ_VERSION = 1;
+MIN_VERSION = 1;
+
 using posix.*;
 
 class MethodInfo {
@@ -24,13 +27,14 @@ class MethodInfo {
 	}
 }
 
-class ScriptParser {
+class PackageParser {
 	String[] clsdefined;
 	String[] mtddefined;
 	MethodInfo[] methods;
 	Boolean javadocflag;
 	String annotation;
-	Parser () {
+	
+	PackageParser () {
 		clsdefined = [];
 		mtddefined = [];
 		methods = [];
@@ -89,7 +93,7 @@ class ScriptParser {
 			methods.add(mi);
 			annotation = "";
 		} else {
-			/* it is out */
+			/* do nothing */
 		}
 	}
 	
@@ -108,6 +112,7 @@ class ScriptParser {
 
 	void genJava (String filename) {
 		os = new OutputStream(filename, "w");
+		os << "import java.util.Iterator;" << EOL;
 		foreach(String cls in clsdefined) {
 			os << %("public class %s{0} {", cls) << EOL;
 			
@@ -122,9 +127,22 @@ class ScriptParser {
 					}
 					line = line.replace(%("%s{0}.", cls), "");
 					line = line.replace(";", "");
-					line = line.replace("?", "<Nullable>");
-					//TODO iterator transform
-					line = line.replace("..", "");
+					line = line.replace("Int", "Integer");
+
+					// find nullable
+					reg = @'re:([a-zA-Z]+)[?]';
+					if (line =~ reg) {
+						m = line.match(reg);
+						line = line.replace(%("%s{0}?", m[0]), %("Nullable<%s{0}>", m[0]));
+					}
+
+					// find iterator 
+					reg = 're:([a-zA-Z]+)..';
+					if (line =~ reg) {
+						m = line.match(reg);
+						line = line.replace(%("%s{0}..", m[0]), %("Iterator<%s{0}>", m[0]));
+					}
+					
 					os << %("\tpublic %s{0} { }", line) << EOL;
 				}
 			}
@@ -142,8 +160,9 @@ int main (String[] args)
 		OUT << "usage:" << EOL;
 		return 0;
 	}
-
-	ScriptParser p = new ScriptParser();
+	OUT << %("JavaDoc Generator 0.%d{0}.%d{1}", MAJ_VERSION, MIN_VERSION) << EOL;
+	
+	PackageParser p = new PackageParser();
 	lines = [];
 	/* Cutout comments from script */
 	foreach(String line from new InputStream(args[1], "r")) {	
@@ -162,7 +181,7 @@ int main (String[] args)
 	packagename = args[1].replace(".k", "");
 	filename = args[1].replace(".k", ".java");
 	p.genJava(filename);
-	System.system(%("javadoc -d %s{0} %s{0}.java", packagename));
+	System.system(%("javadoc -nodeprecatedlist -d %s{0} %s{0}.java", packagename));
 
 	System.system(%("konoha javadoc2konoha.k %s{0}", packagename));
 	
