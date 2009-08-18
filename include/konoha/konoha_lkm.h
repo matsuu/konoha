@@ -84,8 +84,8 @@ typedef intptr_t FILE;
 #define DBG2_ASSERT(c) KNH_ASSERT(c);
 
 #define DBG2_ABORT() abort()
-#define 	KNH_MALLOC(ctx, size)    knh_fastmalloc(ctx, size)
-#define 	KNH_FREE(ctx, p, size)   knh_fastfree(ctx, p, size)
+#define KNH_MALLOC(ctx, size)    knh_fastmalloc(ctx, size)
+#define KNH_FREE(ctx, p, size)   knh_fastfree(ctx, p, size)
 
 
 /* ../../src/ext/qsort.c */
