@@ -397,13 +397,13 @@ KNHAPI(int) konoha_runMain(konoha_t konoha, int argc, char **argv)
 	L_END_TRY:
 	knh_Context_clearstack(ctx);
 	knh_endContext(ctx);
-	return (ctx->hasError == 0 ? -1 : 0);
+	return (ctx->hasError == 0 ? 0 : 1);
 
 	/* catch */
 	L_CATCH:;
 	KNH_PRINT_STACKTRACE(ctx, lsfp, 0);
 	knh_endContext(ctx);
-	return (ctx->hasError == 0 ? -1 : 0);
+	return (ctx->hasError == 0 ? 0 : 1);
 }
 
 
