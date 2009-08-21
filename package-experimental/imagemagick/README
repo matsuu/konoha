@@ -7,6 +7,7 @@
 
 1. What is this?
  Simple binding of ImageMagick-6.5.1 API, MagickWand.
+ Now we bind about half of ImageMagick APIs.
 
 2. How to install?
  Compile imagemagick with makefile.
@@ -31,13 +32,17 @@ from below directories
 
  and goes on like this... 
 
-   >>> ImageMagick mw = new ImageMagick()
-   >>> mw.readImage("xxx.png")
-   >>> mw.flipImage()
-   >>> mw.writeImage("ooo.png")
+   >>> ImageMagick magick = new ImageMagick()
+   >>> magick.readImage("xxx.png")
+   >>> magick.flipImage()
+   >>> magick.writeImage("ooo.png")
 
  As wand package is a simple binding of MagickWand API,
 you would have no trouble with it. ;)
+ImageMagick MagickWand API references is below, or small
+description is in imagemagick.k as comments.
+
+http://www.imagemagick.org/script/perl-magick.php
 
 4. Bugs
  report is always welcome.

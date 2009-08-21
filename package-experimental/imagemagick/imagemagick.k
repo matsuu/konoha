@@ -1,23 +1,109 @@
+/*
+ *----------------------------------------------------
+ *  ImageMagick bindings for konoha
+ *  version 0.1
+ *  kindofbrown (c) 2009
+ *  kindofbrown@users.sourceforge.net
+ *----------------------------------------------------
+ */
+
+/* -----------------------------------------------------------------*/
+/* Class Definition */
+
+//class ImageMagick {
+//	String filename;
+//}
+
 class ImageMagick;
+
+/* -----------------------------------------------------------------*/
+/* Getter Override */
+String ImageMagick.getFilename();
+String ImageMagick.getImageAttribute(String s1);
+Int ImageMagick.getImageIndex();
+String ImageMagick.getFormat();
+String ImageMagick.getFont();
+String ImageMagick.getHomeURL();
+String ImageMagick.getImageProperty(String s1);
+
+
+/* -----------------------------------------------------------------*/
+/* Class Definition */
+
+/* -----------------------------------------------------------------*/
+/* new */
+
 ImageMagick ImageMagick.new();
+
+
+/* -----------------------------------------------------------------*/
+/* ImageMagick */
+
+/**
+ * Read Image into imagemagick's buffer
+ * @param filename path to input imagefile
+ */
+Boolean ImageMagick.readImage(String filename);
+
+/**
+ * Flip buffer image
+ * @param filename path to imagefile
+ */
+Boolean ImageMagick.flipImage();
+
+/**
+ * Write buffer into specified filename
+ * @param filename path to output imagefile
+ */
+Boolean ImageMagick.writeImage(String filename);
+
+/**
+ * Minify buffer image (half sized)
+ */
+Boolean ImageMagick.minifyImage();
+
+/**
+ * Magnify buffer image (double sized)
+ */
+Boolean ImageMagick.magnifyImage();
+
+/**
+ * Resize buffer image
+ * @param width width of resized image
+ * @param height height of resized image
+ */
+Boolean ImageMagick.sampleImage(Int width, Int height);
+Boolean ImageMagick.scaleImage(Int width, Int height);
+
+/*
+ * Blur buffer image
+ *
+ */
+ Boolean ImageMagick.sharpenImage(Float f1, Float f2);
+
+
+/* -----------------------------------------------------------------*/
+/* get attributes */
+
+
 
 void ImageMagick.coreGenesis(String s0, Boolean b1);
 void ImageMagick.coreTerminus();
 String ImageMagick.toMime(String s0);
 String ImageMagick.describeImage();
-String ImageMagick.getImageAttribute(String s1);
-Int ImageMagick.getImageIndex();
+
+
 Boolean ImageMagick.clipPathImage(String s1, Boolean b2);
 Boolean ImageMagick.setImageAttribute(String s1, String s2);
 Boolean ImageMagick.setImageIndex(Int i1);
 Boolean ImageMagick.setImageOption(String s1, String s2, String s3);
 ImageMagick ImageMagick.flattenImages();
 ImageMagick ImageMagick.mosaicImages();
-String ImageMagick.getFilename();
-String ImageMagick.getFormat();
-String ImageMagick.getFont();
-String ImageMagick.getHomeURL();
-String ImageMagick.getImageProperty(String s1);
+
+
+
+
+
 String ImageMagick.getOption(String s1);
 String ImageMagick.queryConfigureOption(String s0);
 String ImageMagick.getCopyright();
@@ -64,7 +150,7 @@ Boolean ImageMagick.edgeImage(Float f1);
 Boolean ImageMagick.embossImage(Float f1, Float f2);
 Boolean ImageMagick.enhanceImage();
 Boolean ImageMagick.equalizeImage();
-Boolean ImageMagick.flipImage();
+
 Boolean ImageMagick.flopImage();
 Boolean ImageMagick.gammaImage(Float f1);
 Boolean ImageMagick.gaussianBlurImage(Float f1, Float f2);
@@ -75,9 +161,9 @@ Boolean ImageMagick.implodeImage(Float f1);
 Boolean ImageMagick.labelImage(String s1);
 Boolean ImageMagick.levelImage(Float f1, Float f2, Float f3);
 Boolean ImageMagick.linearStretchImage(Float f1, Float f2);
-Boolean ImageMagick.magnifyImage();
+
 Boolean ImageMagick.medianFilterImage(Float f1);
-Boolean ImageMagick.minifyImage();
+
 Boolean ImageMagick.modulateImage(Float f1, Float f2, Float f3);
 Boolean ImageMagick.motionBlurImage(Float f1, Float f2, Float f3);
 Boolean ImageMagick.negateImage(Boolean b1);
@@ -89,12 +175,12 @@ Boolean ImageMagick.pingImage(String s1);
 Boolean ImageMagick.previousImage();
 Boolean ImageMagick.radialBlurImage(Float f1);
 Boolean ImageMagick.randomThresholdImage(Float f1, Float f2);
-Boolean ImageMagick.readImage(String s1);
+
 Boolean ImageMagick.reduceNoiseImage(Float f1);
 Boolean ImageMagick.removeImage();
 Boolean ImageMagick.rollImage(Int i1, Int i2);
-Boolean ImageMagick.sampleImage(Int i1, Int i2);
-Boolean ImageMagick.scaleImage(Int i1, Int i2);
+
+
 Boolean ImageMagick.sepiaToneImage(Float f1);
 Boolean ImageMagick.setImageBias(Float f1);
 Boolean ImageMagick.setImageBluePrimary(Float f1, Float f2);
@@ -115,7 +201,7 @@ Boolean ImageMagick.setImageResolution(Float f1, Float f2);
 Boolean ImageMagick.setImageScene(Int i1);
 Boolean ImageMagick.setImageTicksPerSecond(Int i1);
 Boolean ImageMagick.setImageWhitePoint(Float f1, Float f2);
-Boolean ImageMagick.sharpenImage(Float f1, Float f2);
+
 Boolean ImageMagick.shaveImage(Int i1, Int i2);
 Boolean ImageMagick.sketchImage(Float f1, Float f2, Float f3);
 Boolean ImageMagick.solarizeImage(Float f1);
@@ -129,7 +215,7 @@ Boolean ImageMagick.thumbnailImage(Int i1, Int i2);
 Boolean ImageMagick.trimImage(Float f1);
 Boolean ImageMagick.uniqueImageColors();
 Boolean ImageMagick.waveImage(Float f1, Float f2);
-Boolean ImageMagick.writeImage(String s1);
+
 Boolean ImageMagick.writeImages(String s1, Boolean b2);
 ImageMagick ImageMagick.appendImages(Boolean b1);
 ImageMagick ImageMagick.averageImages();

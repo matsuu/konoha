@@ -12,6 +12,7 @@ METHOD ImageMagick_coreGenesis(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_void(ctx, sfp);
 }
 
+
 /* void ImageMagick.coreTerminus() */
 
 METHOD ImageMagick_coreTerminus(Ctx *ctx, knh_sfp_t* sfp)
@@ -116,7 +117,7 @@ METHOD ImageMagick_flattenImages(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
 	MagickWand *ret = MagickFlattenImages(self );
-
+	KNH_RETURN(ctx, sfp, sfp[0].o);
 }
 
 /* ImageMagick ImageMagick.mosaicImages(self) */
@@ -125,7 +126,7 @@ METHOD ImageMagick_mosaicImages(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
 	MagickWand *ret = MagickMosaicImages(self );
-
+	KNH_RETURN(ctx, sfp, sfp[0].o);
 }
 
 /* String ImageMagick.getFilename(self) */
