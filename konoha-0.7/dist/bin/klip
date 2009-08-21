@@ -1,0 +1,9 @@
+#!/usr/local/bin/konoha
+import "/usr/local/share/konoha/script/klip/klip.k"
+
+int main(String[] args)
+{
+  Klip klip = new Klip(args);
+  klip.check();
+  return klip.start();
+}

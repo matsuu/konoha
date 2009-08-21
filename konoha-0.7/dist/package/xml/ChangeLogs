@@ -1,0 +1,10 @@
+2009-06-26 Masahiro Ide <imasahiro@users.sourceforge.jp>
+    * src/*.{c,k}       rename *.{c,k} to src/*.{c,k}
+
+2009-06-14 Masahiro Ide <imasahiro@users.sourceforge.jp>
+    * libxml2.{c,k}     update libxml2.
+    * sample/xmlreader_2.k     make sample. xmlreader_2.k
+
+2009-06-02 Masahiro Ide <imasahiro@users.sourceforge.jp>
+    * libxml2.{c,k}     make libxml2 package.
+

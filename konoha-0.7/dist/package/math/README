@@ -1,0 +1,20 @@
+HOW TO BUILD THIS PACKAGE
+=========================
+
+Windows
+-------
+
+	$ copy \path\to\konoha.lib .
+	$ nmake -f windows.mk
+
+Apple MacOSX
+------------
+
+	$ make -f macosx_32.mk
+
+Linux
+-----
+
+	$ make -f linux_32.mk
+
+
