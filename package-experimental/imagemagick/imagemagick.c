@@ -1,5 +1,5 @@
-#include <konoha.h>
-#include <wand/MagickWand.h>
+#include "knh_imagemagick.h"
+
 
 /* void ImageMagick.coreGenesis(String s0, Boolean b1) */
 
@@ -134,8 +134,9 @@ METHOD ImageMagick_mosaicImages(Ctx *ctx, knh_sfp_t* sfp)
 METHOD ImageMagick_getFilename(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	char *ret = MagickGetFilename(self );
 
+	char *ret = MagickGetImageFilename(self);
+	if (!ret)  KNH_RETURN_void(ctx, sfp);
 	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
 }
 
@@ -144,10 +145,20 @@ METHOD ImageMagick_getFilename(Ctx *ctx, knh_sfp_t* sfp)
 METHOD ImageMagick_getFormat(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	char *ret = MagickGetFormat(self );
-
+	char *ret = MagickGetImageFormat(self );
+	if (!ret)  KNH_RETURN_void(ctx, sfp);
 	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
 }
+
+METHOD ImageMagick_getSignature(Ctx *ctx, knh_sfp_t* sfp)
+{
+	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
+	char *ret = MagickGetImageSignature(self);
+	if (!ret)  KNH_RETURN_void(ctx, sfp);
+	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
+}
+
+
 
 /* String ImageMagick.getFont(self) */
 
@@ -155,7 +166,7 @@ METHOD ImageMagick_getFont(Ctx *ctx, knh_sfp_t* sfp)
 {
 	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
 	char *ret = MagickGetFont(self );
-
+	if (!ret)  KNH_RETURN_void(ctx, sfp);
 	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
 }
 
@@ -405,45 +416,7 @@ METHOD ImageMagick_setSize(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Int ImageMagick.getCompressionQuality(self) */
 
-METHOD ImageMagick_getCompressionQuality(Ctx *ctx, knh_sfp_t* sfp)
-{
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	int ret = MagickGetCompressionQuality(self );
-
-	KNH_RETURN_Int(ctx, sfp, ret);
-}
-
-/* String ImageMagick.getImageFilename(self) */
-
-METHOD ImageMagick_getImageFilename(Ctx *ctx, knh_sfp_t* sfp)
-{
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	char *ret = MagickGetImageFilename(self );
-
-	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
-}
-
-/* String ImageMagick.getImageFormat(self) */
-
-METHOD ImageMagick_getImageFormat(Ctx *ctx, knh_sfp_t* sfp)
-{
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	char *ret = MagickGetImageFormat(self );
-
-	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
-}
-
-/* String ImageMagick.getImageSignature(self) */
-
-METHOD ImageMagick_getImageSignature(Ctx *ctx, knh_sfp_t* sfp)
-{
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	char *ret = MagickGetImageSignature(self );
-
-	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
-}
 
 /* String ImageMagick.identifyImage(self) */
 
@@ -455,15 +428,7 @@ METHOD ImageMagick_identifyImage(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
 }
 
-/* Float ImageMagick.getImageGamma(self) */
 
-METHOD ImageMagick_getImageGamma(Ctx *ctx, knh_sfp_t* sfp)
-{
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	double ret = MagickGetImageGamma(self );
-
-	KNH_RETURN_Float(ctx, sfp, ret);
-}
 
 /* Float ImageMagick.getImageTotalInkDensity(self) */
 
@@ -719,15 +684,7 @@ METHOD ImageMagick_gaussianBlurImage(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_Boolean(ctx, sfp, ret);
 }
 
-/* Boolean ImageMagick.getImageMatte(self) */
 
-METHOD ImageMagick_getImageMatte(Ctx *ctx, knh_sfp_t* sfp)
-{
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	int ret = MagickGetImageMatte(self );
-
-	KNH_RETURN_Boolean(ctx, sfp, ret);
-}
 
 /* Boolean ImageMagick.hasNextImage(self) */
 
@@ -1518,75 +1475,6 @@ METHOD ImageMagick_transformImage(Ctx *ctx, knh_sfp_t* sfp)
 
 }
 
-/* Int ImageMagick.getImageColors(self) */
-
-METHOD ImageMagick_getImageColors(Ctx *ctx, knh_sfp_t* sfp)
-{
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	int ret = MagickGetImageColors(self );
-
-	KNH_RETURN_Int(ctx, sfp, ret);
-}
-
-/* Int ImageMagick.getImageCompressionQuality(self) */
-
-METHOD ImageMagick_getImageCompressionQuality(Ctx *ctx, knh_sfp_t* sfp)
-{
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	int ret = MagickGetImageCompressionQuality(self );
-
-	KNH_RETURN_Int(ctx, sfp, ret);
-}
-
-/* Int ImageMagick.getImageDelay(self) */
-
-METHOD ImageMagick_getImageDelay(Ctx *ctx, knh_sfp_t* sfp)
-{
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	int ret = MagickGetImageDelay(self );
-
-	KNH_RETURN_Int(ctx, sfp, ret);
-}
-
-/* Int ImageMagick.getImageDepth(self) */
-
-METHOD ImageMagick_getImageDepth(Ctx *ctx, knh_sfp_t* sfp)
-{
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	int ret = MagickGetImageDepth(self );
-
-	KNH_RETURN_Int(ctx, sfp, ret);
-}
-
-/* Int ImageMagick.getImageHeight(self) */
-
-METHOD ImageMagick_getImageHeight(Ctx *ctx, knh_sfp_t* sfp)
-{
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	int ret = MagickGetImageHeight(self );
-
-	KNH_RETURN_Int(ctx, sfp, ret);
-}
-
-/* Int ImageMagick.getImageIterations(self) */
-
-METHOD ImageMagick_getImageIterations(Ctx *ctx, knh_sfp_t* sfp)
-{
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	int ret = MagickGetImageIterations(self );
-
-	KNH_RETURN_Int(ctx, sfp, ret);
-}
-
-/* Int ImageMagick.getImageScene(self) */
-
-METHOD ImageMagick_getImageScene(Ctx *ctx, knh_sfp_t* sfp)
-{
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	int ret = MagickGetImageScene(self );
-
-	KNH_RETURN_Int(ctx, sfp, ret);
-}
 
 /* Int ImageMagick.getImageTicksPerSecond(self) */
 
@@ -1598,15 +1486,7 @@ METHOD ImageMagick_getImageTicksPerSecond(Ctx *ctx, knh_sfp_t* sfp)
 	KNH_RETURN_Int(ctx, sfp, ret);
 }
 
-/* Int ImageMagick.getImageWidth(self) */
 
-METHOD ImageMagick_getImageWidth(Ctx *ctx, knh_sfp_t* sfp)
-{
-	MagickWand *self =(MagickWand*)((sfp[0].glue)->ptr);
-	int ret = MagickGetImageWidth(self );
-
-	KNH_RETURN_Int(ctx, sfp, ret);
-}
 
 /* Int ImageMagick.getNumberImages(self) */
 

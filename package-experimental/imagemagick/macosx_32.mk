@@ -12,9 +12,12 @@ library = "$(pkgname)_$(target).dylib"
 .PHONY: all
 all: $(library)
 
-objs = "$(pkgname).o"
+objs = "$(pkgname).o" attributes.o
 
 "$(pkgname).o": $(pkgname).c
+	$(CC) $(CFLAGS) -o $@ -c $^
+
+attributes.o : attributes.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 $(library): $(objs)

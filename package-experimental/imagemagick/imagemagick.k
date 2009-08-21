@@ -10,14 +10,12 @@
 /* -----------------------------------------------------------------*/
 /* Class Definition */
 
-//class ImageMagick {
-//	String filename;
-//}
 
 class ImageMagick;
 
+
 /* -----------------------------------------------------------------*/
-/* Getter Override */
+/* Getter Override (Instance getter) */
 String ImageMagick.getFilename();
 String ImageMagick.getImageAttribute(String s1);
 Int ImageMagick.getImageIndex();
@@ -25,8 +23,18 @@ String ImageMagick.getFormat();
 String ImageMagick.getFont();
 String ImageMagick.getHomeURL();
 String ImageMagick.getImageProperty(String s1);
-
-
+Int ImageMagick.getWidth();
+Int ImageMagick.getHeight();
+String ImageMagick.getSignature();
+Float ImageMagick.getGamma();
+Boolean ImageMagick.getMatte();
+Int ImageMagick.getColors();
+Int ImageMagick.getCompressionQuality();
+Int ImageMagick.getDelay();
+Int ImageMagick.getDepth();
+Int ImageMagick.getIterations();
+Int ImageMagick.getScene();
+Int ImageMagick.getTicksPerSecond();
 /* -----------------------------------------------------------------*/
 /* Class Definition */
 
@@ -83,8 +91,10 @@ Boolean ImageMagick.scaleImage(Int width, Int height);
 
 
 /* -----------------------------------------------------------------*/
-/* get attributes */
-
+/* Get Library Attributes */
+String ImageMagick.getCopyright();
+String ImageMagick.getPackageName();
+String ImageMagick.getReleaseDate();
 
 
 void ImageMagick.coreGenesis(String s0, Boolean b1);
@@ -101,36 +111,25 @@ ImageMagick ImageMagick.flattenImages();
 ImageMagick ImageMagick.mosaicImages();
 
 
-
-
-
 String ImageMagick.getOption(String s1);
 String ImageMagick.queryConfigureOption(String s0);
-String ImageMagick.getCopyright();
-String ImageMagick.getPackageName();
-String ImageMagick.getReleaseDate();
+
 Float ImageMagick.getPointsize();
 Boolean ImageMagick.deleteOption(String s1);
 Boolean ImageMagick.deleteImageProperty(String s1);
 Boolean ImageMagick.getAntialias();
 Boolean ImageMagick.setAntialias(Boolean b1);
-Boolean ImageMagick.setCompressionQuality(Int i1);
-Boolean ImageMagick.setDepth(Int i1);
-Boolean ImageMagick.setFilename(String s1);
-Boolean ImageMagick.setFormat(String s1);
-Boolean ImageMagick.setFont(String s1);
+//Boolean ImageMagick.setFilename(String s1);
 Boolean ImageMagick.setImageProperty(String s1, String s2);
 Boolean ImageMagick.setOption(String s1, String s2);
 Boolean ImageMagick.setPassphrase(String s1);
 Boolean ImageMagick.setPointsize(Float f1);
 Boolean ImageMagick.setResolution(Float f1, Float f2);
 Boolean ImageMagick.setSize(Int i1, Int i2);
-Int ImageMagick.getCompressionQuality();
-String ImageMagick.getImageFilename();
-String ImageMagick.getImageFormat();
-String ImageMagick.getImageSignature();
+//Int ImageMagick.getCompressionQuality();
+
 String ImageMagick.identifyImage();
-Float ImageMagick.getImageGamma();
+
 Float ImageMagick.getImageTotalInkDensity();
 Boolean ImageMagick.adaptiveBlurImage(Float f1, Float f2);
 Boolean ImageMagick.adaptiveSharpenImage(Float f1, Float f2);
@@ -154,7 +153,7 @@ Boolean ImageMagick.equalizeImage();
 Boolean ImageMagick.flopImage();
 Boolean ImageMagick.gammaImage(Float f1);
 Boolean ImageMagick.gaussianBlurImage(Float f1, Float f2);
-Boolean ImageMagick.getImageMatte();
+
 Boolean ImageMagick.hasNextImage();
 Boolean ImageMagick.hasPreviousImage();
 Boolean ImageMagick.implodeImage(Float f1);
@@ -227,15 +226,8 @@ ImageMagick ImageMagick.getImageClipMask();
 ImageMagick ImageMagick.morphImages(Int i1);
 ImageMagick ImageMagick.optimizeImageLayers();
 ImageMagick ImageMagick.transformImage(String s1, String s2);
-Int ImageMagick.getImageColors();
-Int ImageMagick.getImageCompressionQuality();
-Int ImageMagick.getImageDelay();
-Int ImageMagick.getImageDepth();
-Int ImageMagick.getImageHeight();
-Int ImageMagick.getImageIterations();
-Int ImageMagick.getImageScene();
-Int ImageMagick.getImageTicksPerSecond();
-Int ImageMagick.getImageWidth();
+
+
 Int ImageMagick.getNumberImages();
 Int ImageMagick.getIteratorIndex();
 Boolean ImageMagick.clearException();
