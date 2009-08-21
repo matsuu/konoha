@@ -2033,17 +2033,15 @@ void knh_StmtIF_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 {
 	knh_labelid_t lbelse = knh_Asm_newLabelId(ctx, abr, NULL);
 	knh_labelid_t lbend = knh_Asm_newLabelId(ctx, abr, NULL);
-
 	/* if */
 	TERMs_ASM_JIFF(ctx, stmt, 0, abr, lbelse);
 	/*then*/
 	TERMs_asmBLOCK(ctx, stmt, 1, abr);
-
-	if(TERMs_isDONE(stmt, 2)) { /* PEEPHOLE */
-		KNH_ASM_LLABEL(ctx, abr, lbend);
-		return;
+	if(TERMs_isDONE(stmt, 2)) {
+		/* PEEPHOLE this isn't a bug */
+		KNH_ASM_LLABEL(ctx, abr, lbelse);
+		return ;
 	}
-
 	KNH_ASM_JMP(ctx, abr, lbend);
 	/* else */
 	KNH_ASM_LLABEL(ctx, abr, lbelse);

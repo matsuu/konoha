@@ -57,8 +57,8 @@ Stmt* knh_Stmt_copy(Ctx *ctx, Stmt *stmt)
 	SP(o)->uri = SP(stmt)->uri;
 	SP(o)->line = SP(stmt)->line;
 	DP(o)->type = DP(stmt)->type;
-	DP(o)->size = DP(stmt)->size;
-	for(i = 0; DP(o)->size; i++) {
+	DP(o)->size = 0;
+	for(i = 0; i < DP(stmt)->size; i++) {
 		knh_Stmt_add(ctx, o, DP(stmt)->terms[i]);
 	}
 	//KNH_SETv(ctx, DP(o)->metaDictMap, DP(stmt)->metaDictMap);
@@ -113,7 +113,7 @@ void knh_Stmt_terms_expand(Ctx *ctx, Stmt *o)
 
 void knh_Stmt_add(Ctx *ctx, Stmt *o, Term *tm)
 {
-	DBG2_ASSERT(IS_Term(tm));
+	DBG2_ASSERT(IS_Token(tm) || IS_Stmt(tm));
 	DBG2_ASSERT(SP(o)->stt != STT_DONE);
 	if(!(DP(o)->size < DP(o)->capacity)) {
 		knh_Stmt_terms_expand(ctx, o);
