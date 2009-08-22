@@ -702,10 +702,13 @@ void knh_Stmt_add_RANGE(Ctx *ctx, Stmt *stmt, knh_tkc_t *tc, knh_index_t idx, in
 	}
 	if(idx == -1) {
 		int c = knh_tokens_count(tc, TT_COMMA);
+		c = knh_Stmt_add_EXPRs(ctx, stmt, tc, /*isData*/0);
 		if(c == 0) { /* @TEST a[] = 0 */
 			DP(tkM)->mn = METHODN_setAll;
 		}
-		c = knh_Stmt_add_EXPRs(ctx, stmt, tc, /*isData*/0);
+		else if(c == 1) {
+			DP(tkM)->mn = METHODN_get;
+		}
 		if(c == 2) {
 			/* @TEST a[1,2] */
 			DP(tkM)->mn = METHODN_get2D;
