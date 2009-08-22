@@ -2182,7 +2182,7 @@ void knh_StmtSEPARATOR_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 		if(STT_(stmtDECL) == STT_LET) {
 			knh_StmtLET_asm(ctx, stmtDECL, abr, TYPE_void, 0);
 		}
-		stmtDECL = DP(stmt)->next;
+		stmtDECL = DP(stmtDECL)->next;
 	}
 }
 

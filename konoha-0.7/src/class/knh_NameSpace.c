@@ -108,11 +108,14 @@ KNHAPI(knh_class_t) knh_findcid(Ctx *ctx, knh_bytes_t lname)
 	}
 	if(knh_bytes_endsWith(lname, STEXT("[]"))) {
 		lname.len -= 2;
+		if(knh_bytes_equals(lname, STEXT("byte"))) {
+			return CLASS_Bytes;
+		}
 		cid = knh_getcid(ctx, lname);
 		if(cid == CLASS_unknown || knh_class_isPrivate(cid)) {
 			return CLASS_Array;
 		}
-		return knh_class_Array(ctx, CLASS_Array, cid);
+		return knh_class_Array(ctx, cid);
 	}
 	if(knh_bytes_endsWith(lname, STEXT(".."))) {
 		lname.len -= 2;

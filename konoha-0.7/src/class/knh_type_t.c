@@ -133,16 +133,25 @@ knh_type_t knh_pmztype_totype(Ctx *ctx, knh_type_t t, knh_class_t this_cid)
 
 /* ------------------------------------------------------------------------ */
 
-knh_class_t knh_class_Array(Ctx *ctx, knh_class_t bcid, knh_class_t p1)
+knh_class_t knh_class_Array(Ctx *ctx, knh_class_t p1)
 {
-	knh_class_t cid = CLASS_unknown;
+	knh_class_t bcid = CLASS_Array, cid = CLASS_unknown;
 	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
-	if(p1 == ClassTable(bcid).p1) return bcid;
+	KNH_ASSERT_cid(p1);
+	if(p1 == CLASS_Any) return CLASS_Array;
+	if(ClassTable(p1).bcid == CLASS_Int) {
+		bcid = CLASS_IArray;
+		if(p1 == CLASS_Int) return bcid;
+	}
+	if(ClassTable(p1).bcid == CLASS_Float) {
+		bcid = CLASS_FArray;
+		if(p1 == CLASS_Float) return bcid;
+	}
 	knh_write_ltype(ctx, cwb->w, p1);
 	knh_write(ctx, cwb->w, STEXT("[]"));
 	cid = knh_getcid(ctx, knh_cwb_tobytes(cwb));
 	if(cid == CLASS_unknown) {
-		cid = knh_addGenericsClass(ctx, CLASS_newid, knh_cwb_newString(ctx, cwb), CLASS_Array, p1, CLASS_unknown);
+		cid = knh_addGenericsClass(ctx, CLASS_newid, knh_cwb_newString(ctx, cwb), bcid, p1, CLASS_unknown);
 	} else {
 		knh_cwb_close(cwb);
 	}
@@ -177,7 +186,7 @@ knh_class_t knh_class_Generics(Ctx *ctx, knh_class_t bcid, knh_class_t p1, knh_c
 		return knh_class_Iterator(ctx, p1);
 	}
 	else if(bcid == CLASS_Array || bcid == CLASS_IArray || bcid == CLASS_FArray) {
-		return knh_class_Array(ctx, bcid, p1);
+		return knh_class_Array(ctx, p1);
 	}
 	if(p1 == CLASS_Any && (p2 == CLASS_Any || p2 == CLASS_unknown)) {
 		return bcid;

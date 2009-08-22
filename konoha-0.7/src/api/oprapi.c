@@ -357,13 +357,11 @@ static METHOD knh__Tuple_opHas(Ctx *ctx, knh_sfp_t *sfp)
 static METHOD knh__IArray_opHas(Ctx *ctx, knh_sfp_t *sfp)
 {
 	int res = 0/*NotFound*/;
-	DBG2_P("******* cid=%s", CLASSNo(sfp[1].o));
 	if(IS_bInt(sfp[1].o)) {
 		IArray *o = (IArray*)sfp[0].o;
 		knh_int_t v = sfp[1].ivalue;
 		size_t i;
 		for(i = 0; i < o->size; i++) {
-			DBG2_P("%d %d, %d", i, (int)o->ilist[i], (int)v);
 			if(o->ilist[i] == v) {
 				res = 1; break;
 			}
@@ -1303,6 +1301,22 @@ static METHOD knh__FArray_opRangeTo(Ctx *ctx, knh_sfp_t *sfp)
 /* [op1] */
 
 /* ------------------------------------------------------------------------ */
+/* @method T1! Pair.op0()  */
+
+static METHOD knh__Pair_op0(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN(ctx, sfp, (sfp[0].pair)->first);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method T2! Pair.op1()  */
+
+static METHOD knh__Pair_op1(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN(ctx, sfp, (sfp[0].pair)->second);
+}
+
+/* ------------------------------------------------------------------------ */
 /* @method Any Tuple.op0()  */
 
 static METHOD knh__Tuple_op0(Ctx *ctx, knh_sfp_t *sfp)
@@ -1319,9 +1333,9 @@ static METHOD knh__Tuple_op0(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Any Tuple.op2()  */
+/* @method Any Tuple.op1()  */
 
-static METHOD knh__Tuple_op2(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__Tuple_op1(Ctx *ctx, knh_sfp_t *sfp)
 {
 	Object *res;
 	if(knh_Tuple_isTriple(sfp[0].tuple)) {
@@ -1360,9 +1374,9 @@ static METHOD knh__Array_op0(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method T1! Array.op2()  */
+/* @method T1! Array.op1()  */
 
-static METHOD knh__Array_op2(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__Array_op1(Ctx *ctx, knh_sfp_t *sfp)
 {
 	Array *a = sfp[0].a;
 	KNH_RETURN(ctx, sfp, knh_Array_n(a, knh_array_index(ctx, 1, a->size)));
@@ -1387,9 +1401,9 @@ static METHOD knh__IArray_op0(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Int! IArray.op2()  */
+/* @method Int! IArray.op1()  */
 
-static METHOD knh__IArray_op2(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__IArray_op1(Ctx *ctx, knh_sfp_t *sfp)
 {
 	IArray *a = sfp[0].ia;
 	KNH_RETURN_Int(ctx, sfp, a->ilist[knh_array_index(ctx, 1, a->size)]);
@@ -1414,9 +1428,9 @@ static METHOD knh__FArray_op0(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Float! FArray.op2()  */
+/* @method Float! FArray.op1()  */
 
-static METHOD knh__FArray_op2(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__FArray_op1(Ctx *ctx, knh_sfp_t *sfp)
 {
 	FArray *a = sfp[0].fa;
 	KNH_RETURN_Float(ctx, sfp, a->flist[knh_array_index(ctx, 1, a->size)]);

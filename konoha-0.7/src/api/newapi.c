@@ -127,7 +127,7 @@ METHOD knh__Regex_new(Ctx *ctx, knh_sfp_t *sfp)
 
 /* ------------------------------------------------------------------------ */
 /* [Pair, Tuple, Range] */
-/* @method This! Pair.new:init(T1! first, T2! second) */
+/* @method This! Pair.new:init(T1! first, T2! second) @Const */
 
 static METHOD knh__Pair_new__init(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -140,7 +140,7 @@ static METHOD knh__Pair_new__init(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[VARARGS] This! Tuple.new:init(Any value) @VARARGS @Hidden */
+/* @method[VARARGS] This! Tuple.new:init(Any value) @VARARGS @Hidden @Const */
 
 static METHOD knh__Tuple_new__init(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -171,7 +171,7 @@ static METHOD knh__Tuple_new__init(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method This! Range.new:init(T1! start, T1! end)  */
+/* @method This! Range.new:init(T1! start, T1! end) @Const */
 
 static METHOD knh__Range_new__init(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -184,7 +184,7 @@ static METHOD knh__Range_new__init(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method This! Range.new(T1! start, T1! end)  */
+/* @method This! Range.new(T1! start, T1! end)  @Const */
 
 static METHOD knh__Range_new(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -352,11 +352,6 @@ static METHOD knh__FArray_new__init(Ctx *ctx, knh_sfp_t *sfp)
 	}
 	KNH_RETURN(ctx, sfp, o);
 }
-
-/* ------------------------------------------------------------------------ */
-/* [new] */
-
-
 
 #endif/* KNH_CC_METHODAPI*/
 

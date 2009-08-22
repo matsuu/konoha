@@ -773,7 +773,6 @@ void knh_Exception__dump(Ctx *ctx, Exception *o, OutputStream *w, String *m)
 		knh_printf(ctx, w, "[%s:%d] ", DP(o)->file, DP(o)->line);
 	}
 	knh_write(ctx, w, knh_String_tobytes(DP(o)->msg));
-	knh_print(ctx, w, STEXT(" Exception"));
 	if(IS_bArray(DP(o)->traces)) {
 		size_t i, size = knh_Array_size(DP(o)->traces), c = 0;
 		knh_bytes_t prev = STEXT("?");

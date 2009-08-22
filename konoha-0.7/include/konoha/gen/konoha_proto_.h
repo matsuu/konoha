@@ -397,7 +397,7 @@ knh_bool_t konoha_initcheck(void);
 /* ../src/class/knh_type_t.c */
 knh_class_t knh_pmztype_toclass(Ctx *ctx, knh_type_t t, knh_class_t this_cid);
 knh_type_t knh_pmztype_totype(Ctx *ctx, knh_type_t t, knh_class_t this_cid);
-knh_class_t knh_class_Array(Ctx *ctx, knh_class_t bcid, knh_class_t p1);
+knh_class_t knh_class_Array(Ctx *ctx, knh_class_t p1);
 knh_class_t knh_class_Iterator(Ctx *ctx, knh_class_t p1);
 knh_class_t knh_class_Generics(Ctx *ctx, knh_class_t bcid, knh_class_t p1, knh_class_t p2);
 char *TYPEQ(knh_type_t type);
@@ -529,6 +529,7 @@ Term * knh_StmtDECL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns);
 Term *knh_StmtLET_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_t reqt);
 char *METHODN_op(knh_methodn_t mn);
 Term *knh_StmtEXPR_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_class_t reqt);
+Term *knh_StmtSEPARATOR_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns);
 void knh_Asm_initReg(Ctx *ctx, Asm *abr);
 int knh_Stmt_initParams(Ctx *ctx, Stmt *pstmt, Asm *abr, NameSpace *ns, int level);
 void knh_StmtMETHOD_typingBODY(Ctx *ctx, Asm *abr, NameSpace *ns, Method *mtd, Stmt *stmtPARAMS, Stmt *stmtBODY, int isIteration);

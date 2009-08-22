@@ -2635,11 +2635,11 @@ extern "C" {
 #define METHODN__op0                    ((knh_methodn_t)157|KNH_FLAG_MN_MOVTEXT)
 #define METHODN_getOp0                  ((knh_methodn_t)157|KNH_FLAG_MN_GETTER)
 #define METHODN_setOp0                  ((knh_methodn_t)157|KNH_FLAG_MN_SETTER)
-#define FIELDN_op2                      ((knh_fieldn_t)158)
-#define METHODN_op2                     ((knh_methodn_t)158)
-#define METHODN__op2                    ((knh_methodn_t)158|KNH_FLAG_MN_MOVTEXT)
-#define METHODN_getOp2                  ((knh_methodn_t)158|KNH_FLAG_MN_GETTER)
-#define METHODN_setOp2                  ((knh_methodn_t)158|KNH_FLAG_MN_SETTER)
+#define FIELDN_op1                      ((knh_fieldn_t)158)
+#define METHODN_op1                     ((knh_methodn_t)158)
+#define METHODN__op1                    ((knh_methodn_t)158|KNH_FLAG_MN_MOVTEXT)
+#define METHODN_getOp1                  ((knh_methodn_t)158|KNH_FLAG_MN_GETTER)
+#define METHODN_setOp1                  ((knh_methodn_t)158|KNH_FLAG_MN_SETTER)
 #define FIELDN_opAdd                    ((knh_fieldn_t)159)
 #define METHODN_opAdd                   ((knh_methodn_t)159)
 #define METHODN__opAdd                  ((knh_methodn_t)159|KNH_FLAG_MN_MOVTEXT)
@@ -3347,73 +3347,75 @@ extern "C" {
 #define MF_nThis_Int_Int                knh_tMethodField(ctx, MFN_nThis_Int_Int)
 #define MFN_nT1                 94
 #define MF_nT1                          knh_tMethodField(ctx, MFN_nT1)
-#define MFN_nArray              95
+#define MFN_nT2                 95
+#define MF_nT2                          knh_tMethodField(ctx, MFN_nT2)
+#define MFN_nArray              96
 #define MF_nArray                       knh_tMethodField(ctx, MFN_nArray)
-#define MFN_InputStream_nString_String 96
+#define MFN_InputStream_nString_String 97
 #define MF_InputStream_nString_String   knh_tMethodField(ctx, MFN_InputStream_nString_String)
-#define MFN_nInt_nBytes_Int_Int 97
+#define MFN_nInt_nBytes_Int_Int 98
 #define MF_nInt_nBytes_Int_Int          knh_tMethodField(ctx, MFN_nInt_nBytes_Int_Int)
-#define MFN_nString             98
+#define MFN_nString             99
 #define MF_nString                      knh_tMethodField(ctx, MFN_nString)
-#define MFN_OutputStream_nString_String 99
+#define MFN_OutputStream_nString_String 100
 #define MF_OutputStream_nString_String  knh_tMethodField(ctx, MFN_OutputStream_nString_String)
-#define MFN_void_Any            100
+#define MFN_void_Any            101
 #define MF_void_Any                     knh_tMethodField(ctx, MFN_void_Any)
-#define MFN_nSocket_nString_nInt 101
+#define MFN_nSocket_nString_nInt 102
 #define MF_nSocket_nString_nInt         knh_tMethodField(ctx, MFN_nSocket_nString_nInt)
-#define MFN_nInputStream        102
+#define MFN_nInputStream        103
 #define MF_nInputStream                 knh_tMethodField(ctx, MFN_nInputStream)
-#define MFN_nOutputStream       103
+#define MFN_nOutputStream       104
 #define MF_nOutputStream                knh_tMethodField(ctx, MFN_nOutputStream)
-#define MFN_nBytes_String       104
+#define MFN_nBytes_String       105
 #define MF_nBytes_String                knh_tMethodField(ctx, MFN_nBytes_String)
-#define MFN_nString_Any_        105
+#define MFN_nString_Any_        106
 #define MF_nString_Any_                 knh_tMethodField(ctx, MFN_nString_Any_)
-#define MFN_nString_nString_nString 106
+#define MFN_nString_nString_nString 107
 #define MF_nString_nString_nString      knh_tMethodField(ctx, MFN_nString_nString_nString)
-#define MFN_aString_String_Int  107
+#define MFN_aString_String_Int  108
 #define MF_aString_String_Int           knh_tMethodField(ctx, MFN_aString_String_Int)
-#define MFN_nBoolean_nRegex     108
+#define MFN_nBoolean_nRegex     109
 #define MF_nBoolean_nRegex              knh_tMethodField(ctx, MFN_nBoolean_nRegex)
-#define MFN_aString_Regex       109
+#define MFN_aString_Regex       110
 #define MF_aString_Regex                knh_tMethodField(ctx, MFN_aString_Regex)
-#define MFN_nBoolean_nString_String 110
+#define MFN_nBoolean_nString_String 111
 #define MF_nBoolean_nString_String      knh_tMethodField(ctx, MFN_nBoolean_nString_String)
-#define MFN_void_Int            111
+#define MFN_void_Int            112
 #define MF_void_Int                     knh_tMethodField(ctx, MFN_void_Int)
-#define MFN_aString_String      112
+#define MFN_aString_String      113
 #define MF_aString_String               knh_tMethodField(ctx, MFN_aString_String)
-#define MFN_nBoolean_String_String 113
+#define MFN_nBoolean_String_String 114
 #define MF_nBoolean_String_String       knh_tMethodField(ctx, MFN_nBoolean_String_String)
-#define MFN_Any_nString         114
+#define MFN_Any_nString         115
 #define MF_Any_nString                  knh_tMethodField(ctx, MFN_Any_nString)
-#define MFN_void_nString_Any    115
+#define MFN_void_nString_Any    116
 #define MF_void_nString_Any             knh_tMethodField(ctx, MFN_void_nString_Any)
-#define MFN_naString_String     116
+#define MFN_naString_String     117
 #define MF_naString_String              knh_tMethodField(ctx, MFN_naString_String)
-#define MFN_void_InputStream    117
+#define MFN_void_InputStream    118
 #define MF_void_InputStream             knh_tMethodField(ctx, MFN_void_InputStream)
-#define MFN_void_OutputStream   118
+#define MFN_void_OutputStream   119
 #define MF_void_OutputStream            knh_tMethodField(ctx, MFN_void_OutputStream)
-#define MFN_nException_String_Any 119
+#define MFN_nException_String_Any 120
 #define MF_nException_String_Any        knh_tMethodField(ctx, MFN_nException_String_Any)
-#define MFN_nThis_nAny_nMethod  120
+#define MFN_nThis_nAny_nMethod  121
 #define MF_nThis_nAny_nMethod           knh_tMethodField(ctx, MFN_nThis_nAny_nMethod)
-#define MFN_T0_T1_T2_T3         121
+#define MFN_T0_T1_T2_T3         122
 #define MF_T0_T1_T2_T3                  knh_tMethodField(ctx, MFN_T0_T1_T2_T3)
-#define MFN_nException_String_String_Object 122
+#define MFN_nException_String_String_Object 123
 #define MF_nException_String_String_Object knh_tMethodField(ctx, MFN_nException_String_String_Object)
-#define MFN_String              123
+#define MFN_String              124
 #define MF_String                       knh_tMethodField(ctx, MFN_String)
-#define MFN_nThis               124
+#define MFN_nThis               125
 #define MF_nThis                        knh_tMethodField(ctx, MFN_nThis)
-#define MFN_aString             125
+#define MFN_aString             126
 #define MF_aString                      knh_tMethodField(ctx, MFN_aString)
-#define MFN_Boolean_nClass      126
+#define MFN_Boolean_nClass      127
 #define MF_Boolean_nClass               knh_tMethodField(ctx, MFN_Boolean_nClass)
-#define MFN_void_Boolean        127
+#define MFN_void_Boolean        128
 #define MF_void_Boolean                 knh_tMethodField(ctx, MFN_void_Boolean)
-#define KNH_TMETHODFIELD_SIZE   128
+#define KNH_TMETHODFIELD_SIZE   129
 #define EXPT_Exception          1
 #define EXPT_Fatal              2
 #define EXPT_OutOfMemory        3

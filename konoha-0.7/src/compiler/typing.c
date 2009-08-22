@@ -2409,7 +2409,7 @@ Term *knh_StmtNEW_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_clas
 			knh_class_t ccid = CLASS_Any;
 			if(knh_StmtPARAMs_findCommonClass(ctx, stmt, abr, ns, &ccid)) {
 				if(ccid != CLASS_Any) {
-					mtd_cid = knh_class_Array(ctx, CLASS_Array, ccid);
+					mtd_cid = knh_class_Array(ctx, ccid);
 					knh_Asm_derivedClass(ctx, abr, CLASS_Array, mtd_cid);
 				}
 			}
@@ -2436,7 +2436,7 @@ Term *knh_StmtNEW_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_clas
 			knh_Asm_perror(ctx, abr, KERR_ERROR, _("unknown constructor: %s %C(...)"), sToken(tkNEW), mtd_cid);
 			return NULL;
 		}
-		//DBG2_P("LOOKUP CONSTRUCTOR %s %s", CLASSN(mtd_cid), CLASSN(DP(mtd)->cid));
+		DBG2_P("LOOKUP CONSTRUCTOR %s %s", CLASSN(mtd_cid), CLASSN(DP(mtd)->cid));
 		DP(tkC)->cid = mtd_cid;
 		knh_Token_toMTD(ctx, tkNEW, mn, mtd);
 		return knh_StmtPARAMS_typing(ctx, stmt, abr, ns, mtd_cid, mtd);
@@ -3384,16 +3384,18 @@ Term *knh_StmtFOR_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 static
 int knh_Asm_typingSEPARATOR(Ctx *ctx, Asm *abr, NameSpace *ns, Stmt *stmtDECL, Token *tkIT)
 {
-	knh_int_t c = 1;
-	Method *mtd = knh_Class_getMethod(ctx, CLASS_type(DP(tkIT)->type), METHODN_op0);
+	knh_int_t c = 0;
+	knh_class_t mtd_cid = CLASS_type(DP(tkIT)->type);
+	Method *mtd = knh_Class_getMethod(ctx, mtd_cid, METHODN_op1);
 	if(IS_NULL(mtd)) {
-		knh_Asm_perror(ctx, abr, KERR_TERROR, _("unsupported multi-selection: %C"));
+		knh_Asm_perror(ctx, abr, KERR_TERROR, _("unsupported separator: %C"), mtd_cid);
 		return 0;
 	}
+	DBG2_P("SEPARATOR %s", CLASSN(mtd_cid));
 	while(IS_Stmt(stmtDECL)) {
 		Stmt *stmtVALUE;
-		if(c < 3) {
-			stmtVALUE = new_StmtMN(ctx, FL(stmtDECL), (c == 1) ? METHODN_op0 : METHODN_op2);
+		if(c < 2) {
+			stmtVALUE = new_StmtMN(ctx, FL(stmtDECL), (c == 0) ? METHODN_op0 : METHODN_op1);
 			knh_Stmt_addT(ctx, stmtVALUE, tkIT);
 		}
 		else {
@@ -3404,25 +3406,37 @@ int knh_Asm_typingSEPARATOR(Ctx *ctx, Asm *abr, NameSpace *ns, Stmt *stmtDECL, T
 		DBG2_ASSERT(SP(stmtDECL)->stt == STT_DECL);
 		KNH_SETv(ctx, DP(stmtDECL)->terms[2], stmtVALUE);
 		{
-			int templevel = DP(abr)->level;
-			DP(abr)->level = INNERPARAMS;
 			Term *tm = knh_StmtDECL_typing(ctx, stmtDECL, abr, ns);
-			DP(abr)->level = templevel;
 			if(tm == NULL) return 0;
+			DBG2_P("stt=%s", knh_stmt_tochar(STT_(stmtDECL)));
 			DBG2_ASSERT(STT_(stmtDECL) == STT_LET);
+		}
+		c++;
+		if(c == 2 && IS_NOTNULL(DP(stmtDECL)->next)) {
+			mtd = knh_Class_getMethod(ctx, mtd_cid, METHODN_opN);
+			if(IS_NULL(mtd)) {
+				knh_Asm_perror(ctx, abr, KERR_EWARN, _("only twofold: %C"), mtd_cid);
+				KNH_SETv(ctx, DP(stmtDECL)->next, KNH_NULL);
+				return 1;
+			}
 		}
 		stmtDECL = DP(stmtDECL)->next;
 	}
+//	if(IS_NULL(mtd)) {
+//		knh_Asm_perror(ctx, abr, KERR_TERROR, _("unsupported separator: %C"), CLASS_type(DP(tkIT)->type));
+//		return 0;
+//	}
 	return 1;
 }
 
-static
+/* ------------------------------------------------------------------------ */
+
 Term *knh_StmtSEPARATOR_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 {
 	if(TERMs_typing(ctx, stmt, 1, abr, ns, TYPE_Any, TWARN_)) {
 		Token *tkIT = knh_Stmt_add_IT(ctx, stmt, TERMs_getcid(stmt, 1), 0);
 		if(knh_Asm_typingSEPARATOR(ctx, abr, ns, DP(stmt)->stmts[0], tkIT)) {
-			return TM(stmt);
+			return knh_Stmt_typed(ctx, stmt, TYPE_void);
 		}
 	}
 	return NULL;
@@ -3872,15 +3886,16 @@ int knh_Stmt_checkLastReturn(Ctx *ctx, Stmt *stmt, Method *mtd)
 {
 	Stmt *stmtLAST = knh_Stmt_tailReturn(ctx, stmt);
 	knh_stmt_t stt = SP(stmtLAST)->stt;
+	knh_type_t rtype = knh_Method_rztype(mtd);
 	if(stt == STT_RETURN || stt == STT_THROW || stt == STT_ERR) {
 		return 1;
 	}
-	if(stt == STT_CALL1) {
+	if(stt == STT_CALL1 || rtype != TYPE_void) {
 		STT_(stmtLAST) = STT_RETURN;
 		return 1;
 	}
-	if(STT_NEW <= stt && stt <= STT_OR) {
-		if(stt != STT_CALL || knh_Method_rztype(mtd) != TYPE_void) {
+	if(STT_NEW <= stt && stt <= STT_OR && rtype != TYPE_void) {
+		if(stt != STT_CALL) {
 			Stmt *o = knh_Stmt_copy(ctx, stmtLAST);
 			STT_(stmtLAST) = STT_RETURN;
 			knh_Stmt_resize(ctx, stmtLAST, 1);
@@ -3900,7 +3915,7 @@ int knh_Stmt_checkLastReturn(Ctx *ctx, Stmt *stmt, Method *mtd)
 	/* Generate default return statement */
 	{
 		Stmt *stmtRETURN = new_Stmt(ctx, 0, STT_RETURN);
-		if(!knh_Method_isConstructor(ctx, mtd)) {
+		if(!knh_Method_isConstructor(ctx, mtd) || rtype != TYPE_void) {
 			knh_Asm_addDefaultReturnValue(ctx, ctx->abr, stmtRETURN, knh_Method_rtype(ctx, mtd, DP(mtd)->cid));
 		}
 		KNH_SETv(ctx, DP(stmtLAST)->next, stmtRETURN);
@@ -4235,7 +4250,8 @@ Term *knh_Stmt_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_type_t 
 {
 	/* check statement or expr */
 	if(reqt == TYPE_void) {  /* Statement */
-		switch(SP(stmt)->stt) {
+		if(knh_Stmt_isTyped(stmt)) return TM(stmt);
+		switch(STT_(stmt)) {
 		case STT_BLOCK:
 			if(!TERMs_typingBLOCK(ctx, stmt, 0, abr, ns, 1)) {
 				return NULL;

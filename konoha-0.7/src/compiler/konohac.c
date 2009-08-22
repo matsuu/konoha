@@ -811,7 +811,7 @@ int knh_Stmt_eval(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, int isEval)
 			KNH_MOV(ctx, lsfp[3].o, scr);
 			KNH_SCALL(ctx, lsfp, 2, mtd, 0/*args*/);
 			if(isExpr && !isVOID) {
-				DBG2_P("returning %p %s %lld", lsfp + 2, CLASSNo(lsfp[2].o), lsfp[2].ivalue);
+				//DBG2_P("returning %p %s %lld", lsfp+2, CLASSNo(lsfp[2].o), lsfp[2].ivalue);
 				((Context*)ctx)->esp = lsfp+1;
 				knh_esp1_format(ctx, mt, KNH_STDOUT, KNH_NULL);
 				knh_write_EOL(ctx, KNH_STDOUT);
@@ -911,6 +911,11 @@ int knh_NameSpace_compile(Ctx *ctx, NameSpace *ns, Stmt *stmt, int isEval)
 		case STT_LET: {
 				knh_Asm_initThisScript(ctx, abr);
 				tm = knh_StmtLET_typing(ctx, cur, abr, ns, TYPE_void);
+				break;
+			}
+		case STT_SEPARATOR: {
+				knh_Asm_initThisScript(ctx, abr);
+				tm = knh_StmtSEPARATOR_typing(ctx, cur, abr, ns);
 				break;
 			}
 		}
