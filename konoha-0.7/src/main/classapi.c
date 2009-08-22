@@ -591,9 +591,9 @@ void knh_Pair_traverse(Ctx *ctx, knh_Pair_t *t, knh_ftraverse ftr)
 static
 void knh_Tuple_init(Ctx *ctx, knh_Tuple_t *t, int init)
 {
-	KNH_INITv(t->first, KNH_NULL);
-	KNH_INITv(t->second, KNH_NULL);
-	KNH_INITv(t->third, KNH_NULL);
+	DBG2_ASSERT(init == 0);
+	t->size = 0; /* @see Tuple_new */
+	t->list = NULL;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -601,9 +601,21 @@ void knh_Tuple_init(Ctx *ctx, knh_Tuple_t *t, int init)
 static
 void knh_Tuple_traverse(Ctx *ctx, knh_Tuple_t *t, knh_ftraverse ftr)
 {
-	ftr(ctx, t->first);
-	ftr(ctx, t->second);
-	ftr(ctx, t->third);
+	if(knh_Tuple_isTriple(t)) {
+		ftr(ctx, t->first);
+		ftr(ctx, t->second);
+		ftr(ctx, t->third);
+	}
+	else if(t->size > 0){
+		size_t i;
+		for(i = 0; i < t->size; i++) {
+			ftr(ctx, t->list[i]);
+		}
+		if(IS_SWEEP(ftr)) {
+			KNH_FREE(ctx, t->list, sizeof(void*) * t->size);
+			t->size = 0;
+		}
+	}
 }
 
 /* ======================================================================== */

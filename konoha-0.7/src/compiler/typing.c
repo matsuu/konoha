@@ -166,17 +166,26 @@ knh_type_t knh_Token_gettype(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t def
 static
 knh_class_t knh_Token_getcid(Ctx *ctx, Token *tk, NameSpace *ns, knh_class_t defc)
 {
+	knh_class_t cid;
 	DBG2_ASSERT(IS_Token(tk));
-	if(TT_(tk) == TT_CID) return DP(tk)->cid;
-	if(knh_Token_isExceptionType(tk)) return CLASS_Exception;
-
-	knh_bytes_t name = knh_Token_tobytes(ctx, tk);
-	knh_class_t cid = knh_NameSpace_getcid(ctx, ns, name);
-
-	if(cid == CLASS_unknown) {
-		if(defc == CLASS_unknown) return cid;
-		cid = defc;
-		knh_Token_perror(ctx, tk, KERR_ERRATA, _("unknown class: %s ==> %C"), sToken(tk), defc);
+	if(TT_(tk) == TT_CID) {
+		cid = DP(tk)->cid;
+	}
+	else if(knh_Token_isExceptionType(tk)) {
+		cid = CLASS_Exception;
+	}
+	else if(TT_(tk) == TT_ASIS) {
+		cid = CLASS_Object;
+	}
+	else {
+		knh_bytes_t name = knh_Token_tobytes(ctx, tk);
+		cid = knh_NameSpace_getcid(ctx, ns, name);
+		if(cid == CLASS_unknown) {
+			if(defc != CLASS_unknown) {
+				cid = defc;
+				knh_Token_perror(ctx, tk, KERR_ERRATA, _("unknown class: %s ==> %C"), sToken(tk), defc);
+			}
+		}
 	}
 	return cid;
 }
@@ -222,6 +231,14 @@ Token *knh_Asm_getSharedUntypedToken(Ctx *ctx, Asm *abr, Token *tkN)
 	Token *tkVAR = (Token*)DP(abr)->gamma[idx].value;
 	DBG2_ASSERT(IS_Token(tkVAR) && DP(tkN)->index == DP(tkVAR)->index);
 	return tkVAR;
+}
+
+static
+void knh_Asm_derivedClass(Ctx *ctx, Asm *abr, knh_class_t origc, knh_class_t cid)
+{
+	if(origc != cid) {
+		knh_Asm_perror(ctx, abr, KERR_TINFO, _("specialized: %C => %C"), origc, cid);
+	}
 }
 
 static
@@ -2303,11 +2320,24 @@ int knh_StmtPARAMs_findCommonClass(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns
 static
 Term *knh_StmtNEW_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_class_t reqt)
 {
-	DBG2_ASSERT(DP(stmt)->size > 1);
+	knh_class_t reqc = CLASS_type(reqt);
 	Token *tkNEW = DP(stmt)->tokens[0];
 	Token *tkC = DP(stmt)->tokens[1];
 	knh_methodn_t mn = knh_Token_getmn(ctx, tkNEW);
 	knh_class_t mtd_cid = knh_Token_getcid(ctx, tkC, ns, CLASS_unknown);
+	KNH_ASSERT_cid(reqc);
+
+	if(mtd_cid == CLASS_Object) {
+		if(reqc != CLASS_Any) {
+			mtd_cid = reqc;
+			knh_Asm_derivedClass(ctx, abr, CLASS_Object, mtd_cid);
+			knh_foundKonohaStyle(1);
+		}
+		else {
+			knh_Token_perror(ctx, tkC, KERR_TERROR, _("needs class"));
+			return NULL;
+		}
+	}
 
 	if(mtd_cid == CLASS_unknown) {
 		if(!IS_NNTYPE(reqt)) {
@@ -2320,35 +2350,73 @@ Term *knh_StmtNEW_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_clas
 		return NULL;
 	}
 
-	if(mtd_cid == CLASS_Range) {
-
+	if(mtd_cid == CLASS_Pair) {
+		knh_class_t bcid = ClassTable(reqc).bcid;
+		if(bcid == CLASS_Pair) {
+			mtd_cid = reqc;
+			knh_Asm_derivedClass(ctx, abr, CLASS_Pair, mtd_cid);
+		}
+		else {
+			if(!TERMs_typing(ctx, stmt, 2, abr, ns, TYPE_Any, TWARN_)
+			|| !TERMs_typing(ctx, stmt, 3, abr, ns, TYPE_Any, TWARN_)) {
+				return NULL;
+			}
+			knh_class_t p1 = TERMs_getcid(stmt, 2);
+			knh_class_t p2 = TERMs_getcid(stmt, 3);
+			mtd_cid = knh_class_Generics(ctx, CLASS_Pair, p1, p2);
+			knh_Asm_derivedClass(ctx, abr, CLASS_Pair, mtd_cid);
+		}
+		knh_foundKonohaStyle(1);
 		goto L_LOOKUPMETHOD;
 	}
 
-	if(mtd_cid == CLASS_Array) {
-		knh_class_t reqc = CLASS_type(reqt);
-		KNH_ASSERT_cid(reqc);
+	if(mtd_cid == CLASS_Range) {
 		knh_class_t bcid = ClassTable(reqc).bcid;
-		if(bcid == CLASS_Array || bcid == CLASS_IArray || bcid == CLASS_FArray) {
+		knh_class_t ccid = CLASS_Any;
+		if(bcid == CLASS_Range) {
 			mtd_cid = reqc;
-			goto L_LOOKUPMETHOD;
+			knh_Asm_derivedClass(ctx, abr, CLASS_Range, mtd_cid);
 		}
-		if(mn == METHODN_new__array) {
-			if(DP(stmt)->size == 4) mn = METHODN_new__array2D;
-			if(DP(stmt)->size == 5) mn = METHODN_new__array3D;
-			goto L_LOOKUPMETHOD;
-		}
-		if(reqc == CLASS_Any && mn == METHODN_new__init) {
-			knh_class_t ccid = CLASS_Any;
+		else {
 			if(knh_StmtPARAMs_findCommonClass(ctx, stmt, abr, ns, &ccid)) {
 				if(ccid != CLASS_Any) {
-					mtd_cid = knh_class_Array(ctx, CLASS_Array, ccid);
-					knh_Token_perror(ctx, tkC, KERR_TINFO, _("%s ==> %C"), sToken(tkC), mtd_cid);
+					mtd_cid = knh_class_Generics(ctx, CLASS_Range, ccid, CLASS_unknown);
+					knh_Asm_derivedClass(ctx, abr, CLASS_Range, mtd_cid);
 				}
 			}
 			else {
 				return NULL;
 			}
+		}
+		knh_foundKonohaStyle(1);
+		goto L_LOOKUPMETHOD;
+	}
+
+	if(mtd_cid == CLASS_Array) {
+		knh_class_t bcid = ClassTable(reqc).bcid;
+		if(bcid == CLASS_Array || bcid == CLASS_IArray || bcid == CLASS_FArray) {
+			mtd_cid = reqc;
+			knh_Asm_derivedClass(ctx, abr, CLASS_Array, mtd_cid);
+			goto L_LOOKUPMETHOD;
+		}
+		if(mn == METHODN_new__array) {
+			if(DP(stmt)->size == 4) mn = METHODN_new__array2D;
+			if(DP(stmt)->size == 5) mn = METHODN_new__array3D;
+			knh_foundKonohaStyle(1);
+			goto L_LOOKUPMETHOD;
+		}
+		if(/*reqc == CLASS_Any && */ mn == METHODN_new__init) {
+			knh_class_t ccid = CLASS_Any;
+			if(knh_StmtPARAMs_findCommonClass(ctx, stmt, abr, ns, &ccid)) {
+				if(ccid != CLASS_Any) {
+					mtd_cid = knh_class_Array(ctx, CLASS_Array, ccid);
+					knh_Asm_derivedClass(ctx, abr, CLASS_Array, mtd_cid);
+				}
+			}
+			else {
+				return NULL;
+			}
+			knh_foundKonohaStyle(1);
 			goto L_LOOKUPMETHOD;
 		}
 	}
@@ -2364,14 +2432,11 @@ Term *knh_StmtNEW_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_clas
 	KNH_ASSERT_cid(mtd_cid);
 	{
 		Method *mtd = knh_Class_getMethod(ctx, mtd_cid, mn);
-//		if(IS_NULL(mtd) || knh_class_isPrivate(mtd_cid) || knh_Method_isPrivate(mtd)) {
-//			knh_Asm_perror(ctx, abr, KERR_ERROR, _("unknown constructor: %s %C(...)"), sToken(tkNEW), mtd_cid);
-//			return NULL;
-//		}
 		if(IS_NULL(mtd) || ClassTable(DP(mtd)->cid).bcid != ClassTable(mtd_cid).bcid) {
 			knh_Asm_perror(ctx, abr, KERR_ERROR, _("unknown constructor: %s %C(...)"), sToken(tkNEW), mtd_cid);
 			return NULL;
 		}
+		//DBG2_P("LOOKUP CONSTRUCTOR %s %s", CLASSN(mtd_cid), CLASSN(DP(mtd)->cid));
 		DP(tkC)->cid = mtd_cid;
 		knh_Token_toMTD(ctx, tkNEW, mn, mtd);
 		return knh_StmtPARAMS_typing(ctx, stmt, abr, ns, mtd_cid, mtd);
@@ -3320,7 +3385,7 @@ static
 int knh_Asm_typingSEPARATOR(Ctx *ctx, Asm *abr, NameSpace *ns, Stmt *stmtDECL, Token *tkIT)
 {
 	knh_int_t c = 1;
-	Method *mtd = knh_Class_getMethod(ctx, CLASS_type(DP(tkIT)->type), METHODN_op1);
+	Method *mtd = knh_Class_getMethod(ctx, CLASS_type(DP(tkIT)->type), METHODN_op0);
 	if(IS_NULL(mtd)) {
 		knh_Asm_perror(ctx, abr, KERR_TERROR, _("unsupported multi-selection: %C"));
 		return 0;
@@ -3328,7 +3393,7 @@ int knh_Asm_typingSEPARATOR(Ctx *ctx, Asm *abr, NameSpace *ns, Stmt *stmtDECL, T
 	while(IS_Stmt(stmtDECL)) {
 		Stmt *stmtVALUE;
 		if(c < 3) {
-			stmtVALUE = new_StmtMN(ctx, FL(stmtDECL), (c == 1) ? METHODN_op1 : METHODN_op2);
+			stmtVALUE = new_StmtMN(ctx, FL(stmtDECL), (c == 1) ? METHODN_op0 : METHODN_op2);
 			knh_Stmt_addT(ctx, stmtVALUE, tkIT);
 		}
 		else {
@@ -4061,16 +4126,7 @@ void knh_Asm_initClassTableField(Ctx *ctx, Asm *abr, knh_class_t cid)
 	DP(abr)->flag = 0;
 	DP(abr)->this_cid = cid;
 	DP(abr)->level = 0;
-	DBG2_ASSERT(DP(abr)->gamma_size == 0);
-//	for(i = 0; i < KONOHA_LOCALSIZE; i++) {
-//		DP(abr)->vars[i].flag  = 0;
-//		DP(abr)->vars[i].type  = TYPE_Any;
-//		DP(abr)->vars[i].fn    = FIELDN_NONAME;
-//		if(DP(abr)->vars[i].value != NULL) {
-//			KNH_FINALv(ctx, DP(abr)->vars[i].value);
-//			DP(abr)->vars[i].value = NULL;
-//		}
-//	}
+	knh_Asm_initGamma(ctx, abr, 0);
 }
 
 /* ------------------------------------------------------------------------ */

@@ -504,6 +504,9 @@ typedef struct knh_sfp_t {
 		struct knh_Class_t  *c;
 		struct knh_String_t *s;
 		struct knh_Bytes_t  *ba;
+		struct knh_Pair_t   *pair;
+		struct knh_Tuple_t  *tuple;
+		struct knh_Range_t  *range;
 		struct knh_Array_t  *a;
 		struct knh_IArray_t  *ia;
 		struct knh_FArray_t  *fa;

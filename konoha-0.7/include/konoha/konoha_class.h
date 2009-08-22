@@ -157,16 +157,24 @@ typedef struct knh_Pair_t {
 
 /* ------------------------------------------------------------------------ */
 /* @class Tuple Object knh_Tuple_t @Immutable */
+/* @flag Tuple.Triple TUPLE:1 (%s)->h.flag 'is:set:*:*' */
 
 typedef struct knh_Tuple_t {
 	knh_hObject_t h;
-	knh_Object_t  *first;
-	knh_Object_t  *second;
+	union {
+		knh_Object_t  *first;
+		knh_Object_t  **list;
+	};
+	union {
+		knh_Object_t  *second;
+		size_t         size;
+	};
 	knh_Object_t  *third;
 } knh_Tuple_t;
 
 /* ------------------------------------------------------------------------ */
-/* @class Range Object knh_Range_t @Immutable */
+/* @class Range Object knh_Range_t @Immutable @Param1 */
+/* @flag Range.Inclusive RANGE:1 (%s)->h.flag 'is:set:*:*' */
 
 typedef struct knh_Range_t {
 	knh_hObject_t h;

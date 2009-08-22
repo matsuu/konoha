@@ -124,17 +124,21 @@ int knh_Object_compareTo(Ctx *ctx, Object *o1, Object *o2)
 {
 	knh_class_t bcid = o1->h.bcid;
 	knh_class_t bcid2 = o2->h.bcid;
+	int res;
 	if(bcid == bcid2) {
-		return ctx->share->StructTable[bcid].fcompareTo(o1, o2);
+		res = ctx->share->StructTable[bcid].fcompareTo(o1, o2);
 	}
 	else {
 		if((o1->h.cid == CLASS_Int || o1->h.cid == CLASS_Float)
 		&& (o2->h.cid == CLASS_Int || o2->h.cid == CLASS_Float)) {
-			return (int)(knh_Number_tofloat(o1) - knh_Number_tofloat(o2));
+			res = (int)knh_Number_tofloat(o1) - (int)knh_Number_tofloat(o2);
 		}
-		DBG2_P("Compared Incompatible Type %s - %s", CLASSN(o1->h.cid), CLASSN(o2->h.cid));
-		return (int)(o1 - o2);
+		else {
+			res = (int)(o1 - o2);
+		}
 	}
+	DBG2_P("compared %s %s res=%d", CLASSNo(o1), CLASSNo(o2), res);
+	return res;
 }
 
 /* ------------------------------------------------------------------------ */

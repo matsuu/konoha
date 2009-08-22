@@ -196,7 +196,7 @@ knh_class_t knh_class_Generics(Ctx *ctx, knh_class_t bcid, knh_class_t p1, knh_c
 		knh_putc(ctx, cwb->w, '>');
 		/* knh_class_t*/ cid = knh_getcid(ctx, knh_cwb_tobytes(cwb));
 		if(cid == CLASS_unknown) {
-			cid = knh_addGenericsClass(ctx, CLASS_newid, knh_cwb_newString(ctx, cwb), CLASS_Array, p1, CLASS_unknown);
+			cid = knh_addGenericsClass(ctx, CLASS_newid, knh_cwb_newString(ctx, cwb), bcid, p1, p2);
 		} else {
 			knh_cwb_close(cwb);
 		}

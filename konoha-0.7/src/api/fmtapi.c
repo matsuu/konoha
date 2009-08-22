@@ -317,6 +317,72 @@ void knh_Iterator__k(Ctx *ctx, Iterator *it, OutputStream *w, String *m)
 }
 
 /* ------------------------------------------------------------------------ */
+/* @method void Pair.%k(OutputStream w, String m) */
+
+static
+void knh_Pair__k(Ctx *ctx, knh_Pair_t *o, OutputStream *w, String *m)
+{
+	knh_putc(ctx, w, '(');
+	if(knh_stack_isRecuriveFormatting(ctx, ctx->esp - 3, UP(o), w, knh_Pair__k)) {
+		knh_write_dots(ctx,w);
+	}
+	else {
+		knh_format(ctx, w, METHODN__k, o->first, KNH_NULL);
+		knh_write_delim(ctx,w);
+		knh_format(ctx, w, METHODN__k, o->second, KNH_NULL);
+	}
+	knh_putc(ctx, w, ')');
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method void Tuple.%k(OutputStream w, String m) */
+
+static
+void knh_Tuple__k(Ctx *ctx, knh_Tuple_t *o, OutputStream *w, String *m)
+{
+	knh_putc(ctx, w, '(');
+	if(knh_stack_isRecuriveFormatting(ctx, ctx->esp - 3, UP(o), w, knh_Tuple__k)) {
+		knh_write_dots(ctx,w);
+	}
+	else if(knh_Tuple_isTriple(o)) {
+		knh_format(ctx, w, METHODN__k, o->first, KNH_NULL);
+		knh_write_delim(ctx,w);
+		knh_format(ctx, w, METHODN__k, o->second, KNH_NULL);
+		knh_write_delim(ctx,w);
+		knh_format(ctx, w, METHODN__k, o->third, KNH_NULL);
+	}
+	else {
+		size_t i, c = 0;
+		for(i = 0; o->size; i++) {
+			if(c > 0) {
+				knh_write_delim(ctx,w);
+			}
+			knh_format(ctx, w, METHODN__k, o->list[c], KNH_NULL);
+			c++;
+		}
+	}
+	knh_putc(ctx, w, ')');
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method void Range.%k(OutputStream w, String m) */
+
+static
+void knh_Range__k(Ctx *ctx, knh_Range_t *o, OutputStream *w, String *m)
+{
+	knh_putc(ctx, w, '(');
+	knh_format(ctx, w, METHODN__k, o->start, KNH_NULL);
+	if(knh_Range_isInclusive(o)) {
+		knh_write(ctx, w, STEXT(" to "));
+	}
+	else {
+		knh_write(ctx, w, STEXT(" until "));
+	}
+	knh_format(ctx, w, METHODN__k, o->end, KNH_NULL);
+	knh_putc(ctx, w, ')');
+}
+
+/* ------------------------------------------------------------------------ */
 /* @method void Array.%k(OutputStream w, String m) */
 
 static

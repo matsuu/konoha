@@ -782,12 +782,10 @@ Term *new_TermTUPLE(Ctx *ctx, Token *tk, int isData)
 	else {
 		/* @TEST (1 to 3) :=> new Range(1,3) */
 		Stmt *stmt = new_Stmt(ctx, KNH_FLAG_STMTF_LITERAL, STT_NEW);
+		knh_methodn_t mn = (TT_(tc->ts[idx]) == TT_UNTIL) ? METHODN_new__init : METHODN_new;
+		knh_Stmt_addT(ctx, stmt, new_TokenMN(ctx, FL(tk), mn));
 		knh_Stmt_addT(ctx, stmt, new_TokenCID(ctx, FL(tk), CLASS_Range));
-		knh_Stmt_addT(ctx, stmt, new_TokenMN(ctx, FL(tk), METHODN_new));
 		knh_Stmt_add_RANGE(ctx, stmt, tc, idx, isData);
-		if(TT_(tc->ts[idx]) == TT_UNTIL) {
-			knh_Stmt_addT(ctx, stmt, new_TokenCONST(ctx, FL(tk), UP(KNH_INT0)));
-		}
 		tm = TM(stmt);
 	}
 	knh_Token_tokens_empty(ctx, tk);
@@ -1674,6 +1672,13 @@ static Term *new_TermEXPR(Ctx *ctx, knh_tkc_t *tc, int isData)
 				tc->c = oc + 2; knh_tokens_nextStmt(tc);
 				return TM(tke);
 			}
+		}
+		if(TTn_(ts[oc]) == TT_PARENTHESIS) {
+			stmt = new_Stmt(ctx, 0, STT_NEW);
+			knh_Stmt_add(ctx, stmt, TM(ts[oc]));
+			knh_Stmt_add_ASIS(ctx, stmt);
+			pc = oc + 1;
+			goto L_PARAM;
 		}
 	}
 

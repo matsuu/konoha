@@ -256,6 +256,143 @@ static METHOD knh__Float_opGte(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ======================================================================== */
+/* [opHas] */
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] Boolean! String.opHas(String! s) */
+
+static METHOD knh__String_opHas(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN_Boolean(ctx, sfp,
+		knh_bytes_indexOf(knh_String_tobytes(sfp[0].s), knh_String_tobytes(sfp[1].s)) != -1);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Boolean! Pair.opHas(Any v) */
+/* @method Boolean! Pair.opCase(Any v) */
+
+static METHOD knh__Pair_opHas(Ctx *ctx, knh_sfp_t *sfp)
+{
+	Pair *t = sfp[0].pair;
+	int res;
+	knh_sfp_boxing(ctx, sfp + 1);
+	res = ((knh_Object_compareTo(ctx, t->first, sfp[1].o) == 0)
+			|| (knh_Object_compareTo(ctx, t->second, sfp[1].o) == 0));
+	KNH_RETURN_Boolean(ctx, sfp, res);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Boolean! Range.opHas(Any v) */
+/* @method Boolean! Range.opCase(Any v) */
+
+static METHOD knh__Range_opHas(Ctx *ctx, knh_sfp_t *sfp)
+{
+	int res = 0/*NotFound*/;
+	Range *o = sfp[0].range;
+	if(IS_Int((o)->start) && IS_Float(sfp[1].o)) {
+		KNH_SETv(ctx, sfp[1].o, new_Int(ctx, (knh_int_t)sfp[1].fvalue));
+	}
+	else if(IS_Float((o)->start) && IS_Int(sfp[1].o)) {
+		KNH_SETv(ctx, sfp[1].o, new_Float(ctx, (knh_float_t)sfp[1].ivalue));
+	}
+	else {
+		knh_sfp_boxing(ctx, sfp + 1);
+	}
+	if(knh_Object_compareTo(ctx, o->start, sfp[1].o) <= 0) {
+		if(knh_Range_isInclusive(o)) {
+			if(knh_Object_compareTo(ctx, sfp[1].o, o->end) <= 0) {
+				res = 1;
+			}
+		}
+		else {
+			if(knh_Object_compareTo(ctx, sfp[1].o, o->end) < 0) {
+				res = 1;
+			}
+		}
+	}
+	KNH_RETURN_Boolean(ctx, sfp, res);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Boolean! Array.opHas(Any v) */
+/* @method Boolean! Array.opCase(Any v) */
+
+static METHOD knh__Array_opHas(Ctx *ctx, knh_sfp_t *sfp)
+{
+	Array *o = (Array*)sfp[0].o;
+	knh_sfp_boxing(ctx, sfp + 1);
+	size_t i, res = 0/*NotFound*/;
+	for(i = 0; i < o->size; i++) {
+		if(knh_Object_compareTo(ctx, o->list[i], sfp[1].o) == 0) {
+			res = 1; break;
+		}
+	}
+	KNH_RETURN_Boolean(ctx, sfp, res);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Boolean! Tuple.opHas(Any v) */
+/* @method Boolean! Tuple.opCase(Any v) */
+
+static METHOD knh__Tuple_opHas(Ctx *ctx, knh_sfp_t *sfp)
+{
+	if(knh_Tuple_isTriple(sfp[0].tuple)) {
+		Tuple *t = sfp[0].tuple;
+		int res;
+		knh_sfp_boxing(ctx, sfp + 1);
+		res = ((knh_Object_compareTo(ctx, t->first, sfp[1].o) == 0)
+				|| (knh_Object_compareTo(ctx, t->second, sfp[1].o) == 0)
+				|| (knh_Object_compareTo(ctx, t->third, sfp[1].o) == 0));
+		KNH_RETURN_Boolean(ctx, sfp, res);
+	}
+	else {
+		knh__Array_opHas(ctx, sfp); // reuse
+	}
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Boolean! IArray.opHas(Any v) */
+/* @method Boolean! IArray.opCase(Any v) */
+
+static METHOD knh__IArray_opHas(Ctx *ctx, knh_sfp_t *sfp)
+{
+	int res = 0/*NotFound*/;
+	DBG2_P("******* cid=%s", CLASSNo(sfp[1].o));
+	if(IS_bInt(sfp[1].o)) {
+		IArray *o = (IArray*)sfp[0].o;
+		knh_int_t v = sfp[1].ivalue;
+		size_t i;
+		for(i = 0; i < o->size; i++) {
+			DBG2_P("%d %d, %d", i, (int)o->ilist[i], (int)v);
+			if(o->ilist[i] == v) {
+				res = 1; break;
+			}
+		}
+	}
+	KNH_RETURN_Boolean(ctx, sfp, res);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Boolean! FArray.opHas(Any v) */
+/* @method Boolean! FArray.opCase(Any v) */
+
+static METHOD knh__FArray_opHas(Ctx *ctx, knh_sfp_t *sfp)
+{
+	int res = 0/*NotFound*/;
+	if(IS_bFloat(sfp[1].o)) {
+		FArray *o = (FArray*)sfp[0].o;
+		knh_float_t v = sfp[1].fvalue;
+		size_t i;
+		for(i = 0; i < o->size; i++) {
+			if(o->flist[i] == v) {
+				res = 1; break;
+			}
+		}
+	}
+	KNH_RETURN_Boolean(ctx, sfp, res);
+}
+
+/* ======================================================================== */
 /* [Case] */
 
 /* ------------------------------------------------------------------------ */
@@ -425,6 +562,63 @@ static METHOD knh__Float_opDiv(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
+/* @method[CONST|NULLBASE] String! String.opAdd(Any v) */
+
+static METHOD knh__String_opAdd(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
+	knh_sfp_t *esp = KNH_LOCAL(ctx);
+	if(IS_bString(sfp[0].o)) {
+		knh_Bytes_write(ctx, cwb->ba, knh_String_tobytes(sfp[0].s));
+	}
+	else {
+		KNH_SETv(ctx, esp[1].o, sfp[0].o); esp[1].data = sfp[0].data;
+		knh_esp1_format(ctx, METHODN__s, cwb->w, KNH_NULL);
+	}
+	if(IS_bString(sfp[1].o)) {
+		knh_Bytes_write(ctx, cwb->ba, knh_String_tobytes(sfp[1].s));
+	}
+	else {
+		KNH_ASSERT(esp == ctx->esp);
+		KNH_SETv(ctx, esp[1].o, sfp[1].o); esp[1].data = sfp[1].data;
+		knh_esp1_format(ctx, METHODN__s, cwb->w, KNH_NULL);
+	}
+	KNH_RETURN(ctx, sfp, knh_cwb_newString(ctx, cwb));
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] String! String.opSub(String! t) */
+
+static METHOD knh__String_opSub(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
+	knh_bytes_t t = knh_String_tobytes(sfp[1].s);
+	knh_uchar_t c = t.buf[0];
+	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
+	size_t i;
+	for(i = 0; i < base.len; i++) {
+		if(base.buf[i] == c) {
+			size_t j;
+			for(j = 1; j < t.len; j++) {
+				if(base.buf[i+j] != t.buf[j]) break;
+			}
+			if(j == t.len) {
+				i += t.len - 1;
+				continue;
+			}
+		}
+		knh_Bytes_putc(ctx, cwb->ba, base.buf[i]);
+	}
+	if(base.len == knh_cwb_size(cwb)) {
+		knh_cwb_close(cwb);
+		KNH_RETURN(ctx, sfp, sfp[0].o);
+	}
+	else {
+		KNH_RETURN(ctx, sfp, knh_cwb_newString(ctx, cwb));
+	}
+}
+
+/* ------------------------------------------------------------------------ */
 /* [Any] */
 /* @method Any Any.opAdd(Any v) */
 
@@ -550,11 +744,8 @@ static METHOD knh__Int_opRshift(Ctx *ctx, knh_sfp_t *sfp)
 	KNH_RETURN_Int(ctx, sfp, p_integer(sfp[0]) >> p_integer(sfp[1]));
 }
 
-
-
 /* ======================================================================== */
 /* [Enum] */
-
 
 /* ------------------------------------------------------------------------ */
 /* @method[CONST] Int! Int.opNext() */
@@ -599,51 +790,87 @@ static METHOD knh__Float_opPrev(Ctx *ctx, knh_sfp_t *sfp)
 /* ======================================================================== */
 /* [getSize] */
 
-/* ------------------------------------------------------------------------ */
-/* @method[NULLBASE|CONST] Int! Int.getSize() */
-
-static METHOD knh__Int_getSize(Ctx *ctx, knh_sfp_t *sfp)
-{
-	if(IS_NULL(sfp[0].o)) {
-		KNH_RETURN_Int(ctx, sfp, 0);
-	}
-	else {
-		knh_int_t n = p_integer(sfp[0]);
-		if(n >= 0) {
-			KNH_RETURN_Int(ctx, sfp, n);
-		}
-		else {
-			KNH_RETURN_Int(ctx, sfp, -(n));
-		}
-	}
-}
-
-/* ------------------------------------------------------------------------ */
-/* @method[NULLBASE|CONST] Int! Float.getSize() */
-
-static METHOD knh__Float_getSize(Ctx *ctx, knh_sfp_t *sfp)
-{
-	if(IS_NULL(sfp[0].o)) {
-		KNH_RETURN_Int(ctx, sfp, 0);
-	}
-	else {
-		knh_uint_t n = (knh_uint_t)p_float(sfp[0]);
-		KNH_RETURN_Int(ctx, sfp, n);
-	}
-}
+///* ------------------------------------------------------------------------ */
+///* @ method[NULLBASE|CONST] Int! Int.getSize() */
+//
+//static METHOD knh__Int_getSize(Ctx *ctx, knh_sfp_t *sfp)
+//{
+//	if(IS_NULL(sfp[0].o)) {
+//		KNH_RETURN_Int(ctx, sfp, 0);
+//	}
+//	else {
+//		knh_int_t n = p_integer(sfp[0]);
+//		if(n >= 0) {
+//			KNH_RETURN_Int(ctx, sfp, n);
+//		}
+//		else {
+//			KNH_RETURN_Int(ctx, sfp, -(n));
+//		}
+//	}
+//}
+//
+///* ------------------------------------------------------------------------ */
+///* @ method[NULLBASE|CONST] Int! Float.getSize() */
+//
+//static METHOD knh__Float_getSize(Ctx *ctx, knh_sfp_t *sfp)
+//{
+//	if(IS_NULL(sfp[0].o)) {
+//		KNH_RETURN_Int(ctx, sfp, 0);
+//	}
+//	else {
+//		knh_uint_t n = (knh_uint_t)p_float(sfp[0]);
+//		KNH_RETURN_Int(ctx, sfp, n);
+//	}
+//}
 
 /* ------------------------------------------------------------------------ */
 /* @method[NULLBASE] Int! Bytes.getSize() */
 
 static METHOD knh__Bytes_getSize(Ctx *ctx, knh_sfp_t *sfp)
 {
-	if(IS_NULL(sfp[0].o)) {
-		KNH_RETURN_Int(ctx, sfp, 0);
+	size_t size = IS_bBytes(sfp[0].ba) ? (sfp[0].ba)->size : 0;
+	KNH_RETURN_Int(ctx, sfp, size);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST|NULLBASE] Int! String.getSize() */
+
+static METHOD knh__String_getSize(Ctx *ctx, knh_sfp_t *sfp)
+{
+	size_t size = IS_bString(sfp[0].s) ? (sfp[0].s)->size : 0;
+	if(!knh_String_isASCII(sfp[0].s)) {
+		size = knh_bytes_mlen(knh_String_tobytes(sfp[0].s));
 	}
-	else {
-		Bytes *o = (Bytes*)sfp[0].o;
-		KNH_RETURN_Int(ctx, sfp, o->size);
-	}
+	KNH_RETURN_Int(ctx, sfp, size);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[NULLBASE] Int! Pair.getSize() */
+
+static METHOD knh__Pair_getSize(Ctx *ctx, knh_sfp_t *sfp)
+{
+	size_t size = (IS_NULL(sfp[0].o)) ? 0 : 2;
+	KNH_RETURN_Int(ctx, sfp, size);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[NULLBASE] Int! Tuple.getSize() */
+
+static METHOD knh__Tuple_getSize(Ctx *ctx, knh_sfp_t *sfp)
+{
+	size_t size = (IS_NULL(sfp[0].o)) ? 0 : 2;
+	if(!knh_Tuple_isTriple(sfp[0].tuple)) size = (sfp[0].tuple)->size;
+	KNH_RETURN_Int(ctx, sfp, size);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[NULLBASE] Int! Range.getSize() */
+
+static METHOD knh__Range_getSize(Ctx *ctx, knh_sfp_t *sfp)
+{
+	size_t size = (IS_NULL(sfp[0].o)) ? 0 : 2;
+	knh_printf(ctx, KNH_STDOUT, "Do you really want to count Range.size ?\n");
+	KNH_RETURN_Int(ctx, sfp, size);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -653,32 +880,8 @@ static METHOD knh__Bytes_getSize(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Array_getSize(Ctx *ctx, knh_sfp_t *sfp)
 {
-	if(IS_NULL(sfp[0].o)) {
-		KNH_RETURN_Int(ctx, sfp, 0);
-	}
-	else {
-		Array *o = (Array*)sfp[0].o;
-		KNH_RETURN_Int(ctx, sfp, o->size);
-	}
-}
-
-/* ======================================================================== */
-/* [opHas] */
-
-/* ------------------------------------------------------------------------ */
-/* @method Boolean! Array.opHas(T1 v) */
-
-static METHOD knh__Array_opHas(Ctx *ctx, knh_sfp_t *sfp)
-{
-	Array *o = (Array*)sfp[0].o;
-	knh_sfp_boxing(ctx, sfp + 1);
-	size_t i;
-	for(i = 0; i < o->size; i++) {
-		if(knh_Object_compareTo(ctx, o->list[i], sfp[1].o) == 0) {
-			KNH_RETURN_Boolean(ctx, sfp, 1);
-		}
-	}
-	KNH_RETURN_Boolean(ctx, sfp, 0); // Not Found
+	size_t size = IS_NULL(sfp[0].o) ? 0 : (sfp[0].a)->size ;
+	KNH_RETURN_Int(ctx, sfp, size);
 }
 
 /* ======================================================================== */
@@ -723,6 +926,27 @@ static METHOD knh__Bytes_setAll(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
+/* @method[CONST] String! String.get(Int! n) */
+
+static METHOD knh__String_get(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
+	String *s;
+	if(knh_String_isASCII(sfp[0].s)) {
+		size_t n = knh_array_index(ctx, p_int(sfp[1]), knh_String_strlen(sfp[0].s));
+		base.buf = base.buf + n;
+		base.len = 1;
+		s = new_String(ctx, base, sfp[0].s);
+	}
+	else {
+		size_t off = knh_array_index(ctx, p_int(sfp[1]), knh_bytes_mlen(base));
+		knh_bytes_t sub = knh_bytes_mofflen(base, off, 1);
+		s = new_String(ctx, sub, sfp[0].s);
+	}
+	KNH_RETURN(ctx, sfp, s);
+}
+
+/* ------------------------------------------------------------------------ */
 /* @method T1! Array.get(Int! n) */
 
 static METHOD knh__Array_get(Ctx *ctx, knh_sfp_t *sfp)
@@ -730,6 +954,26 @@ static METHOD knh__Array_get(Ctx *ctx, knh_sfp_t *sfp)
 	Array *o = (Array*)sfp[0].o;
 	size_t n2 = knh_array_index(ctx, p_int(sfp[1]), o->size);
 	KNH_RETURN(ctx, sfp, o->list[n2]);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Any Tuple.get(Int! n) */
+
+static METHOD knh__Tuple_get(Ctx *ctx, knh_sfp_t *sfp)
+{
+	if(knh_Tuple_isTriple(sfp[0].tuple)) {
+		Object *v = KNH_NULL;
+		switch(p_int(sfp[1])) {
+		case 0: v = (sfp[0].tuple)->first; break;
+		case 1: v = (sfp[1].tuple)->first; break;
+		case 2: v = (sfp[2].tuple)->first; break;
+		default: knh_array_index(ctx, p_int(sfp[1]), 3);
+		}
+		KNH_RETURN(ctx, sfp, v);
+	}
+	else {
+		knh__Array_get(ctx, sfp); /* reuse */
+	}
 }
 
 /* ------------------------------------------------------------------------ */
@@ -841,10 +1085,132 @@ static METHOD knh__FArray_setAll(Ctx *ctx, knh_sfp_t *sfp)
 /* ======================================================================== */
 /* [opRange] */
 
+static
+void knh_stack_rangeUntil(Ctx *ctx, knh_sfp_t *sfp, size_t size, size_t *s, size_t *e)
+{
+	*s = IS_NULL(sfp[1].o) ? 0 : knh_array_index(ctx, p_int(sfp[1]), size);
+	*e = IS_NULL(sfp[2].o) ? (size) : knh_array_index(ctx, p_int(sfp[2]), size);
+}
+
 /* ------------------------------------------------------------------------ */
 
 static
-Array *new_Array__range(Ctx *ctx, Array *a, size_t s, size_t e /*until*/)
+void knh_stack_rangeTo(Ctx *ctx, knh_sfp_t *sfp, size_t size, size_t *s, size_t *e)
+{
+	*s = IS_NULL(sfp[1].o) ? 0 : knh_array_index(ctx, p_int(sfp[1]), size);
+	*e = IS_NULL(sfp[2].o) ? (size) : knh_array_index(ctx, p_int(sfp[2]) + 1, size);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+Bytes *new_Bytes__range(Ctx *ctx, Bytes *ba, size_t s, size_t e)
+{
+	Bytes *newa = (Bytes*)new_Object_init(ctx, ba->h.flag, ba->h.cid, 0);
+	if(e < s) {
+		size_t t = s; s = e; e = t;
+	}
+	DBG2_ASSERT(e <= ba->size);
+	if(s < e) {
+		size_t newsize = e - s;
+		size_t capacity = newsize;
+		if(newsize > 0) {
+			if(capacity < 256) capacity = 256;
+			newa->buf = (knh_uchar_t*)KNH_MALLOC(ctx, capacity);
+			knh_bzero(newa->buf, capacity);
+			knh_memcpy(newa->buf, &ba->buf[s], newsize);
+		}
+		else {
+			newa->buf = (knh_uchar_t*)"";
+		}
+		newa->capacity = capacity;
+		newa->size = newsize;
+	}
+	return newa;
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Bytes! Bytes.opRangeUntil(Int s, Int e) @Debug */
+
+static METHOD knh__Bytes_opRangeUntil(Ctx *ctx, knh_sfp_t *sfp)
+{
+	size_t s, e;
+	knh_stack_rangeUntil(ctx, sfp, (sfp[0].ba)->size, &s, &e);
+	KNH_RETURN(ctx, sfp, new_Bytes__range(ctx, sfp[0].ba, s, e));
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Bytes! Bytes.opRangeTo(Int s, Int e) @Debug */
+
+static METHOD knh__Bytes_opRangeTo(Ctx *ctx, knh_sfp_t *sfp)
+{
+	size_t s, e;
+	knh_stack_rangeTo(ctx, sfp, (sfp[0].ba)->size, &s, &e);
+	KNH_RETURN(ctx, sfp, new_Bytes__range(ctx, sfp[0].ba, s, e));
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] String! String.substring(Int offset, Int len) */
+
+static METHOD knh__String_substring(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_bytes_t base = knh_String_tobytes(sfp[0].s);
+	knh_bytes_t sub;
+	if(knh_String_isASCII(sfp[0].s)) {
+		size_t offset = IS_NULL(sfp[1].o) ? 0 : knh_array_index(ctx, sfp[1].ivalue, base.len);
+		sub = knh_bytes_last(base, offset);
+		if(IS_NOTNULL(sfp[2].o)) {
+			size_t len = (size_t)sfp[2].ivalue;
+			if(len < sub.len) sub = knh_bytes_first(sub, len);
+		}
+	}
+	else { // multibytes
+		size_t mlen = knh_bytes_mlen(base);
+		size_t offset = IS_NULL(sfp[1].o) ? 0 : knh_array_index(ctx, sfp[1].ivalue, mlen);
+		size_t length = IS_NULL(sfp[2].o) ? (mlen - offset) : (size_t)sfp[2].ivalue;
+		sub = knh_bytes_mofflen(base, offset, length);
+	}
+	String *s;
+	if(sub.len == 0) {
+		s = TS_EMPTY;
+	}
+	else if(sub.len == base.len) {
+		s = sfp[0].s;
+	}
+	else {
+		s = new_String(ctx, sub, sfp[0].s);
+	}
+	KNH_RETURN(ctx, sfp, s);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] String! String.opRangeUntil(Int s, Int e) */
+
+static METHOD knh__String_opRangeUntil(Ctx *ctx, knh_sfp_t *sfp)
+{
+	if(IS_NOTNULL(sfp[2].o)) {
+		size_t offset = IS_NULL(sfp[1].o) ? 0 : (size_t)sfp[1].ivalue;
+		sfp[2].ivalue = sfp[2].ivalue - offset;
+	}
+	knh__String_substring(ctx, sfp);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method[CONST] String! String.opRangeTo(Int s, Int e) */
+
+static METHOD knh__String_opRangeTo(Ctx *ctx, knh_sfp_t *sfp)
+{
+	if(IS_NOTNULL(sfp[2].o)) {
+		size_t offset = IS_NULL(sfp[1].o) ? 0 : (size_t)sfp[1].ivalue;
+		sfp[2].ivalue = sfp[2].ivalue - offset + 1;
+	}
+	knh__String_substring(ctx, sfp);
+}
+
+/* ------------------------------------------------------------------------ */
+
+static
+Array *new_Array__range(Ctx *ctx, Array *a, size_t s, size_t e /*until*/, size_t sizeofdata)
 {
 	Array *newa = (Array*)new_Object_init(ctx, a->h.flag, a->h.cid, 0);
 	if(e < s) {
@@ -853,16 +1219,20 @@ Array *new_Array__range(Ctx *ctx, Array *a, size_t s, size_t e /*until*/)
 	if(s < e) {
 		KNH_ASSERT(e <= a->size);
 		size_t newsize = e - s;
-		newa->list = (Object**)KNH_MALLOC(ctx, newsize * sizeof(Object*));
-		knh_memcpy(newa->list, &a->list[s], newsize * sizeof(Object*));
-#ifdef KNH_USING_RCGC
-		{
-			size_t i;
-			for(i = 0; i < newsize; i++) {
-				knh_Object_RCinc(newa->list[i]);
+		if(newsize > 0) {
+			char *p = (char*)a->list;
+			newa->list = (Object**)KNH_MALLOC(ctx, newsize * sizeofdata);
+			knh_memcpy(newa->list, p + (s * sizeofdata), newsize * sizeofdata);
+			if(IS_bArray(a)) {
+				size_t i;
+				for(i = 0; i < newsize; i++) {
+					knh_Object_RCinc(newa->list[i]);
+				}
 			}
 		}
-#endif
+		else {
+			newa->list = NULL;
+		}
 		newa->capacity = newsize;
 		newa->size = newsize;
 	}
@@ -874,10 +1244,9 @@ Array *new_Array__range(Ctx *ctx, Array *a, size_t s, size_t e /*until*/)
 
 static METHOD knh__Array_opRangeUntil(Ctx *ctx, knh_sfp_t *sfp)
 {
-	Array *o = (Array*)sfp[0].o;
-	size_t s = IS_NULL(sfp[1].o) ? 0 : knh_array_index(ctx, p_int(sfp[1]), o->size);
-	size_t e = IS_NULL(sfp[2].o) ? (o->size) : knh_array_index(ctx, p_int(sfp[2]), o->size);
-	KNH_RETURN(ctx, sfp, new_Array__range(ctx, o, s, e));
+	size_t s, e;
+	knh_stack_rangeUntil(ctx, sfp, (sfp[0].a)->size, &s, &e);
+	KNH_RETURN(ctx, sfp, new_Array__range(ctx, sfp[0].a, s, e, sizeof(Object*)));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -885,19 +1254,106 @@ static METHOD knh__Array_opRangeUntil(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Array_opRangeTo(Ctx *ctx, knh_sfp_t *sfp)
 {
-	Array *o = (Array*)sfp[0].o;
-	size_t s = IS_NULL(sfp[1].o) ? 0 : knh_array_index(ctx, p_int(sfp[1]), o->size);
-	size_t e = IS_NULL(sfp[2].o) ? (o->size) : knh_array_index(ctx, p_int(sfp[2]) + 1, o->size) ;
-	KNH_RETURN(ctx, sfp, new_Array__range(ctx, o, s, e));
+	size_t s, e;
+	knh_stack_rangeTo(ctx, sfp, (sfp[0].a)->size, &s, &e);
+	KNH_RETURN(ctx, sfp, new_Array__range(ctx, sfp[0].a, s, e, sizeof(Object*)));
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method This! IArray.opRangeUntil(Int s, Int e) @Debug */
+
+static METHOD knh__IArray_opRangeUntil(Ctx *ctx, knh_sfp_t *sfp)
+{
+	size_t s, e;
+	knh_stack_rangeUntil(ctx, sfp, (sfp[0].a)->size, &s, &e);
+	KNH_RETURN(ctx, sfp, new_Array__range(ctx, sfp[0].a, s, e, sizeof(knh_int_t)));
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method This! IArray.opRangeTo(Int s, Int e) @Debug */
+
+static METHOD knh__IArray_opRangeTo(Ctx *ctx, knh_sfp_t *sfp)
+{
+	size_t s, e;
+	knh_stack_rangeTo(ctx, sfp, (sfp[0].a)->size, &s, &e);
+	KNH_RETURN(ctx, sfp, new_Array__range(ctx, sfp[0].a, s, e, sizeof(knh_int_t)));
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method This! FArray.opRangeUntil(Int s, Int e) @Debug */
+
+static METHOD knh__FArray_opRangeUntil(Ctx *ctx, knh_sfp_t *sfp)
+{
+	size_t s, e;
+	knh_stack_rangeUntil(ctx, sfp, (sfp[0].a)->size, &s, &e);
+	KNH_RETURN(ctx, sfp, new_Array__range(ctx, sfp[0].a, s, e, sizeof(knh_float_t)));
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method This! FArray.opRangeTo(Int s, Int e) @Debug */
+
+static METHOD knh__FArray_opRangeTo(Ctx *ctx, knh_sfp_t *sfp)
+{
+	size_t s, e;
+	knh_stack_rangeTo(ctx, sfp, (sfp[0].a)->size, &s, &e);
+	KNH_RETURN(ctx, sfp, new_Array__range(ctx, sfp[0].a, s, e, sizeof(knh_float_t)));
 }
 
 /* ======================================================================== */
 /* [op1] */
 
 /* ------------------------------------------------------------------------ */
-/* @method T1! Array.op1()  */
+/* @method Any Tuple.op0()  */
 
-static METHOD knh__Array_op1(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__Tuple_op0(Ctx *ctx, knh_sfp_t *sfp)
+{
+	Object *res;
+	if(knh_Tuple_isTriple(sfp[0].tuple)) {
+		res = (sfp[0].tuple)->first;
+	}
+	else {
+		knh_array_index(ctx, 0, (sfp[0].tuple)->size);
+		res = (sfp[0].tuple)->list[0];
+	}
+	KNH_RETURN(ctx, sfp, res);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Any Tuple.op2()  */
+
+static METHOD knh__Tuple_op2(Ctx *ctx, knh_sfp_t *sfp)
+{
+	Object *res;
+	if(knh_Tuple_isTriple(sfp[0].tuple)) {
+		res = (sfp[0].tuple)->second;
+	}
+	else {
+		knh_array_index(ctx, 1, (sfp[0].tuple)->size);
+		res = (sfp[0].tuple)->list[1];
+	}
+	KNH_RETURN(ctx, sfp, res);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method Any Tuple.opN(Int! n)  */
+
+static METHOD knh__Tuple_opN(Ctx *ctx, knh_sfp_t *sfp)
+{
+	Object *res;
+	size_t size = knh_array_index(ctx, p_int(sfp[1]), (sfp[0].tuple)->size);
+	if(knh_Tuple_isTriple(sfp[0].tuple)) {
+		res = (sfp[0].tuple)->third;
+	}
+	else {
+		res = (sfp[0].tuple)->list[size];
+	}
+	KNH_RETURN(ctx, sfp, res);
+}
+
+/* ------------------------------------------------------------------------ */
+/* @method T1! Array.op0()  */
+
+static METHOD knh__Array_op0(Ctx *ctx, knh_sfp_t *sfp)
 {
 	Array *a = sfp[0].a;
 	KNH_RETURN(ctx, sfp, knh_Array_n(a, knh_array_index(ctx, 0, a->size)));
@@ -922,9 +1378,9 @@ static METHOD knh__Array_opN(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Int! IArray.op1()  */
+/* @method Int! IArray.op0()  */
 
-static METHOD knh__IArray_op1(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__IArray_op0(Ctx *ctx, knh_sfp_t *sfp)
 {
 	IArray *a = sfp[0].ia;
 	KNH_RETURN_Int(ctx, sfp, a->ilist[knh_array_index(ctx, 0, a->size)]);
@@ -949,9 +1405,9 @@ static METHOD knh__IArray_opN(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Float! FArray.op1()  */
+/* @method Float! FArray.op0()  */
 
-static METHOD knh__FArray_op1(Ctx *ctx, knh_sfp_t *sfp)
+static METHOD knh__FArray_op0(Ctx *ctx, knh_sfp_t *sfp)
 {
 	FArray *a = sfp[0].fa;
 	KNH_RETURN_Float(ctx, sfp, a->flist[knh_array_index(ctx, 0, a->size)]);
