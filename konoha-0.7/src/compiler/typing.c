@@ -1422,7 +1422,6 @@ knh_index_t knh_Asm_declareFieldVariable(Ctx *ctx, Asm *abr, knh_cfield_t *decl)
 }
 
 /* ------------------------------------------------------------------------ */
-
 static
 knh_index_t knh_Asm_declareLocalVariable(Ctx *ctx, Asm *abr, knh_cfield_t *decl)
 {
@@ -2294,7 +2293,7 @@ Term *knh_StmtCALL_typing(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_cla
 static
 int knh_StmtPARAMs_findCommonClass(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns, knh_class_t *cdef)
 {
-	if(DP(stmt)->size > 1) {
+	if(DP(stmt)->size > 2) {
 		int i;
 		knh_class_t ccid;
 		if(!TERMs_typing(ctx, stmt, 2, abr, ns, CLASS_Any, TWARN_)) {
