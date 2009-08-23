@@ -60,7 +60,7 @@ typedef intptr_t FILE;
 #define assert(x) BUG_ON(!(x))
 #define abort() BUG_ON(1)
 
-
+/*
 #define DBG2_(stmt)  stmt
 
 #define DBG2_P(fmt, ...) \
@@ -86,7 +86,7 @@ typedef intptr_t FILE;
 #define DBG2_ABORT() abort()
 #define KNH_MALLOC(ctx, size)    knh_fastmalloc(ctx, size)
 #define KNH_FREE(ctx, p, size)   knh_fastfree(ctx, p, size)
-
+*/
 
 /* ../../src/ext/qsort.c */
 void qsort(void* base,size_t total,size_t size, int (*comp)(const void*,const void*));
