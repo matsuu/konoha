@@ -46,7 +46,7 @@ typedef intptr_t FILE;
 #define stdout KERN_INFO
 #define stderr KERN_ALERT
 
-#define malloc(x) kmalloc(x,GFP_KERNEL)
+#define malloc(x) kzalloc(x,GFP_KERNEL)
 #define free(x)   kfree(x)
 
 #define fprintf(out,fmt, arg...) printk(out fmt , ##arg)
