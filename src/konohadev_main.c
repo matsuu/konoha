@@ -27,8 +27,9 @@
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("masahiro ide");
 
+
 enum {
-    MAXCOPYBUF = 256
+    MAXCOPYBUF = 128
 };
 
 struct konohadev_t {
@@ -42,7 +43,7 @@ struct konohadev_t {
 };
 
 static const char *msg = "konohadev";
-static struct konohadev_t *konohadev_p;
+struct konohadev_t *konohadev_p;
 
 static int knh_dev_open (struct inode *inode , struct file *filp);
 static ssize_t knh_dev_read(struct file *filp, char __user *user_buf,
@@ -60,19 +61,25 @@ static struct file_operations knh_fops = {
     //.ioctl = knh_dev_ioctl,
 };
 
-void *konoha_malloc(const size_t size)
+/*
+konoha_t *konoha_getCurrntKnh(const void *p)
+{
+    return &konohadev_p->konoha;
+}
+*/
+
+static inline void *konoha_malloc(const size_t size)
 {
     // kzalloc : see linux/slab.h
     void *p = kzalloc(size, GFP_KERNEL);
     return p;
 }
 
-void konoha_free(const void *p)
+static inline void konoha_free(const void *p)
 {
     if (p)
         kfree(p);
 }
-
 
 static int knh_dev_open (struct inode* inode, struct file *filp)
 {
@@ -96,7 +103,7 @@ static ssize_t knh_dev_read (struct file* filp, char __user *user_buf,
     }
 #endif
 
-    len = snprintf(buf,MAXCOPYBUF,"%s\n",dev->buffer);
+    len = snprintf(buf,sizeof(buf),"%s\n",dev->buffer);
 
     if(copy_to_user(user_buf,buf,len)){
 #ifdef KNH_ENABLE_SEMAPHORE
@@ -119,6 +126,7 @@ static ssize_t knh_dev_write(struct file *filp,const char __user *user_buf,
     char buf[MAXCOPYBUF];
     char*  ret = NULL;
     struct konohadev_t *dev = filp->private_data;
+    konoha_t konoha = dev->konoha;
     long len;
 
 #ifdef KNH_ENABLE_SEMAPHORE
@@ -128,13 +136,13 @@ static ssize_t knh_dev_write(struct file *filp,const char __user *user_buf,
 #endif
 
     len = copy_from_user(buf,user_buf,count);
-    memset(dev->buffer,0,sizeof(char)*MAXCOPYBUF);
+    memset(dev->buffer,0,sizeof(dev->buffer));
     buf[count] = '\0';
 
     printk("[%s][user_buf=%s]\n", __FUNCTION__,buf);
-    konoha_evalScript(dev->konoha,buf);
-    ret = konoha_getStdOutBufferText(dev->konoha);
-    snprintf(dev->buffer,MAXCOPYBUF,"%s",knh_ret);
+    konoha_evalScript(konoha,buf);
+    ret = konoha_getStdOutBufferText(konoha);
+    snprintf(dev->buffer,sizeof(dev->buffer),"%s",ret);
     printk(KERN_DEBUG "[%s][dev->buffer=%s]\n",__FUNCTION__ ,dev->buffer);
 
 #ifdef KNH_ENABLE_SEMAPHORE
@@ -146,6 +154,7 @@ static ssize_t knh_dev_write(struct file *filp,const char __user *user_buf,
 
 static void knh_dev_setup(struct konohadev_t *dev){
     int err = alloc_chrdev_region(&dev->id, 0, 1, msg);
+    size_t size = MAXCOPYBUF;
     if(err){
         printk(KERN_ALERT "%s: alloc_chrdev_region() failed (%d)\n",
                 msg,err);
@@ -153,9 +162,9 @@ static void knh_dev_setup(struct konohadev_t *dev){
     }
     cdev_init(&dev->cdev,&knh_fops);
     dev->cdev.owner = THIS_MODULE;
-    dev->konoha = konoha_open(MAXCOPYBUF);
-    konoha_setOutputStreamBuffer(dev->konoha, MAXCOPYBUF,MAXCOPYBUF);
-    dev->buffer = konoha_malloc(sizeof(char)*MAXCOPYBUF);
+    dev->konoha = konoha_open(size);
+    konoha_setOutputStreamBuffer(dev->konoha, size,size);
+    dev->buffer = konoha_malloc(size);
 
 #ifdef KNH_ENABLE_SEMAPHORE
     init_MUTEX(&dev->sem);
@@ -184,7 +193,7 @@ static int __init konoha_init(void) {
 
 // End/Cleanup function
 static void __exit konoha_exit(void) {
-    printk(KERN_ALERT "Goodbye!\n");
+    printk(KERN_ALERT "Goodbye konoha!\n");
     konoha_close(konohadev_p->konoha);
     konoha_free(konohadev_p->buffer);
 
