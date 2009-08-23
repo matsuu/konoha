@@ -127,7 +127,7 @@ METHOD knh__Regex_new(Ctx *ctx, knh_sfp_t *sfp)
 
 /* ------------------------------------------------------------------------ */
 /* [Pair, Tuple, Range] */
-/* @method This! Pair.new:init(T1! first, T2! second) @Const */
+/* @method This! Pair.new:init(T1 first, T2 second) @Const */
 
 static METHOD knh__Pair_new__init(Ctx *ctx, knh_sfp_t *sfp)
 {

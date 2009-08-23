@@ -930,6 +930,7 @@ char *knh_methodop_tochar(knh_methodn_t mn)
 	case METHODN_opHas:  return "y in x";
 	case METHODN_opIs:  return "x is y";
 	case METHODN_opAs:  return "x as y";
+	case METHODN_opInto:  return "x into y";
 
 	case METHODN_opEq:  return "x == y";
 	case METHODN_opNeq:  return "x != x";
@@ -943,41 +944,28 @@ char *knh_methodop_tochar(knh_methodn_t mn)
 
 	case METHODN_opMod:  return "x mod y";
 
-#ifdef METHODN_opAdd__2
-	case METHODN_opAdd__2 :
-#endif
 	case METHODN_opAdd:  return "x + y";
-
-#ifdef METHODN_opSub__2
-	case METHODN_opSub__2 :
-#endif
-	case METHODN_opNeg: return "-x";
-
+	case METHODN_opNeg:  return "-x";
 	case METHODN_opSub:  return "x - y";
-
-#ifdef METHODN_opDiv__2
-	case METHODN_opDiv__2 :
-#endif
 	case METHODN_opDiv:  return "x / y";
-
-#ifdef METHODN_opMul__2
-	case METHODN_opMul__2 :
-#endif
 	case METHODN_opMul:  return "x * y";
 
-	case METHODN_opLor:  return "x & y";
-	case METHODN_opLand:  return "x | y";
-	case METHODN_opLnot:  return "~x";
-	case METHODN_opXor:  return "x ^ y";
-	case METHODN_opNext:  return "x++";
-	case METHODN_opPrev:  return "x--";
-	case METHODN_opItr:   return "x..";
-	case METHODN_getSize: return "|x|";
-	case METHODN_get: return "x[n]";
-	case METHODN_set: return "x[n]=y";
-	case METHODN_setAll: return "x[]=y";
-	case METHODN_opRangeTo: return "x[m to n]";
+	case METHODN_opLor:        return "x & y";
+	case METHODN_opLand:       return "x | y";
+	case METHODN_opLnot:       return "~x";
+	case METHODN_opXor:        return "x ^ y";
+	case METHODN_opNext:       return "x++";
+	case METHODN_opPrev:       return "x--";
+	case METHODN_opItr:        return "x..";
+	case METHODN_getSize:      return "|x|";
+	case METHODN_get:          return "x[n]";
+	case METHODN_set:          return "x[n]=y";
+	case METHODN_setAll:       return "x[]=y";
+	case METHODN_opRangeTo:    return "x[m to n]";
 	case METHODN_opRangeUntil: return "x[m until n]";
+	case METHODN_op0:          return "a,b = x";
+	case METHODN_opN :         return "a,b,c = x";
+	case METHODN_opCase :      return "case x:";
 	}
 	return NULL;
 }
@@ -1016,11 +1004,8 @@ void knh_Method__man(Ctx *ctx, Method *o, OutputStream *w, knh_class_t cid)
 		knh_write(ctx, w, STEXT("@Abstract"));
 		knh_putc(ctx, w, ' ');
 	}
-//	if(knh_Method_rztype(o) == TYPE_void) {
-//		knh_write(ctx, w, knh_String_tobytes(TS_void));
-//	}else{
-		knh_write_type(ctx, w, knh_pmztype_totype(ctx, knh_Method_rztype(o), cid));
-//	}
+
+	knh_write_type(ctx, w, knh_pmztype_totype(ctx, knh_Method_rztype(o), cid));
 	knh_putc(ctx, w, ' ');
 
 	if(knh_Method_isStatic(o)) {
@@ -1130,15 +1115,20 @@ void knh_Class__man(Ctx *ctx, Class *o, OutputStream *w, String *m)
 		if(IS_Method(mtd)) {
 			if(METHODN_IS_MOVTEXT(DP(mtd)->mn)) continue;
 			if(DP(mtd)->cid == CLASS_Object && cid != CLASS_Object) continue;
-//			if(DP(mtd)->cid != ClassTable(cid).bcid) continue;
 			if(hasCaption == 0) {
 				knh_write_char(ctx, w, _("Method"));
 				knh_write_EOL(ctx, w);
 				hasCaption = 1;
 			}
-			knh_write_TAB(ctx, w);
-			knh_Method__man(ctx, mtd, w, cid);
-			knh_write_EOL(ctx, w);
+#if defined(KNH_DBGMODE2)
+			if(1) {
+#else
+			if(!knh_Method_isPrivate(mtd) || !knh_Method_isHidden(mtd)) {
+#endif
+				knh_write_TAB(ctx, w);
+				knh_Method__man(ctx, mtd, w, cid);
+				knh_write_EOL(ctx, w);
+			}
 			knh_DictMap_removeAt(ctx, dm, i);
 		}
 	}

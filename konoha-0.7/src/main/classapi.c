@@ -2908,6 +2908,8 @@ static void knh_loadClassProperties(Ctx *ctx)
 	t = pClassTable(CLASS_String);
 	KNH_SETv(ctx, t->cspec, u);
 
+	knh_setClassParam(ctx, CLASS_Pair, CLASS_Any, CLASS_Any);
+	knh_setClassParam(ctx, CLASS_Range, CLASS_Any, CLASS_unknown);
 	knh_setClassParam(ctx, CLASS_Array, CLASS_Any, CLASS_unknown);
 	knh_setClassParam(ctx, CLASS_IArray, CLASS_Int, CLASS_unknown);
 	knh_setClassParam(ctx, CLASS_FArray, CLASS_Float, CLASS_unknown);

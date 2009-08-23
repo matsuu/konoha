@@ -92,10 +92,13 @@ knh_type_t knh_pmztype_totype(Ctx *ctx, knh_type_t t, knh_class_t this_cid)
 		return this_cid | mask;
 	}
 	if(cid == CLASS_T1) {
-		return ctx->share->ClassTable[this_cid].p1 | mask;
+		/* if aborted, setClassParam in knh_loadClassProperties(Ctx *ctx) */
+		DBG2_ASSERT(ClassTable(this_cid).p1 != CLASS_unknown);
+		return ClassTable(this_cid).p1 | mask;
 	}
 	if(cid == CLASS_T2) {
-		return ctx->share->ClassTable[this_cid].p2 | mask;
+		DBG2_ASSERT(ClassTable(this_cid).p1 != CLASS_unknown);
+		return ClassTable(this_cid).p2 | mask;
 	}
 	if(ClassTable(cid).bcid == CLASS_Closure) {
 		knh_type_t r0 = ClassTable(cid).r0;

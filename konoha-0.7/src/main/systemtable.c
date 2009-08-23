@@ -138,7 +138,7 @@ void knh_ObjectPageTable_free(Ctx *ctx, char *thead)
 static
 void knh_Context_initCommon(Ctx *ctx, knh_Context_t *o, size_t stacksize)
 {
-	o->stacksize = (stacksize < 64) ? KONOHA_STACKSIZE : stacksize;
+	o->stacksize = (stacksize < 128) ? KONOHA_STACKSIZE : stacksize;
 	o->stack = (knh_sfp_t*)KNH_MALLOC(ctx, sizeof(knh_sfp_t) * o->stacksize);
 	o->esp = o->stack;
 	{
