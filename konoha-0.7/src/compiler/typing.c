@@ -1332,8 +1332,8 @@ knh_index_t knh_Asm_addVariableTable(Ctx *ctx, Asm *abr, knh_cfield_t *tbl, size
 				(IS_ubxfloat(decl->type) && (sizeof(knh_float_t) > sizeof(void*)))) {
 				tbl[idx+1].flag = 0;
 				tbl[idx+1].type = TYPE_void;
-				tbl[idx+1].type = FIELDN_register;
-				DBG2_ASSERT(tbl[idx].value == NULL);
+				tbl[idx+1].fn   = FIELDN_register;
+				DBG2_ASSERT(tbl[idx+1].value == NULL);
 			}
 #endif
 			return idx;
@@ -4145,48 +4145,61 @@ void knh_Asm_initClassTableField(Ctx *ctx, Asm *abr, knh_class_t cid)
 
 /* ------------------------------------------------------------------------ */
 
+#ifdef KNH_DBGMODE2
+static
+void knh_cfield_dump(Ctx *ctx, knh_cfield_t *f, size_t offset, size_t fsize, OutputStream *w)
+{
+	size_t idx = 0;
+	for(idx = 0; idx < fsize; idx++) {
+		if(f[idx].fn == FIELDN_NONAME) {
+			knh_printf(ctx, w, "[%d] -\n", (offset+idx));
+			continue;
+		}
+		if(f[idx].fn == FIELDN_register || f[idx].type == CLASS_unknown) continue;
+		knh_printf(ctx, w, "[%d] %T %N = %O\n", (offset+idx), f[idx].type, f[idx].fn, f[idx].value);
+	}
+}
+#endif
+
 static
 void knh_Asm_declareClassField(Ctx *ctx, Asm *abr, NameSpace* ns, knh_class_t cid)
 {
 	knh_ClassTable_t *t = (knh_ClassTable_t*)(&ClassTable(cid));
-	DBG2_ASSERT(IS_ClassStruct(t->cstruct));
-	DBG2_ASSERT((t->cstruct)->fields == NULL);
+		DBG2_ASSERT(IS_ClassStruct(t->cstruct));
+		DBG2_ASSERT((t->cstruct)->fields == NULL);
+	int i, fsize = DP(abr)->gamma_size;
+	knh_cfield_t *cf = (knh_cfield_t*)KNH_MALLOC(ctx, sizeof(knh_cfield_t) * fsize);
+	for(i = 0; i < fsize; i++) {
+		cf[i] = DP(abr)->gamma[i];
+		if(cf[i].value != NULL) {
+			DP(abr)->gamma[i].value = NULL; /* COPY TO GC */
+		}
+	}
+	(t->cstruct)->fields = cf;
+	(t->cstruct)->fsize = fsize;
+	t->sid = BSIZE_TOSID(fsize);
+	if(t->supcid != CLASS_Object) {
+		t->offset = ctx->share->ClassTable[t->supcid].bsize;
+		//DBG2_P("offset extending 0 -> %d", TC->offset);
+	}
+	t->bsize = fsize + t->offset;
+	t->size = sizeof(Object*) * t->bsize;
+	knh_NameSpace_setcid(ctx, ns, t->sname, cid);
+	DBG2_({
+		DBG2_P("HERE IS DEFINED STRUCT (offset=%d, fsize=%d)", t->offset, fsize);
+		knh_cfield_dump(ctx, cf, t->offset, fsize, KNH_STDOUT);
+	});
+	/* update default value */
+	DBG2_ASSERT(knh_Object_cid(t->cspec) == cid);
 	{
-		int i, fsize = DP(abr)->gamma_size;
-		knh_cfield_t *cf = (knh_cfield_t*)KNH_MALLOC(ctx, sizeof(knh_cfield_t) * fsize);
-		//DBG2_P("class %s fsize=%d", CLASSN(cid), fsize);
-		for(i = 0; i < fsize; i++) {
-			cf[i] = DP(abr)->gamma[i];
-			if(cf[i].value != NULL) {
-				DP(abr)->gamma[i].value = NULL; /* COPY TO GC */
-			}
+		knh_ObjectField_t *of = (knh_ObjectField_t*)t->cspec;
+		of->bsize = t->bsize;
+		if(t->bsize == 0) {
+			of->fields = NULL;
 		}
-		(t->cstruct)->fields = cf;
-		(t->cstruct)->fsize = fsize;
-		t->sid = BSIZE_TOSID(fsize);
-		if(t->supcid != CLASS_Object) {
-			t->offset = ctx->share->ClassTable[t->supcid].bsize;
-			//DBG2_P("offset extending 0 -> %d", TC->offset);
-		}
-		t->bsize = fsize + t->offset;
-		t->size = sizeof(Object*) * t->bsize;
-		knh_NameSpace_setcid(ctx, ns, t->sname, cid);
-		DBG2_({
-			DBG2_P("HERE IS DEFINED STRUCT (offset=%d)", t->offset);
-			knh_cfield_dump(ctx, cf, 0, fsize, KNH_STDOUT);
-		});
-		/* update default value */
-		DBG2_ASSERT(knh_Object_cid(t->cspec) == cid);
-		{
-			knh_ObjectField_t *of = (knh_ObjectField_t*)t->cspec;
-			of->bsize = t->bsize;
-			if(t->bsize == 0) {
-				of->fields = NULL;
-			}
-			else {
-				of->fields = KNH_MALLOC(ctx, sizeof(Object*) * of->bsize);
-				knh_ObjectField_init(ctx, of, 0);
-			}
+		else {
+			of->fields = KNH_MALLOC(ctx, sizeof(Object*) * of->bsize);
+			knh_ObjectField_init(ctx, of, 0);
 		}
 	}
 }

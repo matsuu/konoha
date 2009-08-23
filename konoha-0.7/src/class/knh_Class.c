@@ -261,7 +261,7 @@ void knh_setClassParam(Ctx *ctx, knh_class_t cid, knh_class_t p1, knh_class_t p2
 	t->p1 = p1;
 	t->p2 = p2;
 	if(!knh_class_isCyclic(cid)) {
-		if(knh_class_isCyclic(p1) || knh_class_isCyclic(p2)) {
+		if(knh_class_isCyclic(p1) || (p2 != CLASS_unknown && knh_class_isCyclic(p2))) {
 			knh_class_setCyclic(cid, 1);
 		}
 	}
@@ -396,23 +396,6 @@ knh_cfield_t *knh_Class_fieldAt(Ctx *ctx, knh_class_t cid, size_t n)
 		cid = ClassTable(cid).supcid;
 	}
 	goto L_TAIL;
-}
-
-
-/* ------------------------------------------------------------------------ */
-/* [movabletext] */
-
-void knh_cfield_dump(Ctx *ctx, knh_cfield_t *f, size_t offset, size_t fsize, OutputStream *w)
-{
-	size_t idx = 0;
-	for(idx = 0; idx < fsize; idx++) {
-		if(f[idx].fn == FIELDN_NONAME) {
-			knh_printf(ctx, w, "[%d] -\n", (offset+idx));
-			continue;
-		}
-		if(f[idx].fn == FIELDN_register || f[idx].type == CLASS_unknown) continue;
-		knh_printf(ctx, w, "[%d] %T %N = %O\n", (offset+idx), f[idx].type, f[idx].fn, f[idx].value);
-	}
 }
 
 /* ======================================================================== */

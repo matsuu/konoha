@@ -159,7 +159,6 @@ ClassStruct* new_ClassStruct0(Ctx *ctx, int field_size, int method_size);
 knh_index_t knh_Class_indexOfField(Ctx *ctx, knh_class_t cid, knh_fieldn_t fn);
 knh_index_t knh_Class_queryField(Ctx *ctx, knh_class_t cid, knh_fieldn_t fnq);
 knh_cfield_t *knh_Class_fieldAt(Ctx *ctx, knh_class_t cid, size_t n);
-void knh_cfield_dump(Ctx *ctx, knh_cfield_t *f, size_t offset, size_t fsize, OutputStream *w);
 ClassMap* new_ClassMap0(Ctx *ctx, knh_ushort_t capacity);
 Object *knh_ClassMap_fdefault(Ctx *ctx, knh_class_t cid);
 void knh_readyClassMap(Ctx *ctx, knh_class_t cid);

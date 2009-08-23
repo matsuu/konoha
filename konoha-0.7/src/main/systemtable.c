@@ -124,7 +124,8 @@ void knh_ObjectPageTable_free(Ctx *ctx, char *thead)
 			} )
 			o->h.refc = 0;
 #endif
-			knh_Object_free(ctx, o);
+			/* BUGS: We cannot free cyclic objects at this stage */
+			// knh_Object_free(ctx, o);
 		}
 		t += KONOHA_PAGESIZE;
 	}
