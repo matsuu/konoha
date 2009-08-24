@@ -2843,8 +2843,8 @@ static void knh_loadStringPropertyData(Ctx *ctx, knh_StringConstData_t *data)
 /* @data */
 
 static knh_IntConstData_t IntConstData[] = {
-	{"Int.MAX", KNH_INT_MAX},
-	{"Int.MIN", KNH_INT_MIN},
+	{"konoha.Int.MAX", KNH_INT_MAX},
+	{"konoha.Int.MIN", KNH_INT_MIN},
 	{NULL, 0}
 };
 
