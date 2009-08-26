@@ -1404,6 +1404,34 @@ void knh_Regex_traverse(Ctx *ctx, Regex *o, knh_ftraverse ftr)
 }
 
 /* ======================================================================== */
+/* Chardev */
+
+#define knh_Chardev_init_ NULL
+#define knh_Chardev_copy NULL
+#define knh_Chardev_traverse_ NULL
+#define knh_Chardev_compareTo NULL
+#define knh_Chardev_hashCode NULL
+#define knh_Chardev_newClass NULL
+#define knh_Chardev_getkey NULL
+#define knh_Chardev_fdefault NULL
+
+static
+void knh_Chardev_init(Ctx *ctx, Chardev *o, int init)
+{
+    knh_Chardev_t *cdev = (knh_Chardev_t*)o;
+    cdev->device = (knh_device_t*)KNH_MALLOC(ctx, sizeof(knh_device_t));
+    fprintf(stderr, "%s\n",__FUNCTION__);
+}
+
+void knh_Chardev_traverse(Ctx *ctx, Chardev *o, knh_ftraverse ftr)
+{
+    fprintf(stderr, "%s\n",__FUNCTION__);
+    char* b = o->name;
+    KNH_FREE(ctx, b, strlen(b));
+    KNH_FREE(ctx, o->device, sizeof(knh_device_t));
+}
+
+/* ======================================================================== */
 /* BytesConv */
 
 #define knh_BytesConv_init_ NULL

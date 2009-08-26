@@ -214,6 +214,11 @@ void knh_vprintf(Ctx *ctx, OutputStream *w, char *fmt, va_list ap);
 void knh_setverbose(int v);
 METHOD knh_fmethod_movableText(Ctx *ctx, knh_sfp_t *sfp);
 knh_bool_t knh_stack_isRecuriveFormatting(Ctx *ctx, knh_sfp_t *sfp, Object *o, OutputStream *w, void *mtdcode);
+/* ../src/class/knh_Chardev.c */
+void knh_Chardev_setName(Ctx *ctx, Chardev *o, char* devname);
+METHOD knh__Chardev_new(Ctx *ctx, knh_sfp_t *sfp);
+knh_bool_t knh_Chardev_regist(Ctx *ctx, Chardev *o, char* devname);
+METHOD knh__Chardev_regist(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/class/knh_Class.c */
 knh_struct_t knh_StructTable_newId(Ctx *ctx);
 knh_class_t knh_ClassTable_newId(Ctx *ctx);

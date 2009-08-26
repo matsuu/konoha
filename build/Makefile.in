@@ -90,26 +90,26 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(libkonoha_la_includekonohadir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libkonoha_la_LIBADD =
-am_libkonoha_la_OBJECTS = anyapi.lo arrayapi.lo bytesapi.lo dbapi.lo \
-	dictapi.lo hashapi.lo narutoapi.lo numberapi.lo objectapi.lo \
-	streamapi.lo stringapi.lo systemapi.lo knh_Array.lo \
-	knh_Bytes.lo knh_bytes_t.lo knh_BytesConv.lo knh_Class.lo \
-	knh_ClassSpec.lo knh_Closure.lo knh_Connection.lo \
-	knh_Context.lo knh_DictIdx.lo knh_DictMapSet.lo \
-	knh_Exception.lo knh_Hash.lo knh_InputStream.lo \
-	knh_Iterator.lo knh_Mapper.lo knh_Method.lo knh_NameSpace.lo \
-	knh_Number.lo knh_Object.lo knh_OutputStream.lo \
-	knh_ResultSet.lo knh_Script.lo knh_String.lo \
-	knh_String_mbytes.lo knh_System.lo knh_type_t.lo knh_write.lo \
-	asm.lo kcode.lo konohac.lo parser.lo perror.lo stmt.lo \
-	token.lo tokenizer.lo typing.lo dlopen.lo fileio.lo \
-	filesystem.lo locale.lo regex.lo socket.lo sqlite3.lo \
-	thread.lo time.lo mt19937-64.lo mt19937ar.lo qsort.lo \
-	strerror.lo codetemplate.lo fibo.lo konoha_klr_.lo konohac_.lo \
-	method_.lo konohadev_main.lo b4.lo classapi.lo exports.lo \
-	glue.lo konoha_api.lo konoha_ext.lo logging.lo memory.lo \
-	metadata.lo objectdbms.lo security.lo stack.lo system.lo \
-	systemtable.lo typesystem.lo
+am_libkonoha_la_OBJECTS = system.lo objectdbms.lo typesystem.lo \
+	memory.lo konoha_api.lo konoha_ext.lo systemtable.lo \
+	security.lo classapi.lo glue.lo exports.lo metadata.lo \
+	logging.lo stack.lo konohadev_main.lo knh_Mapper.lo \
+	knh_Array.lo knh_NameSpace.lo knh_System.lo \
+	knh_OutputStream.lo knh_Iterator.lo knh_Bytes.lo knh_write.lo \
+	knh_Chardev.lo knh_Class.lo knh_Script.lo knh_Object.lo \
+	knh_String_mbytes.lo knh_BytesConv.lo knh_Hash.lo \
+	knh_String.lo knh_InputStream.lo knh_Closure.lo \
+	knh_DictMapSet.lo knh_ResultSet.lo knh_DictIdx.lo \
+	knh_ClassSpec.lo knh_Method.lo knh_Connection.lo \
+	knh_bytes_t.lo knh_Exception.lo knh_Context.lo knh_Number.lo \
+	knh_type_t.lo mt19937-64.lo strerror.lo qsort.lo mt19937ar.lo \
+	hashapi.lo narutoapi.lo stringapi.lo systemapi.lo arrayapi.lo \
+	dictapi.lo objectapi.lo dbapi.lo streamapi.lo numberapi.lo \
+	bytesapi.lo anyapi.lo token.lo perror.lo parser.lo asm.lo \
+	kcode.lo typing.lo stmt.lo tokenizer.lo konohac.lo b4.lo \
+	konoha_klr_.lo konohac_.lo method_.lo codetemplate.lo fibo.lo \
+	filesystem.lo locale.lo sqlite3.lo socket.lo fileio.lo \
+	dlopen.lo regex.lo thread.lo time.lo
 libkonoha_la_OBJECTS = $(am_libkonoha_la_OBJECTS)
 libkonoha_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -276,89 +276,90 @@ AM_CPPFLAGS = -I../include
 #if MINGW
 #AM_CPPFLAGS += -DKONOHA_ON_MINGW
 #endif
-libkonoha_la_SOURCES = ../src/api/anyapi.c ../src/api/arrayapi.c \
-	../src/api/bytesapi.c ../src/api/dbapi.c ../src/api/dictapi.c \
-	../src/api/hashapi.c ../src/api/narutoapi.c \
-	../src/api/numberapi.c ../src/api/objectapi.c \
-	../src/api/streamapi.c ../src/api/stringapi.c \
-	../src/api/systemapi.c ../src/class/knh_Array.c \
-	../src/class/knh_Bytes.c ../src/class/knh_bytes_t.c \
-	../src/class/knh_BytesConv.c ../src/class/knh_Class.c \
-	../src/class/knh_ClassSpec.c ../src/class/knh_Closure.c \
-	../src/class/knh_Connection.c ../src/class/knh_Context.c \
-	../src/class/knh_DictIdx.c ../src/class/knh_DictMapSet.c \
-	../src/class/knh_Exception.c ../src/class/knh_Hash.c \
-	../src/class/knh_InputStream.c ../src/class/knh_Iterator.c \
-	../src/class/knh_Mapper.c ../src/class/knh_Method.c \
-	../src/class/knh_NameSpace.c ../src/class/knh_Number.c \
-	../src/class/knh_Object.c ../src/class/knh_OutputStream.c \
-	../src/class/knh_ResultSet.c ../src/class/knh_Script.c \
-	../src/class/knh_String.c ../src/class/knh_String_mbytes.c \
-	../src/class/knh_System.c ../src/class/knh_type_t.c \
-	../src/class/knh_write.c ../src/compiler/asm.c \
-	../src/compiler/kcode.c ../src/compiler/konohac.c \
-	../src/compiler/parser.c ../src/compiler/perror.c \
-	../src/compiler/stmt.c ../src/compiler/token.c \
-	../src/compiler/tokenizer.c ../src/compiler/typing.c \
-	../src/deps/dlopen.c ../src/deps/fileio.c \
-	../src/deps/filesystem.c ../src/deps/locale.c \
-	../src/deps/regex.c ../src/deps/socket.c ../src/deps/sqlite3.c \
-	../src/deps/thread.c ../src/deps/time.c \
-	../src/ext/mt19937-64.c ../src/ext/mt19937ar.c \
-	../src/ext/qsort.c ../src/ext/strerror.c \
-	../src/gen/codetemplate.c ../src/gen/fibo.c \
+libkonoha_la_SOURCES = ../src/main/system.c ../src/main/objectdbms.c \
+	../src/main/typesystem.c ../src/main/memory.c \
+	../src/main/konoha_api.c ../src/main/konoha_ext.c \
+	../src/main/systemtable.c ../src/main/security.c \
+	../src/main/classapi.c ../src/main/glue.c \
+	../src/main/exports.c ../src/main/metadata.c \
+	../src/main/logging.c ../src/main/stack.c \
+	../src/konohadev_main.c ../src/class/knh_Mapper.c \
+	../src/class/knh_Array.c ../src/class/knh_NameSpace.c \
+	../src/class/knh_System.c ../src/class/knh_OutputStream.c \
+	../src/class/knh_Iterator.c ../src/class/knh_Bytes.c \
+	../src/class/knh_write.c ../src/class/knh_Chardev.c \
+	../src/class/knh_Class.c ../src/class/knh_Script.c \
+	../src/class/knh_Object.c ../src/class/knh_String_mbytes.c \
+	../src/class/knh_BytesConv.c ../src/class/knh_Hash.c \
+	../src/class/knh_String.c ../src/class/knh_InputStream.c \
+	../src/class/knh_Closure.c ../src/class/knh_DictMapSet.c \
+	../src/class/knh_ResultSet.c ../src/class/knh_DictIdx.c \
+	../src/class/knh_ClassSpec.c ../src/class/knh_Method.c \
+	../src/class/knh_Connection.c ../src/class/knh_bytes_t.c \
+	../src/class/knh_Exception.c ../src/class/knh_Context.c \
+	../src/class/knh_Number.c ../src/class/knh_type_t.c \
+	../src/ext/mt19937-64.c ../src/ext/strerror.c \
+	../src/ext/qsort.c ../src/ext/mt19937ar.c ../src/api/hashapi.c \
+	../src/api/narutoapi.c ../src/api/stringapi.c \
+	../src/api/systemapi.c ../src/api/arrayapi.c \
+	../src/api/dictapi.c ../src/api/objectapi.c ../src/api/dbapi.c \
+	../src/api/streamapi.c ../src/api/numberapi.c \
+	../src/api/bytesapi.c ../src/api/anyapi.c \
+	../src/compiler/token.c ../src/compiler/perror.c \
+	../src/compiler/parser.c ../src/compiler/asm.c \
+	../src/compiler/kcode.c ../src/compiler/typing.c \
+	../src/compiler/stmt.c ../src/compiler/tokenizer.c \
+	../src/compiler/konohac.c ../src/labs/b4.c \
 	../src/gen/konoha_klr_.c ../src/gen/konohac_.c \
-	../src/gen/method_.c ../src/konohadev_main.c ../src/labs/b4.c \
-	../src/main/classapi.c ../src/main/exports.c \
-	../src/main/glue.c ../src/main/konoha_api.c \
-	../src/main/konoha_ext.c ../src/main/logging.c \
-	../src/main/memory.c ../src/main/metadata.c \
-	../src/main/objectdbms.c ../src/main/security.c \
-	../src/main/stack.c ../src/main/system.c \
-	../src/main/systemtable.c ../src/main/typesystem.c
+	../src/gen/method_.c ../src/gen/codetemplate.c \
+	../src/gen/fibo.c ../src/deps/filesystem.c \
+	../src/deps/locale.c ../src/deps/sqlite3.c \
+	../src/deps/socket.c ../src/deps/fileio.c ../src/deps/dlopen.c \
+	../src/deps/regex.c ../src/deps/thread.c ../src/deps/time.c
 libkonoha_la_includedir = $(includedir)
 libkonoha_la_include_HEADERS = ../include/konoha.h
 libkonoha_la_includekonohadir = $(includedir)/../include/konoha
-libkonoha_la_includekonoha_HEADERS = ../include/konoha/konoha_class.h \
-	../include/konoha/konoha_config.h \
+libkonoha_la_includekonoha_HEADERS = ../include/konoha/konoha_vm.h \
+	../include/konoha/konoha_tb.h ../include/konoha/konoha_t.h \
+	../include/konoha/konoha_glue.h \
+	../include/konoha/konoha_class.h \
 	../include/konoha/konoha_debug.h \
-	../include/konoha/konoha_deps.h ../include/konoha/konoha_dev.h \
-	../include/konoha/konoha_gc.h ../include/konoha/konoha_glue.h \
-	../include/konoha/konoha_lkm.h \
-	../include/konoha/konoha_macros.h ../include/konoha/konoha_t.h \
-	../include/konoha/konoha_tb.h ../include/konoha/konoha_vm.h \
-	../include/konoha/license.h
+	../include/konoha/konoha_lkm.h ../include/konoha/konoha_dev.h \
+	../include/konoha/konoha_deps.h ../include/konoha/license.h \
+	../include/konoha/konoha_config.h \
+	../include/konoha/konoha_gc.h \
+	../include/konoha/konoha_macros.h
 libkonoha_la_includegendir = $(includedir)/../include/konoha/gen
 libkonoha_la_includegen_HEADERS =  \
 	../include/konoha/gen/konoha_class_.h \
-	../include/konoha/gen/konoha_knhapi_.h \
 	../include/konoha/gen/konoha_proto_.h \
+	../include/konoha/gen/konoha_knhapi_.h \
+	../include/konoha/gen/struct_.h \
 	../include/konoha/gen/konohac_klr_.h \
-	../include/konoha/gen/konohac_stmt_.h \
-	../include/konoha/gen/struct_.h
+	../include/konoha/gen/konohac_stmt_.h
 sampledir = /usr/local/share/konoha/sample
-dist_sample_SCRIPTS = ../dist/sample/ao.k ../dist/sample/counter.k \
-	../dist/sample/fib.k ../dist/sample/helloworld.k \
-	../dist/sample/http.k ../dist/sample/konohaget.k \
-	../dist/sample/main.k ../dist/sample/readfile.k \
-	../dist/sample/sort.k
+dist_sample_SCRIPTS = ../dist/sample/counter.k \
+	../dist/sample/readfile.k ../dist/sample/main.k \
+	../dist/sample/sort.k ../dist/sample/ao.k \
+	../dist/sample/konohaget.k ../dist/sample/http.k \
+	../dist/sample/fib.k ../dist/sample/helloworld.k
 pkgmathdir = /usr/local/share/konoha/package/math
 dist_pkgmath_DATA = ../dist/package/math/math.k \
-	../dist/package/math/math_linux_32.so \
-	../dist/package/math/math_macosx_32.dylib
+	../dist/package/math/math_macosx_32.dylib \
+	../dist/package/math/math_linux_32.so
 pkgposixdir = /usr/local/share/konoha/package/posix
-dist_pkgposix_DATA = ../dist/package/posix/posix.k \
+dist_pkgposix_DATA = ../dist/package/posix/posix_macosx_32.dylib \
 	../dist/package/posix/posix_linux_32.so \
-	../dist/package/posix/posix_macosx_32.dylib
+	../dist/package/posix/posix.k
 pkgxmldir = /usr/local/share/konoha/package/xml
-dist_pkgxml_DATA = ../dist/package/xml/libxml2.k \
+dist_pkgxml_DATA = ../dist/package/xml/sample/xml_1.k \
+	../dist/package/xml/sample/xmlreader_2.k \
+	../dist/package/xml/sample/xmlreader_1.k \
+	../dist/package/xml/src/xmlreader.k \
+	../dist/package/xml/src/xml.k \
 	../dist/package/xml/libxml2_linux_32.so \
 	../dist/package/xml/libxml2_macosx_32.dylib \
-	../dist/package/xml/sample/xml_1.k \
-	../dist/package/xml/sample/xmlreader_1.k \
-	../dist/package/xml/sample/xmlreader_2.k \
-	../dist/package/xml/src/xml.k \
-	../dist/package/xml/src/xmlreader.k
+	../dist/package/xml/libxml2.k
 pkgdemodir = /usr/local/share/konoha/package/demo
 dist_pkgdemo_DATA = ../dist/package/demo/demo.k \
 	../dist/package/demo/demo_macosx_32.dylib
@@ -611,6 +612,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Array.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Bytes.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_BytesConv.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Chardev.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Class.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_ClassSpec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/knh_Closure.Plo@am__quote@
@@ -697,40 +699,341 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
-anyapi.lo: ../src/api/anyapi.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT anyapi.lo -MD -MP -MF $(DEPDIR)/anyapi.Tpo -c -o anyapi.lo `test -f '../src/api/anyapi.c' || echo '$(srcdir)/'`../src/api/anyapi.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/anyapi.Tpo $(DEPDIR)/anyapi.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/api/anyapi.c' object='anyapi.lo' libtool=yes @AMDEPBACKSLASH@
+system.lo: ../src/main/system.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT system.lo -MD -MP -MF $(DEPDIR)/system.Tpo -c -o system.lo `test -f '../src/main/system.c' || echo '$(srcdir)/'`../src/main/system.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/system.Tpo $(DEPDIR)/system.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/system.c' object='system.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o anyapi.lo `test -f '../src/api/anyapi.c' || echo '$(srcdir)/'`../src/api/anyapi.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o system.lo `test -f '../src/main/system.c' || echo '$(srcdir)/'`../src/main/system.c
 
-arrayapi.lo: ../src/api/arrayapi.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arrayapi.lo -MD -MP -MF $(DEPDIR)/arrayapi.Tpo -c -o arrayapi.lo `test -f '../src/api/arrayapi.c' || echo '$(srcdir)/'`../src/api/arrayapi.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/arrayapi.Tpo $(DEPDIR)/arrayapi.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/api/arrayapi.c' object='arrayapi.lo' libtool=yes @AMDEPBACKSLASH@
+objectdbms.lo: ../src/main/objectdbms.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT objectdbms.lo -MD -MP -MF $(DEPDIR)/objectdbms.Tpo -c -o objectdbms.lo `test -f '../src/main/objectdbms.c' || echo '$(srcdir)/'`../src/main/objectdbms.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/objectdbms.Tpo $(DEPDIR)/objectdbms.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/objectdbms.c' object='objectdbms.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arrayapi.lo `test -f '../src/api/arrayapi.c' || echo '$(srcdir)/'`../src/api/arrayapi.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o objectdbms.lo `test -f '../src/main/objectdbms.c' || echo '$(srcdir)/'`../src/main/objectdbms.c
 
-bytesapi.lo: ../src/api/bytesapi.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bytesapi.lo -MD -MP -MF $(DEPDIR)/bytesapi.Tpo -c -o bytesapi.lo `test -f '../src/api/bytesapi.c' || echo '$(srcdir)/'`../src/api/bytesapi.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bytesapi.Tpo $(DEPDIR)/bytesapi.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/api/bytesapi.c' object='bytesapi.lo' libtool=yes @AMDEPBACKSLASH@
+typesystem.lo: ../src/main/typesystem.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT typesystem.lo -MD -MP -MF $(DEPDIR)/typesystem.Tpo -c -o typesystem.lo `test -f '../src/main/typesystem.c' || echo '$(srcdir)/'`../src/main/typesystem.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/typesystem.Tpo $(DEPDIR)/typesystem.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/typesystem.c' object='typesystem.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bytesapi.lo `test -f '../src/api/bytesapi.c' || echo '$(srcdir)/'`../src/api/bytesapi.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o typesystem.lo `test -f '../src/main/typesystem.c' || echo '$(srcdir)/'`../src/main/typesystem.c
 
-dbapi.lo: ../src/api/dbapi.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT dbapi.lo -MD -MP -MF $(DEPDIR)/dbapi.Tpo -c -o dbapi.lo `test -f '../src/api/dbapi.c' || echo '$(srcdir)/'`../src/api/dbapi.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/dbapi.Tpo $(DEPDIR)/dbapi.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/api/dbapi.c' object='dbapi.lo' libtool=yes @AMDEPBACKSLASH@
+memory.lo: ../src/main/memory.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT memory.lo -MD -MP -MF $(DEPDIR)/memory.Tpo -c -o memory.lo `test -f '../src/main/memory.c' || echo '$(srcdir)/'`../src/main/memory.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/memory.Tpo $(DEPDIR)/memory.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/memory.c' object='memory.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o dbapi.lo `test -f '../src/api/dbapi.c' || echo '$(srcdir)/'`../src/api/dbapi.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o memory.lo `test -f '../src/main/memory.c' || echo '$(srcdir)/'`../src/main/memory.c
 
-dictapi.lo: ../src/api/dictapi.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT dictapi.lo -MD -MP -MF $(DEPDIR)/dictapi.Tpo -c -o dictapi.lo `test -f '../src/api/dictapi.c' || echo '$(srcdir)/'`../src/api/dictapi.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/dictapi.Tpo $(DEPDIR)/dictapi.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/api/dictapi.c' object='dictapi.lo' libtool=yes @AMDEPBACKSLASH@
+konoha_api.lo: ../src/main/konoha_api.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT konoha_api.lo -MD -MP -MF $(DEPDIR)/konoha_api.Tpo -c -o konoha_api.lo `test -f '../src/main/konoha_api.c' || echo '$(srcdir)/'`../src/main/konoha_api.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/konoha_api.Tpo $(DEPDIR)/konoha_api.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/konoha_api.c' object='konoha_api.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o dictapi.lo `test -f '../src/api/dictapi.c' || echo '$(srcdir)/'`../src/api/dictapi.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o konoha_api.lo `test -f '../src/main/konoha_api.c' || echo '$(srcdir)/'`../src/main/konoha_api.c
+
+konoha_ext.lo: ../src/main/konoha_ext.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT konoha_ext.lo -MD -MP -MF $(DEPDIR)/konoha_ext.Tpo -c -o konoha_ext.lo `test -f '../src/main/konoha_ext.c' || echo '$(srcdir)/'`../src/main/konoha_ext.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/konoha_ext.Tpo $(DEPDIR)/konoha_ext.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/konoha_ext.c' object='konoha_ext.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o konoha_ext.lo `test -f '../src/main/konoha_ext.c' || echo '$(srcdir)/'`../src/main/konoha_ext.c
+
+systemtable.lo: ../src/main/systemtable.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT systemtable.lo -MD -MP -MF $(DEPDIR)/systemtable.Tpo -c -o systemtable.lo `test -f '../src/main/systemtable.c' || echo '$(srcdir)/'`../src/main/systemtable.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/systemtable.Tpo $(DEPDIR)/systemtable.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/systemtable.c' object='systemtable.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o systemtable.lo `test -f '../src/main/systemtable.c' || echo '$(srcdir)/'`../src/main/systemtable.c
+
+security.lo: ../src/main/security.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT security.lo -MD -MP -MF $(DEPDIR)/security.Tpo -c -o security.lo `test -f '../src/main/security.c' || echo '$(srcdir)/'`../src/main/security.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/security.Tpo $(DEPDIR)/security.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/security.c' object='security.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o security.lo `test -f '../src/main/security.c' || echo '$(srcdir)/'`../src/main/security.c
+
+classapi.lo: ../src/main/classapi.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT classapi.lo -MD -MP -MF $(DEPDIR)/classapi.Tpo -c -o classapi.lo `test -f '../src/main/classapi.c' || echo '$(srcdir)/'`../src/main/classapi.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/classapi.Tpo $(DEPDIR)/classapi.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/classapi.c' object='classapi.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o classapi.lo `test -f '../src/main/classapi.c' || echo '$(srcdir)/'`../src/main/classapi.c
+
+glue.lo: ../src/main/glue.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT glue.lo -MD -MP -MF $(DEPDIR)/glue.Tpo -c -o glue.lo `test -f '../src/main/glue.c' || echo '$(srcdir)/'`../src/main/glue.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/glue.Tpo $(DEPDIR)/glue.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/glue.c' object='glue.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o glue.lo `test -f '../src/main/glue.c' || echo '$(srcdir)/'`../src/main/glue.c
+
+exports.lo: ../src/main/exports.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT exports.lo -MD -MP -MF $(DEPDIR)/exports.Tpo -c -o exports.lo `test -f '../src/main/exports.c' || echo '$(srcdir)/'`../src/main/exports.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/exports.Tpo $(DEPDIR)/exports.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/exports.c' object='exports.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o exports.lo `test -f '../src/main/exports.c' || echo '$(srcdir)/'`../src/main/exports.c
+
+metadata.lo: ../src/main/metadata.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT metadata.lo -MD -MP -MF $(DEPDIR)/metadata.Tpo -c -o metadata.lo `test -f '../src/main/metadata.c' || echo '$(srcdir)/'`../src/main/metadata.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/metadata.Tpo $(DEPDIR)/metadata.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/metadata.c' object='metadata.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o metadata.lo `test -f '../src/main/metadata.c' || echo '$(srcdir)/'`../src/main/metadata.c
+
+logging.lo: ../src/main/logging.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT logging.lo -MD -MP -MF $(DEPDIR)/logging.Tpo -c -o logging.lo `test -f '../src/main/logging.c' || echo '$(srcdir)/'`../src/main/logging.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/logging.Tpo $(DEPDIR)/logging.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/logging.c' object='logging.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o logging.lo `test -f '../src/main/logging.c' || echo '$(srcdir)/'`../src/main/logging.c
+
+stack.lo: ../src/main/stack.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT stack.lo -MD -MP -MF $(DEPDIR)/stack.Tpo -c -o stack.lo `test -f '../src/main/stack.c' || echo '$(srcdir)/'`../src/main/stack.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/stack.Tpo $(DEPDIR)/stack.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/stack.c' object='stack.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o stack.lo `test -f '../src/main/stack.c' || echo '$(srcdir)/'`../src/main/stack.c
+
+konohadev_main.lo: ../src/konohadev_main.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT konohadev_main.lo -MD -MP -MF $(DEPDIR)/konohadev_main.Tpo -c -o konohadev_main.lo `test -f '../src/konohadev_main.c' || echo '$(srcdir)/'`../src/konohadev_main.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/konohadev_main.Tpo $(DEPDIR)/konohadev_main.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/konohadev_main.c' object='konohadev_main.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o konohadev_main.lo `test -f '../src/konohadev_main.c' || echo '$(srcdir)/'`../src/konohadev_main.c
+
+knh_Mapper.lo: ../src/class/knh_Mapper.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Mapper.lo -MD -MP -MF $(DEPDIR)/knh_Mapper.Tpo -c -o knh_Mapper.lo `test -f '../src/class/knh_Mapper.c' || echo '$(srcdir)/'`../src/class/knh_Mapper.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Mapper.Tpo $(DEPDIR)/knh_Mapper.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Mapper.c' object='knh_Mapper.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Mapper.lo `test -f '../src/class/knh_Mapper.c' || echo '$(srcdir)/'`../src/class/knh_Mapper.c
+
+knh_Array.lo: ../src/class/knh_Array.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Array.lo -MD -MP -MF $(DEPDIR)/knh_Array.Tpo -c -o knh_Array.lo `test -f '../src/class/knh_Array.c' || echo '$(srcdir)/'`../src/class/knh_Array.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Array.Tpo $(DEPDIR)/knh_Array.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Array.c' object='knh_Array.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Array.lo `test -f '../src/class/knh_Array.c' || echo '$(srcdir)/'`../src/class/knh_Array.c
+
+knh_NameSpace.lo: ../src/class/knh_NameSpace.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_NameSpace.lo -MD -MP -MF $(DEPDIR)/knh_NameSpace.Tpo -c -o knh_NameSpace.lo `test -f '../src/class/knh_NameSpace.c' || echo '$(srcdir)/'`../src/class/knh_NameSpace.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_NameSpace.Tpo $(DEPDIR)/knh_NameSpace.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_NameSpace.c' object='knh_NameSpace.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_NameSpace.lo `test -f '../src/class/knh_NameSpace.c' || echo '$(srcdir)/'`../src/class/knh_NameSpace.c
+
+knh_System.lo: ../src/class/knh_System.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_System.lo -MD -MP -MF $(DEPDIR)/knh_System.Tpo -c -o knh_System.lo `test -f '../src/class/knh_System.c' || echo '$(srcdir)/'`../src/class/knh_System.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_System.Tpo $(DEPDIR)/knh_System.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_System.c' object='knh_System.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_System.lo `test -f '../src/class/knh_System.c' || echo '$(srcdir)/'`../src/class/knh_System.c
+
+knh_OutputStream.lo: ../src/class/knh_OutputStream.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_OutputStream.lo -MD -MP -MF $(DEPDIR)/knh_OutputStream.Tpo -c -o knh_OutputStream.lo `test -f '../src/class/knh_OutputStream.c' || echo '$(srcdir)/'`../src/class/knh_OutputStream.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_OutputStream.Tpo $(DEPDIR)/knh_OutputStream.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_OutputStream.c' object='knh_OutputStream.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_OutputStream.lo `test -f '../src/class/knh_OutputStream.c' || echo '$(srcdir)/'`../src/class/knh_OutputStream.c
+
+knh_Iterator.lo: ../src/class/knh_Iterator.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Iterator.lo -MD -MP -MF $(DEPDIR)/knh_Iterator.Tpo -c -o knh_Iterator.lo `test -f '../src/class/knh_Iterator.c' || echo '$(srcdir)/'`../src/class/knh_Iterator.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Iterator.Tpo $(DEPDIR)/knh_Iterator.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Iterator.c' object='knh_Iterator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Iterator.lo `test -f '../src/class/knh_Iterator.c' || echo '$(srcdir)/'`../src/class/knh_Iterator.c
+
+knh_Bytes.lo: ../src/class/knh_Bytes.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Bytes.lo -MD -MP -MF $(DEPDIR)/knh_Bytes.Tpo -c -o knh_Bytes.lo `test -f '../src/class/knh_Bytes.c' || echo '$(srcdir)/'`../src/class/knh_Bytes.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Bytes.Tpo $(DEPDIR)/knh_Bytes.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Bytes.c' object='knh_Bytes.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Bytes.lo `test -f '../src/class/knh_Bytes.c' || echo '$(srcdir)/'`../src/class/knh_Bytes.c
+
+knh_write.lo: ../src/class/knh_write.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_write.lo -MD -MP -MF $(DEPDIR)/knh_write.Tpo -c -o knh_write.lo `test -f '../src/class/knh_write.c' || echo '$(srcdir)/'`../src/class/knh_write.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_write.Tpo $(DEPDIR)/knh_write.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_write.c' object='knh_write.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_write.lo `test -f '../src/class/knh_write.c' || echo '$(srcdir)/'`../src/class/knh_write.c
+
+knh_Chardev.lo: ../src/class/knh_Chardev.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Chardev.lo -MD -MP -MF $(DEPDIR)/knh_Chardev.Tpo -c -o knh_Chardev.lo `test -f '../src/class/knh_Chardev.c' || echo '$(srcdir)/'`../src/class/knh_Chardev.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Chardev.Tpo $(DEPDIR)/knh_Chardev.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Chardev.c' object='knh_Chardev.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Chardev.lo `test -f '../src/class/knh_Chardev.c' || echo '$(srcdir)/'`../src/class/knh_Chardev.c
+
+knh_Class.lo: ../src/class/knh_Class.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Class.lo -MD -MP -MF $(DEPDIR)/knh_Class.Tpo -c -o knh_Class.lo `test -f '../src/class/knh_Class.c' || echo '$(srcdir)/'`../src/class/knh_Class.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Class.Tpo $(DEPDIR)/knh_Class.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Class.c' object='knh_Class.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Class.lo `test -f '../src/class/knh_Class.c' || echo '$(srcdir)/'`../src/class/knh_Class.c
+
+knh_Script.lo: ../src/class/knh_Script.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Script.lo -MD -MP -MF $(DEPDIR)/knh_Script.Tpo -c -o knh_Script.lo `test -f '../src/class/knh_Script.c' || echo '$(srcdir)/'`../src/class/knh_Script.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Script.Tpo $(DEPDIR)/knh_Script.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Script.c' object='knh_Script.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Script.lo `test -f '../src/class/knh_Script.c' || echo '$(srcdir)/'`../src/class/knh_Script.c
+
+knh_Object.lo: ../src/class/knh_Object.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Object.lo -MD -MP -MF $(DEPDIR)/knh_Object.Tpo -c -o knh_Object.lo `test -f '../src/class/knh_Object.c' || echo '$(srcdir)/'`../src/class/knh_Object.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Object.Tpo $(DEPDIR)/knh_Object.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Object.c' object='knh_Object.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Object.lo `test -f '../src/class/knh_Object.c' || echo '$(srcdir)/'`../src/class/knh_Object.c
+
+knh_String_mbytes.lo: ../src/class/knh_String_mbytes.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_String_mbytes.lo -MD -MP -MF $(DEPDIR)/knh_String_mbytes.Tpo -c -o knh_String_mbytes.lo `test -f '../src/class/knh_String_mbytes.c' || echo '$(srcdir)/'`../src/class/knh_String_mbytes.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_String_mbytes.Tpo $(DEPDIR)/knh_String_mbytes.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_String_mbytes.c' object='knh_String_mbytes.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_String_mbytes.lo `test -f '../src/class/knh_String_mbytes.c' || echo '$(srcdir)/'`../src/class/knh_String_mbytes.c
+
+knh_BytesConv.lo: ../src/class/knh_BytesConv.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_BytesConv.lo -MD -MP -MF $(DEPDIR)/knh_BytesConv.Tpo -c -o knh_BytesConv.lo `test -f '../src/class/knh_BytesConv.c' || echo '$(srcdir)/'`../src/class/knh_BytesConv.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_BytesConv.Tpo $(DEPDIR)/knh_BytesConv.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_BytesConv.c' object='knh_BytesConv.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_BytesConv.lo `test -f '../src/class/knh_BytesConv.c' || echo '$(srcdir)/'`../src/class/knh_BytesConv.c
+
+knh_Hash.lo: ../src/class/knh_Hash.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Hash.lo -MD -MP -MF $(DEPDIR)/knh_Hash.Tpo -c -o knh_Hash.lo `test -f '../src/class/knh_Hash.c' || echo '$(srcdir)/'`../src/class/knh_Hash.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Hash.Tpo $(DEPDIR)/knh_Hash.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Hash.c' object='knh_Hash.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Hash.lo `test -f '../src/class/knh_Hash.c' || echo '$(srcdir)/'`../src/class/knh_Hash.c
+
+knh_String.lo: ../src/class/knh_String.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_String.lo -MD -MP -MF $(DEPDIR)/knh_String.Tpo -c -o knh_String.lo `test -f '../src/class/knh_String.c' || echo '$(srcdir)/'`../src/class/knh_String.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_String.Tpo $(DEPDIR)/knh_String.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_String.c' object='knh_String.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_String.lo `test -f '../src/class/knh_String.c' || echo '$(srcdir)/'`../src/class/knh_String.c
+
+knh_InputStream.lo: ../src/class/knh_InputStream.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_InputStream.lo -MD -MP -MF $(DEPDIR)/knh_InputStream.Tpo -c -o knh_InputStream.lo `test -f '../src/class/knh_InputStream.c' || echo '$(srcdir)/'`../src/class/knh_InputStream.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_InputStream.Tpo $(DEPDIR)/knh_InputStream.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_InputStream.c' object='knh_InputStream.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_InputStream.lo `test -f '../src/class/knh_InputStream.c' || echo '$(srcdir)/'`../src/class/knh_InputStream.c
+
+knh_Closure.lo: ../src/class/knh_Closure.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Closure.lo -MD -MP -MF $(DEPDIR)/knh_Closure.Tpo -c -o knh_Closure.lo `test -f '../src/class/knh_Closure.c' || echo '$(srcdir)/'`../src/class/knh_Closure.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Closure.Tpo $(DEPDIR)/knh_Closure.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Closure.c' object='knh_Closure.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Closure.lo `test -f '../src/class/knh_Closure.c' || echo '$(srcdir)/'`../src/class/knh_Closure.c
+
+knh_DictMapSet.lo: ../src/class/knh_DictMapSet.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_DictMapSet.lo -MD -MP -MF $(DEPDIR)/knh_DictMapSet.Tpo -c -o knh_DictMapSet.lo `test -f '../src/class/knh_DictMapSet.c' || echo '$(srcdir)/'`../src/class/knh_DictMapSet.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_DictMapSet.Tpo $(DEPDIR)/knh_DictMapSet.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_DictMapSet.c' object='knh_DictMapSet.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_DictMapSet.lo `test -f '../src/class/knh_DictMapSet.c' || echo '$(srcdir)/'`../src/class/knh_DictMapSet.c
+
+knh_ResultSet.lo: ../src/class/knh_ResultSet.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_ResultSet.lo -MD -MP -MF $(DEPDIR)/knh_ResultSet.Tpo -c -o knh_ResultSet.lo `test -f '../src/class/knh_ResultSet.c' || echo '$(srcdir)/'`../src/class/knh_ResultSet.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_ResultSet.Tpo $(DEPDIR)/knh_ResultSet.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_ResultSet.c' object='knh_ResultSet.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_ResultSet.lo `test -f '../src/class/knh_ResultSet.c' || echo '$(srcdir)/'`../src/class/knh_ResultSet.c
+
+knh_DictIdx.lo: ../src/class/knh_DictIdx.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_DictIdx.lo -MD -MP -MF $(DEPDIR)/knh_DictIdx.Tpo -c -o knh_DictIdx.lo `test -f '../src/class/knh_DictIdx.c' || echo '$(srcdir)/'`../src/class/knh_DictIdx.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_DictIdx.Tpo $(DEPDIR)/knh_DictIdx.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_DictIdx.c' object='knh_DictIdx.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_DictIdx.lo `test -f '../src/class/knh_DictIdx.c' || echo '$(srcdir)/'`../src/class/knh_DictIdx.c
+
+knh_ClassSpec.lo: ../src/class/knh_ClassSpec.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_ClassSpec.lo -MD -MP -MF $(DEPDIR)/knh_ClassSpec.Tpo -c -o knh_ClassSpec.lo `test -f '../src/class/knh_ClassSpec.c' || echo '$(srcdir)/'`../src/class/knh_ClassSpec.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_ClassSpec.Tpo $(DEPDIR)/knh_ClassSpec.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_ClassSpec.c' object='knh_ClassSpec.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_ClassSpec.lo `test -f '../src/class/knh_ClassSpec.c' || echo '$(srcdir)/'`../src/class/knh_ClassSpec.c
+
+knh_Method.lo: ../src/class/knh_Method.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Method.lo -MD -MP -MF $(DEPDIR)/knh_Method.Tpo -c -o knh_Method.lo `test -f '../src/class/knh_Method.c' || echo '$(srcdir)/'`../src/class/knh_Method.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Method.Tpo $(DEPDIR)/knh_Method.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Method.c' object='knh_Method.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Method.lo `test -f '../src/class/knh_Method.c' || echo '$(srcdir)/'`../src/class/knh_Method.c
+
+knh_Connection.lo: ../src/class/knh_Connection.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Connection.lo -MD -MP -MF $(DEPDIR)/knh_Connection.Tpo -c -o knh_Connection.lo `test -f '../src/class/knh_Connection.c' || echo '$(srcdir)/'`../src/class/knh_Connection.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Connection.Tpo $(DEPDIR)/knh_Connection.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Connection.c' object='knh_Connection.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Connection.lo `test -f '../src/class/knh_Connection.c' || echo '$(srcdir)/'`../src/class/knh_Connection.c
+
+knh_bytes_t.lo: ../src/class/knh_bytes_t.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_bytes_t.lo -MD -MP -MF $(DEPDIR)/knh_bytes_t.Tpo -c -o knh_bytes_t.lo `test -f '../src/class/knh_bytes_t.c' || echo '$(srcdir)/'`../src/class/knh_bytes_t.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_bytes_t.Tpo $(DEPDIR)/knh_bytes_t.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_bytes_t.c' object='knh_bytes_t.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_bytes_t.lo `test -f '../src/class/knh_bytes_t.c' || echo '$(srcdir)/'`../src/class/knh_bytes_t.c
+
+knh_Exception.lo: ../src/class/knh_Exception.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Exception.lo -MD -MP -MF $(DEPDIR)/knh_Exception.Tpo -c -o knh_Exception.lo `test -f '../src/class/knh_Exception.c' || echo '$(srcdir)/'`../src/class/knh_Exception.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Exception.Tpo $(DEPDIR)/knh_Exception.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Exception.c' object='knh_Exception.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Exception.lo `test -f '../src/class/knh_Exception.c' || echo '$(srcdir)/'`../src/class/knh_Exception.c
+
+knh_Context.lo: ../src/class/knh_Context.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Context.lo -MD -MP -MF $(DEPDIR)/knh_Context.Tpo -c -o knh_Context.lo `test -f '../src/class/knh_Context.c' || echo '$(srcdir)/'`../src/class/knh_Context.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Context.Tpo $(DEPDIR)/knh_Context.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Context.c' object='knh_Context.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Context.lo `test -f '../src/class/knh_Context.c' || echo '$(srcdir)/'`../src/class/knh_Context.c
+
+knh_Number.lo: ../src/class/knh_Number.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Number.lo -MD -MP -MF $(DEPDIR)/knh_Number.Tpo -c -o knh_Number.lo `test -f '../src/class/knh_Number.c' || echo '$(srcdir)/'`../src/class/knh_Number.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Number.Tpo $(DEPDIR)/knh_Number.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Number.c' object='knh_Number.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Number.lo `test -f '../src/class/knh_Number.c' || echo '$(srcdir)/'`../src/class/knh_Number.c
+
+knh_type_t.lo: ../src/class/knh_type_t.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_type_t.lo -MD -MP -MF $(DEPDIR)/knh_type_t.Tpo -c -o knh_type_t.lo `test -f '../src/class/knh_type_t.c' || echo '$(srcdir)/'`../src/class/knh_type_t.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_type_t.Tpo $(DEPDIR)/knh_type_t.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_type_t.c' object='knh_type_t.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_type_t.lo `test -f '../src/class/knh_type_t.c' || echo '$(srcdir)/'`../src/class/knh_type_t.c
+
+mt19937-64.lo: ../src/ext/mt19937-64.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT mt19937-64.lo -MD -MP -MF $(DEPDIR)/mt19937-64.Tpo -c -o mt19937-64.lo `test -f '../src/ext/mt19937-64.c' || echo '$(srcdir)/'`../src/ext/mt19937-64.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/mt19937-64.Tpo $(DEPDIR)/mt19937-64.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/ext/mt19937-64.c' object='mt19937-64.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o mt19937-64.lo `test -f '../src/ext/mt19937-64.c' || echo '$(srcdir)/'`../src/ext/mt19937-64.c
+
+strerror.lo: ../src/ext/strerror.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT strerror.lo -MD -MP -MF $(DEPDIR)/strerror.Tpo -c -o strerror.lo `test -f '../src/ext/strerror.c' || echo '$(srcdir)/'`../src/ext/strerror.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/strerror.Tpo $(DEPDIR)/strerror.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/ext/strerror.c' object='strerror.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o strerror.lo `test -f '../src/ext/strerror.c' || echo '$(srcdir)/'`../src/ext/strerror.c
+
+qsort.lo: ../src/ext/qsort.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT qsort.lo -MD -MP -MF $(DEPDIR)/qsort.Tpo -c -o qsort.lo `test -f '../src/ext/qsort.c' || echo '$(srcdir)/'`../src/ext/qsort.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/qsort.Tpo $(DEPDIR)/qsort.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/ext/qsort.c' object='qsort.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o qsort.lo `test -f '../src/ext/qsort.c' || echo '$(srcdir)/'`../src/ext/qsort.c
+
+mt19937ar.lo: ../src/ext/mt19937ar.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT mt19937ar.lo -MD -MP -MF $(DEPDIR)/mt19937ar.Tpo -c -o mt19937ar.lo `test -f '../src/ext/mt19937ar.c' || echo '$(srcdir)/'`../src/ext/mt19937ar.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/mt19937ar.Tpo $(DEPDIR)/mt19937ar.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/ext/mt19937ar.c' object='mt19937ar.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o mt19937ar.lo `test -f '../src/ext/mt19937ar.c' || echo '$(srcdir)/'`../src/ext/mt19937ar.c
 
 hashapi.lo: ../src/api/hashapi.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT hashapi.lo -MD -MP -MF $(DEPDIR)/hashapi.Tpo -c -o hashapi.lo `test -f '../src/api/hashapi.c' || echo '$(srcdir)/'`../src/api/hashapi.c
@@ -746,27 +1049,6 @@ narutoapi.lo: ../src/api/narutoapi.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o narutoapi.lo `test -f '../src/api/narutoapi.c' || echo '$(srcdir)/'`../src/api/narutoapi.c
 
-numberapi.lo: ../src/api/numberapi.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT numberapi.lo -MD -MP -MF $(DEPDIR)/numberapi.Tpo -c -o numberapi.lo `test -f '../src/api/numberapi.c' || echo '$(srcdir)/'`../src/api/numberapi.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/numberapi.Tpo $(DEPDIR)/numberapi.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/api/numberapi.c' object='numberapi.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o numberapi.lo `test -f '../src/api/numberapi.c' || echo '$(srcdir)/'`../src/api/numberapi.c
-
-objectapi.lo: ../src/api/objectapi.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT objectapi.lo -MD -MP -MF $(DEPDIR)/objectapi.Tpo -c -o objectapi.lo `test -f '../src/api/objectapi.c' || echo '$(srcdir)/'`../src/api/objectapi.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/objectapi.Tpo $(DEPDIR)/objectapi.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/api/objectapi.c' object='objectapi.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o objectapi.lo `test -f '../src/api/objectapi.c' || echo '$(srcdir)/'`../src/api/objectapi.c
-
-streamapi.lo: ../src/api/streamapi.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT streamapi.lo -MD -MP -MF $(DEPDIR)/streamapi.Tpo -c -o streamapi.lo `test -f '../src/api/streamapi.c' || echo '$(srcdir)/'`../src/api/streamapi.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/streamapi.Tpo $(DEPDIR)/streamapi.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/api/streamapi.c' object='streamapi.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o streamapi.lo `test -f '../src/api/streamapi.c' || echo '$(srcdir)/'`../src/api/streamapi.c
-
 stringapi.lo: ../src/api/stringapi.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT stringapi.lo -MD -MP -MF $(DEPDIR)/stringapi.Tpo -c -o stringapi.lo `test -f '../src/api/stringapi.c' || echo '$(srcdir)/'`../src/api/stringapi.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/stringapi.Tpo $(DEPDIR)/stringapi.Plo
@@ -781,201 +1063,82 @@ systemapi.lo: ../src/api/systemapi.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o systemapi.lo `test -f '../src/api/systemapi.c' || echo '$(srcdir)/'`../src/api/systemapi.c
 
-knh_Array.lo: ../src/class/knh_Array.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Array.lo -MD -MP -MF $(DEPDIR)/knh_Array.Tpo -c -o knh_Array.lo `test -f '../src/class/knh_Array.c' || echo '$(srcdir)/'`../src/class/knh_Array.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Array.Tpo $(DEPDIR)/knh_Array.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Array.c' object='knh_Array.lo' libtool=yes @AMDEPBACKSLASH@
+arrayapi.lo: ../src/api/arrayapi.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arrayapi.lo -MD -MP -MF $(DEPDIR)/arrayapi.Tpo -c -o arrayapi.lo `test -f '../src/api/arrayapi.c' || echo '$(srcdir)/'`../src/api/arrayapi.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/arrayapi.Tpo $(DEPDIR)/arrayapi.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/api/arrayapi.c' object='arrayapi.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Array.lo `test -f '../src/class/knh_Array.c' || echo '$(srcdir)/'`../src/class/knh_Array.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arrayapi.lo `test -f '../src/api/arrayapi.c' || echo '$(srcdir)/'`../src/api/arrayapi.c
 
-knh_Bytes.lo: ../src/class/knh_Bytes.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Bytes.lo -MD -MP -MF $(DEPDIR)/knh_Bytes.Tpo -c -o knh_Bytes.lo `test -f '../src/class/knh_Bytes.c' || echo '$(srcdir)/'`../src/class/knh_Bytes.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Bytes.Tpo $(DEPDIR)/knh_Bytes.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Bytes.c' object='knh_Bytes.lo' libtool=yes @AMDEPBACKSLASH@
+dictapi.lo: ../src/api/dictapi.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT dictapi.lo -MD -MP -MF $(DEPDIR)/dictapi.Tpo -c -o dictapi.lo `test -f '../src/api/dictapi.c' || echo '$(srcdir)/'`../src/api/dictapi.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/dictapi.Tpo $(DEPDIR)/dictapi.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/api/dictapi.c' object='dictapi.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Bytes.lo `test -f '../src/class/knh_Bytes.c' || echo '$(srcdir)/'`../src/class/knh_Bytes.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o dictapi.lo `test -f '../src/api/dictapi.c' || echo '$(srcdir)/'`../src/api/dictapi.c
 
-knh_bytes_t.lo: ../src/class/knh_bytes_t.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_bytes_t.lo -MD -MP -MF $(DEPDIR)/knh_bytes_t.Tpo -c -o knh_bytes_t.lo `test -f '../src/class/knh_bytes_t.c' || echo '$(srcdir)/'`../src/class/knh_bytes_t.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_bytes_t.Tpo $(DEPDIR)/knh_bytes_t.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_bytes_t.c' object='knh_bytes_t.lo' libtool=yes @AMDEPBACKSLASH@
+objectapi.lo: ../src/api/objectapi.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT objectapi.lo -MD -MP -MF $(DEPDIR)/objectapi.Tpo -c -o objectapi.lo `test -f '../src/api/objectapi.c' || echo '$(srcdir)/'`../src/api/objectapi.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/objectapi.Tpo $(DEPDIR)/objectapi.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/api/objectapi.c' object='objectapi.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_bytes_t.lo `test -f '../src/class/knh_bytes_t.c' || echo '$(srcdir)/'`../src/class/knh_bytes_t.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o objectapi.lo `test -f '../src/api/objectapi.c' || echo '$(srcdir)/'`../src/api/objectapi.c
 
-knh_BytesConv.lo: ../src/class/knh_BytesConv.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_BytesConv.lo -MD -MP -MF $(DEPDIR)/knh_BytesConv.Tpo -c -o knh_BytesConv.lo `test -f '../src/class/knh_BytesConv.c' || echo '$(srcdir)/'`../src/class/knh_BytesConv.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_BytesConv.Tpo $(DEPDIR)/knh_BytesConv.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_BytesConv.c' object='knh_BytesConv.lo' libtool=yes @AMDEPBACKSLASH@
+dbapi.lo: ../src/api/dbapi.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT dbapi.lo -MD -MP -MF $(DEPDIR)/dbapi.Tpo -c -o dbapi.lo `test -f '../src/api/dbapi.c' || echo '$(srcdir)/'`../src/api/dbapi.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/dbapi.Tpo $(DEPDIR)/dbapi.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/api/dbapi.c' object='dbapi.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_BytesConv.lo `test -f '../src/class/knh_BytesConv.c' || echo '$(srcdir)/'`../src/class/knh_BytesConv.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o dbapi.lo `test -f '../src/api/dbapi.c' || echo '$(srcdir)/'`../src/api/dbapi.c
 
-knh_Class.lo: ../src/class/knh_Class.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Class.lo -MD -MP -MF $(DEPDIR)/knh_Class.Tpo -c -o knh_Class.lo `test -f '../src/class/knh_Class.c' || echo '$(srcdir)/'`../src/class/knh_Class.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Class.Tpo $(DEPDIR)/knh_Class.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Class.c' object='knh_Class.lo' libtool=yes @AMDEPBACKSLASH@
+streamapi.lo: ../src/api/streamapi.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT streamapi.lo -MD -MP -MF $(DEPDIR)/streamapi.Tpo -c -o streamapi.lo `test -f '../src/api/streamapi.c' || echo '$(srcdir)/'`../src/api/streamapi.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/streamapi.Tpo $(DEPDIR)/streamapi.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/api/streamapi.c' object='streamapi.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Class.lo `test -f '../src/class/knh_Class.c' || echo '$(srcdir)/'`../src/class/knh_Class.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o streamapi.lo `test -f '../src/api/streamapi.c' || echo '$(srcdir)/'`../src/api/streamapi.c
 
-knh_ClassSpec.lo: ../src/class/knh_ClassSpec.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_ClassSpec.lo -MD -MP -MF $(DEPDIR)/knh_ClassSpec.Tpo -c -o knh_ClassSpec.lo `test -f '../src/class/knh_ClassSpec.c' || echo '$(srcdir)/'`../src/class/knh_ClassSpec.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_ClassSpec.Tpo $(DEPDIR)/knh_ClassSpec.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_ClassSpec.c' object='knh_ClassSpec.lo' libtool=yes @AMDEPBACKSLASH@
+numberapi.lo: ../src/api/numberapi.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT numberapi.lo -MD -MP -MF $(DEPDIR)/numberapi.Tpo -c -o numberapi.lo `test -f '../src/api/numberapi.c' || echo '$(srcdir)/'`../src/api/numberapi.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/numberapi.Tpo $(DEPDIR)/numberapi.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/api/numberapi.c' object='numberapi.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_ClassSpec.lo `test -f '../src/class/knh_ClassSpec.c' || echo '$(srcdir)/'`../src/class/knh_ClassSpec.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o numberapi.lo `test -f '../src/api/numberapi.c' || echo '$(srcdir)/'`../src/api/numberapi.c
 
-knh_Closure.lo: ../src/class/knh_Closure.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Closure.lo -MD -MP -MF $(DEPDIR)/knh_Closure.Tpo -c -o knh_Closure.lo `test -f '../src/class/knh_Closure.c' || echo '$(srcdir)/'`../src/class/knh_Closure.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Closure.Tpo $(DEPDIR)/knh_Closure.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Closure.c' object='knh_Closure.lo' libtool=yes @AMDEPBACKSLASH@
+bytesapi.lo: ../src/api/bytesapi.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT bytesapi.lo -MD -MP -MF $(DEPDIR)/bytesapi.Tpo -c -o bytesapi.lo `test -f '../src/api/bytesapi.c' || echo '$(srcdir)/'`../src/api/bytesapi.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/bytesapi.Tpo $(DEPDIR)/bytesapi.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/api/bytesapi.c' object='bytesapi.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Closure.lo `test -f '../src/class/knh_Closure.c' || echo '$(srcdir)/'`../src/class/knh_Closure.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o bytesapi.lo `test -f '../src/api/bytesapi.c' || echo '$(srcdir)/'`../src/api/bytesapi.c
 
-knh_Connection.lo: ../src/class/knh_Connection.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Connection.lo -MD -MP -MF $(DEPDIR)/knh_Connection.Tpo -c -o knh_Connection.lo `test -f '../src/class/knh_Connection.c' || echo '$(srcdir)/'`../src/class/knh_Connection.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Connection.Tpo $(DEPDIR)/knh_Connection.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Connection.c' object='knh_Connection.lo' libtool=yes @AMDEPBACKSLASH@
+anyapi.lo: ../src/api/anyapi.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT anyapi.lo -MD -MP -MF $(DEPDIR)/anyapi.Tpo -c -o anyapi.lo `test -f '../src/api/anyapi.c' || echo '$(srcdir)/'`../src/api/anyapi.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/anyapi.Tpo $(DEPDIR)/anyapi.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/api/anyapi.c' object='anyapi.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Connection.lo `test -f '../src/class/knh_Connection.c' || echo '$(srcdir)/'`../src/class/knh_Connection.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o anyapi.lo `test -f '../src/api/anyapi.c' || echo '$(srcdir)/'`../src/api/anyapi.c
 
-knh_Context.lo: ../src/class/knh_Context.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Context.lo -MD -MP -MF $(DEPDIR)/knh_Context.Tpo -c -o knh_Context.lo `test -f '../src/class/knh_Context.c' || echo '$(srcdir)/'`../src/class/knh_Context.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Context.Tpo $(DEPDIR)/knh_Context.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Context.c' object='knh_Context.lo' libtool=yes @AMDEPBACKSLASH@
+token.lo: ../src/compiler/token.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT token.lo -MD -MP -MF $(DEPDIR)/token.Tpo -c -o token.lo `test -f '../src/compiler/token.c' || echo '$(srcdir)/'`../src/compiler/token.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/token.Tpo $(DEPDIR)/token.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/compiler/token.c' object='token.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Context.lo `test -f '../src/class/knh_Context.c' || echo '$(srcdir)/'`../src/class/knh_Context.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o token.lo `test -f '../src/compiler/token.c' || echo '$(srcdir)/'`../src/compiler/token.c
 
-knh_DictIdx.lo: ../src/class/knh_DictIdx.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_DictIdx.lo -MD -MP -MF $(DEPDIR)/knh_DictIdx.Tpo -c -o knh_DictIdx.lo `test -f '../src/class/knh_DictIdx.c' || echo '$(srcdir)/'`../src/class/knh_DictIdx.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_DictIdx.Tpo $(DEPDIR)/knh_DictIdx.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_DictIdx.c' object='knh_DictIdx.lo' libtool=yes @AMDEPBACKSLASH@
+perror.lo: ../src/compiler/perror.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT perror.lo -MD -MP -MF $(DEPDIR)/perror.Tpo -c -o perror.lo `test -f '../src/compiler/perror.c' || echo '$(srcdir)/'`../src/compiler/perror.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/perror.Tpo $(DEPDIR)/perror.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/compiler/perror.c' object='perror.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_DictIdx.lo `test -f '../src/class/knh_DictIdx.c' || echo '$(srcdir)/'`../src/class/knh_DictIdx.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o perror.lo `test -f '../src/compiler/perror.c' || echo '$(srcdir)/'`../src/compiler/perror.c
 
-knh_DictMapSet.lo: ../src/class/knh_DictMapSet.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_DictMapSet.lo -MD -MP -MF $(DEPDIR)/knh_DictMapSet.Tpo -c -o knh_DictMapSet.lo `test -f '../src/class/knh_DictMapSet.c' || echo '$(srcdir)/'`../src/class/knh_DictMapSet.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_DictMapSet.Tpo $(DEPDIR)/knh_DictMapSet.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_DictMapSet.c' object='knh_DictMapSet.lo' libtool=yes @AMDEPBACKSLASH@
+parser.lo: ../src/compiler/parser.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT parser.lo -MD -MP -MF $(DEPDIR)/parser.Tpo -c -o parser.lo `test -f '../src/compiler/parser.c' || echo '$(srcdir)/'`../src/compiler/parser.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/parser.Tpo $(DEPDIR)/parser.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/compiler/parser.c' object='parser.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_DictMapSet.lo `test -f '../src/class/knh_DictMapSet.c' || echo '$(srcdir)/'`../src/class/knh_DictMapSet.c
-
-knh_Exception.lo: ../src/class/knh_Exception.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Exception.lo -MD -MP -MF $(DEPDIR)/knh_Exception.Tpo -c -o knh_Exception.lo `test -f '../src/class/knh_Exception.c' || echo '$(srcdir)/'`../src/class/knh_Exception.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Exception.Tpo $(DEPDIR)/knh_Exception.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Exception.c' object='knh_Exception.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Exception.lo `test -f '../src/class/knh_Exception.c' || echo '$(srcdir)/'`../src/class/knh_Exception.c
-
-knh_Hash.lo: ../src/class/knh_Hash.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Hash.lo -MD -MP -MF $(DEPDIR)/knh_Hash.Tpo -c -o knh_Hash.lo `test -f '../src/class/knh_Hash.c' || echo '$(srcdir)/'`../src/class/knh_Hash.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Hash.Tpo $(DEPDIR)/knh_Hash.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Hash.c' object='knh_Hash.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Hash.lo `test -f '../src/class/knh_Hash.c' || echo '$(srcdir)/'`../src/class/knh_Hash.c
-
-knh_InputStream.lo: ../src/class/knh_InputStream.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_InputStream.lo -MD -MP -MF $(DEPDIR)/knh_InputStream.Tpo -c -o knh_InputStream.lo `test -f '../src/class/knh_InputStream.c' || echo '$(srcdir)/'`../src/class/knh_InputStream.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_InputStream.Tpo $(DEPDIR)/knh_InputStream.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_InputStream.c' object='knh_InputStream.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_InputStream.lo `test -f '../src/class/knh_InputStream.c' || echo '$(srcdir)/'`../src/class/knh_InputStream.c
-
-knh_Iterator.lo: ../src/class/knh_Iterator.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Iterator.lo -MD -MP -MF $(DEPDIR)/knh_Iterator.Tpo -c -o knh_Iterator.lo `test -f '../src/class/knh_Iterator.c' || echo '$(srcdir)/'`../src/class/knh_Iterator.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Iterator.Tpo $(DEPDIR)/knh_Iterator.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Iterator.c' object='knh_Iterator.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Iterator.lo `test -f '../src/class/knh_Iterator.c' || echo '$(srcdir)/'`../src/class/knh_Iterator.c
-
-knh_Mapper.lo: ../src/class/knh_Mapper.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Mapper.lo -MD -MP -MF $(DEPDIR)/knh_Mapper.Tpo -c -o knh_Mapper.lo `test -f '../src/class/knh_Mapper.c' || echo '$(srcdir)/'`../src/class/knh_Mapper.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Mapper.Tpo $(DEPDIR)/knh_Mapper.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Mapper.c' object='knh_Mapper.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Mapper.lo `test -f '../src/class/knh_Mapper.c' || echo '$(srcdir)/'`../src/class/knh_Mapper.c
-
-knh_Method.lo: ../src/class/knh_Method.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Method.lo -MD -MP -MF $(DEPDIR)/knh_Method.Tpo -c -o knh_Method.lo `test -f '../src/class/knh_Method.c' || echo '$(srcdir)/'`../src/class/knh_Method.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Method.Tpo $(DEPDIR)/knh_Method.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Method.c' object='knh_Method.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Method.lo `test -f '../src/class/knh_Method.c' || echo '$(srcdir)/'`../src/class/knh_Method.c
-
-knh_NameSpace.lo: ../src/class/knh_NameSpace.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_NameSpace.lo -MD -MP -MF $(DEPDIR)/knh_NameSpace.Tpo -c -o knh_NameSpace.lo `test -f '../src/class/knh_NameSpace.c' || echo '$(srcdir)/'`../src/class/knh_NameSpace.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_NameSpace.Tpo $(DEPDIR)/knh_NameSpace.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_NameSpace.c' object='knh_NameSpace.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_NameSpace.lo `test -f '../src/class/knh_NameSpace.c' || echo '$(srcdir)/'`../src/class/knh_NameSpace.c
-
-knh_Number.lo: ../src/class/knh_Number.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Number.lo -MD -MP -MF $(DEPDIR)/knh_Number.Tpo -c -o knh_Number.lo `test -f '../src/class/knh_Number.c' || echo '$(srcdir)/'`../src/class/knh_Number.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Number.Tpo $(DEPDIR)/knh_Number.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Number.c' object='knh_Number.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Number.lo `test -f '../src/class/knh_Number.c' || echo '$(srcdir)/'`../src/class/knh_Number.c
-
-knh_Object.lo: ../src/class/knh_Object.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Object.lo -MD -MP -MF $(DEPDIR)/knh_Object.Tpo -c -o knh_Object.lo `test -f '../src/class/knh_Object.c' || echo '$(srcdir)/'`../src/class/knh_Object.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Object.Tpo $(DEPDIR)/knh_Object.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Object.c' object='knh_Object.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Object.lo `test -f '../src/class/knh_Object.c' || echo '$(srcdir)/'`../src/class/knh_Object.c
-
-knh_OutputStream.lo: ../src/class/knh_OutputStream.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_OutputStream.lo -MD -MP -MF $(DEPDIR)/knh_OutputStream.Tpo -c -o knh_OutputStream.lo `test -f '../src/class/knh_OutputStream.c' || echo '$(srcdir)/'`../src/class/knh_OutputStream.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_OutputStream.Tpo $(DEPDIR)/knh_OutputStream.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_OutputStream.c' object='knh_OutputStream.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_OutputStream.lo `test -f '../src/class/knh_OutputStream.c' || echo '$(srcdir)/'`../src/class/knh_OutputStream.c
-
-knh_ResultSet.lo: ../src/class/knh_ResultSet.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_ResultSet.lo -MD -MP -MF $(DEPDIR)/knh_ResultSet.Tpo -c -o knh_ResultSet.lo `test -f '../src/class/knh_ResultSet.c' || echo '$(srcdir)/'`../src/class/knh_ResultSet.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_ResultSet.Tpo $(DEPDIR)/knh_ResultSet.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_ResultSet.c' object='knh_ResultSet.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_ResultSet.lo `test -f '../src/class/knh_ResultSet.c' || echo '$(srcdir)/'`../src/class/knh_ResultSet.c
-
-knh_Script.lo: ../src/class/knh_Script.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_Script.lo -MD -MP -MF $(DEPDIR)/knh_Script.Tpo -c -o knh_Script.lo `test -f '../src/class/knh_Script.c' || echo '$(srcdir)/'`../src/class/knh_Script.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_Script.Tpo $(DEPDIR)/knh_Script.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_Script.c' object='knh_Script.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_Script.lo `test -f '../src/class/knh_Script.c' || echo '$(srcdir)/'`../src/class/knh_Script.c
-
-knh_String.lo: ../src/class/knh_String.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_String.lo -MD -MP -MF $(DEPDIR)/knh_String.Tpo -c -o knh_String.lo `test -f '../src/class/knh_String.c' || echo '$(srcdir)/'`../src/class/knh_String.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_String.Tpo $(DEPDIR)/knh_String.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_String.c' object='knh_String.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_String.lo `test -f '../src/class/knh_String.c' || echo '$(srcdir)/'`../src/class/knh_String.c
-
-knh_String_mbytes.lo: ../src/class/knh_String_mbytes.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_String_mbytes.lo -MD -MP -MF $(DEPDIR)/knh_String_mbytes.Tpo -c -o knh_String_mbytes.lo `test -f '../src/class/knh_String_mbytes.c' || echo '$(srcdir)/'`../src/class/knh_String_mbytes.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_String_mbytes.Tpo $(DEPDIR)/knh_String_mbytes.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_String_mbytes.c' object='knh_String_mbytes.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_String_mbytes.lo `test -f '../src/class/knh_String_mbytes.c' || echo '$(srcdir)/'`../src/class/knh_String_mbytes.c
-
-knh_System.lo: ../src/class/knh_System.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_System.lo -MD -MP -MF $(DEPDIR)/knh_System.Tpo -c -o knh_System.lo `test -f '../src/class/knh_System.c' || echo '$(srcdir)/'`../src/class/knh_System.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_System.Tpo $(DEPDIR)/knh_System.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_System.c' object='knh_System.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_System.lo `test -f '../src/class/knh_System.c' || echo '$(srcdir)/'`../src/class/knh_System.c
-
-knh_type_t.lo: ../src/class/knh_type_t.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_type_t.lo -MD -MP -MF $(DEPDIR)/knh_type_t.Tpo -c -o knh_type_t.lo `test -f '../src/class/knh_type_t.c' || echo '$(srcdir)/'`../src/class/knh_type_t.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_type_t.Tpo $(DEPDIR)/knh_type_t.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_type_t.c' object='knh_type_t.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_type_t.lo `test -f '../src/class/knh_type_t.c' || echo '$(srcdir)/'`../src/class/knh_type_t.c
-
-knh_write.lo: ../src/class/knh_write.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT knh_write.lo -MD -MP -MF $(DEPDIR)/knh_write.Tpo -c -o knh_write.lo `test -f '../src/class/knh_write.c' || echo '$(srcdir)/'`../src/class/knh_write.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/knh_write.Tpo $(DEPDIR)/knh_write.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/class/knh_write.c' object='knh_write.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o knh_write.lo `test -f '../src/class/knh_write.c' || echo '$(srcdir)/'`../src/class/knh_write.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o parser.lo `test -f '../src/compiler/parser.c' || echo '$(srcdir)/'`../src/compiler/parser.c
 
 asm.lo: ../src/compiler/asm.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT asm.lo -MD -MP -MF $(DEPDIR)/asm.Tpo -c -o asm.lo `test -f '../src/compiler/asm.c' || echo '$(srcdir)/'`../src/compiler/asm.c
@@ -991,26 +1154,12 @@ kcode.lo: ../src/compiler/kcode.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o kcode.lo `test -f '../src/compiler/kcode.c' || echo '$(srcdir)/'`../src/compiler/kcode.c
 
-konohac.lo: ../src/compiler/konohac.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT konohac.lo -MD -MP -MF $(DEPDIR)/konohac.Tpo -c -o konohac.lo `test -f '../src/compiler/konohac.c' || echo '$(srcdir)/'`../src/compiler/konohac.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/konohac.Tpo $(DEPDIR)/konohac.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/compiler/konohac.c' object='konohac.lo' libtool=yes @AMDEPBACKSLASH@
+typing.lo: ../src/compiler/typing.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT typing.lo -MD -MP -MF $(DEPDIR)/typing.Tpo -c -o typing.lo `test -f '../src/compiler/typing.c' || echo '$(srcdir)/'`../src/compiler/typing.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/typing.Tpo $(DEPDIR)/typing.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/compiler/typing.c' object='typing.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o konohac.lo `test -f '../src/compiler/konohac.c' || echo '$(srcdir)/'`../src/compiler/konohac.c
-
-parser.lo: ../src/compiler/parser.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT parser.lo -MD -MP -MF $(DEPDIR)/parser.Tpo -c -o parser.lo `test -f '../src/compiler/parser.c' || echo '$(srcdir)/'`../src/compiler/parser.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/parser.Tpo $(DEPDIR)/parser.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/compiler/parser.c' object='parser.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o parser.lo `test -f '../src/compiler/parser.c' || echo '$(srcdir)/'`../src/compiler/parser.c
-
-perror.lo: ../src/compiler/perror.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT perror.lo -MD -MP -MF $(DEPDIR)/perror.Tpo -c -o perror.lo `test -f '../src/compiler/perror.c' || echo '$(srcdir)/'`../src/compiler/perror.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/perror.Tpo $(DEPDIR)/perror.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/compiler/perror.c' object='perror.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o perror.lo `test -f '../src/compiler/perror.c' || echo '$(srcdir)/'`../src/compiler/perror.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o typing.lo `test -f '../src/compiler/typing.c' || echo '$(srcdir)/'`../src/compiler/typing.c
 
 stmt.lo: ../src/compiler/stmt.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT stmt.lo -MD -MP -MF $(DEPDIR)/stmt.Tpo -c -o stmt.lo `test -f '../src/compiler/stmt.c' || echo '$(srcdir)/'`../src/compiler/stmt.c
@@ -1019,13 +1168,6 @@ stmt.lo: ../src/compiler/stmt.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o stmt.lo `test -f '../src/compiler/stmt.c' || echo '$(srcdir)/'`../src/compiler/stmt.c
 
-token.lo: ../src/compiler/token.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT token.lo -MD -MP -MF $(DEPDIR)/token.Tpo -c -o token.lo `test -f '../src/compiler/token.c' || echo '$(srcdir)/'`../src/compiler/token.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/token.Tpo $(DEPDIR)/token.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/compiler/token.c' object='token.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o token.lo `test -f '../src/compiler/token.c' || echo '$(srcdir)/'`../src/compiler/token.c
-
 tokenizer.lo: ../src/compiler/tokenizer.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tokenizer.lo -MD -MP -MF $(DEPDIR)/tokenizer.Tpo -c -o tokenizer.lo `test -f '../src/compiler/tokenizer.c' || echo '$(srcdir)/'`../src/compiler/tokenizer.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/tokenizer.Tpo $(DEPDIR)/tokenizer.Plo
@@ -1033,117 +1175,19 @@ tokenizer.lo: ../src/compiler/tokenizer.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tokenizer.lo `test -f '../src/compiler/tokenizer.c' || echo '$(srcdir)/'`../src/compiler/tokenizer.c
 
-typing.lo: ../src/compiler/typing.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT typing.lo -MD -MP -MF $(DEPDIR)/typing.Tpo -c -o typing.lo `test -f '../src/compiler/typing.c' || echo '$(srcdir)/'`../src/compiler/typing.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/typing.Tpo $(DEPDIR)/typing.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/compiler/typing.c' object='typing.lo' libtool=yes @AMDEPBACKSLASH@
+konohac.lo: ../src/compiler/konohac.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT konohac.lo -MD -MP -MF $(DEPDIR)/konohac.Tpo -c -o konohac.lo `test -f '../src/compiler/konohac.c' || echo '$(srcdir)/'`../src/compiler/konohac.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/konohac.Tpo $(DEPDIR)/konohac.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/compiler/konohac.c' object='konohac.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o typing.lo `test -f '../src/compiler/typing.c' || echo '$(srcdir)/'`../src/compiler/typing.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o konohac.lo `test -f '../src/compiler/konohac.c' || echo '$(srcdir)/'`../src/compiler/konohac.c
 
-dlopen.lo: ../src/deps/dlopen.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT dlopen.lo -MD -MP -MF $(DEPDIR)/dlopen.Tpo -c -o dlopen.lo `test -f '../src/deps/dlopen.c' || echo '$(srcdir)/'`../src/deps/dlopen.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/dlopen.Tpo $(DEPDIR)/dlopen.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/dlopen.c' object='dlopen.lo' libtool=yes @AMDEPBACKSLASH@
+b4.lo: ../src/labs/b4.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT b4.lo -MD -MP -MF $(DEPDIR)/b4.Tpo -c -o b4.lo `test -f '../src/labs/b4.c' || echo '$(srcdir)/'`../src/labs/b4.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/b4.Tpo $(DEPDIR)/b4.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/labs/b4.c' object='b4.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o dlopen.lo `test -f '../src/deps/dlopen.c' || echo '$(srcdir)/'`../src/deps/dlopen.c
-
-fileio.lo: ../src/deps/fileio.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fileio.lo -MD -MP -MF $(DEPDIR)/fileio.Tpo -c -o fileio.lo `test -f '../src/deps/fileio.c' || echo '$(srcdir)/'`../src/deps/fileio.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fileio.Tpo $(DEPDIR)/fileio.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/fileio.c' object='fileio.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fileio.lo `test -f '../src/deps/fileio.c' || echo '$(srcdir)/'`../src/deps/fileio.c
-
-filesystem.lo: ../src/deps/filesystem.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT filesystem.lo -MD -MP -MF $(DEPDIR)/filesystem.Tpo -c -o filesystem.lo `test -f '../src/deps/filesystem.c' || echo '$(srcdir)/'`../src/deps/filesystem.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/filesystem.Tpo $(DEPDIR)/filesystem.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/filesystem.c' object='filesystem.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o filesystem.lo `test -f '../src/deps/filesystem.c' || echo '$(srcdir)/'`../src/deps/filesystem.c
-
-locale.lo: ../src/deps/locale.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT locale.lo -MD -MP -MF $(DEPDIR)/locale.Tpo -c -o locale.lo `test -f '../src/deps/locale.c' || echo '$(srcdir)/'`../src/deps/locale.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/locale.Tpo $(DEPDIR)/locale.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/locale.c' object='locale.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o locale.lo `test -f '../src/deps/locale.c' || echo '$(srcdir)/'`../src/deps/locale.c
-
-regex.lo: ../src/deps/regex.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT regex.lo -MD -MP -MF $(DEPDIR)/regex.Tpo -c -o regex.lo `test -f '../src/deps/regex.c' || echo '$(srcdir)/'`../src/deps/regex.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/regex.Tpo $(DEPDIR)/regex.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/regex.c' object='regex.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o regex.lo `test -f '../src/deps/regex.c' || echo '$(srcdir)/'`../src/deps/regex.c
-
-socket.lo: ../src/deps/socket.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT socket.lo -MD -MP -MF $(DEPDIR)/socket.Tpo -c -o socket.lo `test -f '../src/deps/socket.c' || echo '$(srcdir)/'`../src/deps/socket.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/socket.Tpo $(DEPDIR)/socket.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/socket.c' object='socket.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o socket.lo `test -f '../src/deps/socket.c' || echo '$(srcdir)/'`../src/deps/socket.c
-
-sqlite3.lo: ../src/deps/sqlite3.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sqlite3.lo -MD -MP -MF $(DEPDIR)/sqlite3.Tpo -c -o sqlite3.lo `test -f '../src/deps/sqlite3.c' || echo '$(srcdir)/'`../src/deps/sqlite3.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sqlite3.Tpo $(DEPDIR)/sqlite3.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/sqlite3.c' object='sqlite3.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sqlite3.lo `test -f '../src/deps/sqlite3.c' || echo '$(srcdir)/'`../src/deps/sqlite3.c
-
-thread.lo: ../src/deps/thread.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT thread.lo -MD -MP -MF $(DEPDIR)/thread.Tpo -c -o thread.lo `test -f '../src/deps/thread.c' || echo '$(srcdir)/'`../src/deps/thread.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/thread.Tpo $(DEPDIR)/thread.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/thread.c' object='thread.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o thread.lo `test -f '../src/deps/thread.c' || echo '$(srcdir)/'`../src/deps/thread.c
-
-time.lo: ../src/deps/time.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT time.lo -MD -MP -MF $(DEPDIR)/time.Tpo -c -o time.lo `test -f '../src/deps/time.c' || echo '$(srcdir)/'`../src/deps/time.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/time.Tpo $(DEPDIR)/time.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/time.c' object='time.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o time.lo `test -f '../src/deps/time.c' || echo '$(srcdir)/'`../src/deps/time.c
-
-mt19937-64.lo: ../src/ext/mt19937-64.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT mt19937-64.lo -MD -MP -MF $(DEPDIR)/mt19937-64.Tpo -c -o mt19937-64.lo `test -f '../src/ext/mt19937-64.c' || echo '$(srcdir)/'`../src/ext/mt19937-64.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/mt19937-64.Tpo $(DEPDIR)/mt19937-64.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/ext/mt19937-64.c' object='mt19937-64.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o mt19937-64.lo `test -f '../src/ext/mt19937-64.c' || echo '$(srcdir)/'`../src/ext/mt19937-64.c
-
-mt19937ar.lo: ../src/ext/mt19937ar.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT mt19937ar.lo -MD -MP -MF $(DEPDIR)/mt19937ar.Tpo -c -o mt19937ar.lo `test -f '../src/ext/mt19937ar.c' || echo '$(srcdir)/'`../src/ext/mt19937ar.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/mt19937ar.Tpo $(DEPDIR)/mt19937ar.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/ext/mt19937ar.c' object='mt19937ar.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o mt19937ar.lo `test -f '../src/ext/mt19937ar.c' || echo '$(srcdir)/'`../src/ext/mt19937ar.c
-
-qsort.lo: ../src/ext/qsort.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT qsort.lo -MD -MP -MF $(DEPDIR)/qsort.Tpo -c -o qsort.lo `test -f '../src/ext/qsort.c' || echo '$(srcdir)/'`../src/ext/qsort.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/qsort.Tpo $(DEPDIR)/qsort.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/ext/qsort.c' object='qsort.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o qsort.lo `test -f '../src/ext/qsort.c' || echo '$(srcdir)/'`../src/ext/qsort.c
-
-strerror.lo: ../src/ext/strerror.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT strerror.lo -MD -MP -MF $(DEPDIR)/strerror.Tpo -c -o strerror.lo `test -f '../src/ext/strerror.c' || echo '$(srcdir)/'`../src/ext/strerror.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/strerror.Tpo $(DEPDIR)/strerror.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/ext/strerror.c' object='strerror.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o strerror.lo `test -f '../src/ext/strerror.c' || echo '$(srcdir)/'`../src/ext/strerror.c
-
-codetemplate.lo: ../src/gen/codetemplate.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT codetemplate.lo -MD -MP -MF $(DEPDIR)/codetemplate.Tpo -c -o codetemplate.lo `test -f '../src/gen/codetemplate.c' || echo '$(srcdir)/'`../src/gen/codetemplate.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/codetemplate.Tpo $(DEPDIR)/codetemplate.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/gen/codetemplate.c' object='codetemplate.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o codetemplate.lo `test -f '../src/gen/codetemplate.c' || echo '$(srcdir)/'`../src/gen/codetemplate.c
-
-fibo.lo: ../src/gen/fibo.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fibo.lo -MD -MP -MF $(DEPDIR)/fibo.Tpo -c -o fibo.lo `test -f '../src/gen/fibo.c' || echo '$(srcdir)/'`../src/gen/fibo.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fibo.Tpo $(DEPDIR)/fibo.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/gen/fibo.c' object='fibo.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fibo.lo `test -f '../src/gen/fibo.c' || echo '$(srcdir)/'`../src/gen/fibo.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o b4.lo `test -f '../src/labs/b4.c' || echo '$(srcdir)/'`../src/labs/b4.c
 
 konoha_klr_.lo: ../src/gen/konoha_klr_.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT konoha_klr_.lo -MD -MP -MF $(DEPDIR)/konoha_klr_.Tpo -c -o konoha_klr_.lo `test -f '../src/gen/konoha_klr_.c' || echo '$(srcdir)/'`../src/gen/konoha_klr_.c
@@ -1166,117 +1210,82 @@ method_.lo: ../src/gen/method_.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o method_.lo `test -f '../src/gen/method_.c' || echo '$(srcdir)/'`../src/gen/method_.c
 
-konohadev_main.lo: ../src/konohadev_main.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT konohadev_main.lo -MD -MP -MF $(DEPDIR)/konohadev_main.Tpo -c -o konohadev_main.lo `test -f '../src/konohadev_main.c' || echo '$(srcdir)/'`../src/konohadev_main.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/konohadev_main.Tpo $(DEPDIR)/konohadev_main.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/konohadev_main.c' object='konohadev_main.lo' libtool=yes @AMDEPBACKSLASH@
+codetemplate.lo: ../src/gen/codetemplate.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT codetemplate.lo -MD -MP -MF $(DEPDIR)/codetemplate.Tpo -c -o codetemplate.lo `test -f '../src/gen/codetemplate.c' || echo '$(srcdir)/'`../src/gen/codetemplate.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/codetemplate.Tpo $(DEPDIR)/codetemplate.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/gen/codetemplate.c' object='codetemplate.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o konohadev_main.lo `test -f '../src/konohadev_main.c' || echo '$(srcdir)/'`../src/konohadev_main.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o codetemplate.lo `test -f '../src/gen/codetemplate.c' || echo '$(srcdir)/'`../src/gen/codetemplate.c
 
-b4.lo: ../src/labs/b4.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT b4.lo -MD -MP -MF $(DEPDIR)/b4.Tpo -c -o b4.lo `test -f '../src/labs/b4.c' || echo '$(srcdir)/'`../src/labs/b4.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/b4.Tpo $(DEPDIR)/b4.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/labs/b4.c' object='b4.lo' libtool=yes @AMDEPBACKSLASH@
+fibo.lo: ../src/gen/fibo.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fibo.lo -MD -MP -MF $(DEPDIR)/fibo.Tpo -c -o fibo.lo `test -f '../src/gen/fibo.c' || echo '$(srcdir)/'`../src/gen/fibo.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fibo.Tpo $(DEPDIR)/fibo.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/gen/fibo.c' object='fibo.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o b4.lo `test -f '../src/labs/b4.c' || echo '$(srcdir)/'`../src/labs/b4.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fibo.lo `test -f '../src/gen/fibo.c' || echo '$(srcdir)/'`../src/gen/fibo.c
 
-classapi.lo: ../src/main/classapi.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT classapi.lo -MD -MP -MF $(DEPDIR)/classapi.Tpo -c -o classapi.lo `test -f '../src/main/classapi.c' || echo '$(srcdir)/'`../src/main/classapi.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/classapi.Tpo $(DEPDIR)/classapi.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/classapi.c' object='classapi.lo' libtool=yes @AMDEPBACKSLASH@
+filesystem.lo: ../src/deps/filesystem.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT filesystem.lo -MD -MP -MF $(DEPDIR)/filesystem.Tpo -c -o filesystem.lo `test -f '../src/deps/filesystem.c' || echo '$(srcdir)/'`../src/deps/filesystem.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/filesystem.Tpo $(DEPDIR)/filesystem.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/filesystem.c' object='filesystem.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o classapi.lo `test -f '../src/main/classapi.c' || echo '$(srcdir)/'`../src/main/classapi.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o filesystem.lo `test -f '../src/deps/filesystem.c' || echo '$(srcdir)/'`../src/deps/filesystem.c
 
-exports.lo: ../src/main/exports.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT exports.lo -MD -MP -MF $(DEPDIR)/exports.Tpo -c -o exports.lo `test -f '../src/main/exports.c' || echo '$(srcdir)/'`../src/main/exports.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/exports.Tpo $(DEPDIR)/exports.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/exports.c' object='exports.lo' libtool=yes @AMDEPBACKSLASH@
+locale.lo: ../src/deps/locale.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT locale.lo -MD -MP -MF $(DEPDIR)/locale.Tpo -c -o locale.lo `test -f '../src/deps/locale.c' || echo '$(srcdir)/'`../src/deps/locale.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/locale.Tpo $(DEPDIR)/locale.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/locale.c' object='locale.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o exports.lo `test -f '../src/main/exports.c' || echo '$(srcdir)/'`../src/main/exports.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o locale.lo `test -f '../src/deps/locale.c' || echo '$(srcdir)/'`../src/deps/locale.c
 
-glue.lo: ../src/main/glue.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT glue.lo -MD -MP -MF $(DEPDIR)/glue.Tpo -c -o glue.lo `test -f '../src/main/glue.c' || echo '$(srcdir)/'`../src/main/glue.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/glue.Tpo $(DEPDIR)/glue.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/glue.c' object='glue.lo' libtool=yes @AMDEPBACKSLASH@
+sqlite3.lo: ../src/deps/sqlite3.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sqlite3.lo -MD -MP -MF $(DEPDIR)/sqlite3.Tpo -c -o sqlite3.lo `test -f '../src/deps/sqlite3.c' || echo '$(srcdir)/'`../src/deps/sqlite3.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sqlite3.Tpo $(DEPDIR)/sqlite3.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/sqlite3.c' object='sqlite3.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o glue.lo `test -f '../src/main/glue.c' || echo '$(srcdir)/'`../src/main/glue.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sqlite3.lo `test -f '../src/deps/sqlite3.c' || echo '$(srcdir)/'`../src/deps/sqlite3.c
 
-konoha_api.lo: ../src/main/konoha_api.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT konoha_api.lo -MD -MP -MF $(DEPDIR)/konoha_api.Tpo -c -o konoha_api.lo `test -f '../src/main/konoha_api.c' || echo '$(srcdir)/'`../src/main/konoha_api.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/konoha_api.Tpo $(DEPDIR)/konoha_api.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/konoha_api.c' object='konoha_api.lo' libtool=yes @AMDEPBACKSLASH@
+socket.lo: ../src/deps/socket.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT socket.lo -MD -MP -MF $(DEPDIR)/socket.Tpo -c -o socket.lo `test -f '../src/deps/socket.c' || echo '$(srcdir)/'`../src/deps/socket.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/socket.Tpo $(DEPDIR)/socket.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/socket.c' object='socket.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o konoha_api.lo `test -f '../src/main/konoha_api.c' || echo '$(srcdir)/'`../src/main/konoha_api.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o socket.lo `test -f '../src/deps/socket.c' || echo '$(srcdir)/'`../src/deps/socket.c
 
-konoha_ext.lo: ../src/main/konoha_ext.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT konoha_ext.lo -MD -MP -MF $(DEPDIR)/konoha_ext.Tpo -c -o konoha_ext.lo `test -f '../src/main/konoha_ext.c' || echo '$(srcdir)/'`../src/main/konoha_ext.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/konoha_ext.Tpo $(DEPDIR)/konoha_ext.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/konoha_ext.c' object='konoha_ext.lo' libtool=yes @AMDEPBACKSLASH@
+fileio.lo: ../src/deps/fileio.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fileio.lo -MD -MP -MF $(DEPDIR)/fileio.Tpo -c -o fileio.lo `test -f '../src/deps/fileio.c' || echo '$(srcdir)/'`../src/deps/fileio.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fileio.Tpo $(DEPDIR)/fileio.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/fileio.c' object='fileio.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o konoha_ext.lo `test -f '../src/main/konoha_ext.c' || echo '$(srcdir)/'`../src/main/konoha_ext.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fileio.lo `test -f '../src/deps/fileio.c' || echo '$(srcdir)/'`../src/deps/fileio.c
 
-logging.lo: ../src/main/logging.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT logging.lo -MD -MP -MF $(DEPDIR)/logging.Tpo -c -o logging.lo `test -f '../src/main/logging.c' || echo '$(srcdir)/'`../src/main/logging.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/logging.Tpo $(DEPDIR)/logging.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/logging.c' object='logging.lo' libtool=yes @AMDEPBACKSLASH@
+dlopen.lo: ../src/deps/dlopen.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT dlopen.lo -MD -MP -MF $(DEPDIR)/dlopen.Tpo -c -o dlopen.lo `test -f '../src/deps/dlopen.c' || echo '$(srcdir)/'`../src/deps/dlopen.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/dlopen.Tpo $(DEPDIR)/dlopen.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/dlopen.c' object='dlopen.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o logging.lo `test -f '../src/main/logging.c' || echo '$(srcdir)/'`../src/main/logging.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o dlopen.lo `test -f '../src/deps/dlopen.c' || echo '$(srcdir)/'`../src/deps/dlopen.c
 
-memory.lo: ../src/main/memory.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT memory.lo -MD -MP -MF $(DEPDIR)/memory.Tpo -c -o memory.lo `test -f '../src/main/memory.c' || echo '$(srcdir)/'`../src/main/memory.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/memory.Tpo $(DEPDIR)/memory.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/memory.c' object='memory.lo' libtool=yes @AMDEPBACKSLASH@
+regex.lo: ../src/deps/regex.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT regex.lo -MD -MP -MF $(DEPDIR)/regex.Tpo -c -o regex.lo `test -f '../src/deps/regex.c' || echo '$(srcdir)/'`../src/deps/regex.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/regex.Tpo $(DEPDIR)/regex.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/regex.c' object='regex.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o memory.lo `test -f '../src/main/memory.c' || echo '$(srcdir)/'`../src/main/memory.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o regex.lo `test -f '../src/deps/regex.c' || echo '$(srcdir)/'`../src/deps/regex.c
 
-metadata.lo: ../src/main/metadata.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT metadata.lo -MD -MP -MF $(DEPDIR)/metadata.Tpo -c -o metadata.lo `test -f '../src/main/metadata.c' || echo '$(srcdir)/'`../src/main/metadata.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/metadata.Tpo $(DEPDIR)/metadata.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/metadata.c' object='metadata.lo' libtool=yes @AMDEPBACKSLASH@
+thread.lo: ../src/deps/thread.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT thread.lo -MD -MP -MF $(DEPDIR)/thread.Tpo -c -o thread.lo `test -f '../src/deps/thread.c' || echo '$(srcdir)/'`../src/deps/thread.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/thread.Tpo $(DEPDIR)/thread.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/thread.c' object='thread.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o metadata.lo `test -f '../src/main/metadata.c' || echo '$(srcdir)/'`../src/main/metadata.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o thread.lo `test -f '../src/deps/thread.c' || echo '$(srcdir)/'`../src/deps/thread.c
 
-objectdbms.lo: ../src/main/objectdbms.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT objectdbms.lo -MD -MP -MF $(DEPDIR)/objectdbms.Tpo -c -o objectdbms.lo `test -f '../src/main/objectdbms.c' || echo '$(srcdir)/'`../src/main/objectdbms.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/objectdbms.Tpo $(DEPDIR)/objectdbms.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/objectdbms.c' object='objectdbms.lo' libtool=yes @AMDEPBACKSLASH@
+time.lo: ../src/deps/time.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT time.lo -MD -MP -MF $(DEPDIR)/time.Tpo -c -o time.lo `test -f '../src/deps/time.c' || echo '$(srcdir)/'`../src/deps/time.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/time.Tpo $(DEPDIR)/time.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/deps/time.c' object='time.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o objectdbms.lo `test -f '../src/main/objectdbms.c' || echo '$(srcdir)/'`../src/main/objectdbms.c
-
-security.lo: ../src/main/security.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT security.lo -MD -MP -MF $(DEPDIR)/security.Tpo -c -o security.lo `test -f '../src/main/security.c' || echo '$(srcdir)/'`../src/main/security.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/security.Tpo $(DEPDIR)/security.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/security.c' object='security.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o security.lo `test -f '../src/main/security.c' || echo '$(srcdir)/'`../src/main/security.c
-
-stack.lo: ../src/main/stack.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT stack.lo -MD -MP -MF $(DEPDIR)/stack.Tpo -c -o stack.lo `test -f '../src/main/stack.c' || echo '$(srcdir)/'`../src/main/stack.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/stack.Tpo $(DEPDIR)/stack.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/stack.c' object='stack.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o stack.lo `test -f '../src/main/stack.c' || echo '$(srcdir)/'`../src/main/stack.c
-
-system.lo: ../src/main/system.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT system.lo -MD -MP -MF $(DEPDIR)/system.Tpo -c -o system.lo `test -f '../src/main/system.c' || echo '$(srcdir)/'`../src/main/system.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/system.Tpo $(DEPDIR)/system.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/system.c' object='system.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o system.lo `test -f '../src/main/system.c' || echo '$(srcdir)/'`../src/main/system.c
-
-systemtable.lo: ../src/main/systemtable.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT systemtable.lo -MD -MP -MF $(DEPDIR)/systemtable.Tpo -c -o systemtable.lo `test -f '../src/main/systemtable.c' || echo '$(srcdir)/'`../src/main/systemtable.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/systemtable.Tpo $(DEPDIR)/systemtable.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/systemtable.c' object='systemtable.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o systemtable.lo `test -f '../src/main/systemtable.c' || echo '$(srcdir)/'`../src/main/systemtable.c
-
-typesystem.lo: ../src/main/typesystem.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT typesystem.lo -MD -MP -MF $(DEPDIR)/typesystem.Tpo -c -o typesystem.lo `test -f '../src/main/typesystem.c' || echo '$(srcdir)/'`../src/main/typesystem.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/typesystem.Tpo $(DEPDIR)/typesystem.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../src/main/typesystem.c' object='typesystem.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o typesystem.lo `test -f '../src/main/typesystem.c' || echo '$(srcdir)/'`../src/main/typesystem.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o time.lo `test -f '../src/deps/time.c' || echo '$(srcdir)/'`../src/deps/time.c
 
 konoha.o: ../src/konoha.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT konoha.o -MD -MP -MF $(DEPDIR)/konoha.Tpo -c -o konoha.o `test -f '../src/konoha.c' || echo '$(srcdir)/'`../src/konoha.c
@@ -1670,15 +1679,15 @@ uninstall-am: uninstall-binPROGRAMS uninstall-dist_klipSCRIPTS \
 
 check: test
 test: ./konoha
-	./konoha ../test/array.k
-	./konoha ../test/dictmap.k
-	./konoha ../test/dictset.k
 	./konoha ../test/float.k
-	./konoha ../test/hashmap.k
+	./konoha ../test/dictset.k
+	./konoha ../test/dictmap.k
 	./konoha ../test/integer.k
-	./konoha ../test/string.k
+	./konoha ../test/hashmap.k
 	./konoha ../test/syntax.k
+	./konoha ../test/string.k
 	./konoha ../test/trycatch.k
+	./konoha ../test/array.k
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

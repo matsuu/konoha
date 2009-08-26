@@ -99,8 +99,8 @@ extern "C" {
 #define knh_Class_findMethod(ctx, c, mn)   knh_Class_getMethod__(ctx, c, mn, 1)
 #define KNH_SIZE(v)         knh_size(v)
 #define B(c)     new_bytes(c)
-#define B2(c,n)   new_bytes__2((char *)c,n)
-#define STEXT(c)  new_bytes__2((char *)c,sizeof(c)-1)
+#define B2(c,n)   new_bytes__2(c,n)
+#define STEXT(c)  new_bytes__2(c,sizeof(c)-1)
 #define ISB(t,c) (t.len == (sizeof(c)-1) && knh_strncmp((char*)t.buf,c,t.len) == 0)
 #define EXPT_unknown  ((knh_expt_t)-1)
 #define EXPT_newid    ((knh_expt_t)0)
@@ -211,6 +211,7 @@ KNHAPI(void) knh_write_BOL(Ctx *ctx, OutputStream *w);
 KNHAPI(void) knh_format(Ctx *ctx, OutputStream *w, knh_methodn_t mn, Object *o, Any *m);
 KNHAPI(void) knh_printf(Ctx *ctx, OutputStream *w, char *fmt, ...);
 KNHAPI(void) knh_says(Ctx *ctx, int type, char *fmt, ...);
+KNHAPI(Chardev*) new_Chardev(Ctx *ctx);
 KNHAPI(void) knh_Glue_init(Ctx *ctx, knh_Glue_t *g, void *ptr, knh_fgfree gfree);
 KNHAPI(Object*) new_Glue(Ctx *ctx, char *lname, void *ptr, knh_fgfree gfree);
 KNHAPI(String*) new_String__fbcnv(Ctx *ctx, String *s, knh_fbyteconv fbcnv, BytesConv *bc);
@@ -257,7 +258,7 @@ KNHAPI(knh_bytes_t) knh_bytes_first(knh_bytes_t t, knh_intptr_t loc);
 KNHAPI(knh_bytes_t) knh_bytes_last(knh_bytes_t t, knh_intptr_t loc);
 KNHAPI(knh_bytes_t) knh_bytes_skipscheme(knh_bytes_t t);
 KNHAPI(char*) knh_format_bytes(char *buf, size_t bufsiz, knh_bytes_t t);
-KNHAPI(char*) knh_format_join2(char *buf, size_t bufsiz, knh_bytes_t t, knh_bytes_t t2);
+KNHAPI(char*) knh_format_join2(char *buf, size_t bufsiz, knh_bytes_t t1, knh_bytes_t t2);
 KNHAPI(knh_intptr_t) knh_bytes_toint(knh_bytes_t t);
 KNHAPI(knh_float_t) knh_bytes_tofloat(knh_bytes_t t);
 KNHAPI(knh_int64_t) knh_bytes_toint64(knh_bytes_t t);

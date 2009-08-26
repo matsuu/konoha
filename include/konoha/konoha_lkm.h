@@ -2,12 +2,15 @@
 #define KONOHA_LKM_H_
 
 #ifdef KONOHA_ON_LKM
-#include<linux/kernel.h>
-#include<linux/string.h>
-#include<linux/version.h>
-#include<linux/slab.h>
-#include<linux/types.h>
-#include<linux/ctype.h>
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/string.h>
+#include <linux/version.h>
+#include <linux/slab.h>
+#include <linux/types.h>
+#include <linux/ctype.h>
+#include <linux/fs.h>
+#include <linux/cdev.h>
 
 #define KNH_USING_INT32      1
 #define KNH_USING_NOFLOAT    1
@@ -46,6 +49,7 @@ typedef intptr_t FILE;
 #define stdout KERN_INFO
 #define stderr KERN_ALERT
 
+#define strdup(x) kstrdup(x,GFP_KERNEL)
 #define malloc(x) kzalloc(x,GFP_KERNEL)
 #define free(x)   kfree(x)
 
