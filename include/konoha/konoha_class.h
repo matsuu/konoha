@@ -573,12 +573,15 @@ typedef struct {
     dev_t id;
     struct cdev cdev;
     struct file_operations fops;
+    struct knh_DictMap_t*  fmap;
+    struct knh_Context_t*  ctx;
 } knh_device_t;
 
 typedef struct {
     knh_hObject_t h;
     char* name;
     knh_device_t *device;
+    int isEnable;
 } knh_Chardev_t;
 
 

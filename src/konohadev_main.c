@@ -136,14 +136,16 @@ static ssize_t knh_dev_write(struct file *filp,const char __user *user_buf,
 #endif
 
     len = copy_from_user(buf,user_buf,count);
-    memset(dev->buffer,0,sizeof(dev->buffer));
     buf[count] = '\0';
+    memset(dev->buffer,0,sizeof(dev->buffer));
 
     printk("[%s][user_buf=%s]\n", __FUNCTION__,buf);
     konoha_evalScript(konoha,buf);
     ret = konoha_getStdOutBufferText(konoha);
     snprintf(dev->buffer,sizeof(dev->buffer),"%s",ret);
     printk(KERN_DEBUG "[%s][dev->buffer=%s]\n",__FUNCTION__ ,dev->buffer);
+    printk(KERN_DEBUG "[%s][STDOUT=%s]\n",__FUNCTION__ ,ret);
+    printk(KERN_DEBUG "[%s][STDERR=%s]\n",__FUNCTION__ ,konoha_getStdErrBufferText(konoha));
 
 #ifdef KNH_ENABLE_SEMAPHORE
     up(&dev->sem);

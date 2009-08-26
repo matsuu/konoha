@@ -217,8 +217,9 @@ knh_bool_t knh_stack_isRecuriveFormatting(Ctx *ctx, knh_sfp_t *sfp, Object *o, O
 /* ../src/class/knh_Chardev.c */
 void knh_Chardev_setName(Ctx *ctx, Chardev *o, char* devname);
 METHOD knh__Chardev_new(Ctx *ctx, knh_sfp_t *sfp);
-knh_bool_t knh_Chardev_regist(Ctx *ctx, Chardev *o, char* devname);
 METHOD knh__Chardev_regist(Ctx *ctx, knh_sfp_t *sfp);
+METHOD knh__Chardev_unregist(Ctx *ctx, knh_sfp_t *sfp);
+METHOD knh__Chardev_addFunc(Ctx *ctx, knh_sfp_t *sfp);
 /* ../src/class/knh_Class.c */
 knh_struct_t knh_StructTable_newId(Ctx *ctx);
 knh_class_t knh_ClassTable_newId(Ctx *ctx);
