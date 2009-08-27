@@ -1427,7 +1427,6 @@ void knh_Chardev_init(Ctx *ctx, Chardev *o, int init)
 void knh_Chardev_traverse(Ctx *ctx, Chardev *o, knh_ftraverse ftr)
 {
     fprintf(stderr, "%s\n",__FUNCTION__);
-    char* b = o->name;
 #ifdef KONOHA_LKM
     knh_device_t *device = o->device;
     if(o->isEnable) {
@@ -1436,7 +1435,10 @@ void knh_Chardev_traverse(Ctx *ctx, Chardev *o, knh_ftraverse ftr)
         o->isEnable = 0;
     }
 #endif
-    KNH_FREE(ctx, b, strlen(b));
+    char* name = o->device->name;
+    if(name) {
+        KNH_FREE(ctx, name, strlen(name));
+    }
     KNH_FREE(ctx, o->device, sizeof(knh_device_t));
 }
 

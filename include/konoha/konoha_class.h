@@ -571,6 +571,7 @@ struct file_operations {
 
 typedef struct {
     dev_t id;
+    char* name;
     struct cdev cdev;
     struct file_operations fops;
     struct knh_DictMap_t*  fmap;
@@ -579,7 +580,6 @@ typedef struct {
 
 typedef struct {
     knh_hObject_t h;
-    char* name;
     knh_device_t *device;
     int isEnable;
 } knh_Chardev_t;

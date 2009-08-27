@@ -6,20 +6,6 @@
 
 #ifdef KONOHA_ON_LKM
 
-#include <linux/module.h>
-#include <linux/kernel.h>
-#include <linux/version.h>
-#include <linux/fs.h>
-#include <linux/cdev.h>
-#include <linux/init.h>
-#include <asm/uaccess.h>
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
-#include <linux/semaphore.h>
-#ifndef KNH_ENABLE_SEMAPHORE
-#define KNH_ENABLE_SEMAPHORE
-#endif
-#endif
-
 #include <konoha.h>
 #include <konoha/gen/konoha_knhapi_.h>
 

@@ -24,9 +24,11 @@ KNHAPI(Chardev*) new_Chardev(Ctx *ctx)
 
 void knh_Chardev_setName(Ctx *ctx, Chardev *o, char* devname)
 {
-    o->name = (char *)KNH_MALLOC(ctx, strlen(devname));
-    strncpy(o->name, devname, sizeof(devname));
-    //fprintf(stderr, "%s,%s,%s\n",__FUNCTION__,devname,o->name);
+    char* name = o->device->name;
+    name = (char *)KNH_MALLOC(ctx, strlen(devname));
+    strncpy(name, devname, sizeof(devname));
+    o->device->name = name;
+    //fprintf(stderr, "%s,%s,%s\n",__FUNCTION__,devname,o->device->name);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -37,7 +39,7 @@ METHOD knh__Chardev_new(Ctx *ctx, knh_sfp_t *sfp)
 {
     Chardev *o = (Chardev *) sfp[0].o;
     char* devname = knh_String_tochar((String*)sfp[1].o);
-    //fprintf(stderr, "%s\n",__FUNCTION__);
+    //fprintf(stderr, "%s,[%s]\n",__FUNCTION__,devname);
     knh_Chardev_setName(ctx, o, devname);
     KNH_RETURN(ctx, sfp, o);
 }
@@ -70,19 +72,22 @@ static ssize_t knh_device_read (struct file* filp, char __user *user_buf,
     knh_device_t *dev = filp->private_data;
     DictMap *dict = (DictMap *)dev->fmap;
 
+    if(*offset > 0) return 0;
+
     Ctx *lctx = knh_beginContext(dev->ctx);
     knh_sfp_t *lsfp = KNH_LOCAL(lctx);
     Closure *cc = (Closure *) knh_DictMap_get__b(lctx, dict, B("read"));
 
-    printk("%s at %d [dev=0x%p]\n",__FUNCTION__,__LINE__,cc);
     if (cc) {
-    printk("%s at %d\n",__FUNCTION__,__LINE__);
         knh_Closure_invokesfp(lctx, cc, lsfp, 0);
-    printk("%s at %d\n",__FUNCTION__,__LINE__);
-    // XXX where is return value?
-    // I think sfp[-1], but it isn't hear.
-        char* ret = knh_String_tochar((String*)lsfp[-1].o);
-        printk("%s at %d [ret=%s]\n",__FUNCTION__,__LINE__,ret);
+        knh_bytes_t ret = knh_String_tobytes((String*)lsfp[0].o);
+        printk("%s at %d [ret=%s]\n",__FUNCTION__,__LINE__,ret.buf);
+        if(copy_to_user(user_buf,ret.buf,ret.len)){
+            printk(KERN_ALERT "%s: copy_to_user failed\n",dev->name);
+            return -EFAULT;
+        }
+        *offset += ret.len;
+        return ret.len;
     }
 
     return 0;
@@ -94,7 +99,7 @@ knh_bool_t knh_Chardev_regist(Ctx *ctx, Chardev *o)
     fprintf(stderr, "%s\n",__FUNCTION__);
 #ifdef KONOHA_ON_LKM
     knh_device_t *dev = (knh_device_t *) o->device;
-    char* name = o->name;
+    char* name = dev->name;
     int err = alloc_chrdev_region(&dev->id, 0, 1, name);
     if(err){
         printk(KERN_ALERT "%s: alloc_chrdev_region() failed (%d)\n",name,err);

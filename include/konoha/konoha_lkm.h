@@ -11,6 +11,16 @@
 #include <linux/ctype.h>
 #include <linux/fs.h>
 #include <linux/cdev.h>
+#include <linux/version.h>
+#include <asm/uaccess.h>
+
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
+#include <linux/semaphore.h>
+#ifndef KNH_ENABLE_SEMAPHORE
+#define KNH_ENABLE_SEMAPHORE
+#endif
+#endif
+
 
 #define KNH_USING_INT32      1
 #define KNH_USING_NOFLOAT    1
