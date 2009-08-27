@@ -67,7 +67,7 @@ KNHAPI(void) knh_Iterator_close(Ctx *ctx, Iterator *it)
 KNHAPI(Iterator*) new_Iterator(Ctx *ctx, knh_class_t p1, Any *source, knh_fitrnext fnext)
 {
 	knh_class_t cid = knh_class_Iterator(ctx, p1);
-	Iterator *it = (Iterator*)new_Object_init(ctx, FLAG_Iterator, cid, 0);
+	Iterator *it = (Iterator*)new_Object_bcid(ctx, CLASS_Iterator,  0);
 	if(IS_NULL(source)) fnext = knh_fitrnext_end;
 	if(fnext != NULL) DP(it)->fnext = fnext;
 	KNH_SETv(ctx, DP(it)->source, source);

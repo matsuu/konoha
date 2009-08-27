@@ -216,6 +216,12 @@ else
   WITH_READLINE_01=0
 fi
 
+AC_ARG_WITH(iconv-dir,
+AC_HELP_STRING([--with-iconv-dir],
+    [path to libiconv's dir ]),
+    [LIBS="$LIBS $withval"], [])
+
+
 # ADDED for socket ###########################################################
 # Kimio Kuramitsu
 
@@ -275,7 +281,7 @@ fi
 # ADDED for thread ###########################################################
 # Kimio Kuramitsu
 
-AC_ARG_ENABLE(thread,
+AC_ARG_WITH(thread,
 AC_HELP_STRING([--with-thread],
                [enable multithreading..  [[default=detect]]]),
 [case $withval in
