@@ -481,7 +481,7 @@ void knh_Token_join(Ctx *ctx, Token *o)
 {
 	Array *a = (Array*)DP(o)->data;
 	if(!IS_Array(a)) return;
-	int i, size = knh_Array_size(a) - 1;
+	size_t i, size = knh_Array_size(a) - 1;
 	for(i = 0; i < size ; i++) {
 		Token *tk =  (Token*)knh_Array_n(a, i);
 		Token *tkn = (Token*)knh_Array_n(a, i+1);

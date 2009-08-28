@@ -15,7 +15,7 @@ def warning(msg):
 
 STEXT = [
  ("EMPTY", ""), ("TAB", "\\t"), ("LF","\\n"), ("SPC", " "),
- ("EOL", "EOL"), ("BEGIN", "BEGIN"), ("END", "END"),
+ ("EOL", '"KONOHA_OS_LINEFEED"'), ("BEGIN", "BEGIN"), ("END", "END"),
  ("void", "void"), ("true", "true"), ("false","false"), ("null", "null"),
  ("main", "main"), ("ENCODING", '"KONOHA_ENCODING"'),
  ("DEVNULL", "/dev/null"), ("DEVSTDIN", "/dev/stdin"),("DEVSTDERR", "/dev/stderr"), ("DEVSTDOUT", "/dev/stdout"),

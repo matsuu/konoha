@@ -13,42 +13,47 @@
 /* [UNIX] */
 
 #ifdef KONOHA_ON_UNKNOWN
-	#define KNH_USING_STDC  1
-	#define KONOHA_OS_ENCODING "UTF-8"
-	#define KONOHA_OS_LINEFEED "\n"
-	#define KONOHA_OS_DLLEXT   ".so"
+#define KNH_USING_STDC  1
+#define KONOHA_OS_ENCODING "UTF-8"
+#define KONOHA_OS_LINEFEED "\n"
+#define KONOHA_OS_DLLEXT   ".so"
 #endif
 
 #ifdef KONOHA_ON_LINUX
-#define		KNH_USING_POSIX 1
-#define		KNH_USING_UNIX  1
+#define     KNH_USING_POSIX 1
+#define     KNH_USING_UNIX  1
 #define     KNH_USING_SOCKET 1
-#define 	KNH_USING_THREAD   1
+/*
+// if we have config.h, it dosent nead.
+#define     KNH_USING_THREAD   1
 #define     KNH_USING_PTHREAD  1
-#define		KONOHA_OS_ENCODING "UTF-8"
-#define 	KNH_USING_KONOHAGET 1
-	#ifdef HAVE_ICONV_H
-	#define		KNH_USING_ICONV 1
-	#endif
+*/
+#define     KONOHA_OS_ENCODING "UTF-8"
+#define     KNH_USING_KONOHAGET 1
+#ifdef HAVE_ICONV_H
+#define     KNH_USING_ICONV 1
+#endif
 //#ifdef HAVE_REGEX_H
-#define		KNH_USING_REGEX 1
+#define     KNH_USING_REGEX 1
 //#endif
-#define		KONOHA_OS_LINEFEED "\n"
-#define		KONOHA_OS_DLLEXT   ".so"
+#define     KONOHA_OS_LINEFEED "\n"
+#define     KONOHA_OS_DLLEXT   ".so"
 #endif
 
 #ifdef KONOHA_ON_MACOSX
-#define 	KNH_USING_POSIX    1
-#define 	KNH_USING_UNIX     1
-#define 	KNH_USING_SOCKET   1
-#define 	KNH_USING_ICONV    1
-#define 	KNH_USING_REGEX    1
-#define 	KNH_USING_SQLITE3  1
-#define 	KNH_USING_THREAD   1
+#define     KNH_USING_POSIX    1
+#define     KNH_USING_UNIX     1
+#define     KNH_USING_SOCKET   1
+#define     KNH_USING_ICONV    1
+#define     KNH_USING_REGEX    1
+#define     KNH_USING_SQLITE3  1
+/*
+#define     KNH_USING_THREAD   1
 #define     KNH_USING_PTHREAD  1
-#define 	KONOHA_OS_ENCODING "UTF-8"
-#define 	KONOHA_OS_LINEFEED "\n"
-#define 	KONOHA_OS_DLLEXT ".dylib"
+*/
+#define     KONOHA_OS_ENCODING "UTF-8"
+#define     KONOHA_OS_LINEFEED "\n"
+#define     KONOHA_OS_DLLEXT ".dylib"
 #endif
 
 /* ------------------------------------------------------------------------ */
@@ -84,58 +89,58 @@
 
 #ifdef KONOHA_ON_WINDOWS
 #include<windows.h>
-#define 	KNH_USING_WIN32    1
-#define 	KNH_USING_WINDOWS  1
+#define     KNH_USING_WIN32    1
+#define     KNH_USING_WINDOWS  1
 #define     KNH_USING_MATH     1
-#define 	KONOHA_OS_LINEFEED "\r\n"
+#define     KONOHA_OS_LINEFEED "\r\n"
 #ifdef KNHAPI_IMPORTS
-#define 	KNHAPI(T__)     __declspec(dllimport) T__ __cdecl
+#define     KNHAPI(T__)     __declspec(dllimport) T__ __cdecl
 #else
-#define 	KNHAPI(T__)     __declspec(dllexport) T__ __cdecl
+#define     KNHAPI(T__)     __declspec(dllexport) T__ __cdecl
 #endif
 
-#define 	KNH_EXPORTS(T__)     __declspec(dllexport) T__ __cdecl
+#define     KNH_EXPORTS(T__)     __declspec(dllexport) T__ __cdecl
 
-#define 	KONOHA_OS_DLLEXT ".dll"
-#define		KONOHA_OS_FILE_SEPARATOR '\\'
+#define     KONOHA_OS_DLLEXT ".dll"
+#define     KONOHA_OS_FILE_SEPARATOR '\\'
 #define     KONOHA_FOLDER "Konoha"
 #endif
 
 #ifdef KONOHA_ON_MINGW
-#define 	KNH_USING_WIN32    1
-#define 	KNH_USING_WINDOWS  1
-#define 	KONOHA_OS_LINEFEED "\r\n"
+#define     KNH_USING_WIN32    1
+#define     KNH_USING_WINDOWS  1
+#define     KONOHA_OS_LINEFEED "\r\n"
 #ifdef KNHAPI_IMPORTS
-#define 	KNHAPI(T__) __declspec(dllimport) T__ __cdecl
+#define     KNHAPI(T__) __declspec(dllimport) T__ __cdecl
 #else
-#define 	KNHAPI(T__) __declspec(dllexport) T__ __cdecl
+#define     KNHAPI(T__) __declspec(dllexport) T__ __cdecl
 #endif
-#define 	KNH_EXPORTS(T__)  __declspec(dllexport) T__ __cdecl
-#define 	KONOHA_OS_DLLEXT ".dll"
-#define		KONOHA_OS_FILE_SEPARATOR '\\'
+#define     KNH_EXPORTS(T__)  __declspec(dllexport) T__ __cdecl
+#define     KONOHA_OS_DLLEXT ".dll"
+#define     KONOHA_OS_FILE_SEPARATOR '\\'
 #ifndef HAVE_CONFIG_H
-#define 	KNH_USING_ICONV       1
-#define 	HAVE_LOCALCHARSET_H   1
+#define     KNH_USING_ICONV       1
+#define     HAVE_LOCALCHARSET_H   1
 #endif
 #endif
 
 #ifdef KONOHA_ON_CYGWIN
-#define 	KNH_USING_POSIX    1
-#define 	KNH_USING_UNIX     1
-#define 	KNH_USING_REGEX    1
-#define 	KONOHA_OS_LINEFEED "\r\n"
-#define 	KONOHA_OS_DLLEXT ".dll.a"
+#define     KNH_USING_POSIX    1
+#define     KNH_USING_UNIX     1
+#define     KNH_USING_REGEX    1
+#define     KONOHA_OS_LINEFEED "\r\n"
+#define     KONOHA_OS_DLLEXT ".dll.a"
 #endif
 
 /* ======================================================================== */
 /* [TEABOARD] */
 
 #ifdef KONOHA_ON_TB
-#define 	KNH_USING_BTRON    1
-#define 	KNH_USING_TKAPI    1
-#define 	KONOHA_OS_ENCODING KONOHA_ENCODING
-#define 	KONOHA_OS_LINEFEED "\n"
-#define 	KONOHA_OS_DLLEXT ".so"
+#define     KNH_USING_BTRON    1
+#define     KNH_USING_TKAPI    1
+#define     KONOHA_OS_ENCODING KONOHA_ENCODING
+#define     KONOHA_OS_LINEFEED "\n"
+#define     KONOHA_OS_DLLEXT ".so"
 #define     ALT_GETENV
 #undef      KNH_USING_I18N
 #endif

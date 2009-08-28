@@ -2,12 +2,25 @@
 #define KONOHA_LKM_H_
 
 #ifdef KONOHA_ON_LKM
-#include<linux/kernel.h>
-#include<linux/string.h>
-#include<linux/version.h>
-#include<linux/slab.h>
-#include<linux/types.h>
-#include<linux/ctype.h>
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/string.h>
+#include <linux/version.h>
+#include <linux/slab.h>
+#include <linux/types.h>
+#include <linux/ctype.h>
+#include <linux/fs.h>
+#include <linux/cdev.h>
+#include <linux/version.h>
+#include <asm/uaccess.h>
+
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
+#include <linux/semaphore.h>
+#ifndef KNH_ENABLE_SEMAPHORE
+#define KNH_ENABLE_SEMAPHORE
+#endif
+#endif
+
 
 #define KNH_USING_INT32      1
 #define KNH_USING_NOFLOAT    1
@@ -46,7 +59,8 @@ typedef intptr_t FILE;
 #define stdout KERN_INFO
 #define stderr KERN_ALERT
 
-#define malloc(x) kmalloc(x,GFP_KERNEL)
+#define strdup(x) kstrdup(x,GFP_KERNEL)
+#define malloc(x) kzalloc(x,GFP_KERNEL)
 #define free(x)   kfree(x)
 
 #define fprintf(out,fmt, arg...) printk(out fmt , ##arg)
@@ -60,7 +74,7 @@ typedef intptr_t FILE;
 #define assert(x) BUG_ON(!(x))
 #define abort() BUG_ON(1)
 
-
+/*
 #define DBG2_(stmt)  stmt
 
 #define DBG2_P(fmt, ...) \
@@ -84,9 +98,9 @@ typedef intptr_t FILE;
 #define DBG2_ASSERT(c) KNH_ASSERT(c);
 
 #define DBG2_ABORT() abort()
-#define 	KNH_MALLOC(ctx, size)    knh_fastmalloc(ctx, size)
-#define 	KNH_FREE(ctx, p, size)   knh_fastfree(ctx, p, size)
-
+#define KNH_MALLOC(ctx, size)    knh_fastmalloc(ctx, size)
+#define KNH_FREE(ctx, p, size)   knh_fastfree(ctx, p, size)
+*/
 
 /* ../../src/ext/qsort.c */
 void qsort(void* base,size_t total,size_t size, int (*comp)(const void*,const void*));

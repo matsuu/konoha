@@ -57,7 +57,7 @@ size_t knh_array_newsize(size_t newsize, size_t usize)
 size_t knh_array_index0(Ctx *ctx, knh_intptr_t n, size_t size)
 {
 	size_t idx = (size_t)n;
-	if(!(idx < size)) KNH_THROW_OUTOFINDEX(ctx, n, size);
+	if(!(idx < size)) KNH_THROW_OUTOFINDEX(ctx, idx, size);
 	return idx;
 }
 

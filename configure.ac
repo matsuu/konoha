@@ -110,8 +110,19 @@ if test $with_regex = 2; then
   AC_DEFINE_UNQUOTED([KNH_USING_REGEX], [1], Using regex)
 fi
 
+# ADDED for profiler 
+# Masahiro Ide
+# copy from mosh-0.2.0
+AC_ARG_ENABLE(profiler, [  --enable-profiler turn off profiler [default=no]], ,[enable_profiler=no])
+AC_MSG_CHECKING(whether to enable profiler)
+if test "$enable_profiler" = "yes"; then
+  AC_DEFINE(KNH_WITH_PROFILER, 1, enable -p option for profiling)
+fi
+
+
 # ADDED for mtune ############################################################
 # Kimio Kuramitsu
+
 
 AC_ARG_ENABLE(fastmode,
 AC_HELP_STRING([--enable-fastmode],
@@ -169,6 +180,12 @@ if test $use_iconv = yes; then
   AC_SUBST(LIBICONV, -liconv)
   LIBS="$LIBS -liconv"
 fi
+
+AC_ARG_WITH(iconv-dir,
+AC_HELP_STRING([--with-iconv-dir],
+    [path to libiconv's dir ]),
+    [LIBS="$LIBS $withval"], [])
+
 
 # ADDED for readline #########################################################
 # Kimio Kuramitsu
@@ -228,6 +245,7 @@ yes|no|detect) ;;
 esac],
 [with_socket=detect])
 
+
 use_socket=$with_socket
 if test $with_socket = detect; then
   use_socket=no
@@ -275,7 +293,7 @@ fi
 # ADDED for thread ###########################################################
 # Kimio Kuramitsu
 
-AC_ARG_ENABLE(thread,
+AC_ARG_WITH(thread,
 AC_HELP_STRING([--with-thread],
                [enable multithreading..  [[default=detect]]]),
 [case $withval in
@@ -283,6 +301,8 @@ yes|no|detect) ;;
 *) AC_MSG_ERROR([bad value $withval for --with-thread, need yes/no/detect]) ;;
 esac],
 [with_thread=detect])
+
+AC_MSG_RESULT($with_thread)
 
 use_thread=$with_thread
 if test $with_thread = detect; then

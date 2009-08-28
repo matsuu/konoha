@@ -1,16 +1,12 @@
 #!/usr/local/bin/konoha
-
-
 /*----------------------------------------------------------*/
+print "[import]:const.k";
 
-///
-/// define const data
-///
-/*-----system info message-----*/
+/** スクリプトの簡易説明 */
 usage="""
 *************************************
 *  klip ( Konoha LIbrary Provider ) *
-*          version 0.1.5 (09/07/18) *
+*          version 0.1.8 (09/08/28) *
 *************************************
 
 usage:
@@ -33,36 +29,51 @@ options:
   undo        : undo previous operation
 """;
 
-/*-----system const integer-----*/
+/** intでreturnする一般メソッド用の定数 */
 EXIT_SUCCESS = 1;
 EXIT_NORMAL  = 0;
 EXIT_ERROR   = -1;
 
+/** システムファイルを保存するディレクトリ */
+klipdir = $env.home + "/.konoha/klip";
+
+/** パッケージのデータを一時保存するディレクトリ */
+tmpdir = klipdir + "/tmp";
+
+/** パッケージをインストールするディレクトリ(後に代入) */
+instdir = "";
+
+/** インストール済みのパッケージを記録するシステムファイル */
+curdata = klipdir + "/current.json";
+
+/** curdataに記録するテキストの書式 */
+CURFORM = '{"name":"%s{0}","version":"%s{1}","url":"%s{2}"},';
+
+/** 一つ前のcurdataのバックアップファイル */
+prevdata = klipdir + "/previous.json";
+
+/** 最新のシステム情報のログファイル */
+latest = klipdir + "/latest.log";
+
+/** latest.log操作時のモード指定の定数 */
 ADD = 1;
 REPLACE = 2;
 DELETE = 3;
 
-/*-----already installed list & format to write -----*/
-klipdir = $env.home + "/.konoha/klip/";
-curdata = klipdir + "current.json";
-CURFORM = '{"name":"%s{0}","version":"%s{1}","url":"%s{2}"},';
-
-/*-----other files(for undo)-----*/
-prevdata = klipdir + "previous.json";
-latest = klipdir + "latest.log";
-
-/*-----server's klip_data url(klip.xml or etc)-----*/
+/** サーバーから取得するパッケージリスト名 */
 KLIPFILE = "klip.json";
+
+/** パッケージリストの存在するURL */
 KLIPURL = "http://konoha.sourceforge.jp/klip/" + KLIPFILE;
 //KLIPURL = "http://localhost/klip/" +  KLIPFILE;
 
-/*-----sourceforge's mirror server-----*/
+/** sourceforgeのミラーサイトのドメイン */
 sites = ["keihanna" ,"jaist" ,"globalbase", "osdn", "iij"];
 
-/*-----KLIPDATA-----*/
-klipdata = klipdir + KLIPFILE;
+/** ローカルに保存したパッケージリストのパス */
+klipdata = klipdir + "/" + KLIPFILE;
 
-/*-----system flag-----*/
+/** システム情報のチェック用フラグ */
 boolean root;
 boolean fail = false;
 boolean use_curl = false;
@@ -70,47 +81,56 @@ boolean use_zlib = false;
 boolean use_libtar = false;
 boolean use_posix = false;
 boolean use_zllt = false;
-
 /*----------------------------------------------------------*/
+print "[import]:env.k";
 
-//
-//getting system environment
-//
+/** システムディレクトリの作成 */
+if ( !os.hasDir(klipdir) ) os.mkdir(klipdir);
+if ( !os.hasDir(tmpdir) ) os.mkdir(tmpdir);
+tmpdir += "/";
 
-if ( !os.hasDir(klipdir) ) {
-	os.mkdir(klipdir);
+/** ユーザーモードのチェック */
+userdir = $user.package.path;
+try {
+	assert(userdir);
+} catch (Exception e) {
+  OUT.println("Null!! : $user.package.path");
 }
 
-/*
-  user check
-*/
-String path = $konoha.path.package;
-if ( !os.hasDir( path ) ) {
-	root = os.mkdir( path );
-} else {
+rootdir = $konoha.package.path;
+try {
+	assert(rootdir);
+} catch (Exception e) {
+  OUT.println("Null!! : $konoha.package.path");
+}
+
+instdir = rootdir;
+if ( !os.hasDir( instdir ) )
+	root = os.mkdir( instdir );
+else {
 	String home = $env.HOME;
-	if ( "/home/" in? home ) {
+	if ( "/home/" in? home )
 		root = false;
-	} else {
+	else
 		root = true;
-	}
 }
-if ( !root ) { 
-	path = $konoha.path.user.package;
-	if ( !os.hasDir( path ) ) {
-		os.mkdir( path );
-	}
+if ( !root ) {
+	instdir = userdir;
+	if ( !os.hasDir( instdir ) )
+		os.mkdir( instdir );
 }
-path += "/";
+instdir += "/";
 
-/*
-  library check
-*/
-//*-----curl-----*/
-String libcurl = path + "curl";
+/**
+ * 利用するライブラリパッケージのチェック
+ */
+
+//curl
+
+String libcurl = instdir + "curl";
 class Curl {
-	@abstract boolean easyPerform();
-	@abstract void easySetOpt(int type, Any? data);
+	boolean easyPerform();
+	void easySetOpt(int type, Any? data);
 }
 if ( os.hasDir( libcurl ) ) {
 	if ( os.hasLib("libcurl") ) {
@@ -119,10 +139,11 @@ if ( os.hasDir( libcurl ) ) {
 	}
 }
 		
-//*-----zlib-----*/
-String libzlib = path + "zlib";
+//zlib
+
+String libzlib = instdir + "zlib";
 class Zlib {
-	@abstract boolean decompGZ(String gzfile);
+	boolean decompGZ(String gzfile,String outfile);
 }
 if ( os.hasDir( libzlib ) ) {
 	if ( os.hasLib("libz") ) {
@@ -131,10 +152,11 @@ if ( os.hasDir( libzlib ) ) {
 	}
 }
 
-//*-----libtar-----*/
-String liblibtar = path + "libtar";
+//libtar
+
+String liblibtar = instdir + "libtar";
 class Tar {
-	@abstract boolean extractTar(String tarfile);
+	boolean extractTar(String tarfile);
 }
 if ( os.hasDir( liblibtar ) ) {
 	if ( os.hasLib("libtar") ) {
@@ -143,8 +165,9 @@ if ( os.hasDir( liblibtar ) ) {
 	}
 }
 		
-//*-----posix-----*/
-String libposix = path + "posix";
+//posix
+
+String libposix = instdir + "posix";
 String shared = $konoha.platform + ".so";
 if ( os.hasDir( libposix ) ) {
 	if ( os.hasLib( libposix + "/posix_" + shared ) ) {
@@ -152,136 +175,176 @@ if ( os.hasDir( libposix ) ) {
 		use_posix = true;
 	}
 }
-
 /*----------------------------------------------------------*/
+print "[import]:pkg_arc.k";
 
-//
-//define glue class for decompress
-//
-class Decomp {
+/** 
+ * パッケージの.tar.gzアーカイブのクラス
+ */
+class PackageArc {
 
+	/** パッケージの名前 */
 	String name;
-	String version;
 
-	Decomp(String name,String version){
+	/** アーカイブの存在するパス */
+	String filepath;
+
+	/**
+	 * PackageArcクラスのコンストラクタ
+	 * @param name 名前
+	 * @param filepath アーカイブのパス
+	 */
+	PackageArc(String name,String filepath){
 		this.name = name;
-		this.version = version;
+		this.filepath = filepath;
 	}
 
-	@virtual boolean decompPackage();
+	/**
+	 * アーカイブの解凍を行う
+	 * @return boolean 解凍の成否を返す
+	 */
+	@Virtual boolean decompress();
 
 }
-
 /*----------------------------------------------------------*/
+print "[import]:pkg_arc_sys.k";
 
-//
-//define functions for using posix
-//
-/*-----decompPackage by posix-----*/
-class DecompSystem extends Decomp {
+/**
+ * パッケージの.tar.gzアーカイブのクラス
+ * posixパッケージのSystem.system関数から、
+ * tarコマンドを呼び出すことで解凍する
+ * @see PackageArc
+ */
+class PackageArcSys extends PackageArc {
 
-	/*-----Decomp.decompPackage-----*/
-	boolean decompPackage(){
-		String filename = %("%s{0}-%s{1}.tar.gz",name,version);
+	/**
+	 * system関数からtarコマンドを呼び出して解凍する
+	 * @return 解凍の成否
+	 */
+	boolean decompress(){
 		int ret;
-		ret = System.system("tar -xzf " + filename);
+		ret = System.system("tar -xzf " + filepath);
 		if ( ret != 0 || !os.hasDir(name) ) {
-			print("!ERR : DecompSystem.decompPackage : System.system");
+			print("!ERR : PackageArcSys.decompress : System.system");
 			return false;
 		}
-		os.rename(name,__path + name);
+		os.rename(name,__instdir + name);
 		return true;
 	}
 }
-
 /*----------------------------------------------------------*/
+print "[import]:pkg_arc_zllt.k";
 
-//
-//define functions for using zlib & libtar
-//
-/*-----decompPackage by using zlib & libtar-----*/
-class DecompZllT extends Decomp {
+/**
+ * パッケージの.tar.gzアーカイブのクラス
+ * libtarパッケージのTar.extractTarと、
+ * zlibパッケージのZlib.decompGZを利用して解凍する
+ * @see PackageArc
+ */
+class PackageArcZllT extends PackageArc {
 
-	/*-----Decomp.decompPackage-----*/
-	boolean decompPackage(){
-		String filename = %("%s{0}-%s{1}.tar.gz",name,version);
-		if ( !Zlib.decompGZ(filename) ) {
-			print("!ERR : DecompZllT.decompPackage : Zlib.decompGZ");
+	/**
+	 * Zlib.decompGZと、Tar.extractTarを呼び出して解凍する
+	 * @return 解凍の成否
+	 */
+	boolean decompress(){
+		String tarfile = filepath - ".gz";
+		if ( !Zlib.decompGZ(filepath,tarfile) ) {
+			print("!ERR : PackageArcZllT.decompress : Zlib.decompGZ");
 			return false;
 		}
-		String tarfile = filename - ".gz";
 		boolean res = Tar.extractTar(tarfile);
 		os.unlink(tarfile);
-		if ( !res || !os.hasDir(name) ) {
-			print("!ERR : DecompZllT.decompPackage : Tar.extractTar == " + res );
+		String pkgdir = __tmpdir + name;
+		if ( !res || !os.hasDir(pkgdir) ) {
+			print("!ERR : PackageArcZllT.decompress : Tar.extractTar");
 			return false;
 		}
-		os.rename(name,__path + name);
+		os.rename(pkgdir,__instdir + name);
 		return true;
 	}
 	
 }
-
 /*----------------------------------------------------------*/
+print "[import]:pkg_get.k";
 
-//
-//define glue class for get package
-//
-class Getter {
+/**
+ * パッケージのtar.gzアーカイブを取得するクラス
+ */
+class PackageGet {
 
+	/** パッケージのアーカイブのURL */
 	String url;
+	/** アーカイブの保存先のパス */
+	String filepath;
 
-	/*-----constructor-----*/
-	Getter(String url){
+	/**
+	 * PackageGetクラスのコンストラクタ
+	 * @param url URL
+	 * @param filepath 保存先のパス
+	 */
+	PackageGet(String url,String filepath){
 		this.url = url;
+		this.filepath = filepath;
 	}
 
-	/*-----get package data-----*/
-	@virtual boolean getPackage();
+	/**
+	 * アーカイブの取得を行う
+	 * @return 取得の成否
+	 */
+	@Virtual boolean get();
 
 }
-
 /*----------------------------------------------------------*/
+print "[import]:pkg_get_curl.k";
 
-//
-//define functions for using curl
-//
-class GetterCurl extends Getter
+/**
+ * パッケージの取得を行うクラス
+ * curlパッケージを利用して取得する
+ * @see PackageGet
+ */
+class PackageGetCurl extends PackageGet
 {
 
-	/*-----getPackage by curl-----*/
-	boolean getPackage()
+	/**
+	 * Curl.easyPerformを呼び出してアーカイブを取得する
+	 * @return 取得の成否
+	 */
+	boolean get()
 	{
-		String pkgurl = %(url,__sites[Int.random(|sites|)]) + "@@" - "@@";
-		String filename = pkgurl.split("/",0).pop();
-		ous = new OutputStream(filename,"wb");
+		String pkgurl = %(url,__sites[Int.random(|sites|)]);
+		ous = new OutputStream(filepath,"wb");
 		Curl c = new Curl();
 		c.easySetOpt(10002,pkgurl);  //Curl.OPT_URL
 		c.easySetOpt(10001,ous);     //Curl.OPT_FILE
 		c.easyPerform();
 		ous.close();
-		if ( !os.hasFile(filename) ) {
-			print("!ERR : GetterCurl.getPackage : Curl.easyPerform");
+		if ( !os.hasFile(filepath) ) {
+			print("!ERR : PackageGetCurl.get : Curl.easyPerform");
 			return false;
 		}
 		return true;
 	}
 	
 }
-
 /*----------------------------------------------------------*/
+print "[import]:pkg_get_strm.k";
 
-//
-//define functions for using stream
-//
-class GetterStream extends Getter {
+/**
+ * パッケージの取得を行うクラス
+ * Streamでの通信を利用して取得する
+ * @see PackageGet
+ */
+class PackageGetStream extends PackageGet {
 
-	/*-----getPackage by stream-----*/
-	boolean getPackage()
+	/**
+	 * StreamからHTTP経由でアーカイブを取得する
+	 * @return 取得の成否
+	 */
+	boolean get()
 	{
 		String pkgurl = %(url,__sites[Int.random(|sites|)]) + "@@" - "@@";
-		String filename = pkgurl.split("/",0).pop();
-		ous = new OutputStream(filename,"wb");
+		ous = new OutputStream(filepath,"wb");
 		ins = new InputStream(pkgurl);
 		int count = 0;
 		int buf;
@@ -304,30 +367,38 @@ class GetterStream extends Getter {
 		}
 		ous.close();
 		ins.close();
-		if ( !os.hasFile(filename) ) {
-			print("!ERR : GetterStream.getPackage : stream");
+		if ( !os.hasFile(filepath) ) {
+			print("!ERR : PackageGetStream.get : stream");
 			return false;
 		}
 		return true;
 	}
 
 }
-
 /*----------------------------------------------------------*/
+print "[import]:parser.k";
 
-//
-//registing parsers
-//
-/*-----class Parser Form-----*/
+/**
+ * パッケージリストをパースするクラス
+ */
 class Parser
 {
+	/** パースして抜き出すパッケージの名前 */
 	String name;
+	/** 抜き出したパッケージのバージョン */
 	String version;
+	/** 抜き出したパッケージのURL */
 	String url;
+	/** 抜き出したパッケージが依存するパッケージの情報 */
 	String[] depend;
+	/** パースするリストのファイル名 */
 	String file;
 
-	/*-----constructor-----*/
+	/**
+	 * Parserのコンストラクタ
+	 * @param name パースするパッケージ名
+	 * @param file パースするリストファイル名
+	 */
 	Parser(String name, String file)
 	{
 		this.name = name;
@@ -335,35 +406,138 @@ class Parser
 		this.file = file;
  	}
 
-	/*-----Data2Package-----*/
-	@virtual void setMember();
+	/** パースした各フィールドの情報を自身に設置する */
+	@Virtual void getMember();
 
-	/*-----generate formed txt-----*/
-	@virtual String generate();
+	/** 
+	 * 自身のフィールドの情報から、
+	 * リストの書式に沿ったパッケージ情報を生成する
+	 * @return パッケージ情報のリスト書式での文字列
+	 */
+	@Virtual String generate();
 
-	/*-----generate package name list-----*/
-	@virtual String[] nameList();
+	/**
+	 * リストファイルにある全パッケージの名前を出力する
+	 * @return パッケージ名のString配列
+	 */
+	@Virtual String[] getNameList();
 
 }
-
 /*----------------------------------------------------------*/
+print "[import]:parser_sql.k";
 
-//
-// parsing data to json
-//
-/*-----class Parser for Json-----*/
+/**
+ * sqlite3のdbからメンバを得るクラス
+ * @see Parser
+ */
+class ParserSqlite extends Parser
+{
+	/** sqlite3のdbへのコネクション */
+	Connection con;
+	
+	/**
+	 * ParserSqliteのコンストラクタ
+	 * @param name データを取得するパッケージ名
+	 * @param file sqlite3のdbファイル名
+	 */
+	ParserSqlite(String name, String file)
+	{
+		super(name,file);
+		db = "sqlite3:" + this.file;
+		this.con = new Connection(db);
+	}
+
+	/** 取得した各フィールドの情報を自身に設置する */
+	void getMember()
+	{
+		rs = con.query("select * from package");
+		while(rs.next()) {
+			nm = rs.getString("name");
+			if ( nm == this.name ) break;
+		}
+		this.version = rs.getString("version");
+		this.url = rs.getString("url");
+		rs.close();
+		this.depend = getDepend();
+	}
+
+	/**
+	 * dbにある全パッケージの名前を出力する
+	 * @return パッケージ名のString配列
+	 */
+	String[] getNameList()
+	{
+		String[] ret = [];
+		rs = con.query("select name from package");
+		while(rs.next()) {
+			ret << rs.getString("name");
+		}
+		rs.close();
+		return ret;
+	}
+
+	/**
+	 * 自身の依存するパッケージの情報を取得する
+	 * @return 依存するパッケージの情報の文字列配列
+	 */
+	String[] getDepend()
+	{
+		String[] ret = [];
+		cn = new Connection("sqlite3:" + file);
+		rs = cn.query("select * from dependency");
+		while(rs.next()) {
+			if ( rs.getString("name") == name ) {
+				nm = rs.getString("dname");
+				ver = rs.getString("dver");
+				ret << (nm + "=" + ver);
+			}
+		}
+		rs.close();
+		return ret;
+	}
+
+}
+/*----------------------------------------------------------*/
+print "[import]:parser_json.k";
+
+/**
+ * json形式のパッケージリストをパースするクラス
+ * @see Parser
+ */
 class ParserJson extends Parser
 {
 
-	/*-----Override Parser.setMember-----*/
-	void setMember()
+	/** パースした各フィールドの情報を自身に設置する */
+	void getMember()
 	{
 		this.version = getElement("version");
 		this.url = getElement("url");
 		this.depend = getElement("depend").split("&",0);
 	}
 
-	/*-----Override Parser.generate-----*/
+	/**
+	 * リストファイルにある全パッケージの名前を出力する
+	 * @return パッケージ名のString配列
+	 */
+	String[] getNameList()
+	{
+		String[] ret = [];
+		String[] box;
+		String raw = rawjs();
+		String check = '"name":"';
+		box = raw.split(check,0);
+		foreach(String txt from box) {
+			ret << txt / '"';
+		}
+		ret.remove(0);
+		return ret;
+	}
+
+	/** 
+	 * 自身のフィールドの情報から、
+	 * jsonの書式に沿ったパッケージ情報を生成する
+	 * @return パッケージ情報のjson書式での文字列
+	 */
 	String generate()
 	{
 		String ret;
@@ -376,7 +550,11 @@ class ParserJson extends Parser
 		return ret + "\n}\n";
 	}
 
-	/*-----for setMemberJson-----*/ 
+	/** 
+	 * リストファイルから各フィールドの情報を抜き出す
+	 * @param elemname リクエストするフィールド
+	 * @return リスト内から抜き出したフィールド情報の文字列
+	 */
 	String getElement(String elemname)
 	{
 		String ret;
@@ -393,6 +571,13 @@ class ParserJson extends Parser
 		return ret;
 	}
 
+	/** 
+	 * リストファイル内での目的のパッケージの位置、
+	 * 指定されたフィールド部分を抜き出す
+	 * @param raw 目的のパッケージ情報以降のリストの全文字列
+	 * @param elemname リクエストするフィールド
+	 * @return リスト内から抜き出したフィールド情報の文字列
+	 */
 	String parseThisTree(String raw,String elemname)
 	{
 		String ret;
@@ -413,6 +598,11 @@ class ParserJson extends Parser
 		return ret;
 	}
 
+	/** 
+	 * パッケージの依存情報を、単純に記号連結した文字列として出力する
+	 * @param raw 目的のパッケージの依存情報以降のリストの全文字列
+	 * @return 連結した依存情報の文字列
+	 */
 	String getDependencies(String raw)
 	{
 		String ret;
@@ -424,20 +614,11 @@ class ParserJson extends Parser
 		return ret;
 	}
 
-	String[] nameList()
-	{
-		String[] ret = [];
-		String[] box;
-		String raw = rawjs();
-		String check = '"name":"';
-		box = raw.split(check,0);
-		foreach(String txt from box) {
-			ret << txt / '"';
-		}
-		ret.remove(0);
-		return ret;
-	}
-
+	/** 
+	 * リストファイルのテキストを全て連結し、
+	 * 改行文字を消去した文字列で返す
+	 * @return 連結したテキストの文字列
+	 */
 	String rawjs()
 	{
 		String ret;
@@ -449,14 +630,30 @@ class ParserJson extends Parser
 		return ret - "\t";
 	}
 
+	/** 
+	 * jsonの区切り文字(,)単位で現在の読み取り位置を進める
+	 * @param raw 現在の読み取り位置以降の文字列
+	 * @return １単位進めた位置以降の文字列
+	 */
 	String succRaw (String raw)	{ return raw % ","; }
 
-	/*-----for generateJson-----*/
+	/** 
+	 * jsonのノードの文字列を生成する
+	 * @param name ノード名
+	 * @param data ノードのデータ
+	 * @return 生成したノードの文字列
+	 */
 	String setNode(String name,String data)
 	{
 		return %('"%s{0}":"%s{1}"',name,data );
 	}
 
+	/** 
+	 * jsonの配列ノードの文字列を生成する
+	 * @param name ノード名
+	 * @param data ノードのデータ配列
+	 * @return 生成した配列ノードの文字列
+	 */
 	String arrayNode(String name,String[] data)
 	{
 		String ret;
@@ -468,73 +665,65 @@ class ParserJson extends Parser
 	}
 
 }
-
 /*----------------------------------------------------------*/
+print "[import]:files.k";
 
-//
-//define general function
-//
-class FileHandler {
+/**
+ * システムファイルを操作するクラス
+ */
+class Files {
 
-	/*------------------------
-	  methods for latest.log
-	------------------------*/
+	//latest
 
-	//*-----update latest install------*/
+	/** 
+	 * latestの特定セクションを更新する
+	 * @param section 変更するセクション名
+	 * @param diff 書き換える内容
+	 */
 	void updateLatest(String section, String diff)
 	{
-		if ( section == "install" ) {
-			str = "Last-Installed-Package:";
-		} else if ( section == "modified" ) {
-			str = "Last-Modified:";
-		}
 		boolean flag = false;
 		ins = new InputStream(__latest,"r");
 		ous = new OutputStream(__latest + "~","a");
+		String form;
+		if ( section == "install" )
+			form = "Last-Installed-Package:";
+		else if ( section == "modified" )
+			form = "Last-Modified:";
 		foreach( String txt from ins ) {
-			if ( txt.startsWith(str) ) {
+			if ( txt.startsWith(form) ) {
 				flag = true;
-				txt = str + diff;
+				txt = form + diff;
 			}
 			ous.println(txt);
 		}
-		if ( !flag ) {
-			ous.println(str + diff);
-		}
+		if ( !flag ) ous.println(form + diff);
 		ous.close();
 		ins.close();
 		os.rename(__latest + "~",__latest);
 	}
-	
-	//*-----check Modified section of latest.klip-----*/
-	String latestMod(String file)
-	{
-		ins = new InputStream(file,"r");
-		foreach( String txt from ins ) {
-			if ( "Last-Modified:" in? txt ) {
-				ins.close();
-				return txt; 
-			}
-		}
-		ins.close();
-		print("!WARN: FileHandler.latastMod : NOT FOUND Last-Modified");
-		return ""; 
+
+	/** 
+	 * latestの全セクションリセットする
+	 */
+	void resetLatest() {
+		os.unlink(__latest);
+		ous = new OutputStream(__latest,"a");
+		ous.close();
+		updateLatest("install"," None");
+		updateLatest("modified"," None");
 	}
 
+	//klipdata
 
-	/*----------------------
-	  methods for KLIPDATA
-	----------------------*/
-
-	//*-----get klip_data from server -----*/
+	/** 
+	 * klipdataをサーバーから取得する
+	 * @return 取得の成否
+	 */
 	boolean getKlipData()
 	{
-		if ( latestMod(__latest) != latestMod(KLIPURL) ) {
-			os.unlink(__klipdata);
-		} else {
-			print("INFO : non need to update KLIPDATA");
-			return true;
-		}
+		if ( checkLastMod() ) { return true; }
+		os.unlink(__klipdata);
 		boolean write = false;
 		ins = new InputStream(KLIPURL,"r");
 		ous = new OutputStream(__klipdata,"a");
@@ -542,7 +731,7 @@ class FileHandler {
 			if ( "{" == txt || write ) {
 				write = true;
 				ous.println(txt);
-				if ( txt == "}" ) { break;}
+				if ( txt == "}" ) {	break; }
 			} else if ( "Last-Modified:" in? txt ) {
 				updateLatest("modified",
 							 txt.split("Last-Modified:",0).pop());
@@ -553,129 +742,203 @@ class FileHandler {
 		return true;
 	}
 
-	//*-----remove klipdata-----*/
+	/** 
+	 * サーバーとローカルとのklipdataの、
+	 * Last-Modifiedの情報を比較して、
+	 * 更新されているかをチェックする
+	 * @return 更新の有無
+	 */
+	boolean checkLastMod()
+	{
+		String las = getLastMod(__latest);
+		String net = getLastMod(KLIPURL);
+		if ( las != net )
+			return false;
+		else return true;
+	}
+
+	/** 
+	 * ローカルのklipdataを削除し、
+	 * latestのinstallセクションリセットする
+	 */
 	void rmKlipData()
 	{
 		os.unlink(__klipdata);
 		updateLatest("modified"," None");
 	}
 
-	/*--------------------------------
-	  methods for curdata & prevdata
-	--------------------------------*/
+	//curdata & prevdata
+
+	/** 
+	 * curdataの一時的なバックアップファイルを作成する
+	 */
 	void mkBufCurData()	{
 		copyText(__curdata,__curdata + "~");
 	}
 
+	/** 
+	 * curdataのバックアップファイルを削除する
+	 */
 	void rmBufCurData() {
 		os.unlink(__curdata + "~");
 	}
 
+	/** 
+	 * curdataのバックアップの内容でprevdataを書き換える
+	 */
 	void cpBufCur2Prev() {
 		copyText(__curdata + "~",__prevdata);
 	}
 
+	/** 
+	 * curdataとprevdataの内容を初期の状態にリセットする
+	 */
 	void resetCurPrev() {
 		resetText2Js(__curdata);
 		resetText2Js(__prevdata);
 	}
 
-	void resetLatest() {
-		os.unlink(__latest);
-		ous = new OutputStream(__latest,"a");
-		ous.close();
-		updateLatest("install"," None");
-		updateLatest("modified"," None");
-	}
-
-	//*-----modification of current [use TMPDATA]-----*/
+	/** 
+	 * curdataの内容を更新する
+	 * @param data 更新するパッケージ情報の文字列配列
+	 * @param mode 更新のモード
+	 */
 	void modCurData(String[] data,int mode)
 	{
 		InputStream ins = new InputStream(__curdata,"r");
 		OutputStream ous = new OutputStream(__curdata + "#","a");
-		if (mode == ADD ){
-			String base = %(CURFORM,data[0],data[1],data[2]);
-			foreach( String txt from ins ) {
-				if (txt == "}") {
-					break;
-				}
-				String txtname = txt % '"name":' / '"';
-				if ( txtname > data[0] && base != "" ) {
-					ous.println(base);
-					base = "";
-				}
-				ous.println(txt);
-			}
-			if ( base != "" ) {
-				ous.println(base);
-			}
-			ous.println("}");
-		} else if (mode == DELETE || mode == REPLACE) {
-			String base =  %('"name":"%s{0}"',data[0] );
-			foreach ( String txt from ins ) {
-				if ( base in? txt ) {
-					if( mode == REPLACE ) {
-						txt = %(CURFORM,data[0],data[1],data[2]);
-						ous.println(txt);
-					}
-				} else {
-					ous.println(txt);
-				}
-			}
+		String base = %('"name":"%s{0}"',data[0]);
+		String put = %(CURFORM,data[0],data[1],data[2]);
+		if ( mode == ADD ){
+			addPkgData(ins,ous,put);
+		} else if ( mode == REPLACE ) {
+			replPkgData(ins,ous,base,put);
+		} else if ( mode == DELETE ) {
+			delPkgData(ins,ous,base);
 		}
 		ins.close();
 		ous.close();
 		os.rename(__curdata + "#",__curdata);
 	}
 
-	//*-----for undo-----*/
-	String[] changeDiff(String opr)
+	/** 
+	 * curdataとprevdataの内容を比較して、
+	 * 基準側から見て削除されている部分を返す
+	 * @param opr 差分の基準側のファイル
+	 * @return 差分の文字列配列
+	 */
+	String[] changeDiff(String base)
 	{
-		String[] ret =[];
-		String f0;
-		String f1;
-		if(opr == "u_install"){
-			f0 = __prevdata;
-			f1 = __curdata;
-		} else if( opr == "u_remove" ) {
-			f0 = __curdata;
-			f1 = __prevdata;
+		String bef;
+		String aft;
+		if( base == "prev"){
+			bef = __prevdata;
+			aft = __curdata;
+		} else if( base == "cur" ) {
+			bef = __curdata;
+			aft = __prevdata;
 		}
-		ins0 = new InputStream(f0,"r"); 
-		boolean chk;
-		foreach( String txt from ins0 ) {
-			chk = true;
-			ins1 = new InputStream(f1,"r");	
-			foreach( String txt2 from ins1 ) {
-				if( txt == txt2 ) {
-					chk = false;
-				} 
-			}
-			ins1.close();
-			if (chk == true) ret << txt;
-		}
-		ins0.close();
-		return ret;
+		return getDiff(bef,aft);
 	}
 
-
-	/*--------------------------------------
-	  methods for other method in this class
-	--------------------------------------*/
-
-	//*-----reset txt to empty-----*/
-	void resetText2Js(String filename)
+	/** 
+	 * 入力ストリームからのテキストを読み取って、
+	 * 更に新しいパッケージの情報文字列を追加して出力ストリームに出力する
+	 * @param ins 入力ストリーム
+	 * @param ous 出力ストリーム
+	 * @param put 新しく挿入するパッケージ情報の文字列
+	 */
+	void addPkgData(InputStream ins, OutputStream ous, String put)
 	{
-		os.unlink(filename);
-		ous = new OutputStream(filename,"w");
-		String[] form = ["{","}"];
-		foreach( String txt from form) {
+		String base = put;
+		String name = put % '"name":"' / '"';
+		String txtname;
+		foreach( String txt from ins ) {
+			if ( txt == "}" ) break;
+			txtname = txt % '"name":"' / '"';
+			if ( txtname > name && base != "" ) {
+				ous.println(base);
+				base = "";
+			}
 			ous.println(txt);
 		}
-		ous.close();
+		if ( base != "" ) ous.println(base);
+		ous.println("}");
+	}
+
+	/** 
+	 * 入力ストリームからのテキスト内の、
+	 * 特定のパッケージ情報を更新して出力ストリームに出力する
+	 * @param ins 入力ストリーム
+	 * @param ous 出力ストリーム
+	 * @param base 置き換える元のパッケージ情報のキー文字列
+	 * @param put 新しく置き換えるパッケージ情報の文字列
+	 */
+	void replPkgData(InputStream ins, OutputStream ous, String base,String put)
+	{
+		foreach ( String txt from ins ) {
+			if ( base in? txt )	ous.println(put);
+			else ous.println(txt);
+		}
+	}
+
+	/** 
+	 * 入力ストリームからのテキストから、
+	 * 特定のパッケージ情報を除いて出力ストリームに出力する
+	 * @param ins 入力ストリーム
+	 * @param ous 出力ストリーム
+	 * @param base 出力から除外するパッケージのキー文字列
+	 */
+	void delPkgData(InputStream ins, OutputStream ous, String base)
+	{
+		foreach ( String txt from ins )
+			if ( !(base in? txt) ) ous.println(txt);
+	}
+
+	//common methods
+
+	/**
+	 * ファイルまたはストリームから、
+	 * Last-Modifiedセクションのデータを取得する
+	 * @param fist 読み込むファイルストリーム名
+	 * @return 取得したデータ文字列
+	 */
+	String getLastMod(String fist)
+	{
+		ins = new InputStream(fist,"r");
+		foreach( String txt from ins ) {
+			if ( "Last-Modified:" in? txt ) {
+				ins.close();
+				return txt; 
+			}
+		}
+		ins.close();
+		print("!WARN: Files.getLastMod : NOT FOUND");
+		return "";
+	}
+
+	/**
+	 * json形式のファイルの内容をリセットする
+	 * @param filename リセットするファイル名
+	 */
+	void resetText2Js(String filename)
+	{
+		if ( filename.split(".",0).pop() == "json" ) {
+			os.unlink(filename);
+			ous = new OutputStream(filename,"w");
+			String[] form = ["{","}"];
+			foreach( String txt from form) {
+				ous.println(txt);
+			}
+			ous.close();
+		}
 	}
 	
-	//*-----copy txt file-----*/
+	/**
+	 * テキストファイルの内容をコピーする
+	 * @param infile コピー元ファイル名
+	 * @param outfile コピー先ファイル名
+	 */
 	void copyText(String infile ,String outfile)
 	{
 		os.unlink(outfile);
@@ -687,139 +950,76 @@ class FileHandler {
 		ous.close();
 		ins.close();
 	}
-	
+
+	/**
+	 * ２つのテキストファイルを比較して、
+	 * 対象側に無い部分の文字列配列を返す
+	 * @param bef 比較の基準となるファイル名
+	 * @param ouf 比較の対象となるファイル名
+	 * @return 比較から得た差分の文字列配列を返す
+	 */
+	String[] getDiff(String bef, String aft)
+	{
+		String[] ret =[];
+		base = new InputStream(bef,"r"); 
+		boolean chk;
+		foreach( String txt from base ) {
+			chk = true;
+			targ = new InputStream(aft,"r");	
+			foreach( String txt2 from targ )
+				if( txt == txt2 ) chk = false;
+			targ.close();
+			if (chk) ret << txt;
+		}
+		base.close();
+		return ret;
+	}	
+
 }
-
 /*----------------------------------------------------------*/
+print "[import]:package.k";
 
-///
-/// define class Package 
-///
-/*-----Package's class-----*/
 class Package
 {
-	/*-----package-----*/
+	/** パッケージの名前 */
 	String name;
+	/** パッケージのバージョン */
 	String version;
+	/** パッケージのURL */
 	String url;
+	/** パッケージが依存するパッケージの情報 */
 	String[] depend;
 
-	/*-----constructor-----*/
-	Package(String name,String version,String url)
+	/**
+	 * Packageクラスのコンストラクタ
+	 * @param name パッケージの名前
+	 */
+	Package(String name)
 	{
 		this.name = name;
-		this.version = version;
-		this.url = url;
 	}
 
-	//*-----methods for set member variables-----*/
-	void setMember(String file)
+	/**
+	 * パッケージの名前をパーサーから取得する
+	 * @param pars このパッケージの情報をパースしたパーサー
+	 */
+	void setMember(Parser pars)
 	{
-		Parser pars = getParser(file);
-		parsver = pars.version;
-		if( version == "" || version == parsver ) { 
-		} else if ( version < parsver) {
-			String detected = %("%s{0} ver=%s{1}",name,parsver);
-			OUT.println("KLIP : install " + detected);
-		} else {
-			print("!WARN: detected lower version only");
-		}
-		this.version = parsver;
+		this.version = pars.version;
 		this.url = pars.url;
 		this.depend = pars.depend;
 	}
 
-	//*-----get version from CURDATA-----*/
-	String getCurVer()
-	{
-		Parser pars = getParser(__curdata);
-		return pars.version;
-	}
+	//operations
 
-	//*-----check before install [installed or not]-----*/
-	boolean selectYorN(String message)
-	{
-		boolean ret;
-		OUT.print(%("!ASK : %s{0} [y/n] : ",message));
-		while( true ){
-			input = IN.readLine();
-			if ( input == "y" ) {
-				ret = true;
-				break;
-			} else if ( input == "n" ) {
-				ret = false;
-				break;
-			} else {
-				OUT.print("!ASK : please input [y/n] : "); 
-			}
-		}
-		return ret;
-	}
-
-	/*-----remove dir to tmp-----*/
-	String rmtmp(String name)
-	{
-		String tmpdir = "/tmp/" + name;
-		while ( os.hasDir(tmpdir) ) {
-			tmpdir = "/tmp/" + (String)Int.random(1024) + "." + name;
-		}
-		return tmpdir;
-	}
-
-
-	/*
-	  operations
+	/**
+	 * パッケージをインストールする
+	 * @return インストールの結果
 	 */
-	
-	//*-----do real operation-----*/
-	int do_install()
-	{
-		String filename = this.url.split("/",0).pop();
-		if ( !getPackage() ) {
-			print("!ERR : Package.do_install : getPackage");
-			return EXIT_ERROR;
-		}
-		boolean ret = decompPackage();
-		os.unlink(filename);
-		if ( !ret ) {
-			print("!ERR : Package.do_install : decompPackage");
-			return EXIT_ERROR;
-		}
-		OUT.println("KLIP : done!");
-		return EXIT_SUCCESS;
-	}
-
-	int do_remove()
-	{
-		String[] files;
-		String ptmp = rmtmp(name);
-		if ( !os.rename(__path + "/" + name,ptmp) ) {
-			print("!ERR : Package.do_remove : rename");
-			return EXIT_ERROR;
-		}
-		OUT.println("KLIP : done!");
-		return EXIT_SUCCESS;
-	}
-
-	//*-----methods of operations-----*/
 	int install()
 	{
-		OUT.print("KLIP : install ...  ");
-		OUT.println(%("%s{0} ver=%s{1}",name,version));
-		String getver = getCurVer();
-		if ( getver != "" ) {
-			OUT.println(%("KLIP : %s{0} ver=%s{1} is already installed!",name,getver));
-			if ( version >= getver ) {
-				return EXIT_NORMAL; 
-			} else {
-				OUT.println("KLIP : you can update this package");
-				return EXIT_NORMAL;
-			}
-		} else if ( os.hasDir( __path + "/" + name) ) {
-			OUT.println("KLIP : can't touch this exsited package!");
-			return EXIT_NORMAL;
-		}
-		if( !selectYorN("install it?") ) { 
+		OUT.println(%("KLIP : install ... : %s{0}\tver=%s{1}",name,version));
+		if( !askYorN("install it?") ) { 
 			OUT.println("KLIP : denyed to install");
 			return EXIT_NORMAL;
 		} else {
@@ -828,129 +1028,183 @@ class Package
 		return do_install();
 	}
 		
+	/**
+	 * パッケージを更新する
+	 * @return 更新の結果
+	 */
 	int update()
 	{
-		OUT.print("KLIP : update  ...  ");
-		OUT.println(%("%s{0} ver=%s{1}",name,version));
-		String getver = getCurVer();
-		if ( getver == "" ) {
-			if ( os.hasDir( __path + "/" + name ) ) {
-				OUT.println("KLIP : can't touch this exsited package!");
-			} else {
-				OUT.println("KLIP : this package isn't installed.");
-			}
-			return EXIT_NORMAL;
-		} else if ( getver >= version ) {
-			OUT.println(%("KLIP : %s{0} ver=%s{1} is already installed!",name,getver));
-			OUT.println("KLIP : no need to update");
-			return EXIT_NORMAL;
-		}
-		if( !selectYorN("update it?") ) { 
+		OUT.println(%("KLIP : update  : %s{0}\tver=%s{1}",name,version));
+		if( !askYorN("update it?") ) {
 			OUT.println("KLIP : denyed to update");
 			return EXIT_NORMAL;
 		} else {
 			OUT.println("KLIP : update this package");
-		} 
+		}
 		if ( do_remove() == EXIT_ERROR ) {
+			print("!ERR : Package.update : do_remove");
 			return EXIT_ERROR;
 		}
 		return do_install();
 	}
 
+	/**
+	 * パッケージを削除する
+	 * @return 削除の結果
+	 */
 	int remove()
 	{
-		OUT.println("KLIP : remove  ...  " + name);
-		String getver = getCurVer();
-		if ( os.hasDir( __path + "/" + name) ) {
-			if ( getver != "" ) {
-				OUT.println("KLIP : " + %("%s{0} ver=%s{1} ",name,getver) + " is found!");
-				if( !selectYorN("remove it?") ) {
-					OUT.println("KLIP : denyed to remove");
-					return EXIT_NORMAL;
-				} else {
-					OUT.println("KLIP : remove this package");
-				}
-			} else {
-				OUT.println("!ERR : can't touch this existed package!");
-				return EXIT_NORMAL;
-			}
-		} else {
-			OUT.println("KLIP : " + name + " isn't found...");
+		OUT.println(%("KLIP : remove  : %s{0}\tver=%s{1}",name,version));
+		if( !askYorN("remove it?") ) {
+			OUT.println("KLIP : denyed to remove");
 			return EXIT_NORMAL;
+		} else {
+			OUT.println("KLIP : remove this package");
 		}
 		return do_remove();
 	}
 
-
-	/*
-	  methods of depend with system flag
+	/**
+	 * インストールにおける実際のファイル操作を行う
+	 * @return 操作の結果
 	 */
-	String[] getList(String filename)
+	int do_install()
 	{
-		p = getParser(filename);
-		return p.nameList();
-	}
-
-	Parser getParser(String file)
-	{
-		String type = file.split(".",0).pop();
-		Parser pars;
-		if ( type == "json" ) {
-			pars = (Parser) new ParserJson(name,file);
-			//		} else if ( type == "xml" ) {
-			//			if ( use_libxml ) {
-			//				pars = (Parser) new ParserXml(name,file);
-			//			} else {
-			//				OUT.println("!ERR : Package.setMember : cannot using libxml2 ");
-			//				return false;
-			//			}
-		} else {
-			print ("!ERR : Package.setMember : filetype == " + type );
+		String filepath = __tmpdir + url.split("/",0).pop();
+		if ( !os.hasFile( filepath ) ) {
+			if ( !getPackage(filepath) ) {
+				print("!ERR : Package.do_install : getPackage");
+				return EXIT_ERROR;
+			}
 		}
-		pars.setMember();
-		return pars;
+		boolean ret = decompPackage(filepath);
+		if ( !ret ) {
+			print("!ERR : Package.do_install : decompPackage");
+			return EXIT_ERROR;
+		}
+		OUT.println("KLIP : done!");
+		return EXIT_SUCCESS;
 	}
 
-	//*-----get package-----*/
-	boolean getPackage()
+	/**
+	 * 削除における実際のファイル操作を行う
+	 * @return 操作の結果
+	 */
+	int do_remove()
 	{
-		Getter g;
+		String pkgdir = __instdir + name;
+		String[] files = os.listDir(pkgdir);
+		if ( |files| == 0 ) {
+			print("!ERR : Package.do_remove : NOT FOUND");
+			return EXIT_ERROR;
+		}
+		removeFiles(pkgdir,files);
+		if ( !os.rename(pkgdir,__tmpdir + name ) ) {
+			print("!ERR : Package.do_remove : rename");
+			return EXIT_ERROR;
+		}
+		OUT.println("KLIP : done!");
+		return EXIT_SUCCESS;
+	}
+
+	/**
+	 * パッケージのファイル（アーカイブ）を取得する
+	 * @param filepath ファイルの保存パス
+	 * @return 取得の成否
+	 */
+	boolean getPackage(String filepath)
+	{
+		PackageGet pg;
 		if ( __use_curl ) {
-			g = (Getter) new GetterCurl(url);
+			pg = (PackageGet) new PackageGetCurl(url,filepath);
 		} else {
-			g = (Getter) new GetterStream(url);
+			pg = (PackageGet) new PackageGetStream(url,filepath);
 		}
-		return g.getPackage();
+		return pg.get();
 	}
 	
-	//*-----decompress archieves-----*/
-	boolean decompPackage()
+	/**
+	 * パッケージのファイル（アーカイブ）を解凍する
+	 * @param filepath アーカイブの存在するパス
+	 * @return 解凍の成否
+	 */
+	boolean decompPackage(String filepath)
 	{
-		Decomp d;
+		PackageArc pa;
 		if ( __use_zllt ) {
-			d = (Decomp) new DecompZllT(name,version);
+			pa = (PackageArc) new PackageArcZllT(name,filepath);
 		} else if ( __use_posix ) {
-			d = (Decomp) new DecompSystem(name,version);
+			pa = (PackageArc) new PackageArcSys(name,filepath);
 		} else {
 			print("!ERR : Package.decompPackage : no way to decompPackage");
 			return false;
 		}
-		return d.decompPackage();
+		return pa.decompress();
 	}
-}
 
+	//common methods
+
+	/**
+	 * ユーザーにYes／Noの選択肢を選ばせる
+	 * @param message 選択肢に表示させるメッセージ文字列
+	 * @return 選択の結果(Yesならtrue)
+	 */
+	boolean askYorN(String message)
+	{
+		OUT.print(%("!ASK : %s{0} [y/n] : ",message));
+		while( true ){
+			input = IN.readLine();
+			if ( input == "y" ) {
+				return true;
+			} else if ( input == "n" ) {
+				return false;
+			} else {
+				OUT.print("!ASK : please input [y/n] : "); 
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * ディレクトリ内の全ファイルを削除する
+	 * (ただし、空のディレクトリは削除できないので残る)
+	 * @param dir 指定するディレクトリ名
+	 * @param files ディレクトリ内のファイル名の文字列配列
+	 */
+	void removeFiles(String dir,String[] files)
+	{
+		foreach (String file from files) {
+			String filepath = dir + "/" + file;
+			if ( os.hasFile(filepath) ) {
+				os.unlink(filepath);
+			} else if ( os.hasDir(filepath) ) {
+				String[] subfiles = os.listDir(filepath);
+				removeFiles(filepath,subfiles);
+			}
+		}
+	}
+
+}
 /*----------------------------------------------------------*/
 
-//
-//define controller of operations
-//
-class Operater {
+print "[import]:operator.k";
 
+/**
+ * オペレーションの実行を管理するクラス
+ */
+class Operator {
+	/** オペレーションの名前 */
 	String opr;
-	Package pkg;
-	FileHandler fh;
+	/** オペレーションの対象となるパッケージ名 */
+	String name;
+	/** オペレーションで使用するシステムファイル */
+	Files fs;
 	
-	Operater(String[] args)
+	/**
+	 * Operatorクラスのコンストラクタ
+	 * @param args メイン関数から引き渡されたコマンドライン引数
+	 */
+	Operator(String[] args)
 	{
 		int ret;
 		String name = "";
@@ -960,12 +1214,15 @@ class Operater {
 				name = args[2];
 			}
 		}
-		this.pkg = new Package(name,"","");
-		this.fh = new FileHandler();
+		this.name = name;
+		this.fs = new Files();
 	}
 
-	/*-----opr in? operations-----*/
-	boolean checkOpr()
+	/**
+	 * コマンドラインから指定されたオペレーションが正しいかチェックする
+	 * @return オペレーションの有無
+	 */
+	boolean check()
 	{
 		String[] ops = ["search",
 						"install",
@@ -978,217 +1235,365 @@ class Operater {
 		return ( opr in? ops );
 	}
 
-	/*-----init-----*/
+	/**
+	 * システムファイルが無い場合に新規作成する
+	 */
 	void init()
 	{
 		if ( !os.hasFile(__latest) ) {
-			fh.resetLatest();
+			fs.resetLatest();
 		}
 		if ( !os.hasFile(__curdata) ) {
-			fh.resetCurPrev();
+			fs.resetCurPrev();
 		}
 	}
 
-	/*-----do operation-----*/
-	int exec()
+	/**
+	 * オペレーションの開始
+	 * @return オペレーションの結果
+	 */
+	int start()
 	{
 		int ret;
-		boolean flag;
-		String filename;
-		String[] need_search = ["search",
-								"install",
-								"update"];
-		String[] need_list = ["list",
-							  "installed"];
-		if ( opr == "undo" ) {
-			ret = undoMain(); 
-		} else if ( opr == "clean" ) {
-			ret = cleanMain(); 
-		} else if ( opr == "remove" ) {
-			ret = removeMain();
-		} else if ( opr in? need_list ) {
-			if ( opr == "list" ) {
-				filename = __klipdata;
-			} else if ( opr == "installed" ) {
-				filename = __curdata;
-			}
-			listKlip(filename);
-			ret = EXIT_SUCCESS;
-		} else if ( opr in? need_search ){
-			flag = searchKlip();
-			if ( opr == "search" ) {
-				ret = EXIT_SUCCESS;
-			} else if (flag) {
-				if( opr == "install" ) {
-					if ( |pkg.depend| > 1 ) {
-						ret = dinstallMain();
-					} else {
-						ret = installMain();
-					}
-				} else if ( opr == "update" ) {
-					ret = updateMain();
-				}
-			}
-		}
-		if ( ret == EXIT_ERROR ) {
+		String[] need_none = ["undo",
+							  "clean"];
+		String[] need_cur = ["installed",
+							 "remove"];
+		String[] need_klip = ["search",
+							  "list",
+							  "update",
+							  "install"];
+		if ( opr in? need_none )
+			ret = systemOpr(opr);
+		else if ( opr in? need_cur )
+			ret = localOpr(opr);
+		else if ( opr in? need_klip )
+			ret = globalOpr(opr);
+		if ( ret == EXIT_ERROR )
 			OUT.println("!ERR : " + opr + " faild");
-		}
 		return ret;
 	}
 
-	/*-----update KLIPDATA & search pkg from it-----*/
-	boolean searchKlip()
+	//common
+
+	/**
+	 * パッケージの情報をパースするパーサーを、
+	 * パースするリストファイルに対応させて生成する
+	 * @param pkgname パッケージの名前
+	 * @param filename パースするリストファイル名
+	 * @return ファイルに対応したパーサー
+	 */
+	Parser getParser(String pkgname,String filename)
 	{
-		fh.getklipdata();
-		String ret;
-		pkg.setMember(__klipdata);
-		if ( |pkg.url| == 0 ) {
-			OUT.println("KLIP : package is NOT FOUND...");
-			return false;
-		} else {
-			OUT.println(%("PACK : %s{0}\tver=%s{1} is FOUND", pkg.name, pkg.version));
-			return true;
-		}
+		String type = filename.split(".",0).pop();
+		Parser pars;
+		if ( type == "json" )
+			pars = new ParserJson(pkgname,filename);
+		else print("!ERR : Operator.getParser : type");
+		return pars;
 	}
 
-	/*-----update KLIPDATA & list pkg from it-----*/
-	void listKlip(String filename)
+	/**
+	 * リストファイルに存在するパッケージ名の配列を取得する
+	 * @param filename リストファイル名
+	 * @return パッケージ名の配列
+	 */
+	String[] mkNameList(String filename)
 	{
-		OUT.println("KLIP : show package list...");
-		String[] names = [];
-		String[] ret = [];
+		Parser pars = getParser("",filename);
+		pars.getMember();
+		return pars.getNameList();
+	}
+
+	/**
+	 * 特定パッケージのインスタンスを作成し、
+	 * 指定したリストファイルからの情報をセットして返す
+	 * @param pkgname パッケージ名
+	 * @param filename リストファイル名
+	 * @return 作成したパッケージインスタンス
+	 */
+	Package mkPackage(String pkgname, String filename)
+	{
+		Package pac = new Package(pkgname);
+		Parser pars = getParser(pkgname,filename);
+		pars.getMember();
+		pac.setMember(pars);
+		return pac;
+	}
+
+	/**
+	 * パッケージの正当性をチェックする
+	 * @param pkg チェック対象のパッケージ
+	 * @return 正当性の是非
+	 */
+	boolean checkPackage(Package pkg)
+	{
+		if ( |pkg.version| == 0 ) return false;
+		if ( |pkg.url| == 0 ) return false;
+		return true;
+	}
+
+	//search & list
+
+	/**
+	 * リストファイルからパッケージの情報を検索する
+	 * @param filename リストファイル名
+	 * @return 検索の結果
+	 */
+	int searchPackage(String filename)
+	{
 		String form = "PACK : %s{0}\tver=%s{1}";
-		fh.getklipdata();
-		names = pkg.getList(filename);
-		foreach (String nm from names) {
-			pac = new Package(nm,"","");
-			pac.setMember(filename);
-			if ( pac.version == "" ) continue;
+		Package pac = mkPackage(name,filename);
+		if ( checkPackage(pac) ) {
+			OUT.println("INFO : package FOUND!");
+			OUT.println(%(form,pac.name,pac.version));
+		} else {
+			OUT.println("INFO : package NOT FOUND");
+		}
+		return EXIT_SUCCESS;
+	}
+
+	/**
+	 * リストファイルの全パッケージ情報の一覧を表示する
+	 * @param filename リストファイル名
+	 * @return リスト表示の結果
+	 */
+	int showList(String filename)
+	{
+		if ( !os.hasFile(filename) ) return EXIT_ERROR;
+		String[] list = mkNameList(filename);
+		String form = "PACK : %s{0}\tver=%s{1}";
+		foreach (String nm from list) {
+			Package pac = mkPackage(nm,filename);
+			if ( !checkPackage(pac) ) continue;
 			OUT.println(%(form,pac.name,pac.version));
 		}
-		OUT.println("KLIP : theere are [" + |names| + "] packages");
+		OUT.println("KLIP : theere are [" + |list| + "] packages");
+		return EXIT_SUCCESS;
 	}
-	
-	/*-----main of install-----*/
-	int installMain()
+
+	//operation groups
+
+	/**
+	 * スクリプトの内部を操作するオペレーションを実行する
+	 * @param opr 指定されたオペレーション
+	 * @return オペレーションの結果
+	 */
+	int systemOpr(String opr)
+	{
+		if ( opr == "undo" ) return undoMain();
+		if ( opr == "clean" ) return cleanMain(); 
+		return EXIT_ERROR;
+	}
+
+	/**
+	 * ローカルのみの操作を行うオペレーションを実行する
+	 * @param opr 指定されたオペレーション
+	 * @return オペレーションの結果
+	 */
+	int localOpr(String opr)
+	{
+		if ( opr == "installed" ) return showList(__curdata);
+		Package pkg = mkPackage(name,__curdata);
+		if ( opr == "remove" ) {
+			if ( checkPackage(pkg) ) { 
+				return removeMain(pkg);
+			} else if (os.hasDir(__instdir + pkg.name)) {
+				OUT.println("INFO : package is installed by klip");
+			} else {
+				OUT.println("INFO : package isn't installed");
+			}
+			return EXIT_NORMAL;
+		}
+		return EXIT_ERROR;
+	}
+
+	/**
+	 * ネットへの接続が可能なことが前提になるオペレーションを実行する
+	 * @param opr 指定されたオペレーション
+	 * @return オペレーションの結果
+	 */
+	int globalOpr(String opr)
+	{
+		fs.getklipdata();
+		if ( opr == "list" ) return showList(__klipdata);
+		if ( opr == "search" ) return searchPackage(__klipdata);
+		Package chk = mkPackage(name,__curdata);
+		Package pkg = mkPackage(name,__klipdata);
+		if ( !checkPackage(pkg) ) {
+			OUT.println("INFO : package is NOT FOUND");
+			return EXIT_NORMAL;
+		}
+		if ( opr == "install" )
+			if ( !checkPackage(chk) ) return installMain(pkg);
+			else {
+				OUT.println("INFO : package is already installed");
+				if ( chk.version >= pkg.version ) return EXIT_NORMAL;
+				return updateMain(pkg);
+			}
+		if ( opr == "update" )
+			if ( checkPackage(chk) ) {
+				if ( chk.version >= pkg.version ) return EXIT_NORMAL;
+				return updateMain(pkg);
+			} else {
+				OUT.println("INFO : package isn't installed");
+				return installMain(pkg);
+			}
+		return EXIT_ERROR;
+	}
+
+	//for each operations
+
+	/**
+	 * パッケージをインストールの為の依存性の確認や、
+	 * 実行に伴ったシステムファイル操作等を行う
+	 * @param pkg インストールするパッケージ
+	 * @return インストールの結果
+	 */
+	int installMain(Package pkg)
 	{
 		int ret;
-		fh.mkBufCurData();
-		fh.updateLatest("install", pkg.name + "=" + pkg.version );
-		ret = pkg.install();
+		fs.mkBufCurData();
+		fs.updateLatest("install", pkg.name + "=" + pkg.version );
+		if ( |pkg.depend| == 0 ) ret = pkg.install();
+		else ret = dinstall(pkg);
 		if ( ret == EXIT_SUCCESS ) {
-			fh.modCurData([pkg.name,pkg.version,pkg.url],ADD);
-			fh.cpBufCur2Prev();
+			if ( |pkg.depend| == 0 )
+				fs.modCurData([pkg.name,pkg.version,pkg.url],ADD);
+			fs.cpBufCur2Prev();
 		}
-		fh.rmBufCurData();
+		fs.rmBufCurData();
 		return ret;
 	}
 	
-	/*-----main of update-----*/
-	int updateMain()
+	/**
+	 * パッケージ更新に伴ったシステムファイル操作等を行う
+	 * @param pkg 更新するパッケージ
+	 * @return 更新の結果
+	 */
+	int updateMain(Package pkg)
 	{
 		int ret;
-		fh.mkBufCurData();
-		fh.updateLatest("install", pkg.name + "=" + pkg.version);
+		fs.mkBufCurData();
+		fs.updateLatest("install", pkg.name + "=" + pkg.version);
 		ret = pkg.update();
 		if ( ret == EXIT_SUCCESS ) {
-			fh.modCurData([pkg.name,pkg.version,pkg.url],REPLACE);
-			fh.cpBufCur2Prev();
+			fs.modCurData([pkg.name,pkg.version,pkg.url],REPLACE);
+			fs.cpBufCur2Prev();
 		}
-		fh.rmBufCurData();
+		fs.rmBufCurData();
 		return ret;
 	}
 	
-	/*-----main of remove-----*/
-	int removeMain()
+	/**
+	 * パッケージ削除に伴ったシステムファイル操作等を行う
+	 * @param pkg 削除するパッケージ
+	 * @return 削除の結果
+	 */
+	int removeMain(Package pkg)
 	{
 		int ret;
-		fh.mkBufCurData();
+		fs.mkBufCurData();
 		ret = pkg.remove();
 		if ( ret == EXIT_SUCCESS ) {
-			fh.modCurData([pkg.name,pkg.version,pkg.url],DELETE);
-			fh.cpBufCur2Prev();
+			fs.modCurData([pkg.name,pkg.version,pkg.url],DELETE);
+			fs.cpBufCur2Prev();
 		}
-		fh.rmBufCurData();
+		fs.rmBufCurData();
 		return ret;
 	}
 	
-	/*-----main of clean-----*/
+	/**
+	 * システムファイルを最初期の状態に初期化する
+	 * @return 初期化の結果を返す
+	 */
 	int cleanMain()
 	{
-		fh.rmKlipData();
-		fh.resetCurPrev();
-		fh.updateLatest("install"," None");
+		fs.rmKlipData();
+		fs.resetCurPrev();
+		fs.updateLatest("install"," None");
 		return EXIT_SUCCESS;
 	}
 
-
-	/*-------------------------------------------------
-	  define methods of dinstall (not only 1 package)
-	-------------------------------------------------*/
-
-	/*-----main of install with depenency(dinstall)------*/
-	int dinstallMain()
+	/**
+	 * アンドゥの実行に伴うシステムファイル操作を行う
+	 * @return アンドゥの結果を返す
+	 */
+	int undoMain()
 	{
-		int ret;
-		fh.mkBufCurData();
-		ret = dinstall();
-		if ( ret == 0 ) {
-			print("!ERR : OperationController.dinstallMain : dinstall");
-			fh.rmBufCurData();
-			return EXIT_ERROR;
+		String[] u_fail = [];
+		fs.mkBufCurData();
+		if ( undo("cur") != EXIT_SUCCESS ) u_fail << "u_rm";
+		if ( undo("prev") != EXIT_SUCCESS ) u_fail << "u_in";
+		if ( |u_fail| != 0 ) {
+			fs.rmBufCurData();
+			if ( "u_in" in? u_fail ) OUT.println("!ERR : undo : uninstall failed");
+			if ( "u_rm" in? u_fail ) OUT.println("!ERR : undo : unremove failed");
+			return EXIT_NORMAL;
 		}
-		fh.cpBufCur2Prev();
-		fh.rmBufCurData();
-		OUT.println(%("KLIP : %d{0} packages are installed",ret));
+		fs.cpBufCur2Prev();
+		fs.rmBufCurData();
 		return EXIT_SUCCESS;
 	}
 
-	/*-----dinstall------*/
-	int dinstall()
+	//dinstall
+
+	/**
+	 * 依存性のあるパッケージも含めたインストールを行う
+	 * @param pkg インストールの主目的となるパッケージ
+	 * @return インストールしたパッケージの数
+	 */
+	int dinstall(Package pkg)
 	{
-		String[] list = [pkg.name + "=" + pkg.version];
-		resolveDepend(pkg,list);
+		String[] list = getDependList(pkg);
 		int num = |list|;
 		int ret = 0;
 		while( num > 0 ) {
-			Package pac = new Package(
-									list[num - 1].split("=",0)[0],
-									list[num - 1].split("=",0).pop(),
-									"");
-			pac.setMember(__klipdata);
-			if ( |pac.url| == 0 ) {
-				OUT.println(%("!ERR : %s{0} ver=%s{1} is NOT FOUND",
-							  pac.name,
-							  pac.version));
-				num--;
-				continue;
-			}
-			fh.updateLatest("install", pac.name + "=" + pac.version);
-			if ( pac.install() == EXIT_ERROR ) {
-				print("!ERR : OperationController.dinstall : install " + pac.name + "=" + pac.version);
-				num--;
-				continue;
-			}
-			fh.modCurData([pac.name,pac.version,pac.url],ADD);
-			ret++;
+			setver = list[num - 1].split("=",0).pop();
+			setnm = list[num - 1].split("=",0)[0];
+			Package pac = mkPackage(setnm,__klipdata);
 			num--;
+			if ( pac.install() == EXIT_SUCCESS ) {
+				fs.modCurData([pac.name,pac.version,pac.url],ADD);
+				ret++;
+			}
 		}
 		return ret;
 	}
+	
+	/**
+	 * パッケージが依存するパッケージ情報を文字列配列に出力する
+	 * @param pkg 基準となるパッケージ
+	 * @return 依存するパッケージ情報の文字列配列
+	 */
+	String[] getDependList(Package pkg)
+	{
+		String[] list = [pkg.name + "=" + pkg.version];
+		resolveDepend(pkg,list);
+		return list;
+	}
 
-	/*-----resolve dependency & make list for dinstall-----*/
+	/**
+	 * パッケージの依存するパッケージ情報のリストを、
+	 * 子となるパッケージの依存性も含めて再帰的に取得する
+	 * @param cur 現在の基準となるパッケージ
+	 * @param list 情報を追加していくリスト
+	 */
 	void resolveDepend (Package cur,String[] list)
 	{
 		print("KLIP : resolve dependency...");
-		foreach( String ce from cur.depend ) {
-			if( !searchList(ce,list,0) ) continue;
-			Package pac = new Package(ce.split("=",0)[0],
-									  ce.split("=",0).pop(),
-									  "");
-			pac.setMember(__klipdata);
-			if( |pac.url| == 0 ) {
-				print("!ERR : OperationController.resolveDepend : setMember :" + pac.name);
+		foreach( String txt from cur.depend ) {
+			if( !searchList(txt,list,0) ) continue;
+			String setnm = txt.split("=",0)[0];
+			String setver = txt.split("=",0).pop();
+			Package pac = mkPackage(setnm,__klipdata);
+			if( !checkPackage(pac) ) {
+				print("!ERR : Operator.resolveDepend : setMember :" + pac.name);
+				continue;
+			}
+			if ( setver > pac.version ) {
+				OUT.println("!ERR : cannot find required version");
+				OUT.println("!ERR : " + setnm + " NEED==" + setver + " < FOUND==" + pac.version);
 				continue;
 			}
 			searchList(pac.name + "=" + pac.version,list,1);
@@ -1196,150 +1601,137 @@ class Operater {
 		}
 	}
 	
-	/*-----search install list-----*/
+	/**
+	 * 依存パッケージのリストから、指定のパッケージが既に存在するかを検索する
+	 * @param pack パッケージ名
+	 * @param list リストとなる文字列配列
+	 * @param mode 発見した場合に更新するか否か
+	 * @return 検索の結果
+	 */
 	boolean searchList(String pack,String[] list,int mode)
 	{
-		foreach ( String ce from list ) {
-			if( pack.split("=",0)[0] == ce.split("=",0)[0] ) {
-				if ( pack.split("=",0).pop() <= ce.split("=",0).pop() ) {
+		foreach ( String txt from list ) {
+			if( pack.split("=",0)[0] == txt.split("=",0)[0] ) {
+				if ( pack.split("=",0).pop() <= txt.split("=",0).pop() ) 
 					return false;
-				} else if ( mode == 1 ) {
-					list[list.indexOf(ce)] = pack;
+				else if ( mode == 1 ) {
+					list[list.indexOf(txt)] = pack;
 					return true;
 				}
 			}
 		}
-		if( mode == 1 ) {
-			list << pack;
-		}
+		if( mode == 1 ) list << pack;
 		return true;
 	}
 
+	//undo
 
-	/*------------------------
-	  define methods of undo
-	------------------------*/
-
-	/*-----undo main-----*/
-	int undoMain()
-	{
-		String[] u_fail = [];
-		fh.mkBufCurData();
-		if ( undo("u_remove") != EXIT_SUCCESS ) { u_fail << "u_rm"; }
-		if ( undo("u_install") != EXIT_SUCCESS ) { u_fail << "u_in"; }
-		if ( |u_fail| != 0 ) {
-			fh.rmBufCurData();
-			if ( "u_in" in? u_fail ) {
-				OUT.println("!ERR : undo :install failed");
-			}
-			if ( "u_rm" in? u_fail ) {
-				OUT.println("!ERR : undo :remove failed");
-			}
-			return EXIT_NORMAL;
-		}
-		fh.cpBufCur2Prev();
-		fh.rmBufCurData();
-		return EXIT_SUCCESS;
-	}
-
-	/*-----undo(install/remove)-----*/
-	int undo(String u_opr)
+	/**
+	 * アンドゥの実動作として、パッケージのインストール、または削除を行う
+	 * @param base 基準を指定する文字列
+	 * @return アンドゥの結果
+	 */
+	int undo(String base)
 	{
 		int ret;
-		String[] list = fh.changeDiff(u_opr);
-		if ( |list| == 0 ) {
-			return EXIT_SUCCESS;
-		}
-		foreach( String ce from list ) {
-			Package pac = new Package( 
-									   filter(ce,"name"),
-									   filter(ce,"version"),
-									   filter(ce,"url"));
-			if( u_opr == "u_install") {
+		int mode;
+		String[] list = fs.changeDiff(base);
+		if ( |list| == 0 ) return EXIT_SUCCESS;
+		foreach( String txt from list ) {
+			String setnm = nameFilter(txt);
+			if ( base == "prev") {
+				Package pac = mkPackage(setnm,__prevdata);
+				if ( !checkPackage(pac) ) continue;
 				ret = pac.install();
-				if ( ret == EXIT_SUCCESS ) {
-					fh.modCurData([pac.name,pac.version,pac.url],ADD);
-				}
-			} else if ( u_opr == "u_remove" ) {
+				mode = ADD;
+			} else if ( base == "cur" ) {
+				Package pac = mkPackage(setnm,__curdata);
+				if ( !checkPackage(pac) ) continue;
 				ret = pac.remove();
-				if ( ret == EXIT_SUCCESS ) {
-					fh.modCurData([pac.name,pac.version,pac.url],DELETE);
-				}
+				mode = DELETE;
 			}
+			if ( ret == EXIT_SUCCESS )
+				fs.modCurData([pac.name,pac.version,pac.url],mode);
 		}
 		return ret;
 	}
 
-	/*-----filter for undo-----*/
-	String filter(String cell,String member)
+	/**
+	 * アンドゥ用の情報文字列のフィルタリングを行う
+	 * @param cell フィルタリングする文字列
+	 * @return フィルタリング結果
+	 */
+	String nameFilter(String cell)
 	{
-		String bef = %('"%s{0}":"',member);
+		String bef = '"name":"';
 		String aft = '"';
 		String ret = cell.split(bef,0).pop();
 		return ret.split(aft,0)[0];
 	}
 
 }
-
 /*----------------------------------------------------------*/
+print "[import]:klip.k";
 
-//
-//define klip mainline
-//
 class Klip {
-	
+	/** メイン関数からのコマンドライン引数の文字列配列 */	
 	String[] args;
+	/** 設定のチェックの際、検知した問題を格納する文字列配列 */	
 	String[] ecode;
 
+	/**
+	 * Klipクラスのコンストラクタ
+	 * @param args メイン関数からのコマンドライン引数
+	 */
 	Klip(String[] args)
 	{
 		this.args  = args;
-		this.ecode = [];
 	}
 
-	//*-----start klip-----*/
+	/**
+	 * 設定のチェックに成功していれば、オペレーションを実行する
+	 * 問題があるならシステムメッセージを表示する
+	 * @return オペレーションの結果
+	 */
 	int start()
 	{
 		if ( !__fail ) {
-			/*-----oparation exec-----*/
-			Operater op = new Operater(args);
+			Operator op = new Operator(args);
 			op.init();
-			if ( op.checkOpr() ) {
-				return op.exec();
-			}
-			showUsage();
+			if ( op.check() ) return op.start();
+			OUT.println(__usage);
 		} 
 		info();
 		return EXIT_ERROR;
 	}
 	
-	//*-----check package for klip-----*/
+	/**
+	 * usingするライブラリのフラグと、
+	 * 端末内にライブラリの有無とを調査し、
+	 * 問題がある場合はecode配列に指定文字列を格納する
+	 */
 	void check()
 	{
 		ecode = [];
 
-		//*-----curl-----*/
 		if ( !os.hasLib("libcurl") && !__use_curl ) ecode << "curl";
 		
-		//*-----zlib & libtar-----*/
 		if ( !os.hasLib("libz") && !__use_zlib) ecode << "zlib";
 
 		if ( !os.hasLib("libtar") && !__use_libtar) ecode << "libtar";
 		
-		if ( __use_zlib && __use_libtar ) {
-			__use_zllt = true;
-		} else {
-			__use_zllt = false;
-		}
-
-		//*-----result-----*/
+		if ( __use_zlib && __use_libtar ) __use_zllt = true;
+		else __use_zllt = false;
+		
 		if ( !__use_zllt && !__use_posix ) {
 			ecode << "e_decomp";
 			__fail = true;
 		}
 	}
 
-	//*-----show infomation-----*/
+	/**
+	 * ecodeを読み、対応するシステムメッセージを表示する
+	 */
 	void info()
 	{
 		String[] ret = [];
@@ -1347,41 +1739,36 @@ class Klip {
 			ret << "!ERR : unknown_user_mode";
 			ret << '     : please set "property variable HOME" correctry';
 		}
+		
 		if ( "e_decomp" in? ecode ) {
 			ret << '!ERR : cannot both "using [zlib+libtar/posix]"';
 			ret << "     : please install either of them by another way";
 		}
-		if ( "libtar" in? ecode ) {
+		
+		if ( "libtar" in? ecode )
 			ret << "INFO : you should install libtar(-devel)";
-		}
-		if ( "zlib" in? ecode ) {
+		
+		if ( "zlib" in? ecode )
 			ret << "INFO : you should install zlib(-devel)";
-		}
-		if ( "curl" in? ecode ) {
+		
+		if ( "curl" in? ecode )
 			ret << "INFO : you should install libcurl(-devel)";
-		}
-		if ( |ecode| != 0 ) {
-			foreach( String txt from ret ) {
-				OUT.println(txt);
-			}
-		}
-	}
-
-	void showUsage() {
-		OUT << __usage << EOL;
+		
+		if ( |ecode| != 0 ) 
+			foreach( String txt from ret ) OUT.println(txt);
 	}
 
 }
+/*----------------------------------------------------------*/
 
-
-//
-//Script.main
-//
+/**
+ * スクリプトのメイン関数
+ * @param args 実行する処理を指定した文字列配列
+ * @return 全行程の結果
+ */
 int main (String[] args)
 {
-	Klip klip = new Klip(args);
-	klip.check();
-	return klip.start();
+        Klip klip = new Klip(args);
+        klip.check();
+        return klip.start();
 }
-
-
