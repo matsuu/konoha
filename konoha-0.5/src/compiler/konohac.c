@@ -163,10 +163,10 @@ InputStream* new_ScriptInputStream(Ctx *ctx, knh_bytes_t path, knh_cwb_t *cwb, N
 
 Stmt *knh_InputStream_parseStmt(Ctx *ctx, InputStream *in, int isData)
 {
-	Token *tk = new_Token(ctx, 0, DP(in)->uri, 0, TT_BRACE);
+	Token *tk = new_Token(ctx, 0, DP(in)->uri, 0, knh_char_totoken('{'));
 	KNH_LPUSH(ctx, tk);
 	KNH_LPUSH(ctx, in);
-	knh_InputStream_parseToken(ctx, in, tk);
+	knh_Token_parse(ctx, tk, in);
 	DBG2_DUMP(ctx, tk, KNH_NULL, "tokens");
 	return new_StmtINSTMT(ctx, tk, isData);
 }
@@ -465,7 +465,7 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 	knh_class_t cid  = knh_NameSpace_getcid(ctx, ns, B(bufn));
 	if(cid == CLASS_unknown) {
 		cid = knh_ClassTable_newId(ctx);
-		KNH_ASSERT(ClassTable(cid).sname == NULL);
+		KNH_ASSERT(ClassTable(cid).class_cid == NULL);
 	}
 	else {
 		knh_Asm_perror(ctx, abr, KERR_ERROR, _("cannot redefine %C"), cid);
@@ -489,47 +489,45 @@ int knh_StmtCLASS_decl(Ctx *ctx, Stmt *stmt, Asm *abr, NameSpace *ns)
 
 	DP(StmtCLASS_class(stmt))->cid = cid;
 
-	{
-		knh_ClassTable_t *t = (knh_ClassTable_t*)&(ClassTable(cid));
-		t->cflag  = knh_StmtCLASS_flag(ctx, stmt);
-		t->oflag  = KNH_FLAG_CF2OF(t->cflag);
-		if(SP(StmtCLASS_instmt(stmt))->stt == STT_DONE) {
-			t->bcid   = CLASS_Any;    /* Glue */
-		}
-		else {
-			t->bcid   = CLASS_Object;
-		}
-		t->supcid = supcid;
-		t->offset = 0; /* will be extended in CLASS_typing */
-		KNH_ASSERT(t->sname == NULL);
-		knh_setClassName(ctx, cid, new_String(ctx, B(bufn), NULL));
-		KNH_INITv(t->cstruct, new_ClassStruct0(ctx, 0, 8));
-		KNH_INITv(t->cmap, ctx->share->ClassTable[CLASS_Any].cmap);
-		knh_setClassDefaultValue(ctx, cid, KNH_NULL, NULL);
-		knh_NameSpace_setLocalName(ctx, ns, cid);
-
-		if(SP(StmtCLASS_interface(stmt))->stt != STT_DONE) {
-			Stmt *istmt = StmtCLASS_interface(stmt);
-			int i, n = DP(istmt)->size;
-			for(i = 0; i < n; i++) {
-				Token *tk = DP(stmt)->tokens[i];
-				knh_class_t icid = knh_NameSpace_getcid(ctx, ns, knh_Token_tobytes(ctx, tk));
-				if(icid == CLASS_unknown) {
-					knh_Token_perror(ctx, tk, KERR_EWARN, _("unknown class: %s"), sToken(tk));
-					continue;
-				}
-				if(!knh_class_isInterface(icid)) {
-					knh_Token_perror(ctx, tk, KERR_EWARN, _("cannot implements %C: this class is not @Interface"), icid);
-					continue;
-				}
-				knh_class_addInterface(ctx, cid, icid);
-			}
-		}
-		if(SP(StmtCLASS_instmt(stmt))->stt == STT_DONE) {
-			knh_Stmt_done(ctx, stmt);
-		}
-		KNH_NOTICE(ctx, "added new class: %s", CLASSN(cid));
+	knh_ClassTable_t *TC = (knh_ClassTable_t*)&(ClassTable(cid));
+	TC->cflag  = knh_StmtCLASS_flag(ctx, stmt);
+	TC->oflag  = KNH_FLAG_CF2OF(TC->cflag);
+	if(SP(StmtCLASS_instmt(stmt))->stt == STT_DONE) {
+		TC->bcid   = CLASS_Any;    /* Glue */
 	}
+	else {
+		TC->bcid   = CLASS_Object;
+	}
+	TC->supcid = supcid;
+	TC->offset = 0; /* will be extended in CLASS_typing */
+	KNH_ASSERT(TC->class_cid == NULL);
+	knh_setClassName(ctx, cid, new_String(ctx, B(bufn), NULL));
+	KNH_INITv(TC->cstruct, new_ClassStruct0(ctx, 0, 8));
+	KNH_INITv(TC->cmap, ctx->share->ClassTable[CLASS_Any].cmap);
+	knh_setClassDefaultValue(ctx, cid, KNH_NULL, NULL);
+	knh_NameSpace_setLocalName(ctx, ns, cid);
+
+	if(SP(StmtCLASS_interface(stmt))->stt != STT_DONE) {
+		Stmt *istmt = StmtCLASS_interface(stmt);
+		int i, n = DP(istmt)->size;
+		for(i = 0; i < n; i++) {
+			Token *tk = DP(stmt)->tokens[i];
+			knh_class_t icid = knh_NameSpace_getcid(ctx, ns, knh_Token_tobytes(ctx, tk));
+			if(icid == CLASS_unknown) {
+				knh_Token_perror(ctx, tk, KERR_EWARN, _("unknown class: %s"), sToken(tk));
+				continue;
+			}
+			if(!knh_class_isInterface(icid)) {
+				knh_Token_perror(ctx, tk, KERR_EWARN, _("cannot implements %C: this class is not @Interface"), icid);
+				continue;
+			}
+			knh_class_addInterface(ctx, cid, icid);
+		}
+	}
+	if(SP(StmtCLASS_instmt(stmt))->stt == STT_DONE) {
+		knh_Stmt_done(ctx, stmt);
+	}
+	KNH_NOTICE(ctx, "added new class: %s", CLASSN(cid));
 	return 1;
 }
 

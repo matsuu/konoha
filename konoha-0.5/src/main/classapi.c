@@ -546,20 +546,20 @@ void knh_Bytes_traverse(Ctx *ctx, knh_Bytes_t *b, knh_ftraverse ftr)
 }
 
 /* ======================================================================== */
-/* Pair */
+/* Tuple2 */
 
-#define knh_Pair_init_ NULL
-#define knh_Pair_copy NULL
-#define knh_Pair_traverse_ NULL
-#define knh_Pair_compareTo NULL
-#define knh_Pair_hashCode NULL
-#define knh_Pair_newClass NULL
-#define knh_Pair_getkey NULL
+#define knh_Tuple2_init_ NULL
+#define knh_Tuple2_copy NULL
+#define knh_Tuple2_traverse_ NULL
+#define knh_Tuple2_compareTo NULL
+#define knh_Tuple2_hashCode NULL
+#define knh_Tuple2_newClass NULL
+#define knh_Tuple2_getkey NULL
 
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_Pair_init(Ctx *ctx, knh_Pair_t *t, int init)
+void knh_Tuple2_init(Ctx *ctx, knh_Tuple2_t *t, int init)
 {
 	KNH_INITv(t->first, KNH_NULL);
 	KNH_INITv(t->second, KNH_NULL);
@@ -568,54 +568,22 @@ void knh_Pair_init(Ctx *ctx, knh_Pair_t *t, int init)
 /* ------------------------------------------------------------------------ */
 
 static
-void knh_Pair_traverse(Ctx *ctx, knh_Pair_t *t, knh_ftraverse ftr)
+void knh_Tuple2_traverse(Ctx *ctx, knh_Tuple2_t *t, knh_ftraverse ftr)
 {
 	ftr(ctx, t->first);
 	ftr(ctx, t->second);
-}
-
-/* ======================================================================== */
-/* Triple */
-
-#define knh_Triple_init_ NULL
-#define knh_Triple_copy NULL
-#define knh_Triple_traverse_ NULL
-#define knh_Triple_compareTo NULL
-#define knh_Triple_hashCode NULL
-#define knh_Triple_newClass NULL
-#define knh_Triple_getkey NULL
-
-/* ------------------------------------------------------------------------ */
-
-static
-void knh_Triple_init(Ctx *ctx, knh_Triple_t *t, int init)
-{
-	KNH_INITv(t->first, KNH_NULL);
-	KNH_INITv(t->second, KNH_NULL);
-	KNH_INITv(t->third, KNH_NULL);
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
-void knh_Triple_traverse(Ctx *ctx, knh_Triple_t *t, knh_ftraverse ftr)
-{
-	ftr(ctx, t->first);
-	ftr(ctx, t->second);
-	ftr(ctx, t->third);
 }
 
 /* ======================================================================== */
 /* Range */
 
-#define knh_Range_init knh_Pair_init
+#define knh_Range_init knh_Tuple2_init
 #define knh_Range_copy NULL
-#define knh_Range_traverse knh_Pair_traverse
+#define knh_Range_traverse knh_Tuple2_traverse
 #define knh_Range_compareTo NULL
 #define knh_Range_hashCode NULL
 #define knh_Range_newClass NULL
 #define knh_Range_getkey NULL
-
 
 /* ======================================================================== */
 /* Array */
@@ -2345,11 +2313,11 @@ void knh_KLRCode_traverse(Ctx *ctx, KLRCode *o, knh_ftraverse ftr)
 #define knh_Object_fdefault NULL
 #define knh_Any_fdefault NULL
 #define knh_This_fdefault NULL
-#define knh_T0_fdefault NULL
-#define knh_T1_fdefault NULL
-#define knh_T2_fdefault NULL
-#define knh_T3_fdefault NULL
-#define knh_TVar_fdefault NULL
+#define knh_Any0_fdefault NULL
+#define knh_Any1_fdefault NULL
+#define knh_Any2_fdefault NULL
+#define knh_Any3_fdefault NULL
+#define knh_AnyVar_fdefault NULL
 #define knh_Nue_fdefault NULL
 #define knh_Boolean_fdefault_ NULL
 #define knh_Number_fdefault NULL
@@ -2360,8 +2328,7 @@ void knh_KLRCode_traverse(Ctx *ctx, KLRCode *o, knh_ftraverse ftr)
 #define knh_String_fdefault_ NULL
 #define knh_StringX_fdefault_ NULL
 #define knh_Bytes_fdefault NULL
-#define knh_Pair_fdefault NULL
-#define knh_Triple_fdefault NULL
+#define knh_Tuple2_fdefault NULL
 #define knh_Range_fdefault NULL
 #define knh_Array_fdefault NULL
 #define knh_IArray_fdefault NULL
@@ -2378,6 +2345,7 @@ void knh_KLRCode_traverse(Ctx *ctx, KLRCode *o, knh_ftraverse ftr)
 #define knh_MethodField_fdefault NULL
 #define knh_Method_fdefault NULL
 #define knh_Mapper_fdefault NULL
+#define knh_ClassMap_fdefault NULL
 #define knh_Closure_fdefault NULL
 #define knh_AffineConv_fdefault NULL
 #define knh_ClassSpec_fdefault NULL
@@ -2414,7 +2382,7 @@ Object *knh_Boolean_fdefault(Ctx *ctx, knh_class_t cid)
 static
 Object *knh_Class_fdefault(Ctx *ctx, knh_class_t cid)
 {
-	return (Object*)new_Class(ctx, cid);
+	return (Object*)ctx->share->ClassTable[CLASS_Class].class_cid;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -2442,6 +2410,16 @@ Object *knh_Float_fdefault(Ctx *ctx, knh_class_t cid)
 	return (Object*)KNH_FLOAT0;
 }
 
+///* ------------------------------------------------------------------------ */
+//
+//static
+//Object *knh_FloatX_fdefault(Ctx *ctx, knh_class_t cid)
+//{
+//	ClassSpec *o = knh_getClassSpec(ctx, cid].cspec;
+//	KNH_ASSERT(IS_ClassSpec(o));
+//	return UP(DP(o)->fvalue);
+//}
+
 /* ------------------------------------------------------------------------ */
 
 static
@@ -2450,6 +2428,16 @@ Object *knh_Int_fdefault(Ctx *ctx, knh_class_t cid)
 	return (Object*)KNH_INT0;
 }
 
+///* ------------------------------------------------------------------------ */
+//
+//static
+//Object *knh_IntX_fdefault(Ctx *ctx, knh_class_t cid)
+//{
+//	ClassSpec *o = knh_getClassSpec(ctx, cid].cspec;
+//	KNH_ASSERT(IS_ClassSpec(o));
+//	return UP(DP(o)->ivalue);
+//}
+
 /* ------------------------------------------------------------------------ */
 
 static
@@ -2457,6 +2445,16 @@ Object *knh_String_fdefault(Ctx *ctx, knh_class_t cid)
 {
 	return (Object*)TS_EMPTY;
 }
+
+///* ------------------------------------------------------------------------ */
+//
+//static
+//Object *knh_StringX_fdefault(Ctx *ctx, knh_class_t cid)
+//{
+//	ClassSpec *u = knh_getClassSpec(ctx, cid].cspec;
+//	KNH_ASSERT(IS_ClassSpec(u));
+//	return UP(DP(u)->svalue);
+//}
 
 /* ------------------------------------------------------------------------ */
 
@@ -2483,7 +2481,7 @@ Object *knh_System_fdefault(Ctx *ctx, knh_class_t cid)
 
 #define KNH_CC_METHODAPI
 #include"../gen/method_.c"
-#include"../api/oprapi.c"
+#include"../api/objectapi.c"
 #include"../api/numberapi.c"
 #include"../api/stringapi.c"
 
@@ -2676,8 +2674,13 @@ void knh_loadClassData(Ctx *ctx, knh_ClassData_t *data)
 			else {
 				KNH_INITv(t->cstruct, ClassTable(data->supcid).cstruct);
 			}
-			if(t->cmap == NULL) {
-				KNH_INITv(t->cmap, knh_ClassMap_fdefault(ctx, CLASS_ClassMap));
+			KNH_ASSERT(t->cmap == NULL);
+			{
+				ClassMap *cm = ClassTable(CLASS_Any).cmap;
+				if((data->flag & KNH_FLAG_CF_PRIVATE) == 0 || cid == CLASS_Any) {
+					cm = new_ClassMap0(ctx, data->mapper_size);
+				}
+				KNH_INITv(t->cmap, cm);
 			}
 			knh_setClassDefaultValue(ctx, cid, KNH_NULL, data->fdefault);
 		}

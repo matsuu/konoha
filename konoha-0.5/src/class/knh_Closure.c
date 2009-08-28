@@ -46,8 +46,6 @@ extern "C" {
 
 METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp)
 {
-	DBG2_ASSERT(IS_bClosure(sfp[0].cc));
-	DBG2_ASSERT(IS_bMethod(sfp[2].mtd));
 	KNH_INITv((sfp[0].cc)->base, sfp[1].o);
 	KNH_INITv((sfp[0].cc)->mtd, sfp[2].mtd);
 	(sfp[0].cc)->envsfp = NULL;
@@ -55,11 +53,11 @@ METHOD knh__Closure_new(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method T0 Closure.invoke(T1 x, T2 y, T3 z) @VarArgs */
+/* @method Any0 Closure.invoke(Any1 x, Any2 y, Any3 z) @VarArgs */
 
 METHOD knh__Closure_invoke(Ctx *ctx, knh_sfp_t *sfp)
 {
-	DBG2_ASSERT(IS_bClosure(sfp[0].cc));
+	//DBG2_ASSERT(IS_bClosure(sfp[0].cc));
 	KNH_INVOKE(ctx, sfp);
 }
 
@@ -215,26 +213,16 @@ Closure* new_ClosureDEFAULT(Ctx *ctx, knh_type_t rtype, knh_class_t cid)
 knh_class_t
 knh_addClosureClass(Ctx *ctx, knh_class_t cid, String *name, knh_type_t r0, knh_type_t p1, knh_type_t p2, knh_type_t p3)
 {
-	knh_ClassTable_t *t = NULL;
-	knh_flag_t mask = 0;
-
 	if(cid == CLASS_newid) {
 		cid = knh_ClassTable_newId(ctx);
 	} else {
+		//KNH_ASSERT(cid + 1 == ctx->share->ClassTableSize);
 		((knh_SharedData_t*)ctx->share)->ClassTableSize = cid;
 	}
-	/* knh_ClassTable_t */ t = pClassTable(cid);
-	KNH_ASSERT(ClassTable(cid).sname == NULL);
-	if(knh_class_isTypeVariable(CLASS_type(r0)) ||
-			knh_class_isTypeVariable(CLASS_type(p1)) ||
-			knh_class_isTypeVariable(CLASS_type(p2)) ||
-			knh_class_isTypeVariable(CLASS_type(p3))) {
-		mask = KNH_FLAG_CF_TYPEVARIABLE;
-		DBG2_P("TypeVarable: %s", knh_String_tochar(name));
-	}
+	knh_ClassTable_t *t = pClassTable(cid);
+	KNH_ASSERT(ClassTable(cid).class_cid == NULL);
 
-	knh_setClassName(ctx, cid, name);
-	t->cflag  = ClassTable(CLASS_Closure).cflag | mask;
+	t->cflag  = ClassTable(CLASS_Closure).cflag;
 	t->oflag  = ClassTable(CLASS_Closure).oflag;
 	t->sid    = ClassTable(CLASS_Closure).sid;
 
@@ -245,6 +233,7 @@ knh_addClosureClass(Ctx *ctx, knh_class_t cid, String *name, knh_type_t r0, knh_
 	t->size = ClassTable(CLASS_Closure).size;
 	t->bsize  = ClassTable(CLASS_Closure).bsize;
 
+	knh_setClassName(ctx, cid, name);
 	KNH_INITv(t->cstruct, ClassTable(CLASS_Closure).cstruct);
 	KNH_INITv(t->cmap, ClassTable(CLASS_Closure).cmap);
 	t->r0 = r0;
@@ -259,29 +248,28 @@ knh_addClosureClass(Ctx *ctx, knh_class_t cid, String *name, knh_type_t r0, knh_
 
 knh_class_t knh_class_Closure(Ctx *ctx, knh_type_t r0, knh_type_t p1, knh_type_t p2, knh_type_t p3)
 {
-	knh_class_t cid = CLASS_unknown;
-	knh_cwb_t cwbbuf, *cwb = knh_cwb_open(ctx, &cwbbuf);
-	knh_write_ltype(ctx, cwb->w, r0);
-	knh_putc(ctx, cwb->w, '(');
-	knh_write_ltype(ctx, cwb->w, p1);
+	char buf[CLASSNAME_BUFSIZ*2];
+	char tb0[CLASSNAME_BUFSIZ], tb1[CLASSNAME_BUFSIZ];
+	knh_format_type(ctx, tb0, sizeof(tb0), r0);
+	knh_format_type(ctx, tb1, sizeof(tb1), p1);
 	if(p2 == TYPE_void) {
-		goto L_CLOSE;
+		knh_snprintf(buf, sizeof(buf), "%s(%s)", tb0, tb1);
 	}
-	knh_putc(ctx, cwb->w, ',');
-	knh_write_ltype(ctx, cwb->w, p2);
-	if(p3 == TYPE_void) {
-		goto L_CLOSE;
+	else if(p3 == TYPE_void) {
+		char tb2[CLASSNAME_BUFSIZ];
+		knh_format_type(ctx, tb2, sizeof(tb2), p2);
+		knh_snprintf(buf, sizeof(buf), "%s(%s,%s)", tb0, tb1, tb2);
 	}
-	knh_putc(ctx, cwb->w, ',');
-	knh_write_ltype(ctx, cwb->w, p2);
-	L_CLOSE:;
-	knh_putc(ctx, cwb->w, ')');
-
-	/* knh_class_t*/ cid = knh_getcid(ctx, knh_cwb_tobytes(cwb));
+	else {
+		char tb2[CLASSNAME_BUFSIZ], tb3[CLASSNAME_BUFSIZ];
+		knh_format_type(ctx, tb2, sizeof(tb2), p2);
+		knh_format_type(ctx, tb3, sizeof(tb3), p3);
+		knh_snprintf(buf, sizeof(buf), "%s(%s,%s,%s)", tb0, tb1, tb2, tb3);
+	}
+	knh_class_t cid = knh_getcid(ctx, B(buf));
 	if(cid == CLASS_unknown) {
-		cid = knh_addClosureClass(ctx, CLASS_newid, knh_cwb_newString(ctx, cwb), r0, p1, p2, p3);
-	} else {
-		knh_cwb_close(cwb);
+		DBG2_P("*** Generating %s ***", buf);
+		cid = knh_addClosureClass(ctx, CLASS_newid, new_String(ctx, B(buf), NULL), r0, p1, p2, p3);
 	}
 	return cid;
 }

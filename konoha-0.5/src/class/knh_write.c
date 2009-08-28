@@ -212,30 +212,24 @@ void knh_write_mn(Ctx *ctx, OutputStream *w, knh_methodn_t mn)
 
 /* ------------------------------------------------------------------------ */
 
-#define _knh_write_type(ctx, w, type)   knh_write_type_(ctx, w, type, 0)
-#define _knh_write_ltype(ctx, w, type)  knh_write_type_(ctx, w, type, 1)
-
-void knh_write_type_(Ctx *ctx, OutputStream *w, knh_type_t type, int isLongName)
+void knh_write_type(Ctx *ctx, OutputStream *w, knh_type_t type)
 {
-	knh_class_t cid = CLASS_type(type);
-	KNH_ASSERT_cid(cid);
 	if(type == TYPE_void) {
 		knh_write(ctx, w, STEXT("void"));
+		return;
 	}
-	else if(type == TYPE_var) {
-		knh_write(ctx, w, STEXT("var"));
+
+	knh_class_t cid = CLASS_type(type);
+	KNH_ASSERT_cid(cid);
+	char *cname = CTXCLASSN(cid);
+	if(IS_ubxtype(type)) {
+		knh_putc(ctx, w, tolower(cname[0]));
+		knh_write_char(ctx, w, cname + 1);
+		return;
 	}
-	else {
-		char *cname = (isLongName) ? knh_ClassTable_CLASSN(ctx, cid) : CTXCLASSN(cid);
-		if(IS_ubxtype(type)) {
-			knh_putc(ctx, w, tolower(cname[0]));
-			knh_write_char(ctx, w, cname + 1);
-			return;
-		}
-		knh_write_char(ctx, w, cname);
-		if(IS_NATYPE(type)) {
-			knh_putc(ctx, w, '?');
-		}
+	knh_write_char(ctx, w, cname);
+	if(!IS_NNTYPE(type)) {
+		knh_putc(ctx, w, '?');
 	}
 }
 

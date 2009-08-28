@@ -371,34 +371,34 @@ knh_fieldn_t knh_getfnq(Ctx *ctx, knh_bytes_t tname, knh_fieldn_t def)
 /* ======================================================================== */
 /* [methodn] */
 
-//String *new_String__mn(Ctx *ctx, knh_methodn_t mn)
-//{
-//	if(METHODN_IS_MOVTEXT(mn)) {
-//		char buf[CLASSNAME_BUFSIZ];
-//		knh_snprintf(buf, sizeof(buf), "%%%s", FIELDN(METHODN_TOFIELDN(mn)));
-//		return new_String(ctx, B(buf), NULL);
-//	}
-//	if(METHODN_IS_GETTER(mn)) {
-//		char buf[CLASSNAME_BUFSIZ];
-//		knh_snprintf(buf, sizeof(buf), "get%s", FIELDN(METHODN_TOFIELDN(mn)));
-//		if(islower(buf[3])) buf[3] = toupper(buf[3]);
-//		return new_String(ctx, B(buf), NULL);
-//	}
-//	if(METHODN_IS_SETTER(mn)) {
-//		char buf[CLASSNAME_BUFSIZ];
-//		knh_snprintf(buf, sizeof(buf), "set%s", FIELDN(METHODN_TOFIELDN(mn)));
-//		if(islower(buf[3])) buf[3] = toupper(buf[3]);
-//		return new_String(ctx, B(buf), NULL);
-//	}
-//
-//	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
-//	String *s = (String*)knh_DictIdx_get__fast(DP(ctx->sys)->FieldNameDictIdx, FIELDN_UNMASK(mn));
-//	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-//	if(IS_NULL(s)) {
-//		return TS_EMPTY;
-//	}
-//	return s;
-//}
+String *new_String__mn(Ctx *ctx, knh_methodn_t mn)
+{
+	if(METHODN_IS_MOVTEXT(mn)) {
+		char buf[CLASSNAME_BUFSIZ];
+		knh_snprintf(buf, sizeof(buf), "%%%s", FIELDN(METHODN_TOFIELDN(mn)));
+		return new_String(ctx, B(buf), NULL);
+	}
+	if(METHODN_IS_GETTER(mn)) {
+		char buf[CLASSNAME_BUFSIZ];
+		knh_snprintf(buf, sizeof(buf), "get%s", FIELDN(METHODN_TOFIELDN(mn)));
+		if(islower(buf[3])) buf[3] = toupper(buf[3]);
+		return new_String(ctx, B(buf), NULL);
+	}
+	if(METHODN_IS_SETTER(mn)) {
+		char buf[CLASSNAME_BUFSIZ];
+		knh_snprintf(buf, sizeof(buf), "set%s", FIELDN(METHODN_TOFIELDN(mn)));
+		if(islower(buf[3])) buf[3] = toupper(buf[3]);
+		return new_String(ctx, B(buf), NULL);
+	}
+
+	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
+	String *s = (String*)knh_DictIdx_get__fast(DP(ctx->sys)->FieldNameDictIdx, FIELDN_UNMASK(mn));
+	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
+	if(IS_NULL(s)) {
+		return TS_EMPTY;
+	}
+	return s;
+}
 
 /* ------------------------------------------------------------------------ */
 
@@ -544,7 +544,6 @@ String *knh_getResourceName(Ctx *ctx, knh_uri_t uri)
 }
 
 #define _URIDN(uri) knh_String_tochar(knh_getResourceName(ctx, uri))
-#define _FILEN(uri) knh_safefile(URIDN(uri))
 
 /* ======================================================================== */
 /* [tPackage] */

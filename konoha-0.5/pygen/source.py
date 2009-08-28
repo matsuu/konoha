@@ -292,7 +292,7 @@ class Class :
 
 
 # /* @generics HashMapSS HashMap<String,String> String String */
-# /* @generics ArrayCmp int(T1!,T1!) Int! T1! T1! void */
+# /* @generics ArrayCmp int(Any1!,Any1!) Int! Any1! Any1! void */
 
 class Generics :
 	def __init__(self, anno, data):

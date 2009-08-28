@@ -163,11 +163,10 @@ void knh_Context_initCommon(Ctx *ctx, knh_Context_t *o, size_t stacksize)
 			o->mprCache[i] = mprInit;
 		}
 	}
-	if(o->bufa == NULL) {
-		KNH_INITv(o->bufa, new_Bytes(ctx, KONOHA_PAGESIZE));
-		KNH_INITv(o->bufw, new_BytesOutputStream(ctx, o->bufa));
-	}
-	KNH_INITv(o->bconvbuf, new_Bytes(ctx, KONOHA_PAGESIZE));
+
+	KNH_INITv(o->bufa, new_Bytes(ctx, o->stacksize * 4));
+	KNH_INITv(o->bufw, new_BytesOutputStream(ctx, o->bufa));
+	KNH_INITv(o->bconvbuf, new_Bytes(ctx, 256));
 	KNH_INITv(o->props, new_DictMap0(ctx, 16));
 
 	o->ctxlock = (knh_mutex_t*)KNH_MALLOC(ctx, sizeof(knh_mutex_t));
@@ -354,8 +353,6 @@ void knh_initSharedData(Context *ctx)
 	knh_loadSystemString(ctx);
 
 	KNH_INITv(ctx->sys, new_System(ctx));
-	KNH_INITv(ctx->bufa, new_Bytes(ctx, KONOHA_PAGESIZE));
-	KNH_INITv(ctx->bufw, new_BytesOutputStream(ctx, ctx->bufa));
 	knh_loadSystemData(ctx);
 	KNH_INITv(share->mainns, new_NameSpace(ctx, TS_main));
 }
@@ -440,10 +437,7 @@ void knh_traverseSharedData(Ctx *ctx, knh_SharedData_t *share, knh_ftraverse ftr
 
 	for(i = 0; i < share->StructTableSize; i++) {
 		DBG2_ASSERT(ClassTable(i).sname != NULL);
-		if(ClassTable(i).class_cid != NULL)
-			ftr(ctx, UP(ClassTable(i).class_cid));
-		if(ClassTable(i).class_natype != NULL)
-			ftr(ctx, UP(ClassTable(i).class_natype));
+		ftr(ctx, UP(ClassTable(i).class_cid));
 		ftr(ctx, UP(ClassTable(i).cmap));
 		ftr(ctx, UP(ClassTable(i).cspec));
 		if(ClassTable(i).constPool != NULL) {
@@ -460,10 +454,7 @@ void knh_traverseSharedData(Ctx *ctx, knh_SharedData_t *share, knh_ftraverse ftr
 
 	for(i = share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
 		DBG2_ASSERT(ClassTable(i).sname != NULL);
-		if(ClassTable(i).class_cid != NULL)
-			ftr(ctx, UP(ClassTable(i).class_cid));
-		if(ClassTable(i).class_natype != NULL)
-			ftr(ctx, UP(ClassTable(i).class_natype));
+		ftr(ctx, UP(ClassTable(i).class_cid));
 		ftr(ctx, UP(ClassTable(i).cmap));
 		ftr(ctx, UP(ClassTable(i).cspec));
 		if(ClassTable(i).constPool != NULL) {

@@ -1560,100 +1560,100 @@ METHOD jc1_UNBOX(Ctx *ctx, knh_sfp_t *sfp)
 
 
 static
-METHOD jc0_CHECKNULL(Ctx *ctx, knh_sfp_t *sfp)
+METHOD jc0_ISNULL(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_CHECKNULL(ctx, (-1));
+	JIT_ISNULL(ctx, (-1));
 	__asm__ __volatile__("int3");
 }
 
 
 static
-METHOD jc1_CHECKNULL(Ctx *ctx, knh_sfp_t *sfp)
+METHOD jc1_ISNULL(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_CHECKNULL(ctx, (1));
+	JIT_ISNULL(ctx, (1));
 	__asm__ __volatile__("int3");
 }
 
 
 static
-METHOD jc0_CHECKNULLX(Ctx *ctx, knh_sfp_t *sfp)
+METHOD jc0_ISNULLX(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_CHECKNULLx(ctx, (-1), (-1));
+	JIT_ISNULLx(ctx, (-1), (-1));
 	__asm__ __volatile__("int3");
 }
 
 
 static
-METHOD jc1_CHECKNULLX(Ctx *ctx, knh_sfp_t *sfp)
+METHOD jc1_ISNULLX(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_CHECKNULLx(ctx, (1), (-1));
+	JIT_ISNULLx(ctx, (1), (-1));
 	__asm__ __volatile__("int3");
 }
 
 
 static
-METHOD jc2_CHECKNULLX(Ctx *ctx, knh_sfp_t *sfp)
+METHOD jc2_ISNULLX(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_CHECKNULLx(ctx, (-1), (2));
+	JIT_ISNULLx(ctx, (-1), (2));
 	__asm__ __volatile__("int3");
 }
 
 
 static
-METHOD jc0_CHECKTYPE(Ctx *ctx, knh_sfp_t *sfp)
+METHOD jc0_ISTYPE(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_CHECKTYPE(ctx, (-1), (-1));
+	JIT_ISTYPE(ctx, (-1), (-1));
 	__asm__ __volatile__("int3");
 }
 
 
 static
-METHOD jc1_CHECKTYPE(Ctx *ctx, knh_sfp_t *sfp)
+METHOD jc1_ISTYPE(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_CHECKTYPE(ctx, (1), (-1));
+	JIT_ISTYPE(ctx, (1), (-1));
 	__asm__ __volatile__("int3");
 }
 
 
 static
-METHOD jc2_CHECKTYPE(Ctx *ctx, knh_sfp_t *sfp)
+METHOD jc2_ISTYPE(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_CHECKTYPE(ctx, (-1), (2));
+	JIT_ISTYPE(ctx, (-1), (2));
 	__asm__ __volatile__("int3");
 }
 
 
 static
-METHOD jc0_CHECKNNTYPE(Ctx *ctx, knh_sfp_t *sfp)
+METHOD jc0_ISNNTYPE(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_CHECKNNTYPE(ctx, (-1), (-1));
+	JIT_ISNNTYPE(ctx, (-1), (-1));
 	__asm__ __volatile__("int3");
 }
 
 
 static
-METHOD jc1_CHECKNNTYPE(Ctx *ctx, knh_sfp_t *sfp)
+METHOD jc1_ISNNTYPE(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_CHECKNNTYPE(ctx, (1), (-1));
+	JIT_ISNNTYPE(ctx, (1), (-1));
 	__asm__ __volatile__("int3");
 }
 
 
 static
-METHOD jc2_CHECKNNTYPE(Ctx *ctx, knh_sfp_t *sfp)
+METHOD jc2_ISNNTYPE(Ctx *ctx, knh_sfp_t *sfp)
 {
 	__asm__ __volatile__("int3");
-	JIT_CHECKNNTYPE(ctx, (-1), (2));
+	JIT_ISNNTYPE(ctx, (-1), (2));
 	__asm__ __volatile__("int3");
 }
 
@@ -4830,10 +4830,10 @@ static knh_fmethod codeTempList[146][6] = {
 	{jc0_NNBOX,jc1_NNBOX,jc2_NNBOX},
 	{jc0_NNBOXNC,jc1_NNBOXNC,jc2_NNBOXNC},
 	{jc0_UNBOX,jc1_UNBOX},
-	{jc0_CHECKNULL,jc1_CHECKNULL},
-	{jc0_CHECKNULLX,jc1_CHECKNULLX,jc2_CHECKNULLX},
-	{jc0_CHECKTYPE,jc1_CHECKTYPE,jc2_CHECKTYPE},
-	{jc0_CHECKNNTYPE,jc1_CHECKNNTYPE,jc2_CHECKNNTYPE},
+	{jc0_ISNULL,jc1_ISNULL},
+	{jc0_ISNULLX,jc1_ISNULLX,jc2_ISNULLX},
+	{jc0_ISTYPE,jc1_ISTYPE,jc2_ISTYPE},
+	{jc0_ISNNTYPE,jc1_ISNNTYPE,jc2_ISNNTYPE},
 	{jc0_FCALL,jc1_FCALL,jc2_FCALL,jc3_FCALL,jc4_FCALL},
 	{jc0_SCALL,jc1_SCALL,jc2_SCALL,jc3_SCALL},
 	{jc0_AINVOKE,jc1_AINVOKE,jc2_AINVOKE},

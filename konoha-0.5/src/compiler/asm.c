@@ -39,19 +39,6 @@ static int knh_Asm_inTry(Asm *abr);
 void knh_code_traverse(Ctx *ctx, knh_code_t *pc, knh_ftraverse ftr);
 void knh_Asm_writeAddress(Ctx *ctx, Asm *o, knh_code_t *pc_start);
 
-#define ASML(abr, idx)   (idx < DP(abr)->stack) ? DP(abr)->stack : idx
-#define MOVL(ctx, abr, local, idx) {\
-		if(idx < DP(abr)->stack) { \
-			KNH_ASM_MOVa_(ctx, abr, sfi_(idx), sfi_(local));\
-		}\
-	}\
-
-#define nMOVL(ctx, abr, local, idx) {\
-		if(idx < DP(abr)->stack) { \
-			KNH_ASM_MOVn_(ctx, abr, sfi_(idx), sfi_(local));\
-		}\
-	}\
-
 /* ======================================================================== */
 /* [structs] */
 
@@ -470,7 +457,7 @@ void KNH_ASM_SMOVx(Ctx *ctx, Asm *abr, knh_type_t atype, int a, knh_type_t btype
 	}
 #endif
 	if(IS_NNTYPE(atype) && !IS_NNTYPE(btype)) {
-		KNH_ASM_CHECKNULLx_(ctx, abr, bx);
+		KNH_ASM_ISNULLx_(ctx, abr, bx);
 		btype = NNTYPE_cid(btype);
 	}
 	knh_rtti_async(abr, a);
@@ -496,8 +483,8 @@ void KNH_ASM_SMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, Token *tkb)
 		case TT_STACK: {
 			int b = (int)DP(tkb)->index;
 			knh_type_t btype = knh_rtti_type(abr, DP(tkb)->type, b);
-			if(IS_NNTYPE(atype) && IS_NATYPE(btype)) {
-				KNH_ASM_CHECKNULL_(ctx, abr, b);
+			if(IS_NNTYPE(atype) && !IS_NNTYPE(btype)) {
+				KNH_ASM_ISNULL_(ctx, abr, b);
 				knh_rtti_nullChecked(abr, b);
 				btype = NNTYPE_cid(btype);
 			}
@@ -560,27 +547,6 @@ void KNH_ASM_SMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, Token *tkb)
 			return;
 		}
 
-		case TT_CLOSURE: {
-			int local = ASML(abr, a);
-			Method *mtd = DP(tkb)->mtd;
-			knh_class_t cid = DP(mtd)->cid;
-			if(cid == DP(abr)->this_cid || knh_class_instanceof(ctx, DP(abr)->this_cid, cid)) {
-				KNH_ASM_MOVa_(ctx, abr, sfi_(local+2), sfi_(0));
-			}
-			else if(cid == knh_Object_cid(knh_getCurrentScript(ctx))) {
-				KNH_ASM_MOVo_(ctx, abr, sfi_(local+2), UP(knh_getCurrentScript(ctx)));
-			}
-			else {
-				KNH_ASM_MOVDEF_(ctx, abr, sfi_(local+2), cid);
-			}
-			KNH_ASM_MOVo_(ctx, abr, sfi_(local+3), UP(mtd));
-			mtd = knh_Class_getMethod(ctx, CLASS_Closure, METHODN_new);
-			DBG2_ASSERT(IS_Method(mtd));
-			KNH_ASM_NEW_(ctx, abr, local, 0, CLASS_type(DP(tkb)->type), 2, UP(mtd));
-			MOVL(ctx, abr, local, a);
-			break;
-		}
-
 		default: {
 			DBG2_P("unknown TT=%s", knh_token_tochar(SP(tkb)->tt));
 			KNH_ASSERT(ctx == NULL);
@@ -601,7 +567,7 @@ static
 void KNH_ASM_XMOVx(Ctx *ctx, Asm *abr, knh_type_t atype, knh_sfx_t ax, knh_type_t btype, knh_sfx_t bx)
 {
 	if(IS_NNTYPE(atype) && !IS_NNTYPE(btype)) {
-		KNH_ASM_CHECKNULLx_(ctx, abr, bx);
+		KNH_ASM_ISNULLx_(ctx, abr, bx);
 	}
 	if(IS_ubxint(atype)) {
 		if(IS_ubxint(btype)) {
@@ -669,7 +635,7 @@ void KNH_ASM_XMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, size_t an, Token 
 		case TT_STACK: {
 			int b = (int)DP(tkb)->index;
 			if(IS_NNTYPE(atype) && !IS_NNTYPE(btype)) {
-				KNH_ASM_CHECKNULL_(ctx, abr, b);
+				KNH_ASM_ISNULL_(ctx, abr, b);
 				knh_rtti_nullChecked(abr, b);
 			}
 #ifdef KNH_USING_UNBOXFIELD
@@ -737,27 +703,6 @@ void KNH_ASM_XMOV(Ctx *ctx, Asm *abr, knh_type_t atype, int a, size_t an, Token 
 		case TT_SYSVAL: {
 			knh_ushort_t sysid = DP(tkb)->index;
 			KNH_ASM_XMOVSYS_(ctx, abr, ax, sysid);
-			break;
-		}
-
-		case TT_CLOSURE: {
-			int local = DP(abr)->stack;
-			Method *mtd = DP(tkb)->mtd;
-			knh_class_t cid = DP(mtd)->cid;
-			if(cid == DP(abr)->this_cid || knh_class_instanceof(ctx, DP(abr)->this_cid, cid)) {
-				KNH_ASM_MOVa_(ctx, abr, sfi_(local+2), sfi_(0));
-			}
-			else if(cid == knh_Object_cid(knh_getCurrentScript(ctx))) {
-				KNH_ASM_MOVo_(ctx, abr, sfi_(local+2), UP(knh_getCurrentScript(ctx)));
-			}
-			else {
-				KNH_ASM_MOVDEF_(ctx, abr, sfi_(local+2), cid);
-			}
-			KNH_ASM_MOVo_(ctx, abr, sfi_(local+3), UP(mtd));
-			mtd = knh_Class_getMethod(ctx, CLASS_Closure, METHODN_new);
-			KNH_ASSERT(IS_Method(mtd));
-			KNH_ASM_NEW_(ctx, abr, local, 0, CLASS_type(DP(tkb)->type), 2, UP(mtd));
-			KNH_ASM_XMOVs_(ctx, abr, ax, sfi_(local));
 			break;
 		}
 
@@ -868,14 +813,14 @@ void KNH_ASM_CALL(Ctx *ctx, Asm *abr, knh_type_t reqt, int sfpidx, Token *tkb, s
 		}
 		rtype = knh_Method_rztype(mtd);
 		if(IS_NNTYPE(reqt) && !IS_NNTYPE(rtype)) {
-			KNH_ASM_CHECKNULL_(ctx, abr, sfpidx);
+			KNH_ASM_ISNULL_(ctx, abr, sfpidx);
 			knh_rtti_nullChecked(abr, sfpidx);
 		}
 	}
 	else if(SP(tkb)->tt == TT_MN) {
 		KNH_ASM_ACALL_(ctx, abr, sfpidx, args + 2, DP(tkb)->mn);
 		if(IS_NNTYPE(reqt) && !IS_NNTYPE(rtype)) {
-			KNH_ASM_CHECKNULL_(ctx, abr, sfpidx);
+			KNH_ASM_ISNULL_(ctx, abr, sfpidx);
 			knh_rtti_nullChecked(abr, sfpidx);
 		}
 	}
@@ -898,7 +843,7 @@ void KNH_ASM_NEW(Ctx *ctx, Asm *abr, knh_type_t reqt, int sfpidx, Token *tkb,
 
 	knh_type_t rtype = knh_Method_rztype(mtd);
 	if(IS_NNTYPE(reqt) && !IS_NNTYPE(rtype)) {
-		KNH_ASM_CHECKNULL_(ctx, abr, sfpidx);
+		KNH_ASM_ISNULL_(ctx, abr, sfpidx);
 		knh_rtti_nullChecked(abr, sfpidx);
 	}
 }
@@ -962,7 +907,7 @@ void KNH_ASM_MAP(Ctx *ctx, Asm *abr, knh_type_t reqt, int sfpidx, Token *tkb, kn
 		KNH_ASM_NNMAP_(ctx, abr, sfpidx, DP(tkb)->cid);
 	}
 	else if(IS_NNTYPE(reqt)) {
-		KNH_ASM_CHECKNULL_(ctx, abr, sfpidx);
+		KNH_ASM_ISNULL_(ctx, abr, sfpidx);
 	}
 }
 
@@ -1193,6 +1138,20 @@ void TERMs_ASM_THROW(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr)
 /* [EXPR] */
 /* ------------------------------------------------------------------------ */
 /* @data */
+
+#define ASML(abr, idx)   (idx < DP(abr)->stack) ? DP(abr)->stack : idx
+#define MOVL(ctx, abr, local, idx) {\
+		if(idx < DP(abr)->stack) { \
+			KNH_ASM_MOVa_(ctx, abr, sfi_(idx), sfi_(local));\
+		}\
+	}\
+
+#define nMOVL(ctx, abr, local, idx) {\
+		if(idx < DP(abr)->stack) { \
+			KNH_ASM_MOVn_(ctx, abr, sfi_(idx), sfi_(local));\
+		}\
+	}\
+
 /* ------------------------------------------------------------------------ */
 
 static
@@ -1202,14 +1161,14 @@ knh_type_t knh_Method_reqtTERMs(Method *mtd, knh_class_t mtd_cid, Stmt *stmt, si
 		return TYPE_Any;  // boxing
 	}
 	if(n == 1) { // base
-		return knh_Method_isNullBase(mtd) ? NATYPE_cid(mtd_cid) : NNTYPE_cid(mtd_cid);
+		return knh_Method_isNullBase(mtd) ? mtd_cid : NNTYPE_cid(mtd_cid);
 	}
 	else {
 		knh_type_t ptype = knh_Method_pztype(mtd, n - 2);
-		if(ptype == TYPE_Object || ptype == TYPE_T1 || ptype == TYPE_T2) {
+		if(ptype == TYPE_Object || ptype == TYPE_Any1 || ptype == TYPE_Any2) {
 			return TYPE_Any; // boxing
 		}
-		if(ptype == NNTYPE_Object || ptype == NNTYPE_T1 || ptype == NNTYPE_T2) {
+		if(ptype == NNTYPE_Object || ptype == NNTYPE_Any1 || ptype == NNTYPE_Any2) {
 			return NNTYPE_Any; // boxing
 		}
 		if(ptype == NNTYPE_This) return NNTYPE_cid(mtd_cid);
@@ -1227,7 +1186,7 @@ int TERMs_putSTACK(Ctx *ctx, Stmt *stmt, size_t n, Asm *abr, knh_type_t reqt, in
 	if(IS_Token(tk) && SP(tk)->tt == TT_STACK) {
 		int a = DP(tk)->index;
 		if(!IS_NNTYPE(knh_rtti_type(abr, DP(tk)->type, a))) {
-			KNH_ASM_CHECKNULL_(ctx, abr, a);
+			KNH_ASM_ISNULL_(ctx, abr, a);
 			knh_rtti_nullChecked(abr, a);
 		}
 		return a;
@@ -1628,7 +1587,7 @@ void knh_StmtCALL_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpid
 		knh_type_t reqt2 = knh_Method_reqtTERMs(mtd, cid, stmt, 1);
 		knh_type_t vart2 = knh_rtti_type(abr, TERMs_gettype(stmt, 1), a);
 		if(IS_NNTYPE(reqt2) && !IS_NNTYPE(vart2)) {
-			KNH_ASM_CHECKNULL_(ctx, abr, sfi_(a));
+			KNH_ASM_ISNULL_(ctx, abr, sfi_(a));
 			knh_rtti_nullChecked(abr, a);
 		}
 		for(i = 2; i < DP(stmt)->size; i++) {
@@ -1889,7 +1848,7 @@ knh_StmtEXPR_asm(Ctx *ctx, Stmt *stmt, Asm *abr, knh_type_t reqt, int sfpidx)
 		KNH_ASM_NNBOX(ctx, abr, DP(stmt)->type, sfpidx);
 	}
 	else if(IS_NNTYPE(reqt) && !IS_NNTYPE(DP(stmt)->type)) {
-		KNH_ASM_CHECKNULL_(ctx, abr, sfpidx);
+		KNH_ASM_ISNULL_(ctx, abr, sfpidx);
 	}
 }
 
@@ -2329,7 +2288,7 @@ void knh_StmtERR_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 {
 	if(!IS_bString(DP(stmt)->errMsg)) {
 		char buf[512];
-		knh_snprintf(buf, sizeof(buf), "Script!!: you'll fix bugs at %s:%d", FILEN(SP(stmt)->uri), SP(stmt)->line);
+		knh_snprintf(buf, sizeof(buf), "Script!!: you'll fix bugs at %s:%d", URIDN(SP(stmt)->uri), SP(stmt)->line);
 		KNH_SETv(ctx, DP(stmt)->errMsg, new_String(ctx, B(buf), NULL));
 		KNH_SETv(ctx, DP(stmt)->next, KNH_NULL);
 	}
@@ -2372,7 +2331,7 @@ void knh_StmtPRINT_asm(Ctx *ctx, Stmt *stmt, Asm *abr)
 	KNH_ASM_SKIP_(ctx, abr, lbskip);
 	if(konoha_debugLevel() > 1) {
 		char buf[128];
-		knh_snprintf(buf, sizeof(buf), "[%s:%d]", FILEN(DP(abr)->uri), DP(abr)->line);
+		knh_snprintf(buf, sizeof(buf), "[%s:%d]", URIDN(DP(abr)->uri), DP(abr)->line);
 		KNH_ASM_PMSG_(ctx, abr, flag | KNH_FLAG_PF_BOL, UP(new_String(ctx, B(buf), NULL)));
 	}
 	else if(flag != 0 ) {

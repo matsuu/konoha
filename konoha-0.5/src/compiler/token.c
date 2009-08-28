@@ -137,10 +137,9 @@ Token *new_Token__S(Ctx *ctx, Any *fln, knh_token_t tt, String *t)
 
 /* ------------------------------------------------------------------------ */
 
-knh_tkc_t* knh_Token_tc(Ctx *ctx, Token *o, knh_tkc_t *tc)
+void knh_Token_tc(Ctx *ctx, Token *o, knh_tokens_t *tc)
 {
-	DBG2_ASSERT(knh_token_isNested(SP(o)->tt));
-	tc->meta = 0;
+	KNH_ASSERT(knh_token_isNested(SP(o)->tt));
 	tc->c = 0;
 	if(IS_Array(DP(o)->data)) {
 		tc->ts = (Token**)knh_Array_list((Array*)DP(o)->data);
@@ -155,7 +154,6 @@ knh_tkc_t* knh_Token_tc(Ctx *ctx, Token *o, knh_tkc_t *tc)
 		tc->ts = &(DP(o)->token);
 		tc->e = 1;
 	}
-	return tc;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -272,7 +270,7 @@ void knh_Token__k(Ctx *ctx, Token *o, OutputStream *w, String *m)
 	KNH_ASSERT(IS_Token(o));
 	if(knh_token_isNested(SP(o)->tt)) {
 		int i;
-		knh_tkc_t tc;
+		knh_tokens_t tc;
 		knh_Token_tc(ctx, o, &tc);
 		if(SP(o)->tt == TT_PARENTHESIS) {
 			knh_write(ctx, w, STEXT("("));
@@ -347,8 +345,14 @@ void knh_Token__k(Ctx *ctx, Token *o, OutputStream *w, String *m)
 	if(knh_Token_isTailWildCard(o)) {
 		knh_write(ctx, w, STEXT(".*"));
 	}
+	if(knh_Token_isArrayType(o)) {
+		knh_write(ctx, w, STEXT("[]"));
+	}
 	if(knh_Token_isExceptionType(o)) {
 		knh_write(ctx, w, STEXT("!!"));
+	}
+	if(knh_Token_isIteratorType(o)) {
+		knh_write(ctx, w, STEXT(".."));
 	}
 	else if(knh_Token_isNotNullType(o)) {
 		knh_write(ctx, w, STEXT("!"));
@@ -371,7 +375,7 @@ void knh_Token__dump(Ctx *ctx, Token *o, OutputStream *w, String *m)
 	knh_println(ctx, w, STEXT(""));
 	if(knh_token_isNested(SP(o)->tt)) {
 		int i;
-		knh_tkc_t tc;
+		knh_tokens_t tc;
 		knh_Token_tc(ctx, o, &tc);
 		knh_OutputStream_indent_inc(ctx, w);
 		for(i = 0; i < tc.e; i++) {

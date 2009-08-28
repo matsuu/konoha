@@ -77,44 +77,12 @@ knh_class_t knh_ClassTable_newId(Ctx *ctx)
 
 /* ------------------------------------------------------------------------ */
 
-knh_Class_t *new_Class(Ctx *ctx, knh_class_t cid)
+static knh_Class_t *new_Class(Ctx *ctx, knh_class_t cid)
 {
-	KNH_ASSERT_cid(cid);
-	knh_ClassTable_t *t = pClassTable(cid);
-	if(t->class_cid == NULL) {
-		knh_Class_t *o = (knh_Class_t*)new_hObject(ctx, FLAG_Class, CLASS_Class, CLASS_Class);
-		o->cid = cid;
-		o->type = cid;
-		KNH_INITv(t->class_cid, o);
-	}
-	return t->class_cid;
-}
-
-/* ------------------------------------------------------------------------ */
-
-knh_Class_t *new_Type(Ctx *ctx, knh_type_t type)
-{
-	knh_class_t cid = CLASS_type(type);
-	KNH_ASSERT_cid(cid);
-	knh_ClassTable_t *t = pClassTable(cid);
-	if(IS_NATYPE(type)) {
-		if(t->class_natype == NULL) {
-			knh_Class_t *o = (knh_Class_t*)new_hObject(ctx, FLAG_Class, CLASS_Class, CLASS_Class);
-			o->cid = cid;
-			o->type = type;
-			KNH_INITv(t->class_natype, o);
-		}
-		return t->class_natype;
-	}
-	else {
-		if(t->class_cid == NULL) {
-			knh_Class_t *o = (knh_Class_t*)new_hObject(ctx, FLAG_Class, CLASS_Class, CLASS_Class);
-			o->cid = cid;
-			o->type = type;
-			KNH_INITv(t->class_cid, o);
-		}
-		return t->class_cid;
-	}
+	knh_Class_t *o = (knh_Class_t*)new_hObject(ctx, FLAG_Class, CLASS_Class, CLASS_Class);
+	o->cid = cid;
+	o->type = cid;
+	return o;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -125,6 +93,7 @@ void knh_setClassName(Ctx *ctx, knh_class_t cid, String *lname)
 	knh_ClassTable_t *t = pClassTable(cid);
 	//KNH_NOTICE(ctx, _("added new class: %s"), knh_String_tochar(lname));
 	KNH_ASSERT(ClassTable(cid).class_cid == NULL);
+	KNH_INITv(t->class_cid, new_Class(ctx, cid));
 	KNH_INITv(t->lname, lname);
 	{
 		knh_bytes_t n = knh_String_tobytes(lname);
@@ -159,7 +128,6 @@ void knh_setClassName(Ctx *ctx, knh_class_t cid, String *lname)
 		}
 	}
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);
-
 }
 
 /* ------------------------------------------------------------------------ */
@@ -272,21 +240,15 @@ void knh_setClassParam(Ctx *ctx, knh_class_t cid, knh_class_t p1, knh_class_t p2
 knh_class_t
 knh_addGenericsClass(Ctx *ctx, knh_class_t cid, String *name, knh_class_t bcid, knh_class_t p1, knh_class_t p2)
 {
-	knh_ClassTable_t *t;
-	knh_flag_t mask = 0;
 	if(cid == CLASS_newid) {
 		cid = knh_ClassTable_newId(ctx);
 	}else {
 		//KNH_ASSERT(cid + 1 == ctx->share->ClassTableSize);
 		((knh_SharedData_t*)ctx->share)->ClassTableSize = cid;
 	}
-	/* knh_ClassTable_t */t = pClassTable(cid);
-	DBG2_ASSERT(bcid < cid);
-	KNH_ASSERT(t->sname == NULL);
-	if(knh_class_isTypeVariable(CLASS_type(p1)) ||
-			(p2 != CLASS_unknown && knh_class_isTypeVariable(CLASS_type(p2)))) {
-		mask = KNH_FLAG_CF_TYPEVARIABLE;
-	}
+	knh_ClassTable_t *t = pClassTable(cid);
+	KNH_ASSERT(bcid < cid);
+	KNH_ASSERT(t->class_cid == NULL);
 
 	t->cflag  = ClassTable(bcid).cflag;
 	t->oflag  = ClassTable(bcid).oflag;
@@ -429,30 +391,18 @@ ClassMap* new_ClassMap0(Ctx *ctx, knh_ushort_t capacity)
 
 /* ------------------------------------------------------------------------ */
 
-Object *knh_ClassMap_fdefault(Ctx *ctx, knh_class_t cid)
-{
-	if(unlikely(ClassTable(CLASS_Any).cmap == NULL)) {
-		knh_ClassTable_t *t = pClassTable(CLASS_Any);
-		KNH_INITv(t->cmap, new_ClassMap0(ctx, 0));
-	}
-	return (Object*)ClassTable(CLASS_Any).cmap;
-}
-
-/* ------------------------------------------------------------------------ */
-
-static
 int knh_ClassMap_isDefault(Ctx *ctx, ClassMap *o)
 {
-	return (o == (ClassMap*)knh_ClassMap_fdefault(ctx, CLASS_Any));
+	return (o == ctx->share->ClassTable[CLASS_Any].cmap);
 }
 
 /* ------------------------------------------------------------------------ */
 
-void knh_readyClassMap(Ctx *ctx, knh_class_t cid)
+void knh_ClassTable_readyClassMap(Ctx *ctx, knh_class_t cid)
 {
 	KNH_ASSERT_cid(cid);
 	KNH_ASSERT(cid != CLASS_Any);
-	if(knh_ClassMap_isDefault(ctx, ClassTable(cid).cmap)) {
+	if(ClassTable(cid).cmap == ClassTable(CLASS_Any).cmap) {
 		knh_ClassTable_t *t = pClassTable(cid);
 		KNH_SETv(ctx, t->cmap, new_ClassMap0(ctx, 4));
 	}
@@ -570,14 +520,12 @@ void knh_ClassMap__man(Ctx *ctx, ClassMap *o, OutputStream *w, knh_class_t cid)
 static Array* knh_Class_domain(Ctx *ctx)
 {
 	Array *a = new_Array(ctx, CLASS_Class, 0);
-	int cid = 0;
-	for(cid = 0; cid < ctx->share->StructTableSize; cid++) {
-		if(knh_class_isPrivate(cid) || knh_class_isTypeVariable(cid)) continue;
-		knh_Array_add(ctx, a, UP(new_Class(ctx, cid)));
+	int i = 0;
+	for(i = 0; i < ctx->share->StructTableSize; i++) {
+		knh_Array_add(ctx, a, UP(ClassTable(i).class_cid));
 	}
-	for(cid = ctx->share->ClassTableSize; cid < KNH_TCLASS_SIZE; cid++) {
-		if(knh_class_isPrivate(cid) || knh_class_isTypeVariable(cid)) continue;
-		knh_Array_add(ctx, a, UP(new_Class(ctx, cid)));
+	for(i = ctx->share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
+		knh_Array_add(ctx, a, UP(ClassTable(i).class_cid));
 	}
 	return a;
 }
