@@ -75,6 +75,7 @@ klipdata = klipdir + "/" + KLIPFILE;
 
 /** システム情報のチェック用フラグ */
 boolean root;
+boolean plat;
 boolean fail = false;
 boolean use_curl = false;
 boolean use_zlib = false;
@@ -109,10 +110,10 @@ if ( !os.hasDir( instdir ) )
 	root = os.mkdir( instdir );
 else {
 	String home = $env.HOME;
-	if ( "/home/" in? home )
-		root = false;
-	else
+	if ( "root" in? home )
 		root = true;
+	else
+		root = false;
 }
 if ( !root ) {
 	instdir = userdir;
@@ -168,7 +169,16 @@ if ( os.hasDir( liblibtar ) ) {
 //posix
 
 String libposix = instdir + "posix";
-String shared = $konoha.platform + ".so";
+plat = true;
+String shared = $konoha.platform;
+if ( "linux" in? shared ) {
+	shared += ".so";
+} else if ( "macosx" in? shared ) {
+	shared += ".dylib";
+} else {
+	plat = false;
+}
+int System.system(String cmd);
 if ( os.hasDir( libposix ) ) {
 	if ( os.hasLib( libposix + "/posix_" + shared ) ) {
 		eval ( "using posix.*;" );
@@ -1727,6 +1737,8 @@ class Klip {
 			ecode << "e_decomp";
 			__fail = true;
 		}
+
+		if ( !__plat ) ecode << "e_plat";
 	}
 
 	/**
@@ -1734,15 +1746,19 @@ class Klip {
 	 */
 	void info()
 	{
+		String[] e_ret = [];
 		String[] ret = [];
 		if ( "e_user" in? ecode ) {
-			ret << "!ERR : unknown_user_mode";
-			ret << '     : please set "property variable HOME" correctry';
+			e_ret << "!ERR : unknown_user_mode";
+		}
+
+		if ( "e_plat" in? ecode ) {
+			e_ret << "!ERR : unknown_platform";
 		}
 		
 		if ( "e_decomp" in? ecode ) {
-			ret << '!ERR : cannot both "using [zlib+libtar/posix]"';
-			ret << "     : please install either of them by another way";
+			e_ret << '!ERR : package NOTFOUND : zlib+libtar / posix';
+			e_ret << '     : "klip" uses either of these packages'
 		}
 		
 		if ( "libtar" in? ecode )
@@ -1753,9 +1769,12 @@ class Klip {
 		
 		if ( "curl" in? ecode )
 			ret << "INFO : you should install libcurl(-devel)";
-		
-		if ( |ecode| != 0 ) 
+
+		if ( |e_ret| != 0 ) {
+			foreach( String txt from e_ret ) OUT.println(txt);
+		} else if ( |ret| != 0 ) {
 			foreach( String txt from ret ) OUT.println(txt);
+		}
 	}
 
 }
