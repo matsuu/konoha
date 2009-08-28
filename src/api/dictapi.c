@@ -55,7 +55,7 @@ static METHOD knh__DictMap_new(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method[VARARGS] This! DictMap.new:init(T1 value) @VARARGS */
+/* @method[VARARGS] This! DictMap.new:init(Any1 value) @VARARGS */
 
 static METHOD knh__DictMap_new__init(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -77,7 +77,7 @@ static METHOD knh__DictMap_new__init(Ctx *ctx, knh_sfp_t *sfp)
 /* [method] */
 
 /* ------------------------------------------------------------------------ */
-/* @method T1 DictMap.get(String! key) */
+/* @method Any1 DictMap.get(String! key) */
 
 static METHOD knh__DictMap_get(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -93,7 +93,7 @@ static METHOD knh__DictMap_opHas(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method void DictMap.set(String! key, T1 value) */
+/* @method void DictMap.set(String! key, Any1 value) */
 
 static METHOD knh__DictMap_set(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -206,17 +206,17 @@ static METHOD knh__DictMap_getSize(Ctx *ctx, knh_sfp_t *sfp)
 //}
 //
 ///* ------------------------------------------------------------------------ */
-///* @method This! DictMap.opTo(String s, String e) */
+///* @method This! DictMap.opSubsete(String s, String e) */
 //
-//static METHOD knh__DictMap_opTo(Ctx *ctx, knh_sfp_t *sfp)
+//static METHOD knh__DictMap_opSubsete(Ctx *ctx, knh_sfp_t *sfp)
 //{
 //	knh__DictMap_subset(ctx, sfp, OPSUBSETE);
 //}
 //
 ///* ------------------------------------------------------------------------ */
-///* @method This! DictMap.opUntil(String s, String e) */
+///* @method This! DictMap.opSubset(String s, String e) */
 //
-//static METHOD knh__DictMap_opUntil(Ctx *ctx, knh_sfp_t *sfp)
+//static METHOD knh__DictMap_opSubset(Ctx *ctx, knh_sfp_t *sfp)
 //{
 //	knh__DictMap_subset(ctx, sfp, OPSUBSET);
 //}
@@ -499,17 +499,17 @@ static METHOD knh__DictSet_getSize(Ctx *ctx, knh_sfp_t *sfp)
 //}
 //
 ///* ------------------------------------------------------------------------ */
-///* @method This! DictSet.opTo(String s, String e) */
+///* @method This! DictSet.opSubsete(String s, String e) */
 //
-//static METHOD knh__DictSet_opTo(Ctx *ctx, knh_sfp_t *sfp)
+//static METHOD knh__DictSet_opSubsete(Ctx *ctx, knh_sfp_t *sfp)
 //{
 //	knh__DictSet_subset(ctx, sfp, OPSUBSETE);
 //}
 //
 ///* ------------------------------------------------------------------------ */
-///* @method This! DictSet.opUntil(String s, String e) */
+///* @method This! DictSet.opSubset(String s, String e) */
 //
-//static METHOD knh__DictSet_opUntil(Ctx *ctx, knh_sfp_t *sfp)
+//static METHOD knh__DictSet_opSubset(Ctx *ctx, knh_sfp_t *sfp)
 //{
 //	knh__DictSet_subset(ctx, sfp, OPSUBSET);
 //}

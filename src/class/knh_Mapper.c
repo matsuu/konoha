@@ -140,7 +140,7 @@ void knh_Mapper__k(Ctx *ctx, Mapper *o, OutputStream *w, String *m)
 
 KNHAPI(void) knh_addMapper(Ctx *ctx, Mapper *mpr)
 {
-	knh_readyClassMap(ctx, DP(mpr)->scid);
+	knh_ClassTable_readyClassMap(ctx, DP(mpr)->scid);
 	knh_ClassMap_add(ctx, ctx->share->ClassTable[DP(mpr)->scid].cmap, mpr);
 }
 
@@ -150,7 +150,7 @@ void knh_addMapperFunc(Ctx *ctx, knh_flag_t flag, knh_type_t stype, knh_type_t t
 {
 	knh_class_t cid = CLASS_type(stype);
 	KNH_ASSERT_cid(cid);
-	knh_readyClassMap(ctx, cid);
+	knh_ClassTable_readyClassMap(ctx, cid);
 	knh_ClassMap_add(ctx, ClassTable(cid).cmap,
 		new_Mapper(ctx, flag, CLASS_type(stype), CLASS_type(ttype), fmap, mapdata));
 }

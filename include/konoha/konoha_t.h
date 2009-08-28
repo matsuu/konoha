@@ -303,6 +303,7 @@ typedef knh_uint16_t       knh_expt_t;    /* knh_expt_t */
 
 #define CLASS_newid                ((knh_class_t)-1)
 #define CLASS_unknown              ((knh_class_t)-2)
+#define CLASS_type(t)              (t&(~KNH_FLAG_TF_NN))
 
 #define KNH_ASSERT_cid(cid)        KNH_ASSERT(cid < KNH_TCLASS_SIZE)
 #define CLASSN(cid)                knh_ClassTable_CLASSN(ctx, cid)
@@ -310,12 +311,11 @@ typedef knh_uint16_t       knh_expt_t;    /* knh_expt_t */
 
 /* knh_type_t */
 
-#define KNH_FLAG_TF_NA      KNH_FLAG_T0
-#define CLASS_type(t)       (t&(~KNH_FLAG_TF_NA))
-#define IS_NNTYPE(t)        ((t & KNH_FLAG_TF_NA)==0)
-#define IS_NATYPE(t)        ((t & KNH_FLAG_TF_NA)==KNH_FLAG_TF_NA)
-#define NATYPE_cid(t)       (t|KNH_FLAG_TF_NA)
-#define NNTYPE_cid(t)       (t)
+#define KNH_FLAG_TF_NN      KNH_FLAG_T0
+#define TYPE_ISNULLABLE(t)  ((t & KNH_FLAG_TF_NN)==0)
+#define IS_NNTYPE(t)        ((t & KNH_FLAG_TF_NN)==KNH_FLAG_TF_NN)
+#define NNTYPE_cid(c)       (c|KNH_FLAG_TF_NN)
+#define TYPE_TONNTYPE(t)    (t|KNH_FLAG_TF_NN)
 
 #define IS_ubxint(t)        (IS_NNTYPE(t) && ClassTable(CLASS_type(t)).bcid == CLASS_Int)
 #define IS_ubxfloat(t)      (IS_NNTYPE(t) && ClassTable(CLASS_type(t)).bcid == CLASS_Float)
@@ -327,8 +327,9 @@ typedef knh_uint16_t       knh_expt_t;    /* knh_expt_t */
 // @NOUSE
 #define TYPEQN(t)                     TYPEN(t), TYPEQ(t)
 
-#define TYPE_var                      CLASS_TVar
+#define TYPE_var                      CLASS_AnyVar
 #define TYPE_void                     NNTYPE_cid(CLASS_Any)
+#define NNTYPE_void                   NNTYPE_cid(CLASS_Any)
 
 /* ------------------------------------------------------------------------ */
 
@@ -379,9 +380,9 @@ typedef knh_ushort_t          knh_methodn_t;
 typedef knh_ushort_t knh_lock_t;
 
 #ifdef KNH_OBJECT_MAGIC
-	#define DBG2_ASSERT_ISOBJECT(o)        DBG2_ASSERT((o)->h.magic == KNH_OBJECT_MAGIC)
+	#define KNH_ASSERT_ISOBJECT(o)        DBG2_ASSERT((o)->h.magic == KNH_OBJECT_MAGIC)
 #else/*KONOHA_OBJECT_MAGIC*/
-	#define DBG2_ASSERT_ISOBJECT(o)
+	#define KNH_ASSERT_ISOBJECT(o)
 #endif/*KONOHA_OBJECT_MAGIC*/
 
 typedef struct knh_hObject_t {
@@ -407,8 +408,8 @@ typedef struct knh_Object_t {
 #define ObjectNULL      Object
 #define Any             knh_Object_t
 #define This            knh_Object_t
-#define T1            knh_Object_t
-#define T2            knh_Object_t
+#define Any1            knh_Object_t
+#define Any2            knh_Object_t
 #define UP(o)           (Object*)(o)
 
 #define KNH_FIELDn(v,n)            ((Script*)(v))->fields[(n)]
@@ -602,7 +603,6 @@ typedef struct {
 	struct knh_String_t       *sname;
 	struct knh_String_t       *lname;
 	struct knh_Class_t        *class_cid;
-	struct knh_Class_t        *class_natype;
 	struct knh_ClassStruct_t  *cstruct;
 	struct knh_ClassMap_t     *cmap;
 	struct knh_Object_t       *cspec;

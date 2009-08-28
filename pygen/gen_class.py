@@ -200,11 +200,11 @@ def gen_class_h(bdir, data):
 	
 	write_define(f, 'ACLASS_Int', 'CLASS_IArray', 32)
 	write_define(f, 'ATYPE_Int', 'CLASS_IArray', 32)
-	write_define(f, 'NNATYPE_Int', 'NNTYPE_cidOLD(CLASS_IArray)', 32)
+	write_define(f, 'NNATYPE_Int', 'NNTYPE_cid(CLASS_IArray)', 32)
 	
 	write_define(f, 'ACLASS_Float', 'CLASS_FArray', 32)
 	write_define(f, 'ATYPE_Float', 'CLASS_FArray', 32)
-	write_define(f, 'NNATYPE_Float', 'NNTYPE_cidOLD(CLASS_FArray)', 32)
+	write_define(f, 'NNATYPE_Float', 'NNTYPE_cid(CLASS_FArray)', 32)
 	
 	write_chapter(f, '[Array<X>]')
 	for cname in data.ACLASS_LIST:
@@ -212,22 +212,22 @@ def gen_class_h(bdir, data):
 		if cname == 'Int' or cname == 'Float': continue
 		write_define(f, 'ACLASS_%s' % cname, '((knh_class_t)(KNH_TCLASS_SIZE-(%d+1)))' % cn, 32)
 		write_define(f, 'ATYPE_%s' % cname, 'ACLASS_%s' % cname, 32)
-		write_define(f, 'NNATYPE_%s' % cname, 'NNTYPE_cidOLD(ACLASS_%s)' % cname, 32)
+		write_define(f, 'NNATYPE_%s' % cname, 'NNTYPE_cid(ACLASS_%s)' % cname, 32)
 		cn += 1
 	
 	write_chapter(f, '[Iterator<X>]')
 	for cname in data.ICLASS_LIST:
 		cname = cname.replace(":", "__")
 		write_define(f, 'ICLASS_%s' % cname, '((knh_class_t)(KNH_TCLASS_SIZE-(%d+1)))' % cn, 32)
-		write_define(f, 'ITYPE_%s' % cname, 'NNTYPE_cidOLD(ICLASS_%s)' % cname, 32)
-		write_define(f, 'NNITYPE_%s' % cname, 'NNTYPE_cidOLD(ICLASS_%s)' % cname, 32)
+		write_define(f, 'ITYPE_%s' % cname, 'NNTYPE_cid(ICLASS_%s)' % cname, 32)
+		write_define(f, 'NNITYPE_%s' % cname, 'NNTYPE_cid(ICLASS_%s)' % cname, 32)
 		cn += 1
 	
 	write_chapter(f, '[Generics]')
 	for c in data.GENERICS_LIST:
 		write_define(f, 'CLASS_%s' % c.cname, '((knh_class_t)(KNH_TCLASS_SIZE-(%d+1)))' % cn, 32)
 		write_define(f, 'TYPE_%s' % c.cname, 'CLASS_%s' % c.cname, 32)
-		write_define(f, 'NNTYPE_%s' % c.cname, 'NNTYPE_cidOLD(CLASS_%s)' % cname, 32)
+		write_define(f, 'NNTYPE_%s' % c.cname, 'NNTYPE_cid(CLASS_%s)' % cname, 32)
 		cn += 1
 		
 	write_chapter(f, '[Object:X]')
@@ -235,7 +235,7 @@ def gen_class_h(bdir, data):
 		cname = cname.replace(":", "__")
 		write_define(f, 'CLASS_%s' % cname, '((knh_class_t)(KNH_TCLASS_SIZE-(%d+1)))' % cn, 32)
 		write_define(f, 'TYPE_%s' % cname, 'CLASS_%s' % cname, 32)
-		write_define(f, 'NNTYPE_%s' % cname, 'NNTYPE_cidOLD(CLASS_%s)' % cname, 32)
+		write_define(f, 'NNTYPE_%s' % cname, 'NNTYPE_cid(CLASS_%s)' % cname, 32)
 		cn += 1
 	
 	write_chapter(f, '[tString]')

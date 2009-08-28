@@ -194,7 +194,7 @@ static METHOD knh__Object_opTo(Ctx *ctx, knh_sfp_t *sfp)
 
 static METHOD knh__Object_getClass(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN(ctx, sfp, new_Class(ctx, (sfp[0].o)->h.cid));
+	KNH_RETURN(ctx, sfp, ctx->share->ClassTable[(sfp[0].o)->h.cid].class_cid);
 }
 
 /* ------------------------------------------------------------------------ */
@@ -274,18 +274,11 @@ void knh_Object__k(Ctx *ctx, Object *o, OutputStream *w, String *m)
 		knh_write(ctx, w, STEXT("undefined"));
 	}
 	else if(IS_NULL(o)) {
-		DBG2_ABORT();
 		knh_write(ctx, w, STEXT("null"));
 	}
-	else if(o->h.cid == CLASS_Object || o->h.bcid != CLASS_Object) {
-		knh_format(ctx, w, METHODN__s, o, KNH_NULL);
-	}
-	else if(knh_stack_isRecuriveFormatting(ctx, ctx->esp - 3, UP(o), w, knh_Object__k)) {
-		knh_write_dots(ctx, w);
-	}
-	else {
+	else if(o->h.bcid == CLASS_Object) {
 		size_t bsize = ctx->share->ClassTable[o->h.cid].bsize;
-		knh_write_cid(ctx, w, o->h.cid);
+		knh_write_char(ctx, w, CLASSN(o->h.cid));
 		if(bsize > 0) {
 			size_t i;
 			Object **v = (Object**)o->ref;
@@ -297,8 +290,7 @@ void knh_Object__k(Ctx *ctx, Object *o, OutputStream *w, String *m)
 				if(i > 0) {
 					knh_write_delim(ctx, w);
 				}
-				knh_write_fn(ctx, w, cf->fn);
-				knh_write(ctx, w, STEXT(": "));
+				knh_printf(ctx, w, "%s: ", FIELDN(cf->fn));
 #ifdef KNH_USING_UNBOXFIELD
 				if(IS_ubxint(cf->type)) {
 					knh_int_t *data = (knh_int_t*)(v + i);
@@ -316,11 +308,15 @@ void knh_Object__k(Ctx *ctx, Object *o, OutputStream *w, String *m)
 					else knh_write(ctx, w, STEXT("false"));
 					continue;
 				}
-#endif
+#else
 				knh_format(ctx, w, METHODN__k, v[i], KNH_NULL);
+#endif
 			}
 			knh_putc(ctx, w, '}');
 		}
+	}
+	else {
+		knh_format(ctx, w, METHODN__s, o, KNH_NULL);
 	}
 }
 
@@ -361,9 +357,8 @@ void knh_Object__dump(Ctx *ctx, Object *b, OutputStream *w, String *m)
 /* @method void Object.%empty(OutputStream w, String m) */
 
 static
-void knh_Object__empty(Ctx *ctx, Object *o, OutputStream *w, String *m)
+void knh_Object__empty(Ctx *ctx, Object *b, OutputStream *w, String *m)
 {
-	DBG_P("%%empty(%s)", CLASSNo(o));
 }
 
 /* ------------------------------------------------------------------------ */
@@ -492,9 +487,9 @@ char *knh_methodop_tochar(knh_methodn_t mn)
 	case METHODN_get: return "x[n]";
 	case METHODN_set: return "x[n]=y";
 	case METHODN_setAll: return "x[]=y";
-	case METHODN_opTo: return "x[m..n]";
+	case METHODN_opSubsete: return "x[m..n]";
 	case METHODN_opOffset: return "x[m..+n]";
-	case METHODN_opUntil: return "x[m..<n]";
+	case METHODN_opSubset: return "x[m..<n]";
 	}
 	return NULL;
 }

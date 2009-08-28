@@ -76,7 +76,7 @@ static METHOD knh__HashMap_new(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method T2 HashMap.get(T1 key) */
+/* @method Any2 HashMap.get(Any1 key) */
 
 static METHOD knh__HashMap_get(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -97,7 +97,7 @@ static METHOD knh__HashMap_get(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method Boolean! HashMap.opHas(T1 key) */
+/* @method Boolean! HashMap.opHas(Any1 key) */
 
 static METHOD knh__HashMap_opHas(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -118,7 +118,7 @@ static METHOD knh__HashMap_opHas(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method void HashMap.remove(T1 key) */
+/* @method void HashMap.remove(Any1 key) */
 
 static METHOD knh__HashMap_remove(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -145,7 +145,7 @@ static METHOD knh__HashMap_remove(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method void HashMap.set(T1! key, T2 value) */
+/* @method void HashMap.set(Any1! key, Any2 value) */
 
 static METHOD knh__HashMap_set(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -251,7 +251,7 @@ MAPPER knh_HashMap_Iterator(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 /* ------------------------------------------------------------------------ */
-/* @method T1.. HashMap.opItr() */
+/* @method Any1.. HashMap.opItr() */
 
 static METHOD knh__HashMap_opItr(Ctx *ctx, knh_sfp_t *sfp)
 {
@@ -271,7 +271,7 @@ static METHOD knh__HashMap_opItr(Ctx *ctx, knh_sfp_t *sfp)
 //		knh_hashmapentry_t *e = knh_hashmapentry_at(o, pos);
 //		if(e != NULL) {
 //			DP(it)->pos = , pos+1);
-//			return new_Pair(ctx, e->key, e->value);
+//			return new_Tuple2(ctx, e->key, e->value);
 //		}
 //		pos++;
 //	}
@@ -279,11 +279,11 @@ static METHOD knh__HashMap_opItr(Ctx *ctx, knh_sfp_t *sfp)
 //}
 //
 ///* ------------------------------------------------------------------------ */
-///* @map HashMap Pair..! */
+///* @map HashMap Tuple2..! */
 //
-//Iterator* knh_HashMap_Pair__(Ctx *ctx, HashMap *o, Mapper *mpr)
+//Iterator* knh_HashMap_Tuple2__(Ctx *ctx, HashMap *o, Mapper *mpr)
 //{
-//	return new_Iterator(ctx, CLASS_Pair, o, knh_HashMap_tuple2_next);
+//	return new_Iterator(ctx, CLASS_Tuple2, o, knh_HashMap_tuple2_next);
 //}
 //
 ///* ------------------------------------------------------------------------ */
@@ -307,7 +307,7 @@ static METHOD knh__HashMap_opItr(Ctx *ctx, knh_sfp_t *sfp)
 ///* [method] */
 //
 ///* ------------------------------------------------------------------------ */
-///* @method Boolean HashSet.opHas(T1 key) */
+///* @method Boolean HashSet.opHas(Any1 key) */
 //
 //
 //knh_bool_t knh_HashSet_opHas(Ctx *ctx, HashSet *b, knh_hcode_t key, Object *keyobj)

@@ -74,7 +74,7 @@ extern "C" {
 #define KNH_INITv(v,o) {\
 		knh_Object_t *h_ = (knh_Object_t*)o; \
 		knh_Object_t **v_ = (knh_Object_t**)&v; \
-		DBG2_ASSERT_ISOBJECT(h_); \
+		KNH_ASSERT_ISOBJECT(h_); \
 		knh_Object_RCinc(h_); \
 		v_[0] = (h_); \
 	}\
@@ -83,8 +83,7 @@ extern "C" {
 #define KNH_SETv(ctx,v,o) {\
 		knh_Object_t *h_ = (knh_Object_t*)o; \
 		knh_Object_t **v_ = (knh_Object_t**)&v; \
-		DBG2_ASSERT_ISOBJECT(v);  \
-		DBG2_ASSERT_ISOBJECT(h_); \
+		KNH_ASSERT_ISOBJECT(h_); \
 		knh_Object_RCinc(h_); \
 		knh_Object_DRCsweep(ctx, (knh_Object_t*)v); \
 		v_[0] = (h_); \
@@ -93,8 +92,7 @@ extern "C" {
 #define KNH_RCSETv(ctx,v,o) {\
 		knh_Object_t *h_ = (knh_Object_t*)o; \
 		knh_Object_t **v_ = (knh_Object_t**)&v; \
-		DBG2_ASSERT_ISOBJECT(v);  \
-		DBG2_ASSERT_ISOBJECT(h_); \
+		KNH_ASSERT_ISOBJECT(h_); \
 		knh_Object_RCinc(h_); \
 		knh_Object_DRCsweep(ctx, (knh_Object_t*)v); \
 		v_[0] = (h_); \
@@ -103,7 +101,7 @@ extern "C" {
 #define KNH_NGCSETv(ctx,v,o) {\
 		knh_Object_t *h_ = (knh_Object_t*)o; \
 		knh_Object_t **v_ = (knh_Object_t**)&v; \
-		DBG2_ASSERT_ISOBJECT(h_); \
+		KNH_ASSERT_ISOBJECT(h_); \
 		knh_Object_RCinc(h_); \
 		knh_Object_RCdec(v); \
 		v_[0] = (h_); \
@@ -113,14 +111,14 @@ extern "C" {
 
 #define KNH_INITv(v,o) {\
 		knh_Object_t *h_ = (knh_Object_t*)o; \
-		DBG2_ASSERT_ISOBJECT(h_); \
+		KNH_ASSERT_ISOBJECT(h_); \
 		knh_Object_RCinc(h_); \
 		v = (typeof(v))(h_); \
 	}\
 
 #define KNH_SETv(ctx,v,o) {\
 		knh_Object_t *h_ = (knh_Object_t*)o; \
-		DBG2_ASSERT_ISOBJECT(h_); \
+		KNH_ASSERT_ISOBJECT(h_); \
 		knh_Object_RCinc(h_); \
 		knh_Object_DRCsweep(ctx, (knh_Object_t*)v); \
 		v = (typeof(v))(h_); \
@@ -128,7 +126,7 @@ extern "C" {
 
 #define KNH_RCSETv(ctx,v,o) {\
 		knh_Object_t *h_ = (knh_Object_t*)o; \
-		DBG2_ASSERT_ISOBJECT(h_); \
+		KNH_ASSERT_ISOBJECT(h_); \
 		knh_Object_RCinc(h_); \
 		knh_Object_DRCsweep(ctx, (knh_Object_t*)v); \
 		v = (typeof(v))(h_); \
@@ -136,7 +134,7 @@ extern "C" {
 
 #define KNH_NGCSETv(ctx,v,o) {\
 		knh_Object_t *h_ = (knh_Object_t*)o; \
-		DBG2_ASSERT_ISOBJECT(h_); \
+		KNH_ASSERT_ISOBJECT(h_); \
 		knh_Object_RCinc(h_); \
 		knh_Object_RCdec(v); \
 		v = (typeof(v))(h_); \

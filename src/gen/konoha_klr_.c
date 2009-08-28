@@ -1,20 +1,20 @@
 /****************************************************************************
- * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER
- *
+ * KONOHA COPYRIGHT, LICENSE NOTICE, AND DISCRIMER  
+ * 
  * Copyright (c) 2005-2009, Kimio Kuramitsu <kimio at ynu.ac.jp>
- *           (c) 2008-      Konoha Software Foundation
+ *           (c) 2008-      Konoha Software Foundation  
  * All rights reserved.
- *
- * You may choose one of the following two licenses when you use konoha.
+ * 
+ * You may choose one of the following two licenses when you use konoha. 
  * See www.konohaware.org/license.html for further information.
- *
+ * 
  * (1) GNU General Public License 2.0      (with    KONOHA_UNDER_GPL2)
  * (2) Konoha Software Foundation License 1.0
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER 
  * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
@@ -22,14 +22,14 @@
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
+ *  
  ****************************************************************************/
 
 #include<konoha/konoha_dev.h>
 #include<konoha/gen/konohac_klr_.h>
 
 
-#ifdef __cplusplus
+#ifdef __cplusplus 
 extern "C" {
 #endif
 
@@ -84,10 +84,10 @@ static size_t OPSIZE[] = {
 	OPSIZE_NNBOX,
 	OPSIZE_NNBOXNC,
 	OPSIZE_UNBOX,
-	OPSIZE_CHECKNULL,
-	OPSIZE_CHECKNULLX,
-	OPSIZE_CHECKTYPE,
-	OPSIZE_CHECKNNTYPE,
+	OPSIZE_ISNULL,
+	OPSIZE_ISNULLX,
+	OPSIZE_ISTYPE,
+	OPSIZE_ISNNTYPE,
 	OPSIZE_FCALL,
 	OPSIZE_SCALL,
 	OPSIZE_AINVOKE,
@@ -922,11 +922,11 @@ knh_code_t* KNH_ASM_UNBOX_(Ctx *ctx, Asm *o,knh_sfi_t a1)
 
 /* ------------------------------------------------------------------------ */
 
-knh_code_t* KNH_ASM_CHECKNULL_(Ctx *ctx, Asm *o,knh_sfi_t a1)
+knh_code_t* KNH_ASM_ISNULL_(Ctx *ctx, Asm *o,knh_sfi_t a1)
 {
-	klr_checknull_t *op = NULL;
+	klr_isnull_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
-		op = (klr_checknull_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_CHECKNULL);
+		op = (klr_isnull_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ISNULL);
 		op->opcode = 48;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		DP(o)->prev_op = (knh_kode_t*)op;
@@ -936,11 +936,11 @@ knh_code_t* KNH_ASM_CHECKNULL_(Ctx *ctx, Asm *o,knh_sfi_t a1)
 
 /* ------------------------------------------------------------------------ */
 
-knh_code_t* KNH_ASM_CHECKNULLx_(Ctx *ctx, Asm *o,knh_sfx_t a1)
+knh_code_t* KNH_ASM_ISNULLx_(Ctx *ctx, Asm *o,knh_sfx_t a1)
 {
-	klr_checknullx_t *op = NULL;
+	klr_isnullx_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
-		op = (klr_checknullx_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_CHECKNULLX);
+		op = (klr_isnullx_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ISNULLX);
 		op->opcode = 49;
 		op->a1 = /*(knh_sfx_t)*/a1;
 		DP(o)->prev_op = (knh_kode_t*)op;
@@ -950,11 +950,11 @@ knh_code_t* KNH_ASM_CHECKNULLx_(Ctx *ctx, Asm *o,knh_sfx_t a1)
 
 /* ------------------------------------------------------------------------ */
 
-knh_code_t* KNH_ASM_CHECKTYPE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_class_t a2)
+knh_code_t* KNH_ASM_ISTYPE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_class_t a2)
 {
-	klr_checktype_t *op = NULL;
+	klr_istype_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
-		op = (klr_checktype_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_CHECKTYPE);
+		op = (klr_istype_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ISTYPE);
 		op->opcode = 50;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		KNH_ASSERT_cid(a2);
@@ -966,11 +966,11 @@ knh_code_t* KNH_ASM_CHECKTYPE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_class_t a2)
 
 /* ------------------------------------------------------------------------ */
 
-knh_code_t* KNH_ASM_CHECKNNTYPE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_type_t a2)
+knh_code_t* KNH_ASM_ISNNTYPE_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_type_t a2)
 {
-	klr_checknntype_t *op = NULL;
+	klr_isnntype_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
-		op = (klr_checknntype_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_CHECKNNTYPE);
+		op = (klr_isnntype_t*)knh_Asm_asmmalloc(ctx, o, OPSIZE_ISNNTYPE);
 		op->opcode = 51;
 		op->a1 = /*(knh_sfi_t)*/a1;
 		op->a2 = /*(knh_type_t)*/a2;
@@ -1063,7 +1063,7 @@ knh_code_t* KNH_ASM_ACALL_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_ushort_t a2,knh_met
 
 /* ------------------------------------------------------------------------ */
 
-knh_code_t* KNH_ASM_NEW_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_flag_t a2,knh_class_t a3,knh_ushort_t a4, Object* a5)
+knh_code_t* KNH_ASM_NEW_(Ctx *ctx, Asm *o,knh_sfi_t a1,knh_flag_t a2,knh_class_t a3,knh_ushort_t a4,Object* a5)
 {
 	klr_new_t *op = NULL;
 	if(!knh_Asm_isCancelled(o)) {
@@ -2576,10 +2576,10 @@ static frewrite OPREWRITE[] = {
 	knh_rewrite_NOP, /* NNBOX */
 	knh_rewrite_NOP, /* NNBOXnc */
 	knh_rewrite_NOP, /* UNBOX */
-	knh_rewrite_NOP, /* CHECKNULL */
-	knh_rewrite_NOP, /* CHECKNULLx */
-	knh_rewrite_NOP, /* CHECKTYPE */
-	knh_rewrite_NOP, /* CHECKNNTYPE */
+	knh_rewrite_NOP, /* ISNULL */
+	knh_rewrite_NOP, /* ISNULLx */
+	knh_rewrite_NOP, /* ISTYPE */
+	knh_rewrite_NOP, /* ISNNTYPE */
 	knh_rewrite_NOP, /* FCALL */
 	knh_rewrite_NOP, /* SCALL */
 	knh_rewrite_NOP, /* AINVOKE */
@@ -2685,7 +2685,7 @@ void knh_Asm_writeAddress(Ctx *ctx, Asm *o, knh_code_t *pc_start)
 	knh_code_t *pc = pc_start;
 	while(1) {
 		int opcode = KNH_OPCODE(pc);
-		if(opcode == OPCODE_HALT) return ;
+		if(opcode == OPCODE_HALT) return ; 
 		OPREWRITE[opcode](ctx, o, pc_start, (knh_kode_t*)pc);
 		pc += OPSIZE[opcode];
 	}
@@ -3364,10 +3364,10 @@ void KNH_DUMP_UNBOX(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Method 
 /* ------------------------------------------------------------------------ */
 
 static
-void KNH_DUMP_CHECKNULL(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Method *mtd)
+void KNH_DUMP_ISNULL(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Method *mtd)
 {
-	klr_checknull_t *op = (klr_checknull_t*)pc;
-	KNH_DUMP_OPCODE(ctx, pc, w, mtd, "CHECKNULL");
+	klr_isnull_t *op = (klr_isnull_t*)pc;
+	KNH_DUMP_OPCODE(ctx, pc, w, mtd, "ISNULL");
 	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a1));
 	knh_write_EOL(ctx, w);
 }
@@ -3375,10 +3375,10 @@ void KNH_DUMP_CHECKNULL(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Met
 /* ------------------------------------------------------------------------ */
 
 static
-void KNH_DUMP_CHECKNULLx(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Method *mtd)
+void KNH_DUMP_ISNULLx(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Method *mtd)
 {
-	klr_checknullx_t *op = (klr_checknullx_t*)pc;
-	KNH_DUMP_OPCODE(ctx, pc, w, mtd, "CHECKNULLx");
+	klr_isnullx_t *op = (klr_isnullx_t*)pc;
+	KNH_DUMP_OPCODE(ctx, pc, w, mtd, "ISNULLx");
 	knh_putc(ctx, w, ' '); knh_write__sfx(ctx, w, (op->a1));
 	knh_write_EOL(ctx, w);
 }
@@ -3386,10 +3386,10 @@ void KNH_DUMP_CHECKNULLx(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Me
 /* ------------------------------------------------------------------------ */
 
 static
-void KNH_DUMP_CHECKTYPE(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Method *mtd)
+void KNH_DUMP_ISTYPE(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Method *mtd)
 {
-	klr_checktype_t *op = (klr_checktype_t*)pc;
-	KNH_DUMP_OPCODE(ctx, pc, w, mtd, "CHECKTYPE");
+	klr_istype_t *op = (klr_istype_t*)pc;
+	KNH_DUMP_OPCODE(ctx, pc, w, mtd, "ISTYPE");
 	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a1));
 	knh_putc(ctx, w, ' '); knh_write__cid(ctx, w, (op->a2));
 	knh_write_EOL(ctx, w);
@@ -3398,10 +3398,10 @@ void KNH_DUMP_CHECKTYPE(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Met
 /* ------------------------------------------------------------------------ */
 
 static
-void KNH_DUMP_CHECKNNTYPE(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Method *mtd)
+void KNH_DUMP_ISNNTYPE(Ctx *ctx, knh_code_t *pc, int flag, OutputStream *w, Method *mtd)
 {
-	klr_checknntype_t *op = (klr_checknntype_t*)pc;
-	KNH_DUMP_OPCODE(ctx, pc, w, mtd, "CHECKNNTYPE");
+	klr_isnntype_t *op = (klr_isnntype_t*)pc;
+	KNH_DUMP_OPCODE(ctx, pc, w, mtd, "ISNNTYPE");
 	knh_putc(ctx, w, ' '); knh_write__sfi(ctx, w, (op->a1));
 	knh_putc(ctx, w, ' '); knh_write__type(ctx, w, (op->a2));
 	knh_write_EOL(ctx, w);
@@ -4676,10 +4676,10 @@ static fdump OPDUMP[] = {
 	KNH_DUMP_NNBOX,
 	KNH_DUMP_NNBOXnc,
 	KNH_DUMP_UNBOX,
-	KNH_DUMP_CHECKNULL,
-	KNH_DUMP_CHECKNULLx,
-	KNH_DUMP_CHECKTYPE,
-	KNH_DUMP_CHECKNNTYPE,
+	KNH_DUMP_ISNULL,
+	KNH_DUMP_ISNULLx,
+	KNH_DUMP_ISTYPE,
+	KNH_DUMP_ISNNTYPE,
 	KNH_DUMP_FCALL,
 	KNH_DUMP_SCALL,
 	KNH_DUMP_AINVOKE,
@@ -4818,19 +4818,19 @@ void knh_code_thread(Ctx *ctx, knh_code_t *pc, void **codeaddr)
 			return;
 		}
 		switch(op->opcode) {
-		case OPCODE_JMP :
-		case OPCODE_SKIP :
-		case OPCODE_BJIFT :
-		case OPCODE_BJIFF :
-		case OPCODE_BJIFF_LOOP :
-		case OPCODE_JIFNUL :
-		case OPCODE_JIFNN :
-		case OPCODE_NEXT :
-		case OPCODE_INEXT :
-		case OPCODE_MAPNEXT :
-		case OPCODE_SMAPNEXT :
-		case OPCODE_TRY :
-		case OPCODE_CATCH :
+		case OPCODE_JMP : 
+		case OPCODE_SKIP : 
+		case OPCODE_BJIFT : 
+		case OPCODE_BJIFF : 
+		case OPCODE_BJIFF_LOOP : 
+		case OPCODE_JIFNUL : 
+		case OPCODE_JIFNN : 
+		case OPCODE_NEXT : 
+		case OPCODE_INEXT : 
+		case OPCODE_MAPNEXT : 
+		case OPCODE_SMAPNEXT : 
+		case OPCODE_TRY : 
+		case OPCODE_CATCH : 
 			DBG2_P("%p GOTO %p", op, op->jumppc);
 			op->jumpaddr = codeaddr[((knh_kode_t*)(op->jumppc))->opcode];
 			break;
@@ -5284,39 +5284,39 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 			goto L_HEAD;
 		}
 
-	case OPCODE_CHECKNULL :
+	case OPCODE_ISNULL :
 		{
-			const klr_checknull_t* op = (klr_checknull_t*)pc;
+			const klr_isnull_t* op = (klr_isnull_t*)pc;
 			DBG2_OPDUMP(ctx, pc);
-			KLR_CHECKNULL(ctx, op->a1);
-			pc += OPSIZE_CHECKNULL;
+			KLR_ISNULL(ctx, op->a1);
+			pc += OPSIZE_ISNULL;
 			goto L_HEAD;
 		}
 
-	case OPCODE_CHECKNULLX :
+	case OPCODE_ISNULLX :
 		{
-			const klr_checknullx_t* op = (klr_checknullx_t*)pc;
+			const klr_isnullx_t* op = (klr_isnullx_t*)pc;
 			DBG2_OPDUMP(ctx, pc);
-			KLR_CHECKNULLx(ctx, op->a1);
-			pc += OPSIZE_CHECKNULLX;
+			KLR_ISNULLx(ctx, op->a1);
+			pc += OPSIZE_ISNULLX;
 			goto L_HEAD;
 		}
 
-	case OPCODE_CHECKTYPE :
+	case OPCODE_ISTYPE :
 		{
-			const klr_checktype_t* op = (klr_checktype_t*)pc;
+			const klr_istype_t* op = (klr_istype_t*)pc;
 			DBG2_OPDUMP(ctx, pc);
-			KLR_CHECKTYPE(ctx, op->a1, op->a2);
-			pc += OPSIZE_CHECKTYPE;
+			KLR_ISTYPE(ctx, op->a1, op->a2);
+			pc += OPSIZE_ISTYPE;
 			goto L_HEAD;
 		}
 
-	case OPCODE_CHECKNNTYPE :
+	case OPCODE_ISNNTYPE :
 		{
-			const klr_checknntype_t* op = (klr_checknntype_t*)pc;
+			const klr_isnntype_t* op = (klr_isnntype_t*)pc;
 			DBG2_OPDUMP(ctx, pc);
-			KLR_CHECKNNTYPE(ctx, op->a1, op->a2);
-			pc += OPSIZE_CHECKNNTYPE;
+			KLR_ISNNTYPE(ctx, op->a1, op->a2);
+			pc += OPSIZE_ISNNTYPE;
 			goto L_HEAD;
 		}
 
@@ -6244,10 +6244,10 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		&&L_NNBOX,
 		&&L_NNBOXNC,
 		&&L_UNBOX,
-		&&L_CHECKNULL,
-		&&L_CHECKNULLX,
-		&&L_CHECKTYPE,
-		&&L_CHECKNNTYPE,
+		&&L_ISNULL,
+		&&L_ISNULLX,
+		&&L_ISTYPE,
+		&&L_ISNNTYPE,
 		&&L_FCALL,
 		&&L_SCALL,
 		&&L_AINVOKE,
@@ -6345,7 +6345,7 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		&&L_INITCODE,
 		&&L_NOP,
 	};
-
+	
 	register knh_code_t *pc = sfp[-1].pc;
 	DBG2_ASSERT(pc == DP((KLRCode*)DP(sfp[-1].mtd)->code)->code);
 	//register knh_code_t *pc =  DP((KLRCode*)DP(sfp[-1].mtd)->code)->code;
@@ -6736,35 +6736,35 @@ METHOD knh_KLRCode_exec(Ctx *ctx, knh_sfp_t *sfp)
 		goto *(op->nextaddr);
 	}
 
-	L_CHECKNULL:; {
-		const klr_checknull_t *op = (klr_checknull_t*)pc;
+	L_ISNULL:; {
+		const klr_isnull_t *op = (klr_isnull_t*)pc;
 		DBG2_OPDUMP(ctx, pc);
-		KLR_CHECKNULL(ctx, op->a1);
-		pc += OPSIZE_CHECKNULL;
+		KLR_ISNULL(ctx, op->a1);
+		pc += OPSIZE_ISNULL;
 		goto *(op->nextaddr);
 	}
 
-	L_CHECKNULLX:; {
-		const klr_checknullx_t *op = (klr_checknullx_t*)pc;
+	L_ISNULLX:; {
+		const klr_isnullx_t *op = (klr_isnullx_t*)pc;
 		DBG2_OPDUMP(ctx, pc);
-		KLR_CHECKNULLx(ctx, op->a1);
-		pc += OPSIZE_CHECKNULLX;
+		KLR_ISNULLx(ctx, op->a1);
+		pc += OPSIZE_ISNULLX;
 		goto *(op->nextaddr);
 	}
 
-	L_CHECKTYPE:; {
-		const klr_checktype_t *op = (klr_checktype_t*)pc;
+	L_ISTYPE:; {
+		const klr_istype_t *op = (klr_istype_t*)pc;
 		DBG2_OPDUMP(ctx, pc);
-		KLR_CHECKTYPE(ctx, op->a1, op->a2);
-		pc += OPSIZE_CHECKTYPE;
+		KLR_ISTYPE(ctx, op->a1, op->a2);
+		pc += OPSIZE_ISTYPE;
 		goto *(op->nextaddr);
 	}
 
-	L_CHECKNNTYPE:; {
-		const klr_checknntype_t *op = (klr_checknntype_t*)pc;
+	L_ISNNTYPE:; {
+		const klr_isnntype_t *op = (klr_isnntype_t*)pc;
 		DBG2_OPDUMP(ctx, pc);
-		KLR_CHECKNNTYPE(ctx, op->a1, op->a2);
-		pc += OPSIZE_CHECKNNTYPE;
+		KLR_ISNNTYPE(ctx, op->a1, op->a2);
+		pc += OPSIZE_ISNNTYPE;
 		goto *(op->nextaddr);
 	}
 
@@ -7611,10 +7611,10 @@ static fhaslabel OPHASLABEL[] = {
 	knh_hasLabel_NOP, /* NNBOX */
 	knh_hasLabel_NOP, /* NNBOXnc */
 	knh_hasLabel_NOP, /* UNBOX */
-	knh_hasLabel_NOP, /* CHECKNULL */
-	knh_hasLabel_NOP, /* CHECKNULLx */
-	knh_hasLabel_NOP, /* CHECKTYPE */
-	knh_hasLabel_NOP, /* CHECKNNTYPE */
+	knh_hasLabel_NOP, /* ISNULL */
+	knh_hasLabel_NOP, /* ISNULLx */
+	knh_hasLabel_NOP, /* ISTYPE */
+	knh_hasLabel_NOP, /* ISNNTYPE */
 	knh_hasLabel_NOP, /* FCALL */
 	knh_hasLabel_NOP, /* SCALL */
 	knh_hasLabel_NOP, /* AINVOKE */
@@ -7722,7 +7722,7 @@ int knh_hasLabel(knh_code_t *pc_start, knh_code_t *jumppc)
 	knh_code_t *pc = pc_start;
 	while(res == 0) {
 		knh_kode_t *op = (knh_kode_t*)pc;
-		if(op->opcode == OPCODE_HALT) return 0;
+		if(op->opcode == OPCODE_HALT) return 0; 
 		res = OPHASLABEL[op->opcode](op, jumppc);
 		pc += OPSIZE[KNH_OPCODE(pc)];
 	}
@@ -7789,7 +7789,7 @@ void KNH_KLR_MOVx(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 {
 	klr_movx_t *op = (klr_movx_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_MOVx(");
 	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
@@ -7832,7 +7832,7 @@ void KNH_KLR_XMOVs(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 {
 	klr_xmovs_t *op = (klr_xmovs_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVs(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -7847,7 +7847,7 @@ void KNH_KLR_XMOVo(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 {
 	klr_xmovo_t *op = (klr_xmovo_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVo(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -7862,8 +7862,8 @@ void KNH_KLR_XMOVx(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 {
 	klr_xmovx_t *op = (klr_xmovx_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVx(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -7878,7 +7878,7 @@ void KNH_KLR_XMOVDEF(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, 
 {
 	klr_xmovdef_t *op = (klr_xmovdef_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVDEF(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -7893,7 +7893,7 @@ void KNH_KLR_XMOVSYS(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, 
 {
 	klr_xmovsys_t *op = (klr_xmovsys_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVSYS(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -7908,7 +7908,7 @@ void KNH_KLR_MOVxi(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 {
 	klr_movxi_t *op = (klr_movxi_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_MOVxi(");
 	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
@@ -7923,7 +7923,7 @@ void KNH_KLR_XMOVsi(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovsi_t *op = (klr_xmovsi_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVsi(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -7938,7 +7938,7 @@ void KNH_KLR_XMOVoi(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovoi_t *op = (klr_xmovoi_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVoi(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -7953,8 +7953,8 @@ void KNH_KLR_XMOVxi(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovxi_t *op = (klr_xmovxi_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVxi(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -7969,8 +7969,8 @@ void KNH_KLR_XMOVxio(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, 
 {
 	klr_xmovxio_t *op = (klr_xmovxio_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVxio(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -7985,8 +7985,8 @@ void KNH_KLR_XMOVxBXi(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start,
 {
 	klr_xmovxbxi_t *op = (klr_xmovxbxi_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVxBXi(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8003,7 +8003,7 @@ void KNH_KLR_MOVxf(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 {
 	klr_movxf_t *op = (klr_movxf_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_MOVxf(");
 	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8018,7 +8018,7 @@ void KNH_KLR_XMOVsf(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovsf_t *op = (klr_xmovsf_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVsf(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8033,7 +8033,7 @@ void KNH_KLR_XMOVof(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovof_t *op = (klr_xmovof_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVof(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8048,8 +8048,8 @@ void KNH_KLR_XMOVxf(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovxf_t *op = (klr_xmovxf_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVxf(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8064,8 +8064,8 @@ void KNH_KLR_XMOVxfo(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, 
 {
 	klr_xmovxfo_t *op = (klr_xmovxfo_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVxfo(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8080,8 +8080,8 @@ void KNH_KLR_XMOVxBXf(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start,
 {
 	klr_xmovxbxf_t *op = (klr_xmovxbxf_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVxBXf(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8098,7 +8098,7 @@ void KNH_KLR_MOVxb(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 {
 	klr_movxb_t *op = (klr_movxb_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_MOVxb(");
 	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8113,7 +8113,7 @@ void KNH_KLR_XMOVsb(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovsb_t *op = (klr_xmovsb_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVsb(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8128,7 +8128,7 @@ void KNH_KLR_XMOVob(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovob_t *op = (klr_xmovob_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVob(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8143,8 +8143,8 @@ void KNH_KLR_XMOVxb(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, k
 {
 	klr_xmovxb_t *op = (klr_xmovxb_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_XMOVxb(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8334,7 +8334,7 @@ void KNH_KLR_RETx(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh
 {
 	klr_retx_t *op = (klr_retx_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n);
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_2 = {%d, %d};\n", step, op->a2.i, op->a2.n); 
 	knh_printf(ctx, w, "\tKLR_RETx(");
 	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
@@ -8424,11 +8424,11 @@ void KNH_KLR_UNBOX(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, kn
 /* ------------------------------------------------------------------------ */
 
 static
-void KNH_KLR_CHECKNULL(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_code_t *pc, int step)
+void KNH_KLR_ISNULL(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_code_t *pc, int step)
 {
-	klr_checknull_t *op = (klr_checknull_t*)pc;
+	klr_isnull_t *op = (klr_isnull_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tKLR_CHECKNULL(");
+	knh_printf(ctx, w, "\tKLR_ISNULL(");
 	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_println(ctx, w, STEXT(");"));
 }
@@ -8436,12 +8436,12 @@ void KNH_KLR_CHECKNULL(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start
 /* ------------------------------------------------------------------------ */
 
 static
-void KNH_KLR_CHECKNULLx(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_code_t *pc, int step)
+void KNH_KLR_ISNULLx(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_code_t *pc, int step)
 {
-	klr_checknullx_t *op = (klr_checknullx_t*)pc;
+	klr_isnullx_t *op = (klr_isnullx_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n);
-	knh_printf(ctx, w, "\tKLR_CHECKNULLx(");
+	knh_printf(ctx, w, "\tconst knh_sfx_t x%d_1 = {%d, %d};\n", step, op->a1.i, op->a1.n); 
+	knh_printf(ctx, w, "\tKLR_ISNULLx(");
 	knh_printf(ctx, w, "x%d_1", step);
 	knh_println(ctx, w, STEXT(");"));
 }
@@ -8449,11 +8449,11 @@ void KNH_KLR_CHECKNULLx(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_star
 /* ------------------------------------------------------------------------ */
 
 static
-void KNH_KLR_CHECKTYPE(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_code_t *pc, int step)
+void KNH_KLR_ISTYPE(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_code_t *pc, int step)
 {
-	klr_checktype_t *op = (klr_checktype_t*)pc;
+	klr_istype_t *op = (klr_istype_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tKLR_CHECKTYPE(");
+	knh_printf(ctx, w, "\tKLR_ISTYPE(");
 	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_printf(ctx, w, "_CLASS_%d /* %s */", knh_Asm_classId(ctx, abr, op->a2), CTXCLASSN(op->a2));
@@ -8463,11 +8463,11 @@ void KNH_KLR_CHECKTYPE(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start
 /* ------------------------------------------------------------------------ */
 
 static
-void KNH_KLR_CHECKNNTYPE(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_code_t *pc, int step)
+void KNH_KLR_ISNNTYPE(Ctx *ctx, OutputStream *w, Asm *abr, knh_code_t *pc_start, knh_code_t *pc, int step)
 {
-	klr_checknntype_t *op = (klr_checknntype_t*)pc;
+	klr_isnntype_t *op = (klr_isnntype_t*)pc;
 	KNH_KLR_LABEL(ctx, w, pc_start, pc);
-	knh_printf(ctx, w, "\tKLR_CHECKNNTYPE(");
+	knh_printf(ctx, w, "\tKLR_ISNNTYPE(");
 	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a1);
 	knh_write(ctx, w,  STEXT(", "));
 	knh_write_dfmt(ctx, w, KNH_INTPTR_FMT, (knh_intptr_t)op->a2);
@@ -10098,17 +10098,17 @@ void knh_code_generate(Ctx *ctx, Asm *abr, knh_code_t *pc_start, OutputStream *w
 		case OPCODE_UNBOX :
 			KNH_KLR_UNBOX(ctx, w, abr, pc_start, pc, step);
 			break;
-		case OPCODE_CHECKNULL :
-			KNH_KLR_CHECKNULL(ctx, w, abr, pc_start, pc, step);
+		case OPCODE_ISNULL :
+			KNH_KLR_ISNULL(ctx, w, abr, pc_start, pc, step);
 			break;
-		case OPCODE_CHECKNULLX :
-			KNH_KLR_CHECKNULLx(ctx, w, abr, pc_start, pc, step);
+		case OPCODE_ISNULLX :
+			KNH_KLR_ISNULLx(ctx, w, abr, pc_start, pc, step);
 			break;
-		case OPCODE_CHECKTYPE :
-			KNH_KLR_CHECKTYPE(ctx, w, abr, pc_start, pc, step);
+		case OPCODE_ISTYPE :
+			KNH_KLR_ISTYPE(ctx, w, abr, pc_start, pc, step);
 			break;
-		case OPCODE_CHECKNNTYPE :
-			KNH_KLR_CHECKNNTYPE(ctx, w, abr, pc_start, pc, step);
+		case OPCODE_ISNNTYPE :
+			KNH_KLR_ISNNTYPE(ctx, w, abr, pc_start, pc, step);
 			break;
 		case OPCODE_FCALL :
 			KNH_KLR_FCALL(ctx, w, abr, pc_start, pc, step);

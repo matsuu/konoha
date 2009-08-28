@@ -77,6 +77,19 @@ METHOD knh__Object_setModified(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 static 
+METHOD knh__Object_isFormatted(Ctx *ctx, knh_sfp_t *sfp)
+{
+	KNH_RETURN_Boolean(ctx, sfp, knh_Object_isFormatted((knh_Object_t*)sfp[0].o));
+}
+
+static
+METHOD knh__Object_setFormatted(Ctx *ctx, knh_sfp_t *sfp)
+{
+	knh_Object_setFormatted((knh_Object_t*)sfp[0].o, p_bool(sfp[1]));
+	KNH_RETURN_void(ctx, sfp);
+}
+
+static 
 METHOD knh__Object_isShared(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_Object_isShared((knh_Object_t*)sfp[0].o));
@@ -120,9 +133,9 @@ METHOD knh__Class_isImmutable(Ctx *ctx, knh_sfp_t *sfp)
 }
 
 static 
-METHOD knh__Class_isMetaClass(Ctx *ctx, knh_sfp_t *sfp)
+METHOD knh__Class_isMetaExtensible(Ctx *ctx, knh_sfp_t *sfp)
 {
-	KNH_RETURN_Boolean(ctx, sfp, knh_class_isMetaClass(knh_Class_cid(sfp[0].c)));
+	KNH_RETURN_Boolean(ctx, sfp, knh_class_isMetaExtensible(knh_Class_cid(sfp[0].c)));
 }
 
 static 
@@ -141,12 +154,6 @@ static
 METHOD knh__Class_isFinal(Ctx *ctx, knh_sfp_t *sfp)
 {
 	KNH_RETURN_Boolean(ctx, sfp, knh_class_isFinal(knh_Class_cid(sfp[0].c)));
-}
-
-static 
-METHOD knh__Class_isSingleton(Ctx *ctx, knh_sfp_t *sfp)
-{
-	KNH_RETURN_Boolean(ctx, sfp, knh_class_isSingleton(knh_Class_cid(sfp[0].c)));
 }
 
 static 
