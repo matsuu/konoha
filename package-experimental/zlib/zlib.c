@@ -120,18 +120,22 @@ METHOD Zlib_decompress(Ctx *ctx, knh_sfp_t *sfp)
     KNH_RETURN(ctx, sfp, ret);
 }
 
-/* Boolean! Zlib.decompGZ(String gzfile) */
+/* Boolean! Zlib.decompGZ(String gzfile,String outfile) */
 METHOD Zlib_decompGZ(Ctx *ctx, knh_sfp_t *sfp)
 {
     if(IS_String(sfp[1].o)) {
-        char * fi = p_char(sfp[1]);
+        knh_bytes_t gzfn = knh_String_tobytes((String*)sfp[1].o);
+
+		char * fi = (char*)alloca(gzfn.len+1);
+		strncpy(fi,(char*)gzfn.buf,gzfn.len);
+		fi[gzfn.len] = '\0';
+
         int head = knh_get_gzheader(fi);
         if ( head > 0 ) {
-            char * pt = strrchr(fi,'.');
-            int olen = (int)(pt - fi);
-            char fo[olen+1];
-            strncpy(fo,fi,olen);
-            fo[olen]='\0';
+		    knh_bytes_t oufn = knh_String_tobytes((String*)sfp[2].o);
+			char * fo = (char*)alloca(oufn.len+1);
+			strncpy(fo,(char*)oufn.buf,oufn.len);
+			fo[oufn.len] = '\0';
             FILE* fin  = fopen(fi,"rb");
             FILE* fout = fopen(fo,"wb");  
             int ret = knh_decompress_gzfile(fin,fout,head);
