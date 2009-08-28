@@ -260,14 +260,15 @@ knh_bool_t knh_unlink(Ctx *ctx, knh_bytes_t path, int isThrowable)
 }
 
 /* ------------------------------------------------------------------------ */
-
-knh_bool_t knh_rename(Ctx *ctx, knh_bytes_t on, knh_bytes_t nn, int isThrowable)
+int knh__rename(Ctx *ctx,knh_bytes_t old, knh_bytes_t new,knh_cwb_t *cwb,int isThrowable)
 {
-	knh_cwb_t cwbbuf, *cwb = knh_cwb_openinit(ctx, &cwbbuf, on);
-	char *pathname = knh_cwb_ospath(ctx, cwb);
-	knh_cwb_t cwbbuf2, *cwb2 = knh_cwb_openinit(ctx, &cwbbuf2, nn);
-	char *pathname2 = knh_cwb_ospath(ctx, cwb2);
 	int res = 1;
+	char *pathname = (char *) alloca(old.len+1);
+	char *pathname2 = (char *) alloca(new.len+1);
+	memset(pathname,'\0',old.len+1);
+	memset(pathname2,'\0',new.len+1);
+	strncpy(pathname,old.buf,old.len);
+	strncpy(pathname2,new.buf,new.len);
 #if defined(KNH_USING_POSIX)
 	if(rename(pathname, pathname2) == -1) {
 		KNH_PERRNO(ctx, cwb, "OS!!", "rename", isThrowable);
@@ -281,6 +282,17 @@ knh_bool_t knh_rename(Ctx *ctx, knh_bytes_t on, knh_bytes_t nn, int isThrowable)
 #else
 	KNH_NOAPI(ctx, cwb, isThrowable);
 #endif
+	return res;
+}
+
+knh_bool_t knh_rename(Ctx *ctx, knh_bytes_t on, knh_bytes_t nn, int isThrowable)
+{
+	int res = 1;
+	knh_cwb_t cwbbuf, *cwb = knh_cwb_openinit(ctx, &cwbbuf, on);
+	knh_bytes_t pathname = B(knh_cwb_ospath(ctx, cwb));
+	knh_cwb_t cwbbuf2, *cwb2 = knh_cwb_openinit(ctx, &cwbbuf2, nn);
+	knh_bytes_t pathname2 = B(knh_cwb_ospath(ctx, cwb2));
+	res = knh__rename(ctx,pathname,pathname2,cwb,isThrowable);
 	knh_cwb_close(cwb);
 	return res;
 }
