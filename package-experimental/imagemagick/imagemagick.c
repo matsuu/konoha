@@ -27,7 +27,7 @@ METHOD ImageMagick_coreTerminus(Ctx *ctx, knh_sfp_t* sfp)
 METHOD ImageMagick_toMime(Ctx *ctx, knh_sfp_t* sfp)
 {
 	char *s0 = p_char(sfp[1]);
-	char *ret = MagickToMime(s0 );
+	char *ret = MagickToMime(s0);
 
 	KNH_RETURN(ctx, sfp, new_String(ctx, B(ret), NULL));
 }
