@@ -50,8 +50,8 @@
 
 #define DBG2_ABORT()    abort()
 
-#elif /*KNH_DBGMODE2*/ !defined(KONOHA_ON_LKM)
-
+//#elif /*KNH_DBGMODE2*/ !defined(KONOHA_ON_LKM)
+#else 
 #define DBG2_(stmt)
 #define DBG2_P(fmt, ...)
 #define DBG2_DUMP(ctx, o, opt, msg)

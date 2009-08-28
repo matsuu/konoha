@@ -28,7 +28,7 @@
 #ifndef CLASS_KONOHA_H_
 #define CLASS_KONOHA_H_
 
-#include<konoha/konoha_t.h>
+#include <konoha/konoha_t.h>
 
 /* ************************************************************************ */
 
@@ -561,6 +561,31 @@ typedef struct {
 } knh_Regex_t;
 
 /* ------------------------------------------------------------------------ */
+/* @class Chardev Object knh_Chardev_t @Immutable */
+#ifndef KONOHA_ON_LKM
+struct cdev {
+};
+struct file_operations {
+};
+#endif
+
+typedef struct {
+    dev_t id;
+    char* name;
+    struct cdev cdev;
+    struct file_operations fops;
+    struct knh_DictMap_t*  fmap;
+    struct knh_Context_t*  ctx;
+} knh_device_t;
+
+typedef struct {
+    knh_hObject_t h;
+    knh_device_t *device;
+    int isEnable;
+} knh_Chardev_t;
+
+
+/* ------------------------------------------------------------------------ */
 /* @class BytesConv Object knh_BytesConv_t @Private */
 
 //struct knh_BytesConv_t;
@@ -860,6 +885,8 @@ typedef struct knh_System {
 /* @flag Context.Interactive CTXF ((Context*)%s)->flag 'is:set:is:*' */
 /* @flag Context.Compiling CTXF ((Context*)%s)->flag 'is:set:*:*' */
 
+/* @flag Context.Profile CTXF ((Context*)%s)->flag 'is:set:is:set' */
+/* @flag Context.Eval CTXF ((Context*)%s)->flag 'is:set:is:set' */
 /* ------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------ */
 /* konohac.h */

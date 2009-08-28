@@ -98,13 +98,33 @@ libkonoha_la_SOURCES =
     }
     o.println("""
 scriptklipdir = /usr/local/share/konoha/script/klip
-dist_scriptklip_SCRIPTS = ../dist/bin/klip.k""");
+dist_scriptklip_SCRIPTS = ../dist/bin/klip.k
 
-    o.println("""
 klipdir = /usr/local/bin
 dist_klip_SCRIPTS = ../dist/bin/klip
+""");
 
 
+
+
+
+    /* for test files. */
+    o.println("""
+## test
+check: test
+test: ./konoha""");
+
+    foreach (String file in System.walk("../test")) {
+        if(file.indexOf(".svn") >= 0) continue;
+        if(file.endsWith(".k") == false ) continue;
+        if(file.endsWith("utest.k") == true ) continue;
+        o.println(%("	./konoha %s{0}",file));
+    }
+    o.println("");
+
+
+
+    o.println("""
 
 bin_PROGRAMS = konoha
 konoha_SOURCES = ../src/konoha.c
@@ -113,6 +133,5 @@ konoha_LDADD = libkonoha.la
 """);
 
     o.close();
-
     return 0;
 }

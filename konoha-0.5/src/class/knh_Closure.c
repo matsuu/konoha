@@ -30,14 +30,14 @@
 #include"commons.h"
 #include"../../include/konoha/gen/konohac_klr_.h"
 
-size_t knh_code_opsize(int opcode);
+
 
 /* ************************************************************************ */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+size_t knh_code_opsize(int opcode);
 /* ======================================================================== */
 /* [constructors] */
 

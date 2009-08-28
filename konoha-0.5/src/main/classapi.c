@@ -850,8 +850,9 @@ void knh_Hash_init(Ctx *ctx, knh_Hash_t *hash, int init)
 	knh_Hash_struct *b = DP(hash);
 	b->DBG_name = "HashMap";
 	if(init > 0) {
-		b->hmax = init;
-		b->capacity = knh_bytes_newsize(init);
+		size_t newsize = (size_t) init;
+		b->hmax = newsize;
+		b->capacity = knh_bytes_newsize(newsize);
 		b->array = (knh_hashentry_t**)KNH_MALLOC(ctx, sizeof(knh_hashentry_t*) * b->capacity);
 		knh_bzero(b->array, sizeof(knh_hashentry_t*) * b->capacity);
 	}
@@ -1400,6 +1401,45 @@ void knh_Regex_traverse(Ctx *ctx, Regex *o, knh_ftraverse ftr)
 			o->reg = NULL;
 		}
 	}
+}
+
+/* ======================================================================== */
+/* Chardev */
+
+#define knh_Chardev_init_ NULL
+#define knh_Chardev_copy NULL
+#define knh_Chardev_traverse_ NULL
+#define knh_Chardev_compareTo NULL
+#define knh_Chardev_hashCode NULL
+#define knh_Chardev_newClass NULL
+#define knh_Chardev_getkey NULL
+#define knh_Chardev_fdefault NULL
+
+static
+void knh_Chardev_init(Ctx *ctx, Chardev *o, int init)
+{
+    knh_Chardev_t *cdev = (knh_Chardev_t*)o;
+    cdev->device = (knh_device_t*)KNH_MALLOC(ctx, sizeof(knh_device_t));
+    cdev->device->fmap = new_DictMap0(ctx, 8);
+    fprintf(stderr, "%s\n",__FUNCTION__);
+}
+
+void knh_Chardev_traverse(Ctx *ctx, Chardev *o, knh_ftraverse ftr)
+{
+    fprintf(stderr, "%s\n",__FUNCTION__);
+#ifdef KONOHA_LKM
+    knh_device_t *device = o->device;
+    if(o->isEnable) {
+        cdev_del(&device->cdev);
+        unregister_chrdev_region(device->id,1);
+        o->isEnable = 0;
+    }
+#endif
+    char* name = o->device->name;
+    if(name) {
+        KNH_FREE(ctx, name, strlen(name));
+    }
+    KNH_FREE(ctx, o->device, sizeof(knh_device_t));
 }
 
 /* ======================================================================== */
@@ -2842,8 +2882,8 @@ static void knh_loadStringPropertyData(Ctx *ctx, knh_StringConstData_t *data)
 /* @data */
 
 static knh_IntConstData_t IntConstData[] = {
-	{"Int.MAX", KNH_INT_MAX},
-	{"Int.MIN", KNH_INT_MIN},
+	{"konoha.Int.MAX", KNH_INT_MAX},
+	{"konoha.Int.MIN", KNH_INT_MIN},
 	{NULL, 0}
 };
 

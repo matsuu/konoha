@@ -112,11 +112,18 @@
 /* Using thread */
 #undef KNH_USING_THREAD
 
+/* enable -p option for profiling */
+#undef KNH_WITH_PROFILER
+
 /* mtune option */
 #undef KONOHA_CC_CPU
 
 /* Konoha os type */
 #undef KONOHA_CONFIG_OS
+
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#undef LT_OBJDIR
 
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT

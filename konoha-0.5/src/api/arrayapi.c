@@ -133,7 +133,7 @@ static METHOD knh__IArray_new(Ctx *ctx, knh_sfp_t *sfp)
 	IArray *o = (IArray*)sfp[0].o;
 	int init = IS_NULL(sfp[1].o) ? KNH_IARRAY_INITSIZE: p_int(sfp[1]);
 	if(init > 0) {
-		knh_IArray_grow(ctx, o, init, 0);
+		knh_IArray_grow(ctx, o, (size_t)init, 0);
 	}
 	o->size = 0;
 	KNH_RETURN(ctx, sfp, o);
@@ -162,7 +162,7 @@ static METHOD knh__IArray_new__init(Ctx *ctx, knh_sfp_t *sfp)
 	knh_sfp_t *v = sfp + 1;
 	int i, ac = knh_stack_argc(ctx, v);
 	if(ac > 0) {
-		knh_IArray_grow(ctx, o, ac, 0);
+		knh_IArray_grow(ctx, o, (size_t)ac, 0);
 	}
 	for(i = 0; i < ac; i++) {
 		knh_IArray_add(ctx, o, v[i].ivalue);
@@ -215,7 +215,7 @@ static METHOD knh__FArray_new(Ctx *ctx, knh_sfp_t *sfp)
 	FArray *o = (FArray*)sfp[0].o;
 	int init = IS_NULL(sfp[1].o) ? KNH_FARRAY_INITSIZE: p_int(sfp[1]);
 	if(init > 0) {
-		knh_FArray_grow(ctx, o, init, 0.0);
+		knh_FArray_grow(ctx, o, (size_t)init, 0.0);
 	}
 	o->size = 0;
 	KNH_RETURN(ctx, sfp, o);
@@ -229,8 +229,8 @@ static METHOD knh__FArray_new__array(Ctx *ctx, knh_sfp_t *sfp)
 	FArray *o = (FArray*)sfp[0].o;
 	int init = p_int(sfp[1]);
 	if(init > 0) {
-		knh_FArray_grow(ctx, o, init, 0.0);
-		o->size = init;
+		knh_FArray_grow(ctx, o, (size_t)init, 0.0);
+		o->size = (size_t) init;
 	}
 	KNH_RETURN(ctx, sfp, o);
 }
@@ -244,7 +244,7 @@ static METHOD knh__FArray_new__init(Ctx *ctx, knh_sfp_t *sfp)
 	knh_sfp_t *v = sfp + 1;
 	int i, ac = knh_stack_argc(ctx, v);
 	if(ac > 0) {
-		knh_FArray_grow(ctx, o, ac, 0.0);
+		knh_FArray_grow(ctx, o, (size_t)ac, 0.0);
 	}
 	for(i = 0; i < ac; i++) {
 		knh_FArray_add(ctx, o, v[i].fvalue);

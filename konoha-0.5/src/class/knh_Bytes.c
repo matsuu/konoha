@@ -83,7 +83,7 @@ void knh_Bytes_expands(Ctx *ctx, knh_Bytes_t *o, size_t newsize)
 
 KNHAPI(Bytes*) new_Bytes(Ctx *ctx, size_t capacity)
 {
-	return (Bytes*)new_Object_bcid(ctx, CLASS_Bytes, capacity);
+	return (Bytes*)new_Object_bcid(ctx, CLASS_Bytes, (int)capacity);
 }
 
 /* ======================================================================== */
@@ -136,7 +136,7 @@ KNHAPI(void) knh_Bytes_putc(Ctx *ctx, Bytes *o, int ch)
 	if(o->size == o->capacity) {
 		knh_Bytes_expands(ctx, o, o->capacity * 2);
 	}
-	o->buf[o->size] = ch;
+	o->buf[o->size] = (knh_uchar_t) ch;
 	o->size += 1;
 }
 
@@ -200,9 +200,9 @@ void knh_Bytes_update(Ctx *ctx, Bytes *o, size_t pos, knh_bytes_t t)
 
 knh_cwb_t *knh_cwb_open(Ctx* ctx, knh_cwb_t *cwb)
 {
-	cwb->ba = ((Context*)ctx)->bufa;
-	cwb->w  = ((Context*)ctx)->bufw;
-	cwb->pos = knh_Bytes_size(((Context*)ctx)->bufa);
+	cwb->ba = ctx->bufa;
+	cwb->w  = ctx->bufw;
+	cwb->pos = knh_Bytes_size(ctx->bufa);
 	return cwb;
 }
 

@@ -52,7 +52,7 @@ extern "C" {
 /* [charset] */
 
 #ifdef KONOHA_ON_WINDOWS
-
+#include <windows.h>
 #define HAVE_LOCALCHARSET_H 1
 
 static char *locale_charset(void)

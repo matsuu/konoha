@@ -124,7 +124,7 @@ void knh_ObjectPageTable_free(Ctx *ctx, char *thead)
 			} )
 			o->h.refc = 0;
 #endif
-			knh_Object_free(ctx, o);
+			//knh_Object_free(ctx, o);
 		}
 		t += KONOHA_PAGESIZE;
 	}
@@ -429,7 +429,7 @@ void knh_traverseSharedData(Ctx *ctx, knh_SharedData_t *share, knh_ftraverse ftr
 			DBG2_ASSERT(ClassTable(i).sname != NULL);
 			knh_ClassStruct_toAbstractAll(ctx, ClassTable(i).cstruct);
 		}
-		for(i = share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
+		for(i = (int)(share->ClassTableSize); i < KNH_TCLASS_SIZE; i++) {
 			DBG2_ASSERT(ClassTable(i).sname != NULL);
 			knh_ClassStruct_toAbstractAll(ctx, ClassTable(i).cstruct);
 		}
@@ -452,7 +452,7 @@ void knh_traverseSharedData(Ctx *ctx, knh_SharedData_t *share, knh_ftraverse ftr
 		ftr(ctx, UP(ClassTable(i).lname));
 	}
 
-	for(i = share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
+	for(i = (int)(share->ClassTableSize); i < KNH_TCLASS_SIZE; i++) {
 		DBG2_ASSERT(ClassTable(i).sname != NULL);
 		ftr(ctx, UP(ClassTable(i).class_cid));
 		ftr(ctx, UP(ClassTable(i).cmap));
@@ -474,7 +474,7 @@ void knh_traverseSharedData(Ctx *ctx, knh_SharedData_t *share, knh_ftraverse ftr
 		ftr(ctx, UP(ClassTable(i).cstruct));
 		ftr(ctx, UP(ClassTable(i).sname));
 	}
-	for(i = share->ClassTableSize; i < KNH_TCLASS_SIZE; i++) {
+	for(i = (int)(share->ClassTableSize); i < KNH_TCLASS_SIZE; i++) {
 		DBG2_ASSERT(ClassTable(i).sname != NULL);
 		ftr(ctx, UP(ClassTable(i).cstruct));
 		ftr(ctx, UP(ClassTable(i).sname));

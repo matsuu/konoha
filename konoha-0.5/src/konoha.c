@@ -57,20 +57,22 @@ main(int argc, char **argv)
 #endif
     konoha_t konoha = konoha_open(4096);
     int n = konoha_parseopt(konoha, argc, args);
+    int ret = EXIT_FAILURE;
     if(argc - n == 0) {
         //package_init(konoha.ctx);
         konoha_shell(konoha);
     }
     else {
         if(konoha_loadScript(konoha, args[n]) != -1) {
-            konoha_runMain(konoha, argc - n, args + n);
+            ret = konoha_runMain(konoha, argc - n, args + n);
         }
         else {
             fprintf(stderr, "[konoha] cannot open: %s\n", args[n]);
+            ret = EXIT_FAILURE;
         }
     }
     konoha_close(konoha);
-    return 0;
+    return ret;
 }
 
 

@@ -6,23 +6,13 @@
 
 #ifdef KONOHA_ON_LKM
 
-#include <linux/module.h>
-#include <linux/kernel.h>
-#include <linux/version.h>
-#include <linux/fs.h>
-#include <linux/cdev.h>
-#include <linux/init.h>
-#include <asm/uaccess.h>
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
-#include <linux/semaphore.h>
-#endif
-
 #include <konoha.h>
 #include <konoha/gen/konoha_knhapi_.h>
 
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("masahiro ide");
+
 
 enum {
     MAXCOPYBUF = 128
@@ -33,22 +23,19 @@ struct konohadev_t {
     struct cdev cdev;
     konoha_t  konoha;
     char* buffer;
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
+#ifdef KNH_ENABLE_SEMAPHORE
     struct semaphore sem;
 #endif
 };
 
 static const char *msg = "konohadev";
-static struct konohadev_t *konohadev_p;
+struct konohadev_t *konohadev_p;
 
 static int knh_dev_open (struct inode *inode , struct file *filp);
 static ssize_t knh_dev_read(struct file *filp, char __user *user_buf,
         size_t count, loff_t *offset);
-/*
-   static int knh_dev_ioctl (struct inode *inode, struct file *filp,
-   unsigned int cmd, unsigned long arg);
- */
-
+// static int knh_dev_ioctl (struct inode *inode, struct file *filp,
+//   unsigned int cmd, unsigned long arg);
 static ssize_t knh_dev_write(struct file *file,const char __user *buf,
         size_t count,loff_t *offp) ;
 
@@ -59,6 +46,26 @@ static struct file_operations knh_fops = {
     .write = knh_dev_write,
     //.ioctl = knh_dev_ioctl,
 };
+
+/*
+konoha_t *konoha_getCurrntKnh(const void *p)
+{
+    return &konohadev_p->konoha;
+}
+*/
+
+static inline void *konoha_malloc(const size_t size)
+{
+    // kzalloc : see linux/slab.h
+    void *p = kzalloc(size, GFP_KERNEL);
+    return p;
+}
+
+static inline void konoha_free(const void *p)
+{
+    if (p)
+        kfree(p);
+}
 
 static int knh_dev_open (struct inode* inode, struct file *filp)
 {
@@ -76,23 +83,23 @@ static ssize_t knh_dev_read (struct file* filp, char __user *user_buf,
 
     if(*offset > 0) return 0;
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
+#ifdef KNH_ENABLE_SEMAPHORE
     if(down_interruptible(&dev->sem)){
         return -ERESTARTSYS;
     }
 #endif
 
-    len = snprintf(buf,MAXCOPYBUF,"%s\n",dev->buffer);
+    len = snprintf(buf,sizeof(buf),"%s\n",dev->buffer);
 
     if(copy_to_user(user_buf,buf,len)){
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
+#ifdef KNH_ENABLE_SEMAPHORE
         up(&dev->sem);
 #endif
         printk(KERN_ALERT "%s: copy_to_user failed\n",msg);
         return -EFAULT;
     }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
+#ifdef KNH_ENABLE_SEMAPHORE
     up(&dev->sem);
 #endif
     *offset += len;
@@ -103,38 +110,39 @@ static ssize_t knh_dev_read (struct file* filp, char __user *user_buf,
 static ssize_t knh_dev_write(struct file *filp,const char __user *user_buf,
         size_t count,loff_t *offset) {
     char buf[MAXCOPYBUF];
-    char* knh_ret = NULL;
+    char*  ret = NULL;
     struct konohadev_t *dev = filp->private_data;
+    konoha_t konoha = dev->konoha;
     long len;
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
+#ifdef KNH_ENABLE_SEMAPHORE
     if(down_interruptible(&dev->sem)){
         return -ERESTARTSYS;
     }
 #endif
 
     len = copy_from_user(buf,user_buf,count);
-    memset(dev->buffer,0,sizeof(char)*MAXCOPYBUF);
     buf[count] = '\0';
-    printk("[%s][user_buf=%s]\n", __FUNCTION__,buf);
-    //printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "int fib(int n) { if (n==3) { return 1;}}"));
-    //printk(KERN_DEBUG "[%s]\n",konoha_eval(dev->konoha, "fib(10);"));
-    konoha_evalScript(dev->konoha,buf);
-    knh_ret = konoha_getStdOutBufferText(dev->konoha);
-    snprintf(dev->buffer,MAXCOPYBUF,"%s",knh_ret);
-    printk(KERN_DEBUG "[%s][dev->buffer=%s]\n",__FUNCTION__ ,dev->buffer);
+    memset(dev->buffer,0,sizeof(dev->buffer));
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
+    printk("[%s][user_buf=%s]\n", __FUNCTION__,buf);
+    konoha_evalScript(konoha,buf);
+    ret = konoha_getStdOutBufferText(konoha);
+    snprintf(dev->buffer,sizeof(dev->buffer),"%s",ret);
+    printk(KERN_DEBUG "[%s][dev->buffer=%s]\n",__FUNCTION__ ,dev->buffer);
+    printk(KERN_DEBUG "[%s][STDOUT=%s]\n",__FUNCTION__ ,ret);
+    printk(KERN_DEBUG "[%s][STDERR=%s]\n",__FUNCTION__ ,konoha_getStdErrBufferText(konoha));
+
+#ifdef KNH_ENABLE_SEMAPHORE
     up(&dev->sem);
 #endif
     *offset += count - len;
     return count -len;
-    //*offset = 0;
-    //return 1;
 }
 
 static void knh_dev_setup(struct konohadev_t *dev){
     int err = alloc_chrdev_region(&dev->id, 0, 1, msg);
+    size_t size = MAXCOPYBUF;
     if(err){
         printk(KERN_ALERT "%s: alloc_chrdev_region() failed (%d)\n",
                 msg,err);
@@ -142,11 +150,11 @@ static void knh_dev_setup(struct konohadev_t *dev){
     }
     cdev_init(&dev->cdev,&knh_fops);
     dev->cdev.owner = THIS_MODULE;
-    dev->konoha = konoha_open(128);
-    konoha_setOutputStreamBuffer(dev->konoha, 128,128);
-    dev->buffer = kmalloc(sizeof(char)*MAXCOPYBUF,GFP_KERNEL);
-    memset(dev->buffer,0,sizeof(char)*MAXCOPYBUF);
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,25))
+    dev->konoha = konoha_open(size);
+    konoha_setOutputStreamBuffer(dev->konoha, size,size);
+    dev->buffer = konoha_malloc(size);
+
+#ifdef KNH_ENABLE_SEMAPHORE
     init_MUTEX(&dev->sem);
 #endif
 
@@ -159,12 +167,13 @@ static void knh_dev_setup(struct konohadev_t *dev){
 
 // Start/Init function
 static int __init konoha_init(void) {
-    konohadev_p = kmalloc(sizeof(struct konohadev_t),GFP_KERNEL);
+    printk(KERN_ALERT "Hello konoha!\n");
+    konohadev_p = konoha_malloc(sizeof(struct konohadev_t));
     if(!konohadev_p){
         printk(KERN_ALERT "%s:kmalloc() failed\n",msg);
         return -ENOMEM;
     }
-    memset(konohadev_p,0,sizeof(struct konohadev_t));
+    
     knh_dev_setup(konohadev_p);
 
     return 0;
@@ -172,12 +181,13 @@ static int __init konoha_init(void) {
 
 // End/Cleanup function
 static void __exit konoha_exit(void) {
-    printk(KERN_ALERT "Goodbye!\n");
+    printk(KERN_ALERT "Goodbye konoha!\n");
     konoha_close(konohadev_p->konoha);
-    kfree(konohadev_p->buffer);
+    konoha_free(konohadev_p->buffer);
+
     cdev_del(&konohadev_p->cdev);
     unregister_chrdev_region(konohadev_p->id,1);
-    kfree(konohadev_p);
+    konoha_free(konohadev_p);
 }
 
 module_init(konoha_init);

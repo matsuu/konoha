@@ -530,7 +530,7 @@ knh_uri_t knh_cwb_getResourceId(Ctx *ctx, knh_cwb_t *cwb)
 String *knh_getResourceName(Ctx *ctx, knh_uri_t uri)
 {
 	String *s;
-	uri = URI_UNMASK(uri);
+	uri = (knh_uri_t) URI_UNMASK(uri);
 	KNH_LOCK(ctx, LOCK_SYSTBL, NULL);
 	s = (String*)knh_DictIdx_get__fast(DP(ctx->sys)->ResourceDictIdx, uri);
 	KNH_UNLOCK(ctx, LOCK_SYSTBL, NULL);

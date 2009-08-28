@@ -203,7 +203,7 @@ KNHAPI(knh_index_t) knh_bytes_rindex(knh_bytes_t v, knh_intptr_t ch)
 
 KNHAPI(knh_bytes_t) knh_bytes_mod(knh_bytes_t t, int ch)
 {
-	int i;
+	size_t i;
 	for(i = 0; i < t.len; i++) {
 		if(t.buf[i] == ch) {
 			t.buf = t.buf + i + 1;
@@ -218,8 +218,8 @@ KNHAPI(knh_bytes_t) knh_bytes_mod(knh_bytes_t t, int ch)
 
 KNHAPI(knh_bytes_t) knh_bytes_rmod(knh_bytes_t t, int ch)
 {
-	int i;
-	for(i = t.len - 1; i >= 0; i--) {
+	size_t i;
+	for(i = t.len - 1; /* i >= 0*/; i--) {
 		if(t.buf[i] == ch) {
 			t.buf = t.buf + i + 1;
 			t.len = t.len -(i+1);
@@ -235,7 +235,7 @@ KNHAPI(knh_bytes_t) knh_bytes_first(knh_bytes_t t, knh_intptr_t loc)
 {
 	knh_bytes_t t2;
 	t2.buf = t.buf;
-	t2.len = loc;
+	t2.len = (size_t) loc;
 	return t2;
 }
 
@@ -265,9 +265,11 @@ KNHAPI(knh_bytes_t) knh_bytes_skipscheme(knh_bytes_t t)
 KNHAPI(char*) knh_format_bytes(char *buf, size_t bufsiz, knh_bytes_t t)
 {
 	size_t i;
+	char* tb = (char *)t.buf;
+
 	for(i = 0; i < t.len; i++) {
 		if(bufsiz - 1 == i) break;
-		buf[i] = t.buf[i];
+		buf[i] = tb[i];
 	}
 	buf[i] = 0;
 	return buf;
@@ -275,16 +277,19 @@ KNHAPI(char*) knh_format_bytes(char *buf, size_t bufsiz, knh_bytes_t t)
 
 /* ------------------------------------------------------------------------ */
 
-KNHAPI(char*) knh_format_join2(char *buf, size_t bufsiz, knh_bytes_t t, knh_bytes_t t2)
+KNHAPI(char*) knh_format_join2(char *buf, size_t bufsiz, knh_bytes_t t1, knh_bytes_t t2)
 {
 	size_t i, j;
-	for(i = 0; i < t.len; i++) {
-		if(t.buf[i] == 0 || bufsiz - 1 == i) break;
-		buf[i] = t.buf[i];
+	char* tb1 = (char*)t1.buf;
+	char* tb2 = (char*)t2.buf;
+
+	for(i = 0; i < t1.len; i++) {
+		if(tb1[i] == 0 || bufsiz - 1 == i) break;
+		buf[i] = tb1[i];
 	}
 	for(j = 0; j < t2.len; j++) {
 		if(bufsiz - 1 == i + j) break;
-		buf[i+j] = t2.buf[j];
+		buf[i+j] = tb2[j];
 	}
 	buf[i+j] = 0;
 	return buf;
@@ -332,7 +337,7 @@ knh_bytes_t knh_bytes_trim(knh_bytes_t t /*, knh_intptr_t ch*/)
 
 int knh_bytes_parseint(knh_bytes_t t, knh_int_t *value)
 {
-	knh_uint_t n = 0, prev = 0, base = 10;
+	knh_int_t n = 0, prev = 0, base = 10;
 	size_t i = 0;
 
 	if(t.len > 1) {
@@ -349,7 +354,7 @@ int knh_bytes_parseint(knh_bytes_t t, knh_int_t *value)
 	}
 
 	for(;i < t.len; i++) {
-		int c = t.buf[i];
+		knh_int_t c = (knh_int_t)t.buf[i];
 		if('0' <= c && c <= '9') {
 			prev = n;
 			n = n * base + (c - '0');
