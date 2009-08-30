@@ -11,7 +11,7 @@ type system for static/dynamic typing, mappable class, and various experimental
 features. (under construction)
 
 Konoha is open source software and may be freely copied on the terms contained
-in the GNU Publice License 2.0. If you are interested in other form of license,
+in the GNU Lesser General Public License 3.0. If you are interested in other form of license,
 we are preparing "Konoha Software Foundation License 1.0".
 
 OVERVIEW OF KONOHA
